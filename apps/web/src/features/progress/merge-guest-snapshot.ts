@@ -1,3 +1,5 @@
+import { normalizeProjectSnapshots } from './project-snapshot'
+
 export function mergeGuestSnapshot({
   snapshot,
 }: {
@@ -9,12 +11,20 @@ export function mergeGuestSnapshot({
       badgeIds: string[]
       cardIds: string[]
       completedProjectIds: string[]
+      projectSnapshots?: Array<{
+        lessonId: string
+        updatedAt: string
+        blocks: Array<{ type: string }>
+      }>
     }
   }
 }) {
   const completedLessons = [...new Set(snapshot.progress.completedLessonIds)]
   const badgeIds = [...new Set(snapshot.progress.badgeIds)]
   const cardIds = [...new Set(snapshot.progress.cardIds)]
+  const projectSnapshots = normalizeProjectSnapshots(
+    snapshot.progress.projectSnapshots ?? [],
+  )
 
   return {
     childProfile: {
@@ -31,5 +41,6 @@ export function mergeGuestSnapshot({
       cardDefinitionId,
       sourceType: 'guest_merge',
     })),
+    projectSnapshots,
   }
 }

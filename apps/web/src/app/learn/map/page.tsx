@@ -1,15 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 
-import { storyPathLessons } from '@/content/lessons/story-path'
+import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
+import { MapView } from '@/features/lessons/map-view'
 import {
   defaultOnboardingSession,
   readOnboardingSession,
   subscribeOnboardingSession,
 } from '@/features/onboarding/onboarding-session'
-import { MapView } from '@/features/lessons/map-view'
 import {
   defaultGuestProgress,
   readGuestProgress,
@@ -23,6 +23,8 @@ const startLevelLabels = {
 } as const
 
 export default function LearnMapPage() {
+  const { allLessons } = buildLaunchMap()
+  const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const progress = useSyncExternalStore(
     subscribeGuestProgress,
     readGuestProgress,
@@ -35,6 +37,29 @@ export default function LearnMapPage() {
   )
   const recommendedLevel = onboarding.recommendedLevel ?? 'starter'
 
+  useEffect(() => {
+    let isActive = true
+
+    fetch('/api/course-access')
+      .then(async (response) => {
+        if (!response.ok) {
+          return { hasLaunchPack: false }
+        }
+
+        return (await response.json()) as { hasLaunchPack?: boolean }
+      })
+      .then((payload) => {
+        if (isActive) {
+          setHasCourseEntitlement(Boolean(payload.hasLaunchPack))
+        }
+      })
+      .catch(() => {})
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
   return (
     <main className="min-h-screen bg-[#eef8ff] px-6 py-10">
       <section className="mx-auto max-w-5xl space-y-6">
@@ -45,8 +70,8 @@ export default function LearnMapPage() {
             </p>
             <h1 className="text-3xl font-black text-slate-950">学习地图</h1>
             <p className="mt-2 text-sm text-slate-600">
-              已获得 {progress.stars} 颗星星 · 已获得 {progress.badgeIds.length} 枚徽章 ·
-              已收集 {progress.cardIds.length} 张卡片
+              已获得 {progress.stars} 颗星星 · 已获得 {progress.badgeIds.length}{' '}
+              枚徽章 · 已收集 {progress.cardIds.length} 张卡片
             </p>
           </div>
           <Link
@@ -56,7 +81,11 @@ export default function LearnMapPage() {
             打开我的卡册
           </Link>
         </header>
-        <MapView lessons={storyPathLessons} progress={progress} />
+        <MapView
+          hasCourseEntitlement={hasCourseEntitlement}
+          lessons={allLessons}
+          progress={progress}
+        />
       </section>
     </main>
   )

@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import { useSyncExternalStore } from 'react'
 
 import { cardDefinitions } from '@/content/cards/card-definitions'
-import { storyPathLessons } from '@/content/lessons/story-path'
+import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import {
   defaultGuestProgress,
   readGuestProgress,
@@ -22,7 +22,8 @@ export default function ProjectCompletePage() {
     readGuestProgress,
     () => defaultGuestProgress,
   )
-  const lesson = storyPathLessons.find((item) => item.id === projectId)
+  const { allLessons } = buildLaunchMap()
+  const lesson = allLessons.find((item) => item.id === projectId)
 
   if (!lesson) {
     return <main className="p-6 text-lg font-semibold">没有找到这个作品。</main>
@@ -41,16 +42,17 @@ export default function ProjectCompletePage() {
     <main className="min-h-screen bg-[#fff9ec] px-6 py-10">
       <section className="mx-auto max-w-4xl rounded-[2rem] bg-white p-8 text-center shadow-sm">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-orange-500">
-          完成作品
+          作品完成
         </p>
         <h1
           className="mt-4 text-4xl font-black text-slate-950"
           data-testid="project-complete-heading"
         >
-          你已经做出了第一个会动的故事
+          你完成了《{lesson.title}》
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-600">
-          当前累计 {progress.stars} 颗星星，已收集 {progress.cardIds.length} 张卡片。
+          当前累计 {progress.stars} 颗星星，已收集 {progress.cardIds.length}{' '}
+          张卡片。现在可以回到学习地图，继续挑战下一课。
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <span className="rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-700">

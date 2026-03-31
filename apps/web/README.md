@@ -1,29 +1,32 @@
-# Kids Coding Web App
+# Kids Coding Family Launch App
 
-## Setup
+## 启动准备
 
-1. Copy `.env.example` to `.env.local`
-2. Fill in `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`
-3. Install dependencies: `npm install`
-4. Start Supabase locally: `npx supabase db start`
-5. Run migrations: `npx supabase migration up`
-6. Start the app: `npm run dev`
+1. 安装依赖：`npm install`
+2. 配置 `.env.local`：
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_APP_URL`
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+3. 重建本地数据库：`npx supabase db reset`
+4. 启动开发环境：`npm run dev`
 
-## Commands
+## 首发验收命令
 
 - `npm run lint`
 - `npm run test:run`
 - `npm run test:e2e`
 - `npm run build`
 
-## Main Routes
+## 关键路由
 
 - `/`
-- `/onboarding/age`
-- `/onboarding/check`
 - `/learn/map`
-- `/learn/lesson/move-character`
-- `/project/move-character/complete`
-- `/cards`
-- `/auth/bind`
+- `/learn/lesson/trial-01-move-character`
+- `/learn/remedial/remedial-click-trigger`
+- `/project/trial-03-scene-story/complete`
+- `/parent/purchase`
 - `/parent/overview`
+- `/admin`

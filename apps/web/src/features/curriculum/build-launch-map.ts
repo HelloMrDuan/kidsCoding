@@ -1,0 +1,15 @@
+import { launchLessons } from '@/content/curriculum/launch-lessons'
+import { remedialLessons } from '@/content/curriculum/remedial-lessons'
+
+export function buildLaunchMap() {
+  const allLessons = [...launchLessons].sort(
+    (left, right) => left.sortOrder - right.sortOrder,
+  )
+
+  return {
+    allLessons,
+    trialLessons: allLessons.filter((item) => item.phase === 'trial'),
+    paidLessons: allLessons.filter((item) => item.phase === 'course'),
+    remedials: remedialLessons,
+  }
+}
