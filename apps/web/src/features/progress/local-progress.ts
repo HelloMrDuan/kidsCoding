@@ -9,6 +9,11 @@ export type GuestProgress = {
   cardIds: string[]
   streakDays: number
   completedProjectIds: string[]
+  projectSnapshots: Array<{
+    lessonId: string
+    updatedAt: string
+    blocks: Array<{ type: string }>
+  }>
 }
 
 export const defaultGuestProgress: GuestProgress = {
@@ -19,6 +24,7 @@ export const defaultGuestProgress: GuestProgress = {
   cardIds: [],
   streakDays: 1,
   completedProjectIds: [],
+  projectSnapshots: [],
 }
 
 let cachedGuestRaw: string | null | undefined
