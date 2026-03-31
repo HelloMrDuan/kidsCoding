@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
 import { launchTemplates } from '@/content/curriculum/launch-lessons'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
+import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { evaluateStep } from '@/features/lessons/blockly/evaluate-step'
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
@@ -35,12 +36,35 @@ export default function LessonPage() {
   const blocksRef = useRef<Array<{ type: string }>>([])
   const [feedback, setFeedback] = useState(DEFAULT_FEEDBACK)
   const [failedAttempts, setFailedAttempts] = useState(0)
-  const hasCourseEntitlement = false
+  const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
 
   function handleSnapshotChange(nextBlocks: Array<{ type: string }>) {
     blocksRef.current = nextBlocks
     setBlocks(nextBlocks)
   }
+
+  useEffect(() => {
+    let isActive = true
+
+    fetch('/api/course-access')
+      .then(async (response) => {
+        if (!response.ok) {
+          return { hasLaunchPack: false }
+        }
+
+        return (await response.json()) as { hasLaunchPack?: boolean }
+      })
+      .then((payload) => {
+        if (isActive) {
+          setHasCourseEntitlement(Boolean(payload.hasLaunchPack))
+        }
+      })
+      .catch(() => {})
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   if (!lesson) {
     return <main className="p-6 text-lg font-semibold">没有找到这一课。</main>
@@ -60,6 +84,10 @@ export default function LessonPage() {
   const templateName =
     launchTemplates.find((item) => item.id === currentLesson.templateId)?.name ??
     '故事模板'
+  const courseAccess = resolveCourseAccess({
+    lessonPhase: currentLesson.phase,
+    hasLaunchPack: hasCourseEntitlement,
+  })
 
   function handleStartRemedial(remedialId: string) {
     router.push(
@@ -121,7 +149,7 @@ export default function LessonPage() {
           feedback={feedback}
           hintCopy={hintCopy}
           instruction={step.instruction}
-          isLocked={currentLesson.phase === 'course' && !hasCourseEntitlement}
+          isLocked={courseAccess === 'locked'}
           lessonGoal={currentLesson.goal}
           lessonTitle={currentLesson.title}
           onCompleteStep={handleNext}

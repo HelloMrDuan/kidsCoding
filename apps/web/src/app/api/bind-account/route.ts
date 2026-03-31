@@ -84,5 +84,22 @@ export async function POST(request: Request) {
     )
   }
 
+  if (merged.projectSnapshots.length > 0) {
+    await admin.from('project_snapshots').upsert(
+      merged.projectSnapshots.map((snapshot) => ({
+        owner_guest_id: guestId,
+        owner_user_id: user.id,
+        lesson_id: snapshot.lessonId,
+        snapshot: {
+          blocks: snapshot.blocks,
+        },
+        updated_at: snapshot.updatedAt,
+      })),
+      {
+        onConflict: 'owner_user_id,lesson_id',
+      },
+    )
+  }
+
   return NextResponse.json({ ok: true })
 }

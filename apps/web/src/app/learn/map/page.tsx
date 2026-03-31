@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { MapView } from '@/features/lessons/map-view'
@@ -24,6 +24,7 @@ const startLevelLabels = {
 
 export default function LearnMapPage() {
   const { allLessons } = buildLaunchMap()
+  const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const progress = useSyncExternalStore(
     subscribeGuestProgress,
     readGuestProgress,
@@ -35,6 +36,29 @@ export default function LearnMapPage() {
     () => defaultOnboardingSession,
   )
   const recommendedLevel = onboarding.recommendedLevel ?? 'starter'
+
+  useEffect(() => {
+    let isActive = true
+
+    fetch('/api/course-access')
+      .then(async (response) => {
+        if (!response.ok) {
+          return { hasLaunchPack: false }
+        }
+
+        return (await response.json()) as { hasLaunchPack?: boolean }
+      })
+      .then((payload) => {
+        if (isActive) {
+          setHasCourseEntitlement(Boolean(payload.hasLaunchPack))
+        }
+      })
+      .catch(() => {})
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   return (
     <main className="min-h-screen bg-[#eef8ff] px-6 py-10">
@@ -58,7 +82,7 @@ export default function LearnMapPage() {
           </Link>
         </header>
         <MapView
-          hasCourseEntitlement={false}
+          hasCourseEntitlement={hasCourseEntitlement}
           lessons={allLessons}
           progress={progress}
         />

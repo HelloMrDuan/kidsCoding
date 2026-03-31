@@ -33,6 +33,10 @@ create table if not exists project_snapshots (
   updated_at timestamptz not null default timezone('utc', now())
 );
 
+create unique index if not exists project_snapshots_user_lesson_idx
+  on project_snapshots (owner_user_id, lesson_id)
+  where owner_user_id is not null;
+
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,

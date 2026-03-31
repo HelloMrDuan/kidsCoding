@@ -17,7 +17,8 @@
     "blockly": "latest",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "stripe": "^21.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "latest",
