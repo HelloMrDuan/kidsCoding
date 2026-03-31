@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 
 import { launchCoursePack } from '@/features/billing/course-pack'
 import { buildParentOverview } from '@/features/parent/build-parent-overview'
+import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export default async function ParentOverviewPage({
@@ -10,6 +11,10 @@ export default async function ParentOverviewPage({
 }: {
   searchParams: Promise<{ purchase?: string }>
 }) {
+  if (!hasSupabaseEnv()) {
+    redirect('/auth/bind')
+  }
+
   const supabase = await createServerSupabaseClient()
   const { data: authData } = await supabase.auth.getUser()
   const user = authData.user

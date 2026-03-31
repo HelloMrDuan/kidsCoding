@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server'
 
 import { launchCoursePack } from '@/features/billing/course-pack'
+import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export async function GET() {
+  if (!hasSupabaseEnv()) {
+    return NextResponse.json({ hasLaunchPack: false })
+  }
+
   const supabase = await createServerSupabaseClient()
   const { data: authData } = await supabase.auth.getUser()
   const user = authData.user

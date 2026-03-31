@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server'
 
 import { validateCourseContent } from '@/features/admin/validate-course-content'
+import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export async function POST(request: Request) {
-  const supabase = await createServerSupabaseClient()
-  const { data: authData } = await supabase.auth.getUser()
+  if (hasSupabaseEnv()) {
+    const supabase = await createServerSupabaseClient()
+    const { data: authData } = await supabase.auth.getUser()
 
-  if (!authData.user) {
-    return NextResponse.json({ ok: false, issues: [] }, { status: 401 })
+    if (!authData.user) {
+      return NextResponse.json({ ok: false, issues: [] }, { status: 401 })
+    }
   }
 
   const payload = (await request.json()) as {

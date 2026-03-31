@@ -79,6 +79,7 @@ export function GuidedLessonShell({
         ) : null}
         <button
           className="w-full rounded-full bg-orange-500 px-5 py-3 font-bold text-white"
+          data-testid="lesson-complete-step"
           onClick={onCompleteStep}
           type="button"
         >

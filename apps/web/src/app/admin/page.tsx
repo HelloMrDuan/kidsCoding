@@ -2,14 +2,17 @@ import { redirect } from 'next/navigation'
 
 import { CourseEditor } from '@/features/admin/course-editor'
 import { loadLaunchCurriculum } from '@/features/curriculum/load-launch-curriculum'
+import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export default async function AdminPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: authData } = await supabase.auth.getUser()
+  if (hasSupabaseEnv()) {
+    const supabase = await createServerSupabaseClient()
+    const { data: authData } = await supabase.auth.getUser()
 
-  if (!authData.user) {
-    redirect('/auth/bind')
+    if (!authData.user) {
+      redirect('/auth/bind')
+    }
   }
 
   const curriculum = await loadLaunchCurriculum()

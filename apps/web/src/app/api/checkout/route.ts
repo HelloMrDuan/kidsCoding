@@ -3,10 +3,14 @@ import { NextResponse } from 'next/server'
 import { launchCoursePack } from '@/features/billing/course-pack'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createStripeClient } from '@/lib/billing/stripe'
-import { getRequiredEnv } from '@/lib/env'
+import { getRequiredEnv, hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export async function POST() {
+  if (!hasSupabaseEnv()) {
+    return NextResponse.redirect('/parent/purchase?purchase=unavailable', 303)
+  }
+
   const supabase = await createServerSupabaseClient()
   const admin = createAdminClient()
   const { data: authData } = await supabase.auth.getUser()

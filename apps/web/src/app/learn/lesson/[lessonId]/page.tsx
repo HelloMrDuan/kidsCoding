@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
 import { launchTemplates } from '@/content/curriculum/launch-lessons'
@@ -38,10 +38,10 @@ export default function LessonPage() {
   const [failedAttempts, setFailedAttempts] = useState(0)
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
 
-  function handleSnapshotChange(nextBlocks: Array<{ type: string }>) {
+  const handleSnapshotChange = useCallback((nextBlocks: Array<{ type: string }>) => {
     blocksRef.current = nextBlocks
     setBlocks(nextBlocks)
-  }
+  }, [])
 
   useEffect(() => {
     let isActive = true
