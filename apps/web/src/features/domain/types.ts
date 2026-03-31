@@ -47,3 +47,38 @@ export type LessonDefinition = {
   steps: LessonStep[]
   rewardCardId: string
 }
+
+export type LessonPhase = 'trial' | 'course'
+
+export type LessonMode = 'guided' | 'template'
+
+export type HintLayer = {
+  id: string
+  mode: 'repeat_goal' | 'show_block' | 'offer_remedial'
+  copy: string
+  remedialLessonId?: string
+}
+
+export type RemedialLessonDefinition = {
+  id: string
+  title: string
+  focus: string
+  returnToLessonId: string
+  returnToStepId: string
+  steps: LessonStep[]
+}
+
+export type LaunchLessonDefinition = LessonDefinition & {
+  phase: LessonPhase
+  mode: LessonMode
+  sortOrder: number
+  hintLayers: HintLayer[]
+  templateId?: string
+}
+
+export type ProjectTemplateDefinition = {
+  id: string
+  name: string
+  starterScene: string
+  starterCharacters: string[]
+}
