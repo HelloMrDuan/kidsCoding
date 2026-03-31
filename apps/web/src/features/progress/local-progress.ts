@@ -18,7 +18,7 @@ export type GuestProgress = {
 
 export const defaultGuestProgress: GuestProgress = {
   completedLessonIds: [],
-  currentLessonId: 'move-character',
+  currentLessonId: 'trial-01-move-character',
   stars: 0,
   badgeIds: [],
   cardIds: [],
