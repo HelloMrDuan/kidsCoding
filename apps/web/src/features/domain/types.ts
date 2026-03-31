@@ -74,6 +74,7 @@ export type LaunchLessonDefinition = LessonDefinition & {
   sortOrder: number
   hintLayers: HintLayer[]
   templateId?: string
+  parentAdvice?: string
 }
 
 export type ProjectTemplateDefinition = {
@@ -81,4 +82,50 @@ export type ProjectTemplateDefinition = {
   name: string
   starterScene: string
   starterCharacters: string[]
+}
+
+export type LaunchLessonPayload = {
+  steps: LessonStep[]
+  hintLayers: HintLayer[]
+  templateId?: string
+  parentAdvice?: string
+}
+
+export type LessonConfigRow = {
+  id: string
+  phase: LessonPhase
+  mode: LessonMode
+  sort_order: number
+  title: string
+  goal: string
+  payload: LaunchLessonPayload
+  updated_at?: string | null
+  updated_by?: string | null
+}
+
+export type LessonPublicationRow = {
+  lesson_id: string
+  phase: LessonPhase
+  mode: LessonMode
+  sort_order: number
+  title: string
+  goal: string
+  payload: LaunchLessonPayload
+  published_at: string
+  published_by: string | null
+}
+
+export type GeneratedLessonCopy = {
+  title: string
+  goal: string
+  steps: Array<{
+    id: string
+    title: string
+    instruction: string
+  }>
+  hintLayers: Array<{
+    id: string
+    copy: string
+  }>
+  parentAdvice?: string
 }
