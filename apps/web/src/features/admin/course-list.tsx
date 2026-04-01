@@ -20,6 +20,7 @@ export function CourseList({ lessons }: { lessons: AdminLessonSummary[] }) {
           key={lesson.id}
           href={`/admin/lessons/${lesson.id}`}
           className="rounded-[1.5rem] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          data-testid={`admin-lesson-link-${lesson.id}`}
         >
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="space-y-2">

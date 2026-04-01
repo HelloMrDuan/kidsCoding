@@ -160,7 +160,6 @@ export function LessonEditor({
 
     if (result.ok) {
       setMessage('整套课程骨架已生成')
-      router.refresh()
       return
     }
 
@@ -180,7 +179,6 @@ export function LessonEditor({
     if (result.ok && result.lesson) {
       setFormLesson(result.lesson)
       setMessage('AI 草稿已生成，请审核后再发布')
-      router.refresh()
       return
     }
 
@@ -215,6 +213,7 @@ export function LessonEditor({
             <input
               className="rounded-2xl border border-slate-200 px-4 py-3 text-base font-semibold text-slate-900"
               aria-label="课程标题"
+              data-testid="admin-lesson-title"
               value={formLesson.title}
               onChange={(event) =>
                 setFormLesson((current) => ({
@@ -230,6 +229,7 @@ export function LessonEditor({
             <textarea
               className="min-h-28 rounded-2xl border border-slate-200 px-4 py-3 text-base font-semibold text-slate-900"
               aria-label="课程目标"
+              data-testid="admin-lesson-goal"
               value={formLesson.goal}
               onChange={(event) =>
                 setFormLesson((current) => ({
@@ -254,6 +254,7 @@ export function LessonEditor({
                     <input
                       className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base font-semibold text-slate-900"
                       aria-label={`步骤 ${index + 1} 标题`}
+                      data-testid={`admin-step-title-${step.id}`}
                       value={step.title}
                       onChange={(event) =>
                         updateStep(step.id, 'title', event.target.value)
@@ -267,6 +268,7 @@ export function LessonEditor({
                     <textarea
                       className="min-h-24 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base font-semibold text-slate-900"
                       aria-label={`步骤 ${index + 1} 说明`}
+                      data-testid={`admin-step-instruction-${step.id}`}
                       value={step.instruction}
                       onChange={(event) =>
                         updateStep(step.id, 'instruction', event.target.value)
@@ -285,6 +287,7 @@ export function LessonEditor({
           <button
             type="button"
             className="rounded-full border border-sky-300 px-5 py-3 font-bold text-sky-700 disabled:cursor-not-allowed disabled:text-sky-300"
+            data-testid="admin-generate-skeleton"
             disabled={pendingAction !== 'idle'}
             onClick={handleGenerateSkeleton}
           >
@@ -295,6 +298,7 @@ export function LessonEditor({
           <button
             type="button"
             className="rounded-full border border-emerald-300 px-5 py-3 font-bold text-emerald-700 disabled:cursor-not-allowed disabled:text-emerald-300"
+            data-testid="admin-generate-draft"
             disabled={pendingAction !== 'idle'}
             onClick={handleGenerateDraft}
           >
@@ -310,6 +314,7 @@ export function LessonEditor({
           <button
             type="button"
             className="rounded-full bg-amber-500 px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:bg-amber-300"
+            data-testid="admin-save-draft"
             disabled={pendingAction !== 'idle'}
             onClick={handleSaveDraft}
           >
@@ -318,6 +323,7 @@ export function LessonEditor({
           <button
             type="button"
             className="rounded-full bg-slate-900 px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
+            data-testid="admin-publish-lesson"
             disabled={pendingAction !== 'idle'}
             onClick={handlePublish}
           >
@@ -326,6 +332,7 @@ export function LessonEditor({
           <button
             type="button"
             className="rounded-full border border-slate-300 px-5 py-3 font-bold text-slate-800 disabled:cursor-not-allowed disabled:text-slate-400"
+            data-testid="admin-rollback-lesson"
             disabled={pendingAction !== 'idle'}
             onClick={handleRollback}
           >
