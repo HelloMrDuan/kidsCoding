@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
+import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
 import { MapView } from '@/features/lessons/map-view'
 import {
   defaultOnboardingSession,
@@ -23,7 +24,8 @@ const startLevelLabels = {
 } as const
 
 export default function LearnMapPage() {
-  const { allLessons } = buildLaunchMap()
+  const curriculum = useLaunchCurriculum()
+  const { allLessons } = buildLaunchMap(curriculum.lessons)
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const progress = useSyncExternalStore(
     subscribeGuestProgress,

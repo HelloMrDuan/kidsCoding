@@ -84,6 +84,18 @@ export type ProjectTemplateDefinition = {
   starterCharacters: string[]
 }
 
+export type LaunchCurriculum = {
+  lessons: LaunchLessonDefinition[]
+  remedials: RemedialLessonDefinition[]
+  templates: ProjectTemplateDefinition[]
+  audioAssets: Array<{
+    id: string
+    lessonId: string
+    usageType: string
+    provider: string
+  }>
+}
+
 export type LaunchLessonPayload = {
   steps: LessonStep[]
   hintLayers: HintLayer[]

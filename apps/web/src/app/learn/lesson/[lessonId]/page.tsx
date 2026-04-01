@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
-import { launchTemplates } from '@/content/curriculum/launch-lessons'
-import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
+import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
+import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
 import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { evaluateStep } from '@/features/lessons/blockly/evaluate-step'
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
@@ -21,7 +21,7 @@ import {
 import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
 import { awardLessonCompletion } from '@/features/rewards/award-lesson-completion'
 
-const DEFAULT_FEEDBACK = '先按提示完成这一小步。'
+const DEFAULT_FEEDBACK = '鍏堟寜鎻愮ず瀹屾垚杩欎竴灏忔銆?'
 
 export default function LessonPage() {
   const params = useParams<{ lessonId: string }>()
@@ -29,7 +29,8 @@ export default function LessonPage() {
   const lessonId = Array.isArray(params.lessonId)
     ? params.lessonId[0]
     : params.lessonId
-  const { allLessons } = buildLaunchMap()
+  const curriculum = useLaunchCurriculum()
+  const { allLessons } = buildLaunchMap(curriculum.lessons)
   const lesson = allLessons.find((item) => item.id === lessonId)
   const [stepIndex, setStepIndex] = useState(0)
   const [blocks, setBlocks] = useState<Array<{ type: string }>>([])
@@ -67,7 +68,11 @@ export default function LessonPage() {
   }, [])
 
   if (!lesson) {
-    return <main className="p-6 text-lg font-semibold">没有找到这一课。</main>
+    return (
+      <main className="p-6 text-lg font-semibold">
+        濞屸剝婀侀幍鎯у煂鏉╂瑤绔寸拠淇扁偓?
+      </main>
+    )
   }
 
   const currentLesson = lesson
@@ -82,8 +87,8 @@ export default function LessonPage() {
       ? hintState.activeHint?.remedialLessonId
       : undefined
   const templateName =
-    launchTemplates.find((item) => item.id === currentLesson.templateId)?.name ??
-    '故事模板'
+    curriculum.templates.find((item) => item.id === currentLesson.templateId)
+      ?.name ?? '鏁呬簨妯℃澘'
   const courseAccess = resolveCourseAccess({
     lessonPhase: currentLesson.phase,
     hasLaunchPack: hasCourseEntitlement,
@@ -105,7 +110,7 @@ export default function LessonPage() {
 
       setFailedAttempts(nextFailedAttempts)
       setFeedback(
-        nextHintState.activeHint?.copy ?? '再检查一下积木顺序，然后继续试试。',
+        nextHintState.activeHint?.copy ?? '鍐嶆鏌ヤ竴涓嬬Н鏈ㄩ『搴忥紝鐒跺悗缁х画璇曡瘯銆?',
       )
       return
     }
@@ -114,7 +119,7 @@ export default function LessonPage() {
 
     if (stepIndex < currentLesson.steps.length - 1) {
       setStepIndex(stepIndex + 1)
-      setFeedback('太好了，继续下一步。')
+      setFeedback('澶ソ浜嗭紝缁х画涓嬩竴姝ャ€?')
       return
     }
 
@@ -155,7 +160,7 @@ export default function LessonPage() {
           onCompleteStep={handleNext}
           onStartRemedial={handleStartRemedial}
           remedialLessonId={remedialLessonId}
-          stepTitle={`第 ${stepIndex + 1} 步 · ${step.title}`}
+          stepTitle={`绗?${stepIndex + 1} 姝?路 ${step.title}`}
         >
           {currentLesson.mode === 'template' ? (
             <TemplateStoryBuilder

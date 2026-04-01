@@ -1,24 +1,26 @@
-import { launchLessons, launchTemplates } from '@/content/curriculum/launch-lessons'
-import { remedialLessons } from '@/content/curriculum/remedial-lessons'
+import { mergePublishedLessons } from '@/features/admin/launch-curriculum-records'
+import { createLaunchCurriculumRepository } from '@/features/admin/launch-curriculum-repository'
+import type { LaunchCurriculum } from '@/features/domain/types'
+import { hasServiceRoleEnv } from '@/lib/env'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { createSeedLaunchCurriculum } from './seed-launch-curriculum'
 
-export async function loadLaunchCurriculum() {
-  return {
-    lessons: launchLessons,
-    remedials: remedialLessons,
-    templates: launchTemplates,
-    audioAssets: [
-      ...launchLessons.map((lesson) => ({
-        id: `${lesson.id}-voice-guide`,
-        lessonId: lesson.id,
-        usageType: '课程引导语音',
-        provider: '核心课程真人配音',
-      })),
-      ...remedialLessons.map((lesson) => ({
-        id: `${lesson.id}-voice-review`,
-        lessonId: lesson.id,
-        usageType: '补课回顾语音',
-        provider: 'AI 语音提示',
-      })),
-    ],
+export async function loadLaunchCurriculum(): Promise<LaunchCurriculum> {
+  const seed = createSeedLaunchCurriculum()
+
+  if (!hasServiceRoleEnv()) {
+    return seed
+  }
+
+  try {
+    const repository = createLaunchCurriculumRepository(createAdminClient())
+    const publicationRows = await repository.loadPublishedLessons()
+
+    return {
+      ...seed,
+      lessons: mergePublishedLessons(seed.lessons, publicationRows),
+    }
+  } catch {
+    return seed
   }
 }

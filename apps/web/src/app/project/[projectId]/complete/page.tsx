@@ -6,6 +6,7 @@ import { useSyncExternalStore } from 'react'
 
 import { cardDefinitions } from '@/content/cards/card-definitions'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
+import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
 import {
   defaultGuestProgress,
   readGuestProgress,
@@ -22,7 +23,8 @@ export default function ProjectCompletePage() {
     readGuestProgress,
     () => defaultGuestProgress,
   )
-  const { allLessons } = buildLaunchMap()
+  const curriculum = useLaunchCurriculum()
+  const { allLessons } = buildLaunchMap(curriculum.lessons)
   const lesson = allLessons.find((item) => item.id === projectId)
 
   if (!lesson) {
