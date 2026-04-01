@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 
+import { assertAdminUser } from '@/features/admin/admin-auth'
 import { CourseEditor } from '@/features/admin/course-editor'
 import { loadLaunchCurriculum } from '@/features/curriculum/load-launch-curriculum'
 import { hasSupabaseEnv } from '@/lib/env'
@@ -10,7 +11,9 @@ export default async function AdminPage() {
     const supabase = await createServerSupabaseClient()
     const { data: authData } = await supabase.auth.getUser()
 
-    if (!authData.user) {
+    try {
+      assertAdminUser(authData.user)
+    } catch {
       redirect('/auth/bind')
     }
   }

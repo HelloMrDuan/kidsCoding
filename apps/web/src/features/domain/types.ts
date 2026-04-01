@@ -115,6 +115,19 @@ export type LessonPublicationRow = {
   published_by: string | null
 }
 
+export type LessonPublicationBackupRow = {
+  lesson_id: string
+  phase: LessonPhase
+  mode: LessonMode
+  sort_order: number
+  title: string
+  goal: string
+  payload: LaunchLessonPayload
+  source_published_at?: string | null
+  backed_up_at?: string | null
+  backed_up_by?: string | null
+}
+
 export type GeneratedLessonCopy = {
   title: string
   goal: string
@@ -129,3 +142,28 @@ export type GeneratedLessonCopy = {
   }>
   parentAdvice?: string
 }
+
+export type CourseContentValidationIssue = {
+  code:
+    | 'encoding_suspect'
+    | 'title_required'
+    | 'goal_required'
+    | 'step_title_required'
+    | 'step_instruction_required'
+  lessonId: string
+  value: string
+}
+
+export type EditableLaunchLesson = Pick<
+  LaunchLessonDefinition,
+  | 'id'
+  | 'phase'
+  | 'mode'
+  | 'sortOrder'
+  | 'title'
+  | 'goal'
+  | 'steps'
+  | 'hintLayers'
+  | 'templateId'
+  | 'parentAdvice'
+>

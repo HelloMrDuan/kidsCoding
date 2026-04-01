@@ -10,5 +10,7 @@ playwright-report/
 .env.local
 .env.*.local
 .supabase/
+supabase/.temp/
+apps/web/supabase/.temp/
 .DS_Store
 Thumbs.db
