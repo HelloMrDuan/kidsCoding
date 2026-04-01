@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 
 import { assertAdminUser } from '@/features/admin/admin-auth'
-import { CourseEditor } from '@/features/admin/course-editor'
-import { loadLaunchCurriculum } from '@/features/curriculum/load-launch-curriculum'
+import { CourseList } from '@/features/admin/course-list'
+import { loadAdminLessonSummaries } from '@/features/admin/load-admin-lessons'
 import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
@@ -18,7 +18,7 @@ export default async function AdminPage() {
     }
   }
 
-  const curriculum = await loadLaunchCurriculum()
+  const lessons = await loadAdminLessonSummaries()
 
   return (
     <main className="min-h-screen bg-[#fffaf2] px-6 py-8">
@@ -27,13 +27,11 @@ export default async function AdminPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-amber-600">
             内容后台
           </p>
-          <h1 className="text-4xl font-black text-slate-950">
-            课程和提示管理
-          </h1>
+          <h1 className="text-4xl font-black text-slate-950">课程列表</h1>
         </header>
-        <CourseEditor curriculum={curriculum} />
+        <CourseList lessons={lessons} />
         <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
-          这一页同时维护课程步骤、提示文案和语音资源。发布前会先做字符安全校验，避免中文异常内容进入线上。
+          先进入单课编辑页修改课程标题、目标和步骤文案。保存草稿不会影响孩子端，发布后才会切换线上内容。
         </p>
       </section>
     </main>

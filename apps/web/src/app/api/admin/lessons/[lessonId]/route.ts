@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { assertAdminUser } from '@/features/admin/admin-auth'
+import { hasUnpublishedLessonChanges } from '@/features/admin/launch-curriculum-records'
 import { createLaunchCurriculumRepository } from '@/features/admin/launch-curriculum-repository'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { hasServiceRoleEnv, hasSupabaseEnv } from '@/lib/env'
@@ -31,11 +32,6 @@ export async function GET(
     lesson,
     draftUpdatedAt: draft?.updated_at ?? null,
     publishedAt: publication?.published_at ?? null,
-    hasUnpublishedChanges: draft
-      ? !publication ||
-        draft.title !== publication.title ||
-        draft.goal !== publication.goal ||
-        JSON.stringify(draft.payload) !== JSON.stringify(publication.payload)
-      : false,
+    hasUnpublishedChanges: hasUnpublishedLessonChanges(draft, publication),
   })
 }

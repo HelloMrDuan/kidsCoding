@@ -79,6 +79,28 @@ export function mergePublishedLessons(
   })
 }
 
+export function hasUnpublishedLessonChanges(
+  draft: Pick<LessonConfigRow, 'title' | 'goal' | 'payload'> | null | undefined,
+  publication:
+    | Pick<LessonPublicationRow, 'title' | 'goal' | 'payload'>
+    | null
+    | undefined,
+) {
+  if (!draft) {
+    return false
+  }
+
+  if (!publication) {
+    return true
+  }
+
+  return (
+    draft.title !== publication.title ||
+    draft.goal !== publication.goal ||
+    JSON.stringify(draft.payload) !== JSON.stringify(publication.payload)
+  )
+}
+
 export function applyGeneratedLessonCopy(
   current: LaunchLessonDefinition,
   generated: GeneratedLessonCopy,

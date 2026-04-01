@@ -179,3 +179,13 @@ export type EditableLaunchLesson = Pick<
   | 'templateId'
   | 'parentAdvice'
 >
+
+export type AdminLessonSummary = {
+  id: string
+  title: string
+  phase: LessonPhase
+  sortOrder: number
+  draftUpdatedAt?: string | null
+  publishedAt?: string | null
+  hasUnpublishedChanges: boolean
+}

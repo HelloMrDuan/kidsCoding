@@ -4,6 +4,7 @@ import { launchLessons } from '@/content/curriculum/launch-lessons'
 
 import {
   applyGeneratedLessonCopy,
+  hasUnpublishedLessonChanges,
   mergePublishedLessons,
   resolveAdminLessonRecord,
 } from './launch-curriculum-records'
@@ -123,5 +124,53 @@ describe('applyGeneratedLessonCopy', () => {
     expect(next.hintLayers[0]?.mode).toBe(seed.hintLayers[0]?.mode)
     expect(next.rewardCardId).toBe(seed.rewardCardId)
     expect(next.parentAdvice).toBe('家长先让孩子自己试一次，再听提示。')
+  })
+})
+
+describe('hasUnpublishedLessonChanges', () => {
+  it('returns true when there is a draft but no publication yet', () => {
+    const seed = launchLessons[0]
+
+    expect(
+      hasUnpublishedLessonChanges(
+        {
+          title: seed.title,
+          goal: seed.goal,
+          payload: {
+            steps: seed.steps,
+            hintLayers: seed.hintLayers,
+            templateId: seed.templateId,
+          },
+        },
+        null,
+      ),
+    ).toBe(true)
+  })
+
+  it('returns false when draft and publication content are identical', () => {
+    const seed = launchLessons[0]
+
+    expect(
+      hasUnpublishedLessonChanges(
+        {
+          title: seed.title,
+          goal: seed.goal,
+          payload: {
+            steps: seed.steps,
+            hintLayers: seed.hintLayers,
+            templateId: seed.templateId,
+          },
+        },
+        {
+          title: seed.title,
+          goal: seed.goal,
+          payload: {
+            steps: seed.steps,
+            hintLayers: seed.hintLayers,
+            templateId: seed.templateId,
+          },
+        },
+      ),
+    ).toBe(false)
   })
 })
