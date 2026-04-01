@@ -8,6 +8,13 @@ type LessonActionResult = {
   issues: CourseContentValidationIssue[]
 }
 
+type GenerateLessonDraftResult = {
+  ok: boolean
+  lesson?: EditableLaunchLesson
+  issues: CourseContentValidationIssue[]
+  error?: string
+}
+
 async function readJson<T>(response: Response) {
   return (await response.json()) as T
 }
@@ -41,4 +48,22 @@ export async function rollbackLesson(lessonId: string) {
   })
 
   return readJson<{ ok: boolean }>(response)
+}
+
+export async function generateCurriculumSkeleton() {
+  const response = await fetch('/api/admin/ai/curriculum-skeleton', {
+    method: 'POST',
+  })
+
+  return readJson<{ ok: boolean; skeletonCount?: number; error?: string }>(
+    response,
+  )
+}
+
+export async function generateLessonDraft(lessonId: string) {
+  const response = await fetch(`/api/admin/ai/lessons/${lessonId}/generate-draft`, {
+    method: 'POST',
+  })
+
+  return readJson<GenerateLessonDraftResult>(response)
 }

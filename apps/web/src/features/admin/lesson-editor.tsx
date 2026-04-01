@@ -9,6 +9,8 @@ import type {
 } from '@/features/domain/types'
 
 import {
+  generateCurriculumSkeleton,
+  generateLessonDraft,
   publishLesson,
   rollbackLesson,
   saveLessonDraft,
@@ -37,6 +39,17 @@ type LessonEditorProps = {
     lessonId: string,
   ) => Promise<{ ok: boolean; issues: CourseContentValidationIssue[] }>
   rollbackRequest?: (lessonId: string) => Promise<{ ok: boolean }>
+  generateSkeletonRequest?: () => Promise<{
+    ok: boolean
+    skeletonCount?: number
+    error?: string
+  }>
+  generateDraftRequest?: (lessonId: string) => Promise<{
+    ok: boolean
+    lesson?: EditableLaunchLesson
+    issues: CourseContentValidationIssue[]
+    error?: string
+  }>
 }
 
 export function LessonEditor({
@@ -47,11 +60,18 @@ export function LessonEditor({
   saveDraftRequest = saveLessonDraft,
   publishRequest = publishLesson,
   rollbackRequest = rollbackLesson,
+  generateSkeletonRequest = generateCurriculumSkeleton,
+  generateDraftRequest = generateLessonDraft,
 }: LessonEditorProps) {
   const router = useRouter()
   const [formLesson, setFormLesson] = useState(lesson)
   const [pendingAction, setPendingAction] = useState<
-    'idle' | 'save' | 'publish' | 'rollback'
+    | 'idle'
+    | 'save'
+    | 'publish'
+    | 'rollback'
+    | 'generateSkeleton'
+    | 'generateDraft'
   >('idle')
   const [issues, setIssues] = useState<CourseContentValidationIssue[]>([])
   const [message, setMessage] = useState<string | null>(null)
@@ -127,6 +147,44 @@ export function LessonEditor({
     }
 
     setMessage('回退失败，请稍后重试')
+  }
+
+  async function handleGenerateSkeleton() {
+    setPendingAction('generateSkeleton')
+    setIssues([])
+    setMessage(null)
+
+    const result = await generateSkeletonRequest()
+
+    setPendingAction('idle')
+
+    if (result.ok) {
+      setMessage('整套课程骨架已生成')
+      router.refresh()
+      return
+    }
+
+    setMessage(result.error ?? '课程骨架生成失败，请稍后重试')
+  }
+
+  async function handleGenerateDraft() {
+    setPendingAction('generateDraft')
+    setIssues([])
+    setMessage(null)
+
+    const result = await generateDraftRequest(formLesson.id)
+
+    setPendingAction('idle')
+    setIssues(result.issues)
+
+    if (result.ok && result.lesson) {
+      setFormLesson(result.lesson)
+      setMessage('AI 草稿已生成，请审核后再发布')
+      router.refresh()
+      return
+    }
+
+    setMessage(result.error ?? 'AI 草稿生成失败，请先检查课程骨架')
   }
 
   return (
@@ -223,6 +281,31 @@ export function LessonEditor({
       </section>
 
       <section className="rounded-[2rem] bg-white p-6 shadow-sm">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row">
+          <button
+            type="button"
+            className="rounded-full border border-sky-300 px-5 py-3 font-bold text-sky-700 disabled:cursor-not-allowed disabled:text-sky-300"
+            disabled={pendingAction !== 'idle'}
+            onClick={handleGenerateSkeleton}
+          >
+            {pendingAction === 'generateSkeleton'
+              ? '正在生成整套课程骨架'
+              : '生成整套课程骨架'}
+          </button>
+          <button
+            type="button"
+            className="rounded-full border border-emerald-300 px-5 py-3 font-bold text-emerald-700 disabled:cursor-not-allowed disabled:text-emerald-300"
+            disabled={pendingAction !== 'idle'}
+            onClick={handleGenerateDraft}
+          >
+            {pendingAction === 'generateDraft'
+              ? '正在生成本课草稿'
+              : '生成本课草稿'}
+          </button>
+        </div>
+        <p className="mb-4 text-sm font-semibold text-slate-600">
+          AI 只会覆盖标题、目标、步骤说明、提示文案和家长建议，不会改动积木结构字段。
+        </p>
         <div className="flex flex-col gap-3 md:flex-row">
           <button
             type="button"

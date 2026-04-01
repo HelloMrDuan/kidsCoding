@@ -189,3 +189,19 @@ export type AdminLessonSummary = {
   publishedAt?: string | null
   hasUnpublishedChanges: boolean
 }
+
+export type LaunchCurriculumSkeletonStage =
+  | 'trial'
+  | 'guided'
+  | 'story'
+  | 'template'
+
+export type LaunchCurriculumSkeleton = {
+  lessonId: string
+  stage: LaunchCurriculumSkeletonStage
+  lessonObjective: string
+  newConcepts: string[]
+  dependsOn: string[]
+  childOutcome: string
+  difficultyLevel: 1 | 2 | 3 | 4
+}

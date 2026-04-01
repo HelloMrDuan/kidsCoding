@@ -62,4 +62,71 @@ describe('LessonEditor', () => {
       expect(refresh).toHaveBeenCalled()
     })
   })
+
+  it('generates an AI draft and replaces the editable copy', async () => {
+    const generateDraftRequest = vi.fn().mockResolvedValue({
+      ok: true,
+      issues: [],
+      lesson: {
+        id: 'trial-01-move-character',
+        title: 'AI 新标题',
+        goal: 'AI 新目标',
+        steps: [
+          {
+            id: 'step-1',
+            title: 'AI 步骤标题',
+            instruction: 'AI 步骤说明',
+            allowedBlocks: ['when_start'],
+            requiredBlockTypes: ['when_start'],
+          },
+        ],
+        hintLayers: [{ id: 'repeat-goal', mode: 'repeat_goal', copy: 'AI 提示' }],
+        phase: 'trial',
+        mode: 'guided',
+        sortOrder: 1,
+      },
+    })
+
+    render(
+      <LessonEditor
+        lesson={{
+          id: 'trial-01-move-character',
+          title: '原始标题',
+          goal: '原始目标',
+          steps: [
+            {
+              id: 'step-1',
+              title: '原始步骤',
+              instruction: '原始说明',
+              allowedBlocks: ['when_start'],
+              requiredBlockTypes: ['when_start'],
+            },
+          ],
+          hintLayers: [
+            { id: 'repeat-goal', mode: 'repeat_goal', copy: '原始提示' },
+          ],
+          phase: 'trial',
+          mode: 'guided',
+          sortOrder: 1,
+        }}
+        draftUpdatedAt={null}
+        publishedAt={null}
+        hasUnpublishedChanges={false}
+        generateDraftRequest={generateDraftRequest}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: '生成本课草稿' }))
+
+    await waitFor(() =>
+      expect(generateDraftRequest).toHaveBeenCalledWith(
+        'trial-01-move-character',
+      ),
+    )
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('AI 新标题')).toBeInTheDocument()
+      expect(screen.getByText('AI 草稿已生成，请审核后再发布')).toBeInTheDocument()
+    })
+  })
 })

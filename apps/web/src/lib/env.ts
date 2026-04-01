@@ -21,3 +21,7 @@ export function hasServiceRoleEnv() {
       process.env.SUPABASE_SERVICE_ROLE_KEY,
   )
 }
+
+export function hasAiEnv() {
+  return Boolean(process.env.OPENAI_API_KEY)
+}
