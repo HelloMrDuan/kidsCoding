@@ -21,6 +21,18 @@ export function getAdminSetupToken(
   return (env.ADMIN_SETUP_TOKEN ?? '').trim()
 }
 
+export function isLocalSupabaseEnabled(
+  env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
+) {
+  return (env.LOCAL_SUPABASE_ENABLED ?? '').trim() === 'true'
+}
+
+export function getLocalSupabaseAdminEmail(
+  env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
+) {
+  return (env.LOCAL_SUPABASE_ADMIN_EMAIL ?? '').trim()
+}
+
 export function hasSupabaseEnv() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
