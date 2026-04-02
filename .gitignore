@@ -12,5 +12,6 @@ playwright-report/
 .supabase/
 supabase/.temp/
 apps/web/supabase/.temp/
+apps/web/.npm-cache/
 .DS_Store
 Thumbs.db

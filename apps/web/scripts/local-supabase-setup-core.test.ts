@@ -1,6 +1,18 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { runLocalSupabaseSetup } from './local-supabase-setup-core.mjs'
+import {
+  resolveExecInvocation,
+  runLocalSupabaseSetup,
+} from './local-supabase-setup-core.mjs'
+
+describe('resolveExecInvocation', () => {
+  it('uses the installed Supabase CLI directly on Windows', () => {
+    expect(resolveExecInvocation('supabase', ['status', '-o', 'env'], 'win32')).toEqual({
+      file: 'supabase.exe',
+      args: ['status', '-o', 'env'],
+    })
+  })
+})
 
 describe('runLocalSupabaseSetup', () => {
   it('starts supabase, reads env, and resets the local database', async () => {

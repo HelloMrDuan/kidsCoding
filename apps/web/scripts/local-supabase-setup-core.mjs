@@ -10,14 +10,39 @@ import {
 } from './local-supabase-env.mjs'
 
 const execFileAsync = promisify(execFile)
-const NPX_BIN = process.platform === 'win32' ? 'npx.cmd' : 'npx'
 
-async function defaultExec(command, args, cwd) {
+export function resolveExecInvocation(
+  command,
+  args,
+  platform = process.platform,
+) {
   if (command === 'supabase') {
-    return execFileAsync(NPX_BIN, ['supabase', ...args], { cwd })
+    return {
+      file: platform === 'win32' ? 'supabase.exe' : 'supabase',
+      args,
+    }
   }
 
-  return execFileAsync(command, args, { cwd })
+  return {
+    file: command,
+    args,
+  }
+}
+
+async function defaultExec(command, args, cwd) {
+  const invocation = resolveExecInvocation(command, args)
+
+  try {
+    return await execFileAsync(invocation.file, invocation.args, { cwd })
+  } catch (error) {
+    if (command === 'supabase' && error instanceof Error && 'code' in error) {
+      if (error.code === 'ENOENT') {
+        throw new Error('local-supabase-cli-missing')
+      }
+    }
+
+    throw error
+  }
 }
 
 async function defaultWriteEnv(envPath, values) {
