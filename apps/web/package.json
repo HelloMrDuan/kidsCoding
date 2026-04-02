@@ -8,6 +8,7 @@
     "start": "next start",
     "env:check": "node ./scripts/env-check.mjs",
     "env:check:prod": "node ./scripts/env-check.mjs --mode=production",
+    "local:supabase:install-cli": "node ./scripts/local-supabase-install-cli.mjs",
     "local:supabase:setup": "node ./scripts/local-supabase-setup.mjs",
     "lint": "eslint .",
     "test": "vitest",
