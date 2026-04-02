@@ -21,7 +21,7 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
   const [message, setMessage] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  async function loadState() {
+  async function reloadState() {
     const response = await fetch(
       `/api/setup/admin/bootstrap?token=${encodeURIComponent(token)}`,
     )
@@ -30,7 +30,22 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
   }
 
   useEffect(() => {
-    void loadState()
+    let cancelled = false
+
+    void (async () => {
+      const response = await fetch(
+        `/api/setup/admin/bootstrap?token=${encodeURIComponent(token)}`,
+      )
+      const data = (await response.json()) as BootstrapState
+
+      if (!cancelled) {
+        setState(data)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
   }, [token])
 
   async function handleSendOtp() {
@@ -48,7 +63,7 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
       type: 'email',
     })
     setMessage(null)
-    await loadState()
+    await reloadState()
   }
 
   async function handleConfirm() {
@@ -69,7 +84,7 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
 
     if (!response.ok) {
       setMessage('开通失败，请稍后重试')
-      await loadState()
+      await reloadState()
       return
     }
 
@@ -77,7 +92,11 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
   }
 
   if (state.status === 'loading') {
-    return <p className="text-sm font-semibold text-slate-600">正在检查开通状态...</p>
+    return (
+      <p className="text-sm font-semibold text-slate-600">
+        正在检查开通状态...
+      </p>
+    )
   }
 
   if (state.status === 'invalid_token') {
@@ -154,7 +173,7 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
         <p>{state.identityLabel}</p>
       </div>
       <p className="text-sm font-semibold text-slate-600">
-        确认后会把当前账号开通为首个管理员，并立即启用 /admin。
+        确认后会把当前账号开通为首个管理员，并立即启用 `/admin`。
       </p>
       <button
         type="button"

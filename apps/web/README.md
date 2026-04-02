@@ -3,7 +3,7 @@
 ## 启动准备
 
 1. 安装依赖：`npm install`
-2. 把 `.env.example` 复制成 `.env.local`
+2. 复制 `.env.example` 为 `.env.local`
 3. 先执行环境检查：`npm run env:check`
 4. 重建本地数据库：`npx supabase db reset`
 5. 启动开发环境：`npm run dev`
@@ -33,16 +33,17 @@
 - `AI_PROVIDER_SECONDARY_API_KEY`
 - `AI_PROVIDER_SECONDARY_MODELS`
 
-### App URL
+### App 与首次管理员
 
 - `NEXT_PUBLIC_APP_URL`
+- `ADMIN_SETUP_TOKEN`
 
 ## 环境检查
 
 - 开发环境检查：`npm run env:check`
 - 生产环境检查：`npm run env:check:prod`
 
-开发环境允许缺项，但会明确提示哪些功能降级。  
+开发环境允许缺项，但会明确提示哪些能力会降级。  
 生产环境如果缺少关键配置，命令会直接失败。
 
 ## 后台 AI 运行设置
@@ -51,6 +52,14 @@
 - 管理员只能选择默认提供方和默认模型
 - 后台不会显示或保存原始 API Key
 - AI 课程骨架生成和单课草稿生成都会使用当前默认模型
+
+## 首个管理员开通
+
+- 在 `.env.local` 中配置 `ADMIN_SETUP_TOKEN`
+- 首次部署后，使用链接 `/setup/admin?token=<ADMIN_SETUP_TOKEN>` 打开首个管理员开通页
+- 先完成登录，再确认“开通管理员权限”
+- 成功后当前账号会获得 `/admin` 访问权限
+- 只要系统里已经存在任一管理员，这个开通入口就会永久关闭
 
 ## 验证命令
 
@@ -68,5 +77,6 @@
 - `/project/trial-03-scene-story/complete`
 - `/parent/purchase`
 - `/parent/overview`
+- `/setup/admin`
 - `/admin`
 - `/admin/lessons/trial-01-move-character`
