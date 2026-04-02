@@ -15,6 +15,12 @@ export function getRequiredEnv(name: string) {
   return value
 }
 
+export function getAdminSetupToken(
+  env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
+) {
+  return (env.ADMIN_SETUP_TOKEN ?? '').trim()
+}
+
 export function hasSupabaseEnv() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&

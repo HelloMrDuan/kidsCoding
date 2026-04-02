@@ -237,3 +237,16 @@ export type ResolvedAiClientConfig = {
   model: string
   usedFallback: boolean
 }
+
+export type FirstAdminBootstrapState =
+  | { status: 'not_logged_in' }
+  | { status: 'invalid_token' }
+  | { status: 'closed' }
+  | { status: 'ready'; identityLabel: string }
+
+export type AdminBootstrapEventRow = {
+  user_id: string
+  email: string | null
+  event_type: 'first_admin_granted'
+  created_at: string
+}
