@@ -101,7 +101,11 @@ export function resolveAiProviderSelection(input: {
     ? providers.find((item) => item.slot === stored.default_provider_slot)
     : undefined
 
-  if (selectedProvider && selectedProvider.models.includes(stored.default_model)) {
+  if (
+    stored &&
+    selectedProvider &&
+    selectedProvider.models.includes(stored.default_model)
+  ) {
     return {
       provider: selectedProvider,
       model: stored.default_model,

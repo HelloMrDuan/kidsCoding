@@ -77,12 +77,18 @@ function buildLessonDraftPrompt(input: {
 }
 
 type LessonDraftModelCaller = (input: {
+  model: string
   prompt: string
   schemaName: string
   schema: Record<string, unknown>
 }) => Promise<GeneratedLessonCopy>
 
 export async function generateLaunchLessonDraft(input: {
+  aiConfig: {
+    baseUrl: string
+    apiKey: string
+    model: string
+  }
   lesson: LaunchLessonDefinition
   skeleton: LaunchCurriculumSkeleton
   previousSkeleton?: LaunchCurriculumSkeleton
@@ -92,18 +98,22 @@ export async function generateLaunchLessonDraft(input: {
   const callModel =
     input.callModel ??
     ((modelInput: {
+      model: string
       prompt: string
       schemaName: string
       schema: Record<string, unknown>
     }) =>
       callOpenAiStructuredJson<GeneratedLessonCopy>({
-        model: process.env.OPENAI_MODEL ?? 'gpt-5-mini',
+        baseUrl: input.aiConfig.baseUrl,
+        apiKey: input.aiConfig.apiKey,
+        model: modelInput.model,
         prompt: modelInput.prompt,
         schemaName: modelInput.schemaName,
         schema: modelInput.schema,
       }))
 
   const generated = await callModel({
+    model: input.aiConfig.model,
     prompt: buildLessonDraftPrompt(input),
     schemaName: 'launch_lesson_copy',
     schema: generatedLessonCopySchema,

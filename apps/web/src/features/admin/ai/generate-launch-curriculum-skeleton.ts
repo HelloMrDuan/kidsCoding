@@ -62,31 +62,41 @@ function buildSkeletonPrompt(lessons: LaunchLessonDefinition[]) {
 }
 
 type SkeletonModelCaller = (input: {
+  model: string
   prompt: string
   schemaName: string
   schema: Record<string, unknown>
 }) => Promise<LaunchCurriculumSkeleton[]>
 
-export async function generateLaunchCurriculumSkeleton(input?: {
+export async function generateLaunchCurriculumSkeleton(input: {
+  aiConfig: {
+    baseUrl: string
+    apiKey: string
+    model: string
+  }
   lessons?: LaunchLessonDefinition[]
   callModel?: SkeletonModelCaller
 }) {
-  const lessons = input?.lessons ?? launchLessons
+  const lessons = input.lessons ?? launchLessons
   const callModel =
-    input?.callModel ??
+    input.callModel ??
     ((modelInput: {
+      model: string
       prompt: string
       schemaName: string
       schema: Record<string, unknown>
     }) =>
       callOpenAiStructuredJson<LaunchCurriculumSkeleton[]>({
-        model: process.env.OPENAI_MODEL ?? 'gpt-5-mini',
+        baseUrl: input.aiConfig.baseUrl,
+        apiKey: input.aiConfig.apiKey,
+        model: modelInput.model,
         prompt: modelInput.prompt,
         schemaName: modelInput.schemaName,
         schema: modelInput.schema,
       }))
 
   const skeleton = await callModel({
+    model: input.aiConfig.model,
     prompt: buildSkeletonPrompt(lessons),
     schemaName: 'launch_curriculum_skeleton',
     schema: launchCurriculumSkeletonSchema,

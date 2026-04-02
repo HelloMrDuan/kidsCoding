@@ -7,14 +7,11 @@ const fetchMock = vi.fn()
 vi.stubGlobal('fetch', fetchMock)
 
 describe('callOpenAiStructuredJson', () => {
-  const originalApiKey = process.env.OPENAI_API_KEY
-
   beforeEach(() => {
     vi.clearAllMocks()
-    process.env.OPENAI_API_KEY = 'test-key'
   })
 
-  it('sends a structured responses request and parses the returned json text', async () => {
+  it('posts to the configured provider base URL and parses the returned json text', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -35,8 +32,10 @@ describe('callOpenAiStructuredJson', () => {
       lessonId: string
       stage: string
     }>({
-      model: 'gpt-5-mini',
-      prompt: '生成骨架',
+      baseUrl: 'http://127.0.0.1:11434/v1',
+      apiKey: 'ollama-local',
+      model: 'qwen2.5-coder:7b',
+      prompt: '生成课程骨架',
       schemaName: 'launch_curriculum_skeleton',
       schema: {
         type: 'object',
@@ -48,17 +47,17 @@ describe('callOpenAiStructuredJson', () => {
       stage: 'trial',
     })
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.openai.com/v1/responses',
+      'http://127.0.0.1:11434/v1/responses',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
-          Authorization: 'Bearer test-key',
+          Authorization: 'Bearer ollama-local',
         }),
       }),
     )
     expect(JSON.parse(fetchMock.mock.calls[0][1].body as string)).toMatchObject({
-      model: 'gpt-5-mini',
-      input: '生成骨架',
+      model: 'qwen2.5-coder:7b',
+      input: '生成课程骨架',
       text: {
         format: {
           type: 'json_schema',
@@ -80,17 +79,15 @@ describe('callOpenAiStructuredJson', () => {
 
     await expect(
       callOpenAiStructuredJson({
+        baseUrl: 'https://api.openai.com/v1',
+        apiKey: 'sk-primary',
         model: 'gpt-5-mini',
-        prompt: '生成骨架',
+        prompt: '生成课程骨架',
         schemaName: 'launch_curriculum_skeleton',
         schema: {
           type: 'object',
         },
       }),
     ).rejects.toThrow('openai-request-failed:429')
-  })
-
-  afterEach(() => {
-    process.env.OPENAI_API_KEY = originalApiKey
   })
 })

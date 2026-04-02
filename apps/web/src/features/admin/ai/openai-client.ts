@@ -1,5 +1,3 @@
-import { getRequiredEnv } from '@/lib/env'
-
 type JsonSchema = Record<string, unknown>
 
 function extractOutputText(payload: unknown) {
@@ -46,15 +44,18 @@ function extractOutputText(payload: unknown) {
 }
 
 export async function callOpenAiStructuredJson<T>(input: {
+  baseUrl: string
+  apiKey: string
   model: string
   prompt: string
   schemaName: string
   schema: JsonSchema
 }) {
-  const response = await fetch('https://api.openai.com/v1/responses', {
+  const endpoint = `${input.baseUrl.replace(/\/$/, '')}/responses`
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${getRequiredEnv('OPENAI_API_KEY')}`,
+      Authorization: `Bearer ${input.apiKey}`,
       'content-type': 'application/json',
     },
     body: JSON.stringify({

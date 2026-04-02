@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { assertAdminUser } from '@/features/admin/admin-auth'
+import { resolveAiRequestConfig } from '@/features/admin/ai/ai-runtime-settings'
 import { generateLaunchCurriculumSkeleton } from '@/features/admin/ai/generate-launch-curriculum-skeleton'
 import { createLaunchCurriculumRepository } from '@/features/admin/launch-curriculum-repository'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -18,7 +19,18 @@ export async function POST() {
   assertAdminUser(data.user)
 
   const repository = createLaunchCurriculumRepository(createAdminClient())
-  const skeletons = await generateLaunchCurriculumSkeleton()
+  const aiConfig = await resolveAiRequestConfig({
+    env: process.env,
+    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+    repository,
+  })
+  const skeletons = await generateLaunchCurriculumSkeleton({
+    aiConfig: {
+      baseUrl: aiConfig.baseUrl,
+      apiKey: aiConfig.apiKey,
+      model: aiConfig.model,
+    },
+  })
 
   await Promise.all(
     skeletons.map((skeleton) => repository.upsertCurriculumSkeleton(skeleton)),

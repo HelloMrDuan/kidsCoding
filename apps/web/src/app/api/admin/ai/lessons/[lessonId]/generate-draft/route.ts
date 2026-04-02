@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { assertAdminUser } from '@/features/admin/admin-auth'
+import { resolveAiRequestConfig } from '@/features/admin/ai/ai-runtime-settings'
 import { generateLaunchLessonDraft } from '@/features/admin/ai/generate-launch-lesson-draft'
 import { createLaunchCurriculumRepository } from '@/features/admin/launch-curriculum-repository'
 import { saveLaunchLessonDraft } from '@/features/admin/lesson-actions'
@@ -23,6 +24,11 @@ export async function POST(
   const { lessonId } = await context.params
 
   const repository = createLaunchCurriculumRepository(createAdminClient())
+  const aiConfig = await resolveAiRequestConfig({
+    env: process.env,
+    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+    repository,
+  })
   const [lesson, skeleton, skeletons] = await Promise.all([
     repository.loadAdminLesson(lessonId),
     repository.loadCurriculumSkeleton(lessonId),
@@ -51,6 +57,11 @@ export async function POST(
       : undefined
 
   const draftLesson = await generateLaunchLessonDraft({
+    aiConfig: {
+      baseUrl: aiConfig.baseUrl,
+      apiKey: aiConfig.apiKey,
+      model: aiConfig.model,
+    },
     lesson,
     skeleton,
     previousSkeleton,
