@@ -24,12 +24,12 @@ export function resolveFirstAdminBootstrapState(input: {
   user: Pick<User, 'id' | 'email' | 'phone'> | null
   hasAnyAdmin: boolean
 }): FirstAdminBootstrapState {
-  if (!input.expectedToken || input.providedToken !== input.expectedToken) {
-    return { status: 'invalid_token' }
-  }
-
   if (input.hasAnyAdmin) {
     return { status: 'closed' }
+  }
+
+  if (!input.expectedToken || input.providedToken !== input.expectedToken) {
+    return { status: 'invalid_token' }
   }
 
   if (!input.user) {
@@ -78,12 +78,23 @@ export async function bootstrapFirstAdmin(input: {
     },
   })
 
-  await input.repository.insertBootstrapEvent({
-    user_id: input.user.id,
-    email: input.user.email ?? null,
-    event_type: 'first_admin_granted',
-    created_at: (input.now ?? (() => new Date().toISOString()))(),
-  })
+  try {
+    await input.repository.insertBootstrapEvent({
+      user_id: input.user.id,
+      email: input.user.email ?? null,
+      event_type: 'first_admin_granted',
+      created_at: (input.now ?? (() => new Date().toISOString()))(),
+    })
+  } catch (error) {
+    await input.repository.grantAdminRole({
+      userId: input.user.id,
+      appMetadata: {
+        ...(input.user.app_metadata ?? {}),
+      },
+    })
+
+    throw error
+  }
 
   return { ok: true as const }
 }

@@ -28,6 +28,17 @@ describe('resolveFirstAdminBootstrapState', () => {
     ).toEqual({ status: 'invalid_token' })
   })
 
+  it('returns closed before invalid_token when an admin already exists', () => {
+    expect(
+      resolveFirstAdminBootstrapState({
+        expectedToken: 'setup-demo-token',
+        providedToken: 'wrong-token',
+        user: null,
+        hasAnyAdmin: true,
+      }),
+    ).toEqual({ status: 'closed' })
+  })
+
   it('returns closed when any admin already exists', () => {
     expect(
       resolveFirstAdminBootstrapState({
@@ -109,5 +120,35 @@ describe('bootstrapFirstAdmin', () => {
         repository,
       }),
     ).rejects.toThrowError('admin-bootstrap-closed')
+  })
+
+  it('rolls the role back when event logging fails', async () => {
+    const repository = {
+      hasAnyAdmin: vi.fn().mockResolvedValue(false),
+      grantAdminRole: vi.fn().mockResolvedValue(undefined),
+      insertBootstrapEvent: vi.fn().mockRejectedValue(new Error('insert-failed')),
+    }
+
+    await expect(
+      bootstrapFirstAdmin({
+        expectedToken: 'setup-demo-token',
+        providedToken: 'setup-demo-token',
+        user: {
+          id: 'user-1',
+          email: 'owner@example.com',
+          app_metadata: { plan: 'launch' },
+        } as never,
+        repository,
+      }),
+    ).rejects.toThrowError('insert-failed')
+
+    expect(repository.grantAdminRole).toHaveBeenNthCalledWith(1, {
+      userId: 'user-1',
+      appMetadata: { plan: 'launch', role: 'admin' },
+    })
+    expect(repository.grantAdminRole).toHaveBeenNthCalledWith(2, {
+      userId: 'user-1',
+      appMetadata: { plan: 'launch' },
+    })
   })
 })
