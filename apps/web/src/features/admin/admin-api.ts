@@ -15,6 +15,11 @@ type GenerateLessonDraftResult = {
   error?: string
 }
 
+type SaveAiSettingsResult = {
+  ok: boolean
+  error?: string
+}
+
 async function readJson<T>(response: Response) {
   return (await response.json()) as T
 }
@@ -66,4 +71,19 @@ export async function generateLessonDraft(lessonId: string) {
   })
 
   return readJson<GenerateLessonDraftResult>(response)
+}
+
+export async function saveAiSettings(input: {
+  defaultProviderSlot: 'primary' | 'secondary'
+  defaultModel: string
+}) {
+  const response = await fetch('/api/admin/ai/settings', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  })
+
+  return readJson<SaveAiSettingsResult>(response)
 }

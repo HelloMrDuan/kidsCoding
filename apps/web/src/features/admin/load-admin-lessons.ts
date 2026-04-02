@@ -1,9 +1,14 @@
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import type {
   AdminLessonSummary,
+  AiProviderConfig,
   EditableLaunchLesson,
 } from '@/features/domain/types'
-import { hasServiceRoleEnv } from '@/lib/env'
+import {
+  hasServiceRoleEnv,
+  parseAiProviderSlots,
+  resolveAiProviderSelection,
+} from '@/lib/env'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 import {
@@ -96,5 +101,58 @@ export async function loadAdminLessonPageData(lessonId: string): Promise<{
     draftUpdatedAt: draft?.updated_at ?? null,
     publishedAt: publication?.published_at ?? null,
     hasUnpublishedChanges: hasUnpublishedLessonChanges(draft, publication),
+  }
+}
+
+export async function loadAdminDashboardData(): Promise<{
+  lessons: AdminLessonSummary[]
+  ai: {
+    providers: Array<
+      Pick<AiProviderConfig, 'slot' | 'name' | 'baseUrl' | 'models'>
+    >
+    currentSelection: {
+      defaultProviderSlot: 'primary' | 'secondary'
+      defaultModel: string
+    }
+  }
+}> {
+  const lessons = await loadAdminLessonSummaries()
+  const providers = parseAiProviderSlots(process.env).map((provider) => ({
+    slot: provider.slot,
+    name: provider.name,
+    baseUrl: provider.baseUrl,
+    models: provider.models,
+  }))
+
+  if (!hasServiceRoleEnv()) {
+    return {
+      lessons,
+      ai: {
+        providers,
+        currentSelection: {
+          defaultProviderSlot: providers[0]?.slot ?? 'primary',
+          defaultModel: providers[0]?.models[0] ?? '',
+        },
+      },
+    }
+  }
+
+  const repository = createLaunchCurriculumRepository(createAdminClient())
+  const stored = await repository.loadAiRuntimeSetting()
+  const resolved = resolveAiProviderSelection({
+    env: process.env,
+    mode: 'development',
+    stored,
+  })
+
+  return {
+    lessons,
+    ai: {
+      providers,
+      currentSelection: {
+        defaultProviderSlot: resolved.provider.slot,
+        defaultModel: resolved.model,
+      },
+    },
   }
 }
