@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import type {
+  AiRuntimeSettingRow,
   LaunchCurriculumSkeleton,
   LessonConfigRow,
   LessonPublicationBackupRow,
@@ -213,6 +214,30 @@ export function createLaunchCurriculumRepository(admin: AdminClient) {
       }
     }
 
+  const loadAiRuntimeSetting = async () => {
+      const { data, error } = await admin
+        .from('ai_runtime_settings')
+        .select('*')
+        .eq('setting_key', 'default')
+        .maybeSingle()
+
+      if (error) {
+        throw error
+      }
+
+      return (data ?? null) as AiRuntimeSettingRow | null
+    }
+
+  const upsertAiRuntimeSetting = async (row: AiRuntimeSettingRow) => {
+      const { error } = await admin.from('ai_runtime_settings').upsert(row, {
+        onConflict: 'setting_key',
+      })
+
+      if (error) {
+        throw error
+      }
+    }
+
   return {
     loadDraftLessons,
     loadDraftLesson,
@@ -221,10 +246,12 @@ export function createLaunchCurriculumRepository(admin: AdminClient) {
     loadPublicationBackup,
     loadCurriculumSkeletons,
     loadCurriculumSkeleton,
+    loadAiRuntimeSetting,
     loadAdminLesson,
     upsertDraftLesson,
     upsertPublication,
     upsertPublicationBackup,
     upsertCurriculumSkeleton,
+    upsertAiRuntimeSetting,
   }
 }
