@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "env:check": "node ./scripts/env-check.mjs",
+    "env:check:prod": "node ./scripts/env-check.mjs --mode=production",
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
