@@ -205,3 +205,35 @@ export type LaunchCurriculumSkeleton = {
   childOutcome: string
   difficultyLevel: 1 | 2 | 3 | 4
 }
+
+export type AiProviderSlot = 'primary' | 'secondary'
+
+export type AiProviderConfig = {
+  slot: AiProviderSlot
+  name: string
+  baseUrl: string
+  apiKey: string
+  models: string[]
+}
+
+export type AiRuntimeSettingRow = {
+  setting_key: string
+  default_provider_slot: AiProviderSlot
+  default_model: string
+  updated_at?: string | null
+  updated_by?: string | null
+}
+
+export type ResolvedAiProviderSelection = {
+  provider: AiProviderConfig
+  model: string
+  usedFallback: boolean
+}
+
+export type ResolvedAiClientConfig = {
+  providerName: string
+  baseUrl: string
+  apiKey: string
+  model: string
+  usedFallback: boolean
+}
