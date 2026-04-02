@@ -27,6 +27,7 @@ SERVICE_ROLE_KEY=service-local-key
       ['supabase', ['start'], 'D:/pyprograms/kidsCoding/apps/web'],
       ['supabase', ['status', '-o', 'env'], 'D:/pyprograms/kidsCoding/apps/web'],
       ['supabase', ['db', 'reset', '--yes'], 'D:/pyprograms/kidsCoding/apps/web'],
+      ['node', ['./scripts/seed-local-admin.mjs'], 'D:/pyprograms/kidsCoding/apps/web'],
     ])
 
     expect(writeEnv).toHaveBeenCalledWith(

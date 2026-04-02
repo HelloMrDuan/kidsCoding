@@ -39,4 +39,5 @@ export async function runLocalSupabaseSetup({
 
   await writeEnv(envPath, values)
   await exec('supabase', ['db', 'reset', '--yes'], projectDir)
+  await exec('node', ['./scripts/seed-local-admin.mjs'], projectDir)
 }
