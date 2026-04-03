@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveDefaultPaymentProvider } from './payment-provider-registry'
+import {
+  resolveDefaultPaymentProvider,
+  resolvePaymentProvider,
+} from './payment-provider-registry'
 
 describe('resolveDefaultPaymentProvider', () => {
   it('defaults to aggregated_cn when env is missing', () => {
@@ -13,5 +16,16 @@ describe('resolveDefaultPaymentProvider', () => {
         PAYMENT_PROVIDER_DEFAULT: 'stripe',
       }),
     ).toBe('stripe')
+  })
+})
+
+describe('resolvePaymentProvider', () => {
+  it('resolves aggregated_cn provider', () => {
+    const provider = resolvePaymentProvider('aggregated_cn')
+
+    expect(provider.name).toBe('aggregated_cn')
+    expect(typeof provider.createPayment).toBe('function')
+    expect(typeof provider.parseWebhook).toBe('function')
+    expect(typeof provider.queryPayment).toBe('function')
   })
 })
