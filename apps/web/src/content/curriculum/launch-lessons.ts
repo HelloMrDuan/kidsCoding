@@ -751,3 +751,138 @@ export const launchLessons: LaunchLessonDefinition[] = [
     parentAdvice: '和孩子一起回看毕业作品，问一问哪一位朋友先出场、哪里有互动变化。',
   },
 ]
+
+const lesson10 = launchLessons.find((lesson) => lesson.id === 'lesson-10-second-friend')
+
+if (lesson10) {
+  lesson10.title = '第二位朋友上场'
+  lesson10.goal = '让第二位动物朋友也拥有自己的开始和出场动作。'
+  lesson10.steps = [
+    {
+      id: 'step-1',
+      title: '看看今天的新朋友',
+      instruction: '今天不是换掉原来的角色，而是要让第二位动物朋友也来到舞台上。',
+      allowedBlocks: ['when_start'],
+      requiredBlockTypes: ['when_start'],
+    },
+    {
+      id: 'step-2',
+      title: '先让第一位朋友准备好',
+      instruction: '先用熟悉的开始和动作，安排第一位朋友站上舞台。',
+      allowedBlocks: ['when_start', 'move_right'],
+      requiredBlockTypes: ['when_start', 'move_right'],
+    },
+    {
+      id: 'step-3',
+      title: '认识第二位朋友的开始',
+      instruction: '第二位朋友也要有自己的开始积木，这样它才知道什么时候上场。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'switch_character'],
+    },
+    {
+      id: 'step-4',
+      title: '接上第二位朋友的动作',
+      instruction: '给第二位朋友接一个动作，让它也真的走上舞台。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+    {
+      id: 'step-5',
+      title: '回看两个朋友都准备好了',
+      instruction: '点一下运行，看看两位朋友是不是都已经站上了舞台。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+  ]
+  lesson10.parentAdvice = '请孩子告诉你哪一位朋友先准备好，第二位朋友又是怎么上场的。'
+}
+
+const lesson11 = launchLessons.find((lesson) => lesson.id === 'lesson-11-duo-rehearsal')
+
+if (lesson11) {
+  lesson11.title = '两个朋友一起出发'
+  lesson11.goal = '让两个角色按顺序配合行动，像在一起完成一件小事。'
+  lesson11.steps = [
+    {
+      id: 'step-1',
+      title: '回顾两位朋友都在舞台上',
+      instruction: '先看看两位朋友是不是都已经准备好了，再继续安排他们一起行动。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+    {
+      id: 'step-2',
+      title: '先安排第一位朋友行动',
+      instruction: '先让第一位朋友做出一个动作，带着故事往前走。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right'],
+    },
+    {
+      id: 'step-3',
+      title: '再安排第二位朋友跟上',
+      instruction: '切换到第二位朋友，再让它接着行动，这样故事就会更像合作。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+    {
+      id: 'step-4',
+      title: '看看顺序是不是刚刚好',
+      instruction: '确认是第一位朋友先动、第二位朋友再跟上，这样画面会更自然。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+    {
+      id: 'step-5',
+      title: '回看两个朋友一起行动',
+      instruction: '点一下运行，看看两位朋友是不是已经会按顺序一起行动了。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+  ]
+  lesson11.parentAdvice = '和孩子一起看看是谁先出发、谁后跟上，鼓励他调整顺序再试一次。'
+}
+
+const lesson12 = launchLessons.find((lesson) => lesson.id === 'lesson-12-graduation-show')
+
+if (lesson12) {
+  lesson12.title = '一起找到小礼物'
+  lesson12.goal = '完成启蒙毕业作品，让两个角色先后出场，最后一起找到目标。'
+  lesson12.steps = [
+    {
+      id: 'step-1',
+      title: '看看今天的毕业故事',
+      instruction: '今天我们要把两位朋友的动作接成一个完整故事，一起找到舞台上的小礼物。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start'],
+    },
+    {
+      id: 'step-2',
+      title: '让第一位朋友先出场',
+      instruction: '先安排第一位朋友走上舞台，带着故事开始。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right'],
+    },
+    {
+      id: 'step-3',
+      title: '让第二位朋友跟着出场',
+      instruction: '切换到第二位朋友，再让它也走上舞台，和第一位朋友汇合。',
+      allowedBlocks: ['when_start', 'move_right', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+    {
+      id: 'step-4',
+      title: '让两个朋友一起找到目标',
+      instruction: '把两位朋友的动作顺序接完整，让他们一起靠近小礼物。',
+      allowedBlocks: ['when_start', 'move_right', 'say_line', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+    {
+      id: 'step-5',
+      title: '回看我的启蒙毕业作品',
+      instruction: '点一下运行，看看两位朋友是不是已经一起找到小礼物，完成了毕业故事。',
+      allowedBlocks: ['when_start', 'move_right', 'say_line', 'switch_character'],
+      requiredBlockTypes: ['when_start', 'move_right', 'switch_character'],
+    },
+  ]
+  lesson12.parentAdvice = '和孩子一起回看毕业作品，问一问哪位朋友先出场，他们又是怎样一起找到小礼物的。'
+}

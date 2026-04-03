@@ -24,6 +24,7 @@ describe('buildProjectCompletionCopy', () => {
 
     expect(copy.summary).toContain('启蒙毕业作品')
     expect(copy.spotlightTag).toBe('启蒙毕业')
+    expect(copy.spotlightTitle).toContain('两个角色')
   })
 
   it('returns the interactive story copy for lesson 09', () => {

@@ -38,7 +38,18 @@ describe('foundation curriculum seed', () => {
     expect(lessons[1]?.steps).toHaveLength(5)
     expect(lessons[2]?.steps).toHaveLength(5)
     expect(lessons[0]?.goal).toContain('点击')
-    expect(lessons[1]?.goal).toContain('先动再说')
+    expect(lessons[1]?.goal).toContain('先动')
     expect(lessons[2]?.goal).toContain('互动故事')
+  })
+
+  it('expands lessons 10 to 12 into the graduation unit five-step scripts', () => {
+    const lessons = launchLessons.slice(9, 12)
+
+    expect(lessons[0]?.steps).toHaveLength(5)
+    expect(lessons[1]?.steps).toHaveLength(5)
+    expect(lessons[2]?.steps).toHaveLength(5)
+    expect(lessons[0]?.goal).toContain('第二位')
+    expect(lessons[1]?.goal).toContain('顺序')
+    expect(lessons[2]?.goal).toContain('启蒙毕业')
   })
 })

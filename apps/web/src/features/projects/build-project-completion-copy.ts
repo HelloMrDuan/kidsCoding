@@ -24,9 +24,9 @@ export function buildProjectCompletionCopy(lessonId: string) {
   if (lessonId === 'lesson-12-graduation-show') {
     return {
       summary:
-        '你已经完成启蒙毕业作品，可以回看自己的双角色互动故事，再决定是否进入更复杂的高阶创作路线。',
+        '你已经完成启蒙毕业作品，可以回看自己的两个角色完整故事，再决定是否进入更复杂的高阶创作路线。',
       spotlightTag: '启蒙毕业',
-      spotlightTitle: '你的第一部双角色互动故事已经完成',
+      spotlightTitle: '你已经做出了两个角色一起完成的完整故事',
       spotlightBody:
         '接下来可以先回看毕业作品，再看看高阶创作路线能不能帮助孩子做出更长、更有互动感的故事。',
     }

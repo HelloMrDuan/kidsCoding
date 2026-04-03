@@ -21,12 +21,6 @@ describe('getFoundationLessonFeedback', () => {
     ).toBe('先看看动作和对白的顺序对不对，再把缺少的积木接完整。')
   })
 
-  it('falls back to the generic copy for later lessons', () => {
-    expect(
-      getFoundationLessonFeedback('lesson-10-second-friend', 'progress'),
-    ).toBe('很好，这一步完成了。继续往下，作品马上会更像一个完整故事。')
-  })
-
   it('returns the lesson specific opening guidance for lesson 04', () => {
     expect(
       getFoundationLessonFeedback('lesson-04-meadow-scene', 'initial'),
@@ -61,5 +55,29 @@ describe('getFoundationLessonFeedback', () => {
     expect(
       getFoundationLessonFeedback('lesson-09-garden-story', 'retry'),
     ).toBe('先确认“被点击时”放在最前面，再把动作和一句回应的话接上去。')
+  })
+
+  it('returns the lesson specific opening guidance for lesson 10', () => {
+    expect(
+      getFoundationLessonFeedback('lesson-10-second-friend', 'initial'),
+    ).toContain('第二位朋友')
+  })
+
+  it('returns the lesson specific progress feedback for lesson 11', () => {
+    expect(
+      getFoundationLessonFeedback('lesson-11-duo-rehearsal', 'progress'),
+    ).toContain('两个朋友')
+  })
+
+  it('returns the lesson specific retry guidance for lesson 12', () => {
+    expect(
+      getFoundationLessonFeedback('lesson-12-graduation-show', 'retry'),
+    ).toContain('每个角色')
+  })
+
+  it('falls back to the generic copy for unknown lessons', () => {
+    expect(
+      getFoundationLessonFeedback('lesson-99-fallback', 'progress'),
+    ).toBe('很好，这一步完成了。继续往下，作品马上会更像一个完整故事。')
   })
 })

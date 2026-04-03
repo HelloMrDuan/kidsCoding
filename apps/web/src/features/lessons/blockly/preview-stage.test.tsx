@@ -43,4 +43,12 @@ describe('PreviewStage', () => {
       screen.getByText('太好了，角色已经会在点击后先动起来，再用一句话回应你。'),
     ).toBeInTheDocument()
   })
+
+  it('describes the second friend getting ready when a second start block is added', () => {
+    render(<PreviewStage blocks={[{ type: 'when_start' }, { type: 'when_start' }]} />)
+
+    expect(
+      screen.getByText('太好了，第二位朋友也准备好上场了。再接一个动作积木，舞台就会更热闹。'),
+    ).toBeInTheDocument()
+  })
 })

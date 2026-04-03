@@ -44,6 +44,21 @@ const FOUNDATION_LESSON_FEEDBACK = {
     progress: '太好了，你的互动故事已经会回应点击了。',
     retry: '先确认“被点击时”放在最前面，再把动作和一句回应的话接上去。',
   },
+  'lesson-10-second-friend': {
+    initial: '先让第一位朋友准备好，再给第二位朋友放上自己的开始和动作。',
+    progress: '太好了，第二位朋友也已经准备好上场了。',
+    retry: '先看看第二位朋友是不是也有自己的开始积木，再把动作接上去。',
+  },
+  'lesson-11-duo-rehearsal': {
+    initial: '先安排第一位朋友先行动，再让第二位朋友按顺序跟上来。',
+    progress: '太好了，两个朋友已经会按顺序一起行动了。',
+    retry: '先看看是不是先让第一位朋友开始，再让第二位朋友接上自己的动作。',
+  },
+  'lesson-12-graduation-show': {
+    initial: '先让两个朋友先后出场，再让他们合力把小礼物找到。',
+    progress: '太好了，启蒙毕业故事已经变得越来越完整了。',
+    retry: '先看看每个角色是不是都有自己的开始和动作顺序，再把找到礼物的收尾接上去。',
+  },
 } as const
 
 const DEFAULT_FEEDBACK = {
