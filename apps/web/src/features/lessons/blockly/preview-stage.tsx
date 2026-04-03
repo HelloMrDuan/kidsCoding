@@ -2,6 +2,7 @@ export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
   const moved = blocks.some((block) => block.type === 'move_right')
   const spoke = blocks.some((block) => block.type === 'say_line')
   const hasStart = blocks.some((block) => block.type === 'when_start')
+  const switchedScene = blocks.some((block) => block.type === 'switch_scene')
 
   return (
     <div className="rounded-[2rem] border border-[#dceef7] bg-[linear-gradient(180deg,#dff4ff_0%,#ffffff_100%)] p-6 shadow-[0_14px_32px_rgba(56,189,248,0.08)]">
@@ -25,8 +26,12 @@ export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
             />
           </div>
           <p className="mt-4 text-sm font-semibold leading-7 text-slate-700">
-            {spoke
+            {spoke && switchedScene
+              ? '太好了，旅行已经完整地走到了新场景，整个故事越来越像真的冒险。'
+              : spoke
               ? '太好了，角色已经会说话了，故事正在从静态图片变成会动的小舞台。'
+              : switchedScene
+                ? '太好了，故事已经从森林走到草地了。再接一句收尾的话，旅行就更完整了。'
               : moved
                 ? '太好了，角色已经走上舞台了。再接一句话，故事就会更完整。'
               : hasStart
