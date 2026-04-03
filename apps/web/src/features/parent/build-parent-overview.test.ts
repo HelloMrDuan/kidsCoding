@@ -1,23 +1,29 @@
 import { describe, expect, it } from 'vitest'
 
 import { launchLessons } from '@/content/curriculum/launch-lessons'
+
 import { buildParentOverview } from './build-parent-overview'
 
 describe('buildParentOverview', () => {
-  it('surfaces recent project count and an upgrade suggestion after trial completion', () => {
+  it('surfaces recent project count and an upgrade suggestion after foundation graduation', () => {
     const summary = buildParentOverview({
       profile: {
         display_name: '小小创作者',
         recommended_start_level: 'starter',
       },
-      progressRecords: [
-        { lesson_id: 'trial-03-scene-story', status: 'completed', stars: 6 },
+      progressRecords: Array.from({ length: 12 }, (_, index) => ({
+        lesson_id: `lesson-${String(index + 1).padStart(2, '0')}`,
+        status: 'completed',
+        stars: 36,
+      })),
+      cardRecords: [
+        { card_definition_id: 'growth-first-project' },
+        { card_definition_id: 'commemorative-foundation-graduate' },
       ],
-      cardRecords: [{ card_definition_id: 'growth-first-project' }],
-      badgeRecords: [{ badge_type: 'first-project' }],
+      badgeRecords: [{ badge_type: 'foundation-graduate' }],
       projectSnapshots: [
         {
-          lesson_id: 'trial-03-scene-story',
+          lesson_id: 'lesson-12-graduation-show',
           updated_at: '2026-03-31T10:00:00.000Z',
         },
       ],
@@ -26,7 +32,8 @@ describe('buildParentOverview', () => {
     })
 
     expect(summary.recentProjectCount).toBe(1)
-    expect(summary.nextAction).toContain('升级高阶创作')
+    expect(summary.nextAction).toContain('启蒙毕业')
+    expect(summary.nextAction).toContain('高阶创作')
   })
 
   it('builds recent projects with lesson titles, descending order, and parent playback links', () => {
@@ -36,18 +43,18 @@ describe('buildParentOverview', () => {
         recommended_start_level: 'starter',
       },
       progressRecords: [
-        { lesson_id: 'trial-03-scene-story', status: 'completed', stars: 6 },
-        { lesson_id: 'trial-02-dialogue-action', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 6 },
+        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 3 },
       ],
       cardRecords: [],
       badgeRecords: [],
       projectSnapshots: [
         {
-          lesson_id: 'trial-02-dialogue-action',
+          lesson_id: 'lesson-02-forest-greeting',
           updated_at: '2026-03-31T09:00:00.000Z',
         },
         {
-          lesson_id: 'trial-03-scene-story',
+          lesson_id: 'lesson-03-forest-story',
           updated_at: '2026-03-31T10:00:00.000Z',
         },
       ],
@@ -57,15 +64,15 @@ describe('buildParentOverview', () => {
 
     expect(summary.recentProjects).toEqual([
       {
-        lessonId: 'trial-03-scene-story',
-        lessonTitle: '做出第一个完整小故事',
-        href: '/parent/projects/trial-03-scene-story',
+        lessonId: 'lesson-03-forest-story',
+        lessonTitle: '森林里的第一次见面',
+        href: '/parent/projects/lesson-03-forest-story',
         updatedAt: '2026-03-31T10:00:00.000Z',
       },
       {
-        lessonId: 'trial-02-dialogue-action',
-        lessonTitle: '让角色说话和做动作',
-        href: '/parent/projects/trial-02-dialogue-action',
+        lessonId: 'lesson-02-forest-greeting',
+        lessonTitle: '小狐狸打招呼',
+        href: '/parent/projects/lesson-02-forest-greeting',
         updatedAt: '2026-03-31T09:00:00.000Z',
       },
     ])

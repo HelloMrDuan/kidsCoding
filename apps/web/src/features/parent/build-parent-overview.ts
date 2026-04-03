@@ -22,9 +22,6 @@ export function buildParentOverview({
     (maxStars, item) => Math.max(maxStars, item.stars ?? 0),
     0,
   )
-  const hasFinishedTrial = progressRecords.some(
-    (item) => item.lesson_id === 'trial-03-scene-story',
-  )
   const lessonTitles = new Map(
     lessonCatalog.map((lesson) => [lesson.id, lesson.title]),
   )
@@ -37,6 +34,14 @@ export function buildParentOverview({
       updatedAt: snapshot.updated_at,
     }))
 
+  const nextAction = hasLaunchPack
+    ? '孩子已经进入高阶创作阶段，可以继续挑战更长的故事结构和更复杂的互动演出。'
+    : completedLessonCount >= 12
+      ? '孩子已经完成启蒙毕业作品，现在可以看看是否适合升级到更复杂的高阶创作路线。'
+      : completedLessonCount >= 9
+        ? '继续完成最后一个单元，目标是做出双角色互动的启蒙毕业作品。'
+        : '沿着当前单元继续往前走，每 2 到 3 节就会完成一个新的小故事作品。'
+
   return {
     childName: profile.display_name,
     recommendedStartLevel: profile.recommended_start_level,
@@ -47,10 +52,6 @@ export function buildParentOverview({
     recentProjectCount: projectSnapshots.length,
     recentProjects,
     hasLaunchPack,
-    nextAction: hasLaunchPack
-      ? '继续正式课程第 4 节，让孩子开始双角色故事创作。'
-      : hasFinishedTrial
-        ? '孩子已经完成启蒙试听，可以在看完作品后决定是否升级高阶创作。'
-        : '先完成第 3 节试听课，做出第一支完整的小故事作品。',
+    nextAction,
   }
 }

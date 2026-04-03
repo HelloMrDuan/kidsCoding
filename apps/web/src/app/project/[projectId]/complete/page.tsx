@@ -31,10 +31,12 @@ export default function ProjectCompletePage() {
     return <main className="p-6 text-lg font-semibold">没有找到这个作品。</main>
   }
 
+  const isFoundationGraduate = lesson.id === 'lesson-12-graduation-show'
   const visibleRewardIds = new Set([
     lesson.rewardCardId,
     'growth-first-project',
     'growth-three-day-streak',
+    'commemorative-foundation-graduate',
   ])
   const rewardCards = cardDefinitions.filter(
     (card) => progress.cardIds.includes(card.id) && visibleRewardIds.has(card.id),
@@ -53,8 +55,10 @@ export default function ProjectCompletePage() {
           你完成了《{lesson.title}》
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-600">
-          当前累计 {progress.stars} 颗星星，已收集 {progress.cardIds.length}{' '}
-          张卡片。现在可以回到学习地图，继续挑战下一课。
+          当前累计 {progress.stars} 颗星星，已收集 {progress.cardIds.length} 张卡片。
+          {isFoundationGraduate
+            ? '你已经完成启蒙毕业作品，可以回看自己的双角色互动故事，再决定是否进入更复杂的高阶创作路线。'
+            : '现在可以回到学习地图，继续挑战下一课。'}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <span className="rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-700">
@@ -72,6 +76,19 @@ export default function ProjectCompletePage() {
             </span>
           ))}
         </div>
+        {isFoundationGraduate ? (
+          <div className="mt-8 rounded-[1.5rem] bg-violet-50 px-6 py-5 text-left">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-violet-700">
+              启蒙毕业
+            </p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">
+              你的第一部双角色互动故事已经完成
+            </h2>
+            <p className="mt-3 text-base leading-8 text-slate-700">
+              接下来可以先回看毕业作品，再看看高阶创作路线能不能帮助孩子做出更长、更有互动感的故事。
+            </p>
+          </div>
+        ) : null}
         <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
           <Link
             className="rounded-full bg-orange-500 px-6 py-4 text-lg font-bold text-white"
@@ -85,6 +102,14 @@ export default function ProjectCompletePage() {
           >
             回到学习地图
           </Link>
+          {isFoundationGraduate ? (
+            <Link
+              className="rounded-full border border-violet-200 px-6 py-4 text-lg font-bold text-violet-700"
+              href="/parent/purchase"
+            >
+              查看高阶创作路线
+            </Link>
+          ) : null}
         </div>
       </section>
     </main>
