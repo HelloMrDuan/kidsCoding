@@ -10,4 +10,13 @@ describe('foundation curriculum seed', () => {
     expect(launchLessons[0]?.id).toBe('lesson-01-forest-hello')
     expect(launchLessons[11]?.id).toBe('lesson-12-graduation-show')
   })
+
+  it('expands the first three lessons into polished five-step scripts', () => {
+    const lessons = launchLessons.slice(0, 3)
+
+    expect(lessons[0]?.steps).toHaveLength(5)
+    expect(lessons[1]?.steps).toHaveLength(5)
+    expect(lessons[2]?.steps).toHaveLength(5)
+    expect(lessons[2]?.goal).toContain('完整小故事')
+  })
 })
