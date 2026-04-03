@@ -7,6 +7,7 @@ import { useSyncExternalStore } from 'react'
 import { cardDefinitions } from '@/content/cards/card-definitions'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
+import { buildProjectCompletionCopy } from '@/features/projects/build-project-completion-copy'
 import {
   defaultGuestProgress,
   readGuestProgress,
@@ -32,7 +33,7 @@ export default function ProjectCompletePage() {
   }
 
   const isFoundationGraduate = lesson.id === 'lesson-12-graduation-show'
-  const isFirstFoundationProject = lesson.id === 'lesson-03-forest-story'
+  const completionCopy = buildProjectCompletionCopy(lesson.id)
   const visibleRewardIds = new Set([
     lesson.rewardCardId,
     'growth-first-project',
@@ -57,11 +58,7 @@ export default function ProjectCompletePage() {
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-600">
           当前累计 {progress.stars} 颗星星，已收集 {progress.cardIds.length} 张卡片。
-          {isFoundationGraduate
-            ? '你已经完成启蒙毕业作品，可以回看自己的双角色互动故事，再决定是否进入更复杂的高阶创作路线。'
-            : isFirstFoundationProject
-              ? '你已经做出了第一个完整小故事。现在可以回到学习地图，继续进入第二单元，把故事从一个画面推进到两个场景。'
-            : '现在可以回到学习地图，继续挑战下一课。'}
+          {completionCopy.summary}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <span className="rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-700">
@@ -79,29 +76,26 @@ export default function ProjectCompletePage() {
             </span>
           ))}
         </div>
-        {isFirstFoundationProject ? (
-          <div className="mt-8 rounded-[1.5rem] bg-emerald-50 px-6 py-5 text-left">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-700">
-              第一支完整故事
+        {completionCopy.spotlightTag &&
+        completionCopy.spotlightTitle &&
+        completionCopy.spotlightBody ? (
+          <div
+            className={`mt-8 rounded-[1.5rem] px-6 py-5 text-left ${
+              isFoundationGraduate ? 'bg-violet-50' : 'bg-emerald-50'
+            }`}
+          >
+            <p
+              className={`text-sm font-semibold uppercase tracking-[0.24em] ${
+                isFoundationGraduate ? 'text-violet-700' : 'text-emerald-700'
+              }`}
+            >
+              {completionCopy.spotlightTag}
             </p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">
-              你已经做出了第一个完整小故事
+              {completionCopy.spotlightTitle}
             </h2>
             <p className="mt-3 text-base leading-8 text-slate-700">
-              接下来会进入第二单元，孩子会开始学会场景切换和故事顺序，把小故事一步步做得更完整。
-            </p>
-          </div>
-        ) : null}
-        {isFoundationGraduate ? (
-          <div className="mt-8 rounded-[1.5rem] bg-violet-50 px-6 py-5 text-left">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-violet-700">
-              启蒙毕业
-            </p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">
-              你的第一部双角色互动故事已经完成
-            </h2>
-            <p className="mt-3 text-base leading-8 text-slate-700">
-              接下来可以先回看毕业作品，再看看高阶创作路线能不能帮助孩子做出更长、更有互动感的故事。
+              {completionCopy.spotlightBody}
             </p>
           </div>
         ) : null}
