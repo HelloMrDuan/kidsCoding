@@ -59,6 +59,33 @@ describe('createAggregatedCnProvider', () => {
     )
   })
 
+  it('maps SUCCESS webhook to paid after signature verification', async () => {
+    const provider = createAggregatedCnProvider({
+      verifySignature: vi.fn().mockReturnValue(true),
+    })
+
+    const request = new Request(
+      'https://kids.example.com/api/payments/providers/aggregated_cn/webhook',
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-cn-pay-signature': 'valid',
+        },
+        body: JSON.stringify({
+          order_no: 'll-001',
+          trade_status: 'SUCCESS',
+        }),
+      },
+    )
+
+    const result = await provider.parseWebhook(request)
+
+    expect(result.providerOrderId).toBe('ll-001')
+    expect(result.providerStatus).toBe('SUCCESS')
+    expect(result.status).toBe('paid')
+  })
+
   it('throws when createPayment returns a provider error', async () => {
     const provider = createAggregatedCnProvider({
       fetchImpl: vi.fn().mockResolvedValue(

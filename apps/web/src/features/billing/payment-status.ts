@@ -4,12 +4,15 @@ export function mapProviderStatus(value: string): PaymentOrderStatus {
   switch (value) {
     case 'created':
       return 'created'
+    case 'WAIT_BUYER_PAY':
     case 'waiting_payment':
     case 'pending':
       return 'pending'
+    case 'SUCCESS':
     case 'paid':
     case 'succeeded':
       return 'paid'
+    case 'TRADE_CLOSED':
     case 'closed':
     case 'expired':
       return 'expired'
