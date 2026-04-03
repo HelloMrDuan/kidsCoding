@@ -35,6 +35,7 @@ export type LessonStep = {
   id: string
   title: string
   instruction: string
+  voiceover?: string
   allowedBlocks: string[]
   requiredBlockTypes: string[]
 }
@@ -147,6 +148,7 @@ export type GeneratedLessonCopy = {
     id: string
     title: string
     instruction: string
+    voiceover?: string
   }>
   hintLayers: Array<{
     id: string

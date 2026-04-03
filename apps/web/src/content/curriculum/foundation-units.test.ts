@@ -52,4 +52,13 @@ describe('foundation curriculum seed', () => {
     expect(lessons[1]?.goal).toContain('顺序')
     expect(lessons[2]?.goal).toContain('启蒙毕业')
   })
+
+  it('adds voiceover to every foundation lesson step', () => {
+    const allSteps = launchLessons.flatMap((lesson) => lesson.steps)
+
+    expect(allSteps.length).toBeGreaterThan(0)
+    for (const step of allSteps) {
+      expect(step.voiceover).toBeTruthy()
+    }
+  })
 })

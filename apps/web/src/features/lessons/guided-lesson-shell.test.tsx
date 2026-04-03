@@ -17,7 +17,7 @@ describe('GuidedLessonShell', () => {
     expect(
       screen.getByText('这节高阶内容会在启蒙毕业后开启。先完成 12 节启蒙课，再决定要不要升级更复杂的互动故事。'),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: '完成这一步' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '完成这一课' })).toBeNull()
   })
 
   it('keeps the lesson completion action and task framing on unlocked lessons', () => {
@@ -31,12 +31,14 @@ describe('GuidedLessonShell', () => {
         onCompleteStep={vi.fn()}
         onStartRemedial={vi.fn()}
         stepTitle="第 1 步：连接动作"
+        voiceover="先放开始积木。"
       />,
     )
 
     expect(screen.getByText('今天的小步骤')).toBeInTheDocument()
     expect(screen.getByText('把开始积木和向右移动积木接起来。')).toBeInTheDocument()
     expect(screen.getByText('刚刚完成：太好了，角色已经准备好登场。')).toBeInTheDocument()
+    expect(screen.getByText('主语音：先放开始积木。')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-complete-step')).toBeInTheDocument()
   })
 })

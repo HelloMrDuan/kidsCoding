@@ -187,6 +187,7 @@ export default function LessonPage() {
           onStartRemedial={handleStartRemedial}
           remedialLessonId={remedialLessonId}
           stepTitle={`第 ${stepIndex + 1} 步：${step.title}`}
+          voiceover={step.voiceover}
         >
           {currentLesson.mode === 'template' ? (
             <TemplateStoryBuilder

@@ -3,6 +3,8 @@ import type {
   ProjectTemplateDefinition,
 } from '@/features/domain/types'
 
+import { applyFoundationVoiceovers } from './foundation-voiceovers'
+
 const foundationHintLayers = {
   lesson01: [
     {
@@ -751,6 +753,8 @@ export const launchLessons: LaunchLessonDefinition[] = [
     parentAdvice: '和孩子一起回看毕业作品，问一问哪一位朋友先出场、哪里有互动变化。',
   },
 ]
+
+applyFoundationVoiceovers(launchLessons)
 
 const lesson10 = launchLessons.find((lesson) => lesson.id === 'lesson-10-second-friend')
 

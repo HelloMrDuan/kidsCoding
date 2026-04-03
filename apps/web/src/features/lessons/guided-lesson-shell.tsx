@@ -9,6 +9,7 @@ type GuidedLessonShellProps = {
   isLocked: boolean
   stepTitle?: string
   instruction?: string
+  voiceover?: string
   feedback?: string
   hintCopy?: string
   remedialLessonId?: string
@@ -23,6 +24,7 @@ export function GuidedLessonShell({
   isLocked,
   stepTitle,
   instruction,
+  voiceover,
   feedback,
   hintCopy,
   remedialLessonId,
@@ -75,6 +77,11 @@ export function GuidedLessonShell({
             <p className="text-sm font-semibold text-amber-700">当前任务</p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">{stepTitle}</h2>
             <p className="mt-3 text-base leading-8 text-slate-700">{instruction}</p>
+            {voiceover ? (
+              <p className="mt-3 rounded-[1.25rem] bg-white px-4 py-3 text-sm font-semibold leading-7 text-slate-700">
+                主语音：{voiceover}
+              </p>
+            ) : null}
           </div>
         ) : null}
 
@@ -104,7 +111,7 @@ export function GuidedLessonShell({
           onClick={onCompleteStep}
           type="button"
         >
-          完成这一步
+          完成这一课
         </button>
       </aside>
 
