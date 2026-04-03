@@ -30,4 +30,15 @@ describe('foundation curriculum seed', () => {
     expect(lessons[1]?.goal).toContain('顺序')
     expect(lessons[2]?.goal).toContain('完整小故事')
   })
+
+  it('expands lessons 7 to 9 into the third unit five-step scripts', () => {
+    const lessons = launchLessons.slice(6, 9)
+
+    expect(lessons[0]?.steps).toHaveLength(5)
+    expect(lessons[1]?.steps).toHaveLength(5)
+    expect(lessons[2]?.steps).toHaveLength(5)
+    expect(lessons[0]?.goal).toContain('点击')
+    expect(lessons[1]?.goal).toContain('先动再说')
+    expect(lessons[2]?.goal).toContain('互动故事')
+  })
 })

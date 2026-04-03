@@ -134,4 +134,37 @@ describe('buildParentOverview', () => {
     expect(summary.nextAction).toContain('第二个完整小故事')
     expect(summary.nextAction).toContain('第三单元')
   })
+
+  it('suggests moving into unit 4 after the interactive story is finished', () => {
+    const summary = buildParentOverview({
+      profile: {
+        display_name: '小小创作者',
+        recommended_start_level: 'starter',
+      },
+      progressRecords: [
+        { lesson_id: 'lesson-01-forest-hello', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 6 },
+        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 9 },
+        { lesson_id: 'lesson-04-meadow-scene', status: 'completed', stars: 12 },
+        { lesson_id: 'lesson-05-meadow-order', status: 'completed', stars: 15 },
+        { lesson_id: 'lesson-06-meadow-story', status: 'completed', stars: 18 },
+        { lesson_id: 'lesson-07-garden-click', status: 'completed', stars: 21 },
+        { lesson_id: 'lesson-08-garden-dialogue', status: 'completed', stars: 24 },
+        { lesson_id: 'lesson-09-garden-story', status: 'completed', stars: 27 },
+      ],
+      cardRecords: [{ card_definition_id: 'theme-garden-story' }],
+      badgeRecords: [{ badge_type: 'lesson-lesson-09-garden-story' }],
+      projectSnapshots: [
+        {
+          lesson_id: 'lesson-09-garden-story',
+          updated_at: '2026-03-31T14:00:00.000Z',
+        },
+      ],
+      lessonCatalog: launchLessons,
+      hasLaunchPack: false,
+    })
+
+    expect(summary.nextAction).toContain('互动故事')
+    expect(summary.nextAction).toContain('第四单元')
+  })
 })

@@ -29,6 +29,21 @@ const FOUNDATION_LESSON_FEEDBACK = {
     progress: '太好了，第二个完整小故事已经快拼好了。',
     retry: '先看看出发、转场和收尾的话是不是按顺序接好了。',
   },
+  'lesson-07-garden-click': {
+    initial: '先放好“被点击时”，再试试让角色回应你的点击。',
+    progress: '太好了，蝴蝶已经会回应你的点击了。',
+    retry: '先确认“被点击时”放在最前面，再把动作积木接在后面。',
+  },
+  'lesson-08-garden-dialogue': {
+    initial: '先让角色在点击后动起来，再接上一句回应的话。',
+    progress: '太好了，角色已经会用动作和一句话回应你了。',
+    retry: '先看看是不是先动起来，再接上一句回应的话。',
+  },
+  'lesson-09-garden-story': {
+    initial: '先把点击开关放好，再接上动作和一句回应的话。',
+    progress: '太好了，你的互动故事已经会回应点击了。',
+    retry: '先确认“被点击时”放在最前面，再把动作和一句回应的话接上去。',
+  },
 } as const
 
 const DEFAULT_FEEDBACK = {

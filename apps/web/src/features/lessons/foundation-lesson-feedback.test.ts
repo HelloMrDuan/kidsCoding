@@ -23,7 +23,7 @@ describe('getFoundationLessonFeedback', () => {
 
   it('falls back to the generic copy for later lessons', () => {
     expect(
-      getFoundationLessonFeedback('lesson-07-garden-click', 'progress'),
+      getFoundationLessonFeedback('lesson-10-second-friend', 'progress'),
     ).toBe('很好，这一步完成了。继续往下，作品马上会更像一个完整故事。')
   })
 
@@ -43,5 +43,23 @@ describe('getFoundationLessonFeedback', () => {
     expect(
       getFoundationLessonFeedback('lesson-06-meadow-story', 'retry'),
     ).toBe('先看看出发、转场和收尾的话是不是按顺序接好了。')
+  })
+
+  it('returns the lesson specific opening guidance for lesson 07', () => {
+    expect(
+      getFoundationLessonFeedback('lesson-07-garden-click', 'initial'),
+    ).toBe('先放好“被点击时”，再试试让角色回应你的点击。')
+  })
+
+  it('returns the lesson specific progress feedback for lesson 08', () => {
+    expect(
+      getFoundationLessonFeedback('lesson-08-garden-dialogue', 'progress'),
+    ).toBe('太好了，角色已经会用动作和一句话回应你了。')
+  })
+
+  it('returns the lesson specific retry guidance for lesson 09', () => {
+    expect(
+      getFoundationLessonFeedback('lesson-09-garden-story', 'retry'),
+    ).toBe('先确认“被点击时”放在最前面，再把动作和一句回应的话接上去。')
   })
 })

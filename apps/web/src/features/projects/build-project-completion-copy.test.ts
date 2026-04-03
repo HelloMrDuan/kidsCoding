@@ -25,4 +25,12 @@ describe('buildProjectCompletionCopy', () => {
     expect(copy.summary).toContain('启蒙毕业作品')
     expect(copy.spotlightTag).toBe('启蒙毕业')
   })
+
+  it('returns the interactive story copy for lesson 09', () => {
+    const copy = buildProjectCompletionCopy('lesson-09-garden-story')
+
+    expect(copy.summary).toContain('互动故事')
+    expect(copy.summary).toContain('第四单元')
+    expect(copy.spotlightTag).toBe('互动故事作品')
+  })
 })

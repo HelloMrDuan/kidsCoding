@@ -32,6 +32,17 @@ export function buildProjectCompletionCopy(lessonId: string) {
     }
   }
 
+  if (lessonId === 'lesson-09-garden-story') {
+    return {
+      summary:
+        '你已经做出了会回应点击的互动故事。现在可以回到学习地图，继续进入第四单元，让两个角色一起完成毕业作品。',
+      spotlightTag: '互动故事作品',
+      spotlightTitle: '你已经做出了会回应你的互动故事',
+      spotlightBody:
+        '接下来会进入第四单元，孩子会开始把两个角色放进同一个故事里，用已经学会的动作、对白和互动做出毕业作品。',
+    }
+  }
+
   return {
     summary: '现在可以回到学习地图，继续挑战下一课。',
     spotlightTag: null,

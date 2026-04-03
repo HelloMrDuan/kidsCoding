@@ -39,7 +39,7 @@ export function buildParentOverview({
     : completedLessonCount >= 12
       ? '孩子已经完成启蒙毕业作品，现在可以看看是否适合升级到更复杂的高阶创作路线。'
       : completedLessonCount >= 9
-        ? '继续完成最后一个单元，目标是做出双角色互动的启蒙毕业作品。'
+        ? '孩子已经做出了会回应点击的互动故事，接下来会进入第四单元，开始让两个角色一起完成毕业作品。'
         : completedLessonCount >= 6
           ? '孩子已经完成第二个完整小故事，接下来会进入第三单元，开始学会点击触发和简单互动。'
         : completedLessonCount >= 3
