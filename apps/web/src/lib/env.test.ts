@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getCnPaymentProviderEnv,
   hasAiEnv,
   parseAiProviderSlots,
   resolveAiProviderSelection,
@@ -99,5 +100,23 @@ describe('hasAiEnv', () => {
         AI_PROVIDER_PRIMARY_NAME: 'OpenAI',
       }),
     ).toBe(false)
+  })
+})
+
+describe('getCnPaymentProviderEnv', () => {
+  it('returns trimmed CN payment provider settings', () => {
+    const env = getCnPaymentProviderEnv({
+      CN_PAYMENT_PROVIDER_BASE_URL: ' https://payments.example.com ',
+      CN_PAYMENT_PROVIDER_APP_ID: ' demo-app-id ',
+      CN_PAYMENT_PROVIDER_APP_SECRET: ' demo-app-secret ',
+      CN_PAYMENT_PROVIDER_WEBHOOK_SECRET: ' demo-webhook-secret ',
+    })
+
+    expect(env).toEqual({
+      baseUrl: 'https://payments.example.com',
+      appId: 'demo-app-id',
+      appSecret: 'demo-app-secret',
+      webhookSecret: 'demo-webhook-secret',
+    })
   })
 })

@@ -28,6 +28,8 @@
 - `CN_PAYMENT_PROVIDER_APP_SECRET`
 - `CN_PAYMENT_PROVIDER_WEBHOOK_SECRET`
 
+当前首个真实中国大陆 provider 采用连连支付接入，但环境变量继续保持 provider-agnostic 命名，避免后续切换服务商时整仓库重命名。
+
 ### AI 提供方
 
 - `AI_PROVIDER_MODE=openai_compatible`

@@ -93,4 +93,42 @@ describe('createEnvCheckReport', () => {
       'FAIL',
     )
   })
+
+  it('fails in production when aggregated_cn is configured without signing secrets', () => {
+    const report = createEnvCheckReport({
+      mode: 'production',
+      env: {
+        NEXT_PUBLIC_SUPABASE_URL: 'https://demo.supabase.co',
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb-publishable',
+        SUPABASE_SERVICE_ROLE_KEY: 'sb-service',
+        STRIPE_SECRET_KEY: 'sk_test_123',
+        STRIPE_WEBHOOK_SECRET: 'whsec_123',
+        NEXT_PUBLIC_APP_URL: 'https://kidscoding.example.com',
+        PAYMENT_PROVIDER_DEFAULT: 'aggregated_cn',
+        CN_PAYMENT_PROVIDER_BASE_URL: 'https://payments.example.com',
+        CN_PAYMENT_PROVIDER_APP_ID: 'demo-app-id',
+        CN_PAYMENT_PROVIDER_APP_SECRET: '',
+        CN_PAYMENT_PROVIDER_WEBHOOK_SECRET: '',
+        AI_PROVIDER_MODE: 'openai_compatible',
+        AI_PROVIDER_PRIMARY_NAME: 'OpenAI',
+        AI_PROVIDER_PRIMARY_BASE_URL: 'https://api.openai.com/v1',
+        AI_PROVIDER_PRIMARY_API_KEY: 'sk-primary',
+        AI_PROVIDER_PRIMARY_MODELS: 'gpt-5-mini',
+      },
+    })
+
+    const cnPaymentGroup = report.groups.find((group) => group.id === 'cn-payment')
+
+    expect(cnPaymentGroup?.status).toBe('FAIL')
+    expect(
+      cnPaymentGroup?.items.find(
+        (item) => item.field === 'CN_PAYMENT_PROVIDER_APP_SECRET',
+      )?.status,
+    ).toBe('FAIL')
+    expect(
+      cnPaymentGroup?.items.find(
+        (item) => item.field === 'CN_PAYMENT_PROVIDER_WEBHOOK_SECRET',
+      )?.status,
+    ).toBe('FAIL')
+  })
 })

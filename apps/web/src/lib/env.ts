@@ -53,6 +53,17 @@ export function getDefaultPaymentProvider(
   return env.PAYMENT_PROVIDER_DEFAULT === 'stripe' ? 'stripe' : 'aggregated_cn'
 }
 
+export function getCnPaymentProviderEnv(
+  env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
+) {
+  return {
+    baseUrl: (env.CN_PAYMENT_PROVIDER_BASE_URL ?? '').trim(),
+    appId: (env.CN_PAYMENT_PROVIDER_APP_ID ?? '').trim(),
+    appSecret: (env.CN_PAYMENT_PROVIDER_APP_SECRET ?? '').trim(),
+    webhookSecret: (env.CN_PAYMENT_PROVIDER_WEBHOOK_SECRET ?? '').trim(),
+  }
+}
+
 const AI_SLOT_PREFIX: Record<AiProviderSlot, string> = {
   primary: 'AI_PROVIDER_PRIMARY',
   secondary: 'AI_PROVIDER_SECONDARY',
