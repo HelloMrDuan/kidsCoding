@@ -62,7 +62,7 @@ export function GuidedLessonShell({
       <aside className="space-y-5 rounded-[2.25rem] bg-white p-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
         <div className="space-y-3">
           <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
-            今天的小目标
+            今天的小步骤
           </p>
           <h1 className="text-3xl font-black tracking-tight text-slate-950">{lessonTitle}</h1>
           <p className="rounded-[1.5rem] bg-slate-50 px-4 py-4 text-sm leading-7 text-slate-600">
@@ -80,7 +80,7 @@ export function GuidedLessonShell({
 
         {feedback ? (
           <div className="rounded-[1.5rem] bg-[#eff8ff] px-4 py-4 text-sm font-semibold leading-7 text-sky-800">
-            {feedback}
+            刚刚完成：{feedback}
           </div>
         ) : null}
 
@@ -104,7 +104,7 @@ export function GuidedLessonShell({
           onClick={onCompleteStep}
           type="button"
         >
-          完成这一小步
+          完成这一步
         </button>
       </aside>
 

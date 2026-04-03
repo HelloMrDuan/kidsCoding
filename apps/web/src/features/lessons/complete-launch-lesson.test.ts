@@ -7,24 +7,24 @@ import { completeLaunchLesson } from './complete-launch-lesson'
 
 const lessons: LaunchLessonDefinition[] = [
   {
-    id: 'trial-01-move-character',
-    title: '让角色动起来',
-    goal: '主角从左边走到右边',
+    id: 'lesson-01-forest-hello',
+    title: '小狐狸出场',
+    goal: '让小狐狸自己走上舞台，完成第一次出场。',
     recommendedLevel: 'starter',
     steps: [],
-    rewardCardId: 'theme-scout-cat',
+    rewardCardId: 'theme-forest-fox',
     phase: 'trial',
     mode: 'guided',
     sortOrder: 1,
     hintLayers: [],
   },
   {
-    id: 'trial-02-dialogue-action',
-    title: '让角色说话和做动作',
-    goal: '角色边走边说一句话',
+    id: 'lesson-02-forest-greeting',
+    title: '小狐狸打招呼',
+    goal: '让小狐狸开口说一句欢迎的话。',
     recommendedLevel: 'starter',
     steps: [],
-    rewardCardId: 'theme-dialogue-bird',
+    rewardCardId: 'theme-forest-rabbit',
     phase: 'trial',
     mode: 'guided',
     sortOrder: 2,
@@ -34,7 +34,7 @@ const lessons: LaunchLessonDefinition[] = [
 
 const progress: GuestProgress = {
   completedLessonIds: [],
-  currentLessonId: 'trial-01-move-character',
+  currentLessonId: 'lesson-01-forest-hello',
   stars: 0,
   badgeIds: [],
   cardIds: [],
@@ -52,18 +52,18 @@ describe('completeLaunchLesson', () => {
       progress,
       reward: {
         stars: 3,
-        badgeIds: ['lesson-trial-01-move-character'],
-        cardIds: ['theme-scout-cat'],
+        badgeIds: ['lesson-lesson-01-forest-hello'],
+        cardIds: ['theme-forest-fox'],
       },
       updatedAt: '2026-03-31T10:00:00.000Z',
     })
 
-    expect(result.currentLessonId).toBe('trial-02-dialogue-action')
-    expect(result.completedLessonIds).toEqual(['trial-01-move-character'])
-    expect(result.completedProjectIds).toEqual(['trial-01-move-character'])
+    expect(result.currentLessonId).toBe('lesson-02-forest-greeting')
+    expect(result.completedLessonIds).toEqual(['lesson-01-forest-hello'])
+    expect(result.completedProjectIds).toEqual(['lesson-01-forest-hello'])
     expect(result.projectSnapshots).toEqual([
       {
-        lessonId: 'trial-01-move-character',
+        lessonId: 'lesson-01-forest-hello',
         updatedAt: '2026-03-31T10:00:00.000Z',
         blocks: [{ type: 'when_start' }, { type: 'move_right' }],
       },

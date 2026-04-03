@@ -11,6 +11,7 @@ import { evaluateStep } from '@/features/lessons/blockly/evaluate-step'
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
 import { buildHintState } from '@/features/lessons/build-hint-state'
 import { completeLaunchLesson } from '@/features/lessons/complete-launch-lesson'
+import { getFoundationLessonFeedback } from '@/features/lessons/foundation-lesson-feedback'
 import { GuidedLessonShell } from '@/features/lessons/guided-lesson-shell'
 import { TemplateStoryBuilder } from '@/features/lessons/template-story-builder'
 import { readOnboardingSession } from '@/features/onboarding/onboarding-session'
@@ -20,8 +21,6 @@ import {
 } from '@/features/progress/local-progress'
 import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
 import { awardLessonCompletion } from '@/features/rewards/award-lesson-completion'
-
-const DEFAULT_FEEDBACK = '先把第一块积木放上去，角色就会开始准备登场。'
 
 export default function LessonPage() {
   const params = useParams<{ lessonId: string }>()
@@ -35,7 +34,9 @@ export default function LessonPage() {
   const [stepIndex, setStepIndex] = useState(0)
   const [blocks, setBlocks] = useState<Array<{ type: string }>>([])
   const blocksRef = useRef<Array<{ type: string }>>([])
-  const [feedback, setFeedback] = useState(DEFAULT_FEEDBACK)
+  const [feedback, setFeedback] = useState(() =>
+    getFoundationLessonFeedback(lessonId ?? '', 'initial'),
+  )
   const [failedAttempts, setFailedAttempts] = useState(0)
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
 
@@ -111,7 +112,7 @@ export default function LessonPage() {
       setFailedAttempts(nextFailedAttempts)
       setFeedback(
         nextHintState.activeHint?.copy ??
-          '还差一点点。先看看角色是不是已经有开始积木，再把需要的动作接上去。',
+          getFoundationLessonFeedback(currentLesson.id, 'retry'),
       )
       return
     }
@@ -120,7 +121,7 @@ export default function LessonPage() {
 
     if (stepIndex < currentLesson.steps.length - 1) {
       setStepIndex(stepIndex + 1)
-      setFeedback('很好，这一步完成了。继续往下，作品马上会更像一个完整故事。')
+      setFeedback(getFoundationLessonFeedback(currentLesson.id, 'progress'))
       return
     }
 
