@@ -2,6 +2,7 @@ export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
   const moved = blocks.some((block) => block.type === 'move_right')
   const spoke = blocks.some((block) => block.type === 'say_line')
   const hasStart = blocks.some((block) => block.type === 'when_start')
+  const hasClickTrigger = blocks.some((block) => block.type === 'when_clicked')
   const switchedScene = blocks.some((block) => block.type === 'switch_scene')
 
   return (
@@ -28,12 +29,18 @@ export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
           <p className="mt-4 text-sm font-semibold leading-7 text-slate-700">
             {spoke && switchedScene
               ? '太好了，旅行已经完整地走到了新场景，整个故事越来越像真的冒险。'
+              : spoke && hasClickTrigger
+              ? '太好了，角色已经会在点击后先动起来，再用一句话回应你。'
               : spoke
               ? '太好了，角色已经会说话了，故事正在从静态图片变成会动的小舞台。'
               : switchedScene
                 ? '太好了，故事已经从森林走到草地了。再接一句收尾的话，旅行就更完整了。'
+              : moved && hasClickTrigger
+                ? '太好了，角色已经会在点击后动起来了。再接一句回应的话，互动就更完整了。'
               : moved
                 ? '太好了，角色已经走上舞台了。再接一句话，故事就会更完整。'
+              : hasClickTrigger
+                ? '很好，角色已经准备好回应你的点击了。再接一个动作积木，点一下就能看到变化。'
               : hasStart
                 ? '很好，角色已经站上舞台了。再接一个动作积木，马上就能看到表演。'
                 : '先把开始积木放好，再让角色真正开始表演。'}
