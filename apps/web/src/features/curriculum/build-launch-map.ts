@@ -1,3 +1,4 @@
+import { foundationUnits } from '@/content/curriculum/foundation-units'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { remedialLessons } from '@/content/curriculum/remedial-lessons'
 import type { LaunchLessonDefinition } from '@/features/domain/types'
@@ -9,8 +10,9 @@ export function buildLaunchMap(lessons: LaunchLessonDefinition[] = launchLessons
 
   return {
     allLessons,
-    trialLessons: allLessons.filter((item) => item.phase === 'trial'),
-    paidLessons: allLessons.filter((item) => item.phase === 'course'),
+    trialLessons: allLessons,
+    paidLessons: [],
     remedials: remedialLessons,
+    foundationUnits,
   }
 }

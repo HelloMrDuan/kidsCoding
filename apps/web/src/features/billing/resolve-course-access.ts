@@ -1,6 +1,5 @@
 export function resolveCourseAccess({
   lessonPhase,
-  hasLaunchPack,
 }: {
   lessonPhase: 'trial' | 'course'
   hasLaunchPack: boolean
@@ -9,5 +8,5 @@ export function resolveCourseAccess({
     return 'allowed'
   }
 
-  return hasLaunchPack ? 'allowed' : 'locked'
+  return 'allowed'
 }
