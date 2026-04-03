@@ -191,10 +191,10 @@ export type AdminLessonSummary = {
 }
 
 export type LaunchCurriculumSkeletonStage =
-  | 'trial'
-  | 'guided'
-  | 'story'
-  | 'template'
+  | 'unit_1'
+  | 'unit_2'
+  | 'unit_3'
+  | 'unit_4'
 
 export type LaunchCurriculumSkeleton = {
   lessonId: string

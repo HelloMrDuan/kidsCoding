@@ -10,7 +10,7 @@ describe('generateLaunchLessonDraft', () => {
     const lesson = launchLessons[0]
     const skeleton = {
       lessonId: lesson.id,
-      stage: 'trial',
+      stage: 'unit_1',
       lessonObjective: lesson.goal,
       newConcepts: [lesson.goal],
       dependsOn: [],

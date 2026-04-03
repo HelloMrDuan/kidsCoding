@@ -24,7 +24,7 @@ const launchCurriculumSkeletonSchema = {
       lessonId: { type: 'string' },
       stage: {
         type: 'string',
-        enum: ['trial', 'guided', 'story', 'template'],
+        enum: ['unit_1', 'unit_2', 'unit_3', 'unit_4'],
       },
       lessonObjective: { type: 'string' },
       newConcepts: {
@@ -46,9 +46,9 @@ const launchCurriculumSkeletonSchema = {
 
 function buildSkeletonPrompt(lessons: LaunchLessonDefinition[]) {
   return [
-    '请为儿童编程首发主线课程生成 15 节课的课程骨架。',
-    '必须保持第 1-3 节为试听阶段，第 4-8 节为 guided，第 9-12 节为 story，第 13-15 节为 template。',
-    '每节课最多引入 1 个新核心点，难度递进必须平缓。',
+    '请为儿童编程启蒙主线生成 12 节课的课程骨架。',
+    '第 1-3 节必须是 unit_1，第 4-6 节必须是 unit_2，第 7-9 节必须是 unit_3，第 10-12 节必须是 unit_4。',
+    '每节课最多引入 1 个新核心点，最终目标是完成双角色互动故事。',
     JSON.stringify(
       lessons.map((lesson) => ({
         id: lesson.id,
@@ -112,20 +112,20 @@ export async function generateLaunchCurriculumSkeleton(input: {
     }
   }
 
-  if (skeleton.slice(0, 3).some((item) => item.stage !== 'trial')) {
-    throw new Error('skeleton-trial-boundary-invalid')
+  if (skeleton.slice(0, 3).some((item) => item.stage !== 'unit_1')) {
+    throw new Error('skeleton-unit-1-boundary-invalid')
   }
 
-  if (skeleton.slice(3, 8).some((item) => item.stage !== 'guided')) {
-    throw new Error('skeleton-guided-boundary-invalid')
+  if (skeleton.slice(3, 6).some((item) => item.stage !== 'unit_2')) {
+    throw new Error('skeleton-unit-2-boundary-invalid')
   }
 
-  if (skeleton.slice(8, 12).some((item) => item.stage !== 'story')) {
-    throw new Error('skeleton-story-boundary-invalid')
+  if (skeleton.slice(6, 9).some((item) => item.stage !== 'unit_3')) {
+    throw new Error('skeleton-unit-3-boundary-invalid')
   }
 
-  if (skeleton.slice(12).some((item) => item.stage !== 'template')) {
-    throw new Error('skeleton-template-boundary-invalid')
+  if (skeleton.slice(9, 12).some((item) => item.stage !== 'unit_4')) {
+    throw new Error('skeleton-unit-4-boundary-invalid')
   }
 
   return skeleton
