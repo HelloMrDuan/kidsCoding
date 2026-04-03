@@ -30,6 +30,16 @@
 
 当前首个真实中国大陆 provider 采用连连支付接入，但环境变量继续保持 provider-agnostic 命名，避免后续切换服务商时整仓库重命名。
 
+#### 真实联调说明
+
+当 `PAYMENT_PROVIDER_DEFAULT=aggregated_cn` 时：
+
+1. 配置真实或测试环境的中国大陆聚合支付参数
+2. 确认 `webhook` 地址可以被支付服务商回调访问
+3. 在预发布环境至少验证一次真实下单、真实回调、主动查单和管理员重试同步
+
+本地 E2E 仍然只 mock 平台统一订单状态，不直接依赖真实支付网络请求。
+
 ### AI 提供方
 
 - `AI_PROVIDER_MODE=openai_compatible`
