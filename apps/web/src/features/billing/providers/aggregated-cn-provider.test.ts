@@ -111,4 +111,26 @@ describe('createAggregatedCnProvider', () => {
       }),
     ).rejects.toThrow('create-payment-failed')
   })
+
+  it('maps queryPayment success to paid', async () => {
+    const provider = createAggregatedCnProvider({
+      fetchImpl: vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            code: '0000',
+            trade_status: 'SUCCESS',
+          }),
+          { status: 200 },
+        ),
+      ),
+    })
+
+    const result = await provider.queryPayment({
+      orderId: 'order_1',
+      providerOrderId: 'll-001',
+    })
+
+    expect(result.providerStatus).toBe('SUCCESS')
+    expect(result.status).toBe('paid')
+  })
 })

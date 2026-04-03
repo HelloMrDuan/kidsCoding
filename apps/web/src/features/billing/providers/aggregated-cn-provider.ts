@@ -84,10 +84,32 @@ export function createAggregatedCnProvider(
       }
     },
     async queryPayment(_input) {
-      void _input
+      const response = await fetchImpl(
+        `${env.baseUrl}/payments/${_input.providerOrderId || _input.orderId}`,
+        {
+          method: 'GET',
+          headers: {
+            'x-cn-pay-app-id': env.appId,
+          },
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error('query-payment-failed')
+      }
+
+      const payload = (await response.json()) as {
+        code?: string
+        trade_status?: string
+      }
+
+      if (payload.code !== '0000') {
+        throw new Error('query-payment-failed')
+      }
+
       return {
-        providerStatus: 'pending',
-        status: mapProviderStatus('pending'),
+        providerStatus: payload.trade_status ?? 'failed',
+        status: mapProviderStatus(payload.trade_status ?? 'failed'),
       }
     },
   }
