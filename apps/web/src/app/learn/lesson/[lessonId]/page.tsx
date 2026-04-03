@@ -34,7 +34,7 @@ export default function LessonPage() {
   const [stepIndex, setStepIndex] = useState(0)
   const [blocks, setBlocks] = useState<Array<{ type: string }>>([])
   const blocksRef = useRef<Array<{ type: string }>>([])
-  const [feedback, setFeedback] = useState(() =>
+  const [feedback, setFeedback] = useState<string>(() =>
     getFoundationLessonFeedback(lessonId ?? '', 'initial'),
   )
   const [failedAttempts, setFailedAttempts] = useState(0)
@@ -200,6 +200,7 @@ export default function LessonPage() {
               <PreviewStage blocks={blocks} />
               <BlocklyWorkspace
                 allowedBlocks={step.allowedBlocks}
+                blocks={blocks}
                 onSnapshotChange={handleSnapshotChange}
               />
             </div>

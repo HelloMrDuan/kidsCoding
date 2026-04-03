@@ -7,6 +7,7 @@ import {
   getKidsBlockLabel,
   registerKidsBlocks,
 } from './register-kids-blocks'
+import { restoreBlockSequence } from './restore-block-sequence'
 
 type BlockSnapshot = {
   type: string
@@ -62,18 +63,23 @@ function positionOrConnectBlock(
 
 export function BlocklyWorkspace({
   allowedBlocks,
+  blocks,
   onSnapshotChange,
 }: {
   allowedBlocks: string[]
+  blocks: Array<{ type: string }>
   onSnapshotChange: (blocks: Array<{ type: string }>) => void
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
+  const latestBlocksRef = useRef(blocks)
   const allowedBlockKey = useMemo(() => allowedBlocks.join('|'), [allowedBlocks])
   const stableAllowedBlocks = useMemo(
     () => (allowedBlockKey ? allowedBlockKey.split('|') : []),
     [allowedBlockKey],
   )
+
+  latestBlocksRef.current = blocks
 
   useEffect(() => {
     registerKidsBlocks()
@@ -103,6 +109,17 @@ export function BlocklyWorkspace({
     })
 
     workspaceRef.current = workspace
+    const restoredBlocks = restoreBlockSequence(
+      latestBlocksRef.current,
+      stableAllowedBlocks,
+    )
+
+    restoredBlocks.forEach((snapshot) => {
+      const block = workspace.newBlock(snapshot.type)
+      block.initSvg()
+      block.render()
+      positionOrConnectBlock(workspace, block)
+    })
 
     const handleChange = () => {
       onSnapshotChange(buildSnapshot(workspace))

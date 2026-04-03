@@ -27,6 +27,8 @@ export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
           <p className="mt-4 text-sm font-semibold leading-7 text-slate-700">
             {spoke
               ? '太好了，角色已经会说话了，故事正在从静态图片变成会动的小舞台。'
+              : moved
+                ? '太好了，角色已经走上舞台了。再接一句话，故事就会更完整。'
               : hasStart
                 ? '很好，角色已经站上舞台了。再接一个动作积木，马上就能看到表演。'
                 : '先把开始积木放好，再让角色真正开始表演。'}

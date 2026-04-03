@@ -189,7 +189,7 @@ export default async function ParentOverviewPage() {
               </div>
             ) : (
               <p className="mt-5 rounded-[1.5rem] bg-slate-50 p-4 text-sm font-semibold leading-7 text-slate-600">
-                孩子完成第一支故事作品后，这里就会出现最近作品回放入口。
+                孩子完成第一个完整小故事后，这里就会出现最近作品回放入口。
               </p>
             )}
           </section>

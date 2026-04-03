@@ -77,4 +77,31 @@ describe('buildParentOverview', () => {
       },
     ])
   })
+
+  it('suggests moving into unit 2 after the first complete story is finished', () => {
+    const summary = buildParentOverview({
+      profile: {
+        display_name: '小小创作者',
+        recommended_start_level: 'starter',
+      },
+      progressRecords: [
+        { lesson_id: 'lesson-01-forest-hello', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 6 },
+        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 9 },
+      ],
+      cardRecords: [{ card_definition_id: 'growth-first-project' }],
+      badgeRecords: [{ badge_type: 'lesson-lesson-03-forest-story' }],
+      projectSnapshots: [
+        {
+          lesson_id: 'lesson-03-forest-story',
+          updated_at: '2026-03-31T10:00:00.000Z',
+        },
+      ],
+      lessonCatalog: launchLessons,
+      hasLaunchPack: false,
+    })
+
+    expect(summary.nextAction).toContain('第一个完整小故事')
+    expect(summary.nextAction).toContain('第二单元')
+  })
 })

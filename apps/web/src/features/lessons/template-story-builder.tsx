@@ -24,6 +24,7 @@ export function TemplateStoryBuilder({
       <PreviewStage blocks={blocks} />
       <BlocklyWorkspace
         allowedBlocks={allowedBlocks}
+        blocks={blocks}
         onSnapshotChange={onSnapshotChange}
       />
     </div>
