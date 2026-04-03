@@ -79,7 +79,9 @@ export function BlocklyWorkspace({
     [allowedBlockKey],
   )
 
-  latestBlocksRef.current = blocks
+  useEffect(() => {
+    latestBlocksRef.current = blocks
+  }, [blocks])
 
   useEffect(() => {
     registerKidsBlocks()
