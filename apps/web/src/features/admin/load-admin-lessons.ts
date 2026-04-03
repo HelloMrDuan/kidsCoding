@@ -15,6 +15,7 @@ import {
   hasUnpublishedLessonChanges,
   resolveAdminLessonRecord,
 } from './launch-curriculum-records'
+import { ensureAiRuntimeSelection } from './ai/ai-runtime-settings'
 import { createLaunchCurriculumRepository } from './launch-curriculum-repository'
 
 export async function loadAdminLessonSummaries(): Promise<AdminLessonSummary[]> {
@@ -138,7 +139,11 @@ export async function loadAdminDashboardData(): Promise<{
   }
 
   const repository = createLaunchCurriculumRepository(createAdminClient())
-  const stored = await repository.loadAiRuntimeSetting()
+  const stored = await ensureAiRuntimeSelection({
+    env: process.env,
+    mode: 'development',
+    repository,
+  })
   const resolved = resolveAiProviderSelection({
     env: process.env,
     mode: 'development',
