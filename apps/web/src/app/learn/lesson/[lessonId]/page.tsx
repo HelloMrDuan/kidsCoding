@@ -21,7 +21,7 @@ import {
 import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
 import { awardLessonCompletion } from '@/features/rewards/award-lesson-completion'
 
-const DEFAULT_FEEDBACK = '鍏堟寜鎻愮ず瀹屾垚杩欎竴灏忔銆?'
+const DEFAULT_FEEDBACK = '先把第一块积木放上去，角色就会开始准备登场。'
 
 export default function LessonPage() {
   const params = useParams<{ lessonId: string }>()
@@ -70,7 +70,7 @@ export default function LessonPage() {
   if (!lesson) {
     return (
       <main className="p-6 text-lg font-semibold">
-        濞屸剝婀侀幍鎯у煂鏉╂瑤绔寸拠淇扁偓?
+        没找到这节课，先回学习地图重新进入试试。
       </main>
     )
   }
@@ -88,7 +88,7 @@ export default function LessonPage() {
       : undefined
   const templateName =
     curriculum.templates.find((item) => item.id === currentLesson.templateId)
-      ?.name ?? '鏁呬簨妯℃澘'
+      ?.name ?? '故事模板'
   const courseAccess = resolveCourseAccess({
     lessonPhase: currentLesson.phase,
     hasLaunchPack: hasCourseEntitlement,
@@ -110,7 +110,8 @@ export default function LessonPage() {
 
       setFailedAttempts(nextFailedAttempts)
       setFeedback(
-        nextHintState.activeHint?.copy ?? '鍐嶆鏌ヤ竴涓嬬Н鏈ㄩ『搴忥紝鐒跺悗缁х画璇曡瘯銆?',
+        nextHintState.activeHint?.copy ??
+          '还差一点点。先看看角色是不是已经有开始积木，再把需要的动作接上去。',
       )
       return
     }
@@ -119,7 +120,7 @@ export default function LessonPage() {
 
     if (stepIndex < currentLesson.steps.length - 1) {
       setStepIndex(stepIndex + 1)
-      setFeedback('澶ソ浜嗭紝缁х画涓嬩竴姝ャ€?')
+      setFeedback('很好，这一步完成了。继续往下，作品马上会更像一个完整故事。')
       return
     }
 
@@ -148,8 +149,32 @@ export default function LessonPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fbff] px-6 py-8">
-      <section className="mx-auto max-w-6xl">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#f5fbff_0%,#fff8ef_100%)] px-4 py-6 md:px-6 md:py-8">
+      <section className="mx-auto max-w-7xl space-y-6">
+        <header className="rounded-[2.25rem] bg-white px-6 py-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
+              第 {stepIndex + 1} 步 / 共 {currentLesson.steps.length} 步
+            </span>
+            <span className="rounded-full bg-[#fff1d4] px-4 py-2 text-sm font-semibold text-amber-700">
+              {currentLesson.phase === 'trial' ? '启蒙课' : '高阶创作课'}
+            </span>
+          </div>
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <h1 className="text-3xl font-black tracking-tight text-slate-950 md:text-5xl">
+                {currentLesson.title}
+              </h1>
+              <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600 md:text-lg md:leading-8">
+                先完成这个小目标，再把这一节课推进成一段会动的故事片段。每一步都能在右边舞台马上看到结果。
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] bg-slate-50 px-5 py-4 text-sm leading-7 text-slate-600">
+              当前目标：{step.title}
+            </div>
+          </div>
+        </header>
+
         <GuidedLessonShell
           feedback={feedback}
           hintCopy={hintCopy}
@@ -160,7 +185,7 @@ export default function LessonPage() {
           onCompleteStep={handleNext}
           onStartRemedial={handleStartRemedial}
           remedialLessonId={remedialLessonId}
-          stepTitle={`绗?${stepIndex + 1} 姝?路 ${step.title}`}
+          stepTitle={`第 ${stepIndex + 1} 步：${step.title}`}
         >
           {currentLesson.mode === 'template' ? (
             <TemplateStoryBuilder

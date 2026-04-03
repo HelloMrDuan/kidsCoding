@@ -140,16 +140,30 @@ export function BlocklyWorkspace({
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-      <div
-        ref={mountRef}
-        className="min-h-[420px] rounded-[1.5rem] border border-slate-200 bg-white"
-      />
+    <div className="grid gap-4 xl:grid-cols-[1fr_300px]">
+      <div className="space-y-3">
+        <div className="rounded-[1.5rem] bg-white px-4 py-3 shadow-[0_12px_24px_rgba(15,23,42,0.05)]">
+          <p className="text-sm font-semibold text-slate-500">积木操作区</p>
+          <p className="mt-1 text-sm leading-7 text-slate-600">
+            左边拖积木，右边也可以直接点按钮补上本节可用积木。低龄孩子先会拼，再慢慢理解为什么这样拼。
+          </p>
+        </div>
+        <div
+          ref={mountRef}
+          className="min-h-[420px] rounded-[1.75rem] border border-slate-200 bg-white"
+        />
+      </div>
       <div className="grid content-start gap-3">
+        <div className="rounded-[1.5rem] bg-slate-900 px-4 py-4 text-white shadow-[0_16px_28px_rgba(15,23,42,0.18)]">
+          <p className="text-sm font-semibold text-slate-200">本节可用积木</p>
+          <p className="mt-2 text-sm leading-7 text-slate-200">
+            只保留当前任务真正需要的积木，减少分心，让孩子更容易成功。
+          </p>
+        </div>
         {stableAllowedBlocks.map((type) => (
           <button
             key={type}
-            className="rounded-2xl bg-slate-900 px-4 py-3 text-left text-sm font-bold text-white"
+            className="rounded-[1.5rem] bg-slate-900 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-slate-800"
             data-testid={`lesson-add-${type}`}
             onClick={() => addBlock(type)}
             type="button"
