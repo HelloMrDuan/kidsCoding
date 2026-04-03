@@ -58,4 +58,30 @@ describe('createAggregatedCnProvider', () => {
       'invalid-signature',
     )
   })
+
+  it('throws when createPayment returns a provider error', async () => {
+    const provider = createAggregatedCnProvider({
+      fetchImpl: vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            code: '1001',
+            message: 'sign error',
+          }),
+          { status: 200 },
+        ),
+      ),
+    })
+
+    await expect(
+      provider.createPayment({
+        orderId: 'order_1',
+        userId: 'user_1',
+        productCode: 'launch_pack',
+        title: '启蒙课程包',
+        amountCny: 19900,
+        successUrl:
+          'https://kids.example.com/parent/purchase/success?order=order_1',
+      }),
+    ).rejects.toThrow('create-payment-failed')
+  })
 })
