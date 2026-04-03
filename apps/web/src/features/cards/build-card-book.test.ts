@@ -6,9 +6,11 @@ import { buildCardBook } from './build-card-book'
 
 describe('buildCardBook', () => {
   it('groups cards by category and marks earned cards', () => {
-    const result = buildCardBook(cardDefinitions, ['theme-scout-cat'])
+    const result = buildCardBook(cardDefinitions, ['theme-forest-fox'])
+    const themeGroup = result.find((group) => group.category === 'theme')
+    const earnedCard = themeGroup?.cards.find((card) => card.id === 'theme-forest-fox')
 
-    expect(result[0].category).toBe('theme')
-    expect(result[0].cards[0].isEarned).toBe(true)
+    expect(themeGroup).toBeDefined()
+    expect(earnedCard?.isEarned).toBe(true)
   })
 })
