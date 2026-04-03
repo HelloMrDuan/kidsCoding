@@ -1,6 +1,19 @@
 export const LOCAL_SUPABASE_BLOCK_START = '# BEGIN LOCAL_SUPABASE_MANAGED'
 export const LOCAL_SUPABASE_BLOCK_END = '# END LOCAL_SUPABASE_MANAGED'
 
+function stripOptionalQuotes(value) {
+  const trimmed = value.trim()
+
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1)
+  }
+
+  return trimmed
+}
+
 export function parseSupabaseStatusEnv(output) {
   const record = Object.fromEntries(
     output
@@ -8,7 +21,7 @@ export function parseSupabaseStatusEnv(output) {
       .map((line) => line.trim())
       .filter(Boolean)
       .map((line) => line.split('='))
-      .map(([key, ...rest]) => [key, rest.join('=')]),
+      .map(([key, ...rest]) => [key, stripOptionalQuotes(rest.join('='))]),
   )
 
   if (!record.API_URL || !record.ANON_KEY || !record.SERVICE_ROLE_KEY) {

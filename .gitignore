@@ -1,5 +1,6 @@
 .worktrees/
 worktrees/
+.tools/
 node_modules/
 .next/
 dist/
@@ -12,6 +13,7 @@ playwright-report/
 .supabase/
 supabase/.temp/
 apps/web/supabase/.temp/
+apps/web/supabase/.branches/
 apps/web/.npm-cache/
 .DS_Store
 Thumbs.db

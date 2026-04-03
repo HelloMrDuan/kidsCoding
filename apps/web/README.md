@@ -58,9 +58,25 @@
 ### 前置条件
 
 1. 安装 Docker Desktop，并确保 Docker 正在运行
-2. 已安装 `Supabase CLI`，并确认 `supabase --version` 可以执行
+2. 如果你不想安装系统级 `Supabase CLI`，可以先使用仓库内的可移植 CLI 安装命令
 
-### 一键初始化
+### 第一步：安装本地 Supabase CLI
+
+在 `apps/web` 目录下执行：
+
+```bash
+npm run local:supabase:install-cli
+```
+
+如果你已经在系统里安装过 `Supabase CLI`，这一步可以跳过。
+
+如果需要覆盖默认下载源，可先设置：
+
+```bash
+SUPABASE_CLI_DOWNLOAD_BASE_URL=https://your-mirror.example.com/supabase/cli/releases/download
+```
+
+### 第二步：初始化本地 Supabase
 
 在 `apps/web` 目录下执行：
 
@@ -76,7 +92,7 @@ npm run local:supabase:setup
 4. 执行数据库重置与迁移
 5. 创建或修复本地测试管理员
 
-如果当前机器没有安装 `Supabase CLI`，命令会直接提示缺失，而不会继续执行。
+这条命令会优先使用仓库 `.tools` 里的 CLI；如果仓库内没有，再回退系统 `PATH`。
 
 ### 本地管理员登录
 

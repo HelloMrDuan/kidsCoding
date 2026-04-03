@@ -3,7 +3,9 @@ import { runLocalSupabaseSetup } from './local-supabase-setup-core.mjs'
 runLocalSupabaseSetup({ projectDir: process.cwd() }).catch((error) => {
   console.error('[local:supabase:setup] failed')
   if (error instanceof Error && error.message === 'local-supabase-cli-missing') {
-    console.error('Supabase CLI 未安装。请先安装 Supabase CLI，再重新执行 npm run local:supabase:setup。')
+    console.error(
+      '未找到 Supabase CLI。请先执行 npm run local:supabase:install-cli，或自行安装系统级 Supabase CLI。',
+    )
     process.exit(1)
   }
 

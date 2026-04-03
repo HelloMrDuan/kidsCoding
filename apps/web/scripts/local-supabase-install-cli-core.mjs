@@ -1,10 +1,7 @@
-import { createWriteStream, promises as fs } from 'node:fs'
 import { execFile } from 'node:child_process'
 import { dirname, join } from 'node:path'
-import { tmpdir } from 'node:os'
-import { Readable } from 'node:stream'
-import { pipeline } from 'node:stream/promises'
 import { promisify } from 'node:util'
+import { promises as fs } from 'node:fs'
 
 import {
   SUPABASE_CLI_VERSION,
@@ -24,14 +21,31 @@ export function buildSupabaseCliDownloadUrl({
   return `${baseUrl.replace(/\/$/, '')}/v${version}/${assetName}`
 }
 
-async function defaultDownload(url, archivePath) {
-  const response = await fetch(url)
+export function getSupabaseCliTempRoot(repoRoot) {
+  return join(repoRoot, '.tools', '.tmp')
+}
 
-  if (!response.ok || !response.body) {
-    throw new Error(`local-supabase-cli-download-failed:${url}`)
-  }
+async function defaultExec(command, args) {
+  return execFileAsync(command, args)
+}
 
-  await pipeline(Readable.fromWeb(response.body), createWriteStream(archivePath))
+export async function downloadSupabaseCliArchive({
+  url,
+  archivePath,
+  exec = defaultExec,
+  platform = process.platform,
+}) {
+  const curlCommand = platform === 'win32' ? 'curl.exe' : 'curl'
+
+  await exec(curlCommand, [
+    '-L',
+    '--fail',
+    '--silent',
+    '--show-error',
+    '-o',
+    archivePath,
+    url,
+  ])
 }
 
 async function defaultExtract(archivePath, extractDir) {
@@ -80,7 +94,7 @@ export async function installSupabaseCli({
   copyFile = (source, target) => fs.copyFile(source, target),
   chmod = (filePath, mode) => fs.chmod(filePath, mode),
   remove = (filePath) => fs.rm(filePath, { recursive: true, force: true }),
-  download = defaultDownload,
+  download = (url, archivePath) => downloadSupabaseCliArchive({ url, archivePath }),
   extract = defaultExtract,
 }) {
   const target = getSupabaseCliTarget(platform, arch)
@@ -96,7 +110,9 @@ export async function installSupabaseCli({
     }
   }
 
-  const tempDir = await fs.mkdtemp(join(tmpdir(), 'kids-coding-supabase-cli-'))
+  const tempRoot = getSupabaseCliTempRoot(repoRoot)
+  await ensureDir(tempRoot)
+  const tempDir = await fs.mkdtemp(join(tempRoot, 'kids-coding-supabase-cli-'))
   const archivePath = join(tempDir, target.assetName)
   const extractDir = join(tempDir, 'extract')
   const downloadUrl = buildSupabaseCliDownloadUrl({

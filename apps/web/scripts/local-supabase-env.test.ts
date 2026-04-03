@@ -22,6 +22,20 @@ SERVICE_ROLE_KEY=service-local-key
       SUPABASE_SERVICE_ROLE_KEY: 'service-local-key',
     })
   })
+
+  it('strips surrounding quotes from Supabase CLI env output', () => {
+    const parsed = parseSupabaseStatusEnv(`
+API_URL="http://127.0.0.1:54321"
+ANON_KEY="anon-local-key"
+SERVICE_ROLE_KEY="service-local-key"
+`)
+
+    expect(parsed).toEqual({
+      NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'anon-local-key',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-local-key',
+    })
+  })
 })
 
 describe('upsertLocalSupabaseBlock', () => {

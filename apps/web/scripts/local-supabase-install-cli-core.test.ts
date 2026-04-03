@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 import {
   buildSupabaseCliDownloadUrl,
+  downloadSupabaseCliArchive,
+  getSupabaseCliTempRoot,
   installSupabaseCli,
 } from './local-supabase-install-cli-core.mjs'
 
@@ -59,5 +61,36 @@ describe('installSupabaseCli', () => {
 
     expect(download).not.toHaveBeenCalled()
     expect(extract).not.toHaveBeenCalled()
+  })
+})
+
+describe('downloadSupabaseCliArchive', () => {
+  it('uses curl with a local archive output path', async () => {
+    const exec = vi.fn().mockResolvedValue({ stdout: '' })
+
+    await downloadSupabaseCliArchive({
+      url: 'https://example.com/supabase.tar.gz',
+      archivePath: 'D:/temp/supabase.tar.gz',
+      exec,
+      platform: 'win32',
+    })
+
+    expect(exec).toHaveBeenCalledWith('curl.exe', [
+      '-L',
+      '--fail',
+      '--silent',
+      '--show-error',
+      '-o',
+      'D:/temp/supabase.tar.gz',
+      'https://example.com/supabase.tar.gz',
+    ])
+  })
+})
+
+describe('getSupabaseCliTempRoot', () => {
+  it('keeps temporary downloads inside the repository tools directory', () => {
+    expect(getSupabaseCliTempRoot('D:/pyprograms/kidsCoding')).toBe(
+      'D:\\pyprograms\\kidsCoding\\.tools\\.tmp',
+    )
   })
 })
