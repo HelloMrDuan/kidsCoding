@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { assertAdminUser } from '@/features/admin/admin-auth'
 import { AiSettingsCard } from '@/features/admin/ai-settings-card'
 import { CourseList } from '@/features/admin/course-list'
+import { PaymentReconcileCard } from '@/features/admin/payment-reconcile-card'
 import { loadAdminDashboardData } from '@/features/admin/load-admin-lessons'
 import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
@@ -34,6 +35,7 @@ export default async function AdminPage() {
           providers={dashboardData.ai.providers}
           currentSelection={dashboardData.ai.currentSelection}
         />
+        <PaymentReconcileCard />
         <CourseList lessons={dashboardData.lessons} />
         <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
           先进入单课编辑页修改课程标题、目标和步骤文案。保存草稿不会影响孩子端，发布后才会切换线上内容。

@@ -20,6 +20,14 @@
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
+### 中国大陆聚合支付
+
+- `PAYMENT_PROVIDER_DEFAULT=aggregated_cn`
+- `CN_PAYMENT_PROVIDER_BASE_URL`
+- `CN_PAYMENT_PROVIDER_APP_ID`
+- `CN_PAYMENT_PROVIDER_APP_SECRET`
+- `CN_PAYMENT_PROVIDER_WEBHOOK_SECRET`
+
 ### AI 提供方
 
 - `AI_PROVIDER_MODE=openai_compatible`
@@ -50,6 +58,8 @@
 
 开发环境允许缺项，但会明确提示哪些能力会降级。  
 生产环境如果缺少关键配置，命令会直接失败。
+
+如果首发默认走中国大陆聚合支付，生产环境还必须补齐聚合支付 provider 的参数，否则 `env:check:prod` 会失败。
 
 ## 本地 Supabase Docker 联调
 

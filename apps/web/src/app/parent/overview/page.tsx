@@ -8,7 +8,6 @@ import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export default async function ParentOverviewPage({
-  searchParams,
 }: {
   searchParams: Promise<{ purchase?: string }>
 }) {
@@ -63,8 +62,6 @@ export default async function ParentOverviewPage({
     lessonCatalog: curriculum.lessons,
     hasLaunchPack: entitlement?.status === 'active',
   })
-  const query = await searchParams
-  const purchaseSucceeded = query.purchase === 'success'
 
   return (
     <main className="min-h-screen bg-[#f8fbff] px-6 py-10">
@@ -76,11 +73,6 @@ export default async function ParentOverviewPage({
           <h1 className="text-4xl font-black text-slate-950">
             {summary.childName} 的学习进度
           </h1>
-          {purchaseSucceeded ? (
-            <p className="rounded-[1.5rem] bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">
-              购买成功，正式课程已经解锁。
-            </p>
-          ) : null}
         </header>
         <div className="grid gap-4 md:grid-cols-5">
           <article className="rounded-[1.5rem] bg-slate-50 p-5">

@@ -13,6 +13,7 @@ describe('createEnvCheckReport', () => {
         STRIPE_SECRET_KEY: 'sk_test_123',
         STRIPE_WEBHOOK_SECRET: 'whsec_123',
         NEXT_PUBLIC_APP_URL: 'https://kidscoding.example.com',
+        PAYMENT_PROVIDER_DEFAULT: 'stripe',
         AI_PROVIDER_MODE: 'openai_compatible',
         AI_PROVIDER_PRIMARY_NAME: 'OpenAI',
         AI_PROVIDER_PRIMARY_BASE_URL: 'https://api.openai.com/v1',
@@ -32,6 +33,7 @@ describe('createEnvCheckReport', () => {
     const report = createEnvCheckReport({
       mode: 'development',
       env: {
+        PAYMENT_PROVIDER_DEFAULT: 'aggregated_cn',
         AI_PROVIDER_MODE: 'openai_compatible',
         AI_PROVIDER_PRIMARY_NAME: 'OpenAI',
         AI_PROVIDER_PRIMARY_BASE_URL: 'https://api.openai.com/v1',
@@ -41,6 +43,9 @@ describe('createEnvCheckReport', () => {
     })
 
     expect(report.groups.find((group) => group.id === 'stripe')?.status).toBe(
+      'WARN',
+    )
+    expect(report.groups.find((group) => group.id === 'cn-payment')?.status).toBe(
       'WARN',
     )
   })
@@ -61,6 +66,30 @@ describe('createEnvCheckReport', () => {
 
     expect(report.summary.failCount).toBeGreaterThan(0)
     expect(report.groups.find((group) => group.id === 'ai-default')?.status).toBe(
+      'FAIL',
+    )
+  })
+
+  it('fails in production when aggregated_cn is the default without provider credentials', () => {
+    const report = createEnvCheckReport({
+      mode: 'production',
+      env: {
+        NEXT_PUBLIC_SUPABASE_URL: 'https://demo.supabase.co',
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb-publishable',
+        SUPABASE_SERVICE_ROLE_KEY: 'sb-service',
+        STRIPE_SECRET_KEY: 'sk_test_123',
+        STRIPE_WEBHOOK_SECRET: 'whsec_123',
+        NEXT_PUBLIC_APP_URL: 'https://kidscoding.example.com',
+        PAYMENT_PROVIDER_DEFAULT: 'aggregated_cn',
+        AI_PROVIDER_MODE: 'openai_compatible',
+        AI_PROVIDER_PRIMARY_NAME: 'OpenAI',
+        AI_PROVIDER_PRIMARY_BASE_URL: 'https://api.openai.com/v1',
+        AI_PROVIDER_PRIMARY_API_KEY: 'sk-primary',
+        AI_PROVIDER_PRIMARY_MODELS: 'gpt-5-mini',
+      },
+    })
+
+    expect(report.groups.find((group) => group.id === 'cn-payment')?.status).toBe(
       'FAIL',
     )
   })

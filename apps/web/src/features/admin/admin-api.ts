@@ -20,6 +20,12 @@ type SaveAiSettingsResult = {
   error?: string
 }
 
+type ReconcilePaymentOrderResult = {
+  ok: boolean
+  status?: string
+  error?: string
+}
+
 async function readJson<T>(response: Response) {
   return (await response.json()) as T
 }
@@ -86,4 +92,12 @@ export async function saveAiSettings(input: {
   })
 
   return readJson<SaveAiSettingsResult>(response)
+}
+
+export async function reconcilePaymentOrder(orderId: string) {
+  const response = await fetch(`/api/admin/payments/orders/${orderId}/reconcile`, {
+    method: 'POST',
+  })
+
+  return readJson<ReconcilePaymentOrderResult>(response)
 }

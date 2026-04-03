@@ -116,6 +116,57 @@ function buildAiSlotGroup({ env, mode, slot, label }) {
   }
 }
 
+function buildCnPaymentGroup({ env, mode }) {
+  const items = [
+    buildFieldResult({
+      field: 'PAYMENT_PROVIDER_DEFAULT',
+      value: env.PAYMENT_PROVIDER_DEFAULT,
+      mode,
+      hint: 'Checkout cannot resolve the default payment provider',
+      validator: (value) => value === 'aggregated_cn' || value === 'stripe',
+    }),
+  ]
+
+  const isAggregatedDefault =
+    (env.PAYMENT_PROVIDER_DEFAULT ?? 'aggregated_cn') === 'aggregated_cn'
+
+  if (isAggregatedDefault) {
+    items.push(
+      buildFieldResult({
+        field: 'CN_PAYMENT_PROVIDER_BASE_URL',
+        value: env.CN_PAYMENT_PROVIDER_BASE_URL,
+        mode,
+        hint: 'China mainland aggregate payment requests cannot be sent',
+        validator: isValidUrl,
+      }),
+      buildFieldResult({
+        field: 'CN_PAYMENT_PROVIDER_APP_ID',
+        value: env.CN_PAYMENT_PROVIDER_APP_ID,
+        mode,
+        hint: 'Aggregate payment app identity is missing',
+      }),
+      buildFieldResult({
+        field: 'CN_PAYMENT_PROVIDER_APP_SECRET',
+        value: env.CN_PAYMENT_PROVIDER_APP_SECRET,
+        mode,
+        hint: 'Aggregate payment requests cannot be authenticated',
+      }),
+      buildFieldResult({
+        field: 'CN_PAYMENT_PROVIDER_WEBHOOK_SECRET',
+        value: env.CN_PAYMENT_PROVIDER_WEBHOOK_SECRET,
+        mode,
+        hint: 'Aggregate payment webhooks cannot be verified',
+      }),
+    )
+  }
+
+  return {
+    id: 'cn-payment',
+    label: 'CN PAYMENT',
+    items,
+  }
+}
+
 export function createEnvCheckReport({ env, mode }) {
   const aiPrimary = buildAiSlotGroup({
     env,
@@ -185,6 +236,7 @@ export function createEnvCheckReport({ env, mode }) {
         }),
       ],
     },
+    buildCnPaymentGroup({ env, mode }),
     aiPrimary,
     aiSecondary,
     {

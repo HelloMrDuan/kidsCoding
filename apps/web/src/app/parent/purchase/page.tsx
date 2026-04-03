@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { launchCoursePack } from '@/features/billing/course-pack'
+import { PurchaseCheckoutCard } from '@/features/billing/purchase-checkout-card'
 import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
@@ -80,9 +81,6 @@ export default async function ParentPurchasePage({
     .maybeSingle()
 
   const hasLaunchPack = entitlement?.status === 'active'
-  const query = await searchParams
-  const purchaseCancelled = query.purchase === 'cancelled'
-
   return (
     <main className="min-h-screen bg-[#fff8ef] px-6 py-10">
       <section className="mx-auto max-w-4xl space-y-6 rounded-[2rem] bg-white p-8 shadow-sm">
@@ -97,11 +95,6 @@ export default async function ParentPurchasePage({
             已完成 3 节试听后，解锁后续 12 节正式课程，继续完成双角色故事、节奏控制和模板创作。
           </p>
         </header>
-        {purchaseCancelled ? (
-          <p className="rounded-[1.5rem] bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-800">
-            这次购买已取消，课程试听进度还在，可以稍后再继续。
-          </p>
-        ) : null}
         <div className="grid gap-4 md:grid-cols-3">
           <article className="rounded-[1.5rem] bg-slate-50 p-5">
             <p className="text-sm text-slate-500">正式课程</p>
@@ -141,14 +134,7 @@ export default async function ParentPurchasePage({
             </Link>
           </div>
         ) : (
-          <form action="/api/checkout" method="post">
-            <button
-              className="rounded-full bg-orange-500 px-6 py-4 text-lg font-bold text-white"
-              type="submit"
-            >
-              立即购买整套课程
-            </button>
-          </form>
+          <PurchaseCheckoutCard />
         )}
       </section>
     </main>
