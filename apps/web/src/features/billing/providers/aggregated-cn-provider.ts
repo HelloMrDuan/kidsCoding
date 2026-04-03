@@ -35,6 +35,7 @@ export function createAggregatedCnProvider(
         },
         body: JSON.stringify({
           merchant_order_no: input.orderId,
+          payment_method: 'WECHAT_NATIVE',
           amount: input.amountCny,
           subject: input.title,
           return_url: input.successUrl,
@@ -48,11 +49,11 @@ export function createAggregatedCnProvider(
       const payload = (await response.json()) as {
         code?: string
         order_no?: string
-        pay_url?: string
+        code_url?: string
         expire_at?: string
       }
 
-      if (payload.code !== '0000' || !payload.order_no || !payload.pay_url) {
+      if (payload.code !== '0000' || !payload.order_no || !payload.code_url) {
         throw new Error('create-payment-failed')
       }
 
@@ -60,7 +61,7 @@ export function createAggregatedCnProvider(
         provider: 'aggregated_cn',
         providerOrderId: payload.order_no,
         status: 'pending',
-        qrCodeValue: payload.pay_url,
+        qrCodeValue: payload.code_url,
         qrExpiresAt: payload.expire_at ?? null,
       }
     },
