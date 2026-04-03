@@ -28,6 +28,6 @@ test('purchase success page polls until the order is unlocked', async ({ page })
   await page.goto('/parent/purchase/success?order=order-paid')
 
   await expect(page.getByText('正在确认支付')).toBeVisible()
-  await page.waitForTimeout(3500)
+  await expect.poll(() => callCount, { timeout: 10_000 }).toBeGreaterThan(1)
   await expect(page.getByText('正式课程已解锁')).toBeVisible()
 })
