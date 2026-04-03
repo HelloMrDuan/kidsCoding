@@ -136,26 +136,26 @@ function buildCnPaymentGroup({ env, mode }) {
         field: 'CN_PAYMENT_PROVIDER_BASE_URL',
         value: env.CN_PAYMENT_PROVIDER_BASE_URL,
         mode,
-        hint: 'China mainland aggregate payment requests cannot be sent',
+        hint: 'LianLian WECHAT_NATIVE requests cannot be sent',
         validator: isValidUrl,
       }),
       buildFieldResult({
         field: 'CN_PAYMENT_PROVIDER_APP_ID',
         value: env.CN_PAYMENT_PROVIDER_APP_ID,
         mode,
-        hint: 'Aggregate payment app identity is missing',
+        hint: 'LianLian merchant application identity is missing',
       }),
       buildFieldResult({
         field: 'CN_PAYMENT_PROVIDER_APP_SECRET',
         value: env.CN_PAYMENT_PROVIDER_APP_SECRET,
         mode,
-        hint: 'Aggregate payment requests cannot be authenticated',
+        hint: 'LianLian create order and query requests cannot be authenticated',
       }),
       buildFieldResult({
         field: 'CN_PAYMENT_PROVIDER_WEBHOOK_SECRET',
         value: env.CN_PAYMENT_PROVIDER_WEBHOOK_SECRET,
         mode,
-        hint: 'Aggregate payment webhooks cannot be verified',
+        hint: 'LianLian webhook signatures cannot be verified',
       }),
     )
   }

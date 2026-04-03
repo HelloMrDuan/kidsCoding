@@ -20,6 +20,30 @@ describe('POST /api/payments/providers/[provider]/webhook', () => {
     vi.clearAllMocks()
   })
 
+  it('returns 400 when aggregated_cn webhook signature verification fails', async () => {
+    mocks.resolvePaymentProvider.mockReturnValue({
+      createPayment: vi.fn(),
+      parseWebhook: vi.fn().mockRejectedValue(new Error('invalid-signature')),
+      queryPayment: vi.fn(),
+    })
+
+    const response = await POST(
+      new Request(
+        'https://kids.example.com/api/payments/providers/aggregated_cn/webhook',
+        {
+          method: 'POST',
+          body: JSON.stringify({}),
+        },
+      ),
+      {
+        params: Promise.resolve({ provider: 'aggregated_cn' }),
+      },
+    )
+
+    expect(response.status).toBe(400)
+    expect(mocks.createAdminClient).not.toHaveBeenCalled()
+  })
+
   it('marks order as paid when aggregated_cn webhook is valid and successful', async () => {
     const orderUpdateEq = vi.fn().mockResolvedValue({ error: null })
     const entitlementUpsert = vi.fn().mockResolvedValue({ error: null })

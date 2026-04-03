@@ -86,11 +86,12 @@ describe('createAggregatedCnProvider', () => {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          'x-cn-pay-signature': 'invalid',
+          'Signature-Type': 'RSA',
+          'Signature-Data': 'invalid',
         },
         body: JSON.stringify({
-          order_no: 'll-001',
-          trade_status: 'SUCCESS',
+          platform_txno: 'll-001',
+          txn_status: 'SUCCESS',
         }),
       },
     )
@@ -101,8 +102,15 @@ describe('createAggregatedCnProvider', () => {
   })
 
   it('maps SUCCESS webhook to paid after signature verification', async () => {
+    const verifySignature = vi.fn().mockReturnValue(true)
     const provider = createAggregatedCnProvider({
-      verifySignature: vi.fn().mockReturnValue(true),
+      env: {
+        baseUrl: 'https://openapi.lianlianpay.example.com',
+        appId: 'll-app-id',
+        appSecret: 'll-app-secret',
+        webhookSecret: 'll-webhook-secret',
+      },
+      verifySignature,
     })
 
     const request = new Request(
@@ -111,17 +119,29 @@ describe('createAggregatedCnProvider', () => {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          'x-cn-pay-signature': 'valid',
+          'Signature-Type': 'RSA',
+          'Signature-Data': 'valid',
         },
         body: JSON.stringify({
-          order_no: 'll-001',
-          trade_status: 'SUCCESS',
+          txn_seqno: 'order_1',
+          platform_txno: 'll-001',
+          txn_status: 'SUCCESS',
         }),
       },
     )
 
     const result = await provider.parseWebhook(request)
 
+    expect(verifySignature).toHaveBeenCalledWith({
+      body: JSON.stringify({
+        txn_seqno: 'order_1',
+        platform_txno: 'll-001',
+        txn_status: 'SUCCESS',
+      }),
+      signatureData: 'valid',
+      signatureType: 'RSA',
+      secret: 'll-webhook-secret',
+    })
     expect(result.providerOrderId).toBe('ll-001')
     expect(result.providerStatus).toBe('SUCCESS')
     expect(result.status).toBe('paid')

@@ -16,7 +16,18 @@ export async function POST(
   }
 
   const paymentProvider = resolvePaymentProvider(provider as PaymentProviderName)
-  const parsed = await paymentProvider.parseWebhook(request)
+  let parsed: Awaited<ReturnType<typeof paymentProvider.parseWebhook>>
+
+  try {
+    parsed = await paymentProvider.parseWebhook(request)
+  } catch (error) {
+    if (error instanceof Error && error.message === 'invalid-signature') {
+      return NextResponse.json({ error: 'invalid-signature' }, { status: 400 })
+    }
+
+    throw error
+  }
+
   const admin = createAdminClient()
 
   const { data: order } = await admin

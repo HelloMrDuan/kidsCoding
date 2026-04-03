@@ -191,3 +191,18 @@ npm run local:supabase:setup
 - `/setup/local-admin/login`
 - `/admin`
 - `/admin/lessons/trial-01-move-character`
+
+## LianLian WECHAT_NATIVE
+
+- 当前真实中国大陆支付默认接到连连 `WECHAT_NATIVE`
+- 家长购买页直接显示微信扫码二维码
+- 二维码内容来自 provider 返回的 `code_url`，由前端自行渲染
+- webhook 必须能回调到 `/api/payments/providers/aggregated_cn/webhook`
+- 管理员支付补偿继续走 `/api/admin/payments/orders/:orderId/reconcile`
+
+预发布联调至少验证这 4 步：
+
+1. 真实下单后能返回微信 `code_url`
+2. 微信扫码成功后 webhook 能把订单推进到 `paid`
+3. 正式课程权益会自动解锁
+4. 关闭 webhook 或延迟回调时，管理员重试同步仍能补齐订单状态

@@ -1,20 +1,52 @@
+import { createHmac, timingSafeEqual } from 'node:crypto'
+
 import { getCnPaymentProviderEnv } from '@/lib/env'
 
 import { mapProviderStatus } from '../payment-status'
 import type { PaymentProvider } from '../payment-provider'
 
+type VerifySignatureInput = {
+  body: string
+  signatureData: string
+  signatureType: string
+  secret: string
+}
+
 type AggregatedCnProviderDeps = {
   env?: ReturnType<typeof getCnPaymentProviderEnv>
   fetchImpl?: typeof fetch
-  verifySignature?: (
-    body: string,
-    signature: string,
-    secret: string,
-  ) => boolean
+  verifySignature?: (input: VerifySignatureInput) => boolean
 }
 
-function defaultVerifySignature(body: string, signature: string, secret: string) {
-  return Boolean(body && signature && secret)
+function safeCompare(left: string, right: string) {
+  const leftBuffer = Buffer.from(left)
+  const rightBuffer = Buffer.from(right)
+
+  if (leftBuffer.length !== rightBuffer.length) {
+    return false
+  }
+
+  return timingSafeEqual(leftBuffer, rightBuffer)
+}
+
+function defaultVerifySignature(input: VerifySignatureInput) {
+  if (!input.body || !input.signatureData || !input.secret) {
+    return false
+  }
+
+  const signature = input.signatureData.trim()
+  const normalizedSignature = signature.replace(/[\r\n]/g, '')
+  const base64Digest = createHmac('sha256', input.secret)
+    .update(input.body)
+    .digest('base64')
+  const hexDigest = createHmac('sha256', input.secret)
+    .update(input.body)
+    .digest('hex')
+
+  return (
+    safeCompare(normalizedSignature, base64Digest) ||
+    safeCompare(normalizedSignature, hexDigest)
+  )
 }
 
 export function createAggregatedCnProvider(
@@ -31,7 +63,7 @@ export function createAggregatedCnProvider(
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          'x-cn-pay-app-id': env.appId,
+          'x-ll-app-id': env.appId,
         },
         body: JSON.stringify({
           merchant_order_no: input.orderId,
@@ -67,21 +99,37 @@ export function createAggregatedCnProvider(
     },
     async parseWebhook(request) {
       const rawBody = await request.text()
-      const signature = request.headers.get('x-cn-pay-signature') ?? ''
+      const signatureType = request.headers.get('Signature-Type') ?? ''
+      const signatureData =
+        request.headers.get('Signature-Data') ??
+        request.headers.get('x-ll-sign') ??
+        ''
 
-      if (!verifySignature(rawBody, signature, env.webhookSecret)) {
+      if (
+        !verifySignature({
+          body: rawBody,
+          signatureData,
+          signatureType,
+          secret: env.webhookSecret,
+        })
+      ) {
         throw new Error('invalid-signature')
       }
 
       const body = JSON.parse(rawBody) as {
+        txn_seqno?: string
+        platform_txno?: string
+        txn_status?: string
         order_no?: string
         trade_status?: string
       }
+      const providerStatus = body.txn_status ?? body.trade_status ?? 'failed'
+      const providerOrderId = body.platform_txno ?? body.order_no ?? ''
 
       return {
-        providerOrderId: body.order_no ?? '',
-        providerStatus: body.trade_status ?? 'failed',
-        status: mapProviderStatus(body.trade_status ?? 'failed'),
+        providerOrderId,
+        providerStatus,
+        status: mapProviderStatus(providerStatus),
       }
     },
     async queryPayment(_input) {
@@ -90,7 +138,7 @@ export function createAggregatedCnProvider(
         {
           method: 'GET',
           headers: {
-            'x-cn-pay-app-id': env.appId,
+            'x-ll-app-id': env.appId,
           },
         },
       )
@@ -101,16 +149,18 @@ export function createAggregatedCnProvider(
 
       const payload = (await response.json()) as {
         code?: string
+        txn_status?: string
         trade_status?: string
       }
 
       if (payload.code !== '0000') {
         throw new Error('query-payment-failed')
       }
+      const providerStatus = payload.txn_status ?? payload.trade_status ?? 'failed'
 
       return {
-        providerStatus: payload.trade_status ?? 'failed',
-        status: mapProviderStatus(payload.trade_status ?? 'failed'),
+        providerStatus,
+        status: mapProviderStatus(providerStatus),
       }
     },
   }
