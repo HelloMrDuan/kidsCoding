@@ -4,6 +4,7 @@ export function buildParentOverview({
   cardRecords,
   badgeRecords,
   projectSnapshots,
+  lessonCatalog,
   hasLaunchPack,
 }: {
   profile: { display_name: string; recommended_start_level: string }
@@ -11,6 +12,7 @@ export function buildParentOverview({
   cardRecords: Array<{ card_definition_id: string }>
   badgeRecords: Array<{ badge_type: string }>
   projectSnapshots: Array<{ lesson_id: string; updated_at: string }>
+  lessonCatalog: Array<{ id: string; title: string }>
   hasLaunchPack: boolean
 }) {
   const completedLessonCount = progressRecords.filter(
@@ -23,6 +25,17 @@ export function buildParentOverview({
   const hasFinishedTrial = progressRecords.some(
     (item) => item.lesson_id === 'trial-03-scene-story',
   )
+  const lessonTitles = new Map(
+    lessonCatalog.map((lesson) => [lesson.id, lesson.title]),
+  )
+  const recentProjects = [...projectSnapshots]
+    .sort((left, right) => right.updated_at.localeCompare(left.updated_at))
+    .map((snapshot) => ({
+      lessonId: snapshot.lesson_id,
+      lessonTitle: lessonTitles.get(snapshot.lesson_id) ?? snapshot.lesson_id,
+      href: `/parent/projects/${snapshot.lesson_id}`,
+      updatedAt: snapshot.updated_at,
+    }))
 
   return {
     childName: profile.display_name,
@@ -32,6 +45,7 @@ export function buildParentOverview({
     earnedCardCount: cardRecords.length,
     earnedBadgeCount: badgeRecords.length,
     recentProjectCount: projectSnapshots.length,
+    recentProjects,
     hasLaunchPack,
     nextAction: hasLaunchPack
       ? '继续正式课程第 4 课，开始双角色动画故事。'

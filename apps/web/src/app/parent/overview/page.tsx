@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { launchCoursePack } from '@/features/billing/course-pack'
+import { loadLaunchCurriculum } from '@/features/curriculum/load-launch-curriculum'
 import { buildParentOverview } from '@/features/parent/build-parent-overview'
 import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
@@ -24,6 +25,7 @@ export default async function ParentOverviewPage({
   }
 
   const [
+    curriculum,
     { data: profile },
     { data: progressRecords },
     { data: cardRecords },
@@ -31,6 +33,7 @@ export default async function ParentOverviewPage({
     { data: projectSnapshots },
     { data: entitlement },
   ] = await Promise.all([
+    loadLaunchCurriculum(),
     supabase.from('child_profiles').select('*').eq('user_id', user.id).single(),
     supabase.from('progress_records').select('*').eq('user_id', user.id),
     supabase.from('card_records').select('*').eq('user_id', user.id),
@@ -57,6 +60,7 @@ export default async function ParentOverviewPage({
     cardRecords: cardRecords ?? [],
     badgeRecords: badgeRecords ?? [],
     projectSnapshots: projectSnapshots ?? [],
+    lessonCatalog: curriculum.lessons,
     hasLaunchPack: entitlement?.status === 'active',
   })
   const query = await searchParams
@@ -113,6 +117,51 @@ export default async function ParentOverviewPage({
         <p className="rounded-[1.5rem] bg-orange-50 p-5 text-base font-semibold text-orange-700">
           下一步建议：{summary.nextAction}
         </p>
+        <section className="space-y-4 rounded-[1.5rem] bg-slate-50 p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-black text-slate-950">最近作品</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                可以直接回看孩子最近完成的动画故事。
+              </p>
+            </div>
+          </div>
+          {summary.recentProjects.length > 0 ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {summary.recentProjects.map((project) => (
+                <article
+                  key={project.lessonId}
+                  className="rounded-[1.5rem] border border-slate-200 bg-white p-4"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600">
+                    最近完成
+                  </p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">
+                    {project.lessonTitle}
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-500">
+                    更新时间：{new Intl.DateTimeFormat('zh-CN', {
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    }).format(new Date(project.updatedAt))}
+                  </p>
+                  <Link
+                    className="mt-4 inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-3 text-sm font-bold text-white"
+                    href={project.href}
+                  >
+                    查看作品回放
+                  </Link>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-[1.25rem] bg-white p-4 text-sm font-semibold text-slate-600">
+              孩子完成第一个作品后，这里会出现最近作品回放入口。
+            </p>
+          )}
+        </section>
         <div className="flex flex-col gap-4 sm:flex-row">
           <Link
             className="inline-flex items-center justify-center rounded-full bg-sky-500 px-6 py-4 text-lg font-bold text-white"
