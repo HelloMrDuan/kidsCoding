@@ -250,3 +250,12 @@ export type AdminBootstrapEventRow = {
   event_type: 'first_admin_granted'
   created_at: string
 }
+
+export type PaymentProviderName = 'stripe' | 'aggregated_cn'
+
+export type PaymentOrderStatus =
+  | 'created'
+  | 'pending'
+  | 'paid'
+  | 'failed'
+  | 'expired'

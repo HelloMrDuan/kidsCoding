@@ -47,6 +47,12 @@ export function hasServiceRoleEnv() {
   )
 }
 
+export function getDefaultPaymentProvider(
+  env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
+) {
+  return env.PAYMENT_PROVIDER_DEFAULT === 'stripe' ? 'stripe' : 'aggregated_cn'
+}
+
 const AI_SLOT_PREFIX: Record<AiProviderSlot, string> = {
   primary: 'AI_PROVIDER_PRIMARY',
   secondary: 'AI_PROVIDER_SECONDARY',
