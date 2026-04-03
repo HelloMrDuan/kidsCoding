@@ -4,7 +4,7 @@ import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { buildParentOverview } from './build-parent-overview'
 
 describe('buildParentOverview', () => {
-  it('surfaces recent project count and a purchase suggestion before unlock', () => {
+  it('surfaces recent project count and an upgrade suggestion after trial completion', () => {
     const summary = buildParentOverview({
       profile: {
         display_name: '小小创作者',
@@ -26,7 +26,7 @@ describe('buildParentOverview', () => {
     })
 
     expect(summary.recentProjectCount).toBe(1)
-    expect(summary.nextAction).toContain('购买整套课程')
+    expect(summary.nextAction).toContain('升级高阶创作')
   })
 
   it('builds recent projects with lesson titles, descending order, and parent playback links', () => {

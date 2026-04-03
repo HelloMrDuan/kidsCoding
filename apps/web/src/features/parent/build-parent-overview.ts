@@ -48,9 +48,9 @@ export function buildParentOverview({
     recentProjects,
     hasLaunchPack,
     nextAction: hasLaunchPack
-      ? '继续正式课程第 4 课，开始双角色动画故事。'
+      ? '继续正式课程第 4 节，让孩子开始双角色故事创作。'
       : hasFinishedTrial
-        ? '孩子已经完成试听，可以购买整套课程继续学习。'
-        : '先完成第 3 节试听课，做出第一个完整小故事。',
+        ? '孩子已经完成启蒙试听，可以在看完作品后决定是否升级高阶创作。'
+        : '先完成第 3 节试听课，做出第一支完整的小故事作品。',
   }
 }
