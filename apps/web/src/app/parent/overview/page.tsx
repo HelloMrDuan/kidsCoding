@@ -206,7 +206,7 @@ export default async function ParentOverviewPage() {
           <section className="rounded-[2rem] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
             <div className="space-y-2">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-sky-700">
-                Recent work
+                最近作品
               </p>
               <h2 className="text-2xl font-black text-slate-950">最近作品回看</h2>
               <p className="text-sm leading-7 text-slate-500">
@@ -281,7 +281,7 @@ export default async function ParentOverviewPage() {
           <div className="grid gap-6">
             <article className="rounded-[2rem] bg-[linear-gradient(180deg,#fff8ea_0%,#ffffff_100%)] p-6 shadow-[0_16px_36px_rgba(255,162,84,0.12)]">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-700">
-                Next action
+                下一步建议
               </p>
               <h2 className="mt-3 text-2xl font-black text-slate-950">
                 下一步陪学建议
@@ -309,7 +309,7 @@ export default async function ParentOverviewPage() {
 
             <section className="rounded-[2rem] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-sky-700">
-                Growth track
+                成长轨迹
               </p>
               <h2 className="mt-3 text-2xl font-black text-slate-950">
                 启蒙成长轨迹

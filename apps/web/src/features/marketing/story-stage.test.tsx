@@ -14,7 +14,7 @@ describe('StoryStage', () => {
       screen.getByRole('heading', { name: '孩子可以自己做出动画故事' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: '免费开启启蒙主线' }),
+      screen.getByRole('link', { name: '开始 12 节启蒙主线' }),
     ).toHaveAttribute('href', '/onboarding/age')
     expect(
       screen.getByRole('link', { name: '看看家长如何陪学' }),

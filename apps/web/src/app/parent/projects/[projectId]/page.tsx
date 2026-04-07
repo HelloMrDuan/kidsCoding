@@ -123,7 +123,7 @@ export default async function ParentProjectPlaybackPage({
           <article className="overflow-hidden rounded-[2rem] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
             <div className="space-y-2">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-sky-700">
-                Story stage
+                作品舞台
               </p>
               <h2 className="text-2xl font-black text-slate-950">作品舞台回看</h2>
               <p className="text-sm leading-7 text-slate-500">
@@ -139,7 +139,7 @@ export default async function ParentProjectPlaybackPage({
           <div className="grid gap-6">
             <section className="rounded-[2rem] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-sky-700">
-                Block story
+                作品积木
               </p>
               <h2 className="mt-3 text-2xl font-black text-slate-950">
                 这次作品用到了什么
@@ -165,7 +165,7 @@ export default async function ParentProjectPlaybackPage({
 
             <article className="rounded-[2rem] bg-[linear-gradient(180deg,#fff8ea_0%,#ffffff_100%)] p-6 shadow-[0_16px_36px_rgba(255,162,84,0.12)]">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-700">
-                Parent tip
+                陪学提示
               </p>
               <h2 className="mt-3 text-2xl font-black text-slate-950">
                 怎么和孩子聊这次作品

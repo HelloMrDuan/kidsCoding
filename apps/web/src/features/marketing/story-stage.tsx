@@ -15,7 +15,8 @@ const parentFacts = [
 const stageMoments = [
   {
     title: '角色走上舞台',
-    detail: '先让小狐狸从森林里走出来，孩子一眼就能看到“是我让它动起来了”。',
+    detail:
+      '先让小狐狸从森林里走出来，孩子一眼就能看到“是我让它动起来了”。',
   },
   {
     title: '故事会开口说话',
@@ -23,7 +24,8 @@ const stageMoments = [
   },
   {
     title: '点一下就会回应',
-    detail: '孩子点击角色，舞台马上有反应，成就感会一下子立住。',
+    detail:
+      '孩子点击角色，舞台马上有反应，成就感会一下子立住。',
   },
 ]
 
@@ -47,7 +49,8 @@ export function StoryStage() {
               孩子可以自己做出动画故事
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-slate-700 md:text-xl">
-              从单步小谜题开始，慢慢学会动作、对白、场景切换和互动触发。每 2-3 节就能做出一个小作品，家长看得见成果，孩子也一直有成就感。
+              从单步小谜题开始，慢慢学会动作、对白、场景切换和互动触发。每 2-3
+              节就能做出一个小作品，家长看得见成果，孩子也一直有成就感。
             </p>
           </div>
 
@@ -71,7 +74,7 @@ export function StoryStage() {
               data-testid="home-start"
               href="/onboarding/age"
             >
-              免费开启启蒙主线
+              开始 12 节启蒙主线
             </Link>
             <Link
               className="inline-flex items-center justify-center rounded-full border border-sky-200 bg-sky-50 px-6 py-4 text-lg font-bold text-sky-800 transition hover:border-sky-300 hover:bg-sky-100"
@@ -100,7 +103,9 @@ export function StoryStage() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-slate-500">孩子作品舞台</p>
-                  <p className="mt-1 text-xl font-black text-slate-950">今天做出的故事，值得被认真展示</p>
+                  <p className="mt-1 text-xl font-black text-slate-950">
+                    今天做出的故事，值得被认真展示
+                  </p>
                 </div>
                 <span className="shrink-0 rounded-full bg-white/85 px-4 py-2 text-xs font-bold text-slate-600 shadow-sm">
                   第 12 节完成启蒙毕业作品
@@ -117,14 +122,14 @@ export function StoryStage() {
                 </div>
 
                 <div className="relative h-[20rem]">
-                  <div className="absolute left-10 bottom-14 h-28 w-20 rounded-[2rem_2rem_1.3rem_1.3rem] bg-[#ff9f6a] shadow-[0_14px_22px_rgba(255,159,106,0.35)]">
+                  <div className="absolute bottom-14 left-10 h-28 w-20 rounded-[2rem_2rem_1.3rem_1.3rem] bg-[#ff9f6a] shadow-[0_14px_22px_rgba(255,159,106,0.35)]">
                     <div className="absolute left-4 top-4 h-3 w-3 rounded-full bg-slate-900" />
                     <div className="absolute right-4 top-4 h-3 w-3 rounded-full bg-slate-900" />
                     <div className="absolute left-6 top-11 h-2 w-8 rounded-full bg-white/85" />
                     <div className="absolute left-3 top-[-1.8rem] h-8 w-14 rounded-full bg-[#5f85ff]" />
                   </div>
 
-                  <div className="absolute right-14 bottom-16 h-24 w-16 rounded-[1.8rem_1.8rem_1.1rem_1.1rem] bg-[#6fc98b] shadow-[0_14px_22px_rgba(111,201,139,0.3)]">
+                  <div className="absolute bottom-16 right-14 h-24 w-16 rounded-[1.8rem_1.8rem_1.1rem_1.1rem] bg-[#6fc98b] shadow-[0_14px_22px_rgba(111,201,139,0.3)]">
                     <div className="absolute left-3 top-4 h-3 w-3 rounded-full bg-slate-900" />
                     <div className="absolute right-3 top-4 h-3 w-3 rounded-full bg-slate-900" />
                     <div className="absolute left-4 top-10 h-2 w-8 rounded-full bg-white/85" />
@@ -133,8 +138,8 @@ export function StoryStage() {
 
                   <div className="absolute right-8 top-8 text-3xl text-[#ffd54d]">✦</div>
                   <div className="absolute right-20 top-12 text-2xl text-[#ffd54d]">✦</div>
-                  <div className="absolute left-24 top-20 text-xl text-white/70">☁</div>
-                  <div className="absolute left-14 top-28 text-2xl text-white/80">☁</div>
+                  <div className="absolute left-24 top-20 text-xl text-white/70">✦</div>
+                  <div className="absolute left-14 top-28 text-2xl text-white/80">✦</div>
                 </div>
 
                 <div className="grid gap-3 rounded-[1.4rem] bg-white/90 p-4 shadow-[0_12px_24px_rgba(15,23,42,0.12)] md:grid-cols-3">
