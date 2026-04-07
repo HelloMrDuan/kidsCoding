@@ -54,9 +54,9 @@ export function PurchaseCheckoutCard() {
 
     return (
       <section className="space-y-4 rounded-[1.5rem] bg-orange-50 p-5 text-orange-950">
-        <h2 className="text-2xl font-black">扫码支付</h2>
+        <h2 className="text-2xl font-black">扫码解锁高阶创作</h2>
         <p className="text-sm leading-7">
-          请家长使用微信、支付宝或银行卡支持的扫码方式完成支付。
+          请家长使用微信、支付宝或支持扫码的银行卡支付方式完成升级。支付成功后，孩子就能进入高阶创作阶段。
         </p>
         <div className="rounded-[1.5rem] border border-dashed border-orange-200 bg-white p-5">
           <p className="text-sm font-semibold text-slate-600">
@@ -107,7 +107,7 @@ export function PurchaseCheckoutCard() {
         onClick={() => void handleCreateOrder()}
         type="button"
       >
-        {submitting ? '正在创建订单…' : '立即购买整套课程'}
+        {submitting ? '正在创建订单...' : '立即升级高阶创作'}
       </button>
     </section>
   )

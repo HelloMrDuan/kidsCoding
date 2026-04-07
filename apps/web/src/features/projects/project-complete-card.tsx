@@ -97,7 +97,10 @@ export function ProjectCompleteCard({
             当前累计 {stars} 颗星星，已收集 {totalCards} 张卡片。{completionCopy.summary}
           </p>
 
-          <div className="mt-5 rounded-[1.5rem] bg-[#f5fbff] p-4" data-testid="project-complete-lite-preview">
+          <div
+            className="mt-5 rounded-[1.5rem] bg-[#f5fbff] p-4"
+            data-testid="project-complete-lite-preview"
+          >
             <div className="scale-[0.92] origin-top">
               <PreviewStage blocks={blocks} />
             </div>

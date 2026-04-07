@@ -97,7 +97,7 @@ export function CardBook({ definitions, earnedCardIds }: CardBookProps) {
                   <p className="mt-2 text-sm">
                     {card.isEarned
                       ? `稀有度：${rarityLabels[card.rarity]}`
-                      : '继续闯关来点亮这张卡片。'}
+                      : '继续沿着学习路线往前走，就能点亮这张卡片。'}
                   </p>
                 </article>
               ))}

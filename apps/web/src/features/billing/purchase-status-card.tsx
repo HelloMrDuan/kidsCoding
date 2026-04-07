@@ -18,9 +18,9 @@ export function PurchaseStatusCard({
   if (status === 'paid') {
     return (
       <section className="space-y-4 rounded-[1.5rem] bg-emerald-50 p-5 text-emerald-900">
-        <h2 className="text-2xl font-black">正式课程已解锁</h2>
+        <h2 className="text-2xl font-black">高阶创作已解锁</h2>
         <p className="text-sm leading-7">
-          订单 {orderId} 已确认支付成功，孩子现在可以继续学习正式课程。
+          订单 {orderId} 已确认支付成功，孩子现在可以继续进入高阶创作阶段。
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
@@ -43,8 +43,8 @@ export function PurchaseStatusCard({
   if (status === 'failed') {
     return (
       <section className="space-y-4 rounded-[1.5rem] bg-rose-50 p-5 text-rose-900">
-        <h2 className="text-2xl font-black">支付未成功</h2>
-        <p className="text-sm leading-7">这次支付没有完成，请返回购买页重新发起。</p>
+        <h2 className="text-2xl font-black">支付没有完成</h2>
+        <p className="text-sm leading-7">这次升级还没有完成，请返回购买页重新发起。</p>
         <Link
           className="inline-flex items-center justify-center rounded-full border border-rose-200 px-5 py-3 text-sm font-bold text-rose-900"
           href="/parent/purchase"

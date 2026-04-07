@@ -30,6 +30,9 @@ export default function CardsPage() {
           >
             收集你学会的每一步
           </h1>
+          <p className="text-base leading-7 text-slate-600">
+            每完成一段学习旅程，就会点亮新的卡片。这里会把孩子一路做出来的作品能力和成长时刻都收集起来。
+          </p>
         </header>
         <CardBook
           definitions={cardDefinitions}

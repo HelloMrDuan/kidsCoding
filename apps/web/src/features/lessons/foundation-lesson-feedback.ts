@@ -12,7 +12,7 @@ const FOUNDATION_LESSON_FEEDBACK = {
   'lesson-03-forest-story': {
     initial: '先让小狐狸出场，再把欢迎的话按顺序接上去。',
     progress: '很好，你马上就要做出一个完整作品了。',
-    retry: '先看看动作和对话的顺序对不对，再把缺少的积木接完整。',
+    retry: '先看看动作和对白的顺序对不对，再把缺少的积木接完整。',
   },
   'lesson-04-meadow-scene': {
     initial: '先看看森林和草地两个画面，再把出发动作接起来。',

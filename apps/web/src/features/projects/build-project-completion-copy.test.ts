@@ -34,7 +34,7 @@ describe('buildProjectCompletionCopy', () => {
     )
     expect(copy.spotlightTag).toBe('第三个完整作品')
     expect(copy.spotlightTitle).toBe('你做出了一个完整作品')
-    expect(copy.spotlightBody).toContain('会回应你的点击')
+    expect(copy.spotlightBody).toContain('会回应点击')
     expect(copy.spotlightBody).toContain('第四单元')
   })
 
@@ -46,7 +46,7 @@ describe('buildProjectCompletionCopy', () => {
     )
     expect(copy.spotlightTag).toBe('启蒙毕业作品')
     expect(copy.spotlightTitle).toBe('你做出了一个完整作品')
-    expect(copy.spotlightBody).toContain('完成启蒙毕业作品')
+    expect(copy.spotlightBody).toContain('启蒙毕业作品')
     expect(copy.spotlightBody).toContain('高阶创作阶段')
   })
 })

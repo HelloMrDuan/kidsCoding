@@ -20,39 +20,38 @@ export default async function ParentPurchasePage({
         <section className="mx-auto max-w-4xl space-y-6 rounded-[2rem] bg-white p-8 shadow-sm">
           <header className="space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">
-              家长购买
+              家长升级
             </p>
-            <h1 className="text-4xl font-black text-slate-950">
-              动画故事启蒙课程包
-            </h1>
+            <h1 className="text-4xl font-black text-slate-950">高阶创作阶段</h1>
             <p className="text-base leading-7 text-slate-600">
-              当前环境未配置 Supabase 和支付参数，所以这里只展示课程包信息，不执行真实购买。
+              当前环境还没有配置完整的账户和支付参数，所以这里只展示升级说明，不执行真实购买。
             </p>
           </header>
           {purchaseUnavailable ? (
             <p className="rounded-[1.5rem] bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-800">
-              当前环境缺少后端配置，暂时不能发起购买。
+              当前环境缺少后端配置，暂时不能发起升级。
             </p>
           ) : null}
           <div className="grid gap-4 md:grid-cols-3">
             <article className="rounded-[1.5rem] bg-slate-50 p-5">
-              <p className="text-sm text-slate-500">正式课程</p>
+              <p className="text-sm text-slate-500">启蒙阶段</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">12 节</p>
+            </article>
+            <article className="rounded-[1.5rem] bg-slate-50 p-5">
+              <p className="text-sm text-slate-500">高阶创作</p>
               <p className="mt-2 text-3xl font-black text-slate-950">
                 {launchCoursePack.lessonCount} 节
               </p>
             </article>
             <article className="rounded-[1.5rem] bg-slate-50 p-5">
-              <p className="text-sm text-slate-500">试听课程</p>
+              <p className="text-sm text-slate-500">升级价格</p>
               <p className="mt-2 text-3xl font-black text-slate-950">
-                {launchCoursePack.trialLessonCount} 节
+                楼{(launchCoursePack.priceCny / 100).toFixed(0)}
               </p>
             </article>
-            <article className="rounded-[1.5rem] bg-slate-50 p-5">
-              <p className="text-sm text-slate-500">课程价格</p>
-              <p className="mt-2 text-3xl font-black text-slate-950">
-                ¥{(launchCoursePack.priceCny / 100).toFixed(0)}
-              </p>
-            </article>
+          </div>
+          <div className="rounded-[1.5rem] bg-orange-50 p-5 text-base leading-7 text-orange-900">
+            孩子完成 12 节启蒙主线后，可以继续进入更长的故事结构、更复杂的互动逻辑和更完整的动画表达。
           </div>
           <Link
             className="inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800"
@@ -86,37 +85,33 @@ export default async function ParentPurchasePage({
       <section className="mx-auto max-w-4xl space-y-6 rounded-[2rem] bg-white p-8 shadow-sm">
         <header className="space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">
-            家长购买
+            家长升级
           </p>
-          <h1 className="text-4xl font-black text-slate-950">
-            动画故事启蒙课程包
-          </h1>
+          <h1 className="text-4xl font-black text-slate-950">高阶创作阶段</h1>
           <p className="text-base leading-7 text-slate-600">
-            已完成 3 节试听后，解锁后续 12 节正式课程，继续完成双角色故事、节奏控制和模板创作。
+            启蒙 12 节已经打通后，现在可以解锁高阶创作阶段，继续挑战更长的故事结构、更多角色配合和更完整的互动表达。
           </p>
         </header>
         <div className="grid gap-4 md:grid-cols-3">
           <article className="rounded-[1.5rem] bg-slate-50 p-5">
-            <p className="text-sm text-slate-500">正式课程</p>
+            <p className="text-sm text-slate-500">启蒙阶段</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">12 节</p>
+          </article>
+          <article className="rounded-[1.5rem] bg-slate-50 p-5">
+            <p className="text-sm text-slate-500">高阶创作</p>
             <p className="mt-2 text-3xl font-black text-slate-950">
               {launchCoursePack.lessonCount} 节
             </p>
           </article>
           <article className="rounded-[1.5rem] bg-slate-50 p-5">
-            <p className="text-sm text-slate-500">试听课程</p>
+            <p className="text-sm text-slate-500">升级价格</p>
             <p className="mt-2 text-3xl font-black text-slate-950">
-              {launchCoursePack.trialLessonCount} 节
-            </p>
-          </article>
-          <article className="rounded-[1.5rem] bg-slate-50 p-5">
-            <p className="text-sm text-slate-500">课程价格</p>
-            <p className="mt-2 text-3xl font-black text-slate-950">
-              ¥{(launchCoursePack.priceCny / 100).toFixed(0)}
+              楼{(launchCoursePack.priceCny / 100).toFixed(0)}
             </p>
           </article>
         </div>
         <div className="rounded-[1.5rem] bg-orange-50 p-5 text-base leading-7 text-orange-900">
-          购买后会立即解锁第 4 到第 15 节课，孩子可以继续从学习地图进入正式课程。
+          升级后会立刻解锁高阶创作阶段，孩子可以继续从学习地图进入新的成长区域。
         </div>
         {hasLaunchPack ? (
           <div className="flex flex-col gap-4 sm:flex-row">

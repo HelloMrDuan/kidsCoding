@@ -15,9 +15,9 @@ export default async function ParentPurchaseSuccessPage({
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">
             支付确认
           </p>
-          <h1 className="text-4xl font-black text-slate-950">确认课程解锁状态</h1>
+          <h1 className="text-4xl font-black text-slate-950">确认高阶创作解锁状态</h1>
           <p className="text-base leading-7 text-slate-600">
-            家长完成支付后，系统会自动确认订单并解锁正式课程。
+            家长完成支付后，系统会自动确认订单并解锁高阶创作阶段。
           </p>
         </header>
         {!orderId ? (
