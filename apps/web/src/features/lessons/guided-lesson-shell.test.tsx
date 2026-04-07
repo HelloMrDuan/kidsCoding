@@ -22,7 +22,7 @@ describe('GuidedLessonShell', () => {
     expect(screen.queryByRole('button', { name: '完成这一课' })).toBeNull()
   })
 
-  it('keeps the lesson completion action and task framing on unlocked lessons', () => {
+  it('shows the stage-side feedback card on unlocked lessons', () => {
     render(
       <GuidedLessonShell
         feedback="太好了，角色已经准备好登场。"
@@ -39,7 +39,10 @@ describe('GuidedLessonShell', () => {
 
     expect(screen.getByText('今天的小步骤')).toBeInTheDocument()
     expect(screen.getByText('把开始积木和向右移动积木接起来。')).toBeInTheDocument()
-    expect(screen.getByText('刚刚完成：太好了，角色已经准备好登场。')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-feedback-card')).toBeInTheDocument()
+    expect(screen.getByText('刚刚完成')).toBeInTheDocument()
+    expect(screen.getByText('太好了，角色已经准备好登场。')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-feedback-preview')).toBeInTheDocument()
     expect(screen.getByText('主语音：先放开始积木。')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-complete-step')).toBeInTheDocument()
   })

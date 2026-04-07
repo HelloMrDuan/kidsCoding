@@ -90,8 +90,26 @@ export function GuidedLessonShell({
         ) : null}
 
         {feedback ? (
-          <div className="rounded-[1.5rem] bg-[#eff8ff] px-4 py-4 text-sm font-semibold leading-7 text-sky-800">
-            刚刚完成：{feedback}
+          <div
+            className="overflow-hidden rounded-[1.75rem] border border-[#dbeef8] bg-[linear-gradient(180deg,#f5fbff_0%,#ffffff_100%)] shadow-[0_12px_28px_rgba(56,189,248,0.1)]"
+            data-testid="lesson-feedback-card"
+          >
+            <div className="flex items-center justify-between gap-3 px-4 pt-4">
+              <p className="text-sm font-semibold text-sky-700">刚刚完成</p>
+              <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
+                小结果预览
+              </span>
+            </div>
+            <div
+              className="mt-3 rounded-[1.5rem] bg-[linear-gradient(180deg,#cfeeff_0%,#ffffff_100%)] px-4 py-4"
+              data-testid="lesson-feedback-preview"
+            >
+              <div className="flex items-end gap-3">
+                <div className="h-8 w-8 rounded-full bg-amber-300" />
+                <div className="h-16 w-16 rounded-full bg-orange-400 shadow-[0_12px_24px_rgba(251,146,60,0.22)]" />
+              </div>
+              <p className="mt-3 text-sm font-semibold leading-7 text-slate-700">{feedback}</p>
+            </div>
           </div>
         ) : null}
 

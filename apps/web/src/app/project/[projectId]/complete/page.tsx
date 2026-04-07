@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 
 import { cardDefinitions } from '@/content/cards/card-definitions'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
 import { buildProjectCompletionCopy } from '@/features/projects/build-project-completion-copy'
+import { ProjectCompleteCard } from '@/features/projects/project-complete-card'
 import {
   defaultGuestProgress,
   readGuestProgress,
@@ -27,6 +28,10 @@ export default function ProjectCompletePage() {
   const curriculum = useLaunchCurriculum()
   const { allLessons } = buildLaunchMap(curriculum.lessons)
   const lesson = allLessons.find((item) => item.id === projectId)
+  const [replayCount, setReplayCount] = useState(0)
+  const snapshotBlocks =
+    progress.projectSnapshots.find((snapshot) => snapshot.lessonId === projectId)
+      ?.blocks ?? []
 
   if (!lesson) {
     return <main className="p-6 text-lg font-semibold">没有找到这个作品。</main>
@@ -43,85 +48,44 @@ export default function ProjectCompletePage() {
   const rewardCards = cardDefinitions.filter(
     (card) => progress.cardIds.includes(card.id) && visibleRewardIds.has(card.id),
   )
+  const primaryLabel = isFoundationGraduate
+    ? '看看高阶创作阶段'
+    : lesson.sortOrder % 3 === 0
+      ? '继续下一单元'
+      : '继续下一课'
+  const primaryHref = isFoundationGraduate ? '/parent/purchase' : '/learn/map'
 
   return (
-    <main className="min-h-screen bg-[#fff9ec] px-6 py-10">
-      <section className="mx-auto max-w-4xl rounded-[2rem] bg-white p-8 text-center shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-orange-500">
-          作品完成
-        </p>
-        <h1
-          className="mt-4 text-4xl font-black text-slate-950"
-          data-testid="project-complete-heading"
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#fffdf8_0%,#fff4e2_38%,#eef8ff_100%)] px-6 py-10">
+      <ProjectCompleteCard
+        key={`${lesson.id}-${replayCount}`}
+        blocks={snapshotBlocks}
+        completionCopy={completionCopy}
+        isFoundationGraduate={isFoundationGraduate}
+        lessonId={projectId}
+        lessonTitle={lesson.title}
+        onReplay={() => setReplayCount((count) => count + 1)}
+        primaryHref={primaryHref}
+        primaryLabel={primaryLabel}
+        rewardCards={rewardCards}
+        stars={progress.stars}
+        totalCards={progress.cardIds.length}
+      />
+
+      <div className="mx-auto mt-5 flex max-w-5xl flex-wrap justify-center gap-3">
+        <Link
+          className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)] transition hover:bg-slate-50"
+          href="/auth/bind"
         >
-          你完成了《{lesson.title}》
-        </h1>
-        <p className="mt-4 text-lg leading-8 text-slate-600">
-          当前累计 {progress.stars} 颗星星，已收集 {progress.cardIds.length} 张卡片。
-          {completionCopy.summary}
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <span className="rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-700">
-            获得 3 颗星星
-          </span>
-          <span className="rounded-full bg-sky-100 px-4 py-2 text-sm font-bold text-sky-700">
-            获得徽章：lesson-{projectId}
-          </span>
-          {rewardCards.map((card) => (
-            <span
-              key={card.id}
-              className="rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-700"
-            >
-              获得卡片：{card.name}
-            </span>
-          ))}
-        </div>
-        {completionCopy.spotlightTag &&
-        completionCopy.spotlightTitle &&
-        completionCopy.spotlightBody ? (
-          <div
-            className={`mt-8 rounded-[1.5rem] px-6 py-5 text-left ${
-              isFoundationGraduate ? 'bg-violet-50' : 'bg-emerald-50'
-            }`}
-          >
-            <p
-              className={`text-sm font-semibold uppercase tracking-[0.24em] ${
-                isFoundationGraduate ? 'text-violet-700' : 'text-emerald-700'
-              }`}
-            >
-              {completionCopy.spotlightTag}
-            </p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">
-              {completionCopy.spotlightTitle}
-            </h2>
-            <p className="mt-3 text-base leading-8 text-slate-700">
-              {completionCopy.spotlightBody}
-            </p>
-          </div>
-        ) : null}
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
-          <Link
-            className="rounded-full bg-orange-500 px-6 py-4 text-lg font-bold text-white"
-            href="/auth/bind"
-          >
-            保存我的进度
-          </Link>
-          <Link
-            className="rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800"
-            href="/learn/map"
-          >
-            回到学习地图
-          </Link>
-          {isFoundationGraduate ? (
-            <Link
-              className="rounded-full border border-violet-200 px-6 py-4 text-lg font-bold text-violet-700"
-              href="/parent/purchase"
-            >
-              查看高阶创作路线
-            </Link>
-          ) : null}
-        </div>
-      </section>
+          保存我的进度
+        </Link>
+        <Link
+          className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)] transition hover:bg-slate-50"
+          href="/learn/map"
+        >
+          回到学习地图
+        </Link>
+      </div>
     </main>
   )
 }
