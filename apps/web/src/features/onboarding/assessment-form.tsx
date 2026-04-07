@@ -49,12 +49,12 @@ export function AssessmentForm({
 
   return (
     <div
-      className="rounded-[2.4rem] bg-white px-6 py-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8"
+      className="rounded-[2.5rem] bg-white px-6 py-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8"
       data-testid="assessment-form"
     >
       <div className="space-y-2">
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-violet-700">
-          轻量小测评
+          轻量小测
         </p>
         <div className="flex items-center justify-between gap-4">
           <p className="text-base font-bold text-slate-600">
@@ -73,7 +73,7 @@ export function AssessmentForm({
         <p className="text-sm font-semibold text-slate-500">当前问题</p>
         <h1 className="mt-3 text-2xl font-black text-slate-950">{question.prompt}</h1>
         <p className="mt-3 text-sm leading-7 text-slate-600">
-          先选一个最像你的答案就可以，不需要想太久。
+          选一个最接近孩子真实情况的答案就可以，不需要想太久。
         </p>
       </div>
 

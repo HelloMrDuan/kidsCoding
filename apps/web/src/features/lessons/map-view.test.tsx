@@ -31,7 +31,7 @@ describe('MapView', () => {
     expect(screen.getByTestId('learning-map-high-tier')).toBeInTheDocument()
 
     expect(
-      screen.getByRole('link', { name: '继续第 3 课' }),
+      screen.getByRole('link', { name: '继续第 3 节' }),
     ).toHaveAttribute('href', '/learn/lesson/lesson-03-forest-story')
 
     expect(screen.getByTestId('map-unit-unit-1-forest-meetup')).toBeInTheDocument()

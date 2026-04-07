@@ -23,13 +23,14 @@ describe('AgeBandForm', () => {
     push.mockReset()
   })
 
-  it('renders a warm age picker with a clear start promise', () => {
+  it('renders a clear age entry choice with one primary action per card', () => {
     render(<AgeBandForm />)
 
     expect(screen.getByTestId('age-band-form')).toBeInTheDocument()
-    expect(screen.getByText('先按年龄找到合适起点')).toBeInTheDocument()
+    expect(screen.getByText('先选一个年龄入口')).toBeInTheDocument()
     expect(screen.getByText('6-8 岁')).toBeInTheDocument()
     expect(screen.getByText('9-12 岁')).toBeInTheDocument()
     expect(screen.getByText('13 岁以上')).toBeInTheDocument()
+    expect(screen.getAllByText('从这里开始')).toHaveLength(3)
   })
 })

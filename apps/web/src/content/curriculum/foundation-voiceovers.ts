@@ -51,7 +51,7 @@ export const foundationVoiceovers: Record<string, string[]> = {
     '点一下，看看蝴蝶会不会飞起来。',
   ],
   'lesson-08-garden-dialogue': [
-    '先回想点击后会发生什么。',
+    '先回想点一下后会发生什么。',
     '先放好点击开关。',
     '让角色先动起来。',
     '再接上一句回应的话。',

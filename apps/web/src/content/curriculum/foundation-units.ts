@@ -12,7 +12,7 @@ export const foundationUnits: FoundationUnit[] = [
   {
     id: 'unit-1-forest-meetup',
     title: '森林见面会',
-    summary: '让角色动起来并说一句话，做出第一个完整小故事。',
+    summary: '让角色动起来并开口说话，做出第一个完整小故事。',
     lessonIds: [
       'lesson-01-forest-hello',
       'lesson-02-forest-greeting',
@@ -20,14 +20,14 @@ export const foundationUnits: FoundationUnit[] = [
     ],
     remedialMicroScript: {
       title: '课内小补课',
-      lines: ['先放开始积木。', '再接上动作或说话积木。'],
+      lines: ['先放开始积木。', '再接动作或说话积木。'],
       demo: '先高亮开始积木，再高亮后面的动作或说话积木。',
     },
   },
   {
     id: 'unit-2-meadow-journey',
     title: '小动物去旅行',
-    summary: '学会场景切换和故事顺序，让故事从一个画面变成两个片段。',
+    summary: '学会切换场景和安排顺序，让故事从一个画面走到另一个画面。',
     lessonIds: [
       'lesson-04-meadow-scene',
       'lesson-05-meadow-order',
@@ -35,14 +35,14 @@ export const foundationUnits: FoundationUnit[] = [
     ],
     remedialMicroScript: {
       title: '课内小补课',
-      lines: ['先让故事在前一个画面开始。', '再接上切换场景积木。'],
-      demo: '先播放前一个场景的一小段，再闪一下切换场景积木。',
+      lines: ['先让故事在前一个画面开始。', '再接切换场景积木。'],
+      demo: '先播放前一个场景的一小段，再高亮切换场景积木。',
     },
   },
   {
     id: 'unit-3-garden-interaction',
     title: '花园互动秀',
-    summary: '用点击触发让故事对孩子的操作做出反应。',
+    summary: '让角色对点击做出反应，完成第一个互动故事。',
     lessonIds: [
       'lesson-07-garden-click',
       'lesson-08-garden-dialogue',
@@ -50,14 +50,14 @@ export const foundationUnits: FoundationUnit[] = [
     ],
     remedialMicroScript: {
       title: '课内小补课',
-      lines: ['被点击时，不是一开始就会动。', '要等你点到角色，它才会开始回应。'],
+      lines: ['被点击时，不是一开始就会生效。', '要点到角色，它才会开始回应。'],
       demo: '先展示角色静止，再模拟点一下，让角色开始动作。',
     },
   },
   {
     id: 'unit-4-graduation-show',
     title: '动物朋友合作演出',
-    summary: '让双角色配合出场，完成启蒙毕业作品。',
+    summary: '让两个角色按顺序配合行动，完成启蒙毕业作品。',
     lessonIds: [
       'lesson-10-second-friend',
       'lesson-11-duo-rehearsal',
@@ -66,7 +66,7 @@ export const foundationUnits: FoundationUnit[] = [
     remedialMicroScript: {
       title: '课内小补课',
       lines: ['第二个角色也要有自己的开始积木。', '每个角色都要接好自己的动作顺序。'],
-      demo: '先高亮第一位朋友的一条积木线，再高亮第二位朋友的另一条积木线。',
+      demo: '先高亮第一位朋友的积木线，再高亮第二位朋友的积木线。',
     },
   },
 ]

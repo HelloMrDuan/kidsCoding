@@ -64,7 +64,7 @@ function getStationCopy(state: LessonStationState) {
   switch (state) {
     case 'completed':
       return {
-        badge: '已经走过',
+        badge: '已经完成',
         cta: '回看作品',
         badgeClass: 'bg-slate-100 text-slate-600',
         nodeClass: 'border-slate-200 bg-white text-slate-500',
@@ -90,7 +90,7 @@ function getStationCopy(state: LessonStationState) {
       }
     case 'available':
       return {
-        badge: '可以继续',
+        badge: '可以进入',
         cta: '进入这一课',
         badgeClass: 'bg-sky-50 text-sky-700',
         nodeClass: 'border-sky-200 bg-white text-sky-700',
@@ -181,7 +181,7 @@ export function MapView({
                 第 {nextLesson.sortOrder} 节
               </span>
               <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-amber-700">
-                {foundationComplete ? '启蒙已完成' : '继续启蒙主线'}
+                {foundationComplete ? '启蒙已经完成' : '继续启蒙主线'}
               </span>
             </div>
           </div>
@@ -191,7 +191,7 @@ export function MapView({
             data-testid="learning-map-primary-cta"
             href={`/learn/lesson/${nextLesson.id}`}
           >
-            继续第 {nextLesson.sortOrder} 课
+            继续第 {nextLesson.sortOrder} 节
           </Link>
         </div>
       </section>
@@ -238,7 +238,7 @@ export function MapView({
                         {unitCurrent
                           ? '现在正在这个单元'
                           : unitCompleted
-                            ? '这一单元已经完成'
+                            ? '这个单元已经完成'
                             : '接下来会走到这里'}
                       </span>
                     </div>
@@ -319,10 +319,10 @@ export function MapView({
                   高阶创作阶段
                 </p>
                 <h3 className="mt-4 text-2xl font-black text-slate-950">
-                  启蒙走完后，下一段成长会继续发光
+                  启蒙走完后，后面还有更厉害的创作路线
                 </h3>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">
-                  完成 12 节启蒙课后，孩子会继续进入更复杂的互动故事创作。这里先留出方向感，不打断现在的启蒙主线。
+                  完成 12 节启蒙课后，孩子会继续进入更复杂的互动故事创作。这里先告诉你方向，不打断现在的启蒙主线。
                 </p>
 
                 <div className="mt-5">

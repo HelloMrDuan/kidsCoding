@@ -79,10 +79,10 @@ export default function LearnMapPage() {
             </p>
             <div className="space-y-3">
               <h1 className="text-3xl font-black tracking-tight text-slate-950 md:text-5xl">
-                学习地图
+                沿着成长路线继续往前走
               </h1>
               <p className="max-w-3xl text-base leading-7 text-slate-600 md:text-lg md:leading-8">
-                先沿着启蒙路线做出完整小故事，再自然走向高阶创作。这里先告诉孩子现在在哪一段，也告诉家长下一步为什么值得继续。
+                这里先告诉你现在学到哪一段，再告诉你下一步该点哪里。先把当前启蒙主线走稳，做出完整作品。
               </p>
             </div>
           </div>
@@ -93,10 +93,10 @@ export default function LearnMapPage() {
                 当前单元
               </p>
               <h2 className="mt-3 text-2xl font-black text-slate-950">
-                {currentUnit?.title ?? '启蒙路线'}
+                {currentUnit?.title ?? '启蒙主线'}
               </h2>
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                {currentUnit?.summary ?? '先沿着成长路线继续往前走。'}
+                {currentUnit?.summary ?? '先沿着启蒙主线继续往前走。'}
               </p>
             </div>
 

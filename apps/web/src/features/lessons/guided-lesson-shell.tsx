@@ -71,7 +71,7 @@ export function GuidedLessonShell({
       >
         <div className="space-y-3 rounded-[2rem] bg-[linear-gradient(180deg,#ffffff_0%,#fff3de_100%)] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
           <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
-            今天的小步骤
+            今天的小任务
           </p>
           <h1 className="text-[2rem] font-black tracking-tight text-slate-950">
             {lessonTitle}

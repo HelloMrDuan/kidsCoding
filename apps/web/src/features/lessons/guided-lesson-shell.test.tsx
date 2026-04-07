@@ -39,7 +39,7 @@ describe('GuidedLessonShell', () => {
       </GuidedLessonShell>,
     )
 
-    expect(screen.getByText('今天的小步骤')).toBeInTheDocument()
+    expect(screen.getByText('今天的小任务')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-support-rail')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-task-card')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-workbench-shell')).toBeInTheDocument()
@@ -56,7 +56,7 @@ describe('GuidedLessonShell', () => {
   it('shows the in-lesson remedial micro script when the child gets stuck', () => {
     render(
       <GuidedLessonShell
-        hintCopy="先看一看更简单的说明，再回来试一次。"
+        hintCopy="先看一眼更简单的说明，再回来试一次。"
         instruction="把开始积木和向右移动积木接起来。"
         isLocked={false}
         lessonGoal="让主角从舞台左边走到右边。"
