@@ -34,10 +34,7 @@ export default function CardsPage() {
             每完成一段学习旅程，就会点亮新的卡片。这里会把孩子一路做出来的作品能力和成长时刻都收集起来。
           </p>
         </header>
-        <CardBook
-          definitions={cardDefinitions}
-          earnedCardIds={progress.cardIds}
-        />
+        <CardBook definitions={cardDefinitions} earnedCardIds={progress.cardIds} />
       </section>
     </main>
   )

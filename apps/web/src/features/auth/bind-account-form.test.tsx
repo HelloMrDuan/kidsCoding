@@ -22,9 +22,7 @@ describe('BindAccountForm', () => {
     const requestOtp = vi.fn().mockResolvedValue(undefined)
     const verifyOtp = vi.fn().mockResolvedValue(undefined)
 
-    render(
-      <BindAccountForm requestOtp={requestOtp} verifyOtp={verifyOtp} />,
-    )
+    render(<BindAccountForm requestOtp={requestOtp} verifyOtp={verifyOtp} />)
 
     fireEvent.change(screen.getByLabelText('邮箱或手机号'), {
       target: { value: 'family@example.com' },

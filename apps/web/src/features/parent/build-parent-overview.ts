@@ -76,9 +76,7 @@ export function buildParentOverview({
     (maxStars, item) => Math.max(maxStars, item.stars ?? 0),
     0,
   )
-  const lessonTitles = new Map(
-    lessonCatalog.map((lesson) => [lesson.id, lesson.title]),
-  )
+  const lessonTitles = new Map(lessonCatalog.map((lesson) => [lesson.id, lesson.title]))
   const recentProjects = [...projectSnapshots]
     .sort((left, right) => right.updated_at.localeCompare(left.updated_at))
     .map((snapshot) => ({

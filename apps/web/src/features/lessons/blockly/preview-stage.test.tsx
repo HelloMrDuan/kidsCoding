@@ -24,7 +24,7 @@ describe('PreviewStage', () => {
     ).toBeInTheDocument()
   })
 
-  it('describes the click trigger once when_clicked has been connected', () => {
+  it('describes the click trigger once when when_clicked has been connected', () => {
     render(<PreviewStage blocks={[{ type: 'when_clicked' }]} />)
 
     expect(

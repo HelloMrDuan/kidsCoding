@@ -19,7 +19,7 @@ export const foundationUnits: FoundationUnit[] = [
       'lesson-03-forest-story',
     ],
     remedialMicroScript: {
-      title: '课内小补课',
+      title: '课内微补课',
       lines: ['先放开始积木。', '再接动作或说话积木。'],
       demo: '先高亮开始积木，再高亮后面的动作或说话积木。',
     },
@@ -34,7 +34,7 @@ export const foundationUnits: FoundationUnit[] = [
       'lesson-06-meadow-story',
     ],
     remedialMicroScript: {
-      title: '课内小补课',
+      title: '课内微补课',
       lines: ['先让故事在前一个画面开始。', '再接切换场景积木。'],
       demo: '先播放前一个场景的一小段，再高亮切换场景积木。',
     },
@@ -49,7 +49,7 @@ export const foundationUnits: FoundationUnit[] = [
       'lesson-09-garden-story',
     ],
     remedialMicroScript: {
-      title: '课内小补课',
+      title: '课内微补课',
       lines: ['被点击时，不是一开始就会生效。', '要点到角色，它才会开始回应。'],
       demo: '先展示角色静止，再模拟点一下，让角色开始动作。',
     },
@@ -64,7 +64,7 @@ export const foundationUnits: FoundationUnit[] = [
       'lesson-12-graduation-show',
     ],
     remedialMicroScript: {
-      title: '课内小补课',
+      title: '课内微补课',
       lines: ['第二个角色也要有自己的开始积木。', '每个角色都要接好自己的动作顺序。'],
       demo: '先高亮第一位朋友的积木线，再高亮第二位朋友的积木线。',
     },

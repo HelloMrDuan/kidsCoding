@@ -14,14 +14,14 @@ type CardBookProps = {
 const categoryLabels = {
   theme: '主题收藏卡',
   growth: '成长成就卡',
-  commemorative: '稀有纪念卡',
+  commemorative: '纪念收藏卡',
 }
 
 const rarityLabels = {
   common: '普通卡',
   fine: '优质卡',
   rare: '稀有卡',
-  limited: '纪念限定',
+  limited: '限定卡',
 } as const
 
 export function CardBook({ definitions, earnedCardIds }: CardBookProps) {
@@ -71,14 +71,8 @@ export function CardBook({ definitions, earnedCardIds }: CardBookProps) {
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {group.cards
-              .filter(
-                (card) =>
-                  rarityFilter === 'all' || card.rarity === rarityFilter,
-              )
-              .filter(
-                (card) =>
-                  seriesFilter === 'all' || card.series === seriesFilter,
-              )
+              .filter((card) => rarityFilter === 'all' || card.rarity === rarityFilter)
+              .filter((card) => seriesFilter === 'all' || card.series === seriesFilter)
               .map((card) => (
                 <article
                   key={card.id}

@@ -43,8 +43,8 @@ export function PurchaseStatusCard({
   if (status === 'failed') {
     return (
       <section className="space-y-4 rounded-[1.5rem] bg-rose-50 p-5 text-rose-900">
-        <h2 className="text-2xl font-black">支付没有完成</h2>
-        <p className="text-sm leading-7">这次升级还没有完成，请返回购买页重新发起。</p>
+        <h2 className="text-2xl font-black">这次支付没有完成</h2>
+        <p className="text-sm leading-7">请返回购买页重新发起升级。</p>
         <Link
           className="inline-flex items-center justify-center rounded-full border border-rose-200 px-5 py-3 text-sm font-bold text-rose-900"
           href="/parent/purchase"
@@ -58,7 +58,7 @@ export function PurchaseStatusCard({
   if (status === 'expired') {
     return (
       <section className="space-y-4 rounded-[1.5rem] bg-amber-50 p-5 text-amber-900">
-        <h2 className="text-2xl font-black">二维码已失效</h2>
+        <h2 className="text-2xl font-black">支付二维码已失效</h2>
         <p className="text-sm leading-7">支付窗口已经过期，请返回购买页重新发起。</p>
         <Link
           className="inline-flex items-center justify-center rounded-full border border-amber-200 px-5 py-3 text-sm font-bold text-amber-900"
@@ -73,7 +73,7 @@ export function PurchaseStatusCard({
   if (timedOut) {
     return (
       <section className="space-y-4 rounded-[1.5rem] bg-sky-50 p-5 text-sky-950">
-        <h2 className="text-2xl font-black">仍在确认中</h2>
+        <h2 className="text-2xl font-black">还在确认支付结果</h2>
         <p className="text-sm leading-7">
           如果家长已经完成支付，系统稍后会自动完成解锁。你也可以现在手动刷新状态。
         </p>
@@ -99,9 +99,7 @@ export function PurchaseStatusCard({
   return (
     <section className="space-y-4 rounded-[1.5rem] bg-slate-50 p-5 text-slate-900">
       <h2 className="text-2xl font-black">正在确认支付</h2>
-      <p className="text-sm leading-7">
-        订单 {orderId} 正在等待支付结果确认，请稍候。
-      </p>
+      <p className="text-sm leading-7">订单 {orderId} 正在等待支付结果确认，请稍候。</p>
       <button
         className="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-3 text-sm font-bold text-slate-900"
         onClick={() => void onRefresh()}
