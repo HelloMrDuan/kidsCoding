@@ -25,7 +25,7 @@ const startLevelLabels = {
 
 export default function LearnMapPage() {
   const curriculum = useLaunchCurriculum()
-  const { allLessons } = buildLaunchMap(curriculum.lessons)
+  const { allLessons, foundationUnits } = buildLaunchMap(curriculum.lessons)
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const progress = useSyncExternalStore(
     subscribeGuestProgress,
@@ -38,6 +38,13 @@ export default function LearnMapPage() {
     () => defaultOnboardingSession,
   )
   const recommendedLevel = onboarding.recommendedLevel ?? 'starter'
+  const nextLesson =
+    allLessons.find((lesson) => !progress.completedLessonIds.includes(lesson.id)) ??
+    allLessons.find((lesson) => lesson.id === progress.currentLessonId) ??
+    allLessons.at(-1)
+  const currentUnit =
+    foundationUnits.find((unit) => unit.lessonIds.includes(nextLesson?.id ?? '')) ??
+    foundationUnits[0]
 
   useEffect(() => {
     let isActive = true
@@ -65,7 +72,7 @@ export default function LearnMapPage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef9ff_0%,#fffaf0_100%)] px-4 py-6 md:px-6 md:py-8">
       <section className="mx-auto max-w-6xl space-y-6">
-        <header className="grid gap-6 rounded-[2.25rem] bg-white px-6 py-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8 lg:grid-cols-[1fr_auto] lg:items-end">
+        <header className="grid gap-6 rounded-[2.25rem] bg-white px-6 py-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-4">
             <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
               推荐起点：{startLevelLabels[recommendedLevel]}
@@ -75,36 +82,53 @@ export default function LearnMapPage() {
                 学习地图
               </h1>
               <p className="max-w-3xl text-base leading-7 text-slate-600 md:text-lg md:leading-8">
-                先沿着启蒙路线做出第一支故事，再把一个个小作品拼成完整毕业作品。孩子知道下一步做什么，家长也看得懂为什么值得继续。
+                先沿着启蒙路线做出完整小故事，再自然走向高阶创作。这里先告诉孩子现在在哪一段，也告诉家长下一步为什么值得继续。
               </p>
             </div>
           </div>
 
-          <div className="grid gap-3 rounded-[1.75rem] bg-[linear-gradient(180deg,#fff7eb_0%,#ffffff_100%)] p-5 text-sm font-semibold text-slate-700 shadow-[0_12px_30px_rgba(255,162,84,0.12)]">
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-[1.25rem] bg-white p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">星星</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">{progress.stars}</p>
-              </div>
-              <div className="rounded-[1.25rem] bg-white p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">徽章</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">
-                  {progress.badgeIds.length}
-                </p>
-              </div>
-              <div className="rounded-[1.25rem] bg-white p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">卡片</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">
-                  {progress.cardIds.length}
-                </p>
-              </div>
+          <div className="grid gap-4 rounded-[1.9rem] bg-[linear-gradient(180deg,#fff9ef_0%,#f6fbff_100%)] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.08)]">
+            <div className="rounded-[1.4rem] bg-white p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-400">
+                当前单元
+              </p>
+              <h2 className="mt-3 text-2xl font-black text-slate-950">
+                {currentUnit?.title ?? '启蒙路线'}
+              </h2>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                {currentUnit?.summary ?? '先沿着成长路线继续往前走。'}
+              </p>
             </div>
-            <Link
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-3 text-sm font-bold text-slate-800 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800"
-              href="/cards"
-            >
-              打开我的卡册
-            </Link>
+
+            <div className="rounded-[1.4rem] bg-white p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-400">
+                下一步去哪
+              </p>
+              <h3 className="mt-3 text-xl font-black text-slate-950">
+                {nextLesson?.title ?? '继续当前作品'}
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                {nextLesson?.goal ?? '继续把今天的小作品往前推进。'}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm">
+                星星 {progress.stars}
+              </span>
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm">
+                徽章 {progress.badgeIds.length}
+              </span>
+              <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm">
+                卡片 {progress.cardIds.length}
+              </span>
+              <Link
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-800 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800"
+                href="/cards"
+              >
+                打开我的卡册
+              </Link>
+            </div>
           </div>
         </header>
 
