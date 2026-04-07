@@ -22,10 +22,10 @@ describe('GuidedLessonShell', () => {
     expect(screen.queryByRole('button', { name: '完成这一课' })).toBeNull()
   })
 
-  it('shows the stage-side feedback card on unlocked lessons', () => {
+  it('shows the task card, workbench shell, and result card on unlocked lessons', () => {
     render(
       <GuidedLessonShell
-        feedback="太好了，角色已经准备好登场。"
+        feedback="太好了，角色已经准备好登场了。"
         instruction="把开始积木和向右移动积木接起来。"
         isLocked={false}
         lessonGoal="让主角从舞台左边走到右边。"
@@ -34,23 +34,29 @@ describe('GuidedLessonShell', () => {
         onStartRemedial={vi.fn()}
         stepTitle="第 1 步：连接动作"
         voiceover="先放开始积木。"
-      />,
+      >
+        <div>工作台内容</div>
+      </GuidedLessonShell>,
     )
 
     expect(screen.getByText('今天的小步骤')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-support-rail')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-task-card')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-workbench-shell')).toBeInTheDocument()
     expect(screen.getByText('把开始积木和向右移动积木接起来。')).toBeInTheDocument()
-    expect(screen.getByTestId('lesson-feedback-card')).toBeInTheDocument()
-    expect(screen.getByText('刚刚完成')).toBeInTheDocument()
-    expect(screen.getByText('太好了，角色已经准备好登场。')).toBeInTheDocument()
-    expect(screen.getByTestId('lesson-feedback-preview')).toBeInTheDocument()
     expect(screen.getByText('主语音：先放开始积木。')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-feedback-card')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-feedback-preview')).toBeInTheDocument()
+    expect(screen.getByText('刚刚完成')).toBeInTheDocument()
+    expect(screen.getByText('太好了，角色已经准备好登场了。')).toBeInTheDocument()
+    expect(screen.getByText('工作台内容')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-complete-step')).toBeInTheDocument()
   })
 
   it('shows the in-lesson remedial micro script when the child gets stuck', () => {
     render(
       <GuidedLessonShell
-        hintCopy="先看一眼更简单的说明，再回来试一次。"
+        hintCopy="先看一看更简单的说明，再回来试一次。"
         instruction="把开始积木和向右移动积木接起来。"
         isLocked={false}
         lessonGoal="让主角从舞台左边走到右边。"

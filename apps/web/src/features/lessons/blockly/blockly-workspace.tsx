@@ -3,20 +3,14 @@
 import { useEffect, useMemo, useRef } from 'react'
 import * as Blockly from 'blockly'
 
-import {
-  getKidsBlockLabel,
-  registerKidsBlocks,
-} from './register-kids-blocks'
+import { getKidsBlockLabel, registerKidsBlocks } from './register-kids-blocks'
 import { restoreBlockSequence } from './restore-block-sequence'
 
 type BlockSnapshot = {
   type: string
 }
 
-function collectSequence(
-  block: Blockly.Block | null,
-  result: BlockSnapshot[],
-) {
+function collectSequence(block: Blockly.Block | null, result: BlockSnapshot[]) {
   let current = block
 
   while (current) {
@@ -159,38 +153,57 @@ export function BlocklyWorkspace({
   }
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1fr_300px]">
-      <div className="space-y-3">
-        <div className="rounded-[1.5rem] bg-white px-4 py-3 shadow-[0_12px_24px_rgba(15,23,42,0.05)]">
-          <p className="text-sm font-semibold text-slate-500">积木操作区</p>
-          <p className="mt-1 text-sm leading-7 text-slate-600">
-            左边拖积木，右边也可以直接点按钮补上本节可用积木。低龄孩子先会拼，再慢慢理解为什么这样拼。
-          </p>
+    <section className="space-y-4" data-testid="lesson-blockly-workspace">
+      <div className="rounded-[2rem] border border-white/80 bg-[linear-gradient(180deg,#fff9f2_0%,#ffffff_100%)] px-5 py-4 shadow-[0_18px_36px_rgba(15,23,42,0.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-[#ff8b4e]">创作积木桌</p>
+            <h3 className="mt-1 text-xl font-black text-slate-950">把积木拼起来，让舞台里的故事发生</h3>
+          </div>
+          <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+            先拼，再看
+          </span>
         </div>
+        <p className="mt-3 text-sm leading-7 text-slate-600">
+          左边拖动积木，或者直接点下面的快捷按钮补上当前课需要的积木。现在先把故事拼出来，再慢慢理解为什么这样拼。
+        </p>
+      </div>
+
+      <div className="rounded-[2rem] border border-slate-200 bg-white px-3 py-3 shadow-[0_18px_36px_rgba(15,23,42,0.06)]">
         <div
           ref={mountRef}
-          className="min-h-[420px] rounded-[1.75rem] border border-slate-200 bg-white"
+          className="min-h-[420px] rounded-[1.5rem] border border-slate-100 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)]"
         />
       </div>
-      <div className="grid content-start gap-3">
-        <div className="rounded-[1.5rem] bg-slate-900 px-4 py-4 text-white shadow-[0_16px_28px_rgba(15,23,42,0.18)]">
-          <p className="text-sm font-semibold text-slate-200">本节可用积木</p>
-          <p className="mt-2 text-sm leading-7 text-slate-200">
-            只保留当前任务真正需要的积木，减少分心，让孩子更容易成功。
-          </p>
+
+      <div className="rounded-[2rem] bg-slate-900 px-5 py-5 text-white shadow-[0_18px_36px_rgba(15,23,42,0.18)]">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-slate-200">本节可用积木</p>
+            <h4 className="mt-1 text-lg font-black text-white">只保留这一步真正需要的积木</h4>
+          </div>
+          <span className="rounded-full bg-white/10 px-3 py-2 text-[11px] font-bold tracking-[0.18em] text-slate-200">
+            BLOCKS
+          </span>
         </div>
-        {stableAllowedBlocks.map((type) => (
-          <button
-            key={type}
-            className="rounded-[1.5rem] bg-slate-900 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-slate-800"
-            data-testid={`lesson-add-${type}`}
-            onClick={() => addBlock(type)}
-            type="button"
-          >
-            添加积木：{getKidsBlockLabel(type)}
-          </button>
-        ))}
+        <p className="mt-3 text-sm leading-7 text-slate-200">
+          这样能减少分心，让孩子先把当前动作做出来，再往下一步走。
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-3" data-testid="lesson-block-palette">
+          {stableAllowedBlocks.map((type) => (
+            <button
+              key={type}
+              className="rounded-full bg-white px-4 py-3 text-sm font-bold text-slate-900 transition hover:-translate-y-0.5 hover:bg-[#fff1da]"
+              data-testid={`lesson-add-${type}`}
+              onClick={() => addBlock(type)}
+              type="button"
+            >
+              添加积木：{getKidsBlockLabel(type)}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   )
 }

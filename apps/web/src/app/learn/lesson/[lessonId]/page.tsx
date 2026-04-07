@@ -155,9 +155,9 @@ export default function LessonPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f5fbff_0%,#fff8ef_100%)] px-4 py-6 md:px-6 md:py-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#fff7ed_100%)] px-4 py-6 md:px-6 md:py-8">
       <section className="mx-auto max-w-7xl space-y-6">
-        <header className="rounded-[2.25rem] bg-white px-6 py-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8">
+        <header className="rounded-[2.5rem] border border-white/75 bg-[linear-gradient(180deg,#ffffff_0%,#fff6ec_100%)] px-6 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:px-8">
           <div className="flex flex-wrap items-center gap-3">
             <span className="rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
               第 {stepIndex + 1} 步 / 共 {currentLesson.steps.length} 步
@@ -166,17 +166,17 @@ export default function LessonPage() {
               {currentLesson.phase === 'trial' ? '启蒙课' : '高阶创作课'}
             </span>
           </div>
-          <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_260px] xl:items-end">
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-slate-950 md:text-5xl">
+              <h1 className="text-3xl font-black tracking-tight text-slate-950 md:text-[3.2rem]">
                 {currentLesson.title}
               </h1>
               <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600 md:text-lg md:leading-8">
-                先完成这个小目标，再把这一节课推进成一段会动的故事片段。每一步都能在右边舞台马上看到结果。
+                先完成这个小目标，再看看舞台里的角色马上会发生什么变化。每一步都在把故事往前推进。
               </p>
             </div>
-            <div className="rounded-[1.5rem] bg-slate-50 px-5 py-4 text-sm leading-7 text-slate-600">
-              当前目标：{step.title}
+            <div className="rounded-[1.75rem] bg-white/80 px-5 py-4 text-sm leading-7 text-slate-600 shadow-[0_12px_24px_rgba(15,23,42,0.05)]">
+              当前步骤：<span className="font-bold text-slate-900">{step.title}</span>
             </div>
           </div>
         </header>

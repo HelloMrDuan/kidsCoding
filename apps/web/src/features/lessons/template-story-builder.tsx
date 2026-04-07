@@ -16,10 +16,8 @@ export function TemplateStoryBuilder({
 }) {
   return (
     <div className="space-y-4">
-      <div className="rounded-[1.5rem] border border-violet-200 bg-violet-50 px-4 py-3">
-        <p className="text-sm font-semibold text-violet-800">
-          当前模板：{templateName}
-        </p>
+      <div className="rounded-[1.75rem] border border-violet-200 bg-[linear-gradient(180deg,#f8f2ff_0%,#ffffff_100%)] px-5 py-4 shadow-[0_16px_28px_rgba(124,92,255,0.1)]">
+        <p className="text-sm font-semibold text-violet-800">当前模板：{templateName}</p>
       </div>
       <PreviewStage blocks={blocks} />
       <BlocklyWorkspace

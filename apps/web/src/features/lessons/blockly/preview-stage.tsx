@@ -1,4 +1,4 @@
-export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
+function getStageCopy(blocks: Array<{ type: string }>) {
   const moved = blocks.some((block) => block.type === 'move_right')
   const spoke = blocks.some((block) => block.type === 'say_line')
   const startCount = blocks.filter((block) => block.type === 'when_start').length
@@ -7,52 +7,110 @@ export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
   const hasClickTrigger = blocks.some((block) => block.type === 'when_clicked')
   const switchedScene = blocks.some((block) => block.type === 'switch_scene')
 
+  if (spoke && switchedScene) {
+    return '太好了，故事已经从森林走到草地了。再接一句收尾的话，旅行就更完整了。'
+  }
+
+  if (spoke && hasClickTrigger) {
+    return '太好了，角色已经会在点击后先动起来，再用一句话回应你。'
+  }
+
+  if (spoke) {
+    return '太好了，角色已经会说话了，故事正在从静态画面变成会动的小舞台。'
+  }
+
+  if (switchedScene) {
+    return '太好了，故事已经从森林走到草地了。再接一句收尾的话，旅行就更完整了。'
+  }
+
+  if (moved && hasSecondStart) {
+    return '太好了，两位朋友已经开始按顺序一起行动了。再接一个收尾动作，毕业故事就更完整了。'
+  }
+
+  if (hasSecondStart) {
+    return '太好了，第二位朋友也准备好上场了。再接一个动作积木，舞台就会更热闹。'
+  }
+
+  if (moved && hasClickTrigger) {
+    return '太好了，角色已经会在点击后动起来了。再接一句回应的话，互动就更完整了。'
+  }
+
+  if (moved) {
+    return '太好了，角色已经走上舞台了。再接一句话，故事就会更完整。'
+  }
+
+  if (hasClickTrigger) {
+    return '很好，角色已经准备好回应你的点击了。再接一个动作积木，点一下就能看到变化。'
+  }
+
+  if (hasStart) {
+    return '很好，角色已经准备好开始表演了。再接一个动作积木，马上就能看到变化。'
+  }
+
+  return '先把开始积木放好，再让角色真正开始表演。'
+}
+
+export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
+  const moved = blocks.some((block) => block.type === 'move_right')
+  const startCount = blocks.filter((block) => block.type === 'when_start').length
+  const hasSecondStart = startCount > 1
+  const switchedScene = blocks.some((block) => block.type === 'switch_scene')
+
   return (
-    <div className="rounded-[2rem] border border-[#dceef7] bg-[linear-gradient(180deg,#dff4ff_0%,#ffffff_100%)] p-6 shadow-[0_14px_32px_rgba(56,189,248,0.08)]">
-      <div className="rounded-[1.75rem] bg-white/80 p-5">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-sky-700">作品舞台</p>
-            <h3 className="mt-1 text-2xl font-black text-slate-950">先看角色怎么表演出来</h3>
+    <section
+      className="overflow-hidden rounded-[2.5rem] border border-[#dceef7] bg-[linear-gradient(180deg,#ecf9ff_0%,#ffffff_100%)] p-5 shadow-[0_24px_50px_rgba(56,189,248,0.12)] md:p-6"
+      data-testid="lesson-preview-stage"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-sky-700">作品舞台</p>
+          <h3 className="mt-1 text-[1.75rem] font-black tracking-tight text-slate-950 md:text-[2rem]">
+            看看你的故事现在发生了什么
+          </h3>
+        </div>
+        <span className="rounded-full bg-white px-4 py-2 text-xs font-bold text-sky-700 shadow-[0_10px_22px_rgba(15,23,42,0.06)]">
+          边做边看结果
+        </span>
+      </div>
+
+      <div className="mt-5 rounded-[2rem] bg-[radial-gradient(circle_at_top,#ffffff_0%,#d8f0ff_42%,#f7ebd6_100%)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] md:p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex gap-2">
+            <span className="h-3 w-3 rounded-full bg-white/80" />
+            <span className="h-3 w-3 rounded-full bg-white/60" />
+            <span className="h-3 w-3 rounded-full bg-white/40" />
           </div>
-          <div className="rounded-full bg-sky-100 px-3 py-2 text-xs font-bold text-sky-700">
-            每一步都会马上反馈
+          <span className="rounded-full bg-white/80 px-3 py-1 text-[11px] font-bold tracking-[0.2em] text-slate-500">
+            STAGE
+          </span>
+        </div>
+
+        <div className="mt-6 rounded-[1.75rem] bg-[linear-gradient(180deg,#84d2ff_0%,#daf4ff_58%,#f8f2e7_100%)] px-5 pb-6 pt-8 shadow-[0_20px_36px_rgba(125,211,252,0.18)]">
+          <div className="relative overflow-hidden rounded-[1.5rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_100%)] px-4 pb-8 pt-6">
+            <div className="absolute left-1/2 top-0 h-24 w-24 -translate-x-1/2 rounded-full bg-white/35 blur-2xl" />
+            <div className="relative flex items-end gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-300 shadow-[0_12px_24px_rgba(252,211,77,0.24)]" />
+              <div
+                className="h-24 w-24 rounded-full bg-orange-400 shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-300"
+                style={{ transform: moved ? 'translateX(88px)' : 'translateX(0px)' }}
+              />
+              {hasSecondStart ? (
+                <div className="h-16 w-16 rounded-full bg-emerald-400 shadow-[0_16px_30px_rgba(52,211,153,0.22)]" />
+              ) : null}
+            </div>
+            <div className="mt-5 h-6 rounded-full bg-[linear-gradient(90deg,#ffdd94_0%,#ffeec1_100%)] opacity-80" />
+            {switchedScene ? (
+              <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
+                场景已经切换到新的画面
+              </div>
+            ) : null}
           </div>
         </div>
 
-        <div className="mt-5 rounded-[1.5rem] bg-[linear-gradient(180deg,#8bd3ff_0%,#ddf2ff_45%,#f9f1e3_100%)] p-5">
-          <div className="flex items-end gap-4">
-            <div className="h-10 w-10 rounded-full bg-amber-300" />
-            <div
-              className="h-24 w-24 rounded-full bg-orange-400 transition-transform duration-300"
-              style={{ transform: moved ? 'translateX(88px)' : 'translateX(0px)' }}
-            />
-          </div>
-          <p className="mt-4 text-sm font-semibold leading-7 text-slate-700">
-            {spoke && switchedScene
-              ? '太好了，旅行已经完整地走到了新场景，整个故事越来越像真的冒险。'
-              : spoke && hasClickTrigger
-                ? '太好了，角色已经会在点击后先动起来，再用一句话回应你。'
-                : spoke
-                  ? '太好了，角色已经会说话了，故事正在从静态图片变成会动的小舞台。'
-                  : switchedScene
-                    ? '太好了，故事已经从森林走到草地了。再接一句收尾的话，旅行就更完整了。'
-                    : moved && hasSecondStart
-                      ? '太好了，两位朋友已经开始按顺序一起行动了。再接一个收尾动作，毕业故事就更完整了。'
-                      : hasSecondStart
-                        ? '太好了，第二位朋友也准备好上场了。再接一个动作积木，舞台就会更热闹。'
-                        : moved && hasClickTrigger
-                          ? '太好了，角色已经会在点击后动起来了。再接一句回应的话，互动就更完整了。'
-                          : moved
-                            ? '太好了，角色已经走上舞台了。再接一句话，故事就会更完整。'
-                            : hasClickTrigger
-                              ? '很好，角色已经准备好回应你的点击了。再接一个动作积木，点一下就能看到变化。'
-                              : hasStart
-                                ? '很好，角色已经站上舞台了。再接一个动作积木，马上就能看到表演。'
-                                : '先把开始积木放好，再让角色真正开始表演。'}
-          </p>
+        <div className="mt-5 rounded-[1.75rem] bg-white/85 px-4 py-4 shadow-[0_14px_28px_rgba(15,23,42,0.06)]">
+          <p className="text-sm font-semibold leading-7 text-slate-700">{getStageCopy(blocks)}</p>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
