@@ -7,7 +7,7 @@ import { defaultGuestProgress } from '@/features/progress/local-progress'
 import { MapView } from './map-view'
 
 describe('MapView', () => {
-  it('renders the growth track with the current focus, milestones, and high-tier region', () => {
+  it('renders the growth track, current focus card, and primary continue action', () => {
     const { allLessons } = buildLaunchMap()
 
     render(
@@ -26,8 +26,13 @@ describe('MapView', () => {
     )
 
     expect(screen.getByTestId('learning-map-current-focus')).toBeInTheDocument()
+    expect(screen.getByTestId('learning-map-focus-preview')).toBeInTheDocument()
     expect(screen.getByTestId('learning-map-track')).toBeInTheDocument()
     expect(screen.getByTestId('learning-map-high-tier')).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('link', { name: '继续第 3 课' }),
+    ).toHaveAttribute('href', '/learn/lesson/lesson-03-forest-story')
 
     expect(screen.getByTestId('map-unit-unit-1-forest-meetup')).toBeInTheDocument()
     expect(
@@ -41,7 +46,7 @@ describe('MapView', () => {
     ).toBeInTheDocument()
 
     const currentNode = screen.getByTestId('map-node-lesson-03-forest-story')
-    expect(within(currentNode).getByText('当前一步')).toBeInTheDocument()
+    expect(within(currentNode).getByText('现在就做')).toBeInTheDocument()
 
     const nextNode = screen.getByTestId('map-node-lesson-04-meadow-scene')
     expect(within(nextNode).getByText('下一站')).toBeInTheDocument()

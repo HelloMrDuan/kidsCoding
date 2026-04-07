@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
@@ -99,6 +100,8 @@ export default function LessonPage() {
     lessonPhase: currentLesson.phase,
     hasLaunchPack: hasCourseEntitlement,
   })
+  const currentUnit = getFoundationUnitByLessonId(currentLesson.id)
+  const completionPreview = getFoundationLessonFeedback(currentLesson.id, 'progress')
 
   function handleStartRemedial(remedialId: string) {
     router.push(
@@ -158,15 +161,29 @@ export default function LessonPage() {
     <main className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#fff7ed_100%)] px-4 py-6 md:px-6 md:py-8">
       <section className="mx-auto max-w-7xl space-y-6">
         <header className="rounded-[2.5rem] border border-white/75 bg-[linear-gradient(180deg,#ffffff_0%,#fff6ec_100%)] px-6 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:px-8">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
-              第 {stepIndex + 1} 步 / 共 {currentLesson.steps.length} 步
-            </span>
-            <span className="rounded-full bg-[#fff1d4] px-4 py-2 text-sm font-semibold text-amber-700">
-              {currentLesson.phase === 'trial' ? '启蒙课' : '高阶创作课'}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800"
+                href="/learn/map"
+              >
+                回到成长地图
+              </Link>
+              {currentUnit ? (
+                <span className="rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
+                  来自 {currentUnit.title}
+                </span>
+              ) : null}
+              <span className="rounded-full bg-[#fff1d4] px-4 py-2 text-sm font-semibold text-amber-700">
+                第 {stepIndex + 1} 步 / 共 {currentLesson.steps.length} 步
+              </span>
+            </div>
+            <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-600 shadow-sm">
+              {currentLesson.phase === 'trial' ? '启蒙主线' : '高阶创作'}
             </span>
           </div>
-          <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_260px] xl:items-end">
+
+          <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-end">
             <div>
               <h1 className="text-3xl font-black tracking-tight text-slate-950 md:text-[3.2rem]">
                 {currentLesson.title}
@@ -175,8 +192,26 @@ export default function LessonPage() {
                 先完成这个小目标，再看看舞台里的角色马上会发生什么变化。每一步都在把故事往前推进。
               </p>
             </div>
-            <div className="rounded-[1.75rem] bg-white/80 px-5 py-4 text-sm leading-7 text-slate-600 shadow-[0_12px_24px_rgba(15,23,42,0.05)]">
-              当前步骤：<span className="font-bold text-slate-900">{step.title}</span>
+            <div
+              className="grid gap-3 rounded-[1.75rem] bg-white/85 px-5 py-4 text-sm leading-7 text-slate-600 shadow-[0_12px_24px_rgba(15,23,42,0.05)]"
+              data-testid="lesson-entry-summary"
+            >
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
+                  当前步骤
+                </p>
+                <p className="mt-2 text-base font-bold text-slate-900">
+                  {step.title}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
+                  做完这节课会得到
+                </p>
+                <p className="mt-2 text-base font-bold text-slate-900">
+                  {completionPreview}
+                </p>
+              </div>
             </div>
           </div>
         </header>

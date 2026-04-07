@@ -64,36 +64,36 @@ function getStationCopy(state: LessonStationState) {
   switch (state) {
     case 'completed':
       return {
-        badge: '已走过',
+        badge: '已经走过',
         cta: '回看作品',
-        badgeClass: 'bg-[#eef3f8] text-slate-600',
-        nodeClass: 'bg-white text-slate-500 border-slate-200',
+        badgeClass: 'bg-slate-100 text-slate-600',
+        nodeClass: 'border-slate-200 bg-white text-slate-500',
         cardClass: 'border-white bg-white/90',
       }
     case 'current':
       return {
-        badge: '当前一步',
-        cta: '继续创作',
-        badgeClass: 'bg-[#dff3ff] text-sky-700',
-        nodeClass: 'bg-[#ffb458] text-slate-950 border-[#ffcf8a]',
+        badge: '现在就做',
+        cta: '继续这一课',
+        badgeClass: 'bg-sky-100 text-sky-700',
+        nodeClass: 'border-[#ffcf8a] bg-[#ffb458] text-slate-950',
         cardClass:
           'border-sky-200 bg-[linear-gradient(180deg,#ffffff_0%,#eef9ff_100%)]',
       }
     case 'next':
       return {
         badge: '下一站',
-        cta: '看看这一课',
-        badgeClass: 'bg-[#fff0cf] text-amber-700',
-        nodeClass: 'bg-[#fff4de] text-amber-700 border-[#ffd89c]',
+        cta: '看看下一课',
+        badgeClass: 'bg-amber-100 text-amber-700',
+        nodeClass: 'border-[#ffd89c] bg-[#fff4de] text-amber-700',
         cardClass:
           'border-[#ffe3b6] bg-[linear-gradient(180deg,#fffdf8_0%,#fff7eb_100%)]',
       }
     case 'available':
       return {
-        badge: '可继续前进',
+        badge: '可以继续',
         cta: '进入这一课',
-        badgeClass: 'bg-[#eef7ff] text-sky-700',
-        nodeClass: 'bg-white text-sky-700 border-sky-200',
+        badgeClass: 'bg-sky-50 text-sky-700',
+        nodeClass: 'border-sky-200 bg-white text-sky-700',
         cardClass: 'border-white bg-white/85',
       }
     case 'upcoming':
@@ -102,7 +102,7 @@ function getStationCopy(state: LessonStationState) {
         badge: '前方站点',
         cta: '看看这一课',
         badgeClass: 'bg-slate-100 text-slate-500',
-        nodeClass: 'bg-white/80 text-slate-400 border-slate-200',
+        nodeClass: 'border-slate-200 bg-white/80 text-slate-400',
         cardClass: 'border-white/80 bg-white/70',
       }
   }
@@ -125,6 +125,9 @@ export function MapView({
     foundationUnits.find((unit) =>
       unit.lessonIds.includes(recommendedLesson.id),
     ) ?? foundationUnits[0]
+  const currentUnitIndex = foundationUnits.findIndex(
+    (unit) => unit.id === currentUnit.id,
+  )
   const nextLesson =
     lessons.find((lesson) => !progress.completedLessonIds.includes(lesson.id)) ??
     lessons.at(-1) ??
@@ -134,7 +137,7 @@ export function MapView({
   return (
     <div className="grid gap-6">
       <section
-        className="grid gap-4 rounded-[2rem] bg-[linear-gradient(135deg,#fff8ef_0%,#f5fbff_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] lg:grid-cols-[1.2fr_0.8fr]"
+        className="grid gap-4 rounded-[2rem] bg-[linear-gradient(135deg,#fff8ef_0%,#f5fbff_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] lg:grid-cols-[1.1fr_0.9fr]"
         data-testid="learning-map-current-focus"
       >
         <div className="space-y-4">
@@ -149,24 +152,47 @@ export function MapView({
               {currentUnit.summary}
             </p>
           </div>
-        </div>
-
-        <div className="rounded-[1.75rem] bg-white/90 p-5 shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
-          <p className="text-sm font-bold text-slate-500">下一步去哪</p>
-          <h3 className="mt-3 text-2xl font-black text-slate-950">
-            {nextLesson.title}
-          </h3>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
-            {nextLesson.goal}
-          </p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <span className="rounded-full bg-[#eef8ff] px-3 py-2 text-xs font-bold text-sky-700">
-              第 {nextLesson.sortOrder} 节
+          <div className="flex flex-wrap gap-3">
+            <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm">
+              第 {currentUnitIndex + 1} 单元
             </span>
-            <span className="rounded-full bg-[#fff0cf] px-3 py-2 text-xs font-bold text-amber-700">
-              {foundationComplete ? '启蒙已完成' : '继续启蒙主线'}
+            <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm">
+              已完成 {completedCount} / {lessons.length} 节
             </span>
           </div>
+        </div>
+
+        <div
+          className="grid gap-4 rounded-[1.9rem] bg-white/90 p-5 shadow-[0_16px_36px_rgba(15,23,42,0.08)]"
+          data-testid="learning-map-focus-preview"
+        >
+          <div className="rounded-[1.5rem] bg-[linear-gradient(180deg,#fff9ed_0%,#eef8ff_100%)] p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-400">
+              现在去这里
+            </p>
+            <h3 className="mt-3 text-2xl font-black text-slate-950">
+              {nextLesson.title}
+            </h3>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              {nextLesson.goal}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-sky-700">
+                第 {nextLesson.sortOrder} 节
+              </span>
+              <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-amber-700">
+                {foundationComplete ? '启蒙已完成' : '继续启蒙主线'}
+              </span>
+            </div>
+          </div>
+
+          <Link
+            className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-slate-800"
+            data-testid="learning-map-primary-cta"
+            href={`/learn/lesson/${nextLesson.id}`}
+          >
+            继续第 {nextLesson.sortOrder} 课
+          </Link>
         </div>
       </section>
 
@@ -175,10 +201,10 @@ export function MapView({
         data-testid="learning-map-track"
       >
         <div className="relative">
-          <div className="absolute left-[1.4rem] top-6 bottom-8 w-[3px] rounded-full bg-[linear-gradient(180deg,#ffcc8b_0%,#bfe4ff_55%,#dbe7f5_100%)]" />
+          <div className="absolute bottom-8 left-[1.4rem] top-6 w-[3px] rounded-full bg-[linear-gradient(180deg,#ffcc8b_0%,#bfe4ff_55%,#dbe7f5_100%)]" />
 
           <div className="space-y-8">
-            {foundationUnits.map((unit) => {
+            {foundationUnits.map((unit, unitIndex) => {
               const unitLessons = unit.lessonIds
                 .map((lessonId) => lessonsById.get(lessonId))
                 .filter((lesson): lesson is LaunchLessonDefinition =>
@@ -198,7 +224,7 @@ export function MapView({
                   <div className="mb-4 rounded-[1.75rem] border border-white bg-[linear-gradient(180deg,#fffdf8_0%,#ffffff_100%)] p-5 shadow-[0_12px_32px_rgba(15,23,42,0.05)]">
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#fff0cf] text-sm font-black text-amber-700">
-                        {foundationUnits.indexOf(unit) + 1}
+                        {unitIndex + 1}
                       </span>
                       <span
                         className={`rounded-full px-3 py-2 text-xs font-bold ${
@@ -210,9 +236,9 @@ export function MapView({
                         }`}
                       >
                         {unitCurrent
-                          ? '正在这一单元'
+                          ? '现在正在这个单元'
                           : unitCompleted
-                            ? '这一单元已完成'
+                            ? '这一单元已经完成'
                             : '接下来会走到这里'}
                       </span>
                     </div>
@@ -287,10 +313,7 @@ export function MapView({
               )
             })}
 
-            <aside
-              className="relative pl-12"
-              data-testid="learning-map-high-tier"
-            >
+            <aside className="relative pl-12" data-testid="learning-map-high-tier">
               <div className="rounded-[1.85rem] border border-[#e5ddff] bg-[radial-gradient(circle_at_top,#fff8d6_0%,#f7f4ff_44%,#eef9ff_100%)] p-6 shadow-[0_18px_42px_rgba(107,70,255,0.12)]">
                 <p className="inline-flex rounded-full bg-white/90 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-[#6b46ff]">
                   高阶创作阶段
