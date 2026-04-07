@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
+import type { FoundationRemedialMicroScript } from '@/features/domain/types'
+
 import { RemedialLinkCard } from './remedial-link-card'
 
 type GuidedLessonShellProps = {
@@ -13,6 +15,7 @@ type GuidedLessonShellProps = {
   feedback?: string
   hintCopy?: string
   remedialLessonId?: string
+  remedialMicroScript?: FoundationRemedialMicroScript
   onCompleteStep?: () => void
   onStartRemedial: (remedialId: string) => void
   children?: ReactNode
@@ -28,6 +31,7 @@ export function GuidedLessonShell({
   feedback,
   hintCopy,
   remedialLessonId,
+  remedialMicroScript,
   onCompleteStep,
   onStartRemedial,
   children,
@@ -97,11 +101,12 @@ export function GuidedLessonShell({
           </div>
         ) : null}
 
-        {remedialLessonId && hintCopy ? (
+        {hintCopy && (remedialLessonId || remedialMicroScript) ? (
           <RemedialLinkCard
             copy={hintCopy}
             onStartRemedial={onStartRemedial}
             remedialLessonId={remedialLessonId}
+            remedialMicroScript={remedialMicroScript}
           />
         ) : null}
 

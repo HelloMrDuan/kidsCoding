@@ -61,4 +61,15 @@ describe('foundation curriculum seed', () => {
       expect(step.voiceover).toBeTruthy()
     }
   })
+
+  it('adds one remedial micro script to every foundation unit', () => {
+    expect(foundationUnits).toHaveLength(4)
+
+    for (const unit of foundationUnits) {
+      expect(unit.remedialMicroScript.title).toBeTruthy()
+      expect(unit.remedialMicroScript.lines.length).toBeGreaterThanOrEqual(2)
+      expect(unit.remedialMicroScript.lines.length).toBeLessThanOrEqual(3)
+      expect(unit.remedialMicroScript.demo).toBeTruthy()
+    }
+  })
 })

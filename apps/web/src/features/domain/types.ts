@@ -60,6 +60,12 @@ export type HintLayer = {
   remedialLessonId?: string
 }
 
+export type FoundationRemedialMicroScript = {
+  title: string
+  lines: string[]
+  demo: string
+}
+
 export type RemedialLessonDefinition = {
   id: string
   title: string

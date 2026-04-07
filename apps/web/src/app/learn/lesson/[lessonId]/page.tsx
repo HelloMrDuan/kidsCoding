@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
+import { getFoundationUnitByLessonId } from '@/content/curriculum/foundation-units'
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
@@ -86,6 +87,10 @@ export default function LessonPage() {
   const remedialLessonId =
     failedAttempts > 0 && hintState.showRemedialJump
       ? hintState.activeHint?.remedialLessonId
+      : undefined
+  const remedialMicroScript =
+    failedAttempts > 0 && hintState.showRemedialJump
+      ? getFoundationUnitByLessonId(currentLesson.id)?.remedialMicroScript
       : undefined
   const templateName =
     curriculum.templates.find((item) => item.id === currentLesson.templateId)
@@ -186,6 +191,7 @@ export default function LessonPage() {
           onCompleteStep={handleNext}
           onStartRemedial={handleStartRemedial}
           remedialLessonId={remedialLessonId}
+          remedialMicroScript={remedialMicroScript}
           stepTitle={`第 ${stepIndex + 1} 步：${step.title}`}
           voiceover={step.voiceover}
         >
