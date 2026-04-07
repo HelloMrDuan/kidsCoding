@@ -3,81 +3,81 @@ import { describe, expect, it } from 'vitest'
 import { getFoundationLessonFeedback } from './foundation-lesson-feedback'
 
 describe('getFoundationLessonFeedback', () => {
-  it('returns the lesson specific opening guidance for lesson 01', () => {
+  it('uses a result-first progress line for lesson 01', () => {
     expect(
-      getFoundationLessonFeedback('lesson-01-forest-hello', 'initial'),
-    ).toBe('先让小狐狸准备好出场，再把动作积木接上去。')
+      getFoundationLessonFeedback('lesson-01-forest-hello', 'progress'),
+    ).toBe('现在，角色已经会走上舞台了。')
   })
 
-  it('returns the lesson specific progress feedback for lesson 02', () => {
+  it('uses a result-first progress line for lesson 02', () => {
     expect(
       getFoundationLessonFeedback('lesson-02-forest-greeting', 'progress'),
-    ).toBe('太好了，小狐狸已经会打招呼了。')
+    ).toBe('现在，角色已经会开口打招呼了。')
   })
 
-  it('returns the lesson specific retry guidance for lesson 03', () => {
+  it('keeps lesson 03 focused on the upcoming full project', () => {
     expect(
-      getFoundationLessonFeedback('lesson-03-forest-story', 'retry'),
-    ).toBe('先看看动作和对白的顺序对不对，再把缺少的积木接完整。')
+      getFoundationLessonFeedback('lesson-03-forest-story', 'progress'),
+    ).toBe('很好，你马上就要做出一个完整作品了。')
   })
 
-  it('returns the lesson specific opening guidance for lesson 04', () => {
+  it('uses a result-first progress line for lesson 04', () => {
     expect(
-      getFoundationLessonFeedback('lesson-04-meadow-scene', 'initial'),
-    ).toBe('先看看森林和草地两个画面，再把出发动作接起来。')
+      getFoundationLessonFeedback('lesson-04-meadow-scene', 'progress'),
+    ).toBe('现在，故事已经会换到新场景了。')
   })
 
-  it('returns the lesson specific progress feedback for lesson 05', () => {
+  it('uses a result-first progress line for lesson 05', () => {
     expect(
       getFoundationLessonFeedback('lesson-05-meadow-order', 'progress'),
-    ).toBe('太好了，故事已经开始按顺序往前走了。')
+    ).toBe('现在，故事已经有先后顺序了。')
   })
 
-  it('returns the lesson specific retry guidance for lesson 06', () => {
+  it('keeps lesson 06 focused on the upcoming full project', () => {
     expect(
-      getFoundationLessonFeedback('lesson-06-meadow-story', 'retry'),
-    ).toBe('先看看出发、转场和收尾的话是不是按顺序接好了。')
+      getFoundationLessonFeedback('lesson-06-meadow-story', 'progress'),
+    ).toBe('很好，你马上就要做出一个完整作品了。')
   })
 
-  it('returns the lesson specific opening guidance for lesson 07', () => {
+  it('uses a result-first progress line for lesson 07', () => {
     expect(
-      getFoundationLessonFeedback('lesson-07-garden-click', 'initial'),
-    ).toBe('先放好“被点击时”，再试试让角色回应你的点击。')
+      getFoundationLessonFeedback('lesson-07-garden-click', 'progress'),
+    ).toBe('现在，角色已经会回应点击了。')
   })
 
-  it('returns the lesson specific progress feedback for lesson 08', () => {
+  it('uses a result-first progress line for lesson 08', () => {
     expect(
       getFoundationLessonFeedback('lesson-08-garden-dialogue', 'progress'),
-    ).toBe('太好了，角色已经会用动作和一句话回应你了。')
+    ).toBe('现在，角色已经会先动再说了。')
   })
 
-  it('returns the lesson specific retry guidance for lesson 09', () => {
+  it('keeps lesson 09 focused on the upcoming full project', () => {
     expect(
-      getFoundationLessonFeedback('lesson-09-garden-story', 'retry'),
-    ).toBe('先确认“被点击时”放在最前面，再把动作和一句回应的话接上去。')
+      getFoundationLessonFeedback('lesson-09-garden-story', 'progress'),
+    ).toBe('很好，你马上就要做出一个完整作品了。')
   })
 
-  it('returns the lesson specific opening guidance for lesson 10', () => {
+  it('uses a result-first progress line for lesson 10', () => {
     expect(
-      getFoundationLessonFeedback('lesson-10-second-friend', 'initial'),
-    ).toContain('第二位朋友')
+      getFoundationLessonFeedback('lesson-10-second-friend', 'progress'),
+    ).toBe('现在，第二位朋友已经上场了。')
   })
 
-  it('returns the lesson specific progress feedback for lesson 11', () => {
+  it('uses a result-first progress line for lesson 11', () => {
     expect(
       getFoundationLessonFeedback('lesson-11-duo-rehearsal', 'progress'),
-    ).toContain('两个朋友')
+    ).toBe('现在，两个朋友已经开始配合了。')
   })
 
-  it('returns the lesson specific retry guidance for lesson 12', () => {
+  it('keeps lesson 12 focused on the graduation project', () => {
     expect(
-      getFoundationLessonFeedback('lesson-12-graduation-show', 'retry'),
-    ).toContain('每个角色')
+      getFoundationLessonFeedback('lesson-12-graduation-show', 'progress'),
+    ).toBe('很好，你马上就要做出启蒙毕业作品了。')
   })
 
-  it('falls back to the generic copy for unknown lessons', () => {
+  it('falls back to a result-first generic line for unknown lessons', () => {
     expect(
       getFoundationLessonFeedback('lesson-99-fallback', 'progress'),
-    ).toBe('很好，这一步完成了。继续往下，作品马上会更像一个完整故事。')
+    ).toBe('很好，这一步已经完成了。继续往下，你的作品会更完整。')
   })
 })
