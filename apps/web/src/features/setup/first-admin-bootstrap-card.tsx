@@ -52,7 +52,7 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
     const supabase = createBrowserSupabaseClient()
     await supabase.auth.signInWithOtp({ email })
     setCodeSent(true)
-    setMessage('验证码已发送，请完成验证后继续')
+    setMessage('验证码已发送，请完成验证后继续。')
   }
 
   async function handleVerifyOtp() {
@@ -83,7 +83,7 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
     setSubmitting(false)
 
     if (!response.ok) {
-      setMessage('开通失败，请稍后重试')
+      setMessage('开通失败，请稍后重试。')
       await reloadState()
       return
     }
@@ -93,18 +93,14 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
 
   if (state.status === 'loading') {
     return (
-      <p className="text-sm font-semibold text-slate-600">
-        正在检查开通状态...
-      </p>
+      <p className="text-sm font-semibold text-slate-600">正在检查开通状态...</p>
     )
   }
 
   if (state.status === 'invalid_token') {
     return (
       <section className="rounded-[2rem] bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-black text-slate-950">
-          开通链接无效或不可用
-        </h1>
+        <h1 className="text-3xl font-black text-slate-950">开通链接无效或不可用</h1>
       </section>
     )
   }
@@ -112,9 +108,7 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
   if (state.status === 'closed') {
     return (
       <section className="rounded-[2rem] bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-black text-slate-950">
-          首个管理员已完成开通
-        </h1>
+        <h1 className="text-3xl font-black text-slate-950">首个管理员已完成开通</h1>
       </section>
     )
   }
@@ -173,7 +167,7 @@ export function FirstAdminBootstrapCard({ token }: { token: string }) {
         <p>{state.identityLabel}</p>
       </div>
       <p className="text-sm font-semibold text-slate-600">
-        确认后会把当前账号开通为首个管理员，并立即启用 `/admin`。
+        确认后会把当前账号开通为首个管理员，并立刻启用 `/admin`。
       </p>
       <button
         type="button"
