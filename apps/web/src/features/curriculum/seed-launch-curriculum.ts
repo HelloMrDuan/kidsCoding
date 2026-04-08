@@ -7,14 +7,14 @@ function buildAudioAssets(): LaunchCurriculum['audioAssets'] {
     ...launchLessons.map((lesson) => ({
       id: `${lesson.id}-voice-guide`,
       lessonId: lesson.id,
-      usageType: '璇剧▼寮曞璇煶',
-      provider: '鏍稿績璇剧▼鐪熶汉閰嶉煶',
+      usageType: '主课引导语音',
+      provider: '课程配音素材',
     })),
     ...remedialLessons.map((lesson) => ({
       id: `${lesson.id}-voice-review`,
       lessonId: lesson.id,
-      usageType: '琛ヨ鍥為【璇煶',
-      provider: 'AI 璇煶鎻愮ず',
+      usageType: '补课回顾语音',
+      provider: 'AI 语音草稿',
     })),
   ]
 }

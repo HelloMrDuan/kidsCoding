@@ -24,7 +24,7 @@ export default async function ParentPurchasePage({
             </p>
             <h1 className="text-4xl font-black text-slate-950">高阶创作阶段</h1>
             <p className="text-base leading-7 text-slate-600">
-              当前环境还没有配置完整的账户和支付参数，所以这里只展示升级说明，不执行真实购买。
+              当前环境还没有配置完整的账号和支付参数，所以这里先展示升级说明，不执行真实购买。
             </p>
           </header>
           {purchaseUnavailable ? (
@@ -89,7 +89,7 @@ export default async function ParentPurchasePage({
           </p>
           <h1 className="text-4xl font-black text-slate-950">高阶创作阶段</h1>
           <p className="text-base leading-7 text-slate-600">
-            启蒙 12 节已经打通后，现在可以解锁高阶创作阶段，继续挑战更长的故事结构、更多角色配合和更完整的互动表达。
+            启蒙 12 节已经完成后，现在可以解锁高阶创作阶段，继续挑战更长的故事结构、更多角色配合和更完整的互动表达。
           </p>
         </header>
         <div className="grid gap-4 md:grid-cols-3">

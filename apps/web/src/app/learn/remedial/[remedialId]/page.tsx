@@ -37,7 +37,7 @@ export default function RemedialLessonPage() {
           <article className="rounded-[1.5rem] bg-slate-50 p-5">
             <p className="text-sm font-semibold text-slate-500">先看目标</p>
             <p className="mt-2 text-base font-semibold text-slate-900">
-              先听一遍语音提示，确认这一步到底要完成什么。
+              先听一遍语音提示，确认这一小步到底要做什么。
             </p>
           </article>
           <article className="rounded-[1.5rem] bg-slate-50 p-5">
