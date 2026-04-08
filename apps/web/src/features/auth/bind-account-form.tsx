@@ -44,7 +44,7 @@ export function BindAccountForm({
   }
 
   return (
-    <div className="space-y-5 rounded-[2rem] bg-white p-6 shadow-sm">
+    <div className="kc-surface-3d space-y-5 rounded-[2rem] p-6">
       <div className="space-y-2">
         <h2 className="text-2xl font-black text-slate-950">绑定家长账号</h2>
         <p className="text-sm leading-7 text-slate-600">

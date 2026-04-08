@@ -17,7 +17,7 @@ export default async function ParentPurchasePage({
 
     return (
       <main className="min-h-screen bg-[#fff8ef] px-6 py-10">
-        <section className="mx-auto max-w-4xl space-y-6 rounded-[2rem] bg-white p-8 shadow-sm">
+        <section className="kc-surface-3d mx-auto max-w-4xl space-y-6 rounded-[2rem] p-8">
           <header className="space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">
               家长升级
@@ -46,7 +46,7 @@ export default async function ParentPurchasePage({
             <article className="rounded-[1.5rem] bg-slate-50 p-5">
               <p className="text-sm text-slate-500">升级价格</p>
               <p className="mt-2 text-3xl font-black text-slate-950">
-                ¥{(launchCoursePack.priceCny / 100).toFixed(0)}
+                ￥{(launchCoursePack.priceCny / 100).toFixed(0)}
               </p>
             </article>
           </div>
@@ -82,7 +82,7 @@ export default async function ParentPurchasePage({
   const hasLaunchPack = entitlement?.status === 'active'
   return (
     <main className="min-h-screen bg-[#fff8ef] px-6 py-10">
-      <section className="mx-auto max-w-4xl space-y-6 rounded-[2rem] bg-white p-8 shadow-sm">
+      <section className="kc-surface-3d mx-auto max-w-4xl space-y-6 rounded-[2rem] p-8">
         <header className="space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">
             家长升级
@@ -106,7 +106,7 @@ export default async function ParentPurchasePage({
           <article className="rounded-[1.5rem] bg-slate-50 p-5">
             <p className="text-sm text-slate-500">升级价格</p>
             <p className="mt-2 text-3xl font-black text-slate-950">
-              ¥{(launchCoursePack.priceCny / 100).toFixed(0)}
+              ￥{(launchCoursePack.priceCny / 100).toFixed(0)}
             </p>
           </article>
         </div>

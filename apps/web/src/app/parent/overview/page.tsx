@@ -122,7 +122,7 @@ export default async function ParentOverviewPage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f5fbff_0%,#fff8ef_100%)] px-4 py-6 md:px-6 md:py-8">
       <section className="mx-auto max-w-6xl space-y-6">
-        <header className="grid gap-6 rounded-[2.4rem] bg-white px-6 py-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <header className="kc-surface-3d grid gap-6 rounded-[2.4rem] px-6 py-7 md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-5">
             <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
               家长成长页
@@ -137,25 +137,25 @@ export default async function ParentOverviewPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <article className="rounded-[1.4rem] bg-[linear-gradient(180deg,#fff9ef_0%,#ffffff_100%)] p-4">
+              <article className="kc-panel-3d rounded-[1.4rem] p-4">
                 <p className="text-sm font-semibold text-slate-500">已完成课程</p>
                 <p className="mt-2 text-3xl font-black text-slate-950">
                   {summary.completedLessonCount}
                 </p>
               </article>
-              <article className="rounded-[1.4rem] bg-[linear-gradient(180deg,#f3fbff_0%,#ffffff_100%)] p-4">
+              <article className="kc-panel-3d rounded-[1.4rem] p-4">
                 <p className="text-sm font-semibold text-slate-500">累计星星</p>
                 <p className="mt-2 text-3xl font-black text-slate-950">
                   {summary.earnedStarCount}
                 </p>
               </article>
-              <article className="rounded-[1.4rem] bg-[linear-gradient(180deg,#fffaf2_0%,#ffffff_100%)] p-4">
+              <article className="kc-panel-3d rounded-[1.4rem] p-4">
                 <p className="text-sm font-semibold text-slate-500">已收集卡片</p>
                 <p className="mt-2 text-3xl font-black text-slate-950">
                   {summary.earnedCardCount}
                 </p>
               </article>
-              <article className="rounded-[1.4rem] bg-[linear-gradient(180deg,#f9f7ff_0%,#ffffff_100%)] p-4">
+              <article className="kc-panel-3d rounded-[1.4rem] p-4">
                 <p className="text-sm font-semibold text-slate-500">最近作品</p>
                 <p className="mt-2 text-3xl font-black text-slate-950">
                   {summary.recentProjectCount}
@@ -187,7 +187,7 @@ export default async function ParentOverviewPage() {
 
             <div className="flex flex-wrap gap-3">
               <Link
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                className="kc-button-3d inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold text-slate-950"
                 href="/learn/map"
               >
                 回到学习地图
@@ -203,7 +203,7 @@ export default async function ParentOverviewPage() {
         </header>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-[2rem] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+          <section className="kc-surface-3d rounded-[2rem] p-6">
             <div className="space-y-2">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-sky-700">
                 最近作品
@@ -307,7 +307,7 @@ export default async function ParentOverviewPage() {
               </div>
             </article>
 
-            <section className="rounded-[2rem] bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+            <section className="kc-surface-3d rounded-[2rem] p-6">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-sky-700">
                 成长轨迹
               </p>

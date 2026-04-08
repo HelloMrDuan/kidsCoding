@@ -10,7 +10,7 @@ export default async function ParentPurchaseSuccessPage({
 
   return (
     <main className="min-h-screen bg-[#fff8ef] px-6 py-10">
-      <section className="mx-auto max-w-4xl space-y-6 rounded-[2rem] bg-white p-8 shadow-sm">
+      <section className="kc-surface-3d mx-auto max-w-4xl space-y-6 rounded-[2rem] p-8">
         <header className="space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">
             支付确认
