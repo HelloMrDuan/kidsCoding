@@ -5,7 +5,7 @@ import { TrialCta } from '@/features/marketing/trial-cta'
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#fff8eb_0%,#fffefb_18%,#eef9ff_100%)] px-4 py-6 text-slate-900 md:px-6 md:py-8">
+    <main className="min-h-screen px-4 py-6 text-slate-900 md:px-6 md:py-8">
       <div className="mx-auto grid max-w-7xl gap-6 md:gap-8">
         <StoryStage />
         <GrowthPath />

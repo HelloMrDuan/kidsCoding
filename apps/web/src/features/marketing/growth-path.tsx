@@ -36,20 +36,20 @@ const unitSteps = [
 export function GrowthPath() {
   return (
     <section
-      className="relative overflow-hidden rounded-[2.75rem] border border-white/70 bg-[linear-gradient(180deg,#fffef9_0%,#fffaf1_100%)] px-6 py-8 shadow-[0_20px_60px_rgba(15,23,42,0.06)] md:px-10 md:py-10"
+      className="kc-scene-shell relative overflow-hidden rounded-[2.8rem] px-6 py-8 shadow-[var(--kc-shadow-soft)] md:px-10 md:py-10"
       data-testid="growth-path"
     >
-      <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,#ffe4b8,transparent_62%)]" />
+      <div className="absolute inset-x-0 top-0 h-40 kc-glow-warm" />
 
       <div className="relative max-w-3xl space-y-4">
-        <p className="inline-flex rounded-full border border-slate-200 bg-white/85 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
-          参考优秀儿童编程和儿童创作产品的路径规律，但按你的 12 节启蒙主线重新组织
+        <p className="inline-flex rounded-full border border-slate-200 bg-white/85 px-4 py-2 text-sm font-black text-slate-700 shadow-[0_10px_24px_rgba(22,35,63,0.08)]">
+          沿着 4 个启蒙单元，一步一步做出真正的动画故事
         </p>
-        <h2 className="text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
-          沿着 4 个启蒙单元慢慢做出自己的故事
+        <h2 className="text-3xl font-black tracking-tight text-[var(--kc-text-strong)] md:text-4xl">
+          每 2 节学会能力，第 3 节就做出一个完整作品
         </h2>
-        <p className="text-lg leading-8 text-slate-600">
-          每个单元都先用 2 节课学会一个新能力，再用第 3 节做出一个完整小作品。孩子每往前一步，都会更像一个真正的小小创作者。
+        <p className="text-lg leading-8 text-[var(--kc-text-soft)]">
+          孩子不会一直重复同一个动作。每个单元都会往上加一层能力，让作品从“角色动起来”一路长成“两个角色一起完成故事”。
         </p>
       </div>
 

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { StoryStage } from './story-stage'
 
 describe('StoryStage', () => {
-  it('renders a stage-first hero with child-facing promise and parent reassurance', () => {
+  it('renders a stage-first hero with a clear child-facing promise', () => {
     render(<StoryStage />)
 
     expect(screen.getByTestId('story-stage-hero')).toBeInTheDocument()
@@ -14,7 +14,7 @@ describe('StoryStage', () => {
       screen.getByRole('heading', { name: '孩子可以自己做出动画故事' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: '开始 12 节启蒙主线' }),
+      screen.getByRole('link', { name: '开始学第一节' }),
     ).toHaveAttribute('href', '/onboarding/age')
     expect(
       screen.getByRole('link', { name: '看看家长如何陪学' }),

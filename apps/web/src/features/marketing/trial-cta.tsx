@@ -20,16 +20,16 @@ const routePromises = [
 export function TrialCta() {
   return (
     <section
-      className="relative overflow-hidden rounded-[2.75rem] bg-[linear-gradient(135deg,#1f2937_0%,#0f172a_100%)] px-6 py-8 text-white shadow-[0_28px_70px_rgba(15,23,42,0.28)] md:px-10 md:py-12"
+      className="relative overflow-hidden rounded-[2.8rem] bg-[linear-gradient(135deg,#26304e_0%,#16233f_100%)] px-6 py-8 text-white shadow-[0_28px_70px_rgba(22,35,63,0.28)] md:px-10 md:py-12"
       data-testid="trial-cta"
     >
-      <div className="absolute right-[-4rem] top-[-5rem] h-48 w-48 rounded-full bg-[#ffb86b]/25 blur-3xl" />
-      <div className="absolute bottom-[-4rem] left-[-2rem] h-40 w-40 rounded-full bg-[#5dd6ff]/25 blur-3xl" />
+      <div className="absolute right-[-4rem] top-[-5rem] h-48 w-48 kc-glow-warm blur-3xl" />
+      <div className="absolute bottom-[-4rem] left-[-2rem] h-40 w-40 kc-glow-sky blur-3xl" />
 
       <div className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
         <div className="space-y-5">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#ffd08a]">
-            Start the foundation route
+          <p className="inline-flex rounded-full bg-white/10 px-4 py-2 text-sm font-black text-[#ffd08a]">
+            从启蒙主线开始
           </p>
           <h2 className="text-3xl font-black tracking-tight md:text-4xl">
             先把 12 节启蒙主线走完，再决定要不要升级
@@ -50,26 +50,26 @@ export function TrialCta() {
           </div>
         </div>
 
-        <div className="space-y-4 rounded-[2rem] bg-white/10 p-5 backdrop-blur">
+        <div className="rounded-[2rem] bg-white/10 p-5 backdrop-blur">
           <div>
             <p className="text-sm font-semibold text-slate-200">启蒙主线入口</p>
-            <p className="mt-2 text-4xl font-black text-white">立即开始启蒙主线</p>
+            <p className="mt-2 text-4xl font-black text-white">现在就开始启蒙主线</p>
             <p className="mt-3 max-w-sm text-sm leading-7 text-slate-200">
               学习先成立，升级后决定。现在最重要的是让孩子尽快看到“我真的做出来了”。
             </p>
           </div>
 
-          <div className="grid gap-3">
+          <div className="mt-5 grid gap-3">
             {routePromises.map((item) => (
               <div key={item.title} className="rounded-[1.3rem] bg-white/10 p-4">
-                <p className="font-bold text-white">{item.title}</p>
+                <p className="font-black text-white">{item.title}</p>
                 <p className="mt-2 text-sm leading-7 text-slate-200">{item.detail}</p>
               </div>
             ))}
           </div>
 
           <Link
-            className="inline-flex items-center justify-center rounded-full bg-[#ff9b54] px-6 py-4 text-base font-bold text-slate-950 transition hover:bg-[#ffb16f]"
+            className="kc-button-3d mt-5 inline-flex items-center justify-center bg-[#ff9b54] px-6 py-4 text-base font-black text-slate-950 transition hover:bg-[#ffb16f]"
             href="/onboarding/age"
           >
             立即开始启蒙主线
