@@ -44,12 +44,12 @@ const growthGalleryFixture = {
 }
 
 describe('GrowthGallery', () => {
-  it('shows summary stats, badge gallery, and premium card wall', () => {
+  it('shows summary stats, badge gallery, and card wall', () => {
     render(<GrowthGallery gallery={growthGalleryFixture} />)
 
     expect(screen.getByText('成长收藏馆')).toBeInTheDocument()
     expect(screen.getByText('已获得星星')).toBeInTheDocument()
     expect(screen.getByText('勋章墙')).toBeInTheDocument()
-    expect(screen.getByText('高质感收藏卡')).toBeInTheDocument()
+    expect(screen.getByText('卡册墙')).toBeInTheDocument()
   })
 })

@@ -23,12 +23,12 @@ vi.mock('@/features/progress/local-progress', () => ({
 }))
 
 describe('CardsPage', () => {
-  it('renders the growth gallery summary, badges, and card collection', () => {
+  it('renders the growth gallery summary, badges, and card wall', () => {
     render(<CardsPage />)
 
     expect(screen.getByText('成长收藏馆')).toBeInTheDocument()
     expect(screen.getByText('已获得星星')).toBeInTheDocument()
     expect(screen.getByText('勋章墙')).toBeInTheDocument()
-    expect(screen.getByText('高质感收藏卡')).toBeInTheDocument()
+    expect(screen.getByText('卡册墙')).toBeInTheDocument()
   })
 })
