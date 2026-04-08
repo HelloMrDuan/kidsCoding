@@ -9,6 +9,7 @@ import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
 import { buildProjectCompletionCopy } from '@/features/projects/build-project-completion-copy'
 import { ProjectCompleteCard } from '@/features/projects/project-complete-card'
+import { resolveProjectContinueAction } from '@/features/projects/resolve-project-continue-action'
 import {
   defaultGuestProgress,
   readGuestProgress,
@@ -51,12 +52,7 @@ export default function ProjectCompletePage() {
   const rewardCards = cardDefinitions.filter(
     (card) => progress.cardIds.includes(card.id) && visibleRewardIds.has(card.id),
   )
-  const primaryLabel = isFoundationGraduate
-    ? '看看高阶创作阶段'
-    : lesson.sortOrder % 3 === 0
-      ? '继续下一单元'
-      : '继续下一课'
-  const primaryHref = isFoundationGraduate ? '/parent/purchase' : '/learn/map'
+  const continueAction = resolveProjectContinueAction(allLessons, lesson.id)
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#fffdf8_0%,#fff4e2_38%,#eef8ff_100%)] px-6 py-10">
@@ -67,8 +63,8 @@ export default function ProjectCompletePage() {
         isFoundationGraduate={isFoundationGraduate}
         lessonTitle={lesson.title}
         onReplay={() => setReplayCount((count) => count + 1)}
-        primaryHref={primaryHref}
-        primaryLabel={primaryLabel}
+        primaryHref={continueAction.href}
+        primaryLabel={continueAction.label}
         rewardCards={rewardCards}
         stars={progress.stars}
         template={currentTemplate}

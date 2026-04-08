@@ -63,16 +63,16 @@ describe('getFoundationLessonFeedback', () => {
     ).toBe('现在，第二位朋友已经上场了。')
   })
 
-  it('uses a result-first progress line for lesson 11', () => {
+  it('uses a stronger cooperation result line for lesson 11', () => {
     expect(
       getFoundationLessonFeedback('lesson-11-duo-rehearsal', 'progress'),
-    ).toBe('现在，两个朋友已经开始配合了。')
+    ).toBe('现在，两个朋友已经会配合行动，还会一起回应了。')
   })
 
-  it('keeps lesson 12 focused on the graduation project', () => {
+  it('keeps lesson 12 focused on the richer graduation project', () => {
     expect(
       getFoundationLessonFeedback('lesson-12-graduation-show', 'progress'),
-    ).toBe('很好，你马上就要做出启蒙毕业作品了。')
+    ).toBe('很好，你马上就要做出真正完整的启蒙毕业作品了。')
   })
 
   it('falls back to a result-first generic line for unknown lessons', () => {

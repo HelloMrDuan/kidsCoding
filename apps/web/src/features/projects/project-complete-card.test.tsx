@@ -13,7 +13,7 @@ describe('ProjectCompleteCard', () => {
         lessonTitle="森林里的第一次见面"
         onReplay={vi.fn()}
         primaryHref="/learn/map"
-        primaryLabel="继续下一单元"
+        primaryLabel="进入下一单元"
         rewardCards={[{ id: 'growth-first-project', name: '第一张作品卡' }]}
         stars={9}
         totalCards={2}
@@ -24,7 +24,7 @@ describe('ProjectCompleteCard', () => {
     expect(screen.getByTestId('project-complete-stage')).toBeInTheDocument()
     expect(screen.getByText('你做出了一个完整作品')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '回看我的作品' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '继续下一单元' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '进入下一单元' })).toBeInTheDocument()
     expect(screen.getByTestId('project-complete-rewards')).toBeInTheDocument()
     expect(screen.getByText('获得徽章：森林里的第一次见面完成徽章')).toBeInTheDocument()
   })
