@@ -125,12 +125,20 @@ export function BlocklyWorkspace({
       onSnapshotChange(buildSnapshot(workspace))
     }
 
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize()
+    })
+
+    resizeObserver.observe(mountRef.current)
     workspace.addChangeListener(handleChange)
-    handleResize()
+    requestAnimationFrame(() => {
+      handleResize()
+    })
     window.addEventListener('resize', handleResize)
     handleChange()
 
     return () => {
+      resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
       workspace.removeChangeListener(handleChange)
       workspace.dispose()
@@ -184,7 +192,7 @@ export function BlocklyWorkspace({
       <div className="rounded-[2rem] border border-slate-200 bg-white px-3 py-3 shadow-[0_18px_36px_rgba(15,23,42,0.06)]">
         <div
           ref={mountRef}
-          className="min-h-[420px] rounded-[1.5rem] border border-slate-100 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)]"
+          className="relative h-[420px] overflow-hidden rounded-[1.5rem] border border-slate-100 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)]"
         />
       </div>
 

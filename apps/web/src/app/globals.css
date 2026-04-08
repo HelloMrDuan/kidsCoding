@@ -18,3 +18,17 @@ a {
 button {
   cursor: pointer;
 }
+
+.blocklySvg {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.blocklyFlyout {
+  height: 100% !important;
+}
+
+.blocklyMainBackground {
+  stroke: transparent;
+}
