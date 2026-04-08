@@ -27,6 +27,7 @@ describe('ProjectCompleteCard', () => {
     expect(screen.getByRole('button', { name: '回看我的作品' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '继续下一单元' })).toBeInTheDocument()
     expect(screen.getByTestId('project-complete-rewards')).toBeInTheDocument()
+    expect(screen.getByText('获得徽章：森林里的第一次见面完成徽章')).toBeInTheDocument()
   })
 
   it('renders a lighter completion card for non-milestone lessons', () => {
@@ -50,5 +51,6 @@ describe('ProjectCompleteCard', () => {
     expect(screen.getByTestId('project-complete-lite-card')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '回看我的作品' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '继续下一课' })).toBeInTheDocument()
+    expect(screen.getByText('获得徽章：小狐狸出场完成徽章')).toBeInTheDocument()
   })
 })

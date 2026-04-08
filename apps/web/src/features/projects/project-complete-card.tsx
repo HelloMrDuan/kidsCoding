@@ -29,10 +29,10 @@ type ProjectCompleteCardProps = {
 }
 
 function RewardPills({
-  lessonId,
+  lessonTitle,
   rewardCards,
 }: {
-  lessonId: string
+  lessonTitle: string
   rewardCards: RewardCard[]
 }) {
   return (
@@ -44,7 +44,7 @@ function RewardPills({
         获得 3 颗星星
       </span>
       <span className="rounded-full bg-sky-100 px-4 py-2 text-sm font-bold text-sky-700">
-        获得徽章：lesson-{lessonId}
+        获得徽章：{lessonTitle}完成徽章
       </span>
       {rewardCards.map((card) => (
         <span
@@ -123,7 +123,7 @@ export function ProjectCompleteCard({
           </div>
 
           <div className="mt-6">
-            <RewardPills lessonId={lessonId} rewardCards={rewardCards} />
+            <RewardPills lessonTitle={lessonTitle} rewardCards={rewardCards} />
           </div>
         </div>
       </section>
@@ -174,7 +174,7 @@ export function ProjectCompleteCard({
               当前累计 {stars} 颗星星，已收集 {totalCards} 张卡片
             </p>
             <div className="mt-4">
-              <RewardPills lessonId={lessonId} rewardCards={rewardCards} />
+              <RewardPills lessonTitle={lessonTitle} rewardCards={rewardCards} />
             </div>
           </div>
 
