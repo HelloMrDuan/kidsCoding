@@ -7,6 +7,7 @@ export const kidsBlockLabels: Record<string, string> = {
   say_line: '说一句话',
   switch_scene: '切换场景',
   switch_character: '切换到另一位朋友',
+  repeat_twice: '再做一次',
 }
 
 let isRegistered = false
@@ -56,6 +57,13 @@ export function registerKidsBlocks() {
       previousStatement: null,
       nextStatement: null,
       colour: 300,
+    },
+    {
+      type: 'repeat_twice',
+      message0: kidsBlockLabels.repeat_twice,
+      previousStatement: null,
+      nextStatement: null,
+      colour: 160,
     },
   ])
 

@@ -52,6 +52,25 @@ describe('PreviewStage', () => {
     ).toBeInTheDocument()
   })
 
+  it('describes repeated motion once the repeat block has been connected to an interactive story', () => {
+    render(
+      <PreviewStage
+        blocks={[
+          { type: 'when_clicked' },
+          { type: 'move_right' },
+          { type: 'say_line' },
+          { type: 'repeat_twice' },
+        ]}
+      />,
+    )
+
+    expect(
+      screen.getByText(
+        '太好了，角色已经会在点击后连着动两次，再用一句话回应你。',
+      ),
+    ).toBeInTheDocument()
+  })
+
   it('describes the second friend getting ready when a second start block is added', () => {
     render(<PreviewStage blocks={[{ type: 'when_start' }, { type: 'when_start' }]} />)
 
@@ -78,5 +97,20 @@ describe('PreviewStage', () => {
     expect(screen.getByText('小蝴蝶')).toBeInTheDocument()
     expect(screen.getByText('小青蛙')).toBeInTheDocument()
     expect(screen.queryByText('小狐狸')).not.toBeInTheDocument()
+  })
+
+  it('shows the repeat hint card once the repeat block is present', () => {
+    render(
+      <PreviewStage
+        blocks={[
+          { type: 'when_start' },
+          { type: 'move_right' },
+          { type: 'switch_scene' },
+          { type: 'repeat_twice' },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('角色已经学会把刚才的动作再做一次')).toBeInTheDocument()
   })
 })

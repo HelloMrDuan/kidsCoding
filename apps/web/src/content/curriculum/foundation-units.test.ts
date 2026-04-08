@@ -53,11 +53,18 @@ describe('foundation curriculum seed', () => {
 
     expect(longestChain(lesson4)).toBe(3)
     expect(longestChain(lesson5)).toBe(4)
-    expect(longestChain(lesson6)).toBe(4)
+    expect(longestChain(lesson6)).toBe(5)
     expect(lesson5?.steps[3]?.requiredBlockTypes).toEqual([
       'when_start',
       'move_right',
       'switch_scene',
+      'repeat_twice',
+    ])
+    expect(lesson6?.steps[3]?.requiredBlockTypes).toEqual([
+      'when_start',
+      'move_right',
+      'switch_scene',
+      'repeat_twice',
       'say_line',
     ])
   })
@@ -80,11 +87,17 @@ describe('foundation curriculum seed', () => {
 
     expect(longestChain(lesson7)).toBe(2)
     expect(longestChain(lesson8)).toBe(3)
-    expect(longestChain(lesson9)).toBe(3)
+    expect(longestChain(lesson9)).toBe(4)
     expect(lesson8?.steps[4]?.requiredBlockTypes).toEqual([
       'when_clicked',
       'move_right',
       'say_line',
+    ])
+    expect(lesson9?.steps[4]?.requiredBlockTypes).toEqual([
+      'when_clicked',
+      'move_right',
+      'say_line',
+      'repeat_twice',
     ])
   })
 
@@ -106,13 +119,59 @@ describe('foundation curriculum seed', () => {
 
     expect(longestChain(lesson10)).toBe(3)
     expect(longestChain(lesson11)).toBe(4)
-    expect(longestChain(lesson12)).toBe(4)
+    expect(longestChain(lesson12)).toBe(5)
     expect(lesson12?.steps[4]?.requiredBlockTypes).toEqual([
       'when_start',
       'move_right',
       'switch_character',
       'say_line',
+      'repeat_twice',
     ])
+  })
+
+  it('pushes bridge lessons into a real action by the second step', () => {
+    const bridgeLessons = [
+      launchLessons[3], // lesson 4
+      launchLessons[6], // lesson 7
+      launchLessons[9], // lesson 10
+    ]
+
+    for (const lesson of bridgeLessons) {
+      const [step1, step2] = lesson.steps
+      expect(step2?.requiredBlockTypes.length).toBeGreaterThan(
+        step1?.requiredBlockTypes.length ?? 0,
+      )
+    }
+  })
+
+  it('includes the repeat block in the later units so projects keep growing', () => {
+    expect(
+      launchLessons
+        .slice(4)
+        .some((lesson) =>
+          lesson.steps.some((step) =>
+            step.requiredBlockTypes.includes('repeat_twice'),
+          ),
+        ),
+    ).toBe(true)
+    expect(
+      launchLessons
+        .flatMap((lesson) => lesson.steps)
+        .some((step) => step.allowedBlocks.includes('repeat_twice')),
+    ).toBe(true)
+  })
+
+  it('registers the repeat block as a real later-stage action, not a duplicate intro', () => {
+    const projectLessons = [launchLessons[5], launchLessons[8], launchLessons[11]]
+
+    for (const lesson of projectLessons) {
+      expect(lesson.steps[4]?.requiredBlockTypes).toContain('repeat_twice')
+      expect(
+        lesson.steps
+          .slice(3)
+          .some((step) => step.requiredBlockTypes.includes('repeat_twice')),
+      ).toBe(true)
+    }
   })
 
   it('adds voiceover to every foundation lesson step', () => {

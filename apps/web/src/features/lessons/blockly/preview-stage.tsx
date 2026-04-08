@@ -31,11 +31,24 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
 function getStageCopy(blocks: Array<{ type: string }>) {
   const moved = blocks.some((block) => block.type === 'move_right')
   const spoke = blocks.some((block) => block.type === 'say_line')
+  const repeated = blocks.some((block) => block.type === 'repeat_twice')
   const startCount = blocks.filter((block) => block.type === 'when_start').length
   const hasStart = startCount > 0
   const hasSecondStart = startCount > 1
   const hasClickTrigger = blocks.some((block) => block.type === 'when_clicked')
   const switchedScene = blocks.some((block) => block.type === 'switch_scene')
+
+  if (repeated && spoke && hasSecondStart) {
+    return '太好了，两个朋友已经会合了，还会一起再向礼物靠近一步，毕业故事更完整了。'
+  }
+
+  if (repeated && spoke && switchedScene) {
+    return '太好了，故事已经从森林走到草地了，还会在草地上再往前走一步，再说出旅行感受。'
+  }
+
+  if (repeated && spoke && hasClickTrigger) {
+    return '太好了，角色已经会在点击后连着动两次，再用一句话回应你。'
+  }
 
   if (spoke && switchedScene) {
     return '太好了，故事已经从森林走到草地了。再接一句收尾的话，小旅行就更完整了。'
@@ -107,10 +120,12 @@ export function PreviewStage({
   template?: ProjectTemplateDefinition
 }) {
   const moved = blocks.some((block) => block.type === 'move_right')
+  const repeated = blocks.some((block) => block.type === 'repeat_twice')
   const startCount = blocks.filter((block) => block.type === 'when_start').length
   const hasSecondStart = startCount > 1
   const switchedScene = blocks.some((block) => block.type === 'switch_scene')
   const { mainLabel, secondLabel, sceneCopy } = getTemplateCharacterLabels(template)
+  const primaryOffset = repeated ? 136 : moved ? 88 : 0
 
   return (
     <section
@@ -148,7 +163,7 @@ export function PreviewStage({
             <div className="relative flex flex-wrap items-end gap-4">
               <div
                 className="flex h-24 w-24 items-center justify-center rounded-full bg-orange-400 text-sm font-black text-white shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-300"
-                style={{ transform: moved ? 'translateX(88px)' : 'translateX(0px)' }}
+                style={{ transform: `translateX(${primaryOffset}px)` }}
               >
                 {mainLabel}
               </div>
@@ -173,7 +188,11 @@ export function PreviewStage({
 
             <div className="mt-5 h-6 rounded-full bg-[linear-gradient(90deg,#ffdd94_0%,#ffeec1_100%)] opacity-80" />
 
-            {switchedScene ? (
+            {repeated ? (
+              <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
+                角色已经学会把刚才的动作再做一次
+              </div>
+            ) : switchedScene ? (
               <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
                 场景已经切换到新的画面
               </div>

@@ -30,7 +30,7 @@ describe('getFoundationLessonFeedback', () => {
   it('uses a result-first progress line for lesson 05', () => {
     expect(
       getFoundationLessonFeedback('lesson-05-meadow-order', 'progress'),
-    ).toBe('现在，故事已经有先后顺序了。')
+    ).toBe('现在，故事不只会转场，还会在新场景里继续往前走了。')
   })
 
   it('keeps lesson 06 focused on the upcoming full project', () => {
