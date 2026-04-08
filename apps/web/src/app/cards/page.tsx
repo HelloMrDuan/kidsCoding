@@ -27,8 +27,10 @@ export default function CardsPage() {
   })
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#fff7eb_0%,#ffffff_100%)] px-6 py-10">
-      <section className="mx-auto max-w-7xl">
+    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,#fff2dc_0%,#fff8ef_24%,#ffffff_55%,#eef6ff_100%)] px-6 py-10">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,#ffd6a8_0%,rgba(255,214,168,0)_72%)]" />
+      <div className="pointer-events-none absolute right-0 top-28 h-80 w-80 rounded-full bg-[radial-gradient(circle,#dff2ff_0%,rgba(223,242,255,0)_74%)]" />
+      <section className="relative mx-auto max-w-7xl">
         <GrowthGallery gallery={gallery} />
       </section>
     </main>
