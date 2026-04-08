@@ -44,7 +44,7 @@ export function BindAccountForm({
   }
 
   return (
-    <div className="kc-surface-3d space-y-5 rounded-[2rem] p-6">
+    <div className="kc-panel-3d space-y-5 rounded-[2rem] p-6">
       <div className="space-y-2">
         <h2 className="text-2xl font-black text-slate-950">绑定家长账号</h2>
         <p className="text-sm leading-7 text-slate-600">
@@ -90,7 +90,7 @@ export function BindAccountForm({
       ) : null}
       {!codeSent ? (
         <button
-          className="w-full rounded-full bg-orange-500 px-5 py-3 font-bold text-white"
+          className="kc-button-3d w-full rounded-full bg-orange-500 px-5 py-3 font-bold text-white"
           onClick={handleRequestOtp}
           type="button"
         >
@@ -107,7 +107,7 @@ export function BindAccountForm({
             />
           </label>
           <button
-            className="w-full rounded-full bg-sky-600 px-5 py-3 font-bold text-white"
+            className="kc-button-3d w-full rounded-full bg-sky-600 px-5 py-3 font-bold text-white"
             onClick={handleVerify}
             type="button"
           >

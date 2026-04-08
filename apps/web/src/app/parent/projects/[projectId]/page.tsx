@@ -107,13 +107,13 @@ export default async function ParentProjectPlaybackPage({
 
             <div className="flex flex-wrap gap-3">
               <Link
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                className="kc-button-3d inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
                 href="/parent/overview"
               >
                 返回家长页
               </Link>
               <Link
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-800 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800"
+                className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-800 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800"
                 href="/learn/map"
               >
                 继续学习
@@ -134,7 +134,7 @@ export default async function ParentProjectPlaybackPage({
               </p>
             </div>
 
-            <div className="mt-5 rounded-[1.9rem] bg-[linear-gradient(180deg,#fff8ef_0%,#f8fbff_100%)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+            <div className="kc-stage-3d mt-5 rounded-[1.9rem] bg-[linear-gradient(180deg,#fff8ef_0%,#f8fbff_100%)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
               <PreviewStage blocks={playback.blocks} template={currentTemplate} />
             </div>
           </article>

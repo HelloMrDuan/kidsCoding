@@ -73,13 +73,13 @@ export default function ProjectCompletePage() {
 
       <div className="mx-auto mt-5 flex max-w-5xl flex-wrap justify-center gap-3">
         <Link
-          className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)] transition hover:bg-slate-50"
+          className="kc-button-3d rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)] transition hover:bg-slate-50"
           href="/auth/bind"
         >
           保存我的进度
         </Link>
         <Link
-          className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)] transition hover:bg-slate-50"
+          className="kc-button-3d rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)] transition hover:bg-slate-50"
           href="/learn/map"
         >
           回到学习地图

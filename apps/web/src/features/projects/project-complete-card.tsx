@@ -1,7 +1,6 @@
 import Link from 'next/link'
 
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
-
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
 
 type RewardCard = {
@@ -83,7 +82,7 @@ export function ProjectCompleteCard({
     return (
       <section className="mx-auto max-w-4xl rounded-[2rem] bg-white p-8 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
         <div
-          className="rounded-[1.75rem] border border-[#dceef7] bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_100%)] p-5"
+          className="kc-panel-3d rounded-[1.75rem] border border-[#dceef7] bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_100%)] p-5"
           data-testid="project-complete-lite-card"
         >
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-orange-500">
@@ -100,7 +99,7 @@ export function ProjectCompleteCard({
           </p>
 
           <div
-            className="mt-5 rounded-[1.5rem] bg-[#f5fbff] p-4"
+            className="kc-stage-3d mt-5 rounded-[1.5rem] bg-[#f5fbff] p-4"
             data-testid="project-complete-lite-preview"
           >
             <div className="scale-[0.92] origin-top">
@@ -110,14 +109,14 @@ export function ProjectCompleteCard({
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button
-              className="inline-flex items-center justify-center rounded-full bg-[#ff8b4e] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_28px_rgba(255,139,78,0.28)] transition hover:bg-[#ff7b38]"
+              className="kc-button-3d inline-flex items-center justify-center rounded-full bg-[#ff8b4e] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_28px_rgba(255,139,78,0.28)] transition hover:bg-[#ff7b38]"
               onClick={onReplay}
               type="button"
             >
               回看我的作品
             </button>
             <Link
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800 transition hover:bg-slate-50"
+              className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800 transition hover:bg-slate-50"
               href={primaryHref}
             >
               {primaryLabel}
@@ -140,7 +139,7 @@ export function ProjectCompleteCard({
             {completionCopy.spotlightTag}
           </p>
           <div
-            className="rounded-[2rem] border border-[#dceef7] bg-[radial-gradient(circle_at_top,#fffdf8_0%,#fff0d9_24%,#dff4ff_58%,#ffffff_100%)] p-4 shadow-[0_20px_44px_rgba(56,189,248,0.12)]"
+            className="kc-stage-3d rounded-[2rem] border border-[#dceef7] bg-[radial-gradient(circle_at_top,#fffdf8_0%,#fff0d9_24%,#dff4ff_58%,#ffffff_100%)] p-4 shadow-[0_20px_44px_rgba(56,189,248,0.12)]"
             data-testid="project-complete-stage"
           >
             <div className="rounded-[1.75rem] bg-white/70 p-3 backdrop-blur-sm">
@@ -156,7 +155,7 @@ export function ProjectCompleteCard({
           >
             你完成了《{lessonTitle}》
           </h1>
-          <div className="rounded-[1.75rem] bg-white p-5 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+          <div className="kc-panel-3d rounded-[1.75rem] bg-white p-5 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-700">
               作品完成时刻
             </p>
@@ -171,7 +170,7 @@ export function ProjectCompleteCard({
             </p>
           </div>
 
-          <div className="rounded-[1.75rem] bg-white p-5 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+          <div className="kc-panel-3d rounded-[1.75rem] bg-white p-5 shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
             <p className="text-sm font-semibold text-slate-500">
               当前累计 {stars} 颗星星，已收集 {totalCards} 张卡片
             </p>
@@ -182,14 +181,14 @@ export function ProjectCompleteCard({
 
           <div className="flex flex-col gap-3">
             <button
-              className="inline-flex items-center justify-center rounded-full bg-[#ff8b4e] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_28px_rgba(255,139,78,0.28)] transition hover:bg-[#ff7b38]"
+              className="kc-button-3d inline-flex items-center justify-center rounded-full bg-[#ff8b4e] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_28px_rgba(255,139,78,0.28)] transition hover:bg-[#ff7b38]"
               onClick={onReplay}
               type="button"
             >
               回看我的作品
             </button>
             <Link
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-4 text-lg font-bold text-slate-800 transition hover:bg-slate-50"
+              className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-4 text-lg font-bold text-slate-800 transition hover:bg-slate-50"
               href={primaryHref}
             >
               {primaryLabel}

@@ -53,7 +53,7 @@ export function PurchaseCheckoutCard() {
       checkout.qrCodeValue.startsWith('https://')
 
     return (
-      <section className="space-y-4 rounded-[1.5rem] bg-orange-50 p-5 text-orange-950">
+      <section className="kc-panel-3d space-y-4 rounded-[1.75rem] p-5 text-orange-950">
         <h2 className="text-2xl font-black">扫码解锁高阶创作</h2>
         <p className="text-sm leading-7">
           请家长使用微信、支付宝或支持扫码的银行卡支付方式完成升级。支付成功后，孩子就能进入高阶创作阶段。
@@ -68,14 +68,14 @@ export function PurchaseCheckoutCard() {
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            className="inline-flex items-center justify-center rounded-full bg-orange-500 px-5 py-3 text-sm font-bold text-white"
+            className="kc-button-3d inline-flex items-center justify-center rounded-full bg-orange-500 px-5 py-3 text-sm font-bold text-white"
             href={checkout.successUrl}
           >
             我已扫码，查看支付结果
           </Link>
           {qrLooksLikeUrl ? (
             <Link
-              className="inline-flex items-center justify-center rounded-full border border-orange-200 px-5 py-3 text-sm font-bold text-orange-900"
+              className="kc-button-3d inline-flex items-center justify-center rounded-full border border-orange-200 px-5 py-3 text-sm font-bold text-orange-900"
               href={checkout.qrCodeValue}
               target="_blank"
             >
@@ -83,7 +83,7 @@ export function PurchaseCheckoutCard() {
             </Link>
           ) : null}
           <button
-            className="inline-flex items-center justify-center rounded-full border border-orange-200 px-5 py-3 text-sm font-bold text-orange-900"
+            className="kc-button-3d inline-flex items-center justify-center rounded-full border border-orange-200 px-5 py-3 text-sm font-bold text-orange-900"
             onClick={() => setCheckout(null)}
             type="button"
           >
@@ -102,7 +102,7 @@ export function PurchaseCheckoutCard() {
         </p>
       ) : null}
       <button
-        className="rounded-full bg-orange-500 px-6 py-4 text-lg font-bold text-white disabled:opacity-60"
+        className="kc-button-3d rounded-full bg-orange-500 px-6 py-4 text-lg font-bold text-white disabled:opacity-60"
         disabled={submitting}
         onClick={() => void handleCreateOrder()}
         type="button"

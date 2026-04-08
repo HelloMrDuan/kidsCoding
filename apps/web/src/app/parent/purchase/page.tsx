@@ -24,7 +24,7 @@ export default async function ParentPurchasePage({
             </p>
             <h1 className="text-4xl font-black text-slate-950">高阶创作阶段</h1>
             <p className="text-base leading-7 text-slate-600">
-              当前环境还没有配置完整的账号和支付参数，所以这里先展示升级说明，不执行真实购买。
+              当前环境还没有配置完整的账号和支付参数，所以这里只展示升级说明，不执行真实购买。
             </p>
           </header>
           {purchaseUnavailable ? (
@@ -54,7 +54,7 @@ export default async function ParentPurchasePage({
             孩子完成 12 节启蒙主线后，可以继续进入更长的故事结构、更复杂的互动逻辑和更完整的动画表达。
           </div>
           <Link
-            className="inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800"
+            className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800"
             href="/learn/map"
           >
             回到学习地图
@@ -116,13 +116,13 @@ export default async function ParentPurchasePage({
         {hasLaunchPack ? (
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link
-              className="inline-flex items-center justify-center rounded-full bg-orange-500 px-6 py-4 text-lg font-bold text-white"
+              className="kc-button-3d inline-flex items-center justify-center rounded-full bg-orange-500 px-6 py-4 text-lg font-bold text-white"
               href="/learn/map"
             >
               回到学习地图
             </Link>
             <Link
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800"
+              className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800"
               href="/parent/overview"
             >
               查看学习记录
