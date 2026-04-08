@@ -62,7 +62,6 @@ export default function ProjectCompletePage() {
         blocks={snapshotBlocks}
         completionCopy={completionCopy}
         isFoundationGraduate={isFoundationGraduate}
-        lessonId={projectId}
         lessonTitle={lesson.title}
         onReplay={() => setReplayCount((count) => count + 1)}
         primaryHref={primaryHref}

@@ -15,7 +15,6 @@ type CompletionCopy = {
 }
 
 type ProjectCompleteCardProps = {
-  lessonId: string
   lessonTitle: string
   completionCopy: CompletionCopy
   isFoundationGraduate: boolean
@@ -59,7 +58,6 @@ function RewardPills({
 }
 
 export function ProjectCompleteCard({
-  lessonId,
   lessonTitle,
   completionCopy,
   isFoundationGraduate,

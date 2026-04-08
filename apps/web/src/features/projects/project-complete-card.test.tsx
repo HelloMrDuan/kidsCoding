@@ -10,7 +10,6 @@ describe('ProjectCompleteCard', () => {
       <ProjectCompleteCard
         completionCopy={buildProjectCompletionCopy('lesson-03-forest-story')}
         isFoundationGraduate={false}
-        lessonId="lesson-03-forest-story"
         lessonTitle="森林里的第一次见面"
         onReplay={vi.fn()}
         primaryHref="/learn/map"
@@ -35,7 +34,6 @@ describe('ProjectCompleteCard', () => {
       <ProjectCompleteCard
         completionCopy={buildProjectCompletionCopy('lesson-01-forest-hello')}
         isFoundationGraduate={false}
-        lessonId="lesson-01-forest-hello"
         lessonTitle="小狐狸出场"
         onReplay={vi.fn()}
         primaryHref="/learn/map"
