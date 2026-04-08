@@ -200,9 +200,7 @@ export default function LessonPage() {
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
                   当前任务
                 </p>
-                <p className="mt-2 text-base font-bold text-slate-900">
-                  {step.title}
-                </p>
+                <p className="mt-2 text-base font-bold text-slate-900">{step.title}</p>
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">

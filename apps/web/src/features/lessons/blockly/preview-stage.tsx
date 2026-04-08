@@ -8,7 +8,7 @@ function getStageCopy(blocks: Array<{ type: string }>) {
   const switchedScene = blocks.some((block) => block.type === 'switch_scene')
 
   if (spoke && switchedScene) {
-    return '太好了，故事已经从森林走到草地了。再接一句收尾的话，旅行就更完整了。'
+    return '太好了，故事已经从森林走到草地了。再接一句收尾的话，小旅行就更完整了。'
   }
 
   if (spoke && hasClickTrigger) {
@@ -16,11 +16,11 @@ function getStageCopy(blocks: Array<{ type: string }>) {
   }
 
   if (spoke) {
-    return '太好了，角色已经会说话了，故事正在从静态画面变成会动的小舞台。'
+    return '太好了，角色已经会说话了，故事正在从静止画面变成会动的小舞台。'
   }
 
   if (switchedScene) {
-    return '太好了，故事已经从森林走到草地了。再接一句收尾的话，旅行就更完整了。'
+    return '太好了，故事已经从森林走到草地了。再接一句收尾的话，小旅行就更完整了。'
   }
 
   if (moved && hasSecondStart) {
@@ -89,13 +89,29 @@ export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
           <div className="relative overflow-hidden rounded-[1.5rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_100%)] px-4 pb-8 pt-6">
             <div className="absolute left-1/2 top-0 h-24 w-24 -translate-x-1/2 rounded-full bg-white/35 blur-2xl" />
             <div className="relative flex items-end gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-300 shadow-[0_12px_24px_rgba(252,211,77,0.24)]" />
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-300 text-xs font-black text-amber-900 shadow-[0_12px_24px_rgba(252,211,77,0.24)]">
+                  目标
+                </div>
+                <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] font-bold text-amber-700">
+                  小目标
+                </span>
+              </div>
               <div
-                className="h-24 w-24 rounded-full bg-orange-400 shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-300"
+                className="flex h-24 w-24 items-center justify-center rounded-full bg-orange-400 text-sm font-black text-white shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-300"
                 style={{ transform: moved ? 'translateX(88px)' : 'translateX(0px)' }}
-              />
+              >
+                小狐狸
+              </div>
               {hasSecondStart ? (
-                <div className="h-16 w-16 rounded-full bg-emerald-400 shadow-[0_16px_30px_rgba(52,211,153,0.22)]" />
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400 text-xs font-black text-white shadow-[0_16px_30px_rgba(52,211,153,0.22)]">
+                    朋友
+                  </div>
+                  <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] font-bold text-emerald-700">
+                    第二位朋友
+                  </span>
+                </div>
               ) : null}
             </div>
             <div className="mt-5 h-6 rounded-full bg-[linear-gradient(90deg,#ffdd94_0%,#ffeec1_100%)] opacity-80" />

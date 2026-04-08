@@ -53,7 +53,7 @@ function getStationCopy(state: LessonStationState) {
     case 'completed':
       return {
         badge: '已完成',
-        cta: '回看作品',
+        cta: '重新做这一节',
         badgeClass: 'bg-slate-100 text-slate-600',
         nodeClass: 'border-slate-200 bg-white text-slate-500',
         cardClass: 'border-white bg-white/90',
@@ -78,8 +78,8 @@ function getStationCopy(state: LessonStationState) {
       }
     case 'available':
       return {
-        badge: '可回看',
-        cta: '进入这一节',
+        badge: '可以再学',
+        cta: '重新做这一节',
         badgeClass: 'bg-sky-50 text-sky-700',
         nodeClass: 'border-sky-200 bg-white text-sky-700',
         cardClass: 'border-white bg-white/85',

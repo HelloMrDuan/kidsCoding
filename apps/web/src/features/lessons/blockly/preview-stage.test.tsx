@@ -19,7 +19,7 @@ describe('PreviewStage', () => {
     expect(screen.getByText('作品舞台')).toBeInTheDocument()
     expect(
       screen.getByText(
-        '太好了，故事已经从森林走到草地了。再接一句收尾的话，旅行就更完整了。',
+        '太好了，故事已经从森林走到草地了。再接一句收尾的话，小旅行就更完整了。',
       ),
     ).toBeInTheDocument()
   })

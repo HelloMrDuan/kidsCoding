@@ -117,14 +117,21 @@ export function BlocklyWorkspace({
       positionOrConnectBlock(workspace, block)
     })
 
+    const handleResize = () => {
+      Blockly.svgResize(workspace)
+    }
+
     const handleChange = () => {
       onSnapshotChange(buildSnapshot(workspace))
     }
 
     workspace.addChangeListener(handleChange)
+    handleResize()
+    window.addEventListener('resize', handleResize)
     handleChange()
 
     return () => {
+      window.removeEventListener('resize', handleResize)
       workspace.removeChangeListener(handleChange)
       workspace.dispose()
       workspaceRef.current = null
@@ -139,7 +146,10 @@ export function BlocklyWorkspace({
     }
 
     const currentBlocks = buildSnapshot(workspace)
-    if (type === 'when_start' && currentBlocks.some((block) => block.type === type)) {
+    if (
+      (type === 'when_start' || type === 'when_clicked') &&
+      currentBlocks.some((block) => block.type === type)
+    ) {
       onSnapshotChange(currentBlocks)
       return
     }
@@ -158,14 +168,16 @@ export function BlocklyWorkspace({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-[#ff8b4e]">创作积木桌</p>
-            <h3 className="mt-1 text-xl font-black text-slate-950">把积木拼起来，让舞台里的故事发生</h3>
+            <h3 className="mt-1 text-xl font-black text-slate-950">
+              把积木拼起来，让舞台里的故事发生
+            </h3>
           </div>
           <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
-            先拼，再看
+            不会拖也可以点按钮
           </span>
         </div>
         <p className="mt-3 text-sm leading-7 text-slate-600">
-          左边拖动积木，或者直接点下面的快捷按钮补上当前课需要的积木。现在先把故事拼出来，再慢慢理解为什么这样拼。
+          你可以直接拖动左侧积木，也可以点下面的按钮把当前这节课需要的积木补上。先把故事做出来，再慢慢理解为什么这样拼。
         </p>
       </div>
 
@@ -180,7 +192,9 @@ export function BlocklyWorkspace({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-slate-200">本节可用积木</p>
-            <h4 className="mt-1 text-lg font-black text-white">只保留这一步真正需要的积木</h4>
+            <h4 className="mt-1 text-lg font-black text-white">
+              点一下就能把当前需要的积木加上去
+            </h4>
           </div>
           <span className="rounded-full bg-white/10 px-3 py-2 text-[11px] font-bold tracking-[0.18em] text-slate-200">
             BLOCKS
