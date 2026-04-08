@@ -15,15 +15,11 @@ export function RemedialLinkCard({
 }: RemedialLinkCardProps) {
   return (
     <div className="rounded-[1.5rem] border border-amber-200 bg-amber-50 px-4 py-4">
-      <p className="text-sm font-semibold leading-7 text-amber-800">
-        {copy}
-      </p>
+      <p className="text-sm font-semibold leading-7 text-amber-800">{copy}</p>
 
       {remedialMicroScript ? (
         <div className="mt-3 rounded-[1.25rem] bg-white/80 px-4 py-3">
-          <p className="text-sm font-bold text-amber-900">
-            {remedialMicroScript.title}
-          </p>
+          <p className="text-sm font-bold text-amber-900">{remedialMicroScript.title}</p>
           <div className="mt-2 space-y-2 text-sm leading-7 text-amber-900">
             {remedialMicroScript.lines.map((line) => (
               <p key={line}>{line}</p>
@@ -41,7 +37,7 @@ export function RemedialLinkCard({
           onClick={() => onStartRemedial(remedialLessonId)}
           type="button"
         >
-          先去补这节小课
+          先去补这一小节
         </button>
       ) : null}
     </div>

@@ -47,16 +47,16 @@ export function GuidedLessonShell({
             {lessonTitle}
           </h1>
           <p className="rounded-[1.5rem] bg-[#fff6ea] px-5 py-4 text-base leading-8 text-amber-800">
-            这节高阶内容会在启蒙毕业后开启。先完成 12 节启蒙课，再决定要不要升级更复杂的互动故事。
+            这节高阶内容会在启蒙毕业后开启。先学完 12 节启蒙课，再决定要不要继续升级更复杂的互动故事。
           </p>
           <div className="rounded-[1.5rem] bg-slate-50 px-5 py-4 text-sm leading-7 text-slate-600">
-            当前这节会继续朝这个目标升级：{lessonGoal}
+            这节课会继续把能力往这个目标推进：{lessonGoal}
           </div>
           <Link
             className="inline-flex rounded-full bg-[#7c5cff] px-5 py-3 font-bold text-white transition hover:bg-[#6948f2]"
             href="/parent/purchase"
           >
-            查看高阶升级说明
+            看看高阶升级内容
           </Link>
         </div>
       </section>
@@ -77,7 +77,7 @@ export function GuidedLessonShell({
             {lessonTitle}
           </h1>
           <p className="rounded-[1.5rem] bg-white/90 px-4 py-4 text-sm leading-7 text-slate-600">
-            本节目标：{lessonGoal}
+            这节课要做到：{lessonGoal}
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export function GuidedLessonShell({
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm font-semibold text-amber-700">当前任务</p>
               <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-amber-700 shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
-                一步一个小目标
+                一步一步来
               </span>
             </div>
             <h2 className="mt-3 text-[1.75rem] font-black leading-tight text-slate-950">
@@ -110,9 +110,9 @@ export function GuidedLessonShell({
             data-testid="lesson-feedback-card"
           >
             <div className="flex items-center justify-between gap-3 px-5 pt-5">
-              <p className="text-sm font-semibold text-sky-700">刚刚完成</p>
+              <p className="text-sm font-semibold text-sky-700">刚完成的小结果</p>
               <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
-                小结果预览
+                马上看到变化
               </span>
             </div>
             <div
@@ -131,7 +131,7 @@ export function GuidedLessonShell({
 
         {hintCopy ? (
           <div className="rounded-[1.75rem] bg-[#f7f2ff] px-4 py-4 text-sm font-semibold leading-7 text-[#6b46ff] shadow-[0_14px_30px_rgba(107,70,255,0.08)]">
-            提示：{hintCopy}
+            卡住时提示：{hintCopy}
           </div>
         ) : null}
 
@@ -150,7 +150,7 @@ export function GuidedLessonShell({
           onClick={onCompleteStep}
           type="button"
         >
-          完成这一课
+          完成这一步
         </button>
       </aside>
 
@@ -163,7 +163,7 @@ export function GuidedLessonShell({
             <div>
               <p className="text-sm font-semibold text-sky-700">儿童创作工作台</p>
               <h3 className="mt-1 text-xl font-black text-slate-950">
-                先看舞台，再用积木让故事发生
+                先看舞台，再用积木让故事往前走
               </h3>
             </div>
             <span className="rounded-full bg-[#eef8ff] px-3 py-2 text-xs font-bold text-sky-700">

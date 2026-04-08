@@ -27,10 +27,10 @@ describe('AgeBandForm', () => {
     render(<AgeBandForm />)
 
     expect(screen.getByTestId('age-band-form')).toBeInTheDocument()
-    expect(screen.getByText('先选一个年龄入口')).toBeInTheDocument()
+    expect(screen.getByText('选一个最接近的年龄段')).toBeInTheDocument()
     expect(screen.getByText('6-8 岁')).toBeInTheDocument()
     expect(screen.getByText('9-12 岁')).toBeInTheDocument()
     expect(screen.getByText('13 岁以上')).toBeInTheDocument()
-    expect(screen.getAllByText('从这里开始')).toHaveLength(3)
+    expect(screen.getAllByText('选这个开始')).toHaveLength(3)
   })
 })

@@ -16,10 +16,10 @@ describe('GuidedLessonShell', () => {
 
     expect(
       screen.getByText(
-        '这节高阶内容会在启蒙毕业后开启。先完成 12 节启蒙课，再决定要不要升级更复杂的互动故事。',
+        '这节高阶内容会在启蒙毕业后开启。先学完 12 节启蒙课，再决定要不要继续升级更复杂的互动故事。',
       ),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: '完成这一课' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '完成这一步' })).toBeNull()
   })
 
   it('shows the task card, workbench shell, and result card on unlocked lessons', () => {
@@ -47,7 +47,7 @@ describe('GuidedLessonShell', () => {
     expect(screen.getByText('主语音：先放开始积木。')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-feedback-card')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-feedback-preview')).toBeInTheDocument()
-    expect(screen.getByText('刚刚完成')).toBeInTheDocument()
+    expect(screen.getByText('刚完成的小结果')).toBeInTheDocument()
     expect(screen.getByText('太好了，角色已经准备好登场了。')).toBeInTheDocument()
     expect(screen.getByText('工作台内容')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-complete-step')).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('GuidedLessonShell', () => {
         lessonGoal="让主角从舞台左边走到右边。"
         lessonTitle="让角色动起来"
         remedialMicroScript={{
-          title: '课内小补课',
+          title: '课内微补课',
           lines: ['先放开始积木。', '再接上动作积木。'],
           demo: '先高亮开始积木，再高亮后面的动作积木。',
         }}
@@ -71,12 +71,12 @@ describe('GuidedLessonShell', () => {
       />,
     )
 
-    expect(screen.getByText('课内小补课')).toBeInTheDocument()
+    expect(screen.getByText('课内微补课')).toBeInTheDocument()
     expect(screen.getByText('先放开始积木。')).toBeInTheDocument()
     expect(screen.getByText('再接上动作积木。')).toBeInTheDocument()
     expect(
       screen.getByText('示意动作：先高亮开始积木，再高亮后面的动作积木。'),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: '先去补这节小课' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '先去补这一小节' })).toBeNull()
   })
 })

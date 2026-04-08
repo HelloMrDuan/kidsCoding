@@ -73,7 +73,7 @@ export default function LessonPage() {
   if (!lesson) {
     return (
       <main className="p-6 text-lg font-semibold">
-        没找到这节课，先回学习地图重新进入试试。
+        没找到这一节课，先回学习地图再重新进入试试。
       </main>
     )
   }
@@ -167,11 +167,11 @@ export default function LessonPage() {
                 className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800"
                 href="/learn/map"
               >
-                回到成长地图
+                回到学习地图
               </Link>
               {currentUnit ? (
                 <span className="rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
-                  来自 {currentUnit.title}
+                  当前单元：{currentUnit.title}
                 </span>
               ) : null}
               <span className="rounded-full bg-[#fff1d4] px-4 py-2 text-sm font-semibold text-amber-700">
@@ -189,7 +189,7 @@ export default function LessonPage() {
                 {currentLesson.title}
               </h1>
               <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600 md:text-lg md:leading-8">
-                先完成这个小目标，再看看舞台里的角色马上会发生什么变化。每一步都在把故事往前推进。
+                先完成当前这一步，再看看舞台里的角色会发生什么变化。每一步都在把故事往前推进。
               </p>
             </div>
             <div
@@ -198,7 +198,7 @@ export default function LessonPage() {
             >
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
-                  当前步骤
+                  当前任务
                 </p>
                 <p className="mt-2 text-base font-bold text-slate-900">
                   {step.title}
@@ -206,7 +206,7 @@ export default function LessonPage() {
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
-                  做完这节课会得到
+                  做完这节会得到
                 </p>
                 <p className="mt-2 text-base font-bold text-slate-900">
                   {completionPreview}

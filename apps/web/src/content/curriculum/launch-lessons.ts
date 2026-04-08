@@ -81,7 +81,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
       '把“开始时”放在最前面，再把“向右移动”接上去。',
       '先看一个很短的示意，再回来试一次。',
     ),
-    parentAdvice: '请孩子演示一下小狐狸是怎么从舞台一边走到另一边的。',
+    parentAdvice: '请孩子演示一下，小狐狸是怎么从舞台一边走到另一边的。',
   },
   {
     id: 'lesson-02-forest-greeting',
@@ -115,7 +115,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
       step('step-1', '看看今天要完成什么', '今天我们要把小狐狸的第一次见面做成一个完整小故事。', ['when_start'], ['when_start']),
       step('step-2', '先让角色出场', '先接好“开始时”和“向右移动”，让小狐狸走上舞台。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right']),
       step('step-3', '再让角色打招呼', '在移动后面接一句欢迎的话，让故事继续往前走。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
-      step('step-4', '调整顺序让故事完整', '确认小狐狸是先出场，再说话，这样第一次见面会更自然。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
+      step('step-4', '调整顺序让故事完整', '确认小狐狸是先出场，再说话，这样故事会更自然。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
       step('step-5', '回看第一个完整小故事', '点一下运行，看看小狐狸是不是已经做出了第一个完整故事。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
     ],
     rewardCardId: 'growth-first-project',
@@ -125,10 +125,10 @@ export const launchLessons: LaunchLessonDefinition[] = [
     hintLayers: buildHintLayers(
       '先让小狐狸出场，再让它开口打招呼。',
       '顺序要是“开始时 → 向右移动 → 说一句话”。',
-      '先看一个顺序示意，再回来把故事接完整。',
+      '先看一下顺序示意，再回来把故事接完整。',
     ),
     templateId: 'forest-meetup-stage',
-    parentAdvice: '和孩子一起回看第一个作品，问问他先看到了什么、又听到了什么。',
+    parentAdvice: '和孩子一起回看第一个作品，问问他先看到什么、又听到了什么。',
   },
   {
     id: 'lesson-04-meadow-scene',
@@ -172,7 +172,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
     hintLayers: buildHintLayers(
       '先安排出发，再安排到达，最后再说一句旅行感受。',
       '顺序要是“开始时 → 向右移动 → 切换场景 → 说一句话”。',
-      '先看一个顺序示意，再回来把旅行接完整。',
+      '先看一下顺序示意，再回来把旅行接完整。',
     ),
     parentAdvice: '让孩子按顺序说一遍，先发生了什么，再发生了什么。',
   },

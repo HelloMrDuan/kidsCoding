@@ -25,31 +25,24 @@ describe('MapView', () => {
       />,
     )
 
-    expect(screen.getByTestId('learning-map-current-focus')).toBeInTheDocument()
-    expect(screen.getByTestId('learning-map-focus-preview')).toBeInTheDocument()
     expect(screen.getByTestId('learning-map-track')).toBeInTheDocument()
     expect(screen.getByTestId('learning-map-high-tier')).toBeInTheDocument()
 
-    expect(
-      screen.getByRole('link', { name: '继续第 3 节' }),
-    ).toHaveAttribute('href', '/learn/lesson/lesson-03-forest-story')
+    expect(screen.getByRole('link', { name: '开始这一节' })).toHaveAttribute(
+      'href',
+      '/learn/lesson/lesson-03-forest-story',
+    )
 
     expect(screen.getByTestId('map-unit-unit-1-forest-meetup')).toBeInTheDocument()
-    expect(
-      screen.getByTestId('map-unit-unit-2-meadow-journey'),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByTestId('map-unit-unit-3-garden-interaction'),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByTestId('map-unit-unit-4-graduation-show'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('map-unit-unit-2-meadow-journey')).toBeInTheDocument()
+    expect(screen.getByTestId('map-unit-unit-3-garden-interaction')).toBeInTheDocument()
+    expect(screen.getByTestId('map-unit-unit-4-graduation-show')).toBeInTheDocument()
 
     const currentNode = screen.getByTestId('map-node-lesson-03-forest-story')
-    expect(within(currentNode).getByText('现在就做')).toBeInTheDocument()
+    expect(within(currentNode).getByText('现在就学')).toBeInTheDocument()
 
     const nextNode = screen.getByTestId('map-node-lesson-04-meadow-scene')
-    expect(within(nextNode).getByText('下一站')).toBeInTheDocument()
+    expect(within(nextNode).getByText('下一节')).toBeInTheDocument()
   })
 
   it('shows the paid upgrade action after the child finishes the foundation route', () => {
@@ -67,8 +60,9 @@ describe('MapView', () => {
       />,
     )
 
-    expect(
-      screen.getByRole('link', { name: '解锁高阶创作' }),
-    ).toHaveAttribute('href', '/parent/purchase')
+    expect(screen.getByRole('link', { name: '解锁高阶创作' })).toHaveAttribute(
+      'href',
+      '/parent/purchase',
+    )
   })
 })

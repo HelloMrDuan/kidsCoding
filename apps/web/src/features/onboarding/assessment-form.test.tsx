@@ -16,7 +16,7 @@ describe('AssessmentForm', () => {
     )
 
     expect(screen.getByTestId('assessment-form')).toBeInTheDocument()
-    expect(screen.getByText('轻量小测')).toBeInTheDocument()
+    expect(screen.getByText('轻量判断')).toBeInTheDocument()
     expect(screen.getByText('第 1 / 2 题')).toBeInTheDocument()
   })
 

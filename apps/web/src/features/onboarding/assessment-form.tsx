@@ -48,24 +48,24 @@ export function AssessmentForm({
   }
 
   return (
-    <div
+    <section
       className="rounded-[2.5rem] bg-white px-6 py-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8"
       data-testid="assessment-form"
     >
-      <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-violet-700">
-          轻量小测
-        </p>
+      <div className="space-y-3">
         <div className="flex items-center justify-between gap-4">
-          <p className="text-base font-bold text-slate-600">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-violet-700">
+            轻量判断
+          </p>
+          <p className="text-sm font-bold text-slate-500">
             第 {index + 1} / {questions.length} 题
           </p>
-          <div className="h-2 w-32 overflow-hidden rounded-full bg-slate-100">
-            <div
-              className="h-full rounded-full bg-[linear-gradient(90deg,#a78bfa_0%,#7dd3fc_100%)]"
-              style={{ width: `${((index + 1) / questions.length) * 100}%` }}
-            />
-          </div>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+          <div
+            className="h-full rounded-full bg-[linear-gradient(90deg,#a78bfa_0%,#7dd3fc_100%)]"
+            style={{ width: `${((index + 1) / questions.length) * 100}%` }}
+          />
         </div>
       </div>
 
@@ -90,6 +90,6 @@ export function AssessmentForm({
           </button>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
