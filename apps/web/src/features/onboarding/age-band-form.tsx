@@ -13,17 +13,17 @@ const options: Array<{ id: AgeBand; title: string; subtitle: string }> = [
   {
     id: 'age_6_8',
     title: '6-8 岁',
-    subtitle: '更少文字、更多引导，适合从先做出来开始建立兴趣。',
+    subtitle: '更少文字、更多引导，适合先从做出来开始建立兴趣。',
   },
   {
     id: 'age_9_12',
     title: '9-12 岁',
-    subtitle: '理解力更稳，可以更快进入故事搭建和互动逻辑。',
+    subtitle: '理解力更强，可以更快进入故事搭建和互动逻辑。',
   },
   {
     id: 'age_13_plus',
     title: '13 岁以上',
-    subtitle: '节奏更快，后面更适合继续进入复杂一点的创作升级。',
+    subtitle: '节奏更快，后面更适合继续进入更复杂一点的创作升级。',
   },
 ]
 
