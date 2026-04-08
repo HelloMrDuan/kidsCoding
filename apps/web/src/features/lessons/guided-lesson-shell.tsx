@@ -38,7 +38,7 @@ export function GuidedLessonShell({
 }: GuidedLessonShellProps) {
   if (isLocked) {
     return (
-      <section className="rounded-[2.5rem] border border-white/70 bg-[linear-gradient(180deg,#ffffff_0%,#fff6ec_100%)] p-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+      <section className="kc-surface-3d rounded-[2.5rem] p-8">
         <div className="max-w-3xl space-y-5">
           <p className="inline-flex rounded-full bg-[#f2ecff] px-4 py-2 text-sm font-semibold text-[#6b46ff]">
             高阶创作入口
@@ -66,10 +66,10 @@ export function GuidedLessonShell({
   return (
     <section className="grid items-start gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
       <aside
-        className="space-y-5 rounded-[2.5rem] border border-white/70 bg-[linear-gradient(180deg,#ffffff_0%,#fff9f2_100%)] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)]"
+        className="kc-surface-3d space-y-5 rounded-[2.5rem] p-6"
         data-testid="lesson-support-rail"
       >
-        <div className="space-y-3 rounded-[2rem] bg-[linear-gradient(180deg,#ffffff_0%,#fff3de_100%)] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+        <div className="kc-panel-3d space-y-3 rounded-[2rem] px-5 py-5">
           <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
             今天的小任务
           </p>
@@ -155,10 +155,10 @@ export function GuidedLessonShell({
       </aside>
 
       <div
-        className="space-y-4 rounded-[2.75rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.85)_0%,rgba(255,248,238,0.96)_100%)] p-3 shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:p-4"
+        className="kc-scene-shell space-y-4 rounded-[2.75rem] p-3 md:p-4"
         data-testid="lesson-workbench-shell"
       >
-        <div className="rounded-[2rem] border border-white/80 bg-white/70 px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+        <div className="kc-panel-3d rounded-[2rem] px-5 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-sky-700">儿童创作工作台</p>

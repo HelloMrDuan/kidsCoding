@@ -163,7 +163,7 @@ export default function LessonPage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#fff7ed_100%)] px-4 py-6 md:px-6 md:py-8">
       <section className="mx-auto max-w-7xl space-y-6">
-        <header className="rounded-[2.5rem] border border-white/75 bg-[linear-gradient(180deg,#ffffff_0%,#fff6ec_100%)] px-6 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:px-8">
+        <header className="kc-surface-3d rounded-[2.5rem] px-6 py-6 md:px-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <Link
@@ -196,7 +196,7 @@ export default function LessonPage() {
               </p>
             </div>
             <div
-              className="grid gap-3 rounded-[1.75rem] bg-white/85 px-5 py-4 text-sm leading-7 text-slate-600 shadow-[0_12px_24px_rgba(15,23,42,0.05)]"
+              className="kc-panel-3d grid gap-3 rounded-[1.75rem] px-5 py-4 text-sm leading-7 text-slate-600"
               data-testid="lesson-entry-summary"
             >
               <div>

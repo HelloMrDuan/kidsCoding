@@ -78,7 +78,7 @@ function getStationCopy(state: LessonStationState) {
       }
     case 'available':
       return {
-        badge: '可以再学',
+        badge: '可以重学',
         cta: '重新做这一节',
         badgeClass: 'bg-sky-50 text-sky-700',
         nodeClass: 'border-sky-200 bg-white text-sky-700',
@@ -110,11 +110,11 @@ export function MapView({
 
   return (
     <section
-      className="overflow-hidden rounded-[2.25rem] bg-[linear-gradient(180deg,#ffffff_0%,#f8fcff_100%)] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)]"
+      className="kc-surface-3d overflow-hidden rounded-[2.5rem] p-6"
       data-testid="learning-map-track"
     >
       <div className="relative">
-        <div className="absolute bottom-8 left-[1.35rem] top-6 w-[3px] rounded-full bg-[linear-gradient(180deg,#ffcc8b_0%,#bfe4ff_55%,#dbe7f5_100%)]" />
+        <div className="absolute bottom-8 left-[1.35rem] top-6 w-[4px] rounded-full bg-[linear-gradient(180deg,#ffd69f_0%,#bfe4ff_52%,#e3d7ff_100%)] shadow-[0_0_24px_rgba(191,228,255,0.5)]" />
 
         <div className="space-y-8">
           {foundationUnits.map((unit, unitIndex) => {
@@ -132,9 +132,9 @@ export function MapView({
                 className="relative pl-12"
                 data-testid={`map-unit-${unit.id}`}
               >
-                <div className="mb-4 rounded-[1.75rem] border border-white bg-[linear-gradient(180deg,#fffdf8_0%,#ffffff_100%)] p-5 shadow-[0_12px_32px_rgba(15,23,42,0.05)]">
+                <div className="kc-panel-3d mb-4 rounded-[1.9rem] p-5">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#fff0cf] text-sm font-black text-amber-700">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,#fff4cd_0%,#ffe5a5_100%)] text-sm font-black text-amber-700 shadow-[0_12px_20px_rgba(245,158,11,0.16)]">
                       {unitIndex + 1}
                     </span>
                     <span
@@ -174,7 +174,7 @@ export function MapView({
                     return (
                       <article
                         key={lesson.id}
-                        className={`relative rounded-[1.6rem] border p-4 shadow-[0_10px_28px_rgba(15,23,42,0.05)] transition ${copy.cardClass}`}
+                        className={`relative rounded-[1.75rem] border p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)] transition ${copy.cardClass}`}
                         data-testid={`map-node-${lesson.id}`}
                       >
                         <div className="absolute -left-[2.45rem] top-7 flex flex-col items-center">
@@ -209,7 +209,7 @@ export function MapView({
                           </div>
 
                           <Link
-                            className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                            className="kc-button-3d inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold text-slate-950"
                             data-testid={`lesson-link-${lesson.id}`}
                             href={`/learn/lesson/${lesson.id}`}
                           >
@@ -225,7 +225,7 @@ export function MapView({
           })}
 
           <aside className="relative pl-12" data-testid="learning-map-high-tier">
-            <div className="rounded-[1.85rem] border border-[#e5ddff] bg-[radial-gradient(circle_at_top,#fff8d6_0%,#f7f4ff_44%,#eef9ff_100%)] p-6 shadow-[0_18px_42px_rgba(107,70,255,0.12)]">
+            <div className="rounded-[1.95rem] border border-[#e5ddff] bg-[radial-gradient(circle_at_top,#fff8d6_0%,#f7f4ff_42%,#eef9ff_100%)] p-6 shadow-[0_18px_42px_rgba(107,70,255,0.12)]">
               <p className="inline-flex rounded-full bg-white/90 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-[#6b46ff]">
                 高阶创作阶段
               </p>
@@ -240,14 +240,14 @@ export function MapView({
                 {foundationComplete ? (
                   hasCourseEntitlement ? (
                     <Link
-                      className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                      className="kc-button-3d inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold text-slate-950"
                       href="/parent/overview"
                     >
                       查看高阶创作
                     </Link>
                   ) : (
                     <Link
-                      className="inline-flex items-center justify-center rounded-full bg-[#6b46ff] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#5935e6]"
+                      className="inline-flex items-center justify-center rounded-full bg-[#6b46ff] px-5 py-3 text-sm font-bold text-white shadow-[0_16px_28px_rgba(107,70,255,0.25)] transition hover:bg-[#5935e6]"
                       href="/parent/purchase"
                     >
                       解锁高阶创作

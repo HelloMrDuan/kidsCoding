@@ -129,7 +129,7 @@ export function PreviewStage({
 
   return (
     <section
-      className="overflow-hidden rounded-[2.5rem] border border-[#dceef7] bg-[linear-gradient(180deg,#ecf9ff_0%,#ffffff_100%)] p-5 shadow-[0_24px_50px_rgba(56,189,248,0.12)] md:p-6"
+      className="kc-stage-3d overflow-hidden rounded-[2.5rem] p-5 md:p-6"
       data-testid="lesson-preview-stage"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">

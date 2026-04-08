@@ -72,7 +72,7 @@ export default function LearnMapPage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef9ff_0%,#fffaf0_100%)] px-4 py-6 md:px-6 md:py-8">
       <section className="mx-auto max-w-6xl space-y-6">
-        <header className="rounded-[2.25rem] bg-white px-6 py-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8">
+        <header className="kc-surface-3d rounded-[2.4rem] px-6 py-7 md:px-8">
           <div className="flex flex-wrap items-center gap-3">
             <span className="rounded-full bg-sky-100 px-4 py-2 text-sm font-bold text-sky-700">
               推荐起点：{startLevelLabels[recommendedLevel]}
@@ -93,7 +93,7 @@ export default function LearnMapPage() {
             </div>
 
             <div
-              className="rounded-[1.75rem] bg-[linear-gradient(180deg,#fff9ed_0%,#eef8ff_100%)] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.08)]"
+              className="kc-panel-3d rounded-[1.9rem] p-5"
               data-testid="learning-map-focus-preview"
             >
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
@@ -107,7 +107,7 @@ export default function LearnMapPage() {
               </p>
               {nextLesson ? (
                 <Link
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-slate-800"
+                  className="kc-button-3d mt-5 inline-flex w-full items-center justify-center rounded-full px-5 py-3.5 text-sm font-bold text-slate-950"
                   data-testid="learning-map-primary-cta"
                   href={`/learn/lesson/${nextLesson.id}`}
                 >
