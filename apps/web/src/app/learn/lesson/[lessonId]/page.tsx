@@ -96,6 +96,9 @@ export default function LessonPage() {
   const templateName =
     curriculum.templates.find((item) => item.id === currentLesson.templateId)
       ?.name ?? '故事模板'
+  const currentTemplate = curriculum.templates.find(
+    (item) => item.id === currentLesson.templateId,
+  )
   const courseAccess = resolveCourseAccess({
     lessonPhase: currentLesson.phase,
     hasLaunchPack: hasCourseEntitlement,
@@ -233,11 +236,12 @@ export default function LessonPage() {
               allowedBlocks={step.allowedBlocks}
               blocks={blocks}
               onSnapshotChange={handleSnapshotChange}
+              template={currentTemplate}
               templateName={templateName}
             />
           ) : (
             <div className="space-y-6">
-              <PreviewStage blocks={blocks} />
+              <PreviewStage blocks={blocks} template={currentTemplate} />
               <BlocklyWorkspace
                 allowedBlocks={step.allowedBlocks}
                 blocks={blocks}

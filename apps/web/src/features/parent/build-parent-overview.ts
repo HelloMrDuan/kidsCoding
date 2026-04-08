@@ -26,7 +26,7 @@ function describeProjectResult(lessonId: string) {
   }
 
   if (lessonId === 'lesson-02-forest-greeting') {
-    return '现在，角色已经会开口打招呼了。'
+    return '现在，角色已经会边出场边打招呼了。'
   }
 
   if (lessonId === 'lesson-01-forest-hello') {

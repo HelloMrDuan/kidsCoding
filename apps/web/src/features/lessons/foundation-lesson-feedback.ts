@@ -5,9 +5,9 @@ const FOUNDATION_LESSON_FEEDBACK = {
     retry: '先看看开始积木是不是放在最前面，再把移动积木接上去。',
   },
   'lesson-02-forest-greeting': {
-    initial: '先让小狐狸准备出场，再接上一句欢迎的话。',
-    progress: '现在，角色已经会开口打招呼了。',
-    retry: '先让小狐狸准备出场，再把说话积木接在后面。',
+    initial: '先让小狐狸出场，再在后面接上一句欢迎的话。',
+    progress: '现在，角色已经会边出场边打招呼了。',
+    retry: '先确认是先出场，再把说话积木接在后面。',
   },
   'lesson-03-forest-story': {
     initial: '先让小狐狸出场，再把欢迎的话按顺序接上去。',

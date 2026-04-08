@@ -13,6 +13,7 @@ describe('buildParentProjectPlayback', () => {
           id: 'trial-03-scene-story',
           title: '做出第一个完整小故事',
           goal: '完成一个可回放的短故事',
+          templateId: 'forest-meetup-stage',
         },
       ],
     })
@@ -21,6 +22,7 @@ describe('buildParentProjectPlayback', () => {
       lessonId: 'trial-03-scene-story',
       lessonTitle: '做出第一个完整小故事',
       lessonGoal: '完成一个可回放的短故事',
+      templateId: 'forest-meetup-stage',
       updatedAt: '2026-03-31T10:00:00.000Z',
       blocks: [{ type: 'when_start' }, { type: 'move_right' }],
     })

@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import type { ProjectTemplateDefinition } from '@/features/domain/types'
+
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
 
 type RewardCard = {
@@ -22,6 +24,7 @@ type ProjectCompleteCardProps = {
   totalCards: number
   rewardCards: RewardCard[]
   blocks: Array<{ type: string }>
+  template?: ProjectTemplateDefinition
   onReplay: () => void
   primaryHref: string
   primaryLabel: string
@@ -65,6 +68,7 @@ export function ProjectCompleteCard({
   totalCards,
   rewardCards,
   blocks,
+  template,
   onReplay,
   primaryHref,
   primaryLabel,
@@ -100,7 +104,7 @@ export function ProjectCompleteCard({
             data-testid="project-complete-lite-preview"
           >
             <div className="scale-[0.92] origin-top">
-              <PreviewStage blocks={blocks} />
+              <PreviewStage blocks={blocks} template={template} />
             </div>
           </div>
 
@@ -140,7 +144,7 @@ export function ProjectCompleteCard({
             data-testid="project-complete-stage"
           >
             <div className="rounded-[1.75rem] bg-white/70 p-3 backdrop-blur-sm">
-              <PreviewStage blocks={blocks} />
+              <PreviewStage blocks={blocks} template={template} />
             </div>
           </div>
         </div>

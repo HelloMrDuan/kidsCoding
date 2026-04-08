@@ -12,7 +12,7 @@ describe('getFoundationLessonFeedback', () => {
   it('uses a result-first progress line for lesson 02', () => {
     expect(
       getFoundationLessonFeedback('lesson-02-forest-greeting', 'progress'),
-    ).toBe('现在，角色已经会开口打招呼了。')
+    ).toBe('现在，角色已经会边出场边打招呼了。')
   })
 
   it('keeps lesson 03 focused on the upcoming full project', () => {

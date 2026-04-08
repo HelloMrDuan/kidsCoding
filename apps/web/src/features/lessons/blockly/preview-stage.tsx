@@ -1,3 +1,33 @@
+import type { ProjectTemplateDefinition } from '@/features/domain/types'
+
+const CHARACTER_LABELS: Record<string, string> = {
+  fox: '小狐狸',
+  rabbit: '小兔子',
+  bird: '草地小鸟',
+  butterfly: '小蝴蝶',
+  frog: '小青蛙',
+  bear: '小熊',
+}
+
+const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
+  forest: {
+    badge: '森林舞台',
+    note: '先让角色上场，再看看故事会不会往前走。',
+  },
+  meadow: {
+    badge: '草地舞台',
+    note: '先在森林出发，再把故事带到草地。',
+  },
+  garden: {
+    badge: '花园舞台',
+    note: '点一下角色，看看它会不会立刻回应你。',
+  },
+  'forest-stage': {
+    badge: '毕业舞台',
+    note: '让两个朋友按顺序上场，再一起完成故事。',
+  },
+}
+
 function getStageCopy(blocks: Array<{ type: string }>) {
   const moved = blocks.some((block) => block.type === 'move_right')
   const spoke = blocks.some((block) => block.type === 'say_line')
@@ -16,11 +46,11 @@ function getStageCopy(blocks: Array<{ type: string }>) {
   }
 
   if (spoke) {
-    return '太好了，角色已经会说话了，故事正在从静止画面变成会动的小舞台。'
+    return '太好了，角色已经会出场，还会开口打招呼了。'
   }
 
   if (switchedScene) {
-    return '太好了，故事已经从森林走到草地了。再接一句收尾的话，小旅行就更完整了。'
+    return '太好了，故事已经成功换到新场景了。再接一句收尾的话，旅行就更完整了。'
   }
 
   if (moved && hasSecondStart) {
@@ -50,11 +80,37 @@ function getStageCopy(blocks: Array<{ type: string }>) {
   return '先把开始积木放好，再让角色真正开始表演。'
 }
 
-export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
+function getTemplateCharacterLabels(template?: ProjectTemplateDefinition) {
+  const first = template?.starterCharacters[0]
+  const second = template?.starterCharacters[1]
+
+  return {
+    mainLabel: first ? CHARACTER_LABELS[first] ?? '主角' : '主角',
+    secondLabel: second ? CHARACTER_LABELS[second] ?? '伙伴' : null,
+    sceneCopy: template
+      ? SCENE_LABELS[template.starterScene] ?? {
+          badge: '故事舞台',
+          note: '先把这一步做出来，再看舞台会发生什么变化。',
+        }
+      : {
+          badge: '故事舞台',
+          note: '先把这一步做出来，再看舞台会发生什么变化。',
+        },
+  }
+}
+
+export function PreviewStage({
+  blocks,
+  template,
+}: {
+  blocks: Array<{ type: string }>
+  template?: ProjectTemplateDefinition
+}) {
   const moved = blocks.some((block) => block.type === 'move_right')
   const startCount = blocks.filter((block) => block.type === 'when_start').length
   const hasSecondStart = startCount > 1
   const switchedScene = blocks.some((block) => block.type === 'switch_scene')
+  const { mainLabel, secondLabel, sceneCopy } = getTemplateCharacterLabels(template)
 
   return (
     <section
@@ -81,45 +137,51 @@ export function PreviewStage({ blocks }: { blocks: Array<{ type: string }> }) {
             <span className="h-3 w-3 rounded-full bg-white/40" />
           </div>
           <span className="rounded-full bg-white/80 px-3 py-1 text-[11px] font-bold tracking-[0.2em] text-slate-500">
-            STAGE
+            {sceneCopy.badge}
           </span>
         </div>
 
         <div className="mt-6 rounded-[1.75rem] bg-[linear-gradient(180deg,#84d2ff_0%,#daf4ff_58%,#f8f2e7_100%)] px-5 pb-6 pt-8 shadow-[0_20px_36px_rgba(125,211,252,0.18)]">
           <div className="relative overflow-hidden rounded-[1.5rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_100%)] px-4 pb-8 pt-6">
             <div className="absolute left-1/2 top-0 h-24 w-24 -translate-x-1/2 rounded-full bg-white/35 blur-2xl" />
-            <div className="relative flex items-end gap-4">
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-300 text-xs font-black text-amber-900 shadow-[0_12px_24px_rgba(252,211,77,0.24)]">
-                  目标
-                </div>
-                <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] font-bold text-amber-700">
-                  小目标
-                </span>
-              </div>
+
+            <div className="relative flex flex-wrap items-end gap-4">
               <div
                 className="flex h-24 w-24 items-center justify-center rounded-full bg-orange-400 text-sm font-black text-white shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-300"
                 style={{ transform: moved ? 'translateX(88px)' : 'translateX(0px)' }}
               >
-                小狐狸
+                {mainLabel}
               </div>
-              {hasSecondStart ? (
-                <div className="flex flex-col items-center gap-2">
+
+              {secondLabel ? (
+                <div
+                  className={`flex flex-col items-center gap-2 transition-opacity duration-300 ${
+                    hasSecondStart || template?.starterScene === 'garden'
+                      ? 'opacity-100'
+                      : 'opacity-70'
+                  }`}
+                >
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400 text-xs font-black text-white shadow-[0_16px_30px_rgba(52,211,153,0.22)]">
-                    朋友
+                    {secondLabel}
                   </div>
                   <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] font-bold text-emerald-700">
-                    第二位朋友
+                    {hasSecondStart ? '第二位朋友' : '舞台伙伴'}
                   </span>
                 </div>
               ) : null}
             </div>
+
             <div className="mt-5 h-6 rounded-full bg-[linear-gradient(90deg,#ffdd94_0%,#ffeec1_100%)] opacity-80" />
+
             {switchedScene ? (
               <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
                 场景已经切换到新的画面
               </div>
-            ) : null}
+            ) : (
+              <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
+                {sceneCopy.note}
+              </div>
+            )}
           </div>
         </div>
 

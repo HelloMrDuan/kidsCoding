@@ -7,7 +7,12 @@ export function buildParentProjectPlayback({
   lessonId: string
   updatedAt: string
   blocks: Array<{ type: string }>
-  lessonCatalog: Array<{ id: string; title: string; goal: string }>
+  lessonCatalog: Array<{
+    id: string
+    title: string
+    goal: string
+    templateId?: string
+  }>
 }) {
   const lesson = lessonCatalog.find((item) => item.id === lessonId)
 
@@ -15,6 +20,7 @@ export function buildParentProjectPlayback({
     lessonId,
     lessonTitle: lesson?.title ?? lessonId,
     lessonGoal: lesson?.goal ?? '可以回看这个作品的积木结构和动作预览。',
+    templateId: lesson?.templateId,
     updatedAt,
     blocks,
   }

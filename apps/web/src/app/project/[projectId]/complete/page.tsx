@@ -39,6 +39,9 @@ export default function ProjectCompletePage() {
 
   const isFoundationGraduate = lesson.id === 'lesson-12-graduation-show'
   const completionCopy = buildProjectCompletionCopy(lesson.id)
+  const currentTemplate = curriculum.templates.find(
+    (item) => item.id === lesson.templateId,
+  )
   const visibleRewardIds = new Set([
     lesson.rewardCardId,
     'growth-first-project',
@@ -68,6 +71,7 @@ export default function ProjectCompletePage() {
         primaryLabel={primaryLabel}
         rewardCards={rewardCards}
         stars={progress.stars}
+        template={currentTemplate}
         totalCards={progress.cardIds.length}
       />
 

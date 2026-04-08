@@ -19,7 +19,7 @@ describe('PreviewStage', () => {
     expect(screen.getByText('作品舞台')).toBeInTheDocument()
     expect(
       screen.getByText(
-        '太好了，故事已经从森林走到草地了。再接一句收尾的话，小旅行就更完整了。',
+        '太好了，故事已经成功换到新场景了。再接一句收尾的话，旅行就更完整了。',
       ),
     ).toBeInTheDocument()
   })
@@ -60,5 +60,23 @@ describe('PreviewStage', () => {
         '太好了，第二位朋友也准备好上场了。再接一个动作积木，舞台就会更热闹。',
       ),
     ).toBeInTheDocument()
+  })
+
+  it('uses garden template characters instead of the default fox', () => {
+    render(
+      <PreviewStage
+        blocks={[{ type: 'when_clicked' }, { type: 'move_right' }]}
+        template={{
+          id: 'garden-interaction-stage',
+          name: '花园互动舞台',
+          starterScene: 'garden',
+          starterCharacters: ['butterfly', 'frog'],
+        }}
+      />,
+    )
+
+    expect(screen.getByText('小蝴蝶')).toBeInTheDocument()
+    expect(screen.getByText('小青蛙')).toBeInTheDocument()
+    expect(screen.queryByText('小狐狸')).not.toBeInTheDocument()
   })
 })

@@ -9,10 +9,10 @@ export const foundationVoiceovers: Record<string, string[]> = {
     '点一下，看看小狐狸会不会出场。',
   ],
   'lesson-02-forest-greeting': [
-    '先回看小狐狸出场。',
+    '先让小狐狸出场。',
     '认识说一句话积木。',
-    '先放开始积木。',
-    '再接上说一句话积木。',
+    '再接上一句欢迎话。',
+    '把顺序排成先出场再说话。',
     '选一句你喜欢的话。',
   ],
   'lesson-03-forest-story': [

@@ -61,6 +61,9 @@ export default async function ParentProjectPlaybackPage({
     blocks: normalizeSnapshotBlocks(snapshotRow.snapshot?.blocks),
     lessonCatalog: curriculum.lessons,
   })
+  const currentTemplate = curriculum.templates.find(
+    (item) => item.id === playback.templateId,
+  )
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f5fbff_0%,#fff8ef_100%)] px-4 py-6 md:px-6 md:py-8">
@@ -132,7 +135,7 @@ export default async function ParentProjectPlaybackPage({
             </div>
 
             <div className="mt-5 rounded-[1.9rem] bg-[linear-gradient(180deg,#fff8ef_0%,#f8fbff_100%)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-              <PreviewStage blocks={playback.blocks} />
+              <PreviewStage blocks={playback.blocks} template={currentTemplate} />
             </div>
           </article>
 

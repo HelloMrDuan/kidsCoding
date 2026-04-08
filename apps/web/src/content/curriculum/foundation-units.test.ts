@@ -20,6 +20,21 @@ describe('foundation curriculum seed', () => {
     expect(lessons[2]?.goal).toContain('完整小故事')
   })
 
+  it('builds a visible staircase across the first three lessons', () => {
+    const [lesson1, lesson2, lesson3] = launchLessons.slice(0, 3)
+    const longestChain = (lesson = lesson1) =>
+      Math.max(...lesson.steps.map((step) => step.requiredBlockTypes.length))
+
+    expect(longestChain(lesson1)).toBe(2)
+    expect(longestChain(lesson2)).toBe(3)
+    expect(longestChain(lesson3)).toBe(3)
+    expect(lesson2?.goal).toContain('出场后说一句欢迎的话')
+    expect(lesson2?.steps[0]?.requiredBlockTypes).toEqual([
+      'when_start',
+      'move_right',
+    ])
+  })
+
   it('expands lessons 4 to 6 into the second unit five-step scripts', () => {
     const lessons = launchLessons.slice(3, 6)
 
