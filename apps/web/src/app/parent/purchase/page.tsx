@@ -16,7 +16,7 @@ export default async function ParentPurchasePage({
     const purchaseUnavailable = query.purchase === 'unavailable'
 
     return (
-      <main className="min-h-screen bg-[#fff8ef] px-6 py-10">
+      <main className="kc-scene-shell min-h-screen px-6 py-10">
         <section className="kc-surface-3d mx-auto max-w-4xl space-y-6 rounded-[2rem] p-8">
           <header className="space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">
@@ -81,7 +81,7 @@ export default async function ParentPurchasePage({
 
   const hasLaunchPack = entitlement?.status === 'active'
   return (
-    <main className="min-h-screen bg-[#fff8ef] px-6 py-10">
+    <main className="kc-scene-shell min-h-screen px-6 py-10">
       <section className="kc-surface-3d mx-auto max-w-4xl space-y-6 rounded-[2rem] p-8">
         <header className="space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">

@@ -8,9 +8,19 @@ describe('GrowthPath', () => {
     render(<GrowthPath />)
 
     expect(screen.getByTestId('growth-path')).toBeInTheDocument()
+
+    // 徽章文案为 <p>，使用 getByText 验证
     expect(
-      screen.getByRole('heading', { name: '沿着 4 个启蒙单元慢慢做出自己的故事' }),
+      screen.getByText('沿着 4 个启蒙单元，一步一步做出真正的动画故事'),
     ).toBeInTheDocument()
+
+    // 章节主标题为 <h2>，使用 getByRole 验证标题层级
+    expect(
+      screen.getByRole('heading', {
+        name: '每 2 节学会能力，第 3 节就做出一个完整作品',
+      }),
+    ).toBeInTheDocument()
+
     expect(screen.getByTestId('growth-path-unit-1')).toBeInTheDocument()
     expect(screen.getByTestId('growth-path-unit-2')).toBeInTheDocument()
     expect(screen.getByTestId('growth-path-unit-3')).toBeInTheDocument()

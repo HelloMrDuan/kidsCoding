@@ -7,7 +7,7 @@ export default function BindPage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#fffaf4_0%,#fff2e2_38%,#f5f7ff_100%)] px-6 py-10">
       <section className="mx-auto max-w-2xl space-y-6">
-        <header className="space-y-3">
+        <header className="kc-surface-3d space-y-3 rounded-[2rem] p-6">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">
             保存学习成果
           </p>

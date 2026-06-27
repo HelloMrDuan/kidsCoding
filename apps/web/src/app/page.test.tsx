@@ -7,28 +7,25 @@ describe('HomePage', () => {
   it('renders the learning-first homepage narrative', () => {
     render(<HomePage />)
 
+    // 核心价值主张
     expect(
       screen.getByRole('heading', { name: '孩子可以自己做出动画故事' }),
     ).toBeInTheDocument()
+
+    // 入口层四大 3D 场景模块均存在
+    expect(screen.getByTestId('story-stage-hero')).toBeInTheDocument()
+    expect(screen.getByTestId('growth-path')).toBeInTheDocument()
+    expect(screen.getByTestId('parent-confidence')).toBeInTheDocument()
+    expect(screen.getByTestId('trial-cta')).toBeInTheDocument()
+
+    // 主操作：开始学第一节 → 启蒙入口
     expect(
-      screen.getByText('适合 6-8 岁孩子，从零开始也能自己学'),
-    ).toBeInTheDocument()
+      screen.getByRole('link', { name: '开始学第一节' }),
+    ).toHaveAttribute('href', '/onboarding/age')
+
+    // 家长入口
     expect(
-      screen.getByRole('heading', { name: '三步走进自己的故事舞台' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: '成长记录家长看得见' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: '先免费学会，再决定要不要升级' }),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '免费试听 3 节' })).toHaveAttribute(
-      'href',
-      '/onboarding/age',
-    )
-    expect(screen.getByRole('link', { name: '查看家长成长页' })).toHaveAttribute(
-      'href',
-      '/parent/overview',
-    )
+      screen.getByRole('link', { name: '看看家长如何陪学' }),
+    ).toHaveAttribute('href', '/parent/overview')
   })
 })

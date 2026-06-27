@@ -68,7 +68,7 @@ export default async function ParentProjectPlaybackPage({
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f5fbff_0%,#fff8ef_100%)] px-4 py-6 md:px-6 md:py-8">
       <section className="mx-auto max-w-6xl space-y-6">
-        <header className="grid gap-6 rounded-[2.3rem] bg-white px-6 py-7 shadow-[0_20px_50px_rgba(15,23,42,0.08)] md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <header className="kc-surface-3d grid gap-6 rounded-[2.3rem] px-6 py-7 md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-4">
             <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
               作品回看
