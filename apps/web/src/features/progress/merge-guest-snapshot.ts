@@ -1,3 +1,5 @@
+import { LESSON_COMPLETION_STARS } from '@/features/rewards/award-lesson-completion'
+
 import { normalizeProjectSnapshots } from './project-snapshot'
 
 export function mergeGuestSnapshot({
@@ -34,7 +36,7 @@ export function mergeGuestSnapshot({
     progressRecords: completedLessons.map((lessonId) => ({
       lessonId,
       status: 'completed',
-      stars: snapshot.progress.stars,
+      stars: LESSON_COMPLETION_STARS,
     })),
     badgeRecords: badgeIds.map((badgeType) => ({ badgeType })),
     cardRecords: cardIds.map((cardDefinitionId) => ({

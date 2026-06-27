@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { LESSON_COMPLETION_STARS } from '@/features/rewards/award-lesson-completion'
+
 import { mergeGuestSnapshot } from './merge-guest-snapshot'
 
 describe('mergeGuestSnapshot', () => {
@@ -34,7 +36,11 @@ describe('mergeGuestSnapshot', () => {
       recommendedStartLevel: 'starter',
     })
     expect(result.progressRecords).toEqual([
-      { lessonId: 'trial-01-move-character', status: 'completed', stars: 6 },
+      {
+        lessonId: 'trial-01-move-character',
+        status: 'completed',
+        stars: LESSON_COMPLETION_STARS,
+      },
     ])
     expect(result.badgeRecords).toEqual([{ badgeType: 'first-project' }])
     expect(result.cardRecords).toEqual([
@@ -50,5 +56,57 @@ describe('mergeGuestSnapshot', () => {
         blocks: [],
       },
     ])
+  })
+
+  it('writes per-lesson stars instead of the guest cumulative total', () => {
+    const result = mergeGuestSnapshot({
+      snapshot: {
+        onboarding: { ageBand: 'age_6_8', recommendedLevel: 'starter' },
+        progress: {
+          completedLessonIds: ['lesson-01-forest-hello', 'lesson-02-forest-greeting'],
+          currentLessonId: 'lesson-03-forest-story',
+          stars: 6,
+          badgeIds: [],
+          cardIds: [],
+          streakDays: 1,
+          completedProjectIds: [],
+          projectSnapshots: [],
+        },
+      },
+    })
+
+    expect(result.progressRecords).toHaveLength(2)
+    for (const record of result.progressRecords) {
+      expect(record.stars).toBe(LESSON_COMPLETION_STARS)
+    }
+  })
+
+  it('produces identical records when migration runs twice on the same snapshot', () => {
+    const snapshot = {
+      onboarding: { ageBand: 'age_6_8', recommendedLevel: 'starter' },
+      progress: {
+        completedLessonIds: ['lesson-01-forest-hello', 'lesson-02-forest-greeting'],
+        currentLessonId: 'lesson-03-forest-story',
+        stars: 6,
+        badgeIds: ['lesson-lesson-01-forest-hello'],
+        cardIds: ['theme-forest-fox'],
+        streakDays: 1,
+        completedProjectIds: ['lesson-01-forest-hello'],
+        projectSnapshots: [
+          {
+            lessonId: 'lesson-01-forest-hello',
+            updatedAt: '2026-03-31T10:00:00.000Z',
+            blocks: [{ type: 'when_start' }],
+          },
+        ],
+      },
+    }
+
+    const firstRun = mergeGuestSnapshot({ snapshot })
+    const secondRun = mergeGuestSnapshot({ snapshot })
+
+    expect(secondRun).toEqual(firstRun)
+    expect(secondRun.progressRecords).toHaveLength(2)
+    expect(secondRun.progressRecords.every((record) => record.stars === LESSON_COMPLETION_STARS)).toBe(true)
   })
 })

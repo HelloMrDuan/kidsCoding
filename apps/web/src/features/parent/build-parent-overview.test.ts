@@ -14,7 +14,7 @@ describe('buildParentOverview', () => {
       progressRecords: Array.from({ length: 12 }, (_, index) => ({
         lesson_id: `lesson-${String(index + 1).padStart(2, '0')}`,
         status: 'completed',
-        stars: 36,
+        stars: 3,
       })),
       cardRecords: [
         { card_definition_id: 'growth-first-project' },
@@ -32,6 +32,7 @@ describe('buildParentOverview', () => {
     })
 
     expect(summary.recentProjectCount).toBe(1)
+    expect(summary.earnedStarCount).toBe(36)
     expect(summary.nextAction).toContain('启蒙毕业作品')
     expect(summary.nextAction).toContain('两个角色一起完成的完整故事')
     expect(summary.nextAction).toContain('高阶创作阶段')
@@ -44,7 +45,7 @@ describe('buildParentOverview', () => {
         recommended_start_level: 'starter',
       },
       progressRecords: [
-        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 6 },
+        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 3 },
         { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 3 },
       ],
       cardRecords: [],
@@ -89,8 +90,8 @@ describe('buildParentOverview', () => {
       },
       progressRecords: [
         { lesson_id: 'lesson-01-forest-hello', status: 'completed', stars: 3 },
-        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 6 },
-        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 9 },
+        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 3 },
       ],
       cardRecords: [{ card_definition_id: 'growth-first-project' }],
       badgeRecords: [{ badge_type: 'lesson-lesson-03-forest-story' }],
@@ -104,6 +105,7 @@ describe('buildParentOverview', () => {
       hasLaunchPack: false,
     })
 
+    expect(summary.earnedStarCount).toBe(9)
     expect(summary.nextAction).toContain('第一个完整作品')
     expect(summary.nextAction).toContain('第二单元')
     expect(summary.nextAction).toContain('另一个画面')
@@ -117,11 +119,11 @@ describe('buildParentOverview', () => {
       },
       progressRecords: [
         { lesson_id: 'lesson-01-forest-hello', status: 'completed', stars: 3 },
-        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 6 },
-        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 9 },
-        { lesson_id: 'lesson-04-meadow-scene', status: 'completed', stars: 12 },
-        { lesson_id: 'lesson-05-meadow-order', status: 'completed', stars: 15 },
-        { lesson_id: 'lesson-06-meadow-story', status: 'completed', stars: 18 },
+        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-04-meadow-scene', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-05-meadow-order', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-06-meadow-story', status: 'completed', stars: 3 },
       ],
       cardRecords: [{ card_definition_id: 'theme-meadow-story' }],
       badgeRecords: [{ badge_type: 'lesson-lesson-06-meadow-story' }],
@@ -135,6 +137,7 @@ describe('buildParentOverview', () => {
       hasLaunchPack: false,
     })
 
+    expect(summary.earnedStarCount).toBe(18)
     expect(summary.nextAction).toContain('第二个完整作品')
     expect(summary.nextAction).toContain('第三单元')
     expect(summary.nextAction).toContain('回应点击')
@@ -148,14 +151,14 @@ describe('buildParentOverview', () => {
       },
       progressRecords: [
         { lesson_id: 'lesson-01-forest-hello', status: 'completed', stars: 3 },
-        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 6 },
-        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 9 },
-        { lesson_id: 'lesson-04-meadow-scene', status: 'completed', stars: 12 },
-        { lesson_id: 'lesson-05-meadow-order', status: 'completed', stars: 15 },
-        { lesson_id: 'lesson-06-meadow-story', status: 'completed', stars: 18 },
-        { lesson_id: 'lesson-07-garden-click', status: 'completed', stars: 21 },
-        { lesson_id: 'lesson-08-garden-dialogue', status: 'completed', stars: 24 },
-        { lesson_id: 'lesson-09-garden-story', status: 'completed', stars: 27 },
+        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-03-forest-story', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-04-meadow-scene', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-05-meadow-order', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-06-meadow-story', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-07-garden-click', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-08-garden-dialogue', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-09-garden-story', status: 'completed', stars: 3 },
       ],
       cardRecords: [{ card_definition_id: 'theme-garden-story' }],
       badgeRecords: [{ badge_type: 'lesson-lesson-09-garden-story' }],
@@ -169,8 +172,30 @@ describe('buildParentOverview', () => {
       hasLaunchPack: false,
     })
 
+    expect(summary.earnedStarCount).toBe(27)
     expect(summary.nextAction).toContain('会回应点击的互动故事')
     expect(summary.nextAction).toContain('第四单元')
     expect(summary.nextAction).toContain('启蒙毕业作品')
+  })
+
+  it('sums per-lesson stars instead of taking the maximum', () => {
+    const summary = buildParentOverview({
+      profile: {
+        display_name: '小小创作者',
+        recommended_start_level: 'starter',
+      },
+      progressRecords: [
+        { lesson_id: 'lesson-01-forest-hello', status: 'completed', stars: 3 },
+        { lesson_id: 'lesson-02-forest-greeting', status: 'completed', stars: 3 },
+      ],
+      cardRecords: [],
+      badgeRecords: [],
+      projectSnapshots: [],
+      lessonCatalog: launchLessons,
+      hasLaunchPack: false,
+    })
+
+    expect(summary.earnedStarCount).toBe(6)
+    expect(summary.completedLessonCount).toBe(2)
   })
 })

@@ -74,3 +74,14 @@ export function writeGuestProgress(next: GuestProgress) {
   window.localStorage.setItem(STORAGE_KEY, raw)
   window.dispatchEvent(new Event(CHANGE_EVENT))
 }
+
+export function clearGuestProgress() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  cachedGuestRaw = null
+  cachedGuestSnapshot = defaultGuestProgress
+  window.localStorage.removeItem(STORAGE_KEY)
+  window.dispatchEvent(new Event(CHANGE_EVENT))
+}

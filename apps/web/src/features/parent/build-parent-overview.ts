@@ -73,7 +73,7 @@ export function buildParentOverview({
     (item) => item.status === 'completed',
   ).length
   const earnedStarCount = progressRecords.reduce(
-    (maxStars, item) => Math.max(maxStars, item.stars ?? 0),
+    (totalStars, item) => totalStars + (item.stars ?? 0),
     0,
   )
   const lessonTitles = new Map(lessonCatalog.map((lesson) => [lesson.id, lesson.title]))

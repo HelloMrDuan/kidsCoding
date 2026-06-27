@@ -66,3 +66,14 @@ export function writeOnboardingSession(session: OnboardingSession) {
   window.localStorage.setItem(STORAGE_KEY, raw)
   window.dispatchEvent(new Event(CHANGE_EVENT))
 }
+
+export function clearOnboardingSession() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  cachedOnboardingRaw = null
+  cachedOnboardingSnapshot = defaultOnboardingSession
+  window.localStorage.removeItem(STORAGE_KEY)
+  window.dispatchEvent(new Event(CHANGE_EVENT))
+}

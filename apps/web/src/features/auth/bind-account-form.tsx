@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import { clearOnboardingSession } from '@/features/onboarding/onboarding-session'
+import { clearGuestProgress } from '@/features/progress/local-progress'
+
 export function BindAccountForm({
   requestOtp,
   verifyOtp,
@@ -20,27 +23,55 @@ export function BindAccountForm({
   const [token, setToken] = useState('')
   const [codeSent, setCodeSent] = useState(false)
   const [status, setStatus] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleRequestOtp() {
-    await requestOtp(channel, value)
-    setCodeSent(true)
-    setStatus('验证码已发送，请继续输入。')
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      await requestOtp(channel, value)
+      setCodeSent(true)
+      setStatus('验证码已发送，请继续输入。')
+    } catch {
+      setError('验证码发送失败，请检查邮箱或手机号后重试。')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   async function handleVerify() {
-    await verifyOtp(channel, value, token)
+    setError('')
+    setIsSubmitting(true)
 
-    const response = await fetch('/api/bind-account', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ displayName: '小小创作者' }),
-    })
+    try {
+      await verifyOtp(channel, value, token)
 
-    if (!response.ok) {
-      throw new Error('Failed to bind account')
+      const response = await fetch('/api/bind-account', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ displayName: '小小创作者' }),
+      })
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        setError(
+          payload?.error === 'missing-guest-snapshot'
+            ? '没有找到游客进度，请先在学习地图里完成一节课再绑定。'
+            : '绑定失败，请稍后重试或联系支持。',
+        )
+        return
+      }
+
+      clearGuestProgress()
+      clearOnboardingSession()
+      router.push('/parent/overview')
+    } catch {
+      setError('验证码校验失败，请确认验证码后重试。')
+    } finally {
+      setIsSubmitting(false)
     }
-
-    router.push('/parent/overview')
   }
 
   return (
@@ -83,6 +114,14 @@ export function BindAccountForm({
           value={value}
         />
       </label>
+      {error ? (
+        <p
+          className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700"
+          data-testid="bind-account-error"
+        >
+          {error}
+        </p>
+      ) : null}
       {status ? (
         <p className="rounded-2xl bg-sky-50 px-4 py-3 text-sm font-semibold text-sky-700">
           {status}
@@ -90,11 +129,12 @@ export function BindAccountForm({
       ) : null}
       {!codeSent ? (
         <button
-          className="kc-button-3d w-full rounded-full bg-orange-500 px-5 py-3 font-bold text-white"
+          className="kc-button-3d w-full rounded-full bg-orange-500 px-5 py-3 font-bold text-white disabled:opacity-60"
+          disabled={isSubmitting}
           onClick={handleRequestOtp}
           type="button"
         >
-          发送验证码
+          {isSubmitting ? '正在发送…' : '发送验证码'}
         </button>
       ) : (
         <>
@@ -107,11 +147,13 @@ export function BindAccountForm({
             />
           </label>
           <button
-            className="kc-button-3d w-full rounded-full bg-sky-600 px-5 py-3 font-bold text-white"
+            className="kc-button-3d w-full rounded-full bg-sky-600 px-5 py-3 font-bold text-white disabled:opacity-60"
+            data-testid="bind-account-submit"
+            disabled={isSubmitting}
             onClick={handleVerify}
             type="button"
           >
-            保存我的进度
+            {isSubmitting ? '正在保存…' : '保存我的进度'}
           </button>
         </>
       )}
