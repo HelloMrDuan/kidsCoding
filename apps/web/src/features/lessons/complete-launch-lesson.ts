@@ -25,12 +25,13 @@ export function completeLaunchLesson({
 }: CompleteLaunchLessonInput): GuestProgress {
   const lessonIndex = lessons.findIndex((item) => item.id === lesson.id)
   const nextLessonId = lessons[lessonIndex + 1]?.id ?? lesson.id
+  const alreadyCompleted = progress.completedLessonIds.includes(lesson.id)
 
   return {
     ...progress,
     completedLessonIds: [...new Set([...progress.completedLessonIds, lesson.id])],
     currentLessonId: nextLessonId,
-    stars: progress.stars + reward.stars,
+    stars: alreadyCompleted ? progress.stars : progress.stars + reward.stars,
     badgeIds: [...new Set([...progress.badgeIds, ...reward.badgeIds])],
     cardIds: [...new Set([...progress.cardIds, ...reward.cardIds])],
     completedProjectIds: [

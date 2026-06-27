@@ -1,3 +1,5 @@
+export const LESSON_COMPLETION_STARS = 3
+
 type AwardLessonCompletionInput = {
   lessonId: string
   rewardCardId: string
@@ -24,7 +26,7 @@ export function awardLessonCompletion({
   }
 
   return {
-    stars: 3,
+    stars: LESSON_COMPLETION_STARS,
     badgeIds: [...new Set(badgeIds)],
     cardIds: [...new Set(cardIds)],
   }
