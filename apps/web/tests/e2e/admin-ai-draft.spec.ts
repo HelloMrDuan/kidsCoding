@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { FIRST_LAUNCH_LESSON_ID } from './_fixtures/curriculum'
+
 test('admin can trigger AI draft generation from the lesson editor', async ({
   page,
 }) => {
@@ -9,14 +11,14 @@ test('admin can trigger AI draft generation from the lesson editor', async ({
     })
   })
   await page.route(
-    '**/api/admin/ai/lessons/trial-01-move-character/generate-draft',
+    `**/api/admin/ai/lessons/${FIRST_LAUNCH_LESSON_ID}/generate-draft`,
     async (route) => {
       await route.fulfill({
         json: {
           ok: true,
           issues: [],
           lesson: {
-            id: 'trial-01-move-character',
+            id: FIRST_LAUNCH_LESSON_ID,
             title: 'AI 新标题',
             goal: 'AI 新目标',
             steps: [
@@ -54,7 +56,7 @@ test('admin can trigger AI draft generation from the lesson editor', async ({
     },
   )
 
-  await page.goto('/admin/lessons/trial-01-move-character')
+  await page.goto(`/admin/lessons/${FIRST_LAUNCH_LESSON_ID}`)
   await page.getByTestId('admin-generate-skeleton').click()
   await expect(page.getByText('整套课程骨架已生成')).toBeVisible()
   await page.getByTestId('admin-generate-draft').click()
