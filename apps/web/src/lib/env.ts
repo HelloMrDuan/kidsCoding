@@ -33,7 +33,20 @@ export function getLocalSupabaseAdminEmail(
   return (env.LOCAL_SUPABASE_ADMIN_EMAIL ?? '').trim()
 }
 
+// In E2E test mode the app must behave as if Supabase were absent, even when
+// `.env.local` leaks real values into the build (Next.js inlines
+// NEXT_PUBLIC_* at build time, and `next start` loads `.env.local` for
+// non-public vars). Route handlers and server components rely on these
+// helpers to return 503 / render the no-Supabase branch, which the
+// admin-authorization and parent E2E suites assert against.
+function isSupabaseTestMode() {
+  return (process.env.NEXT_PUBLIC_SUPABASE_TEST_MODE ?? '').trim() === 'true'
+}
+
 export function hasSupabaseEnv() {
+  if (isSupabaseTestMode()) {
+    return false
+  }
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
@@ -41,6 +54,9 @@ export function hasSupabaseEnv() {
 }
 
 export function hasServiceRoleEnv() {
+  if (isSupabaseTestMode()) {
+    return false
+  }
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
       process.env.SUPABASE_SERVICE_ROLE_KEY,

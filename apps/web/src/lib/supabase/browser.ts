@@ -40,18 +40,24 @@ export function resolveBrowserSupabaseConfig(
   // time. (Dynamic access like process.env[name] or via an alias variable is
   // NOT inlined and resolves to undefined in production builds, which would
   // break the browser Supabase client.)
+  //
+  // When an explicit env is passed (unit tests), use it exclusively and do
+  // NOT fall back to process.env — otherwise a developer's .env.local would
+  // leak into tests and mask the very misconfiguration paths the tests
+  // assert against.
+  const useProcessEnv = env === undefined
   const url = (
-    env?.NEXT_PUBLIC_SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+    (useProcessEnv ? process.env.NEXT_PUBLIC_SUPABASE_URL : env!.NEXT_PUBLIC_SUPABASE_URL) ?? ''
   ).trim()
   const key = (
-    env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-    ''
+    (useProcessEnv
+      ? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+      : env!.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ?? ''
   ).trim()
   const testMode = (
-    env?.NEXT_PUBLIC_SUPABASE_TEST_MODE ??
-    process.env.NEXT_PUBLIC_SUPABASE_TEST_MODE ??
-    ''
+    (useProcessEnv
+      ? process.env.NEXT_PUBLIC_SUPABASE_TEST_MODE
+      : env!.NEXT_PUBLIC_SUPABASE_TEST_MODE) ?? ''
   ).trim() === 'true'
 
   if (url && key) {

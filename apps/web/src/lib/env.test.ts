@@ -1,8 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   getCnPaymentProviderEnv,
   hasAiEnv,
+  hasServiceRoleEnv,
+  hasSupabaseEnv,
   isAdminBypassEnabled,
   parseAiProviderSlots,
   resolveAiProviderSelection,
@@ -199,5 +201,61 @@ describe('isAdminBypassEnabled', () => {
         NEXT_PUBLIC_SUPABASE_TEST_MODE: '  true  ',
       }),
     ).toBe(true)
+  })
+})
+
+// hasSupabaseEnv / hasServiceRoleEnv read process.env directly (they are used
+// by server components and route handlers that cannot accept an env arg).
+// We stub process.env to exercise the test-mode short-circuit, which prevents
+// `.env.local` leakage from turning 503 responses into 500s in E2E builds.
+describe('hasSupabaseEnv / hasServiceRoleEnv test-mode guard', () => {
+  const keys = [
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
+    'NEXT_PUBLIC_SUPABASE_TEST_MODE',
+    'SUPABASE_SERVICE_ROLE_KEY',
+  ] as const
+  const saved: Record<string, string | undefined> = {}
+
+  beforeEach(() => {
+    for (const k of keys) saved[k] = process.env[k]
+  })
+  afterEach(() => {
+    for (const k of keys) {
+      if (saved[k] === undefined) delete process.env[k]
+      else process.env[k] = saved[k]
+    }
+    vi.unstubAllEnvs()
+  })
+
+  it('returns true when Supabase env is present and test mode is off', () => {
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'pk')
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'sk')
+    delete process.env.NEXT_PUBLIC_SUPABASE_TEST_MODE
+    expect(hasSupabaseEnv()).toBe(true)
+    expect(hasServiceRoleEnv()).toBe(true)
+  })
+
+  it('returns false in test mode even when Supabase env would be present', () => {
+    // Simulates `.env.local` leaking real values into a Playwright build:
+    // NEXT_PUBLIC_* are inlined at build time, so the runtime sees real
+    // values. Test mode must force the no-Supabase branch so admin APIs
+    // return 503 instead of reaching assertAdminUser and throwing 500.
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_TEST_MODE', 'true')
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'pk')
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'sk')
+    expect(hasSupabaseEnv()).toBe(false)
+    expect(hasServiceRoleEnv()).toBe(false)
+  })
+
+  it('returns false when Supabase env is absent', () => {
+    delete process.env.NEXT_PUBLIC_SUPABASE_TEST_MODE
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY
+    expect(hasSupabaseEnv()).toBe(false)
+    expect(hasServiceRoleEnv()).toBe(false)
   })
 })
