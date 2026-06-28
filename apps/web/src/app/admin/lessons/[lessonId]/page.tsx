@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import { assertAdminUser } from '@/features/admin/admin-auth'
 import { LessonEditor } from '@/features/admin/lesson-editor'
 import { loadAdminLessonPageData } from '@/features/admin/load-admin-lessons'
-import { hasSupabaseEnv } from '@/lib/env'
+import { hasSupabaseEnv, isAdminBypassEnabled } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export default async function AdminLessonPage({
@@ -20,6 +20,8 @@ export default async function AdminLessonPage({
     } catch {
       redirect('/auth/bind')
     }
+  } else if (!isAdminBypassEnabled()) {
+    redirect('/auth/bind')
   }
 
   const { lessonId } = await params

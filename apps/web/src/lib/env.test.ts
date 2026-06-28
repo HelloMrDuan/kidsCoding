@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getCnPaymentProviderEnv,
   hasAiEnv,
+  isAdminBypassEnabled,
   parseAiProviderSlots,
   resolveAiProviderSelection,
 } from './env'
@@ -118,5 +119,85 @@ describe('getCnPaymentProviderEnv', () => {
       appSecret: 'demo-app-secret',
       webhookSecret: 'demo-webhook-secret',
     })
+  })
+})
+
+describe('isAdminBypassEnabled', () => {
+  it('returns false when bypass flag is absent', () => {
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'development',
+      }),
+    ).toBe(false)
+  })
+
+  it('returns false when bypass flag is not true', () => {
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'development',
+        ENABLE_ADMIN_BYPASS: 'false',
+      }),
+    ).toBe(false)
+  })
+
+  it('returns false in production without test mode even if flag is true', () => {
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'production',
+        ENABLE_ADMIN_BYPASS: 'true',
+      }),
+    ).toBe(false)
+  })
+
+  it('returns true in non-production when flag is true (local dev path)', () => {
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'development',
+        ENABLE_ADMIN_BYPASS: 'true',
+      }),
+    ).toBe(true)
+
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'test',
+        ENABLE_ADMIN_BYPASS: 'true',
+      }),
+    ).toBe(true)
+  })
+
+  it('returns true in production when both test mode and bypass flag are set (E2E path)', () => {
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'production',
+        ENABLE_ADMIN_BYPASS: 'true',
+        NEXT_PUBLIC_SUPABASE_TEST_MODE: 'true',
+      }),
+    ).toBe(true)
+  })
+
+  it('returns false in production with test mode but without bypass flag', () => {
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'production',
+        NEXT_PUBLIC_SUPABASE_TEST_MODE: 'true',
+      }),
+    ).toBe(false)
+  })
+
+  it('trims whitespace from flag values', () => {
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'development',
+        ENABLE_ADMIN_BYPASS: '  true  ',
+      }),
+    ).toBe(true)
+
+    expect(
+      isAdminBypassEnabled({
+        NODE_ENV: 'production',
+        ENABLE_ADMIN_BYPASS: '  true  ',
+        NEXT_PUBLIC_SUPABASE_TEST_MODE: '  true  ',
+      }),
+    ).toBe(true)
   })
 })

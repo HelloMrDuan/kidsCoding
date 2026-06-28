@@ -5,7 +5,7 @@ import { AiSettingsCard } from '@/features/admin/ai-settings-card'
 import { CourseList } from '@/features/admin/course-list'
 import { PaymentReconcileCard } from '@/features/admin/payment-reconcile-card'
 import { loadAdminDashboardData } from '@/features/admin/load-admin-lessons'
-import { hasSupabaseEnv } from '@/lib/env'
+import { hasSupabaseEnv, isAdminBypassEnabled } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export default async function AdminPage() {
@@ -18,6 +18,10 @@ export default async function AdminPage() {
     } catch {
       redirect('/auth/bind')
     }
+  } else if (!isAdminBypassEnabled()) {
+    // Without Supabase configured, admin pages would render with no auth
+    // check. Only allow an explicit non-production bypass; otherwise refuse.
+    redirect('/auth/bind')
   }
 
   const dashboardData = await loadAdminDashboardData()

@@ -47,6 +47,39 @@ export function hasServiceRoleEnv() {
   )
 }
 
+// Admin pages must enforce server-side auth when Supabase is configured.
+// When Supabase is NOT configured (e.g. local dev without Docker, or E2E
+// route-mock environments), admin pages would otherwise render content with
+// no auth check at all — a real authorization bypass.
+//
+// The bypass is allowed ONLY when one of the following holds:
+//   1. NEXT_PUBLIC_SUPABASE_TEST_MODE is 'true' (explicit E2E/test opt-in)
+//      AND ENABLE_ADMIN_BYPASS is 'true'. This is the path used by Playwright,
+//      which runs against a production build (NODE_ENV=production) but with
+//      test-only env injected at `next start` time.
+//   2. NODE_ENV is not 'production' AND ENABLE_ADMIN_BYPASS is 'true'. This
+//      is the local-dev path (`next dev`).
+//
+// Rationale: a real production deployment never sets
+// NEXT_PUBLIC_SUPABASE_TEST_MODE=true, so the first path cannot fire in prod.
+// The second path is guarded by NODE_ENV, which `next start` forces to
+// 'production'. Both paths require the explicit ENABLE_ADMIN_BYPASS flag.
+export function isAdminBypassEnabled(
+  env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
+) {
+  const bypassFlag = (env.ENABLE_ADMIN_BYPASS ?? '').trim() === 'true'
+  if (!bypassFlag) {
+    return false
+  }
+
+  const testMode = (env.NEXT_PUBLIC_SUPABASE_TEST_MODE ?? '').trim() === 'true'
+  if (testMode) {
+    return true
+  }
+
+  return env.NODE_ENV !== 'production'
+}
+
 export function getDefaultPaymentProvider(
   env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
 ) {
