@@ -4,7 +4,7 @@ import type {
   StartLevel,
 } from '@/features/domain/types'
 
-const STORAGE_KEY = 'kc-onboarding'
+export const ONBOARDING_SESSION_STORAGE_KEY = 'kc-onboarding'
 const CHANGE_EVENT = 'kc-onboarding-change'
 
 export type OnboardingSession = {
@@ -27,7 +27,7 @@ export function readOnboardingSession(): OnboardingSession {
     return defaultOnboardingSession
   }
 
-  const raw = window.localStorage.getItem(STORAGE_KEY)
+  const raw = window.localStorage.getItem(ONBOARDING_SESSION_STORAGE_KEY)
 
   if (raw === cachedOnboardingRaw) {
     return cachedOnboardingSnapshot
@@ -63,7 +63,7 @@ export function writeOnboardingSession(session: OnboardingSession) {
   const raw = JSON.stringify(session)
   cachedOnboardingRaw = raw
   cachedOnboardingSnapshot = session
-  window.localStorage.setItem(STORAGE_KEY, raw)
+  window.localStorage.setItem(ONBOARDING_SESSION_STORAGE_KEY, raw)
   window.dispatchEvent(new Event(CHANGE_EVENT))
 }
 
@@ -74,6 +74,6 @@ export function clearOnboardingSession() {
 
   cachedOnboardingRaw = null
   cachedOnboardingSnapshot = defaultOnboardingSession
-  window.localStorage.removeItem(STORAGE_KEY)
+  window.localStorage.removeItem(ONBOARDING_SESSION_STORAGE_KEY)
   window.dispatchEvent(new Event(CHANGE_EVENT))
 }

@@ -34,7 +34,15 @@ export function PurchaseSuccessView({ orderId }: { orderId: string }) {
       }
 
       const payload = (await response.json()) as OrderStatusPayload
-      const nextStatus = payload.unlocked ? 'paid' : payload.status
+      // The API normalizes paid-but-not-unlocked to pending, but defend against
+      // any upstream inconsistency: only surface the unlocked state once the
+      // entitlement is actually active, and keep polling otherwise.
+      let nextStatus: PaymentOrderStatus = payload.status
+      if (payload.unlocked) {
+        nextStatus = 'paid'
+      } else if (payload.status === 'paid') {
+        nextStatus = 'pending'
+      }
 
       setStatus(nextStatus)
       if (

@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'kc-progress'
+export const GUEST_PROGRESS_STORAGE_KEY = 'kc-progress'
 const CHANGE_EVENT = 'kc-progress-change'
 
 export type GuestProgress = {
@@ -35,7 +35,7 @@ export function readGuestProgress(): GuestProgress {
     return defaultGuestProgress
   }
 
-  const raw = window.localStorage.getItem(STORAGE_KEY)
+  const raw = window.localStorage.getItem(GUEST_PROGRESS_STORAGE_KEY)
 
   if (raw === cachedGuestRaw) {
     return cachedGuestSnapshot
@@ -71,7 +71,7 @@ export function writeGuestProgress(next: GuestProgress) {
   const raw = JSON.stringify(next)
   cachedGuestRaw = raw
   cachedGuestSnapshot = next
-  window.localStorage.setItem(STORAGE_KEY, raw)
+  window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, raw)
   window.dispatchEvent(new Event(CHANGE_EVENT))
 }
 
@@ -82,6 +82,6 @@ export function clearGuestProgress() {
 
   cachedGuestRaw = null
   cachedGuestSnapshot = defaultGuestProgress
-  window.localStorage.removeItem(STORAGE_KEY)
+  window.localStorage.removeItem(GUEST_PROGRESS_STORAGE_KEY)
   window.dispatchEvent(new Event(CHANGE_EVENT))
 }

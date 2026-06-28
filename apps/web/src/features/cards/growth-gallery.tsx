@@ -97,11 +97,13 @@ function SummaryTotem({
   label,
   value,
   accent,
+  testId,
 }: {
   icon: string
   label: string
   value: number
   accent: 'amber' | 'sky' | 'orange'
+  testId?: string
 }) {
   const accentStyles = {
     amber:
@@ -112,7 +114,10 @@ function SummaryTotem({
   } as const
 
   return (
-    <article className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/82 p-5 backdrop-blur-sm">
+    <article
+      className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/82 p-5 backdrop-blur-sm"
+      data-testid={testId}
+    >
       <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.8)_0%,rgba(255,255,255,0)_72%)]" />
       <div
         className={`relative flex h-14 w-14 items-center justify-center rounded-[1.3rem] bg-gradient-to-br text-2xl ${accentStyles[accent]}`}
@@ -233,6 +238,8 @@ function CollectionCard({
     <article
       key={id}
       className={`group relative overflow-hidden rounded-[2.1rem] border p-4 transition duration-300 hover:-translate-y-1 ${style.card}`}
+      data-testid={`collection-card-${id}`}
+      data-earned={isEarned ? 'true' : 'false'}
     >
       <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.85)_0%,rgba(255,255,255,0)_72%)]" />
       <div className={`absolute inset-x-5 top-20 h-px bg-gradient-to-r ${style.line}`} />
@@ -291,7 +298,10 @@ export function GrowthGallery({ gallery }: { gallery: GrowthGalleryData }) {
         <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <SectionEyebrow tone="amber">成长收藏馆</SectionEyebrow>
-            <h1 className="mt-5 text-4xl font-black leading-tight text-slate-950 md:text-[3.8rem]">
+            <h1
+              className="mt-5 text-4xl font-black leading-tight text-slate-950 md:text-[3.8rem]"
+              data-testid="cards-heading"
+            >
               把做出来的每一步
               <br />
               好好收进自己的展馆
@@ -302,9 +312,9 @@ export function GrowthGallery({ gallery }: { gallery: GrowthGalleryData }) {
           </div>
 
           <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1">
-            <SummaryTotem accent="amber" icon="★" label="已获得星星" value={gallery.summary.stars} />
-            <SummaryTotem accent="sky" icon="✦" label="已解锁勋章" value={gallery.summary.badgeCount} />
-            <SummaryTotem accent="orange" icon="▣" label="已收集卡片" value={gallery.summary.cardCount} />
+            <SummaryTotem accent="amber" icon="★" label="已获得星星" testId="cards-star-count" value={gallery.summary.stars} />
+            <SummaryTotem accent="sky" icon="✦" label="已解锁勋章" testId="cards-badge-count" value={gallery.summary.badgeCount} />
+            <SummaryTotem accent="orange" icon="▣" label="已收集卡片" testId="cards-collected-count" value={gallery.summary.cardCount} />
           </div>
         </div>
       </section>
@@ -347,6 +357,7 @@ export function GrowthGallery({ gallery }: { gallery: GrowthGalleryData }) {
                   ? 'border-slate-900 bg-slate-900 text-white shadow-[0_14px_24px_rgba(15,23,42,0.16)]'
                   : 'border-white bg-white/86 text-slate-700 shadow-[0_10px_20px_rgba(15,23,42,0.06)]'
               }`}
+              data-testid={`cards-rarity-filter-${rarity}`}
               onClick={() => setRarityFilter(rarity)}
               type="button"
             >
