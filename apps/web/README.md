@@ -206,3 +206,61 @@ npm run local:supabase:setup
 2. 微信扫码成功后 webhook 能把订单推进到 `paid`
 3. 正式课程权益会自动解锁
 4. 关闭 webhook 或延迟回调时，管理员重试同步仍能补齐订单状态
+
+## 生产部署
+
+### 运行环境
+
+- Node.js `^20.19.0`（LTS），npm `^10.8.2`
+- 在部署机上确认：`node --version`、`npm --version`
+- 不需要全局安装 Supabase CLI；本地联调才用 `npm run local:supabase:install-cli`
+
+### 安装与构建
+
+```bash
+cd apps/web
+npm install
+npm run env:check:prod   # 关键配置缺失会以非零退出码失败
+npm run build
+npm run start -- --hostname 0.0.0.0 --port 3000
+```
+
+- `npm ci` 可替代 `npm install` 以严格复现 lock 文件
+- `next start` 默认监听 `3000`，可用 `--hostname` / `--port` 覆盖
+- 生产进程建议用 PM2 / systemd / 容器编排管理，不要裸跑
+
+### 环境变量清单
+
+完整变量见 `.env.example`。生产部署必须配置：
+
+- Supabase：`NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`、`SUPABASE_SERVICE_ROLE_KEY`
+- 支付（按 provider 选配）：`STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`，或 `PAYMENT_PROVIDER_DEFAULT=aggregated_cn` + 连连四件套
+- AI：`AI_PROVIDER_MODE=openai_compatible` + 至少一个完整 provider slot
+- 应用：`NEXT_PUBLIC_APP_URL`、`ADMIN_SETUP_TOKEN`
+
+### Supabase 初始化与数据库迁移
+
+1. 在 Supabase 控制台创建项目，记录 URL 与 anon/service key
+2. 按 `apps/web/supabase/migrations/` 下文件名时间戳顺序执行迁移（本地联调用 `npm run local:supabase:setup`，生产用 Supabase 控制台或 CI 任务）
+3. 首次部署后通过 `/setup/admin?token=<ADMIN_SETUP_TOKEN>` 开通首个管理员
+4. 只要存在任一管理员，开通入口自动关闭
+
+### 健康检查
+
+- Liveness：`GET /api/health` 返回 `200 {"status":"ok"}`
+- 该端点不访问 Supabase 或支付网络，仅确认进程存活
+- 深度就绪检查（数据库连通性、支付连通性）请由外部监控单独覆盖
+
+### 回滚
+
+- 应用层：保留上一个构建产物目录，重新部署上一版 `.next` + 重启进程；或回退到上一个 git tag 重新 `npm run build && npm run start`
+- 数据库：Supabase 迁移需自行准备 down migration 或项目级快照恢复；不要在生产直接重置
+- 配置：`.env.local` 变更需记录变更点，回滚时同步恢复
+
+### E2E 与测试模式
+
+- 安装 Playwright 浏览器：`npx playwright install --with-deps`
+- 跑全量 E2E：`npm run test:e2e`（等价于 `npx playwright test`）
+- E2E 通过 `NEXT_PUBLIC_SUPABASE_TEST_MODE=true` + `ENABLE_ADMIN_BYPASS=true` 让生产构建在无 Supabase 环境下跑通 admin 与家长流程，所有数据链路用 `page.route` mock
+- **这两个变量只能用于 E2E**：`NEXT_PUBLIC_SUPABASE_TEST_MODE=true` 会让服务端把所有 Supabase 相关分支视为未配置（API 返回 503、页面走降级分支），生产环境绝对不能设置
+- **生产禁止启用 Admin bypass**：`ENABLE_ADMIN_BYPASS=true` 会让 `/admin` 页面在无 Supabase 时跳过鉴权；生产环境必须保证 `ENABLE_ADMIN_BYPASS` 未设置或为 `false`，且 `NEXT_PUBLIC_SUPABASE_TEST_MODE` 未设置
