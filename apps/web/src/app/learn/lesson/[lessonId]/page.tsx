@@ -18,6 +18,12 @@ import { GuidedLessonShell } from '@/features/lessons/guided-lesson-shell'
 import { TemplateStoryBuilder } from '@/features/lessons/template-story-builder'
 import { readOnboardingSession } from '@/features/onboarding/onboarding-session'
 import {
+  clearLessonDraft,
+  clearLessonDraftsForLesson,
+  loadLessonDraft,
+  saveLessonDraft,
+} from '@/features/progress/lesson-draft'
+import {
   readGuestProgress,
   writeGuestProgress,
 } from '@/features/progress/local-progress'
@@ -34,18 +40,47 @@ export default function LessonPage() {
   const { allLessons } = buildLaunchMap(curriculum.lessons)
   const lesson = allLessons.find((item) => item.id === lessonId)
   const [stepIndex, setStepIndex] = useState(0)
-  const [blocks, setBlocks] = useState<Array<{ type: string }>>([])
-  const blocksRef = useRef<Array<{ type: string }>>([])
+  const [blocks, setBlocks] = useState<Array<{ type: string }>>(() => {
+    if (!lessonId) {
+      return []
+    }
+    const draft = loadLessonDraft(lessonId, 0)
+    return draft && draft.blocks.length > 0 ? draft.blocks : []
+  })
+  const blocksRef = useRef<Array<{ type: string }>>(blocks)
   const [feedback, setFeedback] = useState<string>(() =>
     getFoundationLessonFeedback(lessonId ?? '', 'initial'),
   )
   const [failedAttempts, setFailedAttempts] = useState(0)
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
 
-  const handleSnapshotChange = useCallback((nextBlocks: Array<{ type: string }>) => {
-    blocksRef.current = nextBlocks
-    setBlocks(nextBlocks)
-  }, [])
+  const handleSnapshotChange = useCallback(
+    (nextBlocks: Array<{ type: string }>) => {
+      blocksRef.current = nextBlocks
+      setBlocks(nextBlocks)
+
+      if (lessonId) {
+        saveLessonDraft(lessonId, stepIndex, nextBlocks)
+      }
+    },
+    [lessonId, stepIndex],
+  )
+
+  const goToStep = useCallback(
+    (nextStepIndex: number) => {
+      const draft = lessonId
+        ? loadLessonDraft(lessonId, nextStepIndex)
+        : null
+      // Carry the current blocks forward when there is no saved draft for the
+      // next step. Only a saved draft should override the in-progress blocks.
+      const nextBlocks =
+        draft && draft.blocks.length > 0 ? draft.blocks : blocksRef.current
+      blocksRef.current = nextBlocks
+      setBlocks(nextBlocks)
+      setStepIndex(nextStepIndex)
+    },
+    [lessonId],
+  )
 
   useEffect(() => {
     let isActive = true
@@ -131,7 +166,8 @@ export default function LessonPage() {
     setFailedAttempts(0)
 
     if (stepIndex < currentLesson.steps.length - 1) {
-      setStepIndex(stepIndex + 1)
+      clearLessonDraft(currentLesson.id, stepIndex)
+      goToStep(stepIndex + 1)
       setFeedback(getFoundationLessonFeedback(currentLesson.id, 'progress'))
       return
     }
@@ -157,6 +193,7 @@ export default function LessonPage() {
       onboarding: readOnboardingSession(),
       progress: nextProgress,
     })
+    clearLessonDraftsForLesson(currentLesson.id)
     router.push(`/project/${currentLesson.id}/complete`)
   }
 
