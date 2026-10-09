@@ -78,11 +78,14 @@ test.describe('reward idempotency', () => {
     await page.getByTestId('lesson-add-when_start').click()
     await page.getByTestId('lesson-add-move_right').click()
     await page.getByTestId('lesson-complete-step').click()
-    // Remaining steps progressively allow say_line; keep adding the required blocks.
+    // Step 2 requires when_start + move_right (already there)
+    await page.getByTestId('lesson-complete-step').click()
+    // Step 3 requires say_line added
     await page.getByTestId('lesson-add-say_line').click()
     await page.getByTestId('lesson-complete-step').click()
+    // Step 4 requires when_start + move_right + say_line (already there)
     await page.getByTestId('lesson-complete-step').click()
-    await page.getByTestId('lesson-complete-step').click()
+    // Step 5 requires when_start + move_right + say_line (already there)
     await page.getByTestId('lesson-complete-step').click()
 
     await page.waitForURL('**/project/lesson-02-forest-greeting/complete')
