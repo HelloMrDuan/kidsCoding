@@ -303,6 +303,7 @@ export default function LessonPage() {
                   blocks={blocks}
                   template={currentTemplate}
                   requiredBlocks={step.requiredBlockTypes}
+                  stepIndex={stepIndex}
                   onRunSuccess={handleRunSuccess}
                   onRunClear={handleRunClear}
                 />

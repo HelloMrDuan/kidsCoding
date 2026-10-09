@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 
 export type ExecutionState = 'idle' | 'running' | 'success' | 'error'
 
-export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks: string[]) {
+export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks: string[], stepIndex: number = 0) {
   const [executionState, setExecutionState] = useState<ExecutionState>('idle')
   const [characterPosition, setCharacterPosition] = useState(0)
   const [characterMessage, setCharacterMessage] = useState<string | null>(null)
@@ -22,8 +22,8 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
 
     setExecutionState('running')
 
-    // Check if blocks match required
-    if (blocks.length < requiredBlocks.length || !requiredBlocks.every((b, i) => b === blocks[i]?.type)) {
+    // Check if blocks match required exactly
+    if (blocks.length !== requiredBlocks.length || !requiredBlocks.every((b, i) => b === blocks[i]?.type)) {
       setExecutionState('error')
       return
     }
@@ -59,11 +59,12 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
     setExecutionState('success')
   }, [blocks, requiredBlocks, reset])
 
-  // Watch blocks stringified to detect changes and reset
+  // Watch blocks stringified and stepIndex to detect changes and reset
   const blocksKey = JSON.stringify(blocks)
+  const requiredKey = JSON.stringify(requiredBlocks)
   useEffect(() => {
     reset()
-  }, [blocksKey, reset])
+  }, [blocksKey, requiredKey, stepIndex, reset])
 
   // Component unmount cleanup
   useEffect(() => {

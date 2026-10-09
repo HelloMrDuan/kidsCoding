@@ -55,12 +55,14 @@ export function PlayableStage({
   blocks,
   template,
   requiredBlocks,
+  stepIndex,
   onRunSuccess,
   onRunClear,
 }: {
   blocks: Array<{ type: string }>
   template?: ProjectTemplateDefinition
   requiredBlocks: string[]
+  stepIndex: number
   onRunSuccess: () => void
   onRunClear?: () => void
 }) {
@@ -70,7 +72,7 @@ export function PlayableStage({
     characterMessage,
     run,
     reset,
-  } = useBlockExecutor(blocks, requiredBlocks)
+  } = useBlockExecutor(blocks, requiredBlocks, stepIndex)
 
   const { mainLabel, secondLabel, sceneCopy } = getTemplateCharacterLabels(template)
 
