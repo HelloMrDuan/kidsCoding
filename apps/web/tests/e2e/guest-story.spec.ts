@@ -10,15 +10,30 @@ test('guest user can reach the first completed project', async ({ page }) => {
   await page.getByTestId('assessment-option-logic-branch_story').click()
   await page.getByTestId('lesson-link-lesson-01-forest-hello').click()
   await page.getByTestId('lesson-add-when_start').click()
+  await page.getByTestId('run-code-button').click()
+  await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
   await page.getByTestId('lesson-complete-step').click()
+  await page.getByTestId('run-code-button').click()
+  await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
   await page.getByTestId('lesson-complete-step').click()
+  await page.getByTestId('run-code-button').click()
+  await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
   await page.getByTestId('lesson-complete-step').click()
   await page.getByTestId('lesson-add-move_right').click()
-  await expect(
-    page.getByText('太好了，角色已经走上舞台了。再接一句话，故事就会更完整。'),
-  ).toBeVisible()
+
+  // Need to run the code for the playable stage
+  await page.getByTestId('run-code-button').click()
+
+  // Wait for run to finish and success message
+  await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
+
   await page.getByTestId('lesson-complete-step').click()
+
+  // Since we run the code and require run success on step 4 and 5:
+  await page.getByTestId('run-code-button').click()
+  await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
   await page.getByTestId('lesson-complete-step').click()
+
   await page.waitForURL('**/project/lesson-01-forest-hello/complete')
 
   await expect(page.getByTestId('project-complete-heading')).toBeVisible()

@@ -28,11 +28,21 @@ test.describe('reward idempotency', () => {
 
     // Replay all five steps of lesson-01.
     await page.getByTestId('lesson-add-when_start').click()
+    await page.getByTestId('run-code-button').click()
+    await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
     await page.getByTestId('lesson-complete-step').click()
+    await page.getByTestId('run-code-button').click()
+    await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
     await page.getByTestId('lesson-complete-step').click()
+    await page.getByTestId('run-code-button').click()
+    await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
     await page.getByTestId('lesson-complete-step').click()
     await page.getByTestId('lesson-add-move_right').click()
+    await page.getByTestId('run-code-button').click()
+    await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
     await page.getByTestId('lesson-complete-step').click()
+    await page.getByTestId('run-code-button').click()
+    await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
     await page.getByTestId('lesson-complete-step').click()
 
     await page.waitForURL('**/project/lesson-01-forest-hello/complete')

@@ -11,6 +11,7 @@ import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum
 import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { evaluateStep } from '@/features/lessons/blockly/evaluate-step'
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
+import { PlayableStage } from '@/features/lessons/playable-stage'
 import { buildHintState } from '@/features/lessons/build-hint-state'
 import { completeLaunchLesson } from '@/features/lessons/complete-launch-lesson'
 import { getFoundationLessonFeedback } from '@/features/lessons/foundation-lesson-feedback'
@@ -53,6 +54,7 @@ export default function LessonPage() {
   )
   const [failedAttempts, setFailedAttempts] = useState(0)
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
+  const [hasRunSuccess, setHasRunSuccess] = useState(false)
 
   const handleSnapshotChange = useCallback(
     (nextBlocks: Array<{ type: string }>) => {
@@ -78,9 +80,14 @@ export default function LessonPage() {
       blocksRef.current = nextBlocks
       setBlocks(nextBlocks)
       setStepIndex(nextStepIndex)
+      setHasRunSuccess(false)
     },
-    [lessonId],
+    [lessonId, setHasRunSuccess],
   )
+
+  const handleRunSuccess = useCallback(() => {
+    setHasRunSuccess(true)
+  }, [setHasRunSuccess])
 
   useEffect(() => {
     let isActive = true
@@ -148,7 +155,11 @@ export default function LessonPage() {
   }
 
   async function handleNext() {
-    if (!evaluateStep(step.requiredBlockTypes, blocksRef.current)) {
+    const isPlayableLesson = currentLesson.id === 'lesson-01-forest-hello'
+    const isBlocksCorrect = evaluateStep(step.requiredBlockTypes, blocksRef.current)
+
+    // For lesson-01, we require both correct blocks AND successful run.
+    if (!isBlocksCorrect || (isPlayableLesson && !hasRunSuccess)) {
       const nextFailedAttempts = failedAttempts + 1
       const nextHintState = buildHintState({
         failedAttempts: nextFailedAttempts,
@@ -156,14 +167,18 @@ export default function LessonPage() {
       })
 
       setFailedAttempts(nextFailedAttempts)
-      setFeedback(
-        nextHintState.activeHint?.copy ??
-          getFoundationLessonFeedback(currentLesson.id, 'retry'),
-      )
+
+      let errorMsg = nextHintState.activeHint?.copy ?? getFoundationLessonFeedback(currentLesson.id, 'retry')
+      if (isPlayableLesson && isBlocksCorrect && !hasRunSuccess) {
+        errorMsg = '积木拼对啦！现在点击舞台上的"运行"按钮看看效果吧！'
+      }
+
+      setFeedback(errorMsg)
       return
     }
 
     setFailedAttempts(0)
+    setHasRunSuccess(false)
 
     if (stepIndex < currentLesson.steps.length - 1) {
       clearLessonDraft(currentLesson.id, stepIndex)
@@ -278,7 +293,16 @@ export default function LessonPage() {
             />
           ) : (
             <div className="space-y-6">
-              <PreviewStage blocks={blocks} template={currentTemplate} />
+              {currentLesson.id === 'lesson-01-forest-hello' ? (
+                <PlayableStage
+                  blocks={blocks}
+                  template={currentTemplate}
+                  requiredBlocks={step.requiredBlockTypes}
+                  onRunSuccess={handleRunSuccess}
+                />
+              ) : (
+                <PreviewStage blocks={blocks} template={currentTemplate} />
+              )}
               <BlocklyWorkspace
                 allowedBlocks={step.allowedBlocks}
                 blocks={blocks}
