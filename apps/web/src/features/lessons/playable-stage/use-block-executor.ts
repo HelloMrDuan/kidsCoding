@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 
 export type ExecutionState = 'idle' | 'running' | 'success' | 'error'
 
@@ -58,6 +58,19 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
 
     setExecutionState('success')
   }, [blocks, requiredBlocks, reset])
+
+  // Watch blocks stringified to detect changes and reset
+  const blocksKey = JSON.stringify(blocks)
+  useEffect(() => {
+    reset()
+  }, [blocksKey, reset])
+
+  // Component unmount cleanup
+  useEffect(() => {
+    return () => {
+      runIdRef.current += 1
+    }
+  }, [])
 
   return {
     executionState,

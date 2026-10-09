@@ -37,9 +37,16 @@ test('guest user can reach the first completed project', async ({ page }) => {
   await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
   await page.getByTestId('lesson-complete-step').click()
 
-  // Since we run the code and require run success on step 4 and 5:
+  // Verify character displacement on step 5 (which has same blocks as step 4)
+  const characterLabel = page.getByText('主角', { exact: true })
+  await expect(characterLabel).toBeVisible()
+
   await page.getByTestId('run-code-button').click()
   await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
+  // Verify the character moved right (transform style changed)
+  const styleStr = await characterLabel.evaluate((el) => el.getAttribute('style'))
+  expect(styleStr).toContain('translateX(100px)')
+
   await page.getByTestId('lesson-complete-step').click()
 
   await page.waitForURL('**/project/lesson-01-forest-hello/complete')
