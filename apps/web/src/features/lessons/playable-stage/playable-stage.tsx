@@ -56,11 +56,13 @@ export function PlayableStage({
   template,
   requiredBlocks,
   onRunSuccess,
+  onRunClear,
 }: {
   blocks: Array<{ type: string }>
   template?: ProjectTemplateDefinition
   requiredBlocks: string[]
   onRunSuccess: () => void
+  onRunClear?: () => void
 }) {
   const {
     executionState,
@@ -78,6 +80,13 @@ export function PlayableStage({
     }
   }, [executionState, onRunSuccess])
 
+  function handleReset() {
+    reset()
+    if (onRunClear) {
+      onRunClear()
+    }
+  }
+
   return (
     <section
       className="kc-stage-3d overflow-hidden rounded-[2.5rem] p-5 md:p-6"
@@ -94,8 +103,9 @@ export function PlayableStage({
           <button
             type="button"
             className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-200"
-            onClick={reset}
+            onClick={handleReset}
             disabled={executionState === 'running'}
+            data-testid="reset-code-button"
           >
             重置
           </button>

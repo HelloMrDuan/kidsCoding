@@ -60,12 +60,13 @@ export default function LessonPage() {
     (nextBlocks: Array<{ type: string }>) => {
       blocksRef.current = nextBlocks
       setBlocks(nextBlocks)
+      setHasRunSuccess(false) // Changing blocks invalidates successful run state
 
       if (lessonId) {
         saveLessonDraft(lessonId, stepIndex, nextBlocks)
       }
     },
-    [lessonId, stepIndex],
+    [lessonId, stepIndex, setHasRunSuccess],
   )
 
   const goToStep = useCallback(
@@ -87,6 +88,10 @@ export default function LessonPage() {
 
   const handleRunSuccess = useCallback(() => {
     setHasRunSuccess(true)
+  }, [setHasRunSuccess])
+
+  const handleRunClear = useCallback(() => {
+    setHasRunSuccess(false)
   }, [setHasRunSuccess])
 
   useEffect(() => {
@@ -299,6 +304,7 @@ export default function LessonPage() {
                   template={currentTemplate}
                   requiredBlocks={step.requiredBlockTypes}
                   onRunSuccess={handleRunSuccess}
+                  onRunClear={handleRunClear}
                 />
               ) : (
                 <PreviewStage blocks={blocks} template={currentTemplate} />

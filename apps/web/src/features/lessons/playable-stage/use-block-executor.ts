@@ -1,22 +1,25 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 
 export type ExecutionState = 'idle' | 'running' | 'success' | 'error'
 
 export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks: string[]) {
   const [executionState, setExecutionState] = useState<ExecutionState>('idle')
-  const [currentBlockIndex, setCurrentBlockIndex] = useState<number>(-1)
   const [characterPosition, setCharacterPosition] = useState(0)
   const [characterMessage, setCharacterMessage] = useState<string | null>(null)
+  const runIdRef = useRef(0)
 
   const reset = useCallback(() => {
+    runIdRef.current += 1
     setExecutionState('idle')
-    setCurrentBlockIndex(-1)
     setCharacterPosition(0)
     setCharacterMessage(null)
   }, [])
 
   const run = useCallback(async () => {
     reset()
+    runIdRef.current += 1
+    const currentRunId = runIdRef.current
+
     setExecutionState('running')
 
     // Check if blocks match required
@@ -31,19 +34,26 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
     }
 
     for (let i = 0; i < blocks.length; i++) {
-      setCurrentBlockIndex(i)
       const block = blocks[i]
 
       // Delay for animation
       await new Promise(resolve => setTimeout(resolve, 800))
+      if (runIdRef.current !== currentRunId) return
 
-      if (block.type === 'move_right') {
+      if (block.type === 'when_start') {
+        // Just standard delay
+      } else if (block.type === 'move_right') {
         setCharacterPosition(prev => prev + 100)
       } else if (block.type === 'say_line') {
         setCharacterMessage('你好！')
+      } else {
+        // Unsupported block type
+        setExecutionState('error')
+        return
       }
 
       await new Promise(resolve => setTimeout(resolve, 500))
+      if (runIdRef.current !== currentRunId) return
     }
 
     setExecutionState('success')
@@ -51,7 +61,6 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
 
   return {
     executionState,
-    currentBlockIndex,
     characterPosition,
     characterMessage,
     run,

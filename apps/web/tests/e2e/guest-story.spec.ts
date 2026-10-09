@@ -27,6 +27,14 @@ test('guest user can reach the first completed project', async ({ page }) => {
   // Wait for run to finish and success message
   await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
 
+  // Verify reset invalidates success
+  await page.getByTestId('reset-code-button').click()
+  await page.getByTestId('lesson-complete-step').click()
+  await expect(page.getByText('积木拼对啦！现在点击舞台上的"运行"按钮看看效果吧！')).toBeVisible({ timeout: 10000 })
+
+  // Run again to pass the step
+  await page.getByTestId('run-code-button').click()
+  await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
   await page.getByTestId('lesson-complete-step').click()
 
   // Since we run the code and require run success on step 4 and 5:
