@@ -25,6 +25,7 @@ export function GET(request: Request) {
       learningOutcome: found.lesson.learningOutcome,
       contentStage: getLessonContentStage(found.lesson.id),
       playable: false,
+      trialAvailable: found.lesson.id === 'P0-U1-L01',
     })
   }
 
