@@ -1,0 +1,2180 @@
+{
+  "schemaVersion": "1.0",
+  "licensePolicy": "original_or_authorized_only",
+  "tracks": [
+    {
+      "id": "G1",
+      "lessons": 24
+    },
+    {
+      "id": "G2",
+      "lessons": 24
+    },
+    {
+      "id": "P0",
+      "lessons": 24
+    }
+  ],
+  "assets": [
+    {
+      "assetId": "g1-g1-u1-01-scene",
+      "lessonId": "G1-U1-L01",
+      "kind": "scene_illustration",
+      "spec": "原创2D会说话的故事 / 给狐狸一个开场场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-01-guide",
+      "lessonId": "G1-U1-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：狐狸被选作森林主持人，可它总在故事开头沉默。 开始前先说一说：什么变化能证明任务成功？ 把开场对白设为“欢迎来到森林剧场”，放在开始事件后。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-01-feedback",
+      "lessonId": "G1-U1-L01",
+      "kind": "animation_sound",
+      "spec": "成功反馈：点击开始后狐狸先打招呼再移动。；错误反馈：只有移动没有对白时不能算完成。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-02-scene",
+      "lessonId": "G1-U1-L02",
+      "kind": "scene_illustration",
+      "spec": "原创2D会说话的故事 / 与兔子轮流说话场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-02-guide",
+      "lessonId": "G1-U1-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：兔子和狐狸第一次见面，要轮流介绍自己的名字。 开始前先说一说：什么变化能证明任务成功？ 安排狐狸说“你好”，兔子再回应“很高兴见到你”。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-02-feedback",
+      "lessonId": "G1-U1-L02",
+      "kind": "animation_sound",
+      "spec": "成功反馈：两句对白按狐狸→兔子的顺序出现。；错误反馈：两位角色同时说话造成重叠。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-03-scene",
+      "lessonId": "G1-U1-L03",
+      "kind": "scene_illustration",
+      "spec": "原创2D会说话的故事 / 设置故事背景场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-03-guide",
+      "lessonId": "G1-U1-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：舞台后台出现了雪山和森林两张背景，导演需要挑对地点。 开始前先说一说：什么变化能证明任务成功？ 开场使用森林场景，狐狸走进树屋后切到夜晚森林。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-03-feedback",
+      "lessonId": "G1-U1-L03",
+      "kind": "animation_sound",
+      "spec": "成功反馈：前半段为白天森林，转场后为夜晚森林。；错误反馈：一开始就显示结尾背景。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-04-scene",
+      "lessonId": "G1-U1-L04",
+      "kind": "scene_illustration",
+      "spec": "原创2D会说话的故事 / 角色出场退场场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-04-guide",
+      "lessonId": "G1-U1-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：角色下台也要有动作，不可以突然消失。 开始前先说一说：什么变化能证明任务成功？ 让狐狸从左进入舞台，打招呼后向右退出。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-04-feedback",
+      "lessonId": "G1-U1-L04",
+      "kind": "animation_sound",
+      "spec": "成功反馈：出场与退场发生在对白两侧。；错误反馈：退场先于问候，观众看不到角色。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-05-scene",
+      "lessonId": "G1-U1-L05",
+      "kind": "scene_illustration",
+      "spec": "原创2D会说话的故事 / 字幕与旁白场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-05-guide",
+      "lessonId": "G1-U1-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：剧场字幕员抱怨解说的文字总是挡住角色。 开始前先说一说：什么变化能证明任务成功？ 给片头加标题字幕，剧情中改用短旁白。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-05-feedback",
+      "lessonId": "G1-U1-L05",
+      "kind": "animation_sound",
+      "spec": "成功反馈：片头字幕结束后才出现角色对白。；错误反馈：长字幕一直不消失遮挡人物。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-06-scene",
+      "lessonId": "G1-U1-L06",
+      "kind": "scene_illustration",
+      "spec": "原创2D会说话的故事 / 完整森林童话场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-06-guide",
+      "lessonId": "G1-U1-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林剧院迎来第一场正式的童话首演。 开始前先说一说：什么变化能证明任务成功？ 完成开场、相遇、冲突、结尾四部分的狐狸兔子故事。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u1-06-feedback",
+      "lessonId": "G1-U1-L06",
+      "kind": "animation_sound",
+      "spec": "成功反馈：作品可完整播放且至少两位角色有不同对白。；错误反馈：故事跳过结尾或对白顺序混乱。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-01-scene",
+      "lessonId": "G1-U2-L01",
+      "kind": "scene_illustration",
+      "spec": "原创2D动作与坐标 / 认识舞台坐标场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-01-guide",
+      "lessonId": "G1-U2-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：小狐狸找不到舞台中心，导演在地上画出坐标网格。 开始前先说一说：什么变化能证明任务成功？ 将狐狸放到(x=0,y=0)，再分别移动到(60,0)和(60,40)。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-01-feedback",
+      "lessonId": "G1-U2-L01",
+      "kind": "animation_sound",
+      "spec": "成功反馈：角色最终定位在(60,40)。；错误反馈：把x和y调换而停在(40,60)。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-02-scene",
+      "lessonId": "G1-U2-L02",
+      "kind": "scene_illustration",
+      "spec": "原创2D动作与坐标 / 移动到目标点场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-02-guide",
+      "lessonId": "G1-U2-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：兔子收到一张藏宝地图，坐标标的是(-80,20)。 开始前先说一说：什么变化能证明任务成功？ 通过设置坐标让兔子直接到达藏宝点。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-02-feedback",
+      "lessonId": "G1-U2-L02",
+      "kind": "animation_sound",
+      "spec": "成功反馈：精灵最终x=-80,y=20。；错误反馈：坐标超出舞台或符号写反。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-03-scene",
+      "lessonId": "G1-U2-L03",
+      "kind": "scene_illustration",
+      "spec": "原创2D动作与坐标 / 让角色沿路走场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-03-guide",
+      "lessonId": "G1-U2-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林邮差需要先向东后向北送信。 开始前先说一说：什么变化能证明任务成功？ 分解为向右80、向上40、向右20三段移动。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-03-feedback",
+      "lessonId": "G1-U2-L03",
+      "kind": "animation_sound",
+      "spec": "成功反馈：角色最终位移(+100,+40)。；错误反馈：漏走第二段导致目标点错误。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-04-scene",
+      "lessonId": "G1-U2-L04",
+      "kind": "scene_illustration",
+      "spec": "原创2D动作与坐标 / 快慢不同的追逐场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-04-guide",
+      "lessonId": "G1-U2-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：狐狸和兔子比赛谁先到达河边，但两人的速度不同。 开始前先说一说：什么变化能证明任务成功？ 给狐狸每帧移动4步、兔子每帧移动2步，同时从零出发。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-04-feedback",
+      "lessonId": "G1-U2-L04",
+      "kind": "animation_sound",
+      "spec": "成功反馈：相同时间狐狸位移为兔子两倍。；错误反馈：只改变狐狸起点却声称速度更快。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-05-scene",
+      "lessonId": "G1-U2-L05",
+      "kind": "scene_illustration",
+      "spec": "原创2D动作与坐标 / 角色朝向与旋转场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-05-guide",
+      "lessonId": "G1-U2-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：转弯时小兔子头朝向了反方向，跑步看起来像倒退。 开始前先说一说：什么变化能证明任务成功？ 沿四边形路线让兔子依次朝东、朝北、朝西、朝南。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-05-feedback",
+      "lessonId": "G1-U2-L05",
+      "kind": "animation_sound",
+      "spec": "成功反馈：四次转向后角色回到初始朝向。；错误反馈：位置移动了但朝向未改变。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-06-scene",
+      "lessonId": "G1-U2-L06",
+      "kind": "scene_illustration",
+      "spec": "原创2D动作与坐标 / 小兔子运动会场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-06-guide",
+      "lessonId": "G1-U2-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林运动会设了赛跑和跳跃两项比赛。 开始前先说一说：什么变化能证明任务成功？ 设计起跑事件、计时、到达终点和结果播报。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u2-06-feedback",
+      "lessonId": "G1-U2-L06",
+      "kind": "animation_sound",
+      "spec": "成功反馈：竞赛开始后计时变化，到达终点才显示结果。；错误反馈：未出发便显示胜利结果。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-01-scene",
+      "lessonId": "G1-U3-L01",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动与状态 / 点击打开宝箱场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-01-guide",
+      "lessonId": "G1-U3-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：宝箱封着一张奖励卡，要点箱子才能打开。 开始前先说一说：什么变化能证明任务成功？ 绑定宝箱点击事件，使封闭造型变成打开造型。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-01-feedback",
+      "lessonId": "G1-U3-L01",
+      "kind": "animation_sound",
+      "spec": "成功反馈：未点击时保持关闭，点击一次才开启。；错误反馈：点击空白背景也打开宝箱。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-02-scene",
+      "lessonId": "G1-U3-L02",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动与状态 / 判断是否拿钥匙场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-02-guide",
+      "lessonId": "G1-U3-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林钥匙门设置了门卫，没钥匙不能通过。 开始前先说一说：什么变化能证明任务成功？ 引入hasKey布尔变量，拿钥匙后允许开门。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-02-feedback",
+      "lessonId": "G1-U3-L02",
+      "kind": "animation_sound",
+      "spec": "成功反馈：hasKey=true通行，false禁止通行并提示。；错误反馈：不检查钥匙直接打开门。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-03-scene",
+      "lessonId": "G1-U3-L03",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动与状态 / 记录得到的星星场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-03-guide",
+      "lessonId": "G1-U3-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：小狐狸获得一颗星星，记分板应及时变化。 开始前先说一说：什么变化能证明任务成功？ score初始0，每拿到新星星加1，展示在屏幕。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-03-feedback",
+      "lessonId": "G1-U3-L03",
+      "kind": "animation_sound",
+      "spec": "成功反馈：拾取3颗不同星星得到score=3。；错误反馈：重复碰同一星星导致重复加分。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-04-scene",
+      "lessonId": "G1-U3-L04",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动与状态 / 碰到障碍停下来场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-04-guide",
+      "lessonId": "G1-U3-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：乌龟在森林小径行走，碰到石头就必须停下。 开始前先说一说：什么变化能证明任务成功？ 通过触碰检测，碰到障碍时速度设为0并播放警告。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-04-feedback",
+      "lessonId": "G1-U3-L04",
+      "kind": "animation_sound",
+      "spec": "成功反馈：未碰撞可移动，碰撞后保持静止。；错误反馈：撞到石头之后仍继续移动。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-05-scene",
+      "lessonId": "G1-U3-L05",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动与状态 / 按钮切换白天黑夜场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-05-guide",
+      "lessonId": "G1-U3-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林剧院有白天和夜晚按钮，点击后切换灯光。 开始前先说一说：什么变化能证明任务成功？ 用sceneMode在day/night之间切换并选择对应背景。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-05-feedback",
+      "lessonId": "G1-U3-L05",
+      "kind": "animation_sound",
+      "spec": "成功反馈：连续点击两次后回到白天。；错误反馈：模式变量切换了但背景没有更新。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-06-scene",
+      "lessonId": "G1-U3-L06",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动与状态 / 互动故事分支场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-06-guide",
+      "lessonId": "G1-U3-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：故事书的读者可以选“去河边”或“去山坡”两条路。 开始前先说一说：什么变化能证明任务成功？ 设置choice选择与两段分支剧情，走完后显示不同结局。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u3-06-feedback",
+      "lessonId": "G1-U3-L06",
+      "kind": "animation_sound",
+      "spec": "成功反馈：choice=river看到河边，choice=hill看到山坡。；错误反馈：两个按钮都显示相同场景。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-01-scene",
+      "lessonId": "G1-U4-L01",
+      "kind": "scene_illustration",
+      "spec": "原创2D作品设计 / 规划三幕故事场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-01-guide",
+      "lessonId": "G1-U4-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：校园戏剧节要求团队先规划三幕故事再开始编码。 开始前先说一说：什么变化能证明任务成功？ 制作开端、冲突、解决三幕剧情时间线。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-01-feedback",
+      "lessonId": "G1-U4-L01",
+      "kind": "animation_sound",
+      "spec": "成功反馈：每幕有一条可辨识的事件与人物目标。；错误反馈：只有开场没有问题或解决段落。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-02-scene",
+      "lessonId": "G1-U4-L02",
+      "kind": "scene_illustration",
+      "spec": "原创2D作品设计 / 绘制场景草图场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-02-guide",
+      "lessonId": "G1-U4-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：场景美术师需要把脑中的故事变成能操作的画面。 开始前先说一说：什么变化能证明任务成功？ 绘制三张分镜草图并标注角色位置与道具。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-02-feedback",
+      "lessonId": "G1-U4-L02",
+      "kind": "animation_sound",
+      "spec": "成功反馈：每张草图标明角色、背景和触发事件。；错误反馈：图画漂亮却没有动作或触发标记。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-03-scene",
+      "lessonId": "G1-U4-L03",
+      "kind": "scene_illustration",
+      "spec": "原创2D作品设计 / 给人物分配任务场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-03-guide",
+      "lessonId": "G1-U4-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：两位小演员都想控制同一辆小车。 开始前先说一说：什么变化能证明任务成功？ 将狐狸脚本负责行驶、兔子脚本负责提示与计时。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-03-feedback",
+      "lessonId": "G1-U4-L03",
+      "kind": "animation_sound",
+      "spec": "成功反馈：两位角色有独立任务，不重复控制小车。；错误反馈：同一动作被两个脚本同时执行造成抖动。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-04-scene",
+      "lessonId": "G1-U4-L04",
+      "kind": "scene_illustration",
+      "spec": "原创2D作品设计 / 修复对白顺序场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-04-guide",
+      "lessonId": "G1-U4-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：第一次彩排总有两个人同时喊台词。 开始前先说一说：什么变化能证明任务成功？ 对照时间轴逐句调整事件与等待时间。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-04-feedback",
+      "lessonId": "G1-U4-L04",
+      "kind": "animation_sound",
+      "spec": "成功反馈：狐狸说完之后兔子再说，不出现重叠。；错误反馈：减少等待导致两句重叠。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-05-scene",
+      "lessonId": "G1-U4-L05",
+      "kind": "scene_illustration",
+      "spec": "原创2D作品设计 / 邀请朋友试玩场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-05-guide",
+      "lessonId": "G1-U4-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：导演邀请朋友试演新故事，收集真实建议。 开始前先说一说：什么变化能证明任务成功？ 编写试玩任务单，让同伴检查触发入口、对白和结尾。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-05-feedback",
+      "lessonId": "G1-U4-L05",
+      "kind": "animation_sound",
+      "spec": "成功反馈：记录至少3条反馈和一次可追踪的修复。；错误反馈：只问喜欢不喜欢，却没有复现问题。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-06-scene",
+      "lessonId": "G1-U4-L06",
+      "kind": "scene_illustration",
+      "spec": "原创2D作品设计 / 森林剧场首映场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-06-guide",
+      "lessonId": "G1-U4-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林剧场正式首映，需要介绍幕后制作思路。 开始前先说一说：什么变化能证明任务成功？ 整合剧本、动画、交互和两轮测试后展示。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g1-g1-u4-06-feedback",
+      "lessonId": "G1-U4-L06",
+      "kind": "animation_sound",
+      "spec": "成功反馈：作品能从开头完整运行，角色行为与三幕目标一致。；错误反馈：最后一幕缺失或一个触发事件没有响应。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-01-scene",
+      "lessonId": "G2-U1-L01",
+      "kind": "scene_illustration",
+      "spec": "原创2DScratch 工作台 / 认识舞台与精灵场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-01-guide",
+      "lessonId": "G2-U1-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：刚打开Scratch工作台，猫咪站在舞台中央找不到脚本区。 开始前先说一说：什么变化能证明任务成功？ 指出舞台、精灵、积木分类、脚本区四个位置。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-01-feedback",
+      "lessonId": "G2-U1-L01",
+      "kind": "animation_sound",
+      "spec": "成功反馈：能选择猫咪并在脚本区看到对应积木。；错误反馈：误把背景当精灵并试图移动背景。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-02-scene",
+      "lessonId": "G2-U1-L02",
+      "kind": "scene_illustration",
+      "spec": "原创2DScratch 工作台 / 角色换造型场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-02-guide",
+      "lessonId": "G2-U1-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：猫咪准备演出时需要换成挥手造型。 开始前先说一说：什么变化能证明任务成功？ 为精灵设置两个造型，用下一造型积木切换。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-02-feedback",
+      "lessonId": "G2-U1-L02",
+      "kind": "animation_sound",
+      "spec": "成功反馈：连续触发时造型在A/B间切换。；错误反馈：选择了舞台背景造型而没有切换精灵。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-03-scene",
+      "lessonId": "G2-U1-L03",
+      "kind": "scene_illustration",
+      "spec": "原创2DScratch 工作台 / 设置背景和声音场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-03-guide",
+      "lessonId": "G2-U1-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林音乐会需要绿色草地和短提示音。 开始前先说一说：什么变化能证明任务成功？ 选择草地背景，按开幕事件播放一次音效。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-03-feedback",
+      "lessonId": "G2-U1-L03",
+      "kind": "animation_sound",
+      "spec": "成功反馈：绿旗触发后背景正确且音效播放一次。；错误反馈：声音一直循环遮住旁白。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-04-scene",
+      "lessonId": "G2-U1-L04",
+      "kind": "scene_illustration",
+      "spec": "原创2DScratch 工作台 / 运动积木初体验场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-04-guide",
+      "lessonId": "G2-U1-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：猫咪要从舞台中央向右滑行一段距离。 开始前先说一说：什么变化能证明任务成功？ 用移动10步和面向90度实现两次连续移动。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-04-feedback",
+      "lessonId": "G2-U1-L04",
+      "kind": "animation_sound",
+      "spec": "成功反馈：最终沿右方向移动20步。；错误反馈：面向-90度导致向左离开舞台。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-05-scene",
+      "lessonId": "G2-U1-L05",
+      "kind": "scene_illustration",
+      "spec": "原创2DScratch 工作台 / 广播第一条消息场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-05-guide",
+      "lessonId": "G2-U1-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：兔子等猫咪的广播才会上场。 开始前先说一说：什么变化能证明任务成功？ 猫咪广播“入场”，兔子收到消息后移动并说欢迎。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-05-feedback",
+      "lessonId": "G2-U1-L05",
+      "kind": "animation_sound",
+      "spec": "成功反馈：收到正确消息兔子才移动并显示对白。；错误反馈：不同广播也触发兔子出场。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-06-scene",
+      "lessonId": "G2-U1-L06",
+      "kind": "scene_illustration",
+      "spec": "原创2DScratch 工作台 / 制作生日贺卡场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-06-guide",
+      "lessonId": "G2-U1-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：为朋友制作会动会说话的生日贺卡。 开始前先说一说：什么变化能证明任务成功？ 组合背景、两个造型、音乐、互动祝福。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u1-06-feedback",
+      "lessonId": "G2-U1-L06",
+      "kind": "animation_sound",
+      "spec": "成功反馈：点击绿旗后有动画，点击礼物出现祝福。；错误反馈：礼物在点击前就显示所有彩蛋。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-01-scene",
+      "lessonId": "G2-U2-L01",
+      "kind": "scene_illustration",
+      "spec": "原创2D动画制作 / 让角色走路有帧动画场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-01-guide",
+      "lessonId": "G2-U2-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：小猫行走时只有一张图片，看起来像在滑动。 开始前先说一说：什么变化能证明任务成功？ 制作两帧腿部不同的造型，配合移动与等待交替。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-01-feedback",
+      "lessonId": "G2-U2-L01",
+      "kind": "animation_sound",
+      "spec": "成功反馈：连续播放后角色既位移又逐帧换造型。；错误反馈：只换造型却没有移动。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-02-scene",
+      "lessonId": "G2-U2-L02",
+      "kind": "scene_illustration",
+      "spec": "原创2D动画制作 / 制作昼夜交替场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-02-guide",
+      "lessonId": "G2-U2-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：猫咪想展示白天变晚上，再回到白天的故事。 开始前先说一说：什么变化能证明任务成功？ 创建白天与夜晚背景，定时切换两次。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-02-feedback",
+      "lessonId": "G2-U2-L02",
+      "kind": "animation_sound",
+      "spec": "成功反馈：2秒后切夜晚，4秒后恢复白天。；错误反馈：进入夜晚后不返回白天。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-03-scene",
+      "lessonId": "G2-U2-L03",
+      "kind": "scene_illustration",
+      "spec": "原创2D动画制作 / 音乐节奏舞台场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-03-guide",
+      "lessonId": "G2-U2-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林音乐节有鼓和铃两种声音。 开始前先说一说：什么变化能证明任务成功？ 设计两拍鼓声一拍铃声，重复4次。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-03-feedback",
+      "lessonId": "G2-U2-L03",
+      "kind": "animation_sound",
+      "spec": "成功反馈：总计12个音效事件，顺序为鼓鼓铃。；错误反馈：音效重叠导致节奏无法辨认。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-04-scene",
+      "lessonId": "G2-U2-L04",
+      "kind": "scene_illustration",
+      "spec": "原创2D动画制作 / 循环飞舞的蝴蝶场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-04-guide",
+      "lessonId": "G2-U2-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：彩蝶需要围绕花朵一直上下轻轻飞舞。 开始前先说一说：什么变化能证明任务成功？ 设置循环，每轮向上移动再向下移动。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-04-feedback",
+      "lessonId": "G2-U2-L04",
+      "kind": "animation_sound",
+      "spec": "成功反馈：重复两轮后回到初始y坐标。；错误反馈：只向上移动导致飞出舞台。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-05-scene",
+      "lessonId": "G2-U2-L05",
+      "kind": "scene_illustration",
+      "spec": "原创2D动画制作 / 两只精灵同步表演场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-05-guide",
+      "lessonId": "G2-U2-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：狐狸跳舞时兔子要在同一声口令下登台。 开始前先说一说：什么变化能证明任务成功？ 用广播事件同时启动两个角色，并调整不同的延迟。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-05-feedback",
+      "lessonId": "G2-U2-L05",
+      "kind": "animation_sound",
+      "spec": "成功反馈：收到口令后两位角色按指定时机完成各自动作。；错误反馈：一位精灵不响应广播。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-06-scene",
+      "lessonId": "G2-U2-L06",
+      "kind": "scene_illustration",
+      "spec": "原创2D动画制作 / 音乐动画短片场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-06-guide",
+      "lessonId": "G2-U2-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：制作一分钟内的音乐动画短片。 开始前先说一说：什么变化能证明任务成功？ 结合变造型、背景、节拍和至少一次角色互动。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u2-06-feedback",
+      "lessonId": "G2-U2-L06",
+      "kind": "animation_sound",
+      "spec": "成功反馈：完整播放包含开头、中段、收尾和同步的背景音乐。；错误反馈：音乐播放结束动画仍然无限循环。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-01-scene",
+      "lessonId": "G2-U3-L01",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动游戏 / 键盘控制小船场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-01-guide",
+      "lessonId": "G2-U3-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：海洋巡逻小船需要接受左右方向键指挥。 开始前先说一说：什么变化能证明任务成功？ 按右键使x加10，按左键使x减10。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-01-feedback",
+      "lessonId": "G2-U3-L01",
+      "kind": "animation_sound",
+      "spec": "成功反馈：右键后位置+10、左键后回到原位。；错误反馈：不按键小船也持续漂移。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-02-scene",
+      "lessonId": "G2-U3-L02",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动游戏 / 接住掉落水果场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-02-guide",
+      "lessonId": "G2-U3-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：水果从天上落下，篮子要在底部接住。 开始前先说一说：什么变化能证明任务成功？ 让水果向下运动，篮子用鼠标横向跟随。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-02-feedback",
+      "lessonId": "G2-U3-L02",
+      "kind": "animation_sound",
+      "spec": "成功反馈：水果触碰篮子即记为接到，否则落地失败。；错误反馈：水果穿过篮子仍增加分数。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-03-scene",
+      "lessonId": "G2-U3-L03",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动游戏 / 随机出现的礼物场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-03-guide",
+      "lessonId": "G2-U3-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：舞台每次都会在随机位置出现一个礼物。 开始前先说一说：什么变化能证明任务成功？ 生成x在-180到180之间的随机数，设置礼物x。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-03-feedback",
+      "lessonId": "G2-U3-L03",
+      "kind": "animation_sound",
+      "spec": "成功反馈：重复10次，礼物位置保持在舞台范围内。；错误反馈：随机坐标超出舞台导致礼物不可见。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-04-scene",
+      "lessonId": "G2-U3-L04",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动游戏 / 判断碰撞得分场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-04-guide",
+      "lessonId": "G2-U3-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：小球碰到篮子才得分，不能把落在地上的球也算进去。 开始前先说一说：什么变化能证明任务成功？ 在触碰篮子的条件里增加score 1，并隐藏已接小球。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-04-feedback",
+      "lessonId": "G2-U3-L04",
+      "kind": "animation_sound",
+      "spec": "成功反馈：一次接球加1分，同一小球不重复计分。；错误反馈：同一球被循环多次检测导致连加3分。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-05-scene",
+      "lessonId": "G2-U3-L05",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动游戏 / 倒计时游戏结束场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-05-guide",
+      "lessonId": "G2-U3-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：限时接水果比赛需要在倒计时归零后停止。 开始前先说一说：什么变化能证明任务成功？ 设置timeLeft=10，每秒减1，归零广播游戏结束。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-05-feedback",
+      "lessonId": "G2-U3-L05",
+      "kind": "animation_sound",
+      "spec": "成功反馈：10秒内可以得分，归零后分数不再变化。；错误反馈：时间变成负数仍然运行。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-06-scene",
+      "lessonId": "G2-U3-L06",
+      "kind": "scene_illustration",
+      "spec": "原创2D互动游戏 / 水果接力挑战场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-06-guide",
+      "lessonId": "G2-U3-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：做一款完整的水果接力挑战小游戏。 开始前先说一说：什么变化能证明任务成功？ 组合随机落果、篮子移动、碰撞记分和结束条件。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u3-06-feedback",
+      "lessonId": "G2-U3-L06",
+      "kind": "animation_sound",
+      "spec": "成功反馈：成功接到5颗或倒计时结束后能显示结果。；错误反馈：过期水果继续加分或比赛结束后仍能移动。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-01-scene",
+      "lessonId": "G2-U4-L01",
+      "kind": "scene_illustration",
+      "spec": "原创2D综合创作 / 游戏规则说明书场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-01-guide",
+      "lessonId": "G2-U4-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：同伴试玩时不知道游戏规则，设计师需要写一页说明。 开始前先说一说：什么变化能证明任务成功？ 写清控制方法、得分条件、失败条件和重试操作。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-01-feedback",
+      "lessonId": "G2-U4-L01",
+      "kind": "animation_sound",
+      "spec": "成功反馈：首次试玩者不经口头解释能完成一局。；错误反馈：说明里写了得分但没有说明如何操作。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-02-scene",
+      "lessonId": "G2-U4-L02",
+      "kind": "scene_illustration",
+      "spec": "原创2D综合创作 / 设计三种障碍场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-02-guide",
+      "lessonId": "G2-U4-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：猫咪闯关要遇到三种不同障碍。 开始前先说一说：什么变化能证明任务成功？ 设计静止石头、移动小鸟、定时火焰三种障碍。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-02-feedback",
+      "lessonId": "G2-U4-L02",
+      "kind": "animation_sound",
+      "spec": "成功反馈：碰到每种障碍都触发不同反馈。；错误反馈：三类障碍行为完全相同无差异。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-03-scene",
+      "lessonId": "G2-U4-L03",
+      "kind": "scene_illustration",
+      "spec": "原创2D综合创作 / 制作胜负提示场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-03-guide",
+      "lessonId": "G2-U4-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：游戏结束时玩家总看不到自己获胜还是失败。 开始前先说一说：什么变化能证明任务成功？ 在胜利与失败条件中分别广播不同消息并显示字幕。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-03-feedback",
+      "lessonId": "G2-U4-L03",
+      "kind": "animation_sound",
+      "spec": "成功反馈：score达到目标显示胜利、生命为0显示失败。；错误反馈：同时出现胜利和失败两块提示。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-04-scene",
+      "lessonId": "G2-U4-L04",
+      "kind": "scene_illustration",
+      "spec": "原创2D综合创作 / 给游戏加难度场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-04-guide",
+      "lessonId": "G2-U4-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：同一个关卡玩三次就腻了，设计师准备升级难度。 开始前先说一说：什么变化能证明任务成功？ 根据level变量调整水果落下速度和障碍数量。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-04-feedback",
+      "lessonId": "G2-U4-L04",
+      "kind": "animation_sound",
+      "spec": "成功反馈：第2关速度比第1关快，分数保持或按规则清零。；错误反馈：升级后速度没有变化。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-05-scene",
+      "lessonId": "G2-U4-L05",
+      "kind": "scene_illustration",
+      "spec": "原创2D综合创作 / 试玩记录与修复场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-05-guide",
+      "lessonId": "G2-U4-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：测试员发现复活后分数没有清零。 开始前先说一说：什么变化能证明任务成功？ 写出问题复现步骤、修复初始化逻辑、重新测试。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-05-feedback",
+      "lessonId": "G2-U4-L05",
+      "kind": "animation_sound",
+      "spec": "成功反馈：重新开始时score=0、timeLeft恢复初始值。；错误反馈：重新开始保留旧分数和旧计时。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-06-scene",
+      "lessonId": "G2-U4-L06",
+      "kind": "scene_illustration",
+      "spec": "原创2D综合创作 / 发布个人第一款游戏场景，明确角色/目标/开始与完成状态",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-06-guide",
+      "lessonId": "G2-U4-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：小小游戏工作室要公开自己的首款作品。 开始前先说一说：什么变化能证明任务成功？ 整理玩法说明、完整源码、测试记录和原创素材信息。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "g2-g2-u4-06-feedback",
+      "lessonId": "G2-U4-L06",
+      "kind": "animation_sound",
+      "spec": "成功反馈：游戏完整可玩一局，能重开且胜负规则明确。；错误反馈：游戏只有开场动画，没有可完成的任务。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-01-scene",
+      "lessonId": "P0-U1-L01",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：终端输出一行“你好，编程世界”。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-01-guide",
+      "lessonId": "P0-U1-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：新同学在控制台看到一片空白，要让电脑打招呼。 开始前先说一说：什么变化能证明任务成功？ 编写print('你好，编程世界')并运行。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-01-feedback",
+      "lessonId": "P0-U1-L01",
+      "kind": "sample_io",
+      "spec": "成功反馈：终端输出一行“你好，编程世界”。；错误反馈：忘记引号产生NameError。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-02-scene",
+      "lessonId": "P0-U1-L02",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：输出包含两段变量值并保持顺序。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-02-guide",
+      "lessonId": "P0-U1-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：小小机器人想介绍自己的名字和爱好。 开始前先说一说：什么变化能证明任务成功？ 将名字、爱好存到变量，使用print拼成一句话。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-02-feedback",
+      "lessonId": "P0-U1-L02",
+      "kind": "sample_io",
+      "spec": "成功反馈：输出包含两段变量值并保持顺序。；错误反馈：把变量名写进引号导致原样打印。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-03-scene",
+      "lessonId": "P0-U1-L03",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：city=北京、weather=晴输出“北京今天晴”。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-03-guide",
+      "lessonId": "P0-U1-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：制作一个把城市与天气词拼起来的小助手。 开始前先说一说：什么变化能证明任务成功？ 使用f-string组合city和weather变量。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-03-feedback",
+      "lessonId": "P0-U1-L03",
+      "kind": "sample_io",
+      "spec": "成功反馈：city=北京、weather=晴输出“北京今天晴”。；错误反馈：直接用+拼接整数温度出现TypeError。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-04-scene",
+      "lessonId": "P0-U1-L04",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：两个整数相加得到2，两个字符串拼接得到11。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-04-guide",
+      "lessonId": "P0-U1-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：程序把年龄当成字符串导致1+1变成11。 开始前先说一说：什么变化能证明任务成功？ 比较字符串'1'拼接与整数1相加的差异。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-04-feedback",
+      "lessonId": "P0-U1-L04",
+      "kind": "sample_io",
+      "spec": "成功反馈：两个整数相加得到2，两个字符串拼接得到11。；错误反馈：把'12'+3当作合法加法。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-05-scene",
+      "lessonId": "P0-U1-L05",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：输入“ 小明 ”应输出“你好，小明”。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-05-guide",
+      "lessonId": "P0-U1-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：欢迎程序需要知道来访者怎么称呼。 开始前先说一说：什么变化能证明任务成功？ 读取用户输入，去除首尾空格后输出问候。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-05-feedback",
+      "lessonId": "P0-U1-L05",
+      "kind": "sample_io",
+      "spec": "成功反馈：输入“ 小明 ”应输出“你好，小明”。；错误反馈：空白输入导致姓名为空。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-06-scene",
+      "lessonId": "P0-U1-L06",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-06-guide",
+      "lessonId": "P0-U1-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：校园活动需要自动生成一张不含敏感个人信息的名片。 开始前先说一说：什么变化能证明任务成功？ 接收昵称、爱好、喜欢的颜色，格式化三行名片。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u1-06-feedback",
+      "lessonId": "P0-U1-L06",
+      "kind": "sample_io",
+      "spec": "成功反馈：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。；错误反馈：空昵称或过长昵称应有清楚提示。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-01-scene",
+      "lessonId": "P0-U2-L01",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：9度提醒外套，20度轻便，30度注意防晒。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-01-guide",
+      "lessonId": "P0-U2-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：晨跑前要根据温度提醒同学穿衣。 开始前先说一说：什么变化能证明任务成功？ 通过if/elif/else区分低于10、10-24、25以上的建议。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-01-feedback",
+      "lessonId": "P0-U2-L01",
+      "kind": "sample_io",
+      "spec": "成功反馈：9度提醒外套，20度轻便，30度注意防晒。；错误反馈：10度正好落在两个区间或都没有命中。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-02-scene",
+      "lessonId": "P0-U2-L02",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：答案7时猜3提示小了、猜9提示大了、猜7成功。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-02-guide",
+      "lessonId": "P0-U2-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：森林侦探猜一个1到10的数字。 开始前先说一说：什么变化能证明任务成功？ 比较猜测值和答案，分别提示大了、小了、猜中了。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-02-feedback",
+      "lessonId": "P0-U2-L02",
+      "kind": "sample_io",
+      "spec": "成功反馈：答案7时猜3提示小了、猜9提示大了、猜7成功。；错误反馈：用户输入文字引发ValueError。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-03-scene",
+      "lessonId": "P0-U2-L03",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：输出四行分别1、2、3、4个星号。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-03-guide",
+      "lessonId": "P0-U2-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：庆典要在终端打印整齐的三角形星星。 开始前先说一说：什么变化能证明任务成功？ 用for循环依次打印1到4颗星星。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-03-feedback",
+      "lessonId": "P0-U2-L03",
+      "kind": "sample_io",
+      "spec": "成功反馈：输出四行分别1、2、3、4个星号。；错误反馈：range(4)从0开始第一行是空行。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-04-scene",
+      "lessonId": "P0-U2-L04",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：返回总分14，空列表得分0。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-04-guide",
+      "lessonId": "P0-U2-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：小朋友在四项小任务分别得分。 开始前先说一说：什么变化能证明任务成功？ 将[3,5,2,4]用for循环累加。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-04-feedback",
+      "lessonId": "P0-U2-L04",
+      "kind": "sample_io",
+      "spec": "成功反馈：返回总分14，空列表得分0。；错误反馈：第一次循环前没有total=0。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-05-scene",
+      "lessonId": "P0-U2-L05",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：第三次正确成功，三次错误后停止。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-05-guide",
+      "lessonId": "P0-U2-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：班级电脑有模拟口令输入，需要限制尝试次数。 开始前先说一说：什么变化能证明任务成功？ 使用while最多允许三次输入，不保存真实密码。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-05-feedback",
+      "lessonId": "P0-U2-L05",
+      "kind": "sample_io",
+      "spec": "成功反馈：第三次正确成功，三次错误后停止。；错误反馈：第四次仍能尝试或进入无限循环。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-06-scene",
+      "lessonId": "P0-U2-L06",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：抽选结果必属于任务列表，空列表给出错误提示。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-06-guide",
+      "lessonId": "P0-U2-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：班级要公平随机分配四种任务卡给小组。 开始前先说一说：什么变化能证明任务成功？ 用random.choice从非空任务列表选一张，设定可复现随机种子。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u2-06-feedback",
+      "lessonId": "P0-U2-L06",
+      "kind": "sample_io",
+      "spec": "成功反馈：抽选结果必属于任务列表，空列表给出错误提示。；错误反馈：空列表直接choice抛异常。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-01-scene",
+      "lessonId": "P0-U3-L01",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：输入“ 你好 ”返回2，空白返回0。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-01-guide",
+      "lessonId": "P0-U3-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：读书笔记需要知道一段文字有多少字符。 开始前先说一说：什么变化能证明任务成功？ 使用len统计去掉首尾空格后的文本长度。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-01-feedback",
+      "lessonId": "P0-U3-L01",
+      "kind": "sample_io",
+      "spec": "成功反馈：输入“ 你好 ”返回2，空白返回0。；错误反馈：错误地按字节长度统计中文字符。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-02-scene",
+      "lessonId": "P0-U3-L02",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：增加“手电”后清单长度4，移除“帽子”后长度3。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-02-guide",
+      "lessonId": "P0-U3-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：旅行队要携带地图、水壶、帽子。 开始前先说一说：什么变化能证明任务成功？ 用list创建清单、append加物品、remove删物品。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-02-feedback",
+      "lessonId": "P0-U3-L02",
+      "kind": "sample_io",
+      "spec": "成功反馈：增加“手电”后清单长度4，移除“帽子”后长度3。；错误反馈：删除不存在的项目引发ValueError。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-03-scene",
+      "lessonId": "P0-U3-L03",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：查询CAT可匹配cat，查询dog返回未收录。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-03-guide",
+      "lessonId": "P0-U3-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：单词闯关需要判断一个词是否在词库里。 开始前先说一说：什么变化能证明任务成功？ 用小写转换和in实现大小写无关查询。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-03-feedback",
+      "lessonId": "P0-U3-L03",
+      "kind": "sample_io",
+      "spec": "成功反馈：查询CAT可匹配cat，查询dog返回未收录。；错误反馈：直接比较大小写导致同词判错。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-04-scene",
+      "lessonId": "P0-U3-L04",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：A组3分加2变5，不影响B组。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-04-guide",
+      "lessonId": "P0-U3-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：小组积分板记录三组同学的任务得分。 开始前先说一说：什么变化能证明任务成功？ 用字典保存组名到分数，更新指定小组加分。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-04-feedback",
+      "lessonId": "P0-U3-L04",
+      "kind": "sample_io",
+      "spec": "成功反馈：A组3分加2变5，不影响B组。；错误反馈：更新一个组却覆盖整个分数字典。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-05-scene",
+      "lessonId": "P0-U3-L05",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：查已有词返回释义；查未知词返回友好提示。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-05-guide",
+      "lessonId": "P0-U3-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：学校想做一个迷你词典方便查询。 开始前先说一说：什么变化能证明任务成功？ 用dict存单词释义，支持添加、查找和更新。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-05-feedback",
+      "lessonId": "P0-U3-L05",
+      "kind": "sample_io",
+      "spec": "成功反馈：查已有词返回释义；查未知词返回友好提示。；错误反馈：直接dict[key]查未知词抛KeyError。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-06-scene",
+      "lessonId": "P0-U3-L06",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：第一次借阅成功、第二次被拒、归还后再次可借。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-06-guide",
+      "lessonId": "P0-U3-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：图书室借书登记要避免一本书被重复借出。 开始前先说一说：什么变化能证明任务成功？ 维护图书可借状态，提供borrow和return_book功能。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u3-06-feedback",
+      "lessonId": "P0-U3-L06",
+      "kind": "sample_io",
+      "spec": "成功反馈：第一次借阅成功、第二次被拒、归还后再次可借。；错误反馈：同一本书连续借两次却都成功。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-01-scene",
+      "lessonId": "P0-U4-L01",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：greet('小雨')返回包含昵称的问候语。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-01-guide",
+      "lessonId": "P0-U4-L01",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：班级里多处都要说“欢迎来上课”。 开始前先说一说：什么变化能证明任务成功？ 把问候语封装成greet函数并调用两次。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-01-feedback",
+      "lessonId": "P0-U4-L01",
+      "kind": "sample_io",
+      "spec": "成功反馈：greet('小雨')返回包含昵称的问候语。；错误反馈：函数只打印不返回导致调用结果None。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-02-scene",
+      "lessonId": "P0-U4-L02",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：[1,2,3]得6，[]得0。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-02-guide",
+      "lessonId": "P0-U4-L02",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：同一个计算器要处理不同长度的清单。 开始前先说一说：什么变化能证明任务成功？ 写sum_scores(scores)函数，参数为数字列表。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-02-feedback",
+      "lessonId": "P0-U4-L02",
+      "kind": "sample_io",
+      "spec": "成功反馈：[1,2,3]得6，[]得0。；错误反馈：函数内部修改外部列表导致副作用。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-03-scene",
+      "lessonId": "P0-U4-L03",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：指定种子时重复运行结果一致。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-03-guide",
+      "lessonId": "P0-U4-L03",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：太空伙伴随机抽一张行动卡。 开始前先说一说：什么变化能证明任务成功？ 从random模块调用choice，并注入Random种子便于测试。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-03-feedback",
+      "lessonId": "P0-U4-L03",
+      "kind": "sample_io",
+      "spec": "成功反馈：指定种子时重复运行结果一致。；错误反馈：以未固定随机结果作为唯一断言导致测试不稳定。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-04-scene",
+      "lessonId": "P0-U4-L04",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：输入12成功、输入abc提示必须是整数。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-04-guide",
+      "lessonId": "P0-U4-L04",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：同学输入的积分有时是“abc”导致程序崩溃。 开始前先说一说：什么变化能证明任务成功？ 用try/except捕获非整数输入，并返回可读错误。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-04-feedback",
+      "lessonId": "P0-U4-L04",
+      "kind": "sample_io",
+      "spec": "成功反馈：输入12成功、输入abc提示必须是整数。；错误反馈：捕获所有异常掩盖实际代码缺陷。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-05-scene",
+      "lessonId": "P0-U4-L05",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：运行main能调用logic里的函数，单测可独立导入logic。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-05-guide",
+      "lessonId": "P0-U4-L05",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：作品逐渐变大，需要拆成两个Python模块。 开始前先说一说：什么变化能证明任务成功？ 创建logic.py放计算函数，main.py只负责用户交互。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-05-feedback",
+      "lessonId": "P0-U4-L05",
+      "kind": "sample_io",
+      "spec": "成功反馈：运行main能调用logic里的函数，单测可独立导入logic。；错误反馈：模块循环导入导致ImportError。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-06-scene",
+      "lessonId": "P0-U4-L06",
+      "kind": "terminal_fixtures",
+      "spec": "教学用本地匿名示例输入与输出：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-06-guide",
+      "lessonId": "P0-U4-L06",
+      "kind": "voiceover_script",
+      "spec": "中文人声配音：校园班级任务越来越多，大家需要一个小工具记录待办。 开始前先说一说：什么变化能证明任务成功？ 用函数管理添加、完成、查看任务，使用列表存储。",
+      "requiredBeforePublish": true,
+      "source": "script_only",
+      "licenseStatus": "narration_not_recorded",
+      "status": "spec_only"
+    },
+    {
+      "assetId": "p0-p0-u4-06-feedback",
+      "lessonId": "P0-U4-L06",
+      "kind": "sample_io",
+      "spec": "成功反馈：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。；错误反馈：完成不存在的任务导致越界崩溃。",
+      "requiredBeforePublish": true,
+      "source": "not_supplied",
+      "licenseStatus": "not_acquired",
+      "status": "spec_only"
+    }
+  ]
+}
