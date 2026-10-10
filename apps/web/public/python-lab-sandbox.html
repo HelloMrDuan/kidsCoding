@@ -52,7 +52,7 @@ self.onmessage = async (event) => {
         '        __kc_results.append(str(__kc_value))',
         '    except Exception as __kc_error:',
         '        __kc_results.append("ERROR:" + type(__kc_error).__name__)'
-      ].join('\\n'));
+      ].join('\n'));
       const proxy = python.globals.get('__kc_results');
       const cases = proxy.toJs();
       proxy.destroy();
