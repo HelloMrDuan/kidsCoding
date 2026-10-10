@@ -21,6 +21,10 @@ describe('local Python practice portfolio is untrusted and defensive', () => {
     const result = collectLocalPractices({getItem:k=>items.get(k)??null})
     expect(result.map(x=>x.lessonId)).toEqual(['P0-U1-L03', 'P0-U1-L02'])
   })
+  it('accepts a capstone source draft without certifying any grade', () => {
+    const raw=JSON.stringify({source:'def make_profile(a,b,c): pass',passed:true,savedAt:'2026-10-10T14:00:00Z'})
+    expect(parseLocalPractice('P0-U1-L06',raw)).toMatchObject({lessonId:'P0-U1-L06',passed:true})
+  })
   it('does not throw when browser storage is denied', () => {
     const fail = {getItem:():string|null=>{throw Error('privacy blocked')}}
     expect(collectLocalPractices(fail)).toEqual([])

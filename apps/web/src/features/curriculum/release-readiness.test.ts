@@ -9,7 +9,7 @@ describe('lesson publication evidence gate is fail closed',()=>{
     expect(evaluateReleaseReadiness({contentReviewed:true}).missing).toHaveLength(6)
   })
   it('every experimental Scratch/Python pilot stays blocked',()=>{
-    expect(Object.keys(releasePilotEvidence)).toHaveLength(6)
+    expect(Object.keys(releasePilotEvidence)).toHaveLength(7)
     for(const evidence of Object.values(releasePilotEvidence)){
       const decision=evaluateReleaseReadiness(evidence)
       expect(decision.ready).toBe(false)

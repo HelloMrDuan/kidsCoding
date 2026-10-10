@@ -72,7 +72,7 @@ describe('authenticated Python practice cloud draft API', () => {
   })
 
   it('accepts new lesson source drafts without any claimed grade', async () => {
-    for(const lessonId of ['P0-U1-L04','P0-U1-L05']) {
+    for(const lessonId of ['P0-U1-L04','P0-U1-L05','P0-U1-L06']) {
       const response = await PUT(new Request('http://localhost/api/practice/drafts',{
         method:'PUT',body:JSON.stringify({lessonId,source:'def lesson(): pass',passed:true}),
       }))
