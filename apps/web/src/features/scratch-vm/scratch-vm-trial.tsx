@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
-type Sprite = { name: string; x: number; y: number; visible: boolean; original: boolean }
+type Sprite = { id: string; name: string; x: number; y: number; visible: boolean; original: boolean }
 type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[] }
 
 export function ScratchVMTrial() {
@@ -52,7 +52,7 @@ export function ScratchVMTrial() {
         const clones=current.filter(t=>!t.original&&t.visible)
         if(clones.length)setObservedClones(true)
         for(const target of clones) {
-          const key=target.name+':'+target.x.toFixed(1)
+          const key=target.id
           const prior=latestY.current.get(key)
           if(prior!==undefined&&target.y<prior-1)setObservedMovement(true)
           latestY.current.set(key,target.y)
@@ -98,8 +98,8 @@ export function ScratchVMTrial() {
                 <circle cx="40" cy="40" r="3" fill="#fff"/><circle cx="145" cy="92" r="3" fill="#fff"/><circle cx="346" cy="47" r="3" fill="#fff"/>
                 <path d="M0 330L100 270L230 340L340 268L480 340V360H0" fill="#4e6da6"/>
               </svg>
-              {spritesInBounds.map((sprite,i)=>(
-                <span key={i} className="absolute text-3xl" data-testid="scratch-live-clone"
+              {spritesInBounds.map((sprite)=>(
+                <span key={sprite.id} className="absolute text-3xl" data-testid="scratch-live-clone"
                   style={{left:`${(sprite.x+240)/480*100}%`,top:`${(180-sprite.y)/360*100}%`,transform:'translate(-50%,-50%)'}}
                 >☄️</span>
               ))}

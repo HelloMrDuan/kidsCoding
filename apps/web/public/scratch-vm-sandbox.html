@@ -28,7 +28,7 @@
   function snapshot() {
     if (!vm || !vm.runtime) return;
     const targets = vm.runtime.targets.filter(t => !t.isStage).map(t => ({
-      name: typeof t.getName === 'function' ? t.getName() : t.sprite?.name,
+      id: String(t.id), name: typeof t.getName === 'function' ? t.getName() : t.sprite?.name,
       x: Number(t.x), y: Number(t.y), visible: Boolean(t.visible),
       original: Boolean(t.isOriginal)
     }));

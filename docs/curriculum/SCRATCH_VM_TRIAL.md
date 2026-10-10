@@ -7,3 +7,5 @@
 - Browser E2E must prove `loadProject`, `greenFlag`, clone creation, y-coordinate movement, and `stopAll`; it must not use route interception or fabricated VM target data.
 - External jsDelivr dependency + AGPL-3.0-only package obligations need review and self-hosting before wide public release.
 - No user files or grades; not marked as released lesson.
+
+- First Chrome CI confirmed real VM loaded the archive and created clones; it did not observe persistent motion because the original sprite loop had no pause. Revised checked-in archive adds `control_wait(0.05)` after each of 30 y-movement steps; telemetry now correlates VM target IDs across snapshots, not matching by names. This change needs a fresh real Chrome E2E success before merge.
