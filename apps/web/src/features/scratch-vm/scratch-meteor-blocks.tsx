@@ -28,7 +28,7 @@ export function readMeteorProgram(workspace: Blockly.Workspace): MeteorProgram |
   return {spawnCount,fallStep}
 }
 
-export function ScratchMeteorBlocks({onProgramChange}:{onProgramChange:(program:MeteorProgram|null)=>void}) {
+export function ScratchMeteorBlocks({onProgramChange,initialProgram}:{onProgramChange:(program:MeteorProgram|null)=>void;initialProgram?:MeteorProgram}) {
   const node=useRef<HTMLDivElement>(null)
   const workspace=useRef<Blockly.WorkspaceSvg|null>(null)
   const notify=useRef(onProgramChange)
@@ -52,6 +52,7 @@ export function ScratchMeteorBlocks({onProgramChange}:{onProgramChange:(program:
     const count=ws.newBlock('kc_meteor_count')
     const fall=ws.newBlock('kc_meteor_fall')
     for (const b of [start,count,fall]) {b.initSvg();b.render()}
+    if(initialProgram){count.setFieldValue(String(initialProgram.spawnCount),'COUNT');fall.setFieldValue(String(initialProgram.fallStep),'STEP')}
     start.nextConnection?.connect(count.previousConnection!)
     count.nextConnection?.connect(fall.previousConnection!)
     start.moveBy(32,36)

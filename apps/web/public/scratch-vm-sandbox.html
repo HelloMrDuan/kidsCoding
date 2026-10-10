@@ -26,6 +26,32 @@
     }
     vm = null;
   }
+
+  function readMeteorProgram(candidate) {
+    const originals=candidate.runtime.targets.filter(t=>t.isOriginal);
+    if(originals.length!==2 || originals.filter(t=>t.isStage).length!==1) throw new Error('只允许本课程的双角色项目');
+    const sprite=originals.find(t=>!t.isStage && t.getName()==='流星');
+    if(!sprite)throw new Error('流星角色不存在');
+    const required=[
+      ['flag','event_whenflagclicked'],['repeat','control_repeat'],
+      ['spawn','control_create_clone_of'],['clone_flag','control_start_as_clone'],
+      ['move_y','motion_changeyby'],['delete','control_delete_this_clone']
+    ];
+    for(const [id,opcode] of required){
+      if(sprite.blocks.getBlock(id)?.opcode!==opcode)throw new Error('不属于本课程的流星积木脚本');
+    }
+    function numberAt(parentId,input){
+      const parent=sprite.blocks.getBlock(parentId);
+      const nested=sprite.blocks.getBlock(parent?.inputs?.[input]?.block);
+      if(!nested || !nested.opcode.startsWith('math_'))throw new Error('数值积木丢失');
+      return Number(nested.fields?.NUM?.value);
+    }
+    const spawnCount=numberAt('repeat','TIMES');
+    const fallStep=-numberAt('move_y','DY');
+    if(!Number.isInteger(spawnCount)||spawnCount<1||spawnCount>15||
+       !Number.isInteger(fallStep)||fallStep<5||fallStep>25) throw new Error('数字积木超过允许范围');
+    return {spawnCount,fallStep};
+  }
   function snapshot() {
     if (!vm || !vm.runtime) return;
     const targets = vm.runtime.targets.filter(t => !t.isStage).map(t => ({
@@ -131,25 +157,32 @@
       return;
     }
     if (data.kind !== 'LOAD' || !Number.isSafeInteger(data.id) || !(data.archive instanceof ArrayBuffer)) return;
-    reset();
+    // Transactional replacement: an invalid import cannot destroy the last working project.
+    const imported=Boolean(data.imported);
     currentId=data.id;
-    ready=false;
-    currentProgram={spawnCount:10,fallStep:13};
-    if (!window.VirtualMachine) {
-      send('ERROR',{error:'Scratch VM 未加载。请检查 CDN 网络。'});
-      return;
-    }
+    if(!window.VirtualMachine){send('ERROR',{error:'Scratch VM 未加载，请检查 CDN 网络。'});return;}
+    let candidate=null;
     try {
-      vm=new window.VirtualMachine();
-      await vm.loadProject(data.archive);
-      vm.start();
+      if(data.archive.byteLength<300||data.archive.byteLength>5_000_000)throw new Error('项目大小不符合要求');
+      const signature=new Uint8Array(data.archive,0,2);
+      if(signature[0]!==0x50||signature[1]!==0x4b)throw new Error('项目不是 Scratch ZIP');
+      candidate=new window.VirtualMachine();
+      await candidate.loadProject(data.archive);
+      const program=readMeteorProgram(candidate);
+      candidate.start();
+      reset();
+      vm=candidate;
+      candidate=null;
       ready=true;
-      send('PROJECT_LOADED',{targetNames:vm.runtime.targets.map(t=>typeof t.getName==='function'?t.getName():'')});
+      currentProgram=program;
+      send('PROJECT_LOADED',{program,imported,
+        targetNames:vm.runtime.targets.map(t=>typeof t.getName==='function'?t.getName():'')});
       snapshot();
       timer=setInterval(snapshot,100);
-    } catch(error) {
-      send('ERROR',{error:'Scratch VM 加载项目失败：'+String(error).slice(0,700)});
-      reset();
+    }catch(error){
+      send('ERROR',{error:'导入 Scratch 项目失败，原作品不变：'+String(error).slice(0,600)});
+    }finally{
+      if(candidate)try{candidate.quit()}catch(_error){}
     }
   });
 })();
