@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line'; args: [string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line'; args: readonly [string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
