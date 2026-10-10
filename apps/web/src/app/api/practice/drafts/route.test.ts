@@ -71,6 +71,16 @@ describe('authenticated Python practice cloud draft API', () => {
     expect(body.verifiedGrade).toBe(false)
   })
 
+  it('accepts new lesson source drafts without any claimed grade', async () => {
+    for(const lessonId of ['P0-U1-L04','P0-U1-L05']) {
+      const response = await PUT(new Request('http://localhost/api/practice/drafts',{
+        method:'PUT',body:JSON.stringify({lessonId,source:'def lesson(): pass',passed:true}),
+      }))
+      expect(response.status).toBe(200)
+      expect((await response.json()).verifiedGrade).toBe(false)
+    }
+  })
+
   it('rejects invalid lessons and cross-origin writes', async () => {
     expect((await PUT(new Request('http://localhost/api/practice/drafts',{
       method:'PUT',body:JSON.stringify({lessonId:'P0-U1-L01',source:'print(1)'}),

@@ -34,7 +34,7 @@ self.onmessage = async (event) => {
     if (event.data.kind === 'RUN_TESTS') {
       const tests = event.data.tests;
       if (!Array.isArray(tests) || tests.length < 2 || tests.length > 6 ||
-          tests.some(t => !t || !['introduce','weather_line'].includes(t.function) ||
+          tests.some(t => !t || !['introduce','weather_line','number_or_text','greet_name'].includes(t.function) ||
                      !Array.isArray(t.args) || t.args.length !== 2 ||
                      t.args.some(a => typeof a !== 'string' || a.length > 40))) {
         throw new Error('非法练习测试配置');

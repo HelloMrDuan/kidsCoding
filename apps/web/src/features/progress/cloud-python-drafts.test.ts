@@ -7,6 +7,8 @@ describe('Python cloud draft validation', () => {
       lessonId: 'P0-U1-L02', source: 'print(1)', userId: 'other-user', passed: true,
     })).toEqual({ lessonId: 'P0-U1-L02', source: 'print(1)' })
     expect(validatePythonDraftPayload({ lessonId: 'P0-U1-L03', source: '' })).toEqual({ lessonId: 'P0-U1-L03', source: '' })
+    expect(validatePythonDraftPayload({ lessonId: 'P0-U1-L04', source: 'return int(left)' })).toMatchObject({lessonId:'P0-U1-L04'})
+    expect(validatePythonDraftPayload({ lessonId: 'P0-U1-L05', source: 'return name.strip()' })).toMatchObject({lessonId:'P0-U1-L05'})
   })
   it('rejects unknown lessons, bad types, oversized drafts, and invalid JSON shapes', () => {
     for (const value of [

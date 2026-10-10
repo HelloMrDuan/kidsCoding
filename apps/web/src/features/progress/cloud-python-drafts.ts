@@ -3,7 +3,7 @@ import { isMultiPythonLessonId } from '@/features/python-lab/python-multi-grade'
 export const MAX_PYTHON_DRAFT_SOURCE_LENGTH = 5000
 
 export type PythonDraftPayload = {
-  lessonId: 'P0-U1-L02' | 'P0-U1-L03'
+  lessonId: 'P0-U1-L02' | 'P0-U1-L03' | 'P0-U1-L04' | 'P0-U1-L05'
   source: string
 }
 
