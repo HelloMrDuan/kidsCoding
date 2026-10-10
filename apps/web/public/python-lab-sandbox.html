@@ -29,10 +29,38 @@ self.onmessage = async (event) => {
     };
     python.setStdout({batched:addLine});
     python.setStderr({batched:addLine});
-    // Each run receives an independent Python namespace. Nothing executes on the Next.js server.
-    // This is a preview sandbox; do not treat local output grading as a trusted exam result.
-    python.runPython('exec(compile(' + JSON.stringify(source) + ', "<learner>", "exec"), {"__builtins__": __builtins__})');
-    self.postMessage({kind:'RESULT',output:output.slice(0,4000),error:null});
+    // Each run executes in a fresh namespace inside the opaque-origin sandbox worker.
+    // These tests are *local practice*, not a trustworthy exam or server grade.
+    if (event.data.kind === 'RUN_TESTS') {
+      const tests = event.data.tests;
+      if (!Array.isArray(tests) || tests.length < 2 || tests.length > 6 ||
+          tests.some(t => !t || !['introduce','weather_line'].includes(t.function) ||
+                     !Array.isArray(t.args) || t.args.length !== 2 ||
+                     t.args.some(a => typeof a !== 'string' || a.length > 40))) {
+        throw new Error('非法练习测试配置');
+      }
+      python.globals.set('__kc_source', source);
+      python.globals.set('__kc_tests_json', JSON.stringify(tests));
+      python.runPython([
+        'import json',
+        '__kc_ns = {"__builtins__": __builtins__}',
+        'exec(compile(__kc_source, "<learner>", "exec"), __kc_ns)',
+        '__kc_results = []',
+        'for __kc_case in json.loads(__kc_tests_json):',
+        '    try:',
+        '        __kc_value = __kc_ns[__kc_case["function"]](*__kc_case["args"])',
+        '        __kc_results.append(str(__kc_value))',
+        '    except Exception as __kc_error:',
+        '        __kc_results.append("ERROR:" + type(__kc_error).__name__)'
+      ].join('\\n'));
+      const proxy = python.globals.get('__kc_results');
+      const cases = proxy.toJs();
+      proxy.destroy();
+      self.postMessage({kind:'RESULT',output:output.slice(0,4000),cases,error:null});
+    } else {
+      python.runPython('exec(compile(' + JSON.stringify(source) + ', "<learner>", "exec"), {"__builtins__": __builtins__})');
+      self.postMessage({kind:'RESULT',output:output.slice(0,4000),error:null});
+    }
   } catch (error) {
     self.postMessage({kind:'RESULT',output:'',error:String(error).slice(0,800)});
   }
@@ -58,7 +86,7 @@ self.onmessage = async (event) => {
       stop();
       return;
     }
-    if (data.kind !== 'RUN' || !Number.isSafeInteger(data.id)) return;
+    if (!['RUN','RUN_TESTS'].includes(data.kind) || !Number.isSafeInteger(data.id)) return;
     stop();
     const blob = new Blob([document.getElementById('worker-source').textContent], {type:'text/javascript'});
     const address = URL.createObjectURL(blob);
@@ -68,14 +96,14 @@ self.onmessage = async (event) => {
     activeWorker = worker;
     worker.onmessage = (message) => {
       if (worker !== activeWorker) return;
-      window.parent.postMessage({kind:message.data.kind, id:activeId, output:message.data.output, error:message.data.error}, '*');
+      window.parent.postMessage({kind:message.data.kind, id:activeId, output:message.data.output, error:message.data.error, cases:message.data.cases}, '*');
       if (message.data.kind === 'RESULT') stop();
     };
     worker.onerror = () => {
       window.parent.postMessage({kind:'RESULT',id:activeId,output:'',error:'Python 引擎加载或执行失败'},'*');
       stop();
     };
-    worker.postMessage({source:data.source});
+    worker.postMessage({kind:data.kind,source:data.source,tests:data.tests});
   });
 })();
 </script>
