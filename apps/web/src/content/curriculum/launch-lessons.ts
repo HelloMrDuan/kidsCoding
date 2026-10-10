@@ -62,6 +62,7 @@ export const launchTemplates: ProjectTemplateDefinition[] = [
 export const launchLessons: LaunchLessonDefinition[] = [
   {
     id: 'lesson-01-forest-hello',
+    templateId: 'forest-meetup-stage',
     title: '小狐狸出场',
     goal: '让小狐狸从舞台一边走到另一边，完成第一次出场。',
     recommendedLevel: 'starter',
@@ -85,6 +86,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
   },
   {
     id: 'lesson-02-forest-greeting',
+    templateId: 'forest-meetup-stage',
     title: '小狐狸打招呼',
     goal: '让小狐狸出场后说一句欢迎的话。',
     recommendedLevel: 'starter',
@@ -108,6 +110,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
   },
   {
     id: 'lesson-03-forest-story',
+    templateId: 'forest-meetup-stage',
     title: '森林里的第一次见面',
     goal: '把动作和对白连起来，完成第一个完整小故事。',
     recommendedLevel: 'starter',
@@ -127,7 +130,6 @@ export const launchLessons: LaunchLessonDefinition[] = [
       '顺序要是“开始时 → 向右移动 → 说一句话”。',
       '先看一下顺序示意，再回来把故事接完整。',
     ),
-    templateId: 'forest-meetup-stage',
     parentAdvice: '和孩子一起回看第一个作品，问问他先看到什么、又听到了什么。',
   },
   {
