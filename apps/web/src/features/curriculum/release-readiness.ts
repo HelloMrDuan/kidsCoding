@@ -39,4 +39,12 @@ export const releasePilotEvidence: Record<string, ReleaseEvidence> = {
     contentReviewed:false,engineProductionReady:false,assessmentE2EPassed:false,
     licensedAssetsReady:false,progressVerified:false,minorPrivacyApproved:false,humanApproved:false,
   },
+  'P0-U1-L04': {
+    contentReviewed:false,engineProductionReady:false,assessmentE2EPassed:false,
+    licensedAssetsReady:false,progressVerified:false,minorPrivacyApproved:false,humanApproved:false,
+  },
+  'P0-U1-L05': {
+    contentReviewed:false,engineProductionReady:false,assessmentE2EPassed:false,
+    licensedAssetsReady:false,progressVerified:false,minorPrivacyApproved:false,humanApproved:false,
+  },
 }

@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line'; args: readonly [string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name'; args: readonly [string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -22,6 +22,29 @@ export const pythonPracticeLessons = {
       { function: 'weather_line', args: ['成都', '小雨'], expected: '成都今天小雨' },
     ],
     hint: '提示：return f"{city}今天{weather}"',
+  },
+
+  'P0-U1-L04': {
+    title: '第4课 · 数字和字符串',
+    prompt: '编写 number_or_text(left, right) 函数。两个参数是数字字符串，要分别计算整数加法和原字符串拼接，返回“相加=结果；拼接=结果”。注意数字 0 和前导 0。',
+    startCode: 'def number_or_text(left, right):\n    # 数字字符串不能直接当整数相加\n    return left + right',
+    cases: [
+      { function: 'number_or_text', args: ['1', '1'], expected: '相加=2；拼接=11' },
+      { function: 'number_or_text', args: ['12', '3'], expected: '相加=15；拼接=123' },
+      { function: 'number_or_text', args: ['0', '8'], expected: '相加=8；拼接=08' },
+    ],
+    hint: '提示：先用 int(left) + int(right) 求和，再单独用 left + right 拼接。',
+  },
+  'P0-U1-L05': {
+    title: '第5课 · 输入你的名字',
+    prompt: '编写 greet_name(name, prefix) 函数。先清除名字首尾空格，再返回“称呼，姓名”；如果名字只有空格，就返回“请输入名字”。',
+    startCode: 'def greet_name(name, prefix):\n    # 清理姓名，注意空白输入\n    return prefix + "，" + name',
+    cases: [
+      { function: 'greet_name', args: [' 小明 ', '你好'], expected: '你好，小明' },
+      { function: 'greet_name', args: ['  小雪', '欢迎'], expected: '欢迎，小雪' },
+      { function: 'greet_name', args: ['   ', '你好'], expected: '请输入名字' },
+    ],
+    hint: '提示：clean = name.strip()，如果 not clean 则提示重新输入。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; startCode:string; cases: readonly PythonCase[]; hint:string}>
 

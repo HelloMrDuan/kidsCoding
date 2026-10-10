@@ -122,7 +122,7 @@ export function LocalPracticePortfolio() {
         {!loaded ? <p className="rounded-2xl bg-white p-6">正在读取本机作品……</p> : null}
         {loaded && items.length === 0 ? <div className="rounded-[2rem] bg-white p-8 shadow-sm">
           <h2 className="text-xl font-black">还没有保存的练习</h2>
-          <p className="mt-3 text-slate-600">先去第2课或第3课写一段 Python，编辑器会自动保存到当前浏览器。</p>
+          <p className="mt-3 text-slate-600">先去第2～5课中的任意一节写一段 Python，编辑器会自动保存到当前浏览器。</p>
           <Link href="/learn/python-lab/P0-U1-L02" className="mt-5 inline-flex rounded-full bg-emerald-700 px-5 py-3 font-bold text-white">开始第2课 →</Link>
         </div> : null}
         {items.map(item=><article key={item.lessonId} data-testid={`practice-item-${item.lessonId}`} className="rounded-[2rem] bg-white p-6 shadow-sm">

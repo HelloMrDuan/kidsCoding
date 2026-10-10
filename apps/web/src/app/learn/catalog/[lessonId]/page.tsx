@@ -44,7 +44,7 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
             <Link data-testid="scratch-trial-entry" href="/learn/scratch-lab/G3-U1-L02" className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">体验 Scratch VM →</Link>
           </section>
         ) : null}
-        {['P0-U1-L02','P0-U1-L03'].includes(lesson.id) ? (
+        {['P0-U1-L02','P0-U1-L03','P0-U1-L04','P0-U1-L05'].includes(lesson.id) ? (
           <section className="rounded-[2rem] border-2 border-emerald-200 bg-white p-6 shadow-sm">
             <p className="text-xs font-bold text-emerald-700">Python 真运行 · 3组自动评测 · 浏览器草稿</p>
             <h2 className="mt-2 text-xl font-black">编写函数，使用三组不同数据验证</h2>
