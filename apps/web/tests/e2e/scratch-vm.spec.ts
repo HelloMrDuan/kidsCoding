@@ -90,3 +90,41 @@ test('exports a genuine Scratch VM .sb3 and reloads it in a fresh VM to verify e
   await page.getByTestId('scratch-stop').click()
   await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
 })
+
+test('exported real Scratch .sb3 reimports and restores Blockly for continued authoring',async({page})=>{
+  test.setTimeout(180_000)
+  await page.goto('/learn/scratch-lab/G3-U1-L02')
+  await expect(page.getByTestId('scratch-green-flag')).toBeEnabled({timeout:60_000})
+  await page.getByTestId('scratch-edit-spawn-count').fill('4')
+  await page.getByTestId('scratch-edit-fall-step').fill('18')
+  await page.getByTestId('scratch-apply-blocks').click()
+  await expect(page.getByTestId('scratch-applied-program')).toHaveText('4颗 / 每步18')
+  const downloading=page.waitForEvent('download',{timeout:60_000})
+  await page.getByTestId('scratch-export-sb3').click()
+  const saved=await downloading
+  const localPath=await saved.path()
+  expect(localPath).not.toBeNull()
+  await page.getByTestId('scratch-edit-spawn-count').fill('2')
+  await page.getByTestId('scratch-edit-fall-step').fill('25')
+  await page.getByTestId('scratch-apply-blocks').click()
+  await expect(page.getByTestId('scratch-applied-program')).toHaveText('2颗 / 每步25')
+
+  await page.getByTestId('scratch-import-sb3').setInputFiles(localPath!)
+  await expect(page.getByTestId('scratch-vm-status')).toContainText('已重新导入作品',{timeout:50_000})
+  await expect(page.getByTestId('scratch-applied-program')).toHaveText('4颗 / 每步18')
+  await expect(page.getByTestId('scratch-edit-spawn-count')).toHaveValue('4')
+  await expect(page.getByTestId('scratch-edit-fall-step')).toHaveValue('18')
+  await expect(page.getByTestId('scratch-editor-validity')).toContainText('连接正确')
+  await page.getByTestId('scratch-green-flag').click()
+  await expect(page.getByTestId('scratch-created-total')).toHaveText('4',{timeout:18_000})
+  await page.getByTestId('scratch-stop').click()
+  await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
+
+  // Bad file is refused before loading, and does not overwrite the good VM.
+  await page.getByTestId('scratch-import-sb3').setInputFiles({
+    name:'invalid.sb3',mimeType:'application/octet-stream',buffer:Buffer.alloc(1024,0x41)
+  })
+  await expect(page.getByTestId('scratch-vm-status')).toContainText('不是 Scratch ZIP')
+  await expect(page.getByTestId('scratch-applied-program')).toHaveText('4颗 / 每步18')
+  await expect(page.getByTestId('scratch-green-flag')).toBeEnabled()
+})
