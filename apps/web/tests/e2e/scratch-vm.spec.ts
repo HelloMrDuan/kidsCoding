@@ -109,7 +109,9 @@ test('exported real Scratch .sb3 reimports and restores Blockly for continued au
   await page.getByTestId('scratch-apply-blocks').click()
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('2颗 / 每步25')
 
-  await page.getByTestId('scratch-import-sb3').setInputFiles(localPath!)
+  await page.getByTestId('scratch-import-sb3').setInputFiles({
+    name:'restored.sb3',mimeType:'application/octet-stream',buffer:await readFile(localPath!)
+  })
   await expect(page.getByTestId('scratch-vm-status')).toContainText('已重新导入作品',{timeout:50_000})
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('4颗 / 每步18')
   await expect(page.getByTestId('scratch-edit-spawn-count')).toHaveValue('4')
