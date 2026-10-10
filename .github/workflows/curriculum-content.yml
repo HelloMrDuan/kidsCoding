@@ -17,6 +17,8 @@ on:
       - 'examples/python/advanced/**'
       - 'examples/scratch/g3/**'
       - 'apps/web/src/features/python-lab/**'
+      - 'apps/web/src/features/progress/local-practice*'
+      - 'apps/web/src/app/learn/portfolio/**'
       - 'apps/web/src/app/learn/python-lab/**'
       - 'apps/web/public/python-lab-sandbox.html'
       - 'apps/web/public/scratch-vm-sandbox.html'
@@ -49,7 +51,7 @@ jobs:
       - name: ESLint
         run: npm run lint
       - name: Curriculum contract tests
-        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts
+        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts
       - name: Production build
         run: npm run build
 

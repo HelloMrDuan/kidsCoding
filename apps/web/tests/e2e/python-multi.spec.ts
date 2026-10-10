@@ -17,6 +17,11 @@ test('second Python lesson executes three independent cases and restores the rea
   await page.reload()
   await expect(page.getByTestId('python-multi-source')).toHaveValue(correct)
   await expect(page.getByTestId('python-multi-passed')).toBeVisible()
+  await page.getByTestId('python-portfolio-link').click()
+  await expect(page.getByTestId('practice-item-P0-U1-L02')).toBeVisible()
+  await expect(page.getByText('不是正式课程成绩或云端进度')).toBeVisible()
+  await page.getByRole('link',{name:'继续编辑作品 →'}).click()
+  await expect(page.getByTestId('python-multi-source')).toHaveValue(correct)
 })
 
 test('third Python lesson must satisfy different city/weather combinations',async({page})=>{

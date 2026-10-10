@@ -84,7 +84,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   }
   return <main className="min-h-screen bg-[linear-gradient(145deg,#eafbf1,#edf6ff_60%,#fff2dc)] px-4 py-7">
     <div className="mx-auto max-w-6xl space-y-5">
-      <Link className="font-bold text-emerald-800" href={`/learn/catalog/${lessonId}`}>← 返回课程介绍</Link>
+      <div className="flex flex-wrap items-center gap-4"><Link className="font-bold text-emerald-800" href={`/learn/catalog/${lessonId}`}>← 返回课程介绍</Link><Link className="font-bold text-sky-800" data-testid="python-portfolio-link" href="/learn/portfolio">查看本机作品夹 →</Link></div>
       <header className="rounded-[2rem] bg-white p-7 shadow-sm">
         <p className="text-sm font-extrabold text-emerald-700">Python 多题评测实验室 · 浏览器本地试验</p>
         <h1 className="mt-3 text-3xl font-black">{lesson.title}</h1>
