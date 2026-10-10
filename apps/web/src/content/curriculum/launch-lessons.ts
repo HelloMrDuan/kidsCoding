@@ -62,6 +62,7 @@ export const launchTemplates: ProjectTemplateDefinition[] = [
 export const launchLessons: LaunchLessonDefinition[] = [
   {
     id: 'lesson-01-forest-hello',
+    templateId: 'forest-meetup-stage',
     title: '小狐狸出场',
     goal: '让小狐狸从舞台一边走到另一边，完成第一次出场。',
     recommendedLevel: 'starter',
@@ -85,6 +86,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
   },
   {
     id: 'lesson-02-forest-greeting',
+    templateId: 'forest-meetup-stage',
     title: '小狐狸打招呼',
     goal: '让小狐狸出场后说一句欢迎的话。',
     recommendedLevel: 'starter',

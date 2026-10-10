@@ -28,12 +28,12 @@ test.describe('reward idempotency', () => {
 
     // Replay all five steps of lesson-01.
     await page.getByTestId('lesson-add-when_start').click()
-    await page.getByTestId('lesson-complete-step').click()
-    await page.getByTestId('lesson-complete-step').click()
-    await page.getByTestId('lesson-complete-step').click()
-    await page.getByTestId('lesson-add-move_right').click()
-    await page.getByTestId('lesson-complete-step').click()
-    await page.getByTestId('lesson-complete-step').click()
+    for(let step=0;step<5;step++){
+      if(step===3)await page.getByTestId('lesson-add-move_right').click()
+      await page.getByTestId('run-code-button').click()
+      await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:15_000})
+      await page.getByTestId('lesson-complete-step').click()
+    }
 
     await page.waitForURL('**/project/lesson-01-forest-hello/complete')
 
@@ -67,13 +67,12 @@ test.describe('reward idempotency', () => {
     // lesson-02 step 1 requires when_start + move_right.
     await page.getByTestId('lesson-add-when_start').click()
     await page.getByTestId('lesson-add-move_right').click()
-    await page.getByTestId('lesson-complete-step').click()
-    // Remaining steps progressively allow say_line; keep adding the required blocks.
-    await page.getByTestId('lesson-add-say_line').click()
-    await page.getByTestId('lesson-complete-step').click()
-    await page.getByTestId('lesson-complete-step').click()
-    await page.getByTestId('lesson-complete-step').click()
-    await page.getByTestId('lesson-complete-step').click()
+    for(let step=0;step<5;step++){
+      if(step===2)await page.getByTestId('lesson-add-say_line').click()
+      await page.getByTestId('run-code-button').click()
+      await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
+      await page.getByTestId('lesson-complete-step').click()
+    }
 
     await page.waitForURL('**/project/lesson-02-forest-greeting/complete')
 

@@ -4,6 +4,7 @@ test('first forest Blockly lesson requires actual execution before each step and
   test.setTimeout(180_000)
   await page.goto('/learn/lesson/lesson-01-forest-hello')
   await expect(page.getByTestId('lesson-playable-stage')).toBeVisible()
+  await expect(page.getByTestId('stage-character-main')).toContainText('小狐狸')
   await page.getByTestId('lesson-add-when_start').click()
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('请先点击舞台')
