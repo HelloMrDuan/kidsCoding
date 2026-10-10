@@ -15,7 +15,6 @@ on:
   push:
     branches:
       - main
-      - content/full-curriculum-library-v1
 
 permissions:
   contents: read
