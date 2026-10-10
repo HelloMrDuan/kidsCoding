@@ -105,6 +105,47 @@ describe('useBlockExecutor', () => {
     expect(result.current.executionState).toBe('error')
   })
 
+  it('arms a real clicked-event program but does not move until the child clicks the sprite', async () => {
+    const types=['when_clicked','move_right','say_line']
+    const blocks=types.map(type=>({type}))
+    const {result}=renderHook(()=>useBlockExecutor(blocks,types))
+    await act(async()=>{await result.current.run()})
+    expect(result.current.executionState).toBe('armed')
+    expect(result.current.characterPosition).toBe(0)
+    expect(result.current.characterMessage).toBeNull()
+    await act(async()=>{await result.current.clickCharacter()})
+    expect(result.current.executionState).toBe('success')
+    expect(result.current.characterPosition).toBe(100)
+    expect(result.current.characterMessage).toBe('蝴蝶收到你的点击啦！')
+  },12000)
+
+  it('prevents unarmed or repeated clicks and invalidates click success after reset',async()=>{
+    const types=['when_clicked','move_right']
+    const {result}=renderHook(()=>useBlockExecutor(types.map(type=>({type})),types))
+    await act(async()=>{await result.current.clickCharacter()})
+    expect(result.current.executionState).toBe('idle')
+    expect(result.current.characterPosition).toBe(0)
+    await act(async()=>{await result.current.run()})
+    await act(async()=>{await result.current.clickCharacter()})
+    expect(result.current.characterPosition).toBe(100)
+    await act(async()=>{await result.current.clickCharacter()})
+    expect(result.current.characterPosition).toBe(100)
+    act(()=>result.current.reset())
+    expect(result.current.executionState).toBe('idle')
+    expect(result.current.characterPosition).toBe(0)
+  },12000)
+
+  it('runs the original four-block garden story with movement, speech and repeat only after a click',async()=>{
+    const types=['when_clicked','move_right','say_line','repeat_twice']
+    const {result}=renderHook(()=>useBlockExecutor(types.map(type=>({type})),types))
+    await act(async()=>{await result.current.run()})
+    expect(result.current.executionState).toBe('armed')
+    await act(async()=>{await result.current.clickCharacter()})
+    expect(result.current.executionState).toBe('success')
+    expect(result.current.characterPosition).toBe(200)
+    expect(result.current.characterMessage).toBe('蝴蝶收到你的点击啦！')
+  },12000)
+
   it('cancels pending updates on unmount', async () => {
     const { result, unmount } = renderHook(() =>
       useBlockExecutor([{ type: 'when_start' }], ['when_start']),
