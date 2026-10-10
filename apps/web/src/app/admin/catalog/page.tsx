@@ -43,7 +43,7 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
                 <p className="mt-2 text-amber-900">剩余 {result.missing.length} 项：</p>
                 <p className="mt-1 leading-7 text-slate-700">{result.missing.map(item=>item.label).join('、')}</p>
               </div>
-            }))}
+            })}
           </div>
         </section>
         <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">

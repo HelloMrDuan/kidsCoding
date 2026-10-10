@@ -24,6 +24,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   const timeout=useRef<ReturnType<typeof setTimeout>|null>(null)
 
   useEffect(()=>{
+    const timer=window.setTimeout(()=>{
     try {
       const raw=window.localStorage.getItem(PREFIX+lessonId)
       if(raw) {
@@ -34,6 +35,8 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
       }
     } catch { /* Local storage may be blocked; the editor still works. */ }
     setHydrated(true)
+    },0)
+    return ()=>clearTimeout(timer)
   },[lessonId])
 
   useEffect(()=>{
@@ -41,7 +44,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
     try {
       const time=new Date().toISOString()
       window.localStorage.setItem(PREFIX+lessonId,JSON.stringify({source,passed,savedAt:time}))
-      setSavedAt(time)
+      window.setTimeout(()=>setSavedAt(time),0)
     } catch { /* Browser privacy or storage limits may block saving. */ }
   },[lessonId,source,passed,hydrated])
 
