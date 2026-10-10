@@ -85,3 +85,16 @@
 - G1/G2运行引擎尚未验收，不允许借用已有Blockly第一关的成功状态冒充 Scratch 课程已发布。
 
 所有资料需要经过知识点审核、引擎能力匹配、素材版权审查、自动评测、前端E2E后才能从未发布状态晋级。
+
+## G3/P1/P2 第四批
+
+- 24节G3 Scratch高阶详细教案：`track-g3-detailed-lessons-v2.json`。
+- 24节P1 Python游戏详细教案：`track-p1-detailed-lessons-v2.json`。
+- 24节P2 Python算法详细教案：`track-p2-detailed-lessons-v2.json`。
+- 累计**168节目录内课程已具有逐课脚本，264节仍停留在大纲**；原12节既有启蒙课程另计且保持不变。
+- 72条积极验收规格与72条消极验收规格是教案层设计（`spec_only`），没有冒充已经通过的自动评测。
+- 240项素材需求登记为`requirements_only`，不代表具备版权授权。
+- `examples/python/advanced/`提供8个真实P1/P2单元教学项目：4个P1（SVG数学艺术、文字冒险、打砖块、太空生存）和4个P2（排序名次、消息队列、最短路径、拓扑排课），附真实Python自动测试。
+- 其中打砖块还有 `pygame_showcase.py`，在GitHub Actions中使用SDL dummy驱动跑真实pygame窗口/游戏循环；仅证明示例渲染可运行，不代表浏览器Python沙箱。
+- `examples/scratch/g3/`提供原创可编辑星空与流星SVG素材、Scratch 3项目JSON及`.sb3`构建脚本。GitHub CI验证文件、联接与归档并上传可导入文件。**Scratch VM实际执行和画面运行未自动验证，正式发布前必须完成。**
+- 前后端课程详情页面现在可展示新增72节已写教案；未实现引擎的课程仍不可玩，后台只读不自动发布。

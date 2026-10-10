@@ -5,12 +5,17 @@ on:
     paths:
       - 'apps/web/src/content/curriculum/**'
       - 'apps/web/src/features/curriculum/**'
+      - 'apps/web/src/content/curriculum/track-g3-detailed-lessons-v2.json'
+      - 'apps/web/src/content/curriculum/track-p1-detailed-lessons-v2.json'
+      - 'apps/web/src/content/curriculum/track-p2-detailed-lessons-v2.json'
       - 'apps/web/src/app/learn/catalog/**'
       - 'apps/web/src/app/admin/catalog/**'
       - 'apps/web/src/app/api/curriculum/catalog/**'
       - 'apps/web/src/app/learn/map/page.tsx'
       - 'apps/web/src/app/admin/page.tsx'
       - 'examples/python/p0/**'
+      - 'examples/python/advanced/**'
+      - 'examples/scratch/g3/**'
       - '.github/workflows/curriculum-content.yml'
   push:
     branches:
@@ -50,3 +55,35 @@ jobs:
           python-version: '3.12'
       - name: 4 P0 examples and 16 offline unit tests
         run: python -m unittest discover -s examples/python/p0 -p 'test_course_projects.py' -v
+
+  advanced-python-and-pygame:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test 8 unit-level Python reference projects
+        run: python -m unittest discover -s examples/python/advanced -p 'test_*.py' -v
+      - name: Install Pygame for actual game renderer
+        run: python -m pip install -r examples/python/advanced/requirements-pygame.txt
+      - name: Run Pygame game loop against SDL dummy display
+        run: |
+          cd examples/python/advanced
+          SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy python pygame_showcase.py --smoke
+
+  scratch-sb3-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate original Scratch 3 project, media and clone blocks
+        run: python -m unittest discover -s examples/scratch/g3 -p 'test_*.py' -v
+      - name: Package editable Scratch sb3 sample
+        run: python examples/scratch/g3/build_scratch_project.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-scratch-meteor-clones
+          path: examples/scratch/g3/meteor_clones.sb3
