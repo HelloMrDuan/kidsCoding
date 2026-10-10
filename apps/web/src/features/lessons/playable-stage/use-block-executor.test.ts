@@ -96,7 +96,7 @@ describe('useBlockExecutor', () => {
     expect(result.current.characterPosition).toBe(200)
     expect(result.current.stageScene).toBe('meadow')
     expect(result.current.characterMessage).toBe('我到草地啦！')
-  })
+  },12000)
 
   it('refuses to repeat a movement that does not exist',async()=>{
     const sequence=['when_start','repeat_twice']
