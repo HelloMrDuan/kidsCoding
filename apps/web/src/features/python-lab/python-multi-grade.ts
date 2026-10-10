@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name'; args: readonly [string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -45,6 +45,68 @@ export const pythonPracticeLessons = {
       { function: 'greet_name', args: ['   ', '你好'], expected: '请输入名字' },
     ],
     hint: '提示：clean = name.strip()，如果 not clean 则提示重新输入。',
+  },
+  'P0-U1-L06': {
+    title: '第6课 · 制作个人名片生成器',
+    prompt: '单元作品：编写 make_profile(nickname, hobby, color)，返回三行兴趣名片（昵称、爱好、喜欢的颜色）。去除每项首尾空格，空值、超过20字、包含换行或制表符时抛出 ValueError。请只填写虚构昵称，不填真实姓名、电话或住址。',
+    startCode: 'def make_profile(nickname, hobby, color):\n    # 先验证三个字段，再用换行拼接成名片\n    return "待完成"',
+    cases: [
+          {
+                "function": "make_profile",
+                "args": [
+                      "小雨",
+                      "画画",
+                      "蓝"
+                ],
+                "expected": "昵称：小雨\n爱好：画画\n喜欢的颜色：蓝"
+          },
+          {
+                "function": "make_profile",
+                "args": [
+                      " 阿星 ",
+                      "编程",
+                      "紫 "
+                ],
+                "expected": "昵称：阿星\n爱好：编程\n喜欢的颜色：紫"
+          },
+          {
+                "function": "make_profile",
+                "args": [
+                      "乐乐",
+                      "踢足球",
+                      "绿"
+                ],
+                "expected": "昵称：乐乐\n爱好：踢足球\n喜欢的颜色：绿"
+          },
+          {
+                "function": "make_profile",
+                "args": [
+                      "  ",
+                      "画画",
+                      "蓝"
+                ],
+                "expected": "ERROR:ValueError"
+          },
+          {
+                "function": "make_profile",
+                "args": [
+                      "超过二十个汉字的昵称不可以通过这一组测试哦",
+                      "画画",
+                      "蓝"
+                ],
+                "expected": "ERROR:ValueError"
+          },
+          {
+                "function": "make_profile",
+                "args": [
+                      "阿星",
+                      "画\n画",
+                      "蓝"
+                ],
+                "expected": "ERROR:ValueError"
+          }
+    ],
+    hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
