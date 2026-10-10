@@ -49,7 +49,7 @@ jobs:
       - name: ESLint
         run: npm run lint
       - name: Curriculum contract tests
-        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts
+        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts
       - name: Production build
         run: npm run build
 
