@@ -12,8 +12,18 @@ test('loads a real .sb3 using Scratch VM, executes clones and moves them, then s
   await page.getByTestId('scratch-green-flag').click()
   await expect(page.getByTestId('scratch-clone-observed')).toHaveText('是',{timeout:30_000})
   await expect(page.getByTestId('scratch-movement-observed')).toHaveText('是',{timeout:30_000})
+  await expect(page.getByTestId('scratch-deletion-observed')).toHaveText('是',{timeout:30_000})
   await page.getByTestId('scratch-stop').click()
   await expect(page.getByTestId('scratch-vm-status')).toContainText('停止',{timeout:8_000})
+  await expect(page.getByTestId('scratch-live-clones')).toHaveText('0',{timeout:8_000})
+
+  // Exercise a second complete VM lifecycle: no stale clones or observer flags may survive.
+  await page.getByTestId('scratch-green-flag').click()
+  await expect(page.getByTestId('scratch-clone-observed')).toHaveText('是',{timeout:30_000})
+  await expect(page.getByTestId('scratch-movement-observed')).toHaveText('是',{timeout:30_000})
+  await expect(page.getByTestId('scratch-deletion-observed')).toHaveText('是',{timeout:30_000})
+  await page.getByTestId('scratch-stop').click()
+  await expect(page.getByTestId('scratch-live-clones')).toHaveText('0',{timeout:8_000})
 })
 
 test('Scratch engine is only exposed as a controlled trial, no published learner grade', async ({ page }) => {

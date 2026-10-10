@@ -26,9 +26,24 @@ class ScratchProjectStructureTests(unittest.TestCase):
         self.assertEqual(blocks["spawn"]["opcode"],"control_create_clone_of")
         self.assertEqual(blocks["clone_flag"]["opcode"],"control_start_as_clone")
         self.assertEqual(blocks["delete"]["opcode"],"control_delete_this_clone")
+        self.assertEqual(blocks["move_y"]["next"],"move_pause")
+        self.assertEqual(blocks["move_pause"]["opcode"],"control_wait")
+        self.assertEqual(blocks["move_pause"]["inputs"]["DURATION"],[1,[4,"0.05"]])
         for name,block in blocks.items():
             if block["next"]:
                 self.assertIn(block["next"],blocks,name)
+
+    def test_browser_project_preserves_real_clone_motion_and_cleanup(self):
+        # The checked-in sample (used by the actual VM E2E) must not drift
+        # from the generator: an empty motion loop runs too fast to observe.
+        browser_sample = HERE.parents[2] / "apps/web/public/scratch-samples/meteor-clones.sb3"
+        with zipfile.ZipFile(browser_sample) as archive:
+            blocks = json.loads(archive.read("project.json"))["targets"][1]["blocks"]
+        movement = blocks["move_y"]
+        pause = blocks[movement["next"]]
+        self.assertEqual(pause["opcode"],"control_wait")
+        self.assertEqual(pause["inputs"]["DURATION"],[1,[4,"0.05"]])
+        self.assertEqual(blocks["delete"]["opcode"],"control_delete_this_clone")
 
     def test_sb3_is_complete_zip(self):
         with tempfile.TemporaryDirectory() as temporary:

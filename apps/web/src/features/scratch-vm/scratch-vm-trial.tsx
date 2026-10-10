@@ -15,6 +15,9 @@ export function ScratchVMTrial() {
   const [sprites, setSprites] = useState<Sprite[]>([])
   const [observedClones, setObservedClones] = useState(false)
   const [observedMovement, setObservedMovement] = useState(false)
+  const [observedDeletion, setObservedDeletion] = useState(false)
+  const knownCloneIds = useRef<Set<string>>(new Set())
+  const vmRunning = useRef(false)
   const latestY = useRef<Map<string,number>>(new Map())
 
   useEffect(() => {
@@ -50,6 +53,11 @@ export function ScratchVMTrial() {
         const current=msg.targets??[]
         setSprites(current)
         const clones=current.filter(t=>!t.original&&t.visible)
+        const liveCloneIds = new Set(current.filter(t=>!t.original).map(t=>t.id))
+        if (vmRunning.current && [...knownCloneIds.current].some(id=>!liveCloneIds.has(id))) {
+          setObservedDeletion(true)
+        }
+        knownCloneIds.current=liveCloneIds
         if(clones.length)setObservedClones(true)
         for(const target of clones) {
           const key=target.id
@@ -58,12 +66,17 @@ export function ScratchVMTrial() {
           latestY.current.set(key,target.y)
         }
       } else if(msg.kind==='STARTED') {
+        vmRunning.current=true
         setRunning(true)
         setStatus('Scratch VM 正在执行绿旗、创建分身、改变 y 坐标和删除分身。')
       } else if(msg.kind==='STOPPED') {
+        vmRunning.current=false
+        knownCloneIds.current.clear()
         setRunning(false)
         setStatus('已通过 Scratch VM stopAll 停止脚本。')
       } else if(msg.kind==='ERROR') {
+        vmRunning.current=false
+        knownCloneIds.current.clear()
         setRunning(false)
         setStatus(msg.error??'Scratch VM 执行失败')
       }
@@ -107,12 +120,12 @@ export function ScratchVMTrial() {
             <div className="mt-5 flex flex-wrap gap-3">
               <button data-testid="scratch-green-flag" type="button" disabled={!loaded}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
-                onClick={()=>{setObservedClones(false);setObservedMovement(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
+                onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
                 ▶ 绿旗运行
               </button>
               <button data-testid="scratch-stop" type="button" disabled={!loaded}
                 className="rounded-full bg-rose-100 px-6 py-3 font-bold text-rose-800 disabled:opacity-40"
-                onClick={()=>frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*')}>■ 停止</button>
+                onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*')}}>■ 停止</button>
             </div>
           </section>
           <section className="rounded-[2rem] bg-white p-6 shadow-sm">
@@ -122,6 +135,7 @@ export function ScratchVMTrial() {
             <p className="mt-2 text-sm">实际可见流星分身：<strong data-testid="scratch-live-clones">{clones.length}</strong></p>
             <p className="mt-2 text-sm">VM 已创建分身：<strong data-testid="scratch-clone-observed">{observedClones?'是':'否'}</strong></p>
             <p className="mt-2 text-sm">VM 已执行向下运动：<strong data-testid="scratch-movement-observed">{observedMovement?'是':'否'}</strong></p>
+            <p className="mt-2 text-sm">VM 已自然删除分身：<strong data-testid="scratch-deletion-observed">{observedDeletion?'是':'否'}</strong></p>
             <p className="mt-5 text-xs leading-6 text-slate-500">流星的实时坐标来自 Scratch VM 对象状态，前台只按坐标绘制简化图标，尚未接入 Scratch WebGL 渲染器。项目未上传用户数据。</p>
           </section>
         </div>
