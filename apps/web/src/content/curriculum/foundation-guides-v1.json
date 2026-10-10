@@ -1,0 +1,968 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "scripted_content_not_implemented",
+  "purpose": "保留现有12节课程ID，供课程编辑器、AI配音、教学引导和未来互动引擎逐步接入；并非表示12节全部具有对应执行能力。",
+  "lessons": [
+    {
+      "id": "lesson-01-forest-hello",
+      "title": "小狐狸出场",
+      "story": "小狐狸在树屋门口等朋友，却不知道怎样走到桥边。",
+      "concepts": [
+        "顺序",
+        "开始事件",
+        "一次移动"
+      ],
+      "learningOutcome": "孩子让小狐狸启动后向右走到木桥，能解释为什么移动必须接在开始积木之后。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "先找角色和起点",
+          "childAction": "先找角色和起点",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "拖入开始时积木",
+          "childAction": "拖入开始时积木",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "连接向右移动积木",
+          "childAction": "连接向右移动积木",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "预测小狐狸终点",
+          "childAction": "预测小狐狸终点",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "点击运行观察移动",
+          "childAction": "点击运行观察移动",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "说出刚才程序做了什么",
+          "childAction": "说出刚才程序做了什么",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "没有事件积木就直接添加移动",
+        "多添了一块移动积木",
+        "角色移动方向弄反"
+      ],
+      "tieredHints": [
+        "先看看小狐狸现在站在哪。",
+        "谁来告诉小狐狸何时出发？",
+        "对照目标把不需要的积木移走。"
+      ],
+      "extension": "把木桥换到更远的位置并重新安排移动次数。",
+      "parentConversation": "让孩子用手指模拟路线，然后自己解释积木顺序。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-02-forest-greeting",
+      "title": "小狐狸打招呼",
+      "story": "桥边的小兔子听不见小狐狸，帮它说出一句友好的问候。",
+      "concepts": [
+        "事件",
+        "顺序",
+        "对白"
+      ],
+      "learningOutcome": "角色先走到兔子旁边，再显示一句对白，能区分动作顺序和对话内容。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "观察小兔子的位置",
+          "childAction": "观察小兔子的位置",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "复用出发代码",
+          "childAction": "复用出发代码",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "选中对白积木",
+          "childAction": "选中对白积木",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "把说话安排在移动之后",
+          "childAction": "把说话安排在移动之后",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "运行观察气泡",
+          "childAction": "运行观察气泡",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "让同伴复述程序顺序",
+          "childAction": "让同伴复述程序顺序",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "对白比移动先发生",
+        "重复加开始积木",
+        "对白被遮挡"
+      ],
+      "tieredHints": [
+        "先演示小狐狸到哪里才说话。",
+        "把动作和对白比一比谁先执行。",
+        "删掉重复的开始积木后重试。"
+      ],
+      "extension": "写两种不同问候语，观察剧情情绪变化。",
+      "parentConversation": "关注孩子能否独立讲述先移动后说话。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-03-forest-story",
+      "title": "森林里的第一次见面",
+      "story": "森林广播站邀请小狐狸和兔子演一个三幕短故事。",
+      "concepts": [
+        "事件",
+        "移动",
+        "对白",
+        "故事结构"
+      ],
+      "learningOutcome": "完成开场、相遇、问候三幕故事，并让角色动作与对白有先后。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "画三格故事草图",
+          "childAction": "画三格故事草图",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "设置森林场景",
+          "childAction": "设置森林场景",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "规划角色入场",
+          "childAction": "规划角色入场",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "组合移动和对白",
+          "childAction": "组合移动和对白",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "对照草图检查顺序",
+          "childAction": "对照草图检查顺序",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "发布三幕短故事",
+          "childAction": "发布三幕短故事",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "把对白写在故事开头",
+        "只换背景却没推进角色",
+        "忘记运行完整三幕"
+      ],
+      "tieredHints": [
+        "先说一说故事有哪些部分。",
+        "每一幕只安排一个主要动作。",
+        "用时间线从头演示。"
+      ],
+      "extension": "让兔子增加一句回应，并设计第二种结尾。",
+      "parentConversation": "请孩子用30秒介绍故事开端、变化和结果。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-04-meadow-scene",
+      "title": "从森林走到草地",
+      "story": "旅行队要经过森林、穿过小路，第一次到达明亮草地。",
+      "concepts": [
+        "顺序",
+        "背景切换"
+      ],
+      "learningOutcome": "运行后先出发，再出现草地背景，能够解释背景切换的位置。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "观察森林和草地差异",
+          "childAction": "观察森林和草地差异",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "放置开始积木",
+          "childAction": "放置开始积木",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "追加移动动作",
+          "childAction": "追加移动动作",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "插入切换场景",
+          "childAction": "插入切换场景",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "预想切换时机",
+          "childAction": "预想切换时机",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "运行并核对故事",
+          "childAction": "运行并核对故事",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "先换场景再移动",
+        "误把背景作为角色",
+        "没有切换效果却宣布完成"
+      ],
+      "tieredHints": [
+        "故事最开始在哪儿？",
+        "找到改变舞台背景的积木。",
+        "把切换安排在角色走过小路之后。"
+      ],
+      "extension": "增加第三个场景并解释路线选择。",
+      "parentConversation": "让孩子指出什么时候发生了场景切换。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-05-meadow-order",
+      "title": "旅行要按顺序发生",
+      "story": "小鸟给旅行队准备了藏宝提示：出发、到达、前进、休息，次序不能乱。",
+      "concepts": [
+        "顺序",
+        "重复",
+        "时间线"
+      ],
+      "learningOutcome": "孩子能按路线安排出发与到达，识别重复动作和普通连续动作的不同。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "阅读旅行路线图",
+          "childAction": "阅读旅行路线图",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "摆好出发顺序",
+          "childAction": "摆好出发顺序",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "标记场景切换点",
+          "childAction": "标记场景切换点",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "加入第二次行动",
+          "childAction": "加入第二次行动",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "逐帧核对时间线",
+          "childAction": "逐帧核对时间线",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "用语言解释结果",
+          "childAction": "用语言解释结果",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "把重复理解成无条件循环",
+        "动作数量和路线不符",
+        "场景顺序颠倒"
+      ],
+      "tieredHints": [
+        "先把路线图念一遍。",
+        "哪些动作相同，能否复用？",
+        "检查第二次行动是否在到达之后。"
+      ],
+      "extension": "让旅行队选择两条不同路线并比较步骤数。",
+      "parentConversation": "请孩子把程序动作对应到纸上的路线图。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-06-meadow-story",
+      "title": "小动物旅行记",
+      "story": "旅行队制作自己的冒险纪录片，邀请小鸟担任解说员。",
+      "concepts": [
+        "场景",
+        "动作",
+        "对白",
+        "调试"
+      ],
+      "learningOutcome": "作品包含至少两个场景和一段旅行对白，能从头完整重放。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "规划旅行路线",
+          "childAction": "规划旅行路线",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "制作出发镜头",
+          "childAction": "制作出发镜头",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "加入草地镜头",
+          "childAction": "加入草地镜头",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "编排行动与对白",
+          "childAction": "编排行动与对白",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "检查每处转场",
+          "childAction": "检查每处转场",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "完整播放并展示作品",
+          "childAction": "完整播放并展示作品",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "只有多个背景没有故事",
+        "对白发生在错误场景",
+        "保存前没回看"
+      ],
+      "tieredHints": [
+        "先给旅行写一句标题。",
+        "每个镜头要有一个变化。",
+        "再完整运行一次核对剧情。"
+      ],
+      "extension": "换一个主角视角重新叙述这趟旅行。",
+      "parentConversation": "和孩子一起回看成品，确认作品有起点和终点。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-07-garden-click",
+      "title": "点一下，蝴蝶飞起来",
+      "story": "花园蝴蝶在叶片上休息，只有被轻点才愿意跳舞。",
+      "concepts": [
+        "点击事件",
+        "触发"
+      ],
+      "learningOutcome": "点击蝴蝶才播放相应动作；未点击时不应自动响应。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "观察静止蝴蝶",
+          "childAction": "观察静止蝴蝶",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "区分开始和点击事件",
+          "childAction": "区分开始和点击事件",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "选择点击时积木",
+          "childAction": "选择点击时积木",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "连接动作",
+          "childAction": "连接动作",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "运行验证不点击",
+          "childAction": "运行验证不点击",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "点击验证响应",
+          "childAction": "点击验证响应",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "误以为点击舞台就行",
+        "事件触发对象不对",
+        "运行后自动成功"
+      ],
+      "tieredHints": [
+        "先不要点击，观察发生什么。",
+        "蝴蝶什么时候该动？",
+        "确认点击的是哪位角色。"
+      ],
+      "extension": "加入第二只蝴蝶，两只使用不同点击响应。",
+      "parentConversation": "观察孩子能否主动提出一条触发条件。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-08-garden-dialogue",
+      "title": "蝴蝶的秘密问候",
+      "story": "花园管理员有个秘密暗号，只有点到蝴蝶才能听见。",
+      "concepts": [
+        "事件",
+        "对白",
+        "交互反馈"
+      ],
+      "learningOutcome": "点击角色后显示与故事一致的对白，未触发前不显示。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "阅读秘密提示",
+          "childAction": "阅读秘密提示",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "确认可点击角色",
+          "childAction": "确认可点击角色",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "添加点击事件",
+          "childAction": "添加点击事件",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "接上对白",
+          "childAction": "接上对白",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "比较触发前后",
+          "childAction": "比较触发前后",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "邀请同伴找彩蛋",
+          "childAction": "邀请同伴找彩蛋",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "对白在点击前显示",
+        "错误角色说话",
+        "没有反馈提示"
+      ],
+      "tieredHints": [
+        "暗号应该什么时候出现？",
+        "看看哪块积木负责触发。",
+        "给玩家一个能发现交互的提示。"
+      ],
+      "extension": "设计三种隐藏彩蛋和不同的对白。",
+      "parentConversation": "问孩子玩家如何知道自己操作成功。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-09-garden-story",
+      "title": "我的互动花园",
+      "story": "花园开设体验日，小朋友点击不同动物，会遇到不同惊喜。",
+      "concepts": [
+        "多事件",
+        "反馈",
+        "交互故事"
+      ],
+      "learningOutcome": "至少设计两次不同互动，并能说明每个事件与结果的关系。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "画交互关系图",
+          "childAction": "画交互关系图",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "设置花园场景",
+          "childAction": "设置花园场景",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "设计第一位角色",
+          "childAction": "设计第一位角色",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "设计第二次互动",
+          "childAction": "设计第二次互动",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "从未触发状态测试",
+          "childAction": "从未触发状态测试",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "邀请同伴试玩",
+          "childAction": "邀请同伴试玩",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "两个角色响应完全相同",
+        "未点击就自动演出",
+        "只测试一次"
+      ],
+      "tieredHints": [
+        "谁能被点击，分别发生什么？",
+        "把每个互动分开测试。",
+        "让朋友不看说明试试看。"
+      ],
+      "extension": "设计隐藏第三种结局，记录试玩发现率。",
+      "parentConversation": "让孩子解释哪些动作是自动的，哪些需要玩家触发。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-10-second-friend",
+      "title": "第二位朋友登场",
+      "story": "森林音乐会临时来了新朋友，舞台需要安排新的出场顺序。",
+      "concepts": [
+        "多角色",
+        "事件",
+        "独立脚本"
+      ],
+      "learningOutcome": "能控制两位角色各自的触发与动作，不混淆脚本归属。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "认识两位舞台角色",
+          "childAction": "认识两位舞台角色",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "确定谁先出现",
+          "childAction": "确定谁先出现",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "给第一位角色编程",
+          "childAction": "给第一位角色编程",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "给第二位角色编程",
+          "childAction": "给第二位角色编程",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "逐个触发测试",
+          "childAction": "逐个触发测试",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "完整演出",
+          "childAction": "完整演出",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "两个角色用了同一个脚本",
+        "新角色没有开始事件",
+        "角色重叠看不清"
+      ],
+      "tieredHints": [
+        "先指出每段程序属于谁。",
+        "为新朋友设置自己的触发事件。",
+        "分开运行再一起运行。"
+      ],
+      "extension": "增加第三位朋友并安排错峰登场。",
+      "parentConversation": "要求孩子独立解释每位角色的职责。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-11-duo-rehearsal",
+      "title": "双人排练",
+      "story": "两位演员准备森林联欢会，但总是抢着讲话，需要彩排配合。",
+      "concepts": [
+        "协作顺序",
+        "调试",
+        "脚本归属"
+      ],
+      "learningOutcome": "完成两位角色的协作排练，排除抢话和不按顺序出场。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "查看排练清单",
+          "childAction": "查看排练清单",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "标注角色脚本",
+          "childAction": "标注角色脚本",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "模拟第一次排练",
+          "childAction": "模拟第一次排练",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "记录错位现象",
+          "childAction": "记录错位现象",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "调整互动顺序",
+          "childAction": "调整互动顺序",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "第二次排练验收",
+          "childAction": "第二次排练验收",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "脚本互相覆盖",
+        "同时出场造成遮挡",
+        "只检查一位角色"
+      ],
+      "tieredHints": [
+        "先明确谁负责哪段。",
+        "在哪一秒发生了冲突？",
+        "一次只改一个问题再测试。"
+      ],
+      "extension": "加入同步谢幕动作，并比较两种编排方式。",
+      "parentConversation": "鼓励孩子把每次修改的原因说出来。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    },
+    {
+      "id": "lesson-12-graduation-show",
+      "title": "动物朋友毕业演出",
+      "story": "森林剧院开启毕业演出，孩子作为导演要把此前的故事、互动与角色串在一起。",
+      "concepts": [
+        "综合创作",
+        "交互",
+        "调试",
+        "展示"
+      ],
+      "learningOutcome": "提交有开场、两位角色、互动和谢幕的可回放作品，并进行独立讲解。",
+      "instructionSequence": [
+        {
+          "step": 1,
+          "teacherPrompt": "写下演出主题",
+          "childAction": "写下演出主题",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 2,
+          "teacherPrompt": "安排至少两位角色",
+          "childAction": "安排至少两位角色",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 3,
+          "teacherPrompt": "制作一段顺序剧情",
+          "childAction": "制作一段顺序剧情",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 4,
+          "teacherPrompt": "加入一次观众互动",
+          "childAction": "加入一次观众互动",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 5,
+          "teacherPrompt": "执行完整测试清单",
+          "childAction": "执行完整测试清单",
+          "check": "观察操作结果与预期是否一致"
+        },
+        {
+          "step": 6,
+          "teacherPrompt": "展示并讲解作品",
+          "childAction": "展示并讲解作品",
+          "check": "学生能展示完成效果并解释关键步骤"
+        }
+      ],
+      "commonErrors": [
+        "只有堆积木没有连贯剧情",
+        "互动无法触发",
+        "缺少最后一次完整测试"
+      ],
+      "tieredHints": [
+        "先画出完整故事路线。",
+        "列出每位角色该做的动作。",
+        "邀请家人按清单逐项试玩。"
+      ],
+      "extension": "为毕业演出制作海报，并加一个可选择的故事结局。",
+      "parentConversation": "用作品回放请孩子自评：最喜欢的设计和下一次想改的点。",
+      "assessment": {
+        "pass": [
+          "作品可以按任务要求演示",
+          "学生能指出触发条件与实际结果",
+          "学生至少复查一次失败或边界情况"
+        ],
+        "advanced": [
+          "能够改变一个条件做出个性化作品",
+          "能够讲清修改程序的原因"
+        ]
+      },
+      "assetsNeeded": [
+        "课程主题背景",
+        "角色表情/动作",
+        "普通话配音",
+        "操作示范片段",
+        "错误提示与奖励反馈"
+      ],
+      "publicationStatus": "content_ready_engine_unverified"
+    }
+  ]
+}
