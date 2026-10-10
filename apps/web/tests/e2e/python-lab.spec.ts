@@ -20,6 +20,7 @@ test('real Pyodide evaluates the first Python lesson, then corrects a failure', 
 test('Python syntax errors cannot pass output assessment', async ({ page }) => {
   test.setTimeout(120_000)
   await page.goto('/learn/python-lab/P0-U1-L01')
+  await expect(page.getByTestId('python-run')).toBeEnabled({timeout:15_000})
   await page.getByTestId('python-source').fill('print("缺失括号"')
   await page.getByTestId('python-run').click()
   await expect(page.getByTestId('python-feedback')).toContainText('程序报错了', {timeout:70_000})
