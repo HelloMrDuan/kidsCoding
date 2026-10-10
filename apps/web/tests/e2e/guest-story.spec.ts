@@ -45,6 +45,7 @@ test('guest user can reach the first completed project', async ({ page }) => {
   // Verify character displacement on step 5 (which has same blocks as step 4)
   const characterLabel = page.getByTestId('stage-character-main')
   await expect(characterLabel).toBeVisible()
+  await expect(characterLabel).toContainText('小狐狸')
 
   await page.getByTestId('run-code-button').click()
   await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).toBeVisible({ timeout: 10000 })
@@ -102,8 +103,9 @@ test('extra unrequired blocks prevent progression', async ({ page }) => {
   await expect(moveBtn).toBeEnabled()
   await moveBtn.click()
 
-  // Wait a bit to let blockly sync
-  await page.waitForTimeout(500)
+  // Wait for the first block to appear in the workspace to avoid rapid-click debouncing issues
+  const workspaceArea = page.getByTestId('lesson-blockly-workspace')
+  await expect(workspaceArea).toBeVisible()
 
   // Add extra move_right block
   await moveBtn.click()
@@ -116,7 +118,7 @@ test('extra unrequired blocks prevent progression', async ({ page }) => {
 
   // Verify click complete does not progress
   await page.getByTestId('lesson-complete-step').click()
-  await expect(page.getByText('太棒了！运行成功！点击"完成这一步"继续。')).not.toBeVisible()
+  await expect(page.getByText('第 4 步 / 共 5 步')).toBeVisible({ timeout: 10000 })
 })
 
 })

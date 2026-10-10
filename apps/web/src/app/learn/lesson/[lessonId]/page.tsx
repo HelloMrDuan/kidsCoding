@@ -161,7 +161,10 @@ export default function LessonPage() {
 
   async function handleNext() {
     const isPlayableLesson = currentLesson.id === 'lesson-01-forest-hello'
-    const isBlocksCorrect = evaluateStep(step.requiredBlockTypes, blocksRef.current)
+
+    // In lesson-01, we strictly forbid unrequired blocks. Standard evaluation allows extensions.
+    const isBlocksCorrect = evaluateStep(step.requiredBlockTypes, blocksRef.current) &&
+      (!isPlayableLesson || blocksRef.current.length === step.requiredBlockTypes.length)
 
     // For lesson-01, we require both correct blocks AND successful run.
     if (!isBlocksCorrect || (isPlayableLesson && !hasRunSuccess)) {

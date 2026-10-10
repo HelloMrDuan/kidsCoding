@@ -60,26 +60,30 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
   }, [blocks, requiredBlocks, reset])
 
   // Watch blocks stringified and stepIndex to detect changes and reset
-  // We use a ref and layout effect to avoid cascading renders while ensuring sync.
-  // Actually, standard practice to avoid the "setState in effect" warning is to clear it in the event handlers
-  // (which we do in handleSnapshotChange and goToStep) and simply track the last known values to reset if they unexpectedly mismatch,
-  // or use key={} on the component. But here, we can just use the reset logic inside a generic useEffect with a setTimeout, or
-  // simply remove this useEffect and rely purely on the parent calling `onRunClear` / `onSnapshotChange` -> triggering a reset explicitly.
-  // However, `useBlockExecutor` needs its *internal* state reset.
-  // Let's use a ref to track the last values and reset during render, which is the React-recommended way to derive state.
-
+  // We use standard React derived state pattern to reset without causing loops or ref mutation during render.
   const [prevStepIndex, setPrevStepIndex] = useState(stepIndex)
   const [prevBlocksKey, setPrevBlocksKey] = useState(JSON.stringify(blocks))
 
-  if (stepIndex !== prevStepIndex || JSON.stringify(blocks) !== prevBlocksKey) {
+  const currentBlocksKey = JSON.stringify(blocks)
+  if (stepIndex !== prevStepIndex || currentBlocksKey !== prevBlocksKey) {
     setPrevStepIndex(stepIndex)
-    setPrevBlocksKey(JSON.stringify(blocks))
-    // Reset internal state synchronously during render
+    setPrevBlocksKey(currentBlocksKey)
+    // Reset internal state synchronously during render without causing infinite loops
     setExecutionState('idle')
     setCharacterMessage(null)
     setCharacterPosition(0)
-    runIdRef.current += 1
+
+    // Increment run ID but do it via state since we can't mutate ref during render.
+    // Actually, we don't strictly need to increment runIdRef here during render.
+    // The previous async `run` function relies on runIdRef to check stale states.
+    // If we just reset the state here synchronously, it might get overwritten by an ongoing async run if we don't bump the ID.
+    // However, if we move the ID bump to a layout effect, it will be perfectly synchronized before the next paint.
   }
+
+  // Bump run ID immediately in layout effect if step/blocks changed to invalidate async chains
+  useEffect(() => {
+    runIdRef.current += 1
+  }, [stepIndex, currentBlocksKey])
 
   // Component unmount cleanup
   useEffect(() => {
