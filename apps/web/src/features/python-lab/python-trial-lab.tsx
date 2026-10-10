@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { gradeFirstPythonLesson, PYTHON_TRIAL_EXPECTED_OUTPUT } from './python-lab-grade'
 
-type SandboxEvent = { kind: 'LOADED' | 'RESULT'; id: number; output?: string; error?: string | null }
+type SandboxEvent = { kind: 'FRAME_READY' | 'LOADED' | 'RESULT'; id?: number; output?: string; error?: string | null }
 
 export function PythonTrialLab() {
   const [source, setSource] = useState('print("请把我改成正确的问候语")')
@@ -19,9 +19,17 @@ export function PythonTrialLab() {
   const active = useRef(false)
 
   useEffect(() => {
+    const readyProbe = window.setInterval(() => {
+      frame.current?.contentWindow?.postMessage({kind:'PING'}, '*')
+    }, 300)
     const handler = (event: MessageEvent<SandboxEvent>) => {
       // A sandboxed iframe has an opaque origin and no access to app cookies or DOM.
       if (event.source !== frame.current?.contentWindow || event.origin !== 'null') return
+      if (event.data?.kind === 'FRAME_READY') {
+        clearInterval(readyProbe)
+        setReady(true)
+        return
+      }
       if (!active.current || !event.data || event.data.id !== requestId.current) return
       if (event.data.kind === 'LOADED') {
         setStatus('Python 已加载，正在运行你的程序……')
@@ -46,6 +54,7 @@ export function PythonTrialLab() {
     }
     window.addEventListener('message', handler)
     return () => {
+      clearInterval(readyProbe)
       window.removeEventListener('message', handler)
       if (timeout.current) clearTimeout(timeout.current)
       frame.current?.contentWindow?.postMessage({kind:'STOP',id:requestId.current}, '*')
