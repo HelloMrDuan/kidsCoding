@@ -66,7 +66,7 @@ export default function LessonPage() {
         saveLessonDraft(lessonId, stepIndex, nextBlocks)
       }
     },
-    [lessonId, stepIndex],
+    [lessonId, stepIndex, setHasRunSuccess],
   )
 
   const goToStep = useCallback(
@@ -83,11 +83,11 @@ export default function LessonPage() {
       setStepIndex(nextStepIndex)
       setHasRunSuccess(false)
     },
-    [lessonId],
+    [lessonId, setHasRunSuccess],
   )
 
-  const handleRunSuccess=useCallback(()=>setHasRunSuccess(true),[])
-  const handleRunClear=useCallback(()=>setHasRunSuccess(false),[])
+  const handleRunSuccess=useCallback(()=>setHasRunSuccess(true),[setHasRunSuccess])
+  const handleRunClear=useCallback(()=>setHasRunSuccess(false),[setHasRunSuccess])
 
   useEffect(() => {
     let isActive = true
