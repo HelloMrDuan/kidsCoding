@@ -78,6 +78,15 @@ describe('useBlockExecutor', () => {
     expect(result.current.executionState).toBe('idle')
   })
 
+  it('executes a three-block forest greeting and produces the visible speech bubble', async () => {
+    const blocks=[{type:'when_start'},{type:'move_right'},{type:'say_line'}]
+    const {result}=renderHook(()=>useBlockExecutor(blocks,blocks.map(b=>b.type)))
+    await act(async()=>{await result.current.run()})
+    expect(result.current.executionState).toBe('success')
+    expect(result.current.characterPosition).toBe(100)
+    expect(result.current.characterMessage).toBe('你好！')
+  })
+
   it('cancels pending updates on unmount', async () => {
     const { result, unmount } = renderHook(() =>
       useBlockExecutor([{ type: 'when_start' }], ['when_start']),
