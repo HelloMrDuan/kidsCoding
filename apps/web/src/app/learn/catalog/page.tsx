@@ -82,7 +82,7 @@ export default async function CatalogPage({
                       <h4 className="mt-2 text-base font-bold">{lesson.title}</h4>
                       <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{lesson.learningOutcome}</p>
                       <span className="mt-3 inline-block rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700">
-                        {lesson.id === 'P0-U1-L01' ? 'Python试验关卡 · 可体验' : getLessonContentStage(lesson.id) === 'detailed' ? '教案已备 · 待开发' : '大纲规划 · 待开发'}
+                        {['P0-U1-L01','P0-U1-L02','P0-U1-L03'].includes(lesson.id) ? 'Python实验 · 可体验' : getLessonContentStage(lesson.id) === 'detailed' ? '教案已备 · 待开发' : '大纲规划 · 待开发'}
                       </span>
                     </Link>
                   ))}
