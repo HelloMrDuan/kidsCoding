@@ -26,6 +26,8 @@ on:
       - 'apps/web/public/python-lab-sandbox.html'
       - 'apps/web/public/scratch-vm-sandbox.html'
       - 'apps/web/public/scratch-samples/**'
+      - 'apps/web/src/app/api/practice/scratch/**'
+      - 'apps/web/supabase/migrations/202610100010_scratch_private_drafts.sql'
       - 'apps/web/src/features/scratch-vm/**'
       - 'apps/web/src/features/lessons/playable-stage/**'
       - 'apps/web/src/app/learn/lesson/**'
@@ -59,9 +61,29 @@ jobs:
       - name: ESLint
         run: npm run lint
       - name: Curriculum contract tests
-        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts src/features/progress/cloud-python-drafts.test.ts src/app/api/practice/drafts/route.test.ts src/features/scratch-vm/scratch-local-draft.test.ts src/features/lessons/playable-stage/use-block-executor.test.ts
+        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts src/features/progress/cloud-python-drafts.test.ts src/app/api/practice/drafts/route.test.ts src/features/scratch-vm/scratch-local-draft.test.ts src/features/scratch-vm/scratch-cloud-draft.test.ts src/app/api/practice/scratch/route.test.ts src/features/lessons/playable-stage/use-block-executor.test.ts
       - name: Production build
         run: npm run build
+
+  scratch-rls-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: kidscoding_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d kidscoding_test"
+          --health-interval 10s --health-timeout 5s --health-retries 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify cross-account RLS against real PostgreSQL
+        env:
+          PGPASSWORD: testpass
+        run: psql -h localhost -U postgres -d kidscoding_test -v ON_ERROR_STOP=1 -f apps/web/scripts/scratch-cloud-rls.sql
 
   offline-python-projects:
     runs-on: ubuntu-latest

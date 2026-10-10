@@ -29,7 +29,7 @@ test('loads a real .sb3 using Scratch VM, executes clones and moves them, then s
 
 test('Scratch engine is only exposed as a controlled trial, no published learner grade', async ({ page }) => {
   await page.goto('/learn/scratch-lab/G3-U1-L02')
-  await expect(page.getByText('不保存正式成绩')).toBeVisible()
+  await expect(page.getByText('不保存正式成绩').first()).toBeVisible()
   await expect(page.getByTestId('scratch-vm-status')).toContainText('已加载项目',{timeout:60_000})
   await expect(page.getByTestId('scratch-green-flag')).toBeEnabled()
   await expect(page.getByRole('heading',{name:'流星分身雨'})).toBeVisible()
