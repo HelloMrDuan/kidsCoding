@@ -1,0 +1,3103 @@
+{
+  "schemaVersion": "2.0.0",
+  "trackId": "P2",
+  "maturity": "individual_detailed_scripts_with_assessment_specs",
+  "published": false,
+  "runtimeVerified": false,
+  "lessons": [
+    {
+      "id": "P2-U1-L01",
+      "sourceUnitId": "P2-U1",
+      "title": "比较两种找书方法",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "图书管理员要在200本书中快速找一册编号书。",
+      "focusConcept": "复杂度",
+      "knowledgePoints": [
+        "复杂度"
+      ],
+      "prerequisites": [],
+      "learningOutcome": "有序列表查找同一目标时二分比较次数不超过线性。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "比较两种找书方法",
+        "brief": "图书管理员要在200本书中快速找一册编号书。",
+        "learnerBuild": "比较逐本检查和把有序书目对半分两种策略。",
+        "successCriteria": "有序列表查找同一目标时二分比较次数不超过线性。",
+        "creativeExtension": "收集不同规模比较次数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "图书管理员要在200本书中快速找一册编号书。 先预测最终状态。",
+          "learnerAction": "记录目标：有序列表查找同一目标时二分比较次数不超过线性。",
+          "check": "能口述「比较两种找书方法」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、复杂度处理和可见输出。",
+          "learnerAction": "分解具体操作：比较逐本检查和把有序书目对半分两种策略。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "比较逐本检查和把有序书目对半分两种策略。",
+          "check": "程序包含完成本课需要的复杂度逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：有序列表查找同一目标时二分比较次数不超过线性。",
+          "check": "有序列表查找同一目标时二分比较次数不超过线性。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：无序列表直接二分可能得出错误结果。",
+          "learnerAction": "复现失败再尝试修复：二分前明确数据已按同一规则排序。",
+          "check": "修复后满足：有序列表查找同一目标时二分比较次数不超过线性。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U1-L01-POS-01",
+          "setup": "图书管理员要在200本书中快速找一册编号书。",
+          "action": "比较逐本检查和把有序书目对半分两种策略。",
+          "expected": "有序列表查找同一目标时二分比较次数不超过线性。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U1-L01-NEG-01",
+          "setup": "图书管理员要在200本书中快速找一册编号书。",
+          "action": "无序列表直接二分可能得出错误结果。",
+          "expected": "检测失败并引导：二分前明确数据已按同一规则排序。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "有序列表查找同一目标时二分比较次数不超过线性。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课复杂度如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "二分前明确数据已按同一规则排序。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "收集不同规模比较次数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：图书管理员要在200本书中快速找一册编号书。",
+          "只实现核心步骤：比较逐本检查和把有序书目对半分两种策略。",
+          "如果失败：二分前明确数据已按同一规则排序。"
+        ],
+        "commonMistakes": [
+          "无序列表直接二分可能得出错误结果。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u1-l01-asset-1",
+          "p2-u1-l01-asset-2",
+          "p2-u1-l01-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要比较逐本检查和把有序书目对半分两种策略。，再让他演示有序列表查找同一目标时二分比较次数不超过线性。。"
+    },
+    {
+      "id": "P2-U1-L02",
+      "sourceUnitId": "P2-U1",
+      "title": "线性与二分查找",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "侦探在按编号排好的箱子里找线索。",
+      "focusConcept": "复杂度",
+      "knowledgePoints": [
+        "复杂度"
+      ],
+      "prerequisites": [
+        "P2-U1-L01"
+      ],
+      "learningOutcome": "目标存在返回正确索引，不存在返回-1。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "线性与二分查找",
+        "brief": "侦探在按编号排好的箱子里找线索。",
+        "learnerBuild": "实现linear_search与binary_search返回第一个匹配索引。",
+        "successCriteria": "目标存在返回正确索引，不存在返回-1。",
+        "creativeExtension": "增加按词典序查找。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "侦探在按编号排好的箱子里找线索。 先预测最终状态。",
+          "learnerAction": "记录目标：目标存在返回正确索引，不存在返回-1。",
+          "check": "能口述「线性与二分查找」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、复杂度处理和可见输出。",
+          "learnerAction": "分解具体操作：实现linear_search与binary_search返回第一个匹配索引。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "实现linear_search与binary_search返回第一个匹配索引。",
+          "check": "程序包含完成本课需要的复杂度逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：目标存在返回正确索引，不存在返回-1。",
+          "check": "目标存在返回正确索引，不存在返回-1。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：重复值时返回后面的匹配却要求第一个。",
+          "learnerAction": "复现失败再尝试修复：命中后继续往左收缩边界。",
+          "check": "修复后满足：目标存在返回正确索引，不存在返回-1。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U1-L02-POS-01",
+          "setup": "侦探在按编号排好的箱子里找线索。",
+          "action": "实现linear_search与binary_search返回第一个匹配索引。",
+          "expected": "目标存在返回正确索引，不存在返回-1。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U1-L02-NEG-01",
+          "setup": "侦探在按编号排好的箱子里找线索。",
+          "action": "重复值时返回后面的匹配却要求第一个。",
+          "expected": "检测失败并引导：命中后继续往左收缩边界。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "目标存在返回正确索引，不存在返回-1。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课复杂度如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "命中后继续往左收缩边界。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加按词典序查找。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：侦探在按编号排好的箱子里找线索。",
+          "只实现核心步骤：实现linear_search与binary_search返回第一个匹配索引。",
+          "如果失败：命中后继续往左收缩边界。"
+        ],
+        "commonMistakes": [
+          "重复值时返回后面的匹配却要求第一个。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u1-l02-asset-1",
+          "p2-u1-l02-asset-2",
+          "p2-u1-l02-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要实现linear_search与binary_search返回第一个匹配索引。，再让他演示目标存在返回正确索引，不存在返回-1。。"
+    },
+    {
+      "id": "P2-U1-L03",
+      "sourceUnitId": "P2-U1",
+      "title": "冒泡排序动画",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "排序机器人要让大小混乱的数字从小到大。",
+      "focusConcept": "分解",
+      "knowledgePoints": [
+        "复杂度",
+        "分解"
+      ],
+      "prerequisites": [
+        "P2-U1-L02"
+      ],
+      "learningOutcome": "[3,1,2]排为[1,2,3]，原始列表不被改写。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "冒泡排序动画",
+        "brief": "排序机器人要让大小混乱的数字从小到大。",
+        "learnerBuild": "执行冒泡排序并记录每一趟相邻交换。",
+        "successCriteria": "[3,1,2]排为[1,2,3]，原始列表不被改写。",
+        "creativeExtension": "统计交换次数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "排序机器人要让大小混乱的数字从小到大。 先预测最终状态。",
+          "learnerAction": "记录目标：[3,1,2]排为[1,2,3]，原始列表不被改写。",
+          "check": "能口述「冒泡排序动画」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、分解处理和可见输出。",
+          "learnerAction": "分解具体操作：执行冒泡排序并记录每一趟相邻交换。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "执行冒泡排序并记录每一趟相邻交换。",
+          "check": "程序包含完成本课需要的分解逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：[3,1,2]排为[1,2,3]，原始列表不被改写。",
+          "check": "[3,1,2]排为[1,2,3]，原始列表不被改写。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：只进行一趟后就提前停止。",
+          "learnerAction": "复现失败再尝试修复：数清列表长度减一趟的比较次数。",
+          "check": "修复后满足：[3,1,2]排为[1,2,3]，原始列表不被改写。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U1-L03-POS-01",
+          "setup": "排序机器人要让大小混乱的数字从小到大。",
+          "action": "执行冒泡排序并记录每一趟相邻交换。",
+          "expected": "[3,1,2]排为[1,2,3]，原始列表不被改写。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U1-L03-NEG-01",
+          "setup": "排序机器人要让大小混乱的数字从小到大。",
+          "action": "只进行一趟后就提前停止。",
+          "expected": "检测失败并引导：数清列表长度减一趟的比较次数。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "[3,1,2]排为[1,2,3]，原始列表不被改写。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课分解如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "数清列表长度减一趟的比较次数。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "统计交换次数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：排序机器人要让大小混乱的数字从小到大。",
+          "只实现核心步骤：执行冒泡排序并记录每一趟相邻交换。",
+          "如果失败：数清列表长度减一趟的比较次数。"
+        ],
+        "commonMistakes": [
+          "只进行一趟后就提前停止。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u1-l03-asset-1",
+          "p2-u1-l03-asset-2",
+          "p2-u1-l03-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要执行冒泡排序并记录每一趟相邻交换。，再让他演示[3,1,2]排为[1,2,3]，原始列表不被改写。。"
+    },
+    {
+      "id": "P2-U1-L04",
+      "sourceUnitId": "P2-U1",
+      "title": "选择与插入排序",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "选拔赛成绩需要比较选择排序和插入排序。",
+      "focusConcept": "分解",
+      "knowledgePoints": [
+        "复杂度",
+        "分解"
+      ],
+      "prerequisites": [
+        "P2-U1-L03"
+      ],
+      "learningOutcome": "结果与sorted一致，保持完整长度与元素多重集。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "选择与插入排序",
+        "brief": "选拔赛成绩需要比较选择排序和插入排序。",
+        "learnerBuild": "两种算法均排序同一份含重复数列的数据。",
+        "successCriteria": "结果与sorted一致，保持完整长度与元素多重集。",
+        "creativeExtension": "比较基本稳定性。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "选拔赛成绩需要比较选择排序和插入排序。 先预测最终状态。",
+          "learnerAction": "记录目标：结果与sorted一致，保持完整长度与元素多重集。",
+          "check": "能口述「选择与插入排序」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、分解处理和可见输出。",
+          "learnerAction": "分解具体操作：两种算法均排序同一份含重复数列的数据。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "两种算法均排序同一份含重复数列的数据。",
+          "check": "程序包含完成本课需要的分解逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：结果与sorted一致，保持完整长度与元素多重集。",
+          "check": "结果与sorted一致，保持完整长度与元素多重集。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：含重复分数时把一个元素丢失。",
+          "learnerAction": "复现失败再尝试修复：统计排序前后的元素频率并对照。",
+          "check": "修复后满足：结果与sorted一致，保持完整长度与元素多重集。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U1-L04-POS-01",
+          "setup": "选拔赛成绩需要比较选择排序和插入排序。",
+          "action": "两种算法均排序同一份含重复数列的数据。",
+          "expected": "结果与sorted一致，保持完整长度与元素多重集。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U1-L04-NEG-01",
+          "setup": "选拔赛成绩需要比较选择排序和插入排序。",
+          "action": "含重复分数时把一个元素丢失。",
+          "expected": "检测失败并引导：统计排序前后的元素频率并对照。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "结果与sorted一致，保持完整长度与元素多重集。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课分解如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "统计排序前后的元素频率并对照。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "比较基本稳定性。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：选拔赛成绩需要比较选择排序和插入排序。",
+          "只实现核心步骤：两种算法均排序同一份含重复数列的数据。",
+          "如果失败：统计排序前后的元素频率并对照。"
+        ],
+        "commonMistakes": [
+          "含重复分数时把一个元素丢失。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u1-l04-asset-1",
+          "p2-u1-l04-asset-2",
+          "p2-u1-l04-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要两种算法均排序同一份含重复数列的数据。，再让他演示结果与sorted一致，保持完整长度与元素多重集。。"
+    },
+    {
+      "id": "P2-U1-L05",
+      "sourceUnitId": "P2-U1",
+      "title": "算法耗时实验",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "科学小组希望知道不同排序为什么在大数组上表现不同。",
+      "focusConcept": "排序",
+      "knowledgePoints": [
+        "复杂度",
+        "分解",
+        "排序"
+      ],
+      "prerequisites": [
+        "P2-U1-L04"
+      ],
+      "learningOutcome": "数据规模越大时可以观察次数变化，不以一次时间作绝对结论。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "算法耗时实验",
+        "brief": "科学小组希望知道不同排序为什么在大数组上表现不同。",
+        "learnerBuild": "用perf_counter测三组输入规模但固定随机种子。",
+        "successCriteria": "数据规模越大时可以观察次数变化，不以一次时间作绝对结论。",
+        "creativeExtension": "加入已有序数据测试。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "科学小组希望知道不同排序为什么在大数组上表现不同。 先预测最终状态。",
+          "learnerAction": "记录目标：数据规模越大时可以观察次数变化，不以一次时间作绝对结论。",
+          "check": "能口述「算法耗时实验」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、排序处理和可见输出。",
+          "learnerAction": "分解具体操作：用perf_counter测三组输入规模但固定随机种子。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用perf_counter测三组输入规模但固定随机种子。",
+          "check": "程序包含完成本课需要的排序逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：数据规模越大时可以观察次数变化，不以一次时间作绝对结论。",
+          "check": "数据规模越大时可以观察次数变化，不以一次时间作绝对结论。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：随机输入规模不同导致结果不可比。",
+          "learnerAction": "复现失败再尝试修复：相同数据分别复制后计时并多次取中位数。",
+          "check": "修复后满足：数据规模越大时可以观察次数变化，不以一次时间作绝对结论。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U1-L05-POS-01",
+          "setup": "科学小组希望知道不同排序为什么在大数组上表现不同。",
+          "action": "用perf_counter测三组输入规模但固定随机种子。",
+          "expected": "数据规模越大时可以观察次数变化，不以一次时间作绝对结论。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U1-L05-NEG-01",
+          "setup": "科学小组希望知道不同排序为什么在大数组上表现不同。",
+          "action": "随机输入规模不同导致结果不可比。",
+          "expected": "检测失败并引导：相同数据分别复制后计时并多次取中位数。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "数据规模越大时可以观察次数变化，不以一次时间作绝对结论。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课排序如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "相同数据分别复制后计时并多次取中位数。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入已有序数据测试。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：科学小组希望知道不同排序为什么在大数组上表现不同。",
+          "只实现核心步骤：用perf_counter测三组输入规模但固定随机种子。",
+          "如果失败：相同数据分别复制后计时并多次取中位数。"
+        ],
+        "commonMistakes": [
+          "随机输入规模不同导致结果不可比。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u1-l05-asset-1",
+          "p2-u1-l05-asset-2",
+          "p2-u1-l05-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用perf_counter测三组输入规模但固定随机种子。，再让他演示数据规模越大时可以观察次数变化，不以一次时间作绝对结论。。"
+    },
+    {
+      "id": "P2-U1-L06",
+      "sourceUnitId": "P2-U1",
+      "title": "整理全班成绩",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "班级成绩单中含并列成绩，需要排序后生成名次。",
+      "focusConcept": "排序",
+      "knowledgePoints": [
+        "复杂度",
+        "分解",
+        "排序"
+      ],
+      "prerequisites": [
+        "P2-U1-L05"
+      ],
+      "learningOutcome": "并列成绩同名次且按规则有序，不丢记录。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "整理全班成绩",
+        "brief": "班级成绩单中含并列成绩，需要排序后生成名次。",
+        "learnerBuild": "将姓名-分数组按分数降序、姓名升序稳定排序。",
+        "successCriteria": "并列成绩同名次且按规则有序，不丢记录。",
+        "creativeExtension": "输出前十与平均分。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "班级成绩单中含并列成绩，需要排序后生成名次。 先预测最终状态。",
+          "learnerAction": "记录目标：并列成绩同名次且按规则有序，不丢记录。",
+          "check": "能口述「整理全班成绩」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、排序处理和可见输出。",
+          "learnerAction": "分解具体操作：将姓名-分数组按分数降序、姓名升序稳定排序。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "将姓名-分数组按分数降序、姓名升序稳定排序。",
+          "check": "程序包含完成本课需要的排序逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：并列成绩同名次且按规则有序，不丢记录。",
+          "check": "并列成绩同名次且按规则有序，不丢记录。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：并列成绩排序不稳定导致多次结果不同。",
+          "learnerAction": "复现失败再尝试修复：确定二级排序规则和名次计算口径。",
+          "check": "修复后满足：并列成绩同名次且按规则有序，不丢记录。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U1-L06-POS-01",
+          "setup": "班级成绩单中含并列成绩，需要排序后生成名次。",
+          "action": "将姓名-分数组按分数降序、姓名升序稳定排序。",
+          "expected": "并列成绩同名次且按规则有序，不丢记录。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U1-L06-NEG-01",
+          "setup": "班级成绩单中含并列成绩，需要排序后生成名次。",
+          "action": "并列成绩排序不稳定导致多次结果不同。",
+          "expected": "检测失败并引导：确定二级排序规则和名次计算口径。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "并列成绩同名次且按规则有序，不丢记录。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课排序如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "确定二级排序规则和名次计算口径。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "输出前十与平均分。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：班级成绩单中含并列成绩，需要排序后生成名次。",
+          "只实现核心步骤：将姓名-分数组按分数降序、姓名升序稳定排序。",
+          "如果失败：确定二级排序规则和名次计算口径。"
+        ],
+        "commonMistakes": [
+          "并列成绩排序不稳定导致多次结果不同。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u1-l06-asset-1",
+          "p2-u1-l06-asset-2",
+          "p2-u1-l06-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要将姓名-分数组按分数降序、姓名升序稳定排序。，再让他演示并列成绩同名次且按规则有序，不丢记录。。"
+    },
+    {
+      "id": "P2-U2-L01",
+      "sourceUnitId": "P2-U2",
+      "title": "用栈撤销操作",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "小朋友画错画想撤销上一个动作。",
+      "focusConcept": "栈",
+      "knowledgePoints": [
+        "栈"
+      ],
+      "prerequisites": [
+        "P2-U1-L06"
+      ],
+      "learningOutcome": "执行A,B,C后撤销得到A,B，空栈撤销无报错。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "用栈撤销操作",
+        "brief": "小朋友画错画想撤销上一个动作。",
+        "learnerBuild": "用栈保存动作历史，push绘画操作，undo弹出最近一步。",
+        "successCriteria": "执行A,B,C后撤销得到A,B，空栈撤销无报错。",
+        "creativeExtension": "加redo重做栈。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "小朋友画错画想撤销上一个动作。 先预测最终状态。",
+          "learnerAction": "记录目标：执行A,B,C后撤销得到A,B，空栈撤销无报错。",
+          "check": "能口述「用栈撤销操作」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、栈处理和可见输出。",
+          "learnerAction": "分解具体操作：用栈保存动作历史，push绘画操作，undo弹出最近一步。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用栈保存动作历史，push绘画操作，undo弹出最近一步。",
+          "check": "程序包含完成本课需要的栈逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：执行A,B,C后撤销得到A,B，空栈撤销无报错。",
+          "check": "执行A,B,C后撤销得到A,B，空栈撤销无报错。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：撤销最早一步而不是最后一步。",
+          "learnerAction": "复现失败再尝试修复：观察后进先出的栈顶。",
+          "check": "修复后满足：执行A,B,C后撤销得到A,B，空栈撤销无报错。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U2-L01-POS-01",
+          "setup": "小朋友画错画想撤销上一个动作。",
+          "action": "用栈保存动作历史，push绘画操作，undo弹出最近一步。",
+          "expected": "执行A,B,C后撤销得到A,B，空栈撤销无报错。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U2-L01-NEG-01",
+          "setup": "小朋友画错画想撤销上一个动作。",
+          "action": "撤销最早一步而不是最后一步。",
+          "expected": "检测失败并引导：观察后进先出的栈顶。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "执行A,B,C后撤销得到A,B，空栈撤销无报错。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课栈如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "观察后进先出的栈顶。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加redo重做栈。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：小朋友画错画想撤销上一个动作。",
+          "只实现核心步骤：用栈保存动作历史，push绘画操作，undo弹出最近一步。",
+          "如果失败：观察后进先出的栈顶。"
+        ],
+        "commonMistakes": [
+          "撤销最早一步而不是最后一步。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u2-l01-asset-1",
+          "p2-u2-l01-asset-2",
+          "p2-u2-l01-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用栈保存动作历史，push绘画操作，undo弹出最近一步。，再让他演示执行A,B,C后撤销得到A,B，空栈撤销无报错。。"
+    },
+    {
+      "id": "P2-U2-L02",
+      "sourceUnitId": "P2-U2",
+      "title": "排队取号系统",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "游乐园取号窗口应该按到达先后服务。",
+      "focusConcept": "栈",
+      "knowledgePoints": [
+        "栈"
+      ],
+      "prerequisites": [
+        "P2-U2-L01"
+      ],
+      "learningOutcome": "A,B,C依次进入时出队顺序为A,B,C。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "排队取号系统",
+        "brief": "游乐园取号窗口应该按到达先后服务。",
+        "learnerBuild": "使用collections.deque实现入队和出队。",
+        "successCriteria": "A,B,C依次进入时出队顺序为A,B,C。",
+        "creativeExtension": "加入优先通道但保持普通队列顺序。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "游乐园取号窗口应该按到达先后服务。 先预测最终状态。",
+          "learnerAction": "记录目标：A,B,C依次进入时出队顺序为A,B,C。",
+          "check": "能口述「排队取号系统」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、栈处理和可见输出。",
+          "learnerAction": "分解具体操作：使用collections.deque实现入队和出队。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "使用collections.deque实现入队和出队。",
+          "check": "程序包含完成本课需要的栈逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：A,B,C依次进入时出队顺序为A,B,C。",
+          "check": "A,B,C依次进入时出队顺序为A,B,C。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：用pop从队尾取号形成插队。",
+          "learnerAction": "复现失败再尝试修复：使用popleft而不是pop。",
+          "check": "修复后满足：A,B,C依次进入时出队顺序为A,B,C。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U2-L02-POS-01",
+          "setup": "游乐园取号窗口应该按到达先后服务。",
+          "action": "使用collections.deque实现入队和出队。",
+          "expected": "A,B,C依次进入时出队顺序为A,B,C。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U2-L02-NEG-01",
+          "setup": "游乐园取号窗口应该按到达先后服务。",
+          "action": "用pop从队尾取号形成插队。",
+          "expected": "检测失败并引导：使用popleft而不是pop。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "A,B,C依次进入时出队顺序为A,B,C。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课栈如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "使用popleft而不是pop。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入优先通道但保持普通队列顺序。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：游乐园取号窗口应该按到达先后服务。",
+          "只实现核心步骤：使用collections.deque实现入队和出队。",
+          "如果失败：使用popleft而不是pop。"
+        ],
+        "commonMistakes": [
+          "用pop从队尾取号形成插队。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u2-l02-asset-1",
+          "p2-u2-l02-asset-2",
+          "p2-u2-l02-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要使用collections.deque实现入队和出队。，再让他演示A,B,C依次进入时出队顺序为A,B,C。。"
+    },
+    {
+      "id": "P2-U2-L03",
+      "sourceUnitId": "P2-U2",
+      "title": "集合去重",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "社团报名表出现很多重复的项目名。",
+      "focusConcept": "队列",
+      "knowledgePoints": [
+        "栈",
+        "队列"
+      ],
+      "prerequisites": [
+        "P2-U2-L02"
+      ],
+      "learningOutcome": "输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "集合去重",
+        "brief": "社团报名表出现很多重复的项目名。",
+        "learnerBuild": "先用set去重，再用sorted生成稳定输出。",
+        "successCriteria": "输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。",
+        "creativeExtension": "统计每项出现次数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "社团报名表出现很多重复的项目名。 先预测最终状态。",
+          "learnerAction": "记录目标：输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。",
+          "check": "能口述「集合去重」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、队列处理和可见输出。",
+          "learnerAction": "分解具体操作：先用set去重，再用sorted生成稳定输出。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "先用set去重，再用sorted生成稳定输出。",
+          "check": "程序包含完成本课需要的队列逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。",
+          "check": "输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：直接返回set导致展示顺序不稳定。",
+          "learnerAction": "复现失败再尝试修复：集合只负责成员唯一性，输出前要排序。",
+          "check": "修复后满足：输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U2-L03-POS-01",
+          "setup": "社团报名表出现很多重复的项目名。",
+          "action": "先用set去重，再用sorted生成稳定输出。",
+          "expected": "输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U2-L03-NEG-01",
+          "setup": "社团报名表出现很多重复的项目名。",
+          "action": "直接返回set导致展示顺序不稳定。",
+          "expected": "检测失败并引导：集合只负责成员唯一性，输出前要排序。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课队列如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "集合只负责成员唯一性，输出前要排序。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "统计每项出现次数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：社团报名表出现很多重复的项目名。",
+          "只实现核心步骤：先用set去重，再用sorted生成稳定输出。",
+          "如果失败：集合只负责成员唯一性，输出前要排序。"
+        ],
+        "commonMistakes": [
+          "直接返回set导致展示顺序不稳定。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u2-l03-asset-1",
+          "p2-u2-l03-asset-2",
+          "p2-u2-l03-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要先用set去重，再用sorted生成稳定输出。，再让他演示输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。。"
+    },
+    {
+      "id": "P2-U2-L04",
+      "sourceUnitId": "P2-U2",
+      "title": "词频字典",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "老师想知道一篇短文里哪些词出现最多。",
+      "focusConcept": "队列",
+      "knowledgePoints": [
+        "栈",
+        "队列"
+      ],
+      "prerequisites": [
+        "P2-U2-L03"
+      ],
+      "learningOutcome": "apple apple orange输出apple:2,orange:1。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "词频字典",
+        "brief": "老师想知道一篇短文里哪些词出现最多。",
+        "learnerBuild": "用Counter计算按空格拆分的词频并排序。",
+        "successCriteria": "apple apple orange输出apple:2,orange:1。",
+        "creativeExtension": "支持中文分词方案比较。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "老师想知道一篇短文里哪些词出现最多。 先预测最终状态。",
+          "learnerAction": "记录目标：apple apple orange输出apple:2,orange:1。",
+          "check": "能口述「词频字典」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、队列处理和可见输出。",
+          "learnerAction": "分解具体操作：用Counter计算按空格拆分的词频并排序。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用Counter计算按空格拆分的词频并排序。",
+          "check": "程序包含完成本课需要的队列逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：apple apple orange输出apple:2,orange:1。",
+          "check": "apple apple orange输出apple:2,orange:1。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：大小写Apple与apple没有归一化。",
+          "learnerAction": "复现失败再尝试修复：对单词统一lower，去除前后标点。",
+          "check": "修复后满足：apple apple orange输出apple:2,orange:1。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U2-L04-POS-01",
+          "setup": "老师想知道一篇短文里哪些词出现最多。",
+          "action": "用Counter计算按空格拆分的词频并排序。",
+          "expected": "apple apple orange输出apple:2,orange:1。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U2-L04-NEG-01",
+          "setup": "老师想知道一篇短文里哪些词出现最多。",
+          "action": "大小写Apple与apple没有归一化。",
+          "expected": "检测失败并引导：对单词统一lower，去除前后标点。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "apple apple orange输出apple:2,orange:1。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课队列如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "对单词统一lower，去除前后标点。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "支持中文分词方案比较。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：老师想知道一篇短文里哪些词出现最多。",
+          "只实现核心步骤：用Counter计算按空格拆分的词频并排序。",
+          "如果失败：对单词统一lower，去除前后标点。"
+        ],
+        "commonMistakes": [
+          "大小写Apple与apple没有归一化。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u2-l04-asset-1",
+          "p2-u2-l04-asset-2",
+          "p2-u2-l04-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用Counter计算按空格拆分的词频并排序。，再让他演示apple apple orange输出apple:2,orange:1。。"
+    },
+    {
+      "id": "P2-U2-L05",
+      "sourceUnitId": "P2-U2",
+      "title": "二维地图数组",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "机器人在二维网格地图里需要知道上下左右是否能走。",
+      "focusConcept": "集合",
+      "knowledgePoints": [
+        "栈",
+        "队列",
+        "集合"
+      ],
+      "prerequisites": [
+        "P2-U2-L04"
+      ],
+      "learningOutcome": "左上角只返回合法相邻格，无坐标越界。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "二维地图数组",
+        "brief": "机器人在二维网格地图里需要知道上下左右是否能走。",
+        "learnerBuild": "用二维数组存0可走1障碍，枚举四邻居并过滤越界。",
+        "successCriteria": "左上角只返回合法相邻格，无坐标越界。",
+        "creativeExtension": "允许八方向移动并比较结果。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "机器人在二维网格地图里需要知道上下左右是否能走。 先预测最终状态。",
+          "learnerAction": "记录目标：左上角只返回合法相邻格，无坐标越界。",
+          "check": "能口述「二维地图数组」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、集合处理和可见输出。",
+          "learnerAction": "分解具体操作：用二维数组存0可走1障碍，枚举四邻居并过滤越界。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用二维数组存0可走1障碍，枚举四邻居并过滤越界。",
+          "check": "程序包含完成本课需要的集合逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：左上角只返回合法相邻格，无坐标越界。",
+          "check": "左上角只返回合法相邻格，无坐标越界。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：负索引错误地绕到最后一行。",
+          "learnerAction": "复现失败再尝试修复：对行列分别检查0<=x<宽。",
+          "check": "修复后满足：左上角只返回合法相邻格，无坐标越界。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U2-L05-POS-01",
+          "setup": "机器人在二维网格地图里需要知道上下左右是否能走。",
+          "action": "用二维数组存0可走1障碍，枚举四邻居并过滤越界。",
+          "expected": "左上角只返回合法相邻格，无坐标越界。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U2-L05-NEG-01",
+          "setup": "机器人在二维网格地图里需要知道上下左右是否能走。",
+          "action": "负索引错误地绕到最后一行。",
+          "expected": "检测失败并引导：对行列分别检查0<=x<宽。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "左上角只返回合法相邻格，无坐标越界。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课集合如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "对行列分别检查0<=x<宽。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "允许八方向移动并比较结果。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：机器人在二维网格地图里需要知道上下左右是否能走。",
+          "只实现核心步骤：用二维数组存0可走1障碍，枚举四邻居并过滤越界。",
+          "如果失败：对行列分别检查0<=x<宽。"
+        ],
+        "commonMistakes": [
+          "负索引错误地绕到最后一行。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u2-l05-asset-1",
+          "p2-u2-l05-asset-2",
+          "p2-u2-l05-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用二维数组存0可走1障碍，枚举四邻居并过滤越界。，再让他演示左上角只返回合法相邻格，无坐标越界。。"
+    },
+    {
+      "id": "P2-U2-L06",
+      "sourceUnitId": "P2-U2",
+      "title": "设计简易消息中心",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "模拟社区消息中心需要按发送时间处理多条消息。",
+      "focusConcept": "集合",
+      "knowledgePoints": [
+        "栈",
+        "队列",
+        "集合"
+      ],
+      "prerequisites": [
+        "P2-U2-L05"
+      ],
+      "learningOutcome": "3条消息顺序处理，每条恰好处理一次。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "设计简易消息中心",
+        "brief": "模拟社区消息中心需要按发送时间处理多条消息。",
+        "learnerBuild": "用队列接收消息，按先来先服务消费并记录处理顺序。",
+        "successCriteria": "3条消息顺序处理，每条恰好处理一次。",
+        "creativeExtension": "增加失败重试次数上限。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "模拟社区消息中心需要按发送时间处理多条消息。 先预测最终状态。",
+          "learnerAction": "记录目标：3条消息顺序处理，每条恰好处理一次。",
+          "check": "能口述「设计简易消息中心」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、集合处理和可见输出。",
+          "learnerAction": "分解具体操作：用队列接收消息，按先来先服务消费并记录处理顺序。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用队列接收消息，按先来先服务消费并记录处理顺序。",
+          "check": "程序包含完成本课需要的集合逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：3条消息顺序处理，每条恰好处理一次。",
+          "check": "3条消息顺序处理，每条恰好处理一次。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：同一消息因没有出队而重复处理。",
+          "learnerAction": "复现失败再尝试修复：每次消费都从队列中移除并记录编号。",
+          "check": "修复后满足：3条消息顺序处理，每条恰好处理一次。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U2-L06-POS-01",
+          "setup": "模拟社区消息中心需要按发送时间处理多条消息。",
+          "action": "用队列接收消息，按先来先服务消费并记录处理顺序。",
+          "expected": "3条消息顺序处理，每条恰好处理一次。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U2-L06-NEG-01",
+          "setup": "模拟社区消息中心需要按发送时间处理多条消息。",
+          "action": "同一消息因没有出队而重复处理。",
+          "expected": "检测失败并引导：每次消费都从队列中移除并记录编号。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "3条消息顺序处理，每条恰好处理一次。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课集合如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "每次消费都从队列中移除并记录编号。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加失败重试次数上限。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：模拟社区消息中心需要按发送时间处理多条消息。",
+          "只实现核心步骤：用队列接收消息，按先来先服务消费并记录处理顺序。",
+          "如果失败：每次消费都从队列中移除并记录编号。"
+        ],
+        "commonMistakes": [
+          "同一消息因没有出队而重复处理。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u2-l06-asset-1",
+          "p2-u2-l06-asset-2",
+          "p2-u2-l06-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用队列接收消息，按先来先服务消费并记录处理顺序。，再让他演示3条消息顺序处理，每条恰好处理一次。。"
+    },
+    {
+      "id": "P2-U3-L01",
+      "sourceUnitId": "P2-U3",
+      "title": "树枝递归绘图",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "分形树枝每次分成两根更短的树枝。",
+      "focusConcept": "递归",
+      "knowledgePoints": [
+        "递归"
+      ],
+      "prerequisites": [
+        "P2-U2-L06"
+      ],
+      "learningOutcome": "depth=3得到15个树枝且递归有出口。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "树枝递归绘图",
+        "brief": "分形树枝每次分成两根更短的树枝。",
+        "learnerBuild": "递归生成树枝长度列表，depth=0仅含主干。",
+        "successCriteria": "depth=3得到15个树枝且递归有出口。",
+        "creativeExtension": "给分枝角度加入参数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "分形树枝每次分成两根更短的树枝。 先预测最终状态。",
+          "learnerAction": "记录目标：depth=3得到15个树枝且递归有出口。",
+          "check": "能口述「树枝递归绘图」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、递归处理和可见输出。",
+          "learnerAction": "分解具体操作：递归生成树枝长度列表，depth=0仅含主干。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "递归生成树枝长度列表，depth=0仅含主干。",
+          "check": "程序包含完成本课需要的递归逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：depth=3得到15个树枝且递归有出口。",
+          "check": "depth=3得到15个树枝且递归有出口。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：depth为负仍然递归导致不终止。",
+          "learnerAction": "复现失败再尝试修复：函数入口拒绝负深度并先处理base case。",
+          "check": "修复后满足：depth=3得到15个树枝且递归有出口。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U3-L01-POS-01",
+          "setup": "分形树枝每次分成两根更短的树枝。",
+          "action": "递归生成树枝长度列表，depth=0仅含主干。",
+          "expected": "depth=3得到15个树枝且递归有出口。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U3-L01-NEG-01",
+          "setup": "分形树枝每次分成两根更短的树枝。",
+          "action": "depth为负仍然递归导致不终止。",
+          "expected": "检测失败并引导：函数入口拒绝负深度并先处理base case。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "depth=3得到15个树枝且递归有出口。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课递归如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "函数入口拒绝负深度并先处理base case。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "给分枝角度加入参数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：分形树枝每次分成两根更短的树枝。",
+          "只实现核心步骤：递归生成树枝长度列表，depth=0仅含主干。",
+          "如果失败：函数入口拒绝负深度并先处理base case。"
+        ],
+        "commonMistakes": [
+          "depth为负仍然递归导致不终止。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u3-l01-asset-1",
+          "p2-u3-l01-asset-2",
+          "p2-u3-l01-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要递归生成树枝长度列表，depth=0仅含主干。，再让他演示depth=3得到15个树枝且递归有出口。。"
+    },
+    {
+      "id": "P2-U3-L02",
+      "sourceUnitId": "P2-U3",
+      "title": "汉诺塔实验",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "古塔管理员要将三层盘子从A柱移到C柱。",
+      "focusConcept": "递归",
+      "knowledgePoints": [
+        "递归"
+      ],
+      "prerequisites": [
+        "P2-U3-L01"
+      ],
+      "learningOutcome": "n=3需要7步，每步只移动顶部且大盘不压小盘。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "汉诺塔实验",
+        "brief": "古塔管理员要将三层盘子从A柱移到C柱。",
+        "learnerBuild": "递归输出汉诺塔移动步骤并逐步验证合法性。",
+        "successCriteria": "n=3需要7步，每步只移动顶部且大盘不压小盘。",
+        "creativeExtension": "比较n=4步数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "古塔管理员要将三层盘子从A柱移到C柱。 先预测最终状态。",
+          "learnerAction": "记录目标：n=3需要7步，每步只移动顶部且大盘不压小盘。",
+          "check": "能口述「汉诺塔实验」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、递归处理和可见输出。",
+          "learnerAction": "分解具体操作：递归输出汉诺塔移动步骤并逐步验证合法性。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "递归输出汉诺塔移动步骤并逐步验证合法性。",
+          "check": "程序包含完成本课需要的递归逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：n=3需要7步，每步只移动顶部且大盘不压小盘。",
+          "check": "n=3需要7步，每步只移动顶部且大盘不压小盘。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：直接移动底层大盘使状态非法。",
+          "learnerAction": "复现失败再尝试修复：先完成n=1再用n-1递归分解。",
+          "check": "修复后满足：n=3需要7步，每步只移动顶部且大盘不压小盘。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U3-L02-POS-01",
+          "setup": "古塔管理员要将三层盘子从A柱移到C柱。",
+          "action": "递归输出汉诺塔移动步骤并逐步验证合法性。",
+          "expected": "n=3需要7步，每步只移动顶部且大盘不压小盘。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U3-L02-NEG-01",
+          "setup": "古塔管理员要将三层盘子从A柱移到C柱。",
+          "action": "直接移动底层大盘使状态非法。",
+          "expected": "检测失败并引导：先完成n=1再用n-1递归分解。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "n=3需要7步，每步只移动顶部且大盘不压小盘。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课递归如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "先完成n=1再用n-1递归分解。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "比较n=4步数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：古塔管理员要将三层盘子从A柱移到C柱。",
+          "只实现核心步骤：递归输出汉诺塔移动步骤并逐步验证合法性。",
+          "如果失败：先完成n=1再用n-1递归分解。"
+        ],
+        "commonMistakes": [
+          "直接移动底层大盘使状态非法。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u3-l02-asset-1",
+          "p2-u3-l02-asset-2",
+          "p2-u3-l02-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要递归输出汉诺塔移动步骤并逐步验证合法性。，再让他演示n=3需要7步，每步只移动顶部且大盘不压小盘。。"
+    },
+    {
+      "id": "P2-U3-L03",
+      "sourceUnitId": "P2-U3",
+      "title": "走迷宫回溯",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "机器人要从迷宫起点沿可行路径到达出口。",
+      "focusConcept": "回溯",
+      "knowledgePoints": [
+        "递归",
+        "回溯"
+      ],
+      "prerequisites": [
+        "P2-U3-L02"
+      ],
+      "learningOutcome": "可达迷宫返回有效路径，无解返回None且不无限循环。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "走迷宫回溯",
+        "brief": "机器人要从迷宫起点沿可行路径到达出口。",
+        "learnerBuild": "使用DFS与visited搜索可到达路径。",
+        "successCriteria": "可达迷宫返回有效路径，无解返回None且不无限循环。",
+        "creativeExtension": "统计探索步数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "机器人要从迷宫起点沿可行路径到达出口。 先预测最终状态。",
+          "learnerAction": "记录目标：可达迷宫返回有效路径，无解返回None且不无限循环。",
+          "check": "能口述「走迷宫回溯」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、回溯处理和可见输出。",
+          "learnerAction": "分解具体操作：使用DFS与visited搜索可到达路径。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "使用DFS与visited搜索可到达路径。",
+          "check": "程序包含完成本课需要的回溯逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：可达迷宫返回有效路径，无解返回None且不无限循环。",
+          "check": "可达迷宫返回有效路径，无解返回None且不无限循环。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：忘记visited在环形走廊反复绕圈。",
+          "learnerAction": "复现失败再尝试修复：每次入栈前记录已访问位置。",
+          "check": "修复后满足：可达迷宫返回有效路径，无解返回None且不无限循环。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U3-L03-POS-01",
+          "setup": "机器人要从迷宫起点沿可行路径到达出口。",
+          "action": "使用DFS与visited搜索可到达路径。",
+          "expected": "可达迷宫返回有效路径，无解返回None且不无限循环。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U3-L03-NEG-01",
+          "setup": "机器人要从迷宫起点沿可行路径到达出口。",
+          "action": "忘记visited在环形走廊反复绕圈。",
+          "expected": "检测失败并引导：每次入栈前记录已访问位置。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "可达迷宫返回有效路径，无解返回None且不无限循环。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课回溯如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "每次入栈前记录已访问位置。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "统计探索步数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：机器人要从迷宫起点沿可行路径到达出口。",
+          "只实现核心步骤：使用DFS与visited搜索可到达路径。",
+          "如果失败：每次入栈前记录已访问位置。"
+        ],
+        "commonMistakes": [
+          "忘记visited在环形走廊反复绕圈。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u3-l03-asset-1",
+          "p2-u3-l03-asset-2",
+          "p2-u3-l03-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要使用DFS与visited搜索可到达路径。，再让他演示可达迷宫返回有效路径，无解返回None且不无限循环。。"
+    },
+    {
+      "id": "P2-U3-L04",
+      "sourceUnitId": "P2-U3",
+      "title": "广度优先找最短路",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "救援机器人希望走最短的无权迷宫路线。",
+      "focusConcept": "回溯",
+      "knowledgePoints": [
+        "递归",
+        "回溯"
+      ],
+      "prerequisites": [
+        "P2-U3-L03"
+      ],
+      "learningOutcome": "在同一迷宫BFS路径长度不超过DFS任意路径。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "广度优先找最短路",
+        "brief": "救援机器人希望走最短的无权迷宫路线。",
+        "learnerBuild": "使用BFS队列和parent回溯路径。",
+        "successCriteria": "在同一迷宫BFS路径长度不超过DFS任意路径。",
+        "creativeExtension": "加入多个出口选择最近。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "救援机器人希望走最短的无权迷宫路线。 先预测最终状态。",
+          "learnerAction": "记录目标：在同一迷宫BFS路径长度不超过DFS任意路径。",
+          "check": "能口述「广度优先找最短路」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、回溯处理和可见输出。",
+          "learnerAction": "分解具体操作：使用BFS队列和parent回溯路径。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "使用BFS队列和parent回溯路径。",
+          "check": "程序包含完成本课需要的回溯逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：在同一迷宫BFS路径长度不超过DFS任意路径。",
+          "check": "在同一迷宫BFS路径长度不超过DFS任意路径。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：使用栈替代队列后仍宣称最短。",
+          "learnerAction": "复现失败再尝试修复：按层访问节点，队列先入先出。",
+          "check": "修复后满足：在同一迷宫BFS路径长度不超过DFS任意路径。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U3-L04-POS-01",
+          "setup": "救援机器人希望走最短的无权迷宫路线。",
+          "action": "使用BFS队列和parent回溯路径。",
+          "expected": "在同一迷宫BFS路径长度不超过DFS任意路径。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U3-L04-NEG-01",
+          "setup": "救援机器人希望走最短的无权迷宫路线。",
+          "action": "使用栈替代队列后仍宣称最短。",
+          "expected": "检测失败并引导：按层访问节点，队列先入先出。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "在同一迷宫BFS路径长度不超过DFS任意路径。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课回溯如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "按层访问节点，队列先入先出。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入多个出口选择最近。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：救援机器人希望走最短的无权迷宫路线。",
+          "只实现核心步骤：使用BFS队列和parent回溯路径。",
+          "如果失败：按层访问节点，队列先入先出。"
+        ],
+        "commonMistakes": [
+          "使用栈替代队列后仍宣称最短。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u3-l04-asset-1",
+          "p2-u3-l04-asset-2",
+          "p2-u3-l04-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要使用BFS队列和parent回溯路径。，再让他演示在同一迷宫BFS路径长度不超过DFS任意路径。。"
+    },
+    {
+      "id": "P2-U3-L05",
+      "sourceUnitId": "P2-U3",
+      "title": "分治寻找最大值",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "分治队要从海量分数里快速找最大值。",
+      "focusConcept": "图",
+      "knowledgePoints": [
+        "递归",
+        "回溯",
+        "图"
+      ],
+      "prerequisites": [
+        "P2-U3-L04"
+      ],
+      "learningOutcome": "[-5,-2,-8]返回-2，空数组有明确错误。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "分治寻找最大值",
+        "brief": "分治队要从海量分数里快速找最大值。",
+        "learnerBuild": "把数组分成左右两半递归求最大并合并。",
+        "successCriteria": "[-5,-2,-8]返回-2，空数组有明确错误。",
+        "creativeExtension": "计算递归调用次数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "分治队要从海量分数里快速找最大值。 先预测最终状态。",
+          "learnerAction": "记录目标：[-5,-2,-8]返回-2，空数组有明确错误。",
+          "check": "能口述「分治寻找最大值」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、图处理和可见输出。",
+          "learnerAction": "分解具体操作：把数组分成左右两半递归求最大并合并。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "把数组分成左右两半递归求最大并合并。",
+          "check": "程序包含完成本课需要的图逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：[-5,-2,-8]返回-2，空数组有明确错误。",
+          "check": "[-5,-2,-8]返回-2，空数组有明确错误。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：初始最大值写0导致全负数列错误。",
+          "learnerAction": "复现失败再尝试修复：用第一个元素作为基线并设空数组验证。",
+          "check": "修复后满足：[-5,-2,-8]返回-2，空数组有明确错误。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U3-L05-POS-01",
+          "setup": "分治队要从海量分数里快速找最大值。",
+          "action": "把数组分成左右两半递归求最大并合并。",
+          "expected": "[-5,-2,-8]返回-2，空数组有明确错误。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U3-L05-NEG-01",
+          "setup": "分治队要从海量分数里快速找最大值。",
+          "action": "初始最大值写0导致全负数列错误。",
+          "expected": "检测失败并引导：用第一个元素作为基线并设空数组验证。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "[-5,-2,-8]返回-2，空数组有明确错误。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课图如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "用第一个元素作为基线并设空数组验证。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "计算递归调用次数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：分治队要从海量分数里快速找最大值。",
+          "只实现核心步骤：把数组分成左右两半递归求最大并合并。",
+          "如果失败：用第一个元素作为基线并设空数组验证。"
+        ],
+        "commonMistakes": [
+          "初始最大值写0导致全负数列错误。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u3-l05-asset-1",
+          "p2-u3-l05-asset-2",
+          "p2-u3-l05-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要把数组分成左右两半递归求最大并合并。，再让他演示[-5,-2,-8]返回-2，空数组有明确错误。。"
+    },
+    {
+      "id": "P2-U3-L06",
+      "sourceUnitId": "P2-U3",
+      "title": "迷宫自动寻路器",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "冒险地图有许多通道，智能向导想走最短路。",
+      "focusConcept": "图",
+      "knowledgePoints": [
+        "递归",
+        "回溯",
+        "图"
+      ],
+      "prerequisites": [
+        "P2-U3-L05"
+      ],
+      "learningOutcome": "A→C最短2步，不可达点返回None。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "迷宫自动寻路器",
+        "brief": "冒险地图有许多通道，智能向导想走最短路。",
+        "learnerBuild": "把地图存为邻接表，使用BFS找无权最短路。",
+        "successCriteria": "A→C最短2步，不可达点返回None。",
+        "creativeExtension": "升级Dijkstra处理不同路长。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "冒险地图有许多通道，智能向导想走最短路。 先预测最终状态。",
+          "learnerAction": "记录目标：A→C最短2步，不可达点返回None。",
+          "check": "能口述「迷宫自动寻路器」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、图处理和可见输出。",
+          "learnerAction": "分解具体操作：把地图存为邻接表，使用BFS找无权最短路。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "把地图存为邻接表，使用BFS找无权最短路。",
+          "check": "程序包含完成本课需要的图逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：A→C最短2步，不可达点返回None。",
+          "check": "A→C最短2步，不可达点返回None。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：把有权道路当无权处理给出错误最短路。",
+          "learnerAction": "复现失败再尝试修复：清楚标注所有边都是等权。",
+          "check": "修复后满足：A→C最短2步，不可达点返回None。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U3-L06-POS-01",
+          "setup": "冒险地图有许多通道，智能向导想走最短路。",
+          "action": "把地图存为邻接表，使用BFS找无权最短路。",
+          "expected": "A→C最短2步，不可达点返回None。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U3-L06-NEG-01",
+          "setup": "冒险地图有许多通道，智能向导想走最短路。",
+          "action": "把有权道路当无权处理给出错误最短路。",
+          "expected": "检测失败并引导：清楚标注所有边都是等权。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "A→C最短2步，不可达点返回None。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课图如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "清楚标注所有边都是等权。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "升级Dijkstra处理不同路长。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：冒险地图有许多通道，智能向导想走最短路。",
+          "只实现核心步骤：把地图存为邻接表，使用BFS找无权最短路。",
+          "如果失败：清楚标注所有边都是等权。"
+        ],
+        "commonMistakes": [
+          "把有权道路当无权处理给出错误最短路。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u3-l06-asset-1",
+          "p2-u3-l06-asset-2",
+          "p2-u3-l06-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要把地图存为邻接表，使用BFS找无权最短路。，再让他演示A→C最短2步，不可达点返回None。。"
+    },
+    {
+      "id": "P2-U4-L01",
+      "sourceUnitId": "P2-U4",
+      "title": "为函数写测试",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "程序测试员要给加法函数写可重复运行的测试。",
+      "focusConcept": "测试",
+      "knowledgePoints": [
+        "测试"
+      ],
+      "prerequisites": [
+        "P2-U3-L06"
+      ],
+      "learningOutcome": "正确实现全部通过，故意引入错误后至少一项失败。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "为函数写测试",
+        "brief": "程序测试员要给加法函数写可重复运行的测试。",
+        "learnerBuild": "使用unittest为正常、负数、边界输入编写3项断言。",
+        "successCriteria": "正确实现全部通过，故意引入错误后至少一项失败。",
+        "creativeExtension": "添加属性测试。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "程序测试员要给加法函数写可重复运行的测试。 先预测最终状态。",
+          "learnerAction": "记录目标：正确实现全部通过，故意引入错误后至少一项失败。",
+          "check": "能口述「为函数写测试」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、测试处理和可见输出。",
+          "learnerAction": "分解具体操作：使用unittest为正常、负数、边界输入编写3项断言。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "使用unittest为正常、负数、边界输入编写3项断言。",
+          "check": "程序包含完成本课需要的测试逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：正确实现全部通过，故意引入错误后至少一项失败。",
+          "check": "正确实现全部通过，故意引入错误后至少一项失败。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：测试只验证永远为真的表达式。",
+          "learnerAction": "复现失败再尝试修复：确认测试对故意错误的实现能报错。",
+          "check": "修复后满足：正确实现全部通过，故意引入错误后至少一项失败。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U4-L01-POS-01",
+          "setup": "程序测试员要给加法函数写可重复运行的测试。",
+          "action": "使用unittest为正常、负数、边界输入编写3项断言。",
+          "expected": "正确实现全部通过，故意引入错误后至少一项失败。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U4-L01-NEG-01",
+          "setup": "程序测试员要给加法函数写可重复运行的测试。",
+          "action": "测试只验证永远为真的表达式。",
+          "expected": "检测失败并引导：确认测试对故意错误的实现能报错。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "正确实现全部通过，故意引入错误后至少一项失败。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课测试如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "确认测试对故意错误的实现能报错。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "添加属性测试。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：程序测试员要给加法函数写可重复运行的测试。",
+          "只实现核心步骤：使用unittest为正常、负数、边界输入编写3项断言。",
+          "如果失败：确认测试对故意错误的实现能报错。"
+        ],
+        "commonMistakes": [
+          "测试只验证永远为真的表达式。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u4-l01-asset-1",
+          "p2-u4-l01-asset-2",
+          "p2-u4-l01-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要使用unittest为正常、负数、边界输入编写3项断言。，再让他演示正确实现全部通过，故意引入错误后至少一项失败。。"
+    },
+    {
+      "id": "P2-U4-L02",
+      "sourceUnitId": "P2-U4",
+      "title": "设计异常输入",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "用户输入不是数字时，程序要解释错误而不是崩溃。",
+      "focusConcept": "测试",
+      "knowledgePoints": [
+        "测试"
+      ],
+      "prerequisites": [
+        "P2-U4-L01"
+      ],
+      "learningOutcome": "合法数字返回int，非法字符串抛ValueError。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "设计异常输入",
+        "brief": "用户输入不是数字时，程序要解释错误而不是崩溃。",
+        "learnerBuild": "定义parse_int并限制范围，针对abc与极大数写异常测试。",
+        "successCriteria": "合法数字返回int，非法字符串抛ValueError。",
+        "creativeExtension": "支持有符号整数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "用户输入不是数字时，程序要解释错误而不是崩溃。 先预测最终状态。",
+          "learnerAction": "记录目标：合法数字返回int，非法字符串抛ValueError。",
+          "check": "能口述「设计异常输入」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、测试处理和可见输出。",
+          "learnerAction": "分解具体操作：定义parse_int并限制范围，针对abc与极大数写异常测试。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "定义parse_int并限制范围，针对abc与极大数写异常测试。",
+          "check": "程序包含完成本课需要的测试逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：合法数字返回int，非法字符串抛ValueError。",
+          "check": "合法数字返回int，非法字符串抛ValueError。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：使用except:掩盖内存或编程错误。",
+          "learnerAction": "复现失败再尝试修复：仅捕获预期的ValueError。",
+          "check": "修复后满足：合法数字返回int，非法字符串抛ValueError。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U4-L02-POS-01",
+          "setup": "用户输入不是数字时，程序要解释错误而不是崩溃。",
+          "action": "定义parse_int并限制范围，针对abc与极大数写异常测试。",
+          "expected": "合法数字返回int，非法字符串抛ValueError。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U4-L02-NEG-01",
+          "setup": "用户输入不是数字时，程序要解释错误而不是崩溃。",
+          "action": "使用except:掩盖内存或编程错误。",
+          "expected": "检测失败并引导：仅捕获预期的ValueError。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "合法数字返回int，非法字符串抛ValueError。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课测试如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "仅捕获预期的ValueError。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "支持有符号整数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：用户输入不是数字时，程序要解释错误而不是崩溃。",
+          "只实现核心步骤：定义parse_int并限制范围，针对abc与极大数写异常测试。",
+          "如果失败：仅捕获预期的ValueError。"
+        ],
+        "commonMistakes": [
+          "使用except:掩盖内存或编程错误。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u4-l02-asset-1",
+          "p2-u4-l02-asset-2",
+          "p2-u4-l02-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要定义parse_int并限制范围，针对abc与极大数写异常测试。，再让他演示合法数字返回int，非法字符串抛ValueError。。"
+    },
+    {
+      "id": "P2-U4-L03",
+      "sourceUnitId": "P2-U4",
+      "title": "读取CSV数据",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "学校数据员要读取含姓名代号与分数的CSV。",
+      "focusConcept": "性能",
+      "knowledgePoints": [
+        "测试",
+        "性能"
+      ],
+      "prerequisites": [
+        "P2-U4-L02"
+      ],
+      "learningOutcome": "保留有效分数并统计平均，空文件显示无数据。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "读取CSV数据",
+        "brief": "学校数据员要读取含姓名代号与分数的CSV。",
+        "learnerBuild": "用csv.DictReader读取模拟数据并筛选无效分数。",
+        "successCriteria": "保留有效分数并统计平均，空文件显示无数据。",
+        "creativeExtension": "输出匿名班级成绩图。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "学校数据员要读取含姓名代号与分数的CSV。 先预测最终状态。",
+          "learnerAction": "记录目标：保留有效分数并统计平均，空文件显示无数据。",
+          "check": "能口述「读取CSV数据」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、性能处理和可见输出。",
+          "learnerAction": "分解具体操作：用csv.DictReader读取模拟数据并筛选无效分数。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用csv.DictReader读取模拟数据并筛选无效分数。",
+          "check": "程序包含完成本课需要的性能逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：保留有效分数并统计平均，空文件显示无数据。",
+          "check": "保留有效分数并统计平均，空文件显示无数据。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：含缺失列的CSV直接抛异常。",
+          "learnerAction": "复现失败再尝试修复：检查必需字段存在并报告行号。",
+          "check": "修复后满足：保留有效分数并统计平均，空文件显示无数据。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U4-L03-POS-01",
+          "setup": "学校数据员要读取含姓名代号与分数的CSV。",
+          "action": "用csv.DictReader读取模拟数据并筛选无效分数。",
+          "expected": "保留有效分数并统计平均，空文件显示无数据。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U4-L03-NEG-01",
+          "setup": "学校数据员要读取含姓名代号与分数的CSV。",
+          "action": "含缺失列的CSV直接抛异常。",
+          "expected": "检测失败并引导：检查必需字段存在并报告行号。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "保留有效分数并统计平均，空文件显示无数据。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课性能如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "检查必需字段存在并报告行号。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "输出匿名班级成绩图。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：学校数据员要读取含姓名代号与分数的CSV。",
+          "只实现核心步骤：用csv.DictReader读取模拟数据并筛选无效分数。",
+          "如果失败：检查必需字段存在并报告行号。"
+        ],
+        "commonMistakes": [
+          "含缺失列的CSV直接抛异常。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u4-l03-asset-1",
+          "p2-u4-l03-asset-2",
+          "p2-u4-l03-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用csv.DictReader读取模拟数据并筛选无效分数。，再让他演示保留有效分数并统计平均，空文件显示无数据。。"
+    },
+    {
+      "id": "P2-U4-L04",
+      "sourceUnitId": "P2-U4",
+      "title": "验证算法正确性",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "算法设计师要证明自己的程序在不同输入都正确。",
+      "focusConcept": "性能",
+      "knowledgePoints": [
+        "测试",
+        "性能"
+      ],
+      "prerequisites": [
+        "P2-U4-L03"
+      ],
+      "learningOutcome": "输出等于sorted，排列不丢元素。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "验证算法正确性",
+        "brief": "算法设计师要证明自己的程序在不同输入都正确。",
+        "learnerBuild": "为排序函数设计空、单项、重复、逆序四组断言。",
+        "successCriteria": "输出等于sorted，排列不丢元素。",
+        "creativeExtension": "编写自动随机生成测试。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "算法设计师要证明自己的程序在不同输入都正确。 先预测最终状态。",
+          "learnerAction": "记录目标：输出等于sorted，排列不丢元素。",
+          "check": "能口述「验证算法正确性」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、性能处理和可见输出。",
+          "learnerAction": "分解具体操作：为排序函数设计空、单项、重复、逆序四组断言。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "为排序函数设计空、单项、重复、逆序四组断言。",
+          "check": "程序包含完成本课需要的性能逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：输出等于sorted，排列不丢元素。",
+          "check": "输出等于sorted，排列不丢元素。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：只测试[1,2,3]而隐藏逆序错误。",
+          "learnerAction": "复现失败再尝试修复：按等价类与边界值补充输入集合。",
+          "check": "修复后满足：输出等于sorted，排列不丢元素。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U4-L04-POS-01",
+          "setup": "算法设计师要证明自己的程序在不同输入都正确。",
+          "action": "为排序函数设计空、单项、重复、逆序四组断言。",
+          "expected": "输出等于sorted，排列不丢元素。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U4-L04-NEG-01",
+          "setup": "算法设计师要证明自己的程序在不同输入都正确。",
+          "action": "只测试[1,2,3]而隐藏逆序错误。",
+          "expected": "检测失败并引导：按等价类与边界值补充输入集合。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "输出等于sorted，排列不丢元素。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课性能如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "按等价类与边界值补充输入集合。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "编写自动随机生成测试。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：算法设计师要证明自己的程序在不同输入都正确。",
+          "只实现核心步骤：为排序函数设计空、单项、重复、逆序四组断言。",
+          "如果失败：按等价类与边界值补充输入集合。"
+        ],
+        "commonMistakes": [
+          "只测试[1,2,3]而隐藏逆序错误。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u4-l04-asset-1",
+          "p2-u4-l04-asset-2",
+          "p2-u4-l04-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要为排序函数设计空、单项、重复、逆序四组断言。，再让他演示输出等于sorted，排列不丢元素。。"
+    },
+    {
+      "id": "P2-U4-L05",
+      "sourceUnitId": "P2-U4",
+      "title": "比较内存耗用",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "社团要比较两种算法的内存开销。",
+      "focusConcept": "优化",
+      "knowledgePoints": [
+        "测试",
+        "性能",
+        "优化"
+      ],
+      "prerequisites": [
+        "P2-U4-L04"
+      ],
+      "learningOutcome": "能报告非负字节数，区分测量误差和趋势。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "比较内存耗用",
+        "brief": "社团要比较两种算法的内存开销。",
+        "learnerBuild": "用tracemalloc检测同样输入量的两种实现峰值内存。",
+        "successCriteria": "能报告非负字节数，区分测量误差和趋势。",
+        "creativeExtension": "绘制折线图。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "社团要比较两种算法的内存开销。 先预测最终状态。",
+          "learnerAction": "记录目标：能报告非负字节数，区分测量误差和趋势。",
+          "check": "能口述「比较内存耗用」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、优化处理和可见输出。",
+          "learnerAction": "分解具体操作：用tracemalloc检测同样输入量的两种实现峰值内存。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用tracemalloc检测同样输入量的两种实现峰值内存。",
+          "check": "程序包含完成本课需要的优化逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：能报告非负字节数，区分测量误差和趋势。",
+          "check": "能报告非负字节数，区分测量误差和趋势。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：把一次峰值的大小当成绝对数学证明。",
+          "learnerAction": "复现失败再尝试修复：重复测试并记录输入规模与环境。",
+          "check": "修复后满足：能报告非负字节数，区分测量误差和趋势。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U4-L05-POS-01",
+          "setup": "社团要比较两种算法的内存开销。",
+          "action": "用tracemalloc检测同样输入量的两种实现峰值内存。",
+          "expected": "能报告非负字节数，区分测量误差和趋势。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U4-L05-NEG-01",
+          "setup": "社团要比较两种算法的内存开销。",
+          "action": "把一次峰值的大小当成绝对数学证明。",
+          "expected": "检测失败并引导：重复测试并记录输入规模与环境。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "能报告非负字节数，区分测量误差和趋势。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课优化如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "重复测试并记录输入规模与环境。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "绘制折线图。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：社团要比较两种算法的内存开销。",
+          "只实现核心步骤：用tracemalloc检测同样输入量的两种实现峰值内存。",
+          "如果失败：重复测试并记录输入规模与环境。"
+        ],
+        "commonMistakes": [
+          "把一次峰值的大小当成绝对数学证明。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u4-l05-asset-1",
+          "p2-u4-l05-asset-2",
+          "p2-u4-l05-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用tracemalloc检测同样输入量的两种实现峰值内存。，再让他演示能报告非负字节数，区分测量误差和趋势。。"
+    },
+    {
+      "id": "P2-U4-L06",
+      "sourceUnitId": "P2-U4",
+      "title": "智能班级排课原型",
+      "engine": "python",
+      "ageRange": "11-16",
+      "status": "detailed_not_published",
+      "story": "校园活动安排6项任务，部分任务必须先于另一些进行。",
+      "focusConcept": "优化",
+      "knowledgePoints": [
+        "测试",
+        "性能",
+        "优化"
+      ],
+      "prerequisites": [
+        "P2-U4-L05"
+      ],
+      "learningOutcome": "A→B条件下A在B前，依赖存在环时报错。",
+      "environment": "Python3标准库",
+      "project": {
+        "title": "智能班级排课原型",
+        "brief": "校园活动安排6项任务，部分任务必须先于另一些进行。",
+        "learnerBuild": "构建DAG依赖并用拓扑排序生成合理日程。",
+        "successCriteria": "A→B条件下A在B前，依赖存在环时报错。",
+        "creativeExtension": "加入任务工期与资源约束。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "校园活动安排6项任务，部分任务必须先于另一些进行。 先预测最终状态。",
+          "learnerAction": "记录目标：A→B条件下A在B前，依赖存在环时报错。",
+          "check": "能口述「智能班级排课原型」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、优化处理和可见输出。",
+          "learnerAction": "分解具体操作：构建DAG依赖并用拓扑排序生成合理日程。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "构建DAG依赖并用拓扑排序生成合理日程。",
+          "check": "程序包含完成本课需要的优化逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：A→B条件下A在B前，依赖存在环时报错。",
+          "check": "A→B条件下A在B前，依赖存在环时报错。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：忽略循环依赖仍输出错误排课顺序。",
+          "learnerAction": "复现失败再尝试修复：用入度为0队列逐个安排并检测剩余节点。",
+          "check": "修复后满足：A→B条件下A在B前，依赖存在环时报错。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P2-U4-L06-POS-01",
+          "setup": "校园活动安排6项任务，部分任务必须先于另一些进行。",
+          "action": "构建DAG依赖并用拓扑排序生成合理日程。",
+          "expected": "A→B条件下A在B前，依赖存在环时报错。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P2-U4-L06-NEG-01",
+          "setup": "校园活动安排6项任务，部分任务必须先于另一些进行。",
+          "action": "忽略循环依赖仍输出错误排课顺序。",
+          "expected": "检测失败并引导：用入度为0队列逐个安排并检测剩余节点。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "A→B条件下A在B前，依赖存在环时报错。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课优化如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "用入度为0队列逐个安排并检测剩余节点。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入任务工期与资源约束。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：校园活动安排6项任务，部分任务必须先于另一些进行。",
+          "只实现核心步骤：构建DAG依赖并用拓扑排序生成合理日程。",
+          "如果失败：用入度为0队列逐个安排并检测剩余节点。"
+        ],
+        "commonMistakes": [
+          "忽略循环依赖仍输出错误排课顺序。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p2-u4-l06-asset-1",
+          "p2-u4-l06-asset-2",
+          "p2-u4-l06-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要构建DAG依赖并用拓扑排序生成合理日程。，再让他演示A→B条件下A在B前，依赖存在环时报错。。"
+    }
+  ]
+}

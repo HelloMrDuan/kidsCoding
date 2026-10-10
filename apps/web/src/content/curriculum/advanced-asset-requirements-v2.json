@@ -1,0 +1,2408 @@
+{
+  "schemaVersion": "2.0.0",
+  "lessonCount": 72,
+  "assetCount": 240,
+  "note": "制作清单，非已生产素材；可使用下方随仓库交付的原创SVG作为部分G3原型素材。",
+  "assets": [
+    {
+      "id": "g3-u1-l01-asset-1",
+      "lessonId": "G3-U1-L01",
+      "kind": "角色造型SVG",
+      "spec": "用自制积木画图：角色造型SVG。场景：机器人要用同样的五角星花纹装饰六面旗。；运行目标：6面旗均有星形，尺寸按输入参数变化。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l01-asset-2",
+      "lessonId": "G3-U1-L01",
+      "kind": "场景背景SVG",
+      "spec": "用自制积木画图：场景背景SVG。场景：机器人要用同样的五角星花纹装饰六面旗。；运行目标：6面旗均有星形，尺寸按输入参数变化。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l01-asset-3",
+      "lessonId": "G3-U1-L01",
+      "kind": "事件反馈音效",
+      "spec": "用自制积木画图：事件反馈音效。场景：机器人要用同样的五角星花纹装饰六面旗。；运行目标：6面旗均有星形，尺寸按输入参数变化。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l01-asset-4",
+      "lessonId": "G3-U1-L01",
+      "kind": "Scratch项目模板",
+      "spec": "用自制积木画图：Scratch项目模板。场景：机器人要用同样的五角星花纹装饰六面旗。；运行目标：6面旗均有星形，尺寸按输入参数变化。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l02-asset-1",
+      "lessonId": "G3-U1-L02",
+      "kind": "角色造型SVG",
+      "spec": "克隆流星雨：角色造型SVG。场景：星球防卫站发现流星从不同位置坠落。；运行目标：生成10个分身后舞台无永久堆积，分身到地面消失。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l02-asset-2",
+      "lessonId": "G3-U1-L02",
+      "kind": "场景背景SVG",
+      "spec": "克隆流星雨：场景背景SVG。场景：星球防卫站发现流星从不同位置坠落。；运行目标：生成10个分身后舞台无永久堆积，分身到地面消失。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l02-asset-3",
+      "lessonId": "G3-U1-L02",
+      "kind": "事件反馈音效",
+      "spec": "克隆流星雨：事件反馈音效。场景：星球防卫站发现流星从不同位置坠落。；运行目标：生成10个分身后舞台无永久堆积，分身到地面消失。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l02-asset-4",
+      "lessonId": "G3-U1-L02",
+      "kind": "Scratch项目模板",
+      "spec": "克隆流星雨：Scratch项目模板。场景：星球防卫站发现流星从不同位置坠落。；运行目标：生成10个分身后舞台无永久堆积，分身到地面消失。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l03-asset-1",
+      "lessonId": "G3-U1-L03",
+      "kind": "角色造型SVG",
+      "spec": "列表管理背包：角色造型SVG。场景：探险家捡到三件道具需要在背包按顺序保存。；运行目标：列表最终仅有罗盘与钥匙并保持次序。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l03-asset-2",
+      "lessonId": "G3-U1-L03",
+      "kind": "场景背景SVG",
+      "spec": "列表管理背包：场景背景SVG。场景：探险家捡到三件道具需要在背包按顺序保存。；运行目标：列表最终仅有罗盘与钥匙并保持次序。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l03-asset-3",
+      "lessonId": "G3-U1-L03",
+      "kind": "事件反馈音效",
+      "spec": "列表管理背包：事件反馈音效。场景：探险家捡到三件道具需要在背包按顺序保存。；运行目标：列表最终仅有罗盘与钥匙并保持次序。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l03-asset-4",
+      "lessonId": "G3-U1-L03",
+      "kind": "Scratch项目模板",
+      "spec": "列表管理背包：Scratch项目模板。场景：探险家捡到三件道具需要在背包按顺序保存。；运行目标：列表最终仅有罗盘与钥匙并保持次序。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l04-asset-1",
+      "lessonId": "G3-U1-L04",
+      "kind": "角色造型SVG",
+      "spec": "角色状态切换：角色造型SVG。场景：宇航员待机、奔跑、受伤时应该展示不同造型。；运行目标：state=hurt时停止奔跑，state=run时持续移动。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l04-asset-2",
+      "lessonId": "G3-U1-L04",
+      "kind": "场景背景SVG",
+      "spec": "角色状态切换：场景背景SVG。场景：宇航员待机、奔跑、受伤时应该展示不同造型。；运行目标：state=hurt时停止奔跑，state=run时持续移动。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l04-asset-3",
+      "lessonId": "G3-U1-L04",
+      "kind": "事件反馈音效",
+      "spec": "角色状态切换：事件反馈音效。场景：宇航员待机、奔跑、受伤时应该展示不同造型。；运行目标：state=hurt时停止奔跑，state=run时持续移动。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l04-asset-4",
+      "lessonId": "G3-U1-L04",
+      "kind": "Scratch项目模板",
+      "spec": "角色状态切换：Scratch项目模板。场景：宇航员待机、奔跑、受伤时应该展示不同造型。；运行目标：state=hurt时停止奔跑，state=run时持续移动。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l05-asset-1",
+      "lessonId": "G3-U1-L05",
+      "kind": "角色造型SVG",
+      "spec": "批量生成敌人：角色造型SVG。场景：敌方机器人一波一波出现，数量随关卡提高。；运行目标：level=2生成5个且每个敌人只能被消灭一次。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l05-asset-2",
+      "lessonId": "G3-U1-L05",
+      "kind": "场景背景SVG",
+      "spec": "批量生成敌人：场景背景SVG。场景：敌方机器人一波一波出现，数量随关卡提高。；运行目标：level=2生成5个且每个敌人只能被消灭一次。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l05-asset-3",
+      "lessonId": "G3-U1-L05",
+      "kind": "事件反馈音效",
+      "spec": "批量生成敌人：事件反馈音效。场景：敌方机器人一波一波出现，数量随关卡提高。；运行目标：level=2生成5个且每个敌人只能被消灭一次。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l05-asset-4",
+      "lessonId": "G3-U1-L05",
+      "kind": "Scratch项目模板",
+      "spec": "批量生成敌人：Scratch项目模板。场景：敌方机器人一波一波出现，数量随关卡提高。；运行目标：level=2生成5个且每个敌人只能被消灭一次。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l06-asset-1",
+      "lessonId": "G3-U1-L06",
+      "kind": "角色造型SVG",
+      "spec": "星际防御小游戏：角色造型SVG。场景：星际防御作品需要从开始到结束有完整循环。；运行目标：击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l06-asset-2",
+      "lessonId": "G3-U1-L06",
+      "kind": "场景背景SVG",
+      "spec": "星际防御小游戏：场景背景SVG。场景：星际防御作品需要从开始到结束有完整循环。；运行目标：击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l06-asset-3",
+      "lessonId": "G3-U1-L06",
+      "kind": "事件反馈音效",
+      "spec": "星际防御小游戏：事件反馈音效。场景：星际防御作品需要从开始到结束有完整循环。；运行目标：击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u1-l06-asset-4",
+      "lessonId": "G3-U1-L06",
+      "kind": "Scratch项目模板",
+      "spec": "星际防御小游戏：Scratch项目模板。场景：星际防御作品需要从开始到结束有完整循环。；运行目标：击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l01-asset-1",
+      "lessonId": "G3-U2-L01",
+      "kind": "角色造型SVG",
+      "spec": "设计关卡入口：角色造型SVG。场景：奇幻城堡需要一个明确的开场菜单。；运行目标：未点击时角色不能移动，点击后进入第一关。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l01-asset-2",
+      "lessonId": "G3-U2-L01",
+      "kind": "场景背景SVG",
+      "spec": "设计关卡入口：场景背景SVG。场景：奇幻城堡需要一个明确的开场菜单。；运行目标：未点击时角色不能移动，点击后进入第一关。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l01-asset-3",
+      "lessonId": "G3-U2-L01",
+      "kind": "事件反馈音效",
+      "spec": "设计关卡入口：事件反馈音效。场景：奇幻城堡需要一个明确的开场菜单。；运行目标：未点击时角色不能移动，点击后进入第一关。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l01-asset-4",
+      "lessonId": "G3-U2-L01",
+      "kind": "Scratch项目模板",
+      "spec": "设计关卡入口：Scratch项目模板。场景：奇幻城堡需要一个明确的开场菜单。；运行目标：未点击时角色不能移动，点击后进入第一关。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l02-asset-1",
+      "lessonId": "G3-U2-L02",
+      "kind": "角色造型SVG",
+      "spec": "多背景切换：角色造型SVG。场景：探险队先到大厅，再进入地牢和藏宝屋。；运行目标：进入三个房间时背景和起点都正确。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l02-asset-2",
+      "lessonId": "G3-U2-L02",
+      "kind": "场景背景SVG",
+      "spec": "多背景切换：场景背景SVG。场景：探险队先到大厅，再进入地牢和藏宝屋。；运行目标：进入三个房间时背景和起点都正确。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l02-asset-3",
+      "lessonId": "G3-U2-L02",
+      "kind": "事件反馈音效",
+      "spec": "多背景切换：事件反馈音效。场景：探险队先到大厅，再进入地牢和藏宝屋。；运行目标：进入三个房间时背景和起点都正确。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l02-asset-4",
+      "lessonId": "G3-U2-L02",
+      "kind": "Scratch项目模板",
+      "spec": "多背景切换：Scratch项目模板。场景：探险队先到大厅，再进入地牢和藏宝屋。；运行目标：进入三个房间时背景和起点都正确。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l03-asset-1",
+      "lessonId": "G3-U2-L03",
+      "kind": "角色造型SVG",
+      "spec": "收集与解锁道具：角色造型SVG。场景：宝箱钥匙可以解锁下一扇门，但不能一钥两用。；运行目标：一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l03-asset-2",
+      "lessonId": "G3-U2-L03",
+      "kind": "场景背景SVG",
+      "spec": "收集与解锁道具：场景背景SVG。场景：宝箱钥匙可以解锁下一扇门，但不能一钥两用。；运行目标：一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l03-asset-3",
+      "lessonId": "G3-U2-L03",
+      "kind": "事件反馈音效",
+      "spec": "收集与解锁道具：事件反馈音效。场景：宝箱钥匙可以解锁下一扇门，但不能一钥两用。；运行目标：一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l03-asset-4",
+      "lessonId": "G3-U2-L03",
+      "kind": "Scratch项目模板",
+      "spec": "收集与解锁道具：Scratch项目模板。场景：宝箱钥匙可以解锁下一扇门，但不能一钥两用。；运行目标：一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l04-asset-1",
+      "lessonId": "G3-U2-L04",
+      "kind": "角色造型SVG",
+      "spec": "制作移动平台：角色造型SVG。场景：熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。；运行目标：角色站上平台后相对位置保持不变；边界处反向。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l04-asset-2",
+      "lessonId": "G3-U2-L04",
+      "kind": "场景背景SVG",
+      "spec": "制作移动平台：场景背景SVG。场景：熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。；运行目标：角色站上平台后相对位置保持不变；边界处反向。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l04-asset-3",
+      "lessonId": "G3-U2-L04",
+      "kind": "事件反馈音效",
+      "spec": "制作移动平台：事件反馈音效。场景：熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。；运行目标：角色站上平台后相对位置保持不变；边界处反向。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l04-asset-4",
+      "lessonId": "G3-U2-L04",
+      "kind": "Scratch项目模板",
+      "spec": "制作移动平台：Scratch项目模板。场景：熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。；运行目标：角色站上平台后相对位置保持不变；边界处反向。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l05-asset-1",
+      "lessonId": "G3-U2-L05",
+      "kind": "角色造型SVG",
+      "spec": "失败后重新挑战：角色造型SVG。场景：游戏失败后需要能完整重新开始。；运行目标：重试后的初始值和首次开局一致。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l05-asset-2",
+      "lessonId": "G3-U2-L05",
+      "kind": "场景背景SVG",
+      "spec": "失败后重新挑战：场景背景SVG。场景：游戏失败后需要能完整重新开始。；运行目标：重试后的初始值和首次开局一致。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l05-asset-3",
+      "lessonId": "G3-U2-L05",
+      "kind": "事件反馈音效",
+      "spec": "失败后重新挑战：事件反馈音效。场景：游戏失败后需要能完整重新开始。；运行目标：重试后的初始值和首次开局一致。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l05-asset-4",
+      "lessonId": "G3-U2-L05",
+      "kind": "Scratch项目模板",
+      "spec": "失败后重新挑战：Scratch项目模板。场景：游戏失败后需要能完整重新开始。；运行目标：重试后的初始值和首次开局一致。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l06-asset-1",
+      "lessonId": "G3-U2-L06",
+      "kind": "角色造型SVG",
+      "spec": "奇幻城堡冒险：角色造型SVG。场景：城堡冒险要串起钥匙、移动平台和关卡重试。；运行目标：用正确路线开门通关，错误路线损失生命后可重试。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l06-asset-2",
+      "lessonId": "G3-U2-L06",
+      "kind": "场景背景SVG",
+      "spec": "奇幻城堡冒险：场景背景SVG。场景：城堡冒险要串起钥匙、移动平台和关卡重试。；运行目标：用正确路线开门通关，错误路线损失生命后可重试。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l06-asset-3",
+      "lessonId": "G3-U2-L06",
+      "kind": "事件反馈音效",
+      "spec": "奇幻城堡冒险：事件反馈音效。场景：城堡冒险要串起钥匙、移动平台和关卡重试。；运行目标：用正确路线开门通关，错误路线损失生命后可重试。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u2-l06-asset-4",
+      "lessonId": "G3-U2-L06",
+      "kind": "Scratch项目模板",
+      "spec": "奇幻城堡冒险：Scratch项目模板。场景：城堡冒险要串起钥匙、移动平台和关卡重试。；运行目标：用正确路线开门通关，错误路线损失生命后可重试。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l01-asset-1",
+      "lessonId": "G3-U3-L01",
+      "kind": "角色造型SVG",
+      "spec": "模拟昼夜温度：角色造型SVG。场景：太阳升起后森林温度上升，到傍晚又降低。；运行目标：温度曲线白天上升、夜晚下降且每次重放一致。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l01-asset-2",
+      "lessonId": "G3-U3-L01",
+      "kind": "场景背景SVG",
+      "spec": "模拟昼夜温度：场景背景SVG。场景：太阳升起后森林温度上升，到傍晚又降低。；运行目标：温度曲线白天上升、夜晚下降且每次重放一致。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l01-asset-3",
+      "lessonId": "G3-U3-L01",
+      "kind": "事件反馈音效",
+      "spec": "模拟昼夜温度：事件反馈音效。场景：太阳升起后森林温度上升，到傍晚又降低。；运行目标：温度曲线白天上升、夜晚下降且每次重放一致。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l01-asset-4",
+      "lessonId": "G3-U3-L01",
+      "kind": "Scratch项目模板",
+      "spec": "模拟昼夜温度：Scratch项目模板。场景：太阳升起后森林温度上升，到傍晚又降低。；运行目标：温度曲线白天上升、夜晚下降且每次重放一致。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l02-asset-1",
+      "lessonId": "G3-U3-L02",
+      "kind": "角色造型SVG",
+      "spec": "雨滴落下规律：角色造型SVG。场景：雨点落下时会越来越快，最后在地上消失。；运行目标：雨滴速度随帧数增加且不会穿过地面无限运行。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l02-asset-2",
+      "lessonId": "G3-U3-L02",
+      "kind": "场景背景SVG",
+      "spec": "雨滴落下规律：场景背景SVG。场景：雨点落下时会越来越快，最后在地上消失。；运行目标：雨滴速度随帧数增加且不会穿过地面无限运行。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l02-asset-3",
+      "lessonId": "G3-U3-L02",
+      "kind": "事件反馈音效",
+      "spec": "雨滴落下规律：事件反馈音效。场景：雨点落下时会越来越快，最后在地上消失。；运行目标：雨滴速度随帧数增加且不会穿过地面无限运行。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l02-asset-4",
+      "lessonId": "G3-U3-L02",
+      "kind": "Scratch项目模板",
+      "spec": "雨滴落下规律：Scratch项目模板。场景：雨点落下时会越来越快，最后在地上消失。；运行目标：雨滴速度随帧数增加且不会穿过地面无限运行。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l03-asset-1",
+      "lessonId": "G3-U3-L03",
+      "kind": "角色造型SVG",
+      "spec": "掷骰子概率实验：角色造型SVG。场景：科学社模拟100次掷骰子观察每个点数。；运行目标：频数总和=100且每次结果仅在1-6之间。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l03-asset-2",
+      "lessonId": "G3-U3-L03",
+      "kind": "场景背景SVG",
+      "spec": "掷骰子概率实验：场景背景SVG。场景：科学社模拟100次掷骰子观察每个点数。；运行目标：频数总和=100且每次结果仅在1-6之间。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l03-asset-3",
+      "lessonId": "G3-U3-L03",
+      "kind": "事件反馈音效",
+      "spec": "掷骰子概率实验：事件反馈音效。场景：科学社模拟100次掷骰子观察每个点数。；运行目标：频数总和=100且每次结果仅在1-6之间。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l03-asset-4",
+      "lessonId": "G3-U3-L03",
+      "kind": "Scratch项目模板",
+      "spec": "掷骰子概率实验：Scratch项目模板。场景：科学社模拟100次掷骰子观察每个点数。；运行目标：频数总和=100且每次结果仅在1-6之间。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l04-asset-1",
+      "lessonId": "G3-U3-L04",
+      "kind": "角色造型SVG",
+      "spec": "小球反弹物理：角色造型SVG。场景：橡胶球从地面弹起，每次最高点降低。；运行目标：连续三次弹跳高度逐次降低且始终在地面以上。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l04-asset-2",
+      "lessonId": "G3-U3-L04",
+      "kind": "场景背景SVG",
+      "spec": "小球反弹物理：场景背景SVG。场景：橡胶球从地面弹起，每次最高点降低。；运行目标：连续三次弹跳高度逐次降低且始终在地面以上。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l04-asset-3",
+      "lessonId": "G3-U3-L04",
+      "kind": "事件反馈音效",
+      "spec": "小球反弹物理：事件反馈音效。场景：橡胶球从地面弹起，每次最高点降低。；运行目标：连续三次弹跳高度逐次降低且始终在地面以上。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l04-asset-4",
+      "lessonId": "G3-U3-L04",
+      "kind": "Scratch项目模板",
+      "spec": "小球反弹物理：Scratch项目模板。场景：橡胶球从地面弹起，每次最高点降低。；运行目标：连续三次弹跳高度逐次降低且始终在地面以上。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l05-asset-1",
+      "lessonId": "G3-U3-L05",
+      "kind": "角色造型SVG",
+      "spec": "生态食物链模拟：角色造型SVG。场景：草地上兔子与狐狸数量会随食物多少改变。；运行目标：食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l05-asset-2",
+      "lessonId": "G3-U3-L05",
+      "kind": "场景背景SVG",
+      "spec": "生态食物链模拟：场景背景SVG。场景：草地上兔子与狐狸数量会随食物多少改变。；运行目标：食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l05-asset-3",
+      "lessonId": "G3-U3-L05",
+      "kind": "事件反馈音效",
+      "spec": "生态食物链模拟：事件反馈音效。场景：草地上兔子与狐狸数量会随食物多少改变。；运行目标：食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l05-asset-4",
+      "lessonId": "G3-U3-L05",
+      "kind": "Scratch项目模板",
+      "spec": "生态食物链模拟：Scratch项目模板。场景：草地上兔子与狐狸数量会随食物多少改变。；运行目标：食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l06-asset-1",
+      "lessonId": "G3-U3-L06",
+      "kind": "角色造型SVG",
+      "spec": "科学互动展板：角色造型SVG。场景：科学馆需要一块能互动的气候与生态展板。；运行目标：三种实验显示互不混淆，能解释每个数据来源。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l06-asset-2",
+      "lessonId": "G3-U3-L06",
+      "kind": "场景背景SVG",
+      "spec": "科学互动展板：场景背景SVG。场景：科学馆需要一块能互动的气候与生态展板。；运行目标：三种实验显示互不混淆，能解释每个数据来源。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l06-asset-3",
+      "lessonId": "G3-U3-L06",
+      "kind": "事件反馈音效",
+      "spec": "科学互动展板：事件反馈音效。场景：科学馆需要一块能互动的气候与生态展板。；运行目标：三种实验显示互不混淆，能解释每个数据来源。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u3-l06-asset-4",
+      "lessonId": "G3-U3-L06",
+      "kind": "Scratch项目模板",
+      "spec": "科学互动展板：Scratch项目模板。场景：科学馆需要一块能互动的气候与生态展板。；运行目标：三种实验显示互不混淆，能解释每个数据来源。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l01-asset-1",
+      "lessonId": "G3-U4-L01",
+      "kind": "角色造型SVG",
+      "spec": "提出自己的游戏点子：角色造型SVG。场景：设计比赛前先提出真正想解决的一个问题。；运行目标：同伴能依据规则说明完成一次模拟回合。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l01-asset-2",
+      "lessonId": "G3-U4-L01",
+      "kind": "场景背景SVG",
+      "spec": "提出自己的游戏点子：场景背景SVG。场景：设计比赛前先提出真正想解决的一个问题。；运行目标：同伴能依据规则说明完成一次模拟回合。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l01-asset-3",
+      "lessonId": "G3-U4-L01",
+      "kind": "事件反馈音效",
+      "spec": "提出自己的游戏点子：事件反馈音效。场景：设计比赛前先提出真正想解决的一个问题。；运行目标：同伴能依据规则说明完成一次模拟回合。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l01-asset-4",
+      "lessonId": "G3-U4-L01",
+      "kind": "Scratch项目模板",
+      "spec": "提出自己的游戏点子：Scratch项目模板。场景：设计比赛前先提出真正想解决的一个问题。；运行目标：同伴能依据规则说明完成一次模拟回合。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l02-asset-1",
+      "lessonId": "G3-U4-L02",
+      "kind": "角色造型SVG",
+      "spec": "制作角色与世界观：角色造型SVG。场景：自己制作的世界必须有主角、地点和互动目标。；运行目标：每份草图都有角色位置、碰撞边界和触发方式。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l02-asset-2",
+      "lessonId": "G3-U4-L02",
+      "kind": "场景背景SVG",
+      "spec": "制作角色与世界观：场景背景SVG。场景：自己制作的世界必须有主角、地点和互动目标。；运行目标：每份草图都有角色位置、碰撞边界和触发方式。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l02-asset-3",
+      "lessonId": "G3-U4-L02",
+      "kind": "事件反馈音效",
+      "spec": "制作角色与世界观：事件反馈音效。场景：自己制作的世界必须有主角、地点和互动目标。；运行目标：每份草图都有角色位置、碰撞边界和触发方式。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l02-asset-4",
+      "lessonId": "G3-U4-L02",
+      "kind": "Scratch项目模板",
+      "spec": "制作角色与世界观：Scratch项目模板。场景：自己制作的世界必须有主角、地点和互动目标。；运行目标：每份草图都有角色位置、碰撞边界和触发方式。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l03-asset-1",
+      "lessonId": "G3-U4-L03",
+      "kind": "角色造型SVG",
+      "spec": "完成试玩版本：角色造型SVG。场景：毕业游戏先完成最小可玩版本。；运行目标：新玩家能从开始操作到达成功或失败页面。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l03-asset-2",
+      "lessonId": "G3-U4-L03",
+      "kind": "场景背景SVG",
+      "spec": "完成试玩版本：场景背景SVG。场景：毕业游戏先完成最小可玩版本。；运行目标：新玩家能从开始操作到达成功或失败页面。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l03-asset-3",
+      "lessonId": "G3-U4-L03",
+      "kind": "事件反馈音效",
+      "spec": "完成试玩版本：事件反馈音效。场景：毕业游戏先完成最小可玩版本。；运行目标：新玩家能从开始操作到达成功或失败页面。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l03-asset-4",
+      "lessonId": "G3-U4-L03",
+      "kind": "Scratch项目模板",
+      "spec": "完成试玩版本：Scratch项目模板。场景：毕业游戏先完成最小可玩版本。；运行目标：新玩家能从开始操作到达成功或失败页面。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l04-asset-1",
+      "lessonId": "G3-U4-L04",
+      "kind": "角色造型SVG",
+      "spec": "三轮用户反馈：角色造型SVG。场景：试玩会暴露作者没有注意到的问题。；运行目标：至少一条反馈被复现并修复，修复后由原试玩者回归。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l04-asset-2",
+      "lessonId": "G3-U4-L04",
+      "kind": "场景背景SVG",
+      "spec": "三轮用户反馈：场景背景SVG。场景：试玩会暴露作者没有注意到的问题。；运行目标：至少一条反馈被复现并修复，修复后由原试玩者回归。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l04-asset-3",
+      "lessonId": "G3-U4-L04",
+      "kind": "事件反馈音效",
+      "spec": "三轮用户反馈：事件反馈音效。场景：试玩会暴露作者没有注意到的问题。；运行目标：至少一条反馈被复现并修复，修复后由原试玩者回归。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l04-asset-4",
+      "lessonId": "G3-U4-L04",
+      "kind": "Scratch项目模板",
+      "spec": "三轮用户反馈：Scratch项目模板。场景：试玩会暴露作者没有注意到的问题。；运行目标：至少一条反馈被复现并修复，修复后由原试玩者回归。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l05-asset-1",
+      "lessonId": "G3-U4-L05",
+      "kind": "角色造型SVG",
+      "spec": "优化玩法与表现：角色造型SVG。场景：正式发布前要解决卡顿、信息遮挡与难度曲线。；运行目标：20轮重开无持续克隆堆积，新手可完成第一关。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l05-asset-2",
+      "lessonId": "G3-U4-L05",
+      "kind": "场景背景SVG",
+      "spec": "优化玩法与表现：场景背景SVG。场景：正式发布前要解决卡顿、信息遮挡与难度曲线。；运行目标：20轮重开无持续克隆堆积，新手可完成第一关。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l05-asset-3",
+      "lessonId": "G3-U4-L05",
+      "kind": "事件反馈音效",
+      "spec": "优化玩法与表现：事件反馈音效。场景：正式发布前要解决卡顿、信息遮挡与难度曲线。；运行目标：20轮重开无持续克隆堆积，新手可完成第一关。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l05-asset-4",
+      "lessonId": "G3-U4-L05",
+      "kind": "Scratch项目模板",
+      "spec": "优化玩法与表现：Scratch项目模板。场景：正式发布前要解决卡顿、信息遮挡与难度曲线。；运行目标：20轮重开无持续克隆堆积，新手可完成第一关。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l06-asset-1",
+      "lessonId": "G3-U4-L06",
+      "kind": "角色造型SVG",
+      "spec": "个人创作发布会：角色造型SVG。场景：创作毕业展需要展示原创游戏和复盘记录。；运行目标：首次试玩者能完成完整一局，且资源版权信息可查询。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l06-asset-2",
+      "lessonId": "G3-U4-L06",
+      "kind": "场景背景SVG",
+      "spec": "个人创作发布会：场景背景SVG。场景：创作毕业展需要展示原创游戏和复盘记录。；运行目标：首次试玩者能完成完整一局，且资源版权信息可查询。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l06-asset-3",
+      "lessonId": "G3-U4-L06",
+      "kind": "事件反馈音效",
+      "spec": "个人创作发布会：事件反馈音效。场景：创作毕业展需要展示原创游戏和复盘记录。；运行目标：首次试玩者能完成完整一局，且资源版权信息可查询。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "g3-u4-l06-asset-4",
+      "lessonId": "G3-U4-L06",
+      "kind": "Scratch项目模板",
+      "spec": "个人创作发布会：Scratch项目模板。场景：创作毕业展需要展示原创游戏和复盘记录。；运行目标：首次试玩者能完成完整一局，且资源版权信息可查询。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l01-asset-1",
+      "lessonId": "P1-U1-L01",
+      "kind": "示例数据",
+      "spec": "画一座彩色房子：示例数据。场景：美术馆要用代码绘制一座彩色小房子。；运行目标：墙体闭合为矩形，屋顶两斜边连接顶点。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l01-asset-2",
+      "lessonId": "P1-U1-L01",
+      "kind": "教学动效/讲解录音",
+      "spec": "画一座彩色房子：教学动效/讲解录音。场景：美术馆要用代码绘制一座彩色小房子。；运行目标：墙体闭合为矩形，屋顶两斜边连接顶点。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l01-asset-3",
+      "lessonId": "P1-U1-L01",
+      "kind": "游戏原创图形和音效",
+      "spec": "画一座彩色房子：游戏原创图形和音效。场景：美术馆要用代码绘制一座彩色小房子。；运行目标：墙体闭合为矩形，屋顶两斜边连接顶点。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l02-asset-1",
+      "lessonId": "P1-U1-L02",
+      "kind": "示例数据",
+      "spec": "多边形规律：示例数据。场景：画家想一键绘制三角、四方和五边形。；运行目标：三种正多边形均闭合，画笔回到起点方向。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l02-asset-2",
+      "lessonId": "P1-U1-L02",
+      "kind": "教学动效/讲解录音",
+      "spec": "多边形规律：教学动效/讲解录音。场景：画家想一键绘制三角、四方和五边形。；运行目标：三种正多边形均闭合，画笔回到起点方向。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l02-asset-3",
+      "lessonId": "P1-U1-L02",
+      "kind": "游戏原创图形和音效",
+      "spec": "多边形规律：游戏原创图形和音效。场景：画家想一键绘制三角、四方和五边形。；运行目标：三种正多边形均闭合，画笔回到起点方向。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l03-asset-1",
+      "lessonId": "P1-U1-L03",
+      "kind": "示例数据",
+      "spec": "旋转花瓣图案：示例数据。场景：花园地砖要由12片旋转花瓣组成。；运行目标：12瓣围绕中心排列，最后朝向恢复。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l03-asset-2",
+      "lessonId": "P1-U1-L03",
+      "kind": "教学动效/讲解录音",
+      "spec": "旋转花瓣图案：教学动效/讲解录音。场景：花园地砖要由12片旋转花瓣组成。；运行目标：12瓣围绕中心排列，最后朝向恢复。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l03-asset-3",
+      "lessonId": "P1-U1-L03",
+      "kind": "游戏原创图形和音效",
+      "spec": "旋转花瓣图案：游戏原创图形和音效。场景：花园地砖要由12片旋转花瓣组成。；运行目标：12瓣围绕中心排列，最后朝向恢复。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l04-asset-1",
+      "lessonId": "P1-U1-L04",
+      "kind": "示例数据",
+      "spec": "随机星空：示例数据。场景：天文社要设计一张每次相同的星图。；运行目标：固定seed两次产生完全相同星图，点位均在画布内。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l04-asset-2",
+      "lessonId": "P1-U1-L04",
+      "kind": "教学动效/讲解录音",
+      "spec": "随机星空：教学动效/讲解录音。场景：天文社要设计一张每次相同的星图。；运行目标：固定seed两次产生完全相同星图，点位均在画布内。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l04-asset-3",
+      "lessonId": "P1-U1-L04",
+      "kind": "游戏原创图形和音效",
+      "spec": "随机星空：游戏原创图形和音效。场景：天文社要设计一张每次相同的星图。；运行目标：固定seed两次产生完全相同星图，点位均在画布内。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l05-asset-1",
+      "lessonId": "P1-U1-L05",
+      "kind": "示例数据",
+      "spec": "递归雪花入门：示例数据。场景：雪花边缘需要越来越细小的分枝。；运行目标：level=2生成16个细分线段且不会无限递归。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l05-asset-2",
+      "lessonId": "P1-U1-L05",
+      "kind": "教学动效/讲解录音",
+      "spec": "递归雪花入门：教学动效/讲解录音。场景：雪花边缘需要越来越细小的分枝。；运行目标：level=2生成16个细分线段且不会无限递归。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l05-asset-3",
+      "lessonId": "P1-U1-L05",
+      "kind": "游戏原创图形和音效",
+      "spec": "递归雪花入门：游戏原创图形和音效。场景：雪花边缘需要越来越细小的分枝。；运行目标：level=2生成16个细分线段且不会无限递归。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l06-asset-1",
+      "lessonId": "P1-U1-L06",
+      "kind": "示例数据",
+      "spec": "制作数学艺术画：示例数据。场景：数学美术馆邀请你完成可保存的几何艺术画。；运行目标：指定参数输出合法SVG，包含至少三种几何元素。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l06-asset-2",
+      "lessonId": "P1-U1-L06",
+      "kind": "教学动效/讲解录音",
+      "spec": "制作数学艺术画：教学动效/讲解录音。场景：数学美术馆邀请你完成可保存的几何艺术画。；运行目标：指定参数输出合法SVG，包含至少三种几何元素。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u1-l06-asset-3",
+      "lessonId": "P1-U1-L06",
+      "kind": "游戏原创图形和音效",
+      "spec": "制作数学艺术画：游戏原创图形和音效。场景：数学美术馆邀请你完成可保存的几何艺术画。；运行目标：指定参数输出合法SVG，包含至少三种几何元素。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l01-asset-1",
+      "lessonId": "P1-U2-L01",
+      "kind": "示例数据",
+      "spec": "冒险故事选项：示例数据。场景：探险队在洞穴口看到两条不同通道。；运行目标：left看到水晶桥，right看到岩石坡。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l01-asset-2",
+      "lessonId": "P1-U2-L01",
+      "kind": "教学动效/讲解录音",
+      "spec": "冒险故事选项：教学动效/讲解录音。场景：探险队在洞穴口看到两条不同通道。；运行目标：left看到水晶桥，right看到岩石坡。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l01-asset-3",
+      "lessonId": "P1-U2-L01",
+      "kind": "游戏原创图形和音效",
+      "spec": "冒险故事选项：游戏原创图形和音效。场景：探险队在洞穴口看到两条不同通道。；运行目标：left看到水晶桥，right看到岩石坡。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l02-asset-1",
+      "lessonId": "P1-U2-L02",
+      "kind": "示例数据",
+      "spec": "背包道具收集：示例数据。场景：背包里最多装三样物品，钥匙需要保留到最后。；运行目标：取第四样道具被拒绝且原来三样仍在背包。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l02-asset-2",
+      "lessonId": "P1-U2-L02",
+      "kind": "教学动效/讲解录音",
+      "spec": "背包道具收集：教学动效/讲解录音。场景：背包里最多装三样物品，钥匙需要保留到最后。；运行目标：取第四样道具被拒绝且原来三样仍在背包。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l02-asset-3",
+      "lessonId": "P1-U2-L02",
+      "kind": "游戏原创图形和音效",
+      "spec": "背包道具收集：游戏原创图形和音效。场景：背包里最多装三样物品，钥匙需要保留到最后。；运行目标：取第四样道具被拒绝且原来三样仍在背包。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l03-asset-1",
+      "lessonId": "P1-U2-L03",
+      "kind": "示例数据",
+      "spec": "战斗回合计数：示例数据。场景：怪物与玩家轮流行动，各自最多三点生命。；运行目标：生命归零即结束战斗，不能出现负生命值。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l03-asset-2",
+      "lessonId": "P1-U2-L03",
+      "kind": "教学动效/讲解录音",
+      "spec": "战斗回合计数：教学动效/讲解录音。场景：怪物与玩家轮流行动，各自最多三点生命。；运行目标：生命归零即结束战斗，不能出现负生命值。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l03-asset-3",
+      "lessonId": "P1-U2-L03",
+      "kind": "游戏原创图形和音效",
+      "spec": "战斗回合计数：游戏原创图形和音效。场景：怪物与玩家轮流行动，各自最多三点生命。；运行目标：生命归零即结束战斗，不能出现负生命值。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l04-asset-1",
+      "lessonId": "P1-U2-L04",
+      "kind": "示例数据",
+      "spec": "随机事件发生：示例数据。场景：洞穴发生随机落石，玩家可躲避或防御。；运行目标：同一seed和同一路径得到相同事件记录。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l04-asset-2",
+      "lessonId": "P1-U2-L04",
+      "kind": "教学动效/讲解录音",
+      "spec": "随机事件发生：教学动效/讲解录音。场景：洞穴发生随机落石，玩家可躲避或防御。；运行目标：同一seed和同一路径得到相同事件记录。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l04-asset-3",
+      "lessonId": "P1-U2-L04",
+      "kind": "游戏原创图形和音效",
+      "spec": "随机事件发生：游戏原创图形和音效。场景：洞穴发生随机落石，玩家可躲避或防御。；运行目标：同一seed和同一路径得到相同事件记录。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l05-asset-1",
+      "lessonId": "P1-U2-L05",
+      "kind": "示例数据",
+      "spec": "多结局剧情：示例数据。场景：勇者找到钥匙可能从大门离开，也可能从侧洞出去。；运行目标：有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l05-asset-2",
+      "lessonId": "P1-U2-L05",
+      "kind": "教学动效/讲解录音",
+      "spec": "多结局剧情：教学动效/讲解录音。场景：勇者找到钥匙可能从大门离开，也可能从侧洞出去。；运行目标：有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l05-asset-3",
+      "lessonId": "P1-U2-L05",
+      "kind": "游戏原创图形和音效",
+      "spec": "多结局剧情：游戏原创图形和音效。场景：勇者找到钥匙可能从大门离开，也可能从侧洞出去。；运行目标：有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l06-asset-1",
+      "lessonId": "P1-U2-L06",
+      "kind": "示例数据",
+      "spec": "神秘洞穴冒险：示例数据。场景：制作含入口、钥匙、怪物和终点的洞穴冒险。；运行目标：测试进入、拾取、开门、重新开始和错误输入。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l06-asset-2",
+      "lessonId": "P1-U2-L06",
+      "kind": "教学动效/讲解录音",
+      "spec": "神秘洞穴冒险：教学动效/讲解录音。场景：制作含入口、钥匙、怪物和终点的洞穴冒险。；运行目标：测试进入、拾取、开门、重新开始和错误输入。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u2-l06-asset-3",
+      "lessonId": "P1-U2-L06",
+      "kind": "游戏原创图形和音效",
+      "spec": "神秘洞穴冒险：游戏原创图形和音效。场景：制作含入口、钥匙、怪物和终点的洞穴冒险。；运行目标：测试进入、拾取、开门、重新开始和错误输入。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l01-asset-1",
+      "lessonId": "P1-U3-L01",
+      "kind": "示例数据",
+      "spec": "创建游戏窗口：示例数据。场景：pygame第一课需要安全初始化游戏窗口。；运行目标：在SDL虚拟显示下可绘制3帧并正常退出。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l01-asset-2",
+      "lessonId": "P1-U3-L01",
+      "kind": "教学动效/讲解录音",
+      "spec": "创建游戏窗口：教学动效/讲解录音。场景：pygame第一课需要安全初始化游戏窗口。；运行目标：在SDL虚拟显示下可绘制3帧并正常退出。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l01-asset-3",
+      "lessonId": "P1-U3-L01",
+      "kind": "游戏原创图形和音效",
+      "spec": "创建游戏窗口：游戏原创图形和音效。场景：pygame第一课需要安全初始化游戏窗口。；运行目标：在SDL虚拟显示下可绘制3帧并正常退出。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l02-asset-1",
+      "lessonId": "P1-U3-L02",
+      "kind": "示例数据",
+      "spec": "让小球移动：示例数据。场景：小球准备在舞台里匀速运动。；运行目标：移动10帧保持边界内，左右两侧都能反弹。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l02-asset-2",
+      "lessonId": "P1-U3-L02",
+      "kind": "教学动效/讲解录音",
+      "spec": "让小球移动：教学动效/讲解录音。场景：小球准备在舞台里匀速运动。；运行目标：移动10帧保持边界内，左右两侧都能反弹。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l02-asset-3",
+      "lessonId": "P1-U3-L02",
+      "kind": "游戏原创图形和音效",
+      "spec": "让小球移动：游戏原创图形和音效。场景：小球准备在舞台里匀速运动。；运行目标：移动10帧保持边界内，左右两侧都能反弹。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l03-asset-1",
+      "lessonId": "P1-U3-L03",
+      "kind": "示例数据",
+      "spec": "键盘操控飞船：示例数据。场景：玩家用箭头键控制太空船左右飞行。；运行目标：按右后x增加，松开后x保持，飞船不穿边界。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l03-asset-2",
+      "lessonId": "P1-U3-L03",
+      "kind": "教学动效/讲解录音",
+      "spec": "键盘操控飞船：教学动效/讲解录音。场景：玩家用箭头键控制太空船左右飞行。；运行目标：按右后x增加，松开后x保持，飞船不穿边界。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l03-asset-3",
+      "lessonId": "P1-U3-L03",
+      "kind": "游戏原创图形和音效",
+      "spec": "键盘操控飞船：游戏原创图形和音效。场景：玩家用箭头键控制太空船左右飞行。；运行目标：按右后x增加，松开后x保持，飞船不穿边界。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l04-asset-1",
+      "lessonId": "P1-U3-L04",
+      "kind": "示例数据",
+      "spec": "障碍物碰撞：示例数据。场景：打砖块的球必须碰到墙和挡板才能改变运动方向。；运行目标：碰挡板反弹；撞砖块后砖块消失且分数增加。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l04-asset-2",
+      "lessonId": "P1-U3-L04",
+      "kind": "教学动效/讲解录音",
+      "spec": "障碍物碰撞：教学动效/讲解录音。场景：打砖块的球必须碰到墙和挡板才能改变运动方向。；运行目标：碰挡板反弹；撞砖块后砖块消失且分数增加。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l04-asset-3",
+      "lessonId": "P1-U3-L04",
+      "kind": "游戏原创图形和音效",
+      "spec": "障碍物碰撞：游戏原创图形和音效。场景：打砖块的球必须碰到墙和挡板才能改变运动方向。；运行目标：碰挡板反弹；撞砖块后砖块消失且分数增加。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l05-asset-1",
+      "lessonId": "P1-U3-L05",
+      "kind": "示例数据",
+      "spec": "积分生命值与音效：示例数据。场景：游戏中要显示生命、积分和反馈音效。；运行目标：生命为0时显示失败且停止更新；积分不为负。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l05-asset-2",
+      "lessonId": "P1-U3-L05",
+      "kind": "教学动效/讲解录音",
+      "spec": "积分生命值与音效：教学动效/讲解录音。场景：游戏中要显示生命、积分和反馈音效。；运行目标：生命为0时显示失败且停止更新；积分不为负。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l05-asset-3",
+      "lessonId": "P1-U3-L05",
+      "kind": "游戏原创图形和音效",
+      "spec": "积分生命值与音效：游戏原创图形和音效。场景：游戏中要显示生命、积分和反馈音效。；运行目标：生命为0时显示失败且停止更新；积分不为负。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l06-asset-1",
+      "lessonId": "P1-U3-L06",
+      "kind": "示例数据",
+      "spec": "打砖块小游戏：示例数据。场景：为毕业作业做一款能玩的打砖块小游戏。；运行目标：球击碎所有砖块显示win，落底3次显示lose，可重新开始。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l06-asset-2",
+      "lessonId": "P1-U3-L06",
+      "kind": "教学动效/讲解录音",
+      "spec": "打砖块小游戏：教学动效/讲解录音。场景：为毕业作业做一款能玩的打砖块小游戏。；运行目标：球击碎所有砖块显示win，落底3次显示lose，可重新开始。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u3-l06-asset-3",
+      "lessonId": "P1-U3-L06",
+      "kind": "游戏原创图形和音效",
+      "spec": "打砖块小游戏：游戏原创图形和音效。场景：为毕业作业做一款能玩的打砖块小游戏。；运行目标：球击碎所有砖块显示win，落底3次显示lose，可重新开始。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l01-asset-1",
+      "lessonId": "P1-U4-L01",
+      "kind": "示例数据",
+      "spec": "设计游戏菜单：示例数据。场景：太空游戏需要一个可以操作的菜单。；运行目标：开始前不能开火，按Enter进入playing。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l01-asset-2",
+      "lessonId": "P1-U4-L01",
+      "kind": "教学动效/讲解录音",
+      "spec": "设计游戏菜单：教学动效/讲解录音。场景：太空游戏需要一个可以操作的菜单。；运行目标：开始前不能开火，按Enter进入playing。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l01-asset-3",
+      "lessonId": "P1-U4-L01",
+      "kind": "游戏原创图形和音效",
+      "spec": "设计游戏菜单：游戏原创图形和音效。场景：太空游戏需要一个可以操作的菜单。；运行目标：开始前不能开火，按Enter进入playing。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l02-asset-1",
+      "lessonId": "P1-U4-L02",
+      "kind": "示例数据",
+      "spec": "载入原创角色资源：示例数据。场景：星际探险家设计了一架三色小飞船。；运行目标：画面有飞船且图像边界透明、未使用外部版权资源。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l02-asset-2",
+      "lessonId": "P1-U4-L02",
+      "kind": "教学动效/讲解录音",
+      "spec": "载入原创角色资源：教学动效/讲解录音。场景：星际探险家设计了一架三色小飞船。；运行目标：画面有飞船且图像边界透明、未使用外部版权资源。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l02-asset-3",
+      "lessonId": "P1-U4-L02",
+      "kind": "游戏原创图形和音效",
+      "spec": "载入原创角色资源：游戏原创图形和音效。场景：星际探险家设计了一架三色小飞船。；运行目标：画面有飞船且图像边界透明、未使用外部版权资源。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l03-asset-1",
+      "lessonId": "P1-U4-L03",
+      "kind": "示例数据",
+      "spec": "敌人生成与难度：示例数据。场景：敌方飞船会越来越快地朝地面飞来。；运行目标：level升高敌人更快，但活动敌人数不超过限制。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l03-asset-2",
+      "lessonId": "P1-U4-L03",
+      "kind": "教学动效/讲解录音",
+      "spec": "敌人生成与难度：教学动效/讲解录音。场景：敌方飞船会越来越快地朝地面飞来。；运行目标：level升高敌人更快，但活动敌人数不超过限制。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l03-asset-3",
+      "lessonId": "P1-U4-L03",
+      "kind": "游戏原创图形和音效",
+      "spec": "敌人生成与难度：游戏原创图形和音效。场景：敌方飞船会越来越快地朝地面飞来。；运行目标：level升高敌人更快，但活动敌人数不超过限制。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l04-asset-1",
+      "lessonId": "P1-U4-L04",
+      "kind": "示例数据",
+      "spec": "关卡保存与恢复：示例数据。场景：小飞船通关后应该能从已保存的关卡重新开始。；运行目标：保存后读回状态一致，非法JSON返回清晰错误。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l04-asset-2",
+      "lessonId": "P1-U4-L04",
+      "kind": "教学动效/讲解录音",
+      "spec": "关卡保存与恢复：教学动效/讲解录音。场景：小飞船通关后应该能从已保存的关卡重新开始。；运行目标：保存后读回状态一致，非法JSON返回清晰错误。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l04-asset-3",
+      "lessonId": "P1-U4-L04",
+      "kind": "游戏原创图形和音效",
+      "spec": "关卡保存与恢复：游戏原创图形和音效。场景：小飞船通关后应该能从已保存的关卡重新开始。；运行目标：保存后读回状态一致，非法JSON返回清晰错误。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l05-asset-1",
+      "lessonId": "P1-U4-L05",
+      "kind": "示例数据",
+      "spec": "用户试玩数据：示例数据。场景：新版本游戏需要观察玩家会在哪里失败。；运行目标：同样事件列表统计结果可重现，不记录设备ID。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l05-asset-2",
+      "lessonId": "P1-U4-L05",
+      "kind": "教学动效/讲解录音",
+      "spec": "用户试玩数据：教学动效/讲解录音。场景：新版本游戏需要观察玩家会在哪里失败。；运行目标：同样事件列表统计结果可重现，不记录设备ID。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l05-asset-3",
+      "lessonId": "P1-U4-L05",
+      "kind": "游戏原创图形和音效",
+      "spec": "用户试玩数据：游戏原创图形和音效。场景：新版本游戏需要观察玩家会在哪里失败。；运行目标：同样事件列表统计结果可重现，不记录设备ID。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l06-asset-1",
+      "lessonId": "P1-U4-L06",
+      "kind": "示例数据",
+      "spec": "发布迷你太空游戏：示例数据。场景：把菜单、飞船、敌人、分数和存档组成作品。；运行目标：运行1分钟不卡死，能启动、暂停、结束、重试。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l06-asset-2",
+      "lessonId": "P1-U4-L06",
+      "kind": "教学动效/讲解录音",
+      "spec": "发布迷你太空游戏：教学动效/讲解录音。场景：把菜单、飞船、敌人、分数和存档组成作品。；运行目标：运行1分钟不卡死，能启动、暂停、结束、重试。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p1-u4-l06-asset-3",
+      "lessonId": "P1-U4-L06",
+      "kind": "游戏原创图形和音效",
+      "spec": "发布迷你太空游戏：游戏原创图形和音效。场景：把菜单、飞船、敌人、分数和存档组成作品。；运行目标：运行1分钟不卡死，能启动、暂停、结束、重试。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l01-asset-1",
+      "lessonId": "P2-U1-L01",
+      "kind": "算法逐步运行图",
+      "spec": "比较两种找书方法：算法逐步运行图。场景：图书管理员要在200本书中快速找一册编号书。；运行目标：有序列表查找同一目标时二分比较次数不超过线性。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l01-asset-2",
+      "lessonId": "P2-U1-L01",
+      "kind": "匿名测试输入",
+      "spec": "比较两种找书方法：匿名测试输入。场景：图书管理员要在200本书中快速找一册编号书。；运行目标：有序列表查找同一目标时二分比较次数不超过线性。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l01-asset-3",
+      "lessonId": "P2-U1-L01",
+      "kind": "教学讲解录音",
+      "spec": "比较两种找书方法：教学讲解录音。场景：图书管理员要在200本书中快速找一册编号书。；运行目标：有序列表查找同一目标时二分比较次数不超过线性。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l02-asset-1",
+      "lessonId": "P2-U1-L02",
+      "kind": "算法逐步运行图",
+      "spec": "线性与二分查找：算法逐步运行图。场景：侦探在按编号排好的箱子里找线索。；运行目标：目标存在返回正确索引，不存在返回-1。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l02-asset-2",
+      "lessonId": "P2-U1-L02",
+      "kind": "匿名测试输入",
+      "spec": "线性与二分查找：匿名测试输入。场景：侦探在按编号排好的箱子里找线索。；运行目标：目标存在返回正确索引，不存在返回-1。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l02-asset-3",
+      "lessonId": "P2-U1-L02",
+      "kind": "教学讲解录音",
+      "spec": "线性与二分查找：教学讲解录音。场景：侦探在按编号排好的箱子里找线索。；运行目标：目标存在返回正确索引，不存在返回-1。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l03-asset-1",
+      "lessonId": "P2-U1-L03",
+      "kind": "算法逐步运行图",
+      "spec": "冒泡排序动画：算法逐步运行图。场景：排序机器人要让大小混乱的数字从小到大。；运行目标：[3,1,2]排为[1,2,3]，原始列表不被改写。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l03-asset-2",
+      "lessonId": "P2-U1-L03",
+      "kind": "匿名测试输入",
+      "spec": "冒泡排序动画：匿名测试输入。场景：排序机器人要让大小混乱的数字从小到大。；运行目标：[3,1,2]排为[1,2,3]，原始列表不被改写。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l03-asset-3",
+      "lessonId": "P2-U1-L03",
+      "kind": "教学讲解录音",
+      "spec": "冒泡排序动画：教学讲解录音。场景：排序机器人要让大小混乱的数字从小到大。；运行目标：[3,1,2]排为[1,2,3]，原始列表不被改写。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l04-asset-1",
+      "lessonId": "P2-U1-L04",
+      "kind": "算法逐步运行图",
+      "spec": "选择与插入排序：算法逐步运行图。场景：选拔赛成绩需要比较选择排序和插入排序。；运行目标：结果与sorted一致，保持完整长度与元素多重集。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l04-asset-2",
+      "lessonId": "P2-U1-L04",
+      "kind": "匿名测试输入",
+      "spec": "选择与插入排序：匿名测试输入。场景：选拔赛成绩需要比较选择排序和插入排序。；运行目标：结果与sorted一致，保持完整长度与元素多重集。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l04-asset-3",
+      "lessonId": "P2-U1-L04",
+      "kind": "教学讲解录音",
+      "spec": "选择与插入排序：教学讲解录音。场景：选拔赛成绩需要比较选择排序和插入排序。；运行目标：结果与sorted一致，保持完整长度与元素多重集。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l05-asset-1",
+      "lessonId": "P2-U1-L05",
+      "kind": "算法逐步运行图",
+      "spec": "算法耗时实验：算法逐步运行图。场景：科学小组希望知道不同排序为什么在大数组上表现不同。；运行目标：数据规模越大时可以观察次数变化，不以一次时间作绝对结论。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l05-asset-2",
+      "lessonId": "P2-U1-L05",
+      "kind": "匿名测试输入",
+      "spec": "算法耗时实验：匿名测试输入。场景：科学小组希望知道不同排序为什么在大数组上表现不同。；运行目标：数据规模越大时可以观察次数变化，不以一次时间作绝对结论。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l05-asset-3",
+      "lessonId": "P2-U1-L05",
+      "kind": "教学讲解录音",
+      "spec": "算法耗时实验：教学讲解录音。场景：科学小组希望知道不同排序为什么在大数组上表现不同。；运行目标：数据规模越大时可以观察次数变化，不以一次时间作绝对结论。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l06-asset-1",
+      "lessonId": "P2-U1-L06",
+      "kind": "算法逐步运行图",
+      "spec": "整理全班成绩：算法逐步运行图。场景：班级成绩单中含并列成绩，需要排序后生成名次。；运行目标：并列成绩同名次且按规则有序，不丢记录。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l06-asset-2",
+      "lessonId": "P2-U1-L06",
+      "kind": "匿名测试输入",
+      "spec": "整理全班成绩：匿名测试输入。场景：班级成绩单中含并列成绩，需要排序后生成名次。；运行目标：并列成绩同名次且按规则有序，不丢记录。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u1-l06-asset-3",
+      "lessonId": "P2-U1-L06",
+      "kind": "教学讲解录音",
+      "spec": "整理全班成绩：教学讲解录音。场景：班级成绩单中含并列成绩，需要排序后生成名次。；运行目标：并列成绩同名次且按规则有序，不丢记录。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l01-asset-1",
+      "lessonId": "P2-U2-L01",
+      "kind": "算法逐步运行图",
+      "spec": "用栈撤销操作：算法逐步运行图。场景：小朋友画错画想撤销上一个动作。；运行目标：执行A,B,C后撤销得到A,B，空栈撤销无报错。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l01-asset-2",
+      "lessonId": "P2-U2-L01",
+      "kind": "匿名测试输入",
+      "spec": "用栈撤销操作：匿名测试输入。场景：小朋友画错画想撤销上一个动作。；运行目标：执行A,B,C后撤销得到A,B，空栈撤销无报错。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l01-asset-3",
+      "lessonId": "P2-U2-L01",
+      "kind": "教学讲解录音",
+      "spec": "用栈撤销操作：教学讲解录音。场景：小朋友画错画想撤销上一个动作。；运行目标：执行A,B,C后撤销得到A,B，空栈撤销无报错。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l02-asset-1",
+      "lessonId": "P2-U2-L02",
+      "kind": "算法逐步运行图",
+      "spec": "排队取号系统：算法逐步运行图。场景：游乐园取号窗口应该按到达先后服务。；运行目标：A,B,C依次进入时出队顺序为A,B,C。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l02-asset-2",
+      "lessonId": "P2-U2-L02",
+      "kind": "匿名测试输入",
+      "spec": "排队取号系统：匿名测试输入。场景：游乐园取号窗口应该按到达先后服务。；运行目标：A,B,C依次进入时出队顺序为A,B,C。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l02-asset-3",
+      "lessonId": "P2-U2-L02",
+      "kind": "教学讲解录音",
+      "spec": "排队取号系统：教学讲解录音。场景：游乐园取号窗口应该按到达先后服务。；运行目标：A,B,C依次进入时出队顺序为A,B,C。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l03-asset-1",
+      "lessonId": "P2-U2-L03",
+      "kind": "算法逐步运行图",
+      "spec": "集合去重：算法逐步运行图。场景：社团报名表出现很多重复的项目名。；运行目标：输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l03-asset-2",
+      "lessonId": "P2-U2-L03",
+      "kind": "匿名测试输入",
+      "spec": "集合去重：匿名测试输入。场景：社团报名表出现很多重复的项目名。；运行目标：输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l03-asset-3",
+      "lessonId": "P2-U2-L03",
+      "kind": "教学讲解录音",
+      "spec": "集合去重：教学讲解录音。场景：社团报名表出现很多重复的项目名。；运行目标：输入A,B,A输出A,B，且不会依赖集合原始遍历顺序。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l04-asset-1",
+      "lessonId": "P2-U2-L04",
+      "kind": "算法逐步运行图",
+      "spec": "词频字典：算法逐步运行图。场景：老师想知道一篇短文里哪些词出现最多。；运行目标：apple apple orange输出apple:2,orange:1。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l04-asset-2",
+      "lessonId": "P2-U2-L04",
+      "kind": "匿名测试输入",
+      "spec": "词频字典：匿名测试输入。场景：老师想知道一篇短文里哪些词出现最多。；运行目标：apple apple orange输出apple:2,orange:1。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l04-asset-3",
+      "lessonId": "P2-U2-L04",
+      "kind": "教学讲解录音",
+      "spec": "词频字典：教学讲解录音。场景：老师想知道一篇短文里哪些词出现最多。；运行目标：apple apple orange输出apple:2,orange:1。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l05-asset-1",
+      "lessonId": "P2-U2-L05",
+      "kind": "算法逐步运行图",
+      "spec": "二维地图数组：算法逐步运行图。场景：机器人在二维网格地图里需要知道上下左右是否能走。；运行目标：左上角只返回合法相邻格，无坐标越界。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l05-asset-2",
+      "lessonId": "P2-U2-L05",
+      "kind": "匿名测试输入",
+      "spec": "二维地图数组：匿名测试输入。场景：机器人在二维网格地图里需要知道上下左右是否能走。；运行目标：左上角只返回合法相邻格，无坐标越界。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l05-asset-3",
+      "lessonId": "P2-U2-L05",
+      "kind": "教学讲解录音",
+      "spec": "二维地图数组：教学讲解录音。场景：机器人在二维网格地图里需要知道上下左右是否能走。；运行目标：左上角只返回合法相邻格，无坐标越界。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l06-asset-1",
+      "lessonId": "P2-U2-L06",
+      "kind": "算法逐步运行图",
+      "spec": "设计简易消息中心：算法逐步运行图。场景：模拟社区消息中心需要按发送时间处理多条消息。；运行目标：3条消息顺序处理，每条恰好处理一次。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l06-asset-2",
+      "lessonId": "P2-U2-L06",
+      "kind": "匿名测试输入",
+      "spec": "设计简易消息中心：匿名测试输入。场景：模拟社区消息中心需要按发送时间处理多条消息。；运行目标：3条消息顺序处理，每条恰好处理一次。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u2-l06-asset-3",
+      "lessonId": "P2-U2-L06",
+      "kind": "教学讲解录音",
+      "spec": "设计简易消息中心：教学讲解录音。场景：模拟社区消息中心需要按发送时间处理多条消息。；运行目标：3条消息顺序处理，每条恰好处理一次。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l01-asset-1",
+      "lessonId": "P2-U3-L01",
+      "kind": "算法逐步运行图",
+      "spec": "树枝递归绘图：算法逐步运行图。场景：分形树枝每次分成两根更短的树枝。；运行目标：depth=3得到15个树枝且递归有出口。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l01-asset-2",
+      "lessonId": "P2-U3-L01",
+      "kind": "匿名测试输入",
+      "spec": "树枝递归绘图：匿名测试输入。场景：分形树枝每次分成两根更短的树枝。；运行目标：depth=3得到15个树枝且递归有出口。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l01-asset-3",
+      "lessonId": "P2-U3-L01",
+      "kind": "教学讲解录音",
+      "spec": "树枝递归绘图：教学讲解录音。场景：分形树枝每次分成两根更短的树枝。；运行目标：depth=3得到15个树枝且递归有出口。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l02-asset-1",
+      "lessonId": "P2-U3-L02",
+      "kind": "算法逐步运行图",
+      "spec": "汉诺塔实验：算法逐步运行图。场景：古塔管理员要将三层盘子从A柱移到C柱。；运行目标：n=3需要7步，每步只移动顶部且大盘不压小盘。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l02-asset-2",
+      "lessonId": "P2-U3-L02",
+      "kind": "匿名测试输入",
+      "spec": "汉诺塔实验：匿名测试输入。场景：古塔管理员要将三层盘子从A柱移到C柱。；运行目标：n=3需要7步，每步只移动顶部且大盘不压小盘。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l02-asset-3",
+      "lessonId": "P2-U3-L02",
+      "kind": "教学讲解录音",
+      "spec": "汉诺塔实验：教学讲解录音。场景：古塔管理员要将三层盘子从A柱移到C柱。；运行目标：n=3需要7步，每步只移动顶部且大盘不压小盘。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l03-asset-1",
+      "lessonId": "P2-U3-L03",
+      "kind": "算法逐步运行图",
+      "spec": "走迷宫回溯：算法逐步运行图。场景：机器人要从迷宫起点沿可行路径到达出口。；运行目标：可达迷宫返回有效路径，无解返回None且不无限循环。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l03-asset-2",
+      "lessonId": "P2-U3-L03",
+      "kind": "匿名测试输入",
+      "spec": "走迷宫回溯：匿名测试输入。场景：机器人要从迷宫起点沿可行路径到达出口。；运行目标：可达迷宫返回有效路径，无解返回None且不无限循环。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l03-asset-3",
+      "lessonId": "P2-U3-L03",
+      "kind": "教学讲解录音",
+      "spec": "走迷宫回溯：教学讲解录音。场景：机器人要从迷宫起点沿可行路径到达出口。；运行目标：可达迷宫返回有效路径，无解返回None且不无限循环。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l04-asset-1",
+      "lessonId": "P2-U3-L04",
+      "kind": "算法逐步运行图",
+      "spec": "广度优先找最短路：算法逐步运行图。场景：救援机器人希望走最短的无权迷宫路线。；运行目标：在同一迷宫BFS路径长度不超过DFS任意路径。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l04-asset-2",
+      "lessonId": "P2-U3-L04",
+      "kind": "匿名测试输入",
+      "spec": "广度优先找最短路：匿名测试输入。场景：救援机器人希望走最短的无权迷宫路线。；运行目标：在同一迷宫BFS路径长度不超过DFS任意路径。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l04-asset-3",
+      "lessonId": "P2-U3-L04",
+      "kind": "教学讲解录音",
+      "spec": "广度优先找最短路：教学讲解录音。场景：救援机器人希望走最短的无权迷宫路线。；运行目标：在同一迷宫BFS路径长度不超过DFS任意路径。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l05-asset-1",
+      "lessonId": "P2-U3-L05",
+      "kind": "算法逐步运行图",
+      "spec": "分治寻找最大值：算法逐步运行图。场景：分治队要从海量分数里快速找最大值。；运行目标：[-5,-2,-8]返回-2，空数组有明确错误。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l05-asset-2",
+      "lessonId": "P2-U3-L05",
+      "kind": "匿名测试输入",
+      "spec": "分治寻找最大值：匿名测试输入。场景：分治队要从海量分数里快速找最大值。；运行目标：[-5,-2,-8]返回-2，空数组有明确错误。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l05-asset-3",
+      "lessonId": "P2-U3-L05",
+      "kind": "教学讲解录音",
+      "spec": "分治寻找最大值：教学讲解录音。场景：分治队要从海量分数里快速找最大值。；运行目标：[-5,-2,-8]返回-2，空数组有明确错误。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l06-asset-1",
+      "lessonId": "P2-U3-L06",
+      "kind": "算法逐步运行图",
+      "spec": "迷宫自动寻路器：算法逐步运行图。场景：冒险地图有许多通道，智能向导想走最短路。；运行目标：A→C最短2步，不可达点返回None。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l06-asset-2",
+      "lessonId": "P2-U3-L06",
+      "kind": "匿名测试输入",
+      "spec": "迷宫自动寻路器：匿名测试输入。场景：冒险地图有许多通道，智能向导想走最短路。；运行目标：A→C最短2步，不可达点返回None。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u3-l06-asset-3",
+      "lessonId": "P2-U3-L06",
+      "kind": "教学讲解录音",
+      "spec": "迷宫自动寻路器：教学讲解录音。场景：冒险地图有许多通道，智能向导想走最短路。；运行目标：A→C最短2步，不可达点返回None。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l01-asset-1",
+      "lessonId": "P2-U4-L01",
+      "kind": "算法逐步运行图",
+      "spec": "为函数写测试：算法逐步运行图。场景：程序测试员要给加法函数写可重复运行的测试。；运行目标：正确实现全部通过，故意引入错误后至少一项失败。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l01-asset-2",
+      "lessonId": "P2-U4-L01",
+      "kind": "匿名测试输入",
+      "spec": "为函数写测试：匿名测试输入。场景：程序测试员要给加法函数写可重复运行的测试。；运行目标：正确实现全部通过，故意引入错误后至少一项失败。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l01-asset-3",
+      "lessonId": "P2-U4-L01",
+      "kind": "教学讲解录音",
+      "spec": "为函数写测试：教学讲解录音。场景：程序测试员要给加法函数写可重复运行的测试。；运行目标：正确实现全部通过，故意引入错误后至少一项失败。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l02-asset-1",
+      "lessonId": "P2-U4-L02",
+      "kind": "算法逐步运行图",
+      "spec": "设计异常输入：算法逐步运行图。场景：用户输入不是数字时，程序要解释错误而不是崩溃。；运行目标：合法数字返回int，非法字符串抛ValueError。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l02-asset-2",
+      "lessonId": "P2-U4-L02",
+      "kind": "匿名测试输入",
+      "spec": "设计异常输入：匿名测试输入。场景：用户输入不是数字时，程序要解释错误而不是崩溃。；运行目标：合法数字返回int，非法字符串抛ValueError。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l02-asset-3",
+      "lessonId": "P2-U4-L02",
+      "kind": "教学讲解录音",
+      "spec": "设计异常输入：教学讲解录音。场景：用户输入不是数字时，程序要解释错误而不是崩溃。；运行目标：合法数字返回int，非法字符串抛ValueError。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l03-asset-1",
+      "lessonId": "P2-U4-L03",
+      "kind": "算法逐步运行图",
+      "spec": "读取CSV数据：算法逐步运行图。场景：学校数据员要读取含姓名代号与分数的CSV。；运行目标：保留有效分数并统计平均，空文件显示无数据。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l03-asset-2",
+      "lessonId": "P2-U4-L03",
+      "kind": "匿名测试输入",
+      "spec": "读取CSV数据：匿名测试输入。场景：学校数据员要读取含姓名代号与分数的CSV。；运行目标：保留有效分数并统计平均，空文件显示无数据。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l03-asset-3",
+      "lessonId": "P2-U4-L03",
+      "kind": "教学讲解录音",
+      "spec": "读取CSV数据：教学讲解录音。场景：学校数据员要读取含姓名代号与分数的CSV。；运行目标：保留有效分数并统计平均，空文件显示无数据。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l04-asset-1",
+      "lessonId": "P2-U4-L04",
+      "kind": "算法逐步运行图",
+      "spec": "验证算法正确性：算法逐步运行图。场景：算法设计师要证明自己的程序在不同输入都正确。；运行目标：输出等于sorted，排列不丢元素。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l04-asset-2",
+      "lessonId": "P2-U4-L04",
+      "kind": "匿名测试输入",
+      "spec": "验证算法正确性：匿名测试输入。场景：算法设计师要证明自己的程序在不同输入都正确。；运行目标：输出等于sorted，排列不丢元素。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l04-asset-3",
+      "lessonId": "P2-U4-L04",
+      "kind": "教学讲解录音",
+      "spec": "验证算法正确性：教学讲解录音。场景：算法设计师要证明自己的程序在不同输入都正确。；运行目标：输出等于sorted，排列不丢元素。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l05-asset-1",
+      "lessonId": "P2-U4-L05",
+      "kind": "算法逐步运行图",
+      "spec": "比较内存耗用：算法逐步运行图。场景：社团要比较两种算法的内存开销。；运行目标：能报告非负字节数，区分测量误差和趋势。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l05-asset-2",
+      "lessonId": "P2-U4-L05",
+      "kind": "匿名测试输入",
+      "spec": "比较内存耗用：匿名测试输入。场景：社团要比较两种算法的内存开销。；运行目标：能报告非负字节数，区分测量误差和趋势。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l05-asset-3",
+      "lessonId": "P2-U4-L05",
+      "kind": "教学讲解录音",
+      "spec": "比较内存耗用：教学讲解录音。场景：社团要比较两种算法的内存开销。；运行目标：能报告非负字节数，区分测量误差和趋势。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l06-asset-1",
+      "lessonId": "P2-U4-L06",
+      "kind": "算法逐步运行图",
+      "spec": "智能班级排课原型：算法逐步运行图。场景：校园活动安排6项任务，部分任务必须先于另一些进行。；运行目标：A→B条件下A在B前，依赖存在环时报错。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l06-asset-2",
+      "lessonId": "P2-U4-L06",
+      "kind": "匿名测试输入",
+      "spec": "智能班级排课原型：匿名测试输入。场景：校园活动安排6项任务，部分任务必须先于另一些进行。；运行目标：A→B条件下A在B前，依赖存在环时报错。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    },
+    {
+      "id": "p2-u4-l06-asset-3",
+      "lessonId": "P2-U4-L06",
+      "kind": "教学讲解录音",
+      "spec": "智能班级排课原型：教学讲解录音。场景：校园活动安排6项任务，部分任务必须先于另一些进行。；运行目标：A→B条件下A在B前，依赖存在环时报错。",
+      "file": null,
+      "license": "not_yet_cleared",
+      "productionStatus": "requirements_only",
+      "isPublished": false
+    }
+  ]
+}

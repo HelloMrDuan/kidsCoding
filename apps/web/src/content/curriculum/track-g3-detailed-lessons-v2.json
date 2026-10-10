@@ -1,0 +1,3127 @@
+{
+  "schemaVersion": "2.0.0",
+  "trackId": "G3",
+  "maturity": "individual_detailed_scripts_with_assessment_specs",
+  "published": false,
+  "runtimeVerified": false,
+  "lessons": [
+    {
+      "id": "G3-U1-L01",
+      "sourceUnitId": "G3-U1",
+      "title": "用自制积木画图",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "机器人要用同样的五角星花纹装饰六面旗。",
+      "focusConcept": "自制积木",
+      "knowledgePoints": [
+        "自制积木"
+      ],
+      "prerequisites": [],
+      "learningOutcome": "6面旗均有星形，尺寸按输入参数变化。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "用自制积木画图",
+        "brief": "机器人要用同样的五角星花纹装饰六面旗。",
+        "learnerBuild": "定义参数size的画星形自制积木，循环调用6次并改变size。",
+        "successCriteria": "6面旗均有星形，尺寸按输入参数变化。",
+        "creativeExtension": "再加一个颜色参数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "机器人要用同样的五角星花纹装饰六面旗。 先预测最终状态。",
+          "learnerAction": "记录目标：6面旗均有星形，尺寸按输入参数变化。",
+          "check": "能口述「用自制积木画图」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、自制积木处理和可见输出。",
+          "learnerAction": "分解具体操作：定义参数size的画星形自制积木，循环调用6次并改变size。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "定义参数size的画星形自制积木，循环调用6次并改变size。",
+          "check": "程序包含完成本课需要的自制积木逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：6面旗均有星形，尺寸按输入参数变化。",
+          "check": "6面旗均有星形，尺寸按输入参数变化。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：把具体大小写死在积木里导致6颗星一样大。",
+          "learnerAction": "复现失败再尝试修复：检查自制积木形参是否参与画笔移动长度。",
+          "check": "修复后满足：6面旗均有星形，尺寸按输入参数变化。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U1-L01-POS-01",
+          "setup": "机器人要用同样的五角星花纹装饰六面旗。",
+          "action": "定义参数size的画星形自制积木，循环调用6次并改变size。",
+          "expected": "6面旗均有星形，尺寸按输入参数变化。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U1-L01-NEG-01",
+          "setup": "机器人要用同样的五角星花纹装饰六面旗。",
+          "action": "把具体大小写死在积木里导致6颗星一样大。",
+          "expected": "检测失败并引导：检查自制积木形参是否参与画笔移动长度。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "6面旗均有星形，尺寸按输入参数变化。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课自制积木如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "检查自制积木形参是否参与画笔移动长度。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "再加一个颜色参数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：机器人要用同样的五角星花纹装饰六面旗。",
+          "只实现核心步骤：定义参数size的画星形自制积木，循环调用6次并改变size。",
+          "如果失败：检查自制积木形参是否参与画笔移动长度。"
+        ],
+        "commonMistakes": [
+          "把具体大小写死在积木里导致6颗星一样大。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u1-l01-asset-1",
+          "g3-u1-l01-asset-2",
+          "g3-u1-l01-asset-3",
+          "g3-u1-l01-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要定义参数size的画星形自制积木，循环调用6次并改变size。，再让他演示6面旗均有星形，尺寸按输入参数变化。。"
+    },
+    {
+      "id": "G3-U1-L02",
+      "sourceUnitId": "G3-U1",
+      "title": "克隆流星雨",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "星球防卫站发现流星从不同位置坠落。",
+      "focusConcept": "自制积木",
+      "knowledgePoints": [
+        "自制积木"
+      ],
+      "prerequisites": [
+        "G3-U1-L01"
+      ],
+      "learningOutcome": "生成10个分身后舞台无永久堆积，分身到地面消失。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "克隆流星雨",
+        "brief": "星球防卫站发现流星从不同位置坠落。",
+        "learnerBuild": "克隆流星精灵，每0.5秒生成一个分身，分身下落到底部后删除。",
+        "successCriteria": "生成10个分身后舞台无永久堆积，分身到地面消失。",
+        "creativeExtension": "将生成间隔随时间递减。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "星球防卫站发现流星从不同位置坠落。 先预测最终状态。",
+          "learnerAction": "记录目标：生成10个分身后舞台无永久堆积，分身到地面消失。",
+          "check": "能口述「克隆流星雨」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、自制积木处理和可见输出。",
+          "learnerAction": "分解具体操作：克隆流星精灵，每0.5秒生成一个分身，分身下落到底部后删除。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "克隆流星精灵，每0.5秒生成一个分身，分身下落到底部后删除。",
+          "check": "程序包含完成本课需要的自制积木逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：生成10个分身后舞台无永久堆积，分身到地面消失。",
+          "check": "生成10个分身后舞台无永久堆积，分身到地面消失。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：只隐藏原始角色而没有删除分身，导致分身不断增加。",
+          "learnerAction": "复现失败再尝试修复：检查“当作为克隆体启动”和“删除此克隆体”。",
+          "check": "修复后满足：生成10个分身后舞台无永久堆积，分身到地面消失。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U1-L02-POS-01",
+          "setup": "星球防卫站发现流星从不同位置坠落。",
+          "action": "克隆流星精灵，每0.5秒生成一个分身，分身下落到底部后删除。",
+          "expected": "生成10个分身后舞台无永久堆积，分身到地面消失。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U1-L02-NEG-01",
+          "setup": "星球防卫站发现流星从不同位置坠落。",
+          "action": "只隐藏原始角色而没有删除分身，导致分身不断增加。",
+          "expected": "检测失败并引导：检查“当作为克隆体启动”和“删除此克隆体”。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "生成10个分身后舞台无永久堆积，分身到地面消失。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课自制积木如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "检查“当作为克隆体启动”和“删除此克隆体”。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "将生成间隔随时间递减。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：星球防卫站发现流星从不同位置坠落。",
+          "只实现核心步骤：克隆流星精灵，每0.5秒生成一个分身，分身下落到底部后删除。",
+          "如果失败：检查“当作为克隆体启动”和“删除此克隆体”。"
+        ],
+        "commonMistakes": [
+          "只隐藏原始角色而没有删除分身，导致分身不断增加。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u1-l02-asset-1",
+          "g3-u1-l02-asset-2",
+          "g3-u1-l02-asset-3",
+          "g3-u1-l02-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要克隆流星精灵，每0.5秒生成一个分身，分身下落到底部后删除。，再让他演示生成10个分身后舞台无永久堆积，分身到地面消失。。"
+    },
+    {
+      "id": "G3-U1-L03",
+      "sourceUnitId": "G3-U1",
+      "title": "列表管理背包",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "探险家捡到三件道具需要在背包按顺序保存。",
+      "focusConcept": "克隆",
+      "knowledgePoints": [
+        "自制积木",
+        "克隆"
+      ],
+      "prerequisites": [
+        "G3-U1-L02"
+      ],
+      "learningOutcome": "列表最终仅有罗盘与钥匙并保持次序。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "列表管理背包",
+        "brief": "探险家捡到三件道具需要在背包按顺序保存。",
+        "learnerBuild": "用列表添加罗盘、绳索、钥匙，消费绳索后删除对应条目。",
+        "successCriteria": "列表最终仅有罗盘与钥匙并保持次序。",
+        "creativeExtension": "增加按道具名称检索。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "探险家捡到三件道具需要在背包按顺序保存。 先预测最终状态。",
+          "learnerAction": "记录目标：列表最终仅有罗盘与钥匙并保持次序。",
+          "check": "能口述「列表管理背包」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、克隆处理和可见输出。",
+          "learnerAction": "分解具体操作：用列表添加罗盘、绳索、钥匙，消费绳索后删除对应条目。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用列表添加罗盘、绳索、钥匙，消费绳索后删除对应条目。",
+          "check": "程序包含完成本课需要的克隆逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：列表最终仅有罗盘与钥匙并保持次序。",
+          "check": "列表最终仅有罗盘与钥匙并保持次序。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：删除第二项时错误地删除了钥匙。",
+          "learnerAction": "复现失败再尝试修复：打印/显示每次修改后的列表索引。",
+          "check": "修复后满足：列表最终仅有罗盘与钥匙并保持次序。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U1-L03-POS-01",
+          "setup": "探险家捡到三件道具需要在背包按顺序保存。",
+          "action": "用列表添加罗盘、绳索、钥匙，消费绳索后删除对应条目。",
+          "expected": "列表最终仅有罗盘与钥匙并保持次序。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U1-L03-NEG-01",
+          "setup": "探险家捡到三件道具需要在背包按顺序保存。",
+          "action": "删除第二项时错误地删除了钥匙。",
+          "expected": "检测失败并引导：打印/显示每次修改后的列表索引。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "列表最终仅有罗盘与钥匙并保持次序。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课克隆如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "打印/显示每次修改后的列表索引。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加按道具名称检索。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：探险家捡到三件道具需要在背包按顺序保存。",
+          "只实现核心步骤：用列表添加罗盘、绳索、钥匙，消费绳索后删除对应条目。",
+          "如果失败：打印/显示每次修改后的列表索引。"
+        ],
+        "commonMistakes": [
+          "删除第二项时错误地删除了钥匙。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u1-l03-asset-1",
+          "g3-u1-l03-asset-2",
+          "g3-u1-l03-asset-3",
+          "g3-u1-l03-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用列表添加罗盘、绳索、钥匙，消费绳索后删除对应条目。，再让他演示列表最终仅有罗盘与钥匙并保持次序。。"
+    },
+    {
+      "id": "G3-U1-L04",
+      "sourceUnitId": "G3-U1",
+      "title": "角色状态切换",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "宇航员待机、奔跑、受伤时应该展示不同造型。",
+      "focusConcept": "克隆",
+      "knowledgePoints": [
+        "自制积木",
+        "克隆"
+      ],
+      "prerequisites": [
+        "G3-U1-L03"
+      ],
+      "learningOutcome": "state=hurt时停止奔跑，state=run时持续移动。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "角色状态切换",
+        "brief": "宇航员待机、奔跑、受伤时应该展示不同造型。",
+        "learnerBuild": "用state变量idle/run/hurt切换3组造型并决定能否移动。",
+        "successCriteria": "state=hurt时停止奔跑，state=run时持续移动。",
+        "creativeExtension": "增加无敌恢复倒计时。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "宇航员待机、奔跑、受伤时应该展示不同造型。 先预测最终状态。",
+          "learnerAction": "记录目标：state=hurt时停止奔跑，state=run时持续移动。",
+          "check": "能口述「角色状态切换」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、克隆处理和可见输出。",
+          "learnerAction": "分解具体操作：用state变量idle/run/hurt切换3组造型并决定能否移动。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用state变量idle/run/hurt切换3组造型并决定能否移动。",
+          "check": "程序包含完成本课需要的克隆逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：state=hurt时停止奔跑，state=run时持续移动。",
+          "check": "state=hurt时停止奔跑，state=run时持续移动。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：只是更换图片但运行逻辑仍按奔跑执行。",
+          "learnerAction": "复现失败再尝试修复：同时检查state和移动循环是否一致。",
+          "check": "修复后满足：state=hurt时停止奔跑，state=run时持续移动。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U1-L04-POS-01",
+          "setup": "宇航员待机、奔跑、受伤时应该展示不同造型。",
+          "action": "用state变量idle/run/hurt切换3组造型并决定能否移动。",
+          "expected": "state=hurt时停止奔跑，state=run时持续移动。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U1-L04-NEG-01",
+          "setup": "宇航员待机、奔跑、受伤时应该展示不同造型。",
+          "action": "只是更换图片但运行逻辑仍按奔跑执行。",
+          "expected": "检测失败并引导：同时检查state和移动循环是否一致。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "state=hurt时停止奔跑，state=run时持续移动。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课克隆如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "同时检查state和移动循环是否一致。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加无敌恢复倒计时。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：宇航员待机、奔跑、受伤时应该展示不同造型。",
+          "只实现核心步骤：用state变量idle/run/hurt切换3组造型并决定能否移动。",
+          "如果失败：同时检查state和移动循环是否一致。"
+        ],
+        "commonMistakes": [
+          "只是更换图片但运行逻辑仍按奔跑执行。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u1-l04-asset-1",
+          "g3-u1-l04-asset-2",
+          "g3-u1-l04-asset-3",
+          "g3-u1-l04-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用state变量idle/run/hurt切换3组造型并决定能否移动。，再让他演示state=hurt时停止奔跑，state=run时持续移动。。"
+    },
+    {
+      "id": "G3-U1-L05",
+      "sourceUnitId": "G3-U1",
+      "title": "批量生成敌人",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "敌方机器人一波一波出现，数量随关卡提高。",
+      "focusConcept": "列表",
+      "knowledgePoints": [
+        "自制积木",
+        "克隆",
+        "列表"
+      ],
+      "prerequisites": [
+        "G3-U1-L04"
+      ],
+      "learningOutcome": "level=2生成5个且每个敌人只能被消灭一次。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "批量生成敌人",
+        "brief": "敌方机器人一波一波出现，数量随关卡提高。",
+        "learnerBuild": "用克隆创建3+level个敌人，生成后记录alive计数。",
+        "successCriteria": "level=2生成5个且每个敌人只能被消灭一次。",
+        "creativeExtension": "添加两类速度敌人。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "敌方机器人一波一波出现，数量随关卡提高。 先预测最终状态。",
+          "learnerAction": "记录目标：level=2生成5个且每个敌人只能被消灭一次。",
+          "check": "能口述「批量生成敌人」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、列表处理和可见输出。",
+          "learnerAction": "分解具体操作：用克隆创建3+level个敌人，生成后记录alive计数。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用克隆创建3+level个敌人，生成后记录alive计数。",
+          "check": "程序包含完成本课需要的列表逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：level=2生成5个且每个敌人只能被消灭一次。",
+          "check": "level=2生成5个且每个敌人只能被消灭一次。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：重复碰撞对同一分身连扣alive两次。",
+          "learnerAction": "复现失败再尝试修复：分身被击中后立即切到destroyed状态并删除。",
+          "check": "修复后满足：level=2生成5个且每个敌人只能被消灭一次。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U1-L05-POS-01",
+          "setup": "敌方机器人一波一波出现，数量随关卡提高。",
+          "action": "用克隆创建3+level个敌人，生成后记录alive计数。",
+          "expected": "level=2生成5个且每个敌人只能被消灭一次。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U1-L05-NEG-01",
+          "setup": "敌方机器人一波一波出现，数量随关卡提高。",
+          "action": "重复碰撞对同一分身连扣alive两次。",
+          "expected": "检测失败并引导：分身被击中后立即切到destroyed状态并删除。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "level=2生成5个且每个敌人只能被消灭一次。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课列表如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "分身被击中后立即切到destroyed状态并删除。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "添加两类速度敌人。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：敌方机器人一波一波出现，数量随关卡提高。",
+          "只实现核心步骤：用克隆创建3+level个敌人，生成后记录alive计数。",
+          "如果失败：分身被击中后立即切到destroyed状态并删除。"
+        ],
+        "commonMistakes": [
+          "重复碰撞对同一分身连扣alive两次。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u1-l05-asset-1",
+          "g3-u1-l05-asset-2",
+          "g3-u1-l05-asset-3",
+          "g3-u1-l05-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用克隆创建3+level个敌人，生成后记录alive计数。，再让他演示level=2生成5个且每个敌人只能被消灭一次。。"
+    },
+    {
+      "id": "G3-U1-L06",
+      "sourceUnitId": "G3-U1",
+      "title": "星际防御小游戏",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "星际防御作品需要从开始到结束有完整循环。",
+      "focusConcept": "列表",
+      "knowledgePoints": [
+        "自制积木",
+        "克隆",
+        "列表"
+      ],
+      "prerequisites": [
+        "G3-U1-L05"
+      ],
+      "learningOutcome": "击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "星际防御小游戏",
+        "brief": "星际防御作品需要从开始到结束有完整循环。",
+        "learnerBuild": "结合克隆敌人、击中消失、生命与胜负状态完成迷你防御。",
+        "successCriteria": "击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+        "creativeExtension": "增加下一波难度按钮。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "星际防御作品需要从开始到结束有完整循环。 先预测最终状态。",
+          "learnerAction": "记录目标：击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+          "check": "能口述「星际防御小游戏」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、列表处理和可见输出。",
+          "learnerAction": "分解具体操作：结合克隆敌人、击中消失、生命与胜负状态完成迷你防御。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "结合克隆敌人、击中消失、生命与胜负状态完成迷你防御。",
+          "check": "程序包含完成本课需要的列表逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+          "check": "击落5个敌人显示胜利；生命归零显示失败且停止生成。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：胜利后仍无限创建敌人并继续扣生命。",
+          "learnerAction": "复现失败再尝试修复：统一管理gameState=playing/win/lose。",
+          "check": "修复后满足：击落5个敌人显示胜利；生命归零显示失败且停止生成。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U1-L06-POS-01",
+          "setup": "星际防御作品需要从开始到结束有完整循环。",
+          "action": "结合克隆敌人、击中消失、生命与胜负状态完成迷你防御。",
+          "expected": "击落5个敌人显示胜利；生命归零显示失败且停止生成。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U1-L06-NEG-01",
+          "setup": "星际防御作品需要从开始到结束有完整循环。",
+          "action": "胜利后仍无限创建敌人并继续扣生命。",
+          "expected": "检测失败并引导：统一管理gameState=playing/win/lose。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "击落5个敌人显示胜利；生命归零显示失败且停止生成。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课列表如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "统一管理gameState=playing/win/lose。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加下一波难度按钮。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：星际防御作品需要从开始到结束有完整循环。",
+          "只实现核心步骤：结合克隆敌人、击中消失、生命与胜负状态完成迷你防御。",
+          "如果失败：统一管理gameState=playing/win/lose。"
+        ],
+        "commonMistakes": [
+          "胜利后仍无限创建敌人并继续扣生命。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u1-l06-asset-1",
+          "g3-u1-l06-asset-2",
+          "g3-u1-l06-asset-3",
+          "g3-u1-l06-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要结合克隆敌人、击中消失、生命与胜负状态完成迷你防御。，再让他演示击落5个敌人显示胜利；生命归零显示失败且停止生成。。"
+    },
+    {
+      "id": "G3-U2-L01",
+      "sourceUnitId": "G3-U2",
+      "title": "设计关卡入口",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "奇幻城堡需要一个明确的开场菜单。",
+      "focusConcept": "状态机",
+      "knowledgePoints": [
+        "状态机"
+      ],
+      "prerequisites": [
+        "G3-U1-L06"
+      ],
+      "learningOutcome": "未点击时角色不能移动，点击后进入第一关。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "设计关卡入口",
+        "brief": "奇幻城堡需要一个明确的开场菜单。",
+        "learnerBuild": "开始界面设置start按钮，点击后gameState由menu变playing。",
+        "successCriteria": "未点击时角色不能移动，点击后进入第一关。",
+        "creativeExtension": "添加帮助与退出菜单。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "奇幻城堡需要一个明确的开场菜单。 先预测最终状态。",
+          "learnerAction": "记录目标：未点击时角色不能移动，点击后进入第一关。",
+          "check": "能口述「设计关卡入口」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、状态机处理和可见输出。",
+          "learnerAction": "分解具体操作：开始界面设置start按钮，点击后gameState由menu变playing。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "开始界面设置start按钮，点击后gameState由menu变playing。",
+          "check": "程序包含完成本课需要的状态机逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：未点击时角色不能移动，点击后进入第一关。",
+          "check": "未点击时角色不能移动，点击后进入第一关。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：游戏状态未切换却直接让主角移动。",
+          "learnerAction": "复现失败再尝试修复：把角色运动放到playing状态判断中。",
+          "check": "修复后满足：未点击时角色不能移动，点击后进入第一关。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U2-L01-POS-01",
+          "setup": "奇幻城堡需要一个明确的开场菜单。",
+          "action": "开始界面设置start按钮，点击后gameState由menu变playing。",
+          "expected": "未点击时角色不能移动，点击后进入第一关。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U2-L01-NEG-01",
+          "setup": "奇幻城堡需要一个明确的开场菜单。",
+          "action": "游戏状态未切换却直接让主角移动。",
+          "expected": "检测失败并引导：把角色运动放到playing状态判断中。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "未点击时角色不能移动，点击后进入第一关。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课状态机如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "把角色运动放到playing状态判断中。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "添加帮助与退出菜单。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：奇幻城堡需要一个明确的开场菜单。",
+          "只实现核心步骤：开始界面设置start按钮，点击后gameState由menu变playing。",
+          "如果失败：把角色运动放到playing状态判断中。"
+        ],
+        "commonMistakes": [
+          "游戏状态未切换却直接让主角移动。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u2-l01-asset-1",
+          "g3-u2-l01-asset-2",
+          "g3-u2-l01-asset-3",
+          "g3-u2-l01-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要开始界面设置start按钮，点击后gameState由menu变playing。，再让他演示未点击时角色不能移动，点击后进入第一关。。"
+    },
+    {
+      "id": "G3-U2-L02",
+      "sourceUnitId": "G3-U2",
+      "title": "多背景切换",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "探险队先到大厅，再进入地牢和藏宝屋。",
+      "focusConcept": "状态机",
+      "knowledgePoints": [
+        "状态机"
+      ],
+      "prerequisites": [
+        "G3-U2-L01"
+      ],
+      "learningOutcome": "进入三个房间时背景和起点都正确。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "多背景切换",
+        "brief": "探险队先到大厅，再进入地牢和藏宝屋。",
+        "learnerBuild": "定义sceneIndex=0,1,2，触发门口后切换背景并复位角色位置。",
+        "successCriteria": "进入三个房间时背景和起点都正确。",
+        "creativeExtension": "给每间房配置不同音乐。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "探险队先到大厅，再进入地牢和藏宝屋。 先预测最终状态。",
+          "learnerAction": "记录目标：进入三个房间时背景和起点都正确。",
+          "check": "能口述「多背景切换」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、状态机处理和可见输出。",
+          "learnerAction": "分解具体操作：定义sceneIndex=0,1,2，触发门口后切换背景并复位角色位置。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "定义sceneIndex=0,1,2，触发门口后切换背景并复位角色位置。",
+          "check": "程序包含完成本课需要的状态机逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：进入三个房间时背景和起点都正确。",
+          "check": "进入三个房间时背景和起点都正确。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：只换背景不重置角色，主角穿墙到达下一关。",
+          "learnerAction": "复现失败再尝试修复：场景切换时同时设置背景与角色起点。",
+          "check": "修复后满足：进入三个房间时背景和起点都正确。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U2-L02-POS-01",
+          "setup": "探险队先到大厅，再进入地牢和藏宝屋。",
+          "action": "定义sceneIndex=0,1,2，触发门口后切换背景并复位角色位置。",
+          "expected": "进入三个房间时背景和起点都正确。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U2-L02-NEG-01",
+          "setup": "探险队先到大厅，再进入地牢和藏宝屋。",
+          "action": "只换背景不重置角色，主角穿墙到达下一关。",
+          "expected": "检测失败并引导：场景切换时同时设置背景与角色起点。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "进入三个房间时背景和起点都正确。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课状态机如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "场景切换时同时设置背景与角色起点。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "给每间房配置不同音乐。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：探险队先到大厅，再进入地牢和藏宝屋。",
+          "只实现核心步骤：定义sceneIndex=0,1,2，触发门口后切换背景并复位角色位置。",
+          "如果失败：场景切换时同时设置背景与角色起点。"
+        ],
+        "commonMistakes": [
+          "只换背景不重置角色，主角穿墙到达下一关。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u2-l02-asset-1",
+          "g3-u2-l02-asset-2",
+          "g3-u2-l02-asset-3",
+          "g3-u2-l02-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要定义sceneIndex=0,1,2，触发门口后切换背景并复位角色位置。，再让他演示进入三个房间时背景和起点都正确。。"
+    },
+    {
+      "id": "G3-U2-L03",
+      "sourceUnitId": "G3-U2",
+      "title": "收集与解锁道具",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "宝箱钥匙可以解锁下一扇门，但不能一钥两用。",
+      "focusConcept": "关卡",
+      "knowledgePoints": [
+        "状态机",
+        "关卡"
+      ],
+      "prerequisites": [
+        "G3-U2-L02"
+      ],
+      "learningOutcome": "一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "收集与解锁道具",
+        "brief": "宝箱钥匙可以解锁下一扇门，但不能一钥两用。",
+        "learnerBuild": "收集钥匙计数+1，开门时判断keys>0并扣1。",
+        "successCriteria": "一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+        "creativeExtension": "增加稀有万能钥匙。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "宝箱钥匙可以解锁下一扇门，但不能一钥两用。 先预测最终状态。",
+          "learnerAction": "记录目标：一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+          "check": "能口述「收集与解锁道具」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、关卡处理和可见输出。",
+          "learnerAction": "分解具体操作：收集钥匙计数+1，开门时判断keys>0并扣1。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "收集钥匙计数+1，开门时判断keys>0并扣1。",
+          "check": "程序包含完成本课需要的关卡逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+          "check": "一把钥匙只允许打开一扇门，无钥匙提示锁住。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：开门不消耗钥匙，可反复开无限个门。",
+          "learnerAction": "复现失败再尝试修复：把扣钥匙放在开门成功的同一条件分支。",
+          "check": "修复后满足：一把钥匙只允许打开一扇门，无钥匙提示锁住。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U2-L03-POS-01",
+          "setup": "宝箱钥匙可以解锁下一扇门，但不能一钥两用。",
+          "action": "收集钥匙计数+1，开门时判断keys>0并扣1。",
+          "expected": "一把钥匙只允许打开一扇门，无钥匙提示锁住。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U2-L03-NEG-01",
+          "setup": "宝箱钥匙可以解锁下一扇门，但不能一钥两用。",
+          "action": "开门不消耗钥匙，可反复开无限个门。",
+          "expected": "检测失败并引导：把扣钥匙放在开门成功的同一条件分支。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "一把钥匙只允许打开一扇门，无钥匙提示锁住。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课关卡如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "把扣钥匙放在开门成功的同一条件分支。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加稀有万能钥匙。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：宝箱钥匙可以解锁下一扇门，但不能一钥两用。",
+          "只实现核心步骤：收集钥匙计数+1，开门时判断keys>0并扣1。",
+          "如果失败：把扣钥匙放在开门成功的同一条件分支。"
+        ],
+        "commonMistakes": [
+          "开门不消耗钥匙，可反复开无限个门。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u2-l03-asset-1",
+          "g3-u2-l03-asset-2",
+          "g3-u2-l03-asset-3",
+          "g3-u2-l03-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要收集钥匙计数+1，开门时判断keys>0并扣1。，再让他演示一把钥匙只允许打开一扇门，无钥匙提示锁住。。"
+    },
+    {
+      "id": "G3-U2-L04",
+      "sourceUnitId": "G3-U2",
+      "title": "制作移动平台",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。",
+      "focusConcept": "关卡",
+      "knowledgePoints": [
+        "状态机",
+        "关卡"
+      ],
+      "prerequisites": [
+        "G3-U2-L03"
+      ],
+      "learningOutcome": "角色站上平台后相对位置保持不变；边界处反向。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "制作移动平台",
+        "brief": "熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。",
+        "learnerBuild": "平台沿x=0到100往返，角色站在平台上时随平台位移。",
+        "successCriteria": "角色站上平台后相对位置保持不变；边界处反向。",
+        "creativeExtension": "设计两段不同速度的平台。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。 先预测最终状态。",
+          "learnerAction": "记录目标：角色站上平台后相对位置保持不变；边界处反向。",
+          "check": "能口述「制作移动平台」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、关卡处理和可见输出。",
+          "learnerAction": "分解具体操作：平台沿x=0到100往返，角色站在平台上时随平台位移。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "平台沿x=0到100往返，角色站在平台上时随平台位移。",
+          "check": "程序包含完成本课需要的关卡逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：角色站上平台后相对位置保持不变；边界处反向。",
+          "check": "角色站上平台后相对位置保持不变；边界处反向。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：平台反向后角色位置没跟上而掉落。",
+          "learnerAction": "复现失败再尝试修复：将平台deltaX应用到接触它的角色。",
+          "check": "修复后满足：角色站上平台后相对位置保持不变；边界处反向。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U2-L04-POS-01",
+          "setup": "熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。",
+          "action": "平台沿x=0到100往返，角色站在平台上时随平台位移。",
+          "expected": "角色站上平台后相对位置保持不变；边界处反向。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U2-L04-NEG-01",
+          "setup": "熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。",
+          "action": "平台反向后角色位置没跟上而掉落。",
+          "expected": "检测失败并引导：将平台deltaX应用到接触它的角色。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "角色站上平台后相对位置保持不变；边界处反向。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课关卡如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "将平台deltaX应用到接触它的角色。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "设计两段不同速度的平台。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：熔岩房有一段可移动的平台，玩家要判断什么时候跳上去。",
+          "只实现核心步骤：平台沿x=0到100往返，角色站在平台上时随平台位移。",
+          "如果失败：将平台deltaX应用到接触它的角色。"
+        ],
+        "commonMistakes": [
+          "平台反向后角色位置没跟上而掉落。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u2-l04-asset-1",
+          "g3-u2-l04-asset-2",
+          "g3-u2-l04-asset-3",
+          "g3-u2-l04-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要平台沿x=0到100往返，角色站在平台上时随平台位移。，再让他演示角色站上平台后相对位置保持不变；边界处反向。。"
+    },
+    {
+      "id": "G3-U2-L05",
+      "sourceUnitId": "G3-U2",
+      "title": "失败后重新挑战",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "游戏失败后需要能完整重新开始。",
+      "focusConcept": "碰撞",
+      "knowledgePoints": [
+        "状态机",
+        "关卡",
+        "碰撞"
+      ],
+      "prerequisites": [
+        "G3-U2-L04"
+      ],
+      "learningOutcome": "重试后的初始值和首次开局一致。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "失败后重新挑战",
+        "brief": "游戏失败后需要能完整重新开始。",
+        "learnerBuild": "life归0进入lose状态，点重试复位life、score、scene和角色位置。",
+        "successCriteria": "重试后的初始值和首次开局一致。",
+        "creativeExtension": "增加失败次数统计。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "游戏失败后需要能完整重新开始。 先预测最终状态。",
+          "learnerAction": "记录目标：重试后的初始值和首次开局一致。",
+          "check": "能口述「失败后重新挑战」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、碰撞处理和可见输出。",
+          "learnerAction": "分解具体操作：life归0进入lose状态，点重试复位life、score、scene和角色位置。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "life归0进入lose状态，点重试复位life、score、scene和角色位置。",
+          "check": "程序包含完成本课需要的碰撞逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：重试后的初始值和首次开局一致。",
+          "check": "重试后的初始值和首次开局一致。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：重试保留旧敌人分身或旧倒计时。",
+          "learnerAction": "复现失败再尝试修复：集中在reset过程删除旧分身并重置状态。",
+          "check": "修复后满足：重试后的初始值和首次开局一致。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U2-L05-POS-01",
+          "setup": "游戏失败后需要能完整重新开始。",
+          "action": "life归0进入lose状态，点重试复位life、score、scene和角色位置。",
+          "expected": "重试后的初始值和首次开局一致。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U2-L05-NEG-01",
+          "setup": "游戏失败后需要能完整重新开始。",
+          "action": "重试保留旧敌人分身或旧倒计时。",
+          "expected": "检测失败并引导：集中在reset过程删除旧分身并重置状态。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "重试后的初始值和首次开局一致。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课碰撞如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "集中在reset过程删除旧分身并重置状态。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加失败次数统计。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：游戏失败后需要能完整重新开始。",
+          "只实现核心步骤：life归0进入lose状态，点重试复位life、score、scene和角色位置。",
+          "如果失败：集中在reset过程删除旧分身并重置状态。"
+        ],
+        "commonMistakes": [
+          "重试保留旧敌人分身或旧倒计时。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u2-l05-asset-1",
+          "g3-u2-l05-asset-2",
+          "g3-u2-l05-asset-3",
+          "g3-u2-l05-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要life归0进入lose状态，点重试复位life、score、scene和角色位置。，再让他演示重试后的初始值和首次开局一致。。"
+    },
+    {
+      "id": "G3-U2-L06",
+      "sourceUnitId": "G3-U2",
+      "title": "奇幻城堡冒险",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "城堡冒险要串起钥匙、移动平台和关卡重试。",
+      "focusConcept": "碰撞",
+      "knowledgePoints": [
+        "状态机",
+        "关卡",
+        "碰撞"
+      ],
+      "prerequisites": [
+        "G3-U2-L05"
+      ],
+      "learningOutcome": "用正确路线开门通关，错误路线损失生命后可重试。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "奇幻城堡冒险",
+        "brief": "城堡冒险要串起钥匙、移动平台和关卡重试。",
+        "learnerBuild": "完成三个场景、收集钥匙、一次平台渡河、胜负结局。",
+        "successCriteria": "用正确路线开门通关，错误路线损失生命后可重试。",
+        "creativeExtension": "加入隐藏宝物。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "城堡冒险要串起钥匙、移动平台和关卡重试。 先预测最终状态。",
+          "learnerAction": "记录目标：用正确路线开门通关，错误路线损失生命后可重试。",
+          "check": "能口述「奇幻城堡冒险」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、碰撞处理和可见输出。",
+          "learnerAction": "分解具体操作：完成三个场景、收集钥匙、一次平台渡河、胜负结局。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "完成三个场景、收集钥匙、一次平台渡河、胜负结局。",
+          "check": "程序包含完成本课需要的碰撞逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：用正确路线开门通关，错误路线损失生命后可重试。",
+          "check": "用正确路线开门通关，错误路线损失生命后可重试。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：碰撞后生命无限扣除或重试无法回到开局。",
+          "learnerAction": "复现失败再尝试修复：对碰撞设置冷却并测试完整重开流程。",
+          "check": "修复后满足：用正确路线开门通关，错误路线损失生命后可重试。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U2-L06-POS-01",
+          "setup": "城堡冒险要串起钥匙、移动平台和关卡重试。",
+          "action": "完成三个场景、收集钥匙、一次平台渡河、胜负结局。",
+          "expected": "用正确路线开门通关，错误路线损失生命后可重试。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U2-L06-NEG-01",
+          "setup": "城堡冒险要串起钥匙、移动平台和关卡重试。",
+          "action": "碰撞后生命无限扣除或重试无法回到开局。",
+          "expected": "检测失败并引导：对碰撞设置冷却并测试完整重开流程。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "用正确路线开门通关，错误路线损失生命后可重试。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课碰撞如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "对碰撞设置冷却并测试完整重开流程。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入隐藏宝物。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：城堡冒险要串起钥匙、移动平台和关卡重试。",
+          "只实现核心步骤：完成三个场景、收集钥匙、一次平台渡河、胜负结局。",
+          "如果失败：对碰撞设置冷却并测试完整重开流程。"
+        ],
+        "commonMistakes": [
+          "碰撞后生命无限扣除或重试无法回到开局。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u2-l06-asset-1",
+          "g3-u2-l06-asset-2",
+          "g3-u2-l06-asset-3",
+          "g3-u2-l06-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要完成三个场景、收集钥匙、一次平台渡河、胜负结局。，再让他演示用正确路线开门通关，错误路线损失生命后可重试。。"
+    },
+    {
+      "id": "G3-U3-L01",
+      "sourceUnitId": "G3-U3",
+      "title": "模拟昼夜温度",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "太阳升起后森林温度上升，到傍晚又降低。",
+      "focusConcept": "模型",
+      "knowledgePoints": [
+        "模型"
+      ],
+      "prerequisites": [
+        "G3-U2-L06"
+      ],
+      "learningOutcome": "温度曲线白天上升、夜晚下降且每次重放一致。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "模拟昼夜温度",
+        "brief": "太阳升起后森林温度上升，到傍晚又降低。",
+        "learnerBuild": "用小时hour和近似温度模型记录24个温度值。",
+        "successCriteria": "温度曲线白天上升、夜晚下降且每次重放一致。",
+        "creativeExtension": "制作不同季节温度模型。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "太阳升起后森林温度上升，到傍晚又降低。 先预测最终状态。",
+          "learnerAction": "记录目标：温度曲线白天上升、夜晚下降且每次重放一致。",
+          "check": "能口述「模拟昼夜温度」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、模型处理和可见输出。",
+          "learnerAction": "分解具体操作：用小时hour和近似温度模型记录24个温度值。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用小时hour和近似温度模型记录24个温度值。",
+          "check": "程序包含完成本课需要的模型逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：温度曲线白天上升、夜晚下降且每次重放一致。",
+          "check": "温度曲线白天上升、夜晚下降且每次重放一致。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：使用纯随机温度导致没有规律可解释。",
+          "learnerAction": "复现失败再尝试修复：把温度设为与小时相关的确定性函数。",
+          "check": "修复后满足：温度曲线白天上升、夜晚下降且每次重放一致。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U3-L01-POS-01",
+          "setup": "太阳升起后森林温度上升，到傍晚又降低。",
+          "action": "用小时hour和近似温度模型记录24个温度值。",
+          "expected": "温度曲线白天上升、夜晚下降且每次重放一致。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U3-L01-NEG-01",
+          "setup": "太阳升起后森林温度上升，到傍晚又降低。",
+          "action": "使用纯随机温度导致没有规律可解释。",
+          "expected": "检测失败并引导：把温度设为与小时相关的确定性函数。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "温度曲线白天上升、夜晚下降且每次重放一致。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课模型如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "把温度设为与小时相关的确定性函数。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "制作不同季节温度模型。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：太阳升起后森林温度上升，到傍晚又降低。",
+          "只实现核心步骤：用小时hour和近似温度模型记录24个温度值。",
+          "如果失败：把温度设为与小时相关的确定性函数。"
+        ],
+        "commonMistakes": [
+          "使用纯随机温度导致没有规律可解释。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u3-l01-asset-1",
+          "g3-u3-l01-asset-2",
+          "g3-u3-l01-asset-3",
+          "g3-u3-l01-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用小时hour和近似温度模型记录24个温度值。，再让他演示温度曲线白天上升、夜晚下降且每次重放一致。。"
+    },
+    {
+      "id": "G3-U3-L02",
+      "sourceUnitId": "G3-U3",
+      "title": "雨滴落下规律",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "雨点落下时会越来越快，最后在地上消失。",
+      "focusConcept": "模型",
+      "knowledgePoints": [
+        "模型"
+      ],
+      "prerequisites": [
+        "G3-U3-L01"
+      ],
+      "learningOutcome": "雨滴速度随帧数增加且不会穿过地面无限运行。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "雨滴落下规律",
+        "brief": "雨点落下时会越来越快，最后在地上消失。",
+        "learnerBuild": "用y速度逐帧增加gravity，碰到地面删除雨滴分身。",
+        "successCriteria": "雨滴速度随帧数增加且不会穿过地面无限运行。",
+        "creativeExtension": "加风向左右漂移。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "雨点落下时会越来越快，最后在地上消失。 先预测最终状态。",
+          "learnerAction": "记录目标：雨滴速度随帧数增加且不会穿过地面无限运行。",
+          "check": "能口述「雨滴落下规律」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、模型处理和可见输出。",
+          "learnerAction": "分解具体操作：用y速度逐帧增加gravity，碰到地面删除雨滴分身。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用y速度逐帧增加gravity，碰到地面删除雨滴分身。",
+          "check": "程序包含完成本课需要的模型逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：雨滴速度随帧数增加且不会穿过地面无限运行。",
+          "check": "雨滴速度随帧数增加且不会穿过地面无限运行。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：始终设置固定速度看不到加速。",
+          "learnerAction": "复现失败再尝试修复：区分速度和位置，记录每一帧的vy。",
+          "check": "修复后满足：雨滴速度随帧数增加且不会穿过地面无限运行。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U3-L02-POS-01",
+          "setup": "雨点落下时会越来越快，最后在地上消失。",
+          "action": "用y速度逐帧增加gravity，碰到地面删除雨滴分身。",
+          "expected": "雨滴速度随帧数增加且不会穿过地面无限运行。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U3-L02-NEG-01",
+          "setup": "雨点落下时会越来越快，最后在地上消失。",
+          "action": "始终设置固定速度看不到加速。",
+          "expected": "检测失败并引导：区分速度和位置，记录每一帧的vy。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "雨滴速度随帧数增加且不会穿过地面无限运行。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课模型如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "区分速度和位置，记录每一帧的vy。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加风向左右漂移。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：雨点落下时会越来越快，最后在地上消失。",
+          "只实现核心步骤：用y速度逐帧增加gravity，碰到地面删除雨滴分身。",
+          "如果失败：区分速度和位置，记录每一帧的vy。"
+        ],
+        "commonMistakes": [
+          "始终设置固定速度看不到加速。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u3-l02-asset-1",
+          "g3-u3-l02-asset-2",
+          "g3-u3-l02-asset-3",
+          "g3-u3-l02-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用y速度逐帧增加gravity，碰到地面删除雨滴分身。，再让他演示雨滴速度随帧数增加且不会穿过地面无限运行。。"
+    },
+    {
+      "id": "G3-U3-L03",
+      "sourceUnitId": "G3-U3",
+      "title": "掷骰子概率实验",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "科学社模拟100次掷骰子观察每个点数。",
+      "focusConcept": "变量",
+      "knowledgePoints": [
+        "模型",
+        "变量"
+      ],
+      "prerequisites": [
+        "G3-U3-L02"
+      ],
+      "learningOutcome": "频数总和=100且每次结果仅在1-6之间。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "掷骰子概率实验",
+        "brief": "科学社模拟100次掷骰子观察每个点数。",
+        "learnerBuild": "随机整数1-6累计六个频数，展示柱状图。",
+        "successCriteria": "频数总和=100且每次结果仅在1-6之间。",
+        "creativeExtension": "提高到1000次观察比例变化。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "科学社模拟100次掷骰子观察每个点数。 先预测最终状态。",
+          "learnerAction": "记录目标：频数总和=100且每次结果仅在1-6之间。",
+          "check": "能口述「掷骰子概率实验」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、变量处理和可见输出。",
+          "learnerAction": "分解具体操作：随机整数1-6累计六个频数，展示柱状图。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "随机整数1-6累计六个频数，展示柱状图。",
+          "check": "程序包含完成本课需要的变量逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：频数总和=100且每次结果仅在1-6之间。",
+          "check": "频数总和=100且每次结果仅在1-6之间。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：结果出现0或7，或六项计数之和不是100。",
+          "learnerAction": "复现失败再尝试修复：核对随机范围与更新计数的位置。",
+          "check": "修复后满足：频数总和=100且每次结果仅在1-6之间。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U3-L03-POS-01",
+          "setup": "科学社模拟100次掷骰子观察每个点数。",
+          "action": "随机整数1-6累计六个频数，展示柱状图。",
+          "expected": "频数总和=100且每次结果仅在1-6之间。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U3-L03-NEG-01",
+          "setup": "科学社模拟100次掷骰子观察每个点数。",
+          "action": "结果出现0或7，或六项计数之和不是100。",
+          "expected": "检测失败并引导：核对随机范围与更新计数的位置。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "频数总和=100且每次结果仅在1-6之间。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课变量如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "核对随机范围与更新计数的位置。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "提高到1000次观察比例变化。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：科学社模拟100次掷骰子观察每个点数。",
+          "只实现核心步骤：随机整数1-6累计六个频数，展示柱状图。",
+          "如果失败：核对随机范围与更新计数的位置。"
+        ],
+        "commonMistakes": [
+          "结果出现0或7，或六项计数之和不是100。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u3-l03-asset-1",
+          "g3-u3-l03-asset-2",
+          "g3-u3-l03-asset-3",
+          "g3-u3-l03-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要随机整数1-6累计六个频数，展示柱状图。，再让他演示频数总和=100且每次结果仅在1-6之间。。"
+    },
+    {
+      "id": "G3-U3-L04",
+      "sourceUnitId": "G3-U3",
+      "title": "小球反弹物理",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "橡胶球从地面弹起，每次最高点降低。",
+      "focusConcept": "变量",
+      "knowledgePoints": [
+        "模型",
+        "变量"
+      ],
+      "prerequisites": [
+        "G3-U3-L03"
+      ],
+      "learningOutcome": "连续三次弹跳高度逐次降低且始终在地面以上。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "小球反弹物理",
+        "brief": "橡胶球从地面弹起，每次最高点降低。",
+        "learnerBuild": "给球设置重力及反弹系数0.8并追踪位置速度。",
+        "successCriteria": "连续三次弹跳高度逐次降低且始终在地面以上。",
+        "creativeExtension": "调整材料弹性参数。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "橡胶球从地面弹起，每次最高点降低。 先预测最终状态。",
+          "learnerAction": "记录目标：连续三次弹跳高度逐次降低且始终在地面以上。",
+          "check": "能口述「小球反弹物理」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、变量处理和可见输出。",
+          "learnerAction": "分解具体操作：给球设置重力及反弹系数0.8并追踪位置速度。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "给球设置重力及反弹系数0.8并追踪位置速度。",
+          "check": "程序包含完成本课需要的变量逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：连续三次弹跳高度逐次降低且始终在地面以上。",
+          "check": "连续三次弹跳高度逐次降低且始终在地面以上。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：反弹速度绝对值变大使球无限加速。",
+          "learnerAction": "复现失败再尝试修复：检查碰撞时速度翻转并乘小于1系数。",
+          "check": "修复后满足：连续三次弹跳高度逐次降低且始终在地面以上。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U3-L04-POS-01",
+          "setup": "橡胶球从地面弹起，每次最高点降低。",
+          "action": "给球设置重力及反弹系数0.8并追踪位置速度。",
+          "expected": "连续三次弹跳高度逐次降低且始终在地面以上。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U3-L04-NEG-01",
+          "setup": "橡胶球从地面弹起，每次最高点降低。",
+          "action": "反弹速度绝对值变大使球无限加速。",
+          "expected": "检测失败并引导：检查碰撞时速度翻转并乘小于1系数。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "连续三次弹跳高度逐次降低且始终在地面以上。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课变量如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "检查碰撞时速度翻转并乘小于1系数。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "调整材料弹性参数。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：橡胶球从地面弹起，每次最高点降低。",
+          "只实现核心步骤：给球设置重力及反弹系数0.8并追踪位置速度。",
+          "如果失败：检查碰撞时速度翻转并乘小于1系数。"
+        ],
+        "commonMistakes": [
+          "反弹速度绝对值变大使球无限加速。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u3-l04-asset-1",
+          "g3-u3-l04-asset-2",
+          "g3-u3-l04-asset-3",
+          "g3-u3-l04-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要给球设置重力及反弹系数0.8并追踪位置速度。，再让他演示连续三次弹跳高度逐次降低且始终在地面以上。。"
+    },
+    {
+      "id": "G3-U3-L05",
+      "sourceUnitId": "G3-U3",
+      "title": "生态食物链模拟",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "草地上兔子与狐狸数量会随食物多少改变。",
+      "focusConcept": "数据",
+      "knowledgePoints": [
+        "模型",
+        "变量",
+        "数据"
+      ],
+      "prerequisites": [
+        "G3-U3-L04"
+      ],
+      "learningOutcome": "食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "生态食物链模拟",
+        "brief": "草地上兔子与狐狸数量会随食物多少改变。",
+        "learnerBuild": "设置草量、兔子数、狐狸数，逐回合按规则增减。",
+        "successCriteria": "食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+        "creativeExtension": "用图表比较两组初始种群。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "草地上兔子与狐狸数量会随食物多少改变。 先预测最终状态。",
+          "learnerAction": "记录目标：食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+          "check": "能口述「生态食物链模拟」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、数据处理和可见输出。",
+          "learnerAction": "分解具体操作：设置草量、兔子数、狐狸数，逐回合按规则增减。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "设置草量、兔子数、狐狸数，逐回合按规则增减。",
+          "check": "程序包含完成本课需要的数据逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+          "check": "食物耗尽后兔子不应无限增长，任何种群数量不小于0。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：兔子在草量为零时仍指数增长。",
+          "learnerAction": "复现失败再尝试修复：检查资源消耗是否在增长之前计算。",
+          "check": "修复后满足：食物耗尽后兔子不应无限增长，任何种群数量不小于0。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U3-L05-POS-01",
+          "setup": "草地上兔子与狐狸数量会随食物多少改变。",
+          "action": "设置草量、兔子数、狐狸数，逐回合按规则增减。",
+          "expected": "食物耗尽后兔子不应无限增长，任何种群数量不小于0。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U3-L05-NEG-01",
+          "setup": "草地上兔子与狐狸数量会随食物多少改变。",
+          "action": "兔子在草量为零时仍指数增长。",
+          "expected": "检测失败并引导：检查资源消耗是否在增长之前计算。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "食物耗尽后兔子不应无限增长，任何种群数量不小于0。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课数据如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "检查资源消耗是否在增长之前计算。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "用图表比较两组初始种群。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：草地上兔子与狐狸数量会随食物多少改变。",
+          "只实现核心步骤：设置草量、兔子数、狐狸数，逐回合按规则增减。",
+          "如果失败：检查资源消耗是否在增长之前计算。"
+        ],
+        "commonMistakes": [
+          "兔子在草量为零时仍指数增长。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u3-l05-asset-1",
+          "g3-u3-l05-asset-2",
+          "g3-u3-l05-asset-3",
+          "g3-u3-l05-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要设置草量、兔子数、狐狸数，逐回合按规则增减。，再让他演示食物耗尽后兔子不应无限增长，任何种群数量不小于0。。"
+    },
+    {
+      "id": "G3-U3-L06",
+      "sourceUnitId": "G3-U3",
+      "title": "科学互动展板",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "科学馆需要一块能互动的气候与生态展板。",
+      "focusConcept": "数据",
+      "knowledgePoints": [
+        "模型",
+        "变量",
+        "数据"
+      ],
+      "prerequisites": [
+        "G3-U3-L05"
+      ],
+      "learningOutcome": "三种实验显示互不混淆，能解释每个数据来源。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "科学互动展板",
+        "brief": "科学馆需要一块能互动的气候与生态展板。",
+        "learnerBuild": "结合温度曲线、骰子实验与生态数据，点击标签切换图表。",
+        "successCriteria": "三种实验显示互不混淆，能解释每个数据来源。",
+        "creativeExtension": "增加数据来源注释按钮。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "科学馆需要一块能互动的气候与生态展板。 先预测最终状态。",
+          "learnerAction": "记录目标：三种实验显示互不混淆，能解释每个数据来源。",
+          "check": "能口述「科学互动展板」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、数据处理和可见输出。",
+          "learnerAction": "分解具体操作：结合温度曲线、骰子实验与生态数据，点击标签切换图表。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "结合温度曲线、骰子实验与生态数据，点击标签切换图表。",
+          "check": "程序包含完成本课需要的数据逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：三种实验显示互不混淆，能解释每个数据来源。",
+          "check": "三种实验显示互不混淆，能解释每个数据来源。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：图表切换时保留上一页数据标签误导观众。",
+          "learnerAction": "复现失败再尝试修复：把场景显示和数据源切换绑定到同一个事件。",
+          "check": "修复后满足：三种实验显示互不混淆，能解释每个数据来源。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U3-L06-POS-01",
+          "setup": "科学馆需要一块能互动的气候与生态展板。",
+          "action": "结合温度曲线、骰子实验与生态数据，点击标签切换图表。",
+          "expected": "三种实验显示互不混淆，能解释每个数据来源。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U3-L06-NEG-01",
+          "setup": "科学馆需要一块能互动的气候与生态展板。",
+          "action": "图表切换时保留上一页数据标签误导观众。",
+          "expected": "检测失败并引导：把场景显示和数据源切换绑定到同一个事件。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "三种实验显示互不混淆，能解释每个数据来源。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课数据如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "把场景显示和数据源切换绑定到同一个事件。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加数据来源注释按钮。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：科学馆需要一块能互动的气候与生态展板。",
+          "只实现核心步骤：结合温度曲线、骰子实验与生态数据，点击标签切换图表。",
+          "如果失败：把场景显示和数据源切换绑定到同一个事件。"
+        ],
+        "commonMistakes": [
+          "图表切换时保留上一页数据标签误导观众。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u3-l06-asset-1",
+          "g3-u3-l06-asset-2",
+          "g3-u3-l06-asset-3",
+          "g3-u3-l06-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要结合温度曲线、骰子实验与生态数据，点击标签切换图表。，再让他演示三种实验显示互不混淆，能解释每个数据来源。。"
+    },
+    {
+      "id": "G3-U4-L01",
+      "sourceUnitId": "G3-U4",
+      "title": "提出自己的游戏点子",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "设计比赛前先提出真正想解决的一个问题。",
+      "focusConcept": "设计思维",
+      "knowledgePoints": [
+        "设计思维"
+      ],
+      "prerequisites": [
+        "G3-U3-L06"
+      ],
+      "learningOutcome": "同伴能依据规则说明完成一次模拟回合。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "提出自己的游戏点子",
+        "brief": "设计比赛前先提出真正想解决的一个问题。",
+        "learnerBuild": "写出目标玩家、胜利条件与3条玩法规则。",
+        "successCriteria": "同伴能依据规则说明完成一次模拟回合。",
+        "creativeExtension": "设想第二类玩家的体验。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "设计比赛前先提出真正想解决的一个问题。 先预测最终状态。",
+          "learnerAction": "记录目标：同伴能依据规则说明完成一次模拟回合。",
+          "check": "能口述「提出自己的游戏点子」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、设计思维处理和可见输出。",
+          "learnerAction": "分解具体操作：写出目标玩家、胜利条件与3条玩法规则。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "写出目标玩家、胜利条件与3条玩法规则。",
+          "check": "程序包含完成本课需要的设计思维逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：同伴能依据规则说明完成一次模拟回合。",
+          "check": "同伴能依据规则说明完成一次模拟回合。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：目标只写“要好玩”，没有可检验胜负。",
+          "learnerAction": "复现失败再尝试修复：将玩家行为与成功状态写成具体条件。",
+          "check": "修复后满足：同伴能依据规则说明完成一次模拟回合。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U4-L01-POS-01",
+          "setup": "设计比赛前先提出真正想解决的一个问题。",
+          "action": "写出目标玩家、胜利条件与3条玩法规则。",
+          "expected": "同伴能依据规则说明完成一次模拟回合。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U4-L01-NEG-01",
+          "setup": "设计比赛前先提出真正想解决的一个问题。",
+          "action": "目标只写“要好玩”，没有可检验胜负。",
+          "expected": "检测失败并引导：将玩家行为与成功状态写成具体条件。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "同伴能依据规则说明完成一次模拟回合。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课设计思维如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "将玩家行为与成功状态写成具体条件。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "设想第二类玩家的体验。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：设计比赛前先提出真正想解决的一个问题。",
+          "只实现核心步骤：写出目标玩家、胜利条件与3条玩法规则。",
+          "如果失败：将玩家行为与成功状态写成具体条件。"
+        ],
+        "commonMistakes": [
+          "目标只写“要好玩”，没有可检验胜负。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u4-l01-asset-1",
+          "g3-u4-l01-asset-2",
+          "g3-u4-l01-asset-3",
+          "g3-u4-l01-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要写出目标玩家、胜利条件与3条玩法规则。，再让他演示同伴能依据规则说明完成一次模拟回合。。"
+    },
+    {
+      "id": "G3-U4-L02",
+      "sourceUnitId": "G3-U4",
+      "title": "制作角色与世界观",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "自己制作的世界必须有主角、地点和互动目标。",
+      "focusConcept": "设计思维",
+      "knowledgePoints": [
+        "设计思维"
+      ],
+      "prerequisites": [
+        "G3-U4-L01"
+      ],
+      "learningOutcome": "每份草图都有角色位置、碰撞边界和触发方式。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "制作角色与世界观",
+        "brief": "自己制作的世界必须有主角、地点和互动目标。",
+        "learnerBuild": "绘制角色三视图草案、两张场景草图与互动物品清单。",
+        "successCriteria": "每份草图都有角色位置、碰撞边界和触发方式。",
+        "creativeExtension": "增加关卡隐藏路线。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "自己制作的世界必须有主角、地点和互动目标。 先预测最终状态。",
+          "learnerAction": "记录目标：每份草图都有角色位置、碰撞边界和触发方式。",
+          "check": "能口述「制作角色与世界观」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、设计思维处理和可见输出。",
+          "learnerAction": "分解具体操作：绘制角色三视图草案、两张场景草图与互动物品清单。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "绘制角色三视图草案、两张场景草图与互动物品清单。",
+          "check": "程序包含完成本课需要的设计思维逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：每份草图都有角色位置、碰撞边界和触发方式。",
+          "check": "每份草图都有角色位置、碰撞边界和触发方式。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：只有装饰画，没有任何可以产生交互的物体。",
+          "learnerAction": "复现失败再尝试修复：每个场景标出至少一个点击或碰撞事件。",
+          "check": "修复后满足：每份草图都有角色位置、碰撞边界和触发方式。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U4-L02-POS-01",
+          "setup": "自己制作的世界必须有主角、地点和互动目标。",
+          "action": "绘制角色三视图草案、两张场景草图与互动物品清单。",
+          "expected": "每份草图都有角色位置、碰撞边界和触发方式。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U4-L02-NEG-01",
+          "setup": "自己制作的世界必须有主角、地点和互动目标。",
+          "action": "只有装饰画，没有任何可以产生交互的物体。",
+          "expected": "检测失败并引导：每个场景标出至少一个点击或碰撞事件。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "每份草图都有角色位置、碰撞边界和触发方式。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课设计思维如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "每个场景标出至少一个点击或碰撞事件。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加关卡隐藏路线。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：自己制作的世界必须有主角、地点和互动目标。",
+          "只实现核心步骤：绘制角色三视图草案、两张场景草图与互动物品清单。",
+          "如果失败：每个场景标出至少一个点击或碰撞事件。"
+        ],
+        "commonMistakes": [
+          "只有装饰画，没有任何可以产生交互的物体。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u4-l02-asset-1",
+          "g3-u4-l02-asset-2",
+          "g3-u4-l02-asset-3",
+          "g3-u4-l02-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要绘制角色三视图草案、两张场景草图与互动物品清单。，再让他演示每份草图都有角色位置、碰撞边界和触发方式。。"
+    },
+    {
+      "id": "G3-U4-L03",
+      "sourceUnitId": "G3-U4",
+      "title": "完成试玩版本",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "毕业游戏先完成最小可玩版本。",
+      "focusConcept": "协作",
+      "knowledgePoints": [
+        "设计思维",
+        "协作"
+      ],
+      "prerequisites": [
+        "G3-U4-L02"
+      ],
+      "learningOutcome": "新玩家能从开始操作到达成功或失败页面。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "完成试玩版本",
+        "brief": "毕业游戏先完成最小可玩版本。",
+        "learnerBuild": "连接菜单、角色控制、一个障碍和明确胜负条件。",
+        "successCriteria": "新玩家能从开始操作到达成功或失败页面。",
+        "creativeExtension": "加入第二个敌人或道具。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "毕业游戏先完成最小可玩版本。 先预测最终状态。",
+          "learnerAction": "记录目标：新玩家能从开始操作到达成功或失败页面。",
+          "check": "能口述「完成试玩版本」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、协作处理和可见输出。",
+          "learnerAction": "分解具体操作：连接菜单、角色控制、一个障碍和明确胜负条件。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "连接菜单、角色控制、一个障碍和明确胜负条件。",
+          "check": "程序包含完成本课需要的协作逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：新玩家能从开始操作到达成功或失败页面。",
+          "check": "新玩家能从开始操作到达成功或失败页面。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：只能演示动画，没有用户输入和胜负判定。",
+          "learnerAction": "复现失败再尝试修复：只保留必需四部分，先完成一局闭环。",
+          "check": "修复后满足：新玩家能从开始操作到达成功或失败页面。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U4-L03-POS-01",
+          "setup": "毕业游戏先完成最小可玩版本。",
+          "action": "连接菜单、角色控制、一个障碍和明确胜负条件。",
+          "expected": "新玩家能从开始操作到达成功或失败页面。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U4-L03-NEG-01",
+          "setup": "毕业游戏先完成最小可玩版本。",
+          "action": "只能演示动画，没有用户输入和胜负判定。",
+          "expected": "检测失败并引导：只保留必需四部分，先完成一局闭环。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "新玩家能从开始操作到达成功或失败页面。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课协作如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "只保留必需四部分，先完成一局闭环。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入第二个敌人或道具。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：毕业游戏先完成最小可玩版本。",
+          "只实现核心步骤：连接菜单、角色控制、一个障碍和明确胜负条件。",
+          "如果失败：只保留必需四部分，先完成一局闭环。"
+        ],
+        "commonMistakes": [
+          "只能演示动画，没有用户输入和胜负判定。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u4-l03-asset-1",
+          "g3-u4-l03-asset-2",
+          "g3-u4-l03-asset-3",
+          "g3-u4-l03-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要连接菜单、角色控制、一个障碍和明确胜负条件。，再让他演示新玩家能从开始操作到达成功或失败页面。。"
+    },
+    {
+      "id": "G3-U4-L04",
+      "sourceUnitId": "G3-U4",
+      "title": "三轮用户反馈",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "试玩会暴露作者没有注意到的问题。",
+      "focusConcept": "协作",
+      "knowledgePoints": [
+        "设计思维",
+        "协作"
+      ],
+      "prerequisites": [
+        "G3-U4-L03"
+      ],
+      "learningOutcome": "至少一条反馈被复现并修复，修复后由原试玩者回归。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "三轮用户反馈",
+        "brief": "试玩会暴露作者没有注意到的问题。",
+        "learnerBuild": "邀请3位试玩者，记录各3条可复现反馈并分类。",
+        "successCriteria": "至少一条反馈被复现并修复，修复后由原试玩者回归。",
+        "creativeExtension": "制作测试问题优先级矩阵。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "试玩会暴露作者没有注意到的问题。 先预测最终状态。",
+          "learnerAction": "记录目标：至少一条反馈被复现并修复，修复后由原试玩者回归。",
+          "check": "能口述「三轮用户反馈」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、协作处理和可见输出。",
+          "learnerAction": "分解具体操作：邀请3位试玩者，记录各3条可复现反馈并分类。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "邀请3位试玩者，记录各3条可复现反馈并分类。",
+          "check": "程序包含完成本课需要的协作逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：至少一条反馈被复现并修复，修复后由原试玩者回归。",
+          "check": "至少一条反馈被复现并修复，修复后由原试玩者回归。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：只统计喜欢比例，没有复现步骤。",
+          "learnerAction": "复现失败再尝试修复：收集操作、期望、实际结果与截图位置。",
+          "check": "修复后满足：至少一条反馈被复现并修复，修复后由原试玩者回归。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U4-L04-POS-01",
+          "setup": "试玩会暴露作者没有注意到的问题。",
+          "action": "邀请3位试玩者，记录各3条可复现反馈并分类。",
+          "expected": "至少一条反馈被复现并修复，修复后由原试玩者回归。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U4-L04-NEG-01",
+          "setup": "试玩会暴露作者没有注意到的问题。",
+          "action": "只统计喜欢比例，没有复现步骤。",
+          "expected": "检测失败并引导：收集操作、期望、实际结果与截图位置。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "至少一条反馈被复现并修复，修复后由原试玩者回归。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课协作如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "收集操作、期望、实际结果与截图位置。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "制作测试问题优先级矩阵。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：试玩会暴露作者没有注意到的问题。",
+          "只实现核心步骤：邀请3位试玩者，记录各3条可复现反馈并分类。",
+          "如果失败：收集操作、期望、实际结果与截图位置。"
+        ],
+        "commonMistakes": [
+          "只统计喜欢比例，没有复现步骤。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u4-l04-asset-1",
+          "g3-u4-l04-asset-2",
+          "g3-u4-l04-asset-3",
+          "g3-u4-l04-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要邀请3位试玩者，记录各3条可复现反馈并分类。，再让他演示至少一条反馈被复现并修复，修复后由原试玩者回归。。"
+    },
+    {
+      "id": "G3-U4-L05",
+      "sourceUnitId": "G3-U4",
+      "title": "优化玩法与表现",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "正式发布前要解决卡顿、信息遮挡与难度曲线。",
+      "focusConcept": "迭代",
+      "knowledgePoints": [
+        "设计思维",
+        "协作",
+        "迭代"
+      ],
+      "prerequisites": [
+        "G3-U4-L04"
+      ],
+      "learningOutcome": "20轮重开无持续克隆堆积，新手可完成第一关。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "优化玩法与表现",
+        "brief": "正式发布前要解决卡顿、信息遮挡与难度曲线。",
+        "learnerBuild": "优化克隆数量上限、简化提示、调整第一关难度。",
+        "successCriteria": "20轮重开无持续克隆堆积，新手可完成第一关。",
+        "creativeExtension": "增加低性能设备选项。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "正式发布前要解决卡顿、信息遮挡与难度曲线。 先预测最终状态。",
+          "learnerAction": "记录目标：20轮重开无持续克隆堆积，新手可完成第一关。",
+          "check": "能口述「优化玩法与表现」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、迭代处理和可见输出。",
+          "learnerAction": "分解具体操作：优化克隆数量上限、简化提示、调整第一关难度。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "优化克隆数量上限、简化提示、调整第一关难度。",
+          "check": "程序包含完成本课需要的迭代逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：20轮重开无持续克隆堆积，新手可完成第一关。",
+          "check": "20轮重开无持续克隆堆积，新手可完成第一关。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：每次重开都新增一个永不删除的角色。",
+          "learnerAction": "复现失败再尝试修复：监控活动克隆数量，确保重开清空。",
+          "check": "修复后满足：20轮重开无持续克隆堆积，新手可完成第一关。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U4-L05-POS-01",
+          "setup": "正式发布前要解决卡顿、信息遮挡与难度曲线。",
+          "action": "优化克隆数量上限、简化提示、调整第一关难度。",
+          "expected": "20轮重开无持续克隆堆积，新手可完成第一关。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U4-L05-NEG-01",
+          "setup": "正式发布前要解决卡顿、信息遮挡与难度曲线。",
+          "action": "每次重开都新增一个永不删除的角色。",
+          "expected": "检测失败并引导：监控活动克隆数量，确保重开清空。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "20轮重开无持续克隆堆积，新手可完成第一关。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课迭代如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "监控活动克隆数量，确保重开清空。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加低性能设备选项。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：正式发布前要解决卡顿、信息遮挡与难度曲线。",
+          "只实现核心步骤：优化克隆数量上限、简化提示、调整第一关难度。",
+          "如果失败：监控活动克隆数量，确保重开清空。"
+        ],
+        "commonMistakes": [
+          "每次重开都新增一个永不删除的角色。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u4-l05-asset-1",
+          "g3-u4-l05-asset-2",
+          "g3-u4-l05-asset-3",
+          "g3-u4-l05-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要优化克隆数量上限、简化提示、调整第一关难度。，再让他演示20轮重开无持续克隆堆积，新手可完成第一关。。"
+    },
+    {
+      "id": "G3-U4-L06",
+      "sourceUnitId": "G3-U4",
+      "title": "个人创作发布会",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "status": "detailed_not_published",
+      "story": "创作毕业展需要展示原创游戏和复盘记录。",
+      "focusConcept": "迭代",
+      "knowledgePoints": [
+        "设计思维",
+        "协作",
+        "迭代"
+      ],
+      "prerequisites": [
+        "G3-U4-L05"
+      ],
+      "learningOutcome": "首次试玩者能完成完整一局，且资源版权信息可查询。",
+      "environment": "Scratch 3 正版或兼容执行器",
+      "project": {
+        "title": "个人创作发布会",
+        "brief": "创作毕业展需要展示原创游戏和复盘记录。",
+        "learnerBuild": "输出作品、帮助页面、测试记录、素材授权清单并进行答辩。",
+        "successCriteria": "首次试玩者能完成完整一局，且资源版权信息可查询。",
+        "creativeExtension": "制作互动海报。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "创作毕业展需要展示原创游戏和复盘记录。 先预测最终状态。",
+          "learnerAction": "记录目标：首次试玩者能完成完整一局，且资源版权信息可查询。",
+          "check": "能口述「个人创作发布会」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、迭代处理和可见输出。",
+          "learnerAction": "分解具体操作：输出作品、帮助页面、测试记录、素材授权清单并进行答辩。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "输出作品、帮助页面、测试记录、素材授权清单并进行答辩。",
+          "check": "程序包含完成本课需要的迭代逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：首次试玩者能完成完整一局，且资源版权信息可查询。",
+          "check": "首次试玩者能完成完整一局，且资源版权信息可查询。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：项目无法重启或引用了来源不明的音乐图片。",
+          "learnerAction": "复现失败再尝试修复：按运行、测试、素材来源、儿童隐私四项检查。",
+          "check": "修复后满足：首次试玩者能完成完整一局，且资源版权信息可查询。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "G3-U4-L06-POS-01",
+          "setup": "创作毕业展需要展示原创游戏和复盘记录。",
+          "action": "输出作品、帮助页面、测试记录、素材授权清单并进行答辩。",
+          "expected": "首次试玩者能完成完整一局，且资源版权信息可查询。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "G3-U4-L06-NEG-01",
+          "setup": "创作毕业展需要展示原创游戏和复盘记录。",
+          "action": "项目无法重启或引用了来源不明的音乐图片。",
+          "expected": "检测失败并引导：按运行、测试、素材来源、儿童隐私四项检查。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "首次试玩者能完成完整一局，且资源版权信息可查询。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课迭代如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "按运行、测试、素材来源、儿童隐私四项检查。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "制作互动海报。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：创作毕业展需要展示原创游戏和复盘记录。",
+          "只实现核心步骤：输出作品、帮助页面、测试记录、素材授权清单并进行答辩。",
+          "如果失败：按运行、测试、素材来源、儿童隐私四项检查。"
+        ],
+        "commonMistakes": [
+          "项目无法重启或引用了来源不明的音乐图片。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "g3-u4-l06-asset-1",
+          "g3-u4-l06-asset-2",
+          "g3-u4-l06-asset-3",
+          "g3-u4-l06-asset-4"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要输出作品、帮助页面、测试记录、素材授权清单并进行答辩。，再让他演示首次试玩者能完成完整一局，且资源版权信息可查询。。"
+    }
+  ]
+}

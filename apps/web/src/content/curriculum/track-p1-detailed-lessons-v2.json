@@ -1,0 +1,3103 @@
+{
+  "schemaVersion": "2.0.0",
+  "trackId": "P1",
+  "maturity": "individual_detailed_scripts_with_assessment_specs",
+  "published": false,
+  "runtimeVerified": false,
+  "lessons": [
+    {
+      "id": "P1-U1-L01",
+      "sourceUnitId": "P1-U1",
+      "title": "画一座彩色房子",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "美术馆要用代码绘制一座彩色小房子。",
+      "focusConcept": "坐标",
+      "knowledgePoints": [
+        "坐标"
+      ],
+      "prerequisites": [],
+      "learningOutcome": "墙体闭合为矩形，屋顶两斜边连接顶点。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "画一座彩色房子",
+        "brief": "美术馆要用代码绘制一座彩色小房子。",
+        "learnerBuild": "用turtle画四条墙边和三角屋顶并填色。",
+        "successCriteria": "墙体闭合为矩形，屋顶两斜边连接顶点。",
+        "creativeExtension": "添加烟囱。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "美术馆要用代码绘制一座彩色小房子。 先预测最终状态。",
+          "learnerAction": "记录目标：墙体闭合为矩形，屋顶两斜边连接顶点。",
+          "check": "能口述「画一座彩色房子」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、坐标处理和可见输出。",
+          "learnerAction": "分解具体操作：用turtle画四条墙边和三角屋顶并填色。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用turtle画四条墙边和三角屋顶并填色。",
+          "check": "程序包含完成本课需要的坐标逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：墙体闭合为矩形，屋顶两斜边连接顶点。",
+          "check": "墙体闭合为矩形，屋顶两斜边连接顶点。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：画笔抬起错误，屋顶与房子分离。",
+          "learnerAction": "复现失败再尝试修复：先在纸上标出墙角坐标和屋顶顶点。",
+          "check": "修复后满足：墙体闭合为矩形，屋顶两斜边连接顶点。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U1-L01-POS-01",
+          "setup": "美术馆要用代码绘制一座彩色小房子。",
+          "action": "用turtle画四条墙边和三角屋顶并填色。",
+          "expected": "墙体闭合为矩形，屋顶两斜边连接顶点。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U1-L01-NEG-01",
+          "setup": "美术馆要用代码绘制一座彩色小房子。",
+          "action": "画笔抬起错误，屋顶与房子分离。",
+          "expected": "检测失败并引导：先在纸上标出墙角坐标和屋顶顶点。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "墙体闭合为矩形，屋顶两斜边连接顶点。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课坐标如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "先在纸上标出墙角坐标和屋顶顶点。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "添加烟囱。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：美术馆要用代码绘制一座彩色小房子。",
+          "只实现核心步骤：用turtle画四条墙边和三角屋顶并填色。",
+          "如果失败：先在纸上标出墙角坐标和屋顶顶点。"
+        ],
+        "commonMistakes": [
+          "画笔抬起错误，屋顶与房子分离。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u1-l01-asset-1",
+          "p1-u1-l01-asset-2",
+          "p1-u1-l01-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用turtle画四条墙边和三角屋顶并填色。，再让他演示墙体闭合为矩形，屋顶两斜边连接顶点。。"
+    },
+    {
+      "id": "P1-U1-L02",
+      "sourceUnitId": "P1-U1",
+      "title": "多边形规律",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "画家想一键绘制三角、四方和五边形。",
+      "focusConcept": "坐标",
+      "knowledgePoints": [
+        "坐标"
+      ],
+      "prerequisites": [
+        "P1-U1-L01"
+      ],
+      "learningOutcome": "三种正多边形均闭合，画笔回到起点方向。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "多边形规律",
+        "brief": "画家想一键绘制三角、四方和五边形。",
+        "learnerBuild": "用循环走边并左转360/n度，n依次取3、4、5。",
+        "successCriteria": "三种正多边形均闭合，画笔回到起点方向。",
+        "creativeExtension": "支持边数8。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "画家想一键绘制三角、四方和五边形。 先预测最终状态。",
+          "learnerAction": "记录目标：三种正多边形均闭合，画笔回到起点方向。",
+          "check": "能口述「多边形规律」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、坐标处理和可见输出。",
+          "learnerAction": "分解具体操作：用循环走边并左转360/n度，n依次取3、4、5。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用循环走边并左转360/n度，n依次取3、4、5。",
+          "check": "程序包含完成本课需要的坐标逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：三种正多边形均闭合，画笔回到起点方向。",
+          "check": "三种正多边形均闭合，画笔回到起点方向。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：全部转90度，五边形无法闭合。",
+          "learnerAction": "复现失败再尝试修复：角度由边数决定，不是永远90度。",
+          "check": "修复后满足：三种正多边形均闭合，画笔回到起点方向。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U1-L02-POS-01",
+          "setup": "画家想一键绘制三角、四方和五边形。",
+          "action": "用循环走边并左转360/n度，n依次取3、4、5。",
+          "expected": "三种正多边形均闭合，画笔回到起点方向。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U1-L02-NEG-01",
+          "setup": "画家想一键绘制三角、四方和五边形。",
+          "action": "全部转90度，五边形无法闭合。",
+          "expected": "检测失败并引导：角度由边数决定，不是永远90度。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "三种正多边形均闭合，画笔回到起点方向。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课坐标如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "角度由边数决定，不是永远90度。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "支持边数8。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：画家想一键绘制三角、四方和五边形。",
+          "只实现核心步骤：用循环走边并左转360/n度，n依次取3、4、5。",
+          "如果失败：角度由边数决定，不是永远90度。"
+        ],
+        "commonMistakes": [
+          "全部转90度，五边形无法闭合。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u1-l02-asset-1",
+          "p1-u1-l02-asset-2",
+          "p1-u1-l02-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用循环走边并左转360/n度，n依次取3、4、5。，再让他演示三种正多边形均闭合，画笔回到起点方向。。"
+    },
+    {
+      "id": "P1-U1-L03",
+      "sourceUnitId": "P1-U1",
+      "title": "旋转花瓣图案",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "花园地砖要由12片旋转花瓣组成。",
+      "focusConcept": "循环",
+      "knowledgePoints": [
+        "坐标",
+        "循环"
+      ],
+      "prerequisites": [
+        "P1-U1-L02"
+      ],
+      "learningOutcome": "12瓣围绕中心排列，最后朝向恢复。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "旋转花瓣图案",
+        "brief": "花园地砖要由12片旋转花瓣组成。",
+        "learnerBuild": "写画单瓣函数，绘制后旋转30度重复12次。",
+        "successCriteria": "12瓣围绕中心排列，最后朝向恢复。",
+        "creativeExtension": "加入渐变色。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "花园地砖要由12片旋转花瓣组成。 先预测最终状态。",
+          "learnerAction": "记录目标：12瓣围绕中心排列，最后朝向恢复。",
+          "check": "能口述「旋转花瓣图案」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、循环处理和可见输出。",
+          "learnerAction": "分解具体操作：写画单瓣函数，绘制后旋转30度重复12次。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "写画单瓣函数，绘制后旋转30度重复12次。",
+          "check": "程序包含完成本课需要的循环逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：12瓣围绕中心排列，最后朝向恢复。",
+          "check": "12瓣围绕中心排列，最后朝向恢复。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：每瓣都从上次末端开始导致漂移。",
+          "learnerAction": "复现失败再尝试修复：每次复位画笔到中心。",
+          "check": "修复后满足：12瓣围绕中心排列，最后朝向恢复。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U1-L03-POS-01",
+          "setup": "花园地砖要由12片旋转花瓣组成。",
+          "action": "写画单瓣函数，绘制后旋转30度重复12次。",
+          "expected": "12瓣围绕中心排列，最后朝向恢复。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U1-L03-NEG-01",
+          "setup": "花园地砖要由12片旋转花瓣组成。",
+          "action": "每瓣都从上次末端开始导致漂移。",
+          "expected": "检测失败并引导：每次复位画笔到中心。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "12瓣围绕中心排列，最后朝向恢复。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课循环如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "每次复位画笔到中心。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入渐变色。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：花园地砖要由12片旋转花瓣组成。",
+          "只实现核心步骤：写画单瓣函数，绘制后旋转30度重复12次。",
+          "如果失败：每次复位画笔到中心。"
+        ],
+        "commonMistakes": [
+          "每瓣都从上次末端开始导致漂移。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u1-l03-asset-1",
+          "p1-u1-l03-asset-2",
+          "p1-u1-l03-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要写画单瓣函数，绘制后旋转30度重复12次。，再让他演示12瓣围绕中心排列，最后朝向恢复。。"
+    },
+    {
+      "id": "P1-U1-L04",
+      "sourceUnitId": "P1-U1",
+      "title": "随机星空",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "天文社要设计一张每次相同的星图。",
+      "focusConcept": "循环",
+      "knowledgePoints": [
+        "坐标",
+        "循环"
+      ],
+      "prerequisites": [
+        "P1-U1-L03"
+      ],
+      "learningOutcome": "固定seed两次产生完全相同星图，点位均在画布内。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "随机星空",
+        "brief": "天文社要设计一张每次相同的星图。",
+        "learnerBuild": "用Random(seed)生成30个散点并绘制大小不同的星星。",
+        "successCriteria": "固定seed两次产生完全相同星图，点位均在画布内。",
+        "creativeExtension": "增加星座连线。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "天文社要设计一张每次相同的星图。 先预测最终状态。",
+          "learnerAction": "记录目标：固定seed两次产生完全相同星图，点位均在画布内。",
+          "check": "能口述「随机星空」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、循环处理和可见输出。",
+          "learnerAction": "分解具体操作：用Random(seed)生成30个散点并绘制大小不同的星星。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用Random(seed)生成30个散点并绘制大小不同的星星。",
+          "check": "程序包含完成本课需要的循环逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：固定seed两次产生完全相同星图，点位均在画布内。",
+          "check": "固定seed两次产生完全相同星图，点位均在画布内。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：未固定seed导致无法比对作品测试。",
+          "learnerAction": "复现失败再尝试修复：将随机源实例传入绘图函数。",
+          "check": "修复后满足：固定seed两次产生完全相同星图，点位均在画布内。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U1-L04-POS-01",
+          "setup": "天文社要设计一张每次相同的星图。",
+          "action": "用Random(seed)生成30个散点并绘制大小不同的星星。",
+          "expected": "固定seed两次产生完全相同星图，点位均在画布内。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U1-L04-NEG-01",
+          "setup": "天文社要设计一张每次相同的星图。",
+          "action": "未固定seed导致无法比对作品测试。",
+          "expected": "检测失败并引导：将随机源实例传入绘图函数。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "固定seed两次产生完全相同星图，点位均在画布内。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课循环如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "将随机源实例传入绘图函数。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加星座连线。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：天文社要设计一张每次相同的星图。",
+          "只实现核心步骤：用Random(seed)生成30个散点并绘制大小不同的星星。",
+          "如果失败：将随机源实例传入绘图函数。"
+        ],
+        "commonMistakes": [
+          "未固定seed导致无法比对作品测试。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u1-l04-asset-1",
+          "p1-u1-l04-asset-2",
+          "p1-u1-l04-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用Random(seed)生成30个散点并绘制大小不同的星星。，再让他演示固定seed两次产生完全相同星图，点位均在画布内。。"
+    },
+    {
+      "id": "P1-U1-L05",
+      "sourceUnitId": "P1-U1",
+      "title": "递归雪花入门",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "雪花边缘需要越来越细小的分枝。",
+      "focusConcept": "绘图",
+      "knowledgePoints": [
+        "坐标",
+        "循环",
+        "绘图"
+      ],
+      "prerequisites": [
+        "P1-U1-L04"
+      ],
+      "learningOutcome": "level=2生成16个细分线段且不会无限递归。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "递归雪花入门",
+        "brief": "雪花边缘需要越来越细小的分枝。",
+        "learnerBuild": "编写递归koch_segment(level)生成线段，level=0为基线。",
+        "successCriteria": "level=2生成16个细分线段且不会无限递归。",
+        "creativeExtension": "将三条边拼成雪花。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "雪花边缘需要越来越细小的分枝。 先预测最终状态。",
+          "learnerAction": "记录目标：level=2生成16个细分线段且不会无限递归。",
+          "check": "能口述「递归雪花入门」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、绘图处理和可见输出。",
+          "learnerAction": "分解具体操作：编写递归koch_segment(level)生成线段，level=0为基线。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "编写递归koch_segment(level)生成线段，level=0为基线。",
+          "check": "程序包含完成本课需要的绘图逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：level=2生成16个细分线段且不会无限递归。",
+          "check": "level=2生成16个细分线段且不会无限递归。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：忘记递归出口导致RecursionError。",
+          "learnerAction": "复现失败再尝试修复：先实现level=0再检查4倍增长规律。",
+          "check": "修复后满足：level=2生成16个细分线段且不会无限递归。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U1-L05-POS-01",
+          "setup": "雪花边缘需要越来越细小的分枝。",
+          "action": "编写递归koch_segment(level)生成线段，level=0为基线。",
+          "expected": "level=2生成16个细分线段且不会无限递归。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U1-L05-NEG-01",
+          "setup": "雪花边缘需要越来越细小的分枝。",
+          "action": "忘记递归出口导致RecursionError。",
+          "expected": "检测失败并引导：先实现level=0再检查4倍增长规律。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "level=2生成16个细分线段且不会无限递归。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课绘图如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "先实现level=0再检查4倍增长规律。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "将三条边拼成雪花。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：雪花边缘需要越来越细小的分枝。",
+          "只实现核心步骤：编写递归koch_segment(level)生成线段，level=0为基线。",
+          "如果失败：先实现level=0再检查4倍增长规律。"
+        ],
+        "commonMistakes": [
+          "忘记递归出口导致RecursionError。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u1-l05-asset-1",
+          "p1-u1-l05-asset-2",
+          "p1-u1-l05-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要编写递归koch_segment(level)生成线段，level=0为基线。，再让他演示level=2生成16个细分线段且不会无限递归。。"
+    },
+    {
+      "id": "P1-U1-L06",
+      "sourceUnitId": "P1-U1",
+      "title": "制作数学艺术画",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "数学美术馆邀请你完成可保存的几何艺术画。",
+      "focusConcept": "绘图",
+      "knowledgePoints": [
+        "坐标",
+        "循环",
+        "绘图"
+      ],
+      "prerequisites": [
+        "P1-U1-L05"
+      ],
+      "learningOutcome": "指定参数输出合法SVG，包含至少三种几何元素。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "制作数学艺术画",
+        "brief": "数学美术馆邀请你完成可保存的几何艺术画。",
+        "learnerBuild": "组合正多边形、旋转花瓣和随机星空生成SVG作品。",
+        "successCriteria": "指定参数输出合法SVG，包含至少三种几何元素。",
+        "creativeExtension": "支持不同主题配色。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "数学美术馆邀请你完成可保存的几何艺术画。 先预测最终状态。",
+          "learnerAction": "记录目标：指定参数输出合法SVG，包含至少三种几何元素。",
+          "check": "能口述「制作数学艺术画」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、绘图处理和可见输出。",
+          "learnerAction": "分解具体操作：组合正多边形、旋转花瓣和随机星空生成SVG作品。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "组合正多边形、旋转花瓣和随机星空生成SVG作品。",
+          "check": "程序包含完成本课需要的绘图逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：指定参数输出合法SVG，包含至少三种几何元素。",
+          "check": "指定参数输出合法SVG，包含至少三种几何元素。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：画布外的图形被裁切或相同seed作品不一致。",
+          "learnerAction": "复现失败再尝试修复：检测坐标边界与随机种子，并保存可重现参数。",
+          "check": "修复后满足：指定参数输出合法SVG，包含至少三种几何元素。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U1-L06-POS-01",
+          "setup": "数学美术馆邀请你完成可保存的几何艺术画。",
+          "action": "组合正多边形、旋转花瓣和随机星空生成SVG作品。",
+          "expected": "指定参数输出合法SVG，包含至少三种几何元素。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U1-L06-NEG-01",
+          "setup": "数学美术馆邀请你完成可保存的几何艺术画。",
+          "action": "画布外的图形被裁切或相同seed作品不一致。",
+          "expected": "检测失败并引导：检测坐标边界与随机种子，并保存可重现参数。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "指定参数输出合法SVG，包含至少三种几何元素。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课绘图如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "检测坐标边界与随机种子，并保存可重现参数。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "支持不同主题配色。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：数学美术馆邀请你完成可保存的几何艺术画。",
+          "只实现核心步骤：组合正多边形、旋转花瓣和随机星空生成SVG作品。",
+          "如果失败：检测坐标边界与随机种子，并保存可重现参数。"
+        ],
+        "commonMistakes": [
+          "画布外的图形被裁切或相同seed作品不一致。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u1-l06-asset-1",
+          "p1-u1-l06-asset-2",
+          "p1-u1-l06-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要组合正多边形、旋转花瓣和随机星空生成SVG作品。，再让他演示指定参数输出合法SVG，包含至少三种几何元素。。"
+    },
+    {
+      "id": "P1-U2-L01",
+      "sourceUnitId": "P1-U2",
+      "title": "冒险故事选项",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "探险队在洞穴口看到两条不同通道。",
+      "focusConcept": "流程",
+      "knowledgePoints": [
+        "流程"
+      ],
+      "prerequisites": [
+        "P1-U1-L06"
+      ],
+      "learningOutcome": "left看到水晶桥，right看到岩石坡。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "冒险故事选项",
+        "brief": "探险队在洞穴口看到两条不同通道。",
+        "learnerBuild": "用input读取left/right并进入对应文字剧情。",
+        "successCriteria": "left看到水晶桥，right看到岩石坡。",
+        "creativeExtension": "增加look观察动作。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "探险队在洞穴口看到两条不同通道。 先预测最终状态。",
+          "learnerAction": "记录目标：left看到水晶桥，right看到岩石坡。",
+          "check": "能口述「冒险故事选项」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、流程处理和可见输出。",
+          "learnerAction": "分解具体操作：用input读取left/right并进入对应文字剧情。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用input读取left/right并进入对应文字剧情。",
+          "check": "程序包含完成本课需要的流程逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：left看到水晶桥，right看到岩石坡。",
+          "check": "left看到水晶桥，right看到岩石坡。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：无效输入被默认当right，玩家不知道发生什么。",
+          "learnerAction": "复现失败再尝试修复：验证输入仅限两个选项，否则重试。",
+          "check": "修复后满足：left看到水晶桥，right看到岩石坡。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U2-L01-POS-01",
+          "setup": "探险队在洞穴口看到两条不同通道。",
+          "action": "用input读取left/right并进入对应文字剧情。",
+          "expected": "left看到水晶桥，right看到岩石坡。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U2-L01-NEG-01",
+          "setup": "探险队在洞穴口看到两条不同通道。",
+          "action": "无效输入被默认当right，玩家不知道发生什么。",
+          "expected": "检测失败并引导：验证输入仅限两个选项，否则重试。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "left看到水晶桥，right看到岩石坡。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课流程如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "验证输入仅限两个选项，否则重试。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加look观察动作。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：探险队在洞穴口看到两条不同通道。",
+          "只实现核心步骤：用input读取left/right并进入对应文字剧情。",
+          "如果失败：验证输入仅限两个选项，否则重试。"
+        ],
+        "commonMistakes": [
+          "无效输入被默认当right，玩家不知道发生什么。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u2-l01-asset-1",
+          "p1-u2-l01-asset-2",
+          "p1-u2-l01-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用input读取left/right并进入对应文字剧情。，再让他演示left看到水晶桥，right看到岩石坡。。"
+    },
+    {
+      "id": "P1-U2-L02",
+      "sourceUnitId": "P1-U2",
+      "title": "背包道具收集",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "背包里最多装三样物品，钥匙需要保留到最后。",
+      "focusConcept": "流程",
+      "knowledgePoints": [
+        "流程"
+      ],
+      "prerequisites": [
+        "P1-U2-L01"
+      ],
+      "learningOutcome": "取第四样道具被拒绝且原来三样仍在背包。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "背包道具收集",
+        "brief": "背包里最多装三样物品，钥匙需要保留到最后。",
+        "learnerBuild": "用列表实现take/drop并限制容量为3。",
+        "successCriteria": "取第四样道具被拒绝且原来三样仍在背包。",
+        "creativeExtension": "增加物品重量。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "背包里最多装三样物品，钥匙需要保留到最后。 先预测最终状态。",
+          "learnerAction": "记录目标：取第四样道具被拒绝且原来三样仍在背包。",
+          "check": "能口述「背包道具收集」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、流程处理和可见输出。",
+          "learnerAction": "分解具体操作：用列表实现take/drop并限制容量为3。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用列表实现take/drop并限制容量为3。",
+          "check": "程序包含完成本课需要的流程逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：取第四样道具被拒绝且原来三样仍在背包。",
+          "check": "取第四样道具被拒绝且原来三样仍在背包。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：重复拾取同一物品占用第二格容量。",
+          "learnerAction": "复现失败再尝试修复：取物前检查是否已拥有及背包长度。",
+          "check": "修复后满足：取第四样道具被拒绝且原来三样仍在背包。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U2-L02-POS-01",
+          "setup": "背包里最多装三样物品，钥匙需要保留到最后。",
+          "action": "用列表实现take/drop并限制容量为3。",
+          "expected": "取第四样道具被拒绝且原来三样仍在背包。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U2-L02-NEG-01",
+          "setup": "背包里最多装三样物品，钥匙需要保留到最后。",
+          "action": "重复拾取同一物品占用第二格容量。",
+          "expected": "检测失败并引导：取物前检查是否已拥有及背包长度。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "取第四样道具被拒绝且原来三样仍在背包。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课流程如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "取物前检查是否已拥有及背包长度。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加物品重量。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：背包里最多装三样物品，钥匙需要保留到最后。",
+          "只实现核心步骤：用列表实现take/drop并限制容量为3。",
+          "如果失败：取物前检查是否已拥有及背包长度。"
+        ],
+        "commonMistakes": [
+          "重复拾取同一物品占用第二格容量。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u2-l02-asset-1",
+          "p1-u2-l02-asset-2",
+          "p1-u2-l02-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用列表实现take/drop并限制容量为3。，再让他演示取第四样道具被拒绝且原来三样仍在背包。。"
+    },
+    {
+      "id": "P1-U2-L03",
+      "sourceUnitId": "P1-U2",
+      "title": "战斗回合计数",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "怪物与玩家轮流行动，各自最多三点生命。",
+      "focusConcept": "状态",
+      "knowledgePoints": [
+        "流程",
+        "状态"
+      ],
+      "prerequisites": [
+        "P1-U2-L02"
+      ],
+      "learningOutcome": "生命归零即结束战斗，不能出现负生命值。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "战斗回合计数",
+        "brief": "怪物与玩家轮流行动，各自最多三点生命。",
+        "learnerBuild": "设计玩家回合攻击、怪物回合防御和回合计数。",
+        "successCriteria": "生命归零即结束战斗，不能出现负生命值。",
+        "creativeExtension": "增加治疗道具。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "怪物与玩家轮流行动，各自最多三点生命。 先预测最终状态。",
+          "learnerAction": "记录目标：生命归零即结束战斗，不能出现负生命值。",
+          "check": "能口述「战斗回合计数」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、状态处理和可见输出。",
+          "learnerAction": "分解具体操作：设计玩家回合攻击、怪物回合防御和回合计数。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "设计玩家回合攻击、怪物回合防御和回合计数。",
+          "check": "程序包含完成本课需要的状态逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：生命归零即结束战斗，不能出现负生命值。",
+          "check": "生命归零即结束战斗，不能出现负生命值。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：战斗结束后怪物仍攻击玩家。",
+          "learnerAction": "复现失败再尝试修复：检查alive条件再进入下一回合。",
+          "check": "修复后满足：生命归零即结束战斗，不能出现负生命值。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U2-L03-POS-01",
+          "setup": "怪物与玩家轮流行动，各自最多三点生命。",
+          "action": "设计玩家回合攻击、怪物回合防御和回合计数。",
+          "expected": "生命归零即结束战斗，不能出现负生命值。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U2-L03-NEG-01",
+          "setup": "怪物与玩家轮流行动，各自最多三点生命。",
+          "action": "战斗结束后怪物仍攻击玩家。",
+          "expected": "检测失败并引导：检查alive条件再进入下一回合。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "生命归零即结束战斗，不能出现负生命值。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课状态如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "检查alive条件再进入下一回合。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加治疗道具。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：怪物与玩家轮流行动，各自最多三点生命。",
+          "只实现核心步骤：设计玩家回合攻击、怪物回合防御和回合计数。",
+          "如果失败：检查alive条件再进入下一回合。"
+        ],
+        "commonMistakes": [
+          "战斗结束后怪物仍攻击玩家。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u2-l03-asset-1",
+          "p1-u2-l03-asset-2",
+          "p1-u2-l03-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要设计玩家回合攻击、怪物回合防御和回合计数。，再让他演示生命归零即结束战斗，不能出现负生命值。。"
+    },
+    {
+      "id": "P1-U2-L04",
+      "sourceUnitId": "P1-U2",
+      "title": "随机事件发生",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "洞穴发生随机落石，玩家可躲避或防御。",
+      "focusConcept": "状态",
+      "knowledgePoints": [
+        "流程",
+        "状态"
+      ],
+      "prerequisites": [
+        "P1-U2-L03"
+      ],
+      "learningOutcome": "同一seed和同一路径得到相同事件记录。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "随机事件发生",
+        "brief": "洞穴发生随机落石，玩家可躲避或防御。",
+        "learnerBuild": "用固定seed选定3种随机事件，更新玩家状态。",
+        "successCriteria": "同一seed和同一路径得到相同事件记录。",
+        "creativeExtension": "增加概率可视化。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "洞穴发生随机落石，玩家可躲避或防御。 先预测最终状态。",
+          "learnerAction": "记录目标：同一seed和同一路径得到相同事件记录。",
+          "check": "能口述「随机事件发生」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、状态处理和可见输出。",
+          "learnerAction": "分解具体操作：用固定seed选定3种随机事件，更新玩家状态。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "用固定seed选定3种随机事件，更新玩家状态。",
+          "check": "程序包含完成本课需要的状态逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：同一seed和同一路径得到相同事件记录。",
+          "check": "同一seed和同一路径得到相同事件记录。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：测试依赖随机未固定而时好时坏。",
+          "learnerAction": "复现失败再尝试修复：使用独立Random对象并传递种子。",
+          "check": "修复后满足：同一seed和同一路径得到相同事件记录。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U2-L04-POS-01",
+          "setup": "洞穴发生随机落石，玩家可躲避或防御。",
+          "action": "用固定seed选定3种随机事件，更新玩家状态。",
+          "expected": "同一seed和同一路径得到相同事件记录。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U2-L04-NEG-01",
+          "setup": "洞穴发生随机落石，玩家可躲避或防御。",
+          "action": "测试依赖随机未固定而时好时坏。",
+          "expected": "检测失败并引导：使用独立Random对象并传递种子。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "同一seed和同一路径得到相同事件记录。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课状态如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "使用独立Random对象并传递种子。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加概率可视化。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：洞穴发生随机落石，玩家可躲避或防御。",
+          "只实现核心步骤：用固定seed选定3种随机事件，更新玩家状态。",
+          "如果失败：使用独立Random对象并传递种子。"
+        ],
+        "commonMistakes": [
+          "测试依赖随机未固定而时好时坏。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u2-l04-asset-1",
+          "p1-u2-l04-asset-2",
+          "p1-u2-l04-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要用固定seed选定3种随机事件，更新玩家状态。，再让他演示同一seed和同一路径得到相同事件记录。。"
+    },
+    {
+      "id": "P1-U2-L05",
+      "sourceUnitId": "P1-U2",
+      "title": "多结局剧情",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "勇者找到钥匙可能从大门离开，也可能从侧洞出去。",
+      "focusConcept": "输入",
+      "knowledgePoints": [
+        "流程",
+        "状态",
+        "输入"
+      ],
+      "prerequisites": [
+        "P1-U2-L04"
+      ],
+      "learningOutcome": "有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "多结局剧情",
+        "brief": "勇者找到钥匙可能从大门离开，也可能从侧洞出去。",
+        "learnerBuild": "设计has_key和choice两个条件，得到三类结局。",
+        "successCriteria": "有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。",
+        "creativeExtension": "添加被诅咒宝物支线。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "勇者找到钥匙可能从大门离开，也可能从侧洞出去。 先预测最终状态。",
+          "learnerAction": "记录目标：有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。",
+          "check": "能口述「多结局剧情」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、输入处理和可见输出。",
+          "learnerAction": "分解具体操作：设计has_key和choice两个条件，得到三类结局。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "设计has_key和choice两个条件，得到三类结局。",
+          "check": "程序包含完成本课需要的输入逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。",
+          "check": "有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：没有钥匙仍显示大门通关。",
+          "learnerAction": "复现失败再尝试修复：在场景转移前验证钥匙状态。",
+          "check": "修复后满足：有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U2-L05-POS-01",
+          "setup": "勇者找到钥匙可能从大门离开，也可能从侧洞出去。",
+          "action": "设计has_key和choice两个条件，得到三类结局。",
+          "expected": "有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U2-L05-NEG-01",
+          "setup": "勇者找到钥匙可能从大门离开，也可能从侧洞出去。",
+          "action": "没有钥匙仍显示大门通关。",
+          "expected": "检测失败并引导：在场景转移前验证钥匙状态。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课输入如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "在场景转移前验证钥匙状态。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "添加被诅咒宝物支线。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：勇者找到钥匙可能从大门离开，也可能从侧洞出去。",
+          "只实现核心步骤：设计has_key和choice两个条件，得到三类结局。",
+          "如果失败：在场景转移前验证钥匙状态。"
+        ],
+        "commonMistakes": [
+          "没有钥匙仍显示大门通关。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u2-l05-asset-1",
+          "p1-u2-l05-asset-2",
+          "p1-u2-l05-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要设计has_key和choice两个条件，得到三类结局。，再让他演示有钥匙走大门成功，无钥匙走大门失败，走侧洞安全。。"
+    },
+    {
+      "id": "P1-U2-L06",
+      "sourceUnitId": "P1-U2",
+      "title": "神秘洞穴冒险",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "制作含入口、钥匙、怪物和终点的洞穴冒险。",
+      "focusConcept": "输入",
+      "knowledgePoints": [
+        "流程",
+        "状态",
+        "输入"
+      ],
+      "prerequisites": [
+        "P1-U2-L05"
+      ],
+      "learningOutcome": "测试进入、拾取、开门、重新开始和错误输入。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "神秘洞穴冒险",
+        "brief": "制作含入口、钥匙、怪物和终点的洞穴冒险。",
+        "learnerBuild": "编写状态转移与物品栏，允许reset并提供三种结局。",
+        "successCriteria": "测试进入、拾取、开门、重新开始和错误输入。",
+        "creativeExtension": "设计隐藏宝藏结局。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "制作含入口、钥匙、怪物和终点的洞穴冒险。 先预测最终状态。",
+          "learnerAction": "记录目标：测试进入、拾取、开门、重新开始和错误输入。",
+          "check": "能口述「神秘洞穴冒险」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、输入处理和可见输出。",
+          "learnerAction": "分解具体操作：编写状态转移与物品栏，允许reset并提供三种结局。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "编写状态转移与物品栏，允许reset并提供三种结局。",
+          "check": "程序包含完成本课需要的输入逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：测试进入、拾取、开门、重新开始和错误输入。",
+          "check": "测试进入、拾取、开门、重新开始和错误输入。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：重新开始保留上一局钥匙，直接通关。",
+          "learnerAction": "复现失败再尝试修复：将所有可变状态在new_game重建。",
+          "check": "修复后满足：测试进入、拾取、开门、重新开始和错误输入。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U2-L06-POS-01",
+          "setup": "制作含入口、钥匙、怪物和终点的洞穴冒险。",
+          "action": "编写状态转移与物品栏，允许reset并提供三种结局。",
+          "expected": "测试进入、拾取、开门、重新开始和错误输入。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U2-L06-NEG-01",
+          "setup": "制作含入口、钥匙、怪物和终点的洞穴冒险。",
+          "action": "重新开始保留上一局钥匙，直接通关。",
+          "expected": "检测失败并引导：将所有可变状态在new_game重建。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "测试进入、拾取、开门、重新开始和错误输入。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课输入如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "将所有可变状态在new_game重建。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "设计隐藏宝藏结局。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：制作含入口、钥匙、怪物和终点的洞穴冒险。",
+          "只实现核心步骤：编写状态转移与物品栏，允许reset并提供三种结局。",
+          "如果失败：将所有可变状态在new_game重建。"
+        ],
+        "commonMistakes": [
+          "重新开始保留上一局钥匙，直接通关。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u2-l06-asset-1",
+          "p1-u2-l06-asset-2",
+          "p1-u2-l06-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要编写状态转移与物品栏，允许reset并提供三种结局。，再让他演示测试进入、拾取、开门、重新开始和错误输入。。"
+    },
+    {
+      "id": "P1-U3-L01",
+      "sourceUnitId": "P1-U3",
+      "title": "创建游戏窗口",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "pygame第一课需要安全初始化游戏窗口。",
+      "focusConcept": "游戏循环",
+      "knowledgePoints": [
+        "游戏循环"
+      ],
+      "prerequisites": [
+        "P1-U2-L06"
+      ],
+      "learningOutcome": "在SDL虚拟显示下可绘制3帧并正常退出。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "创建游戏窗口",
+        "brief": "pygame第一课需要安全初始化游戏窗口。",
+        "learnerBuild": "pygame.init后创建640×360窗口，每帧清屏并flip。",
+        "successCriteria": "在SDL虚拟显示下可绘制3帧并正常退出。",
+        "creativeExtension": "改变背景颜色。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "pygame第一课需要安全初始化游戏窗口。 先预测最终状态。",
+          "learnerAction": "记录目标：在SDL虚拟显示下可绘制3帧并正常退出。",
+          "check": "能口述「创建游戏窗口」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、游戏循环处理和可见输出。",
+          "learnerAction": "分解具体操作：pygame.init后创建640×360窗口，每帧清屏并flip。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "pygame.init后创建640×360窗口，每帧清屏并flip。",
+          "check": "程序包含完成本课需要的游戏循环逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：在SDL虚拟显示下可绘制3帧并正常退出。",
+          "check": "在SDL虚拟显示下可绘制3帧并正常退出。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：窗口循环缺少QUIT处理导致无法关闭。",
+          "learnerAction": "复现失败再尝试修复：把事件处理放在每一帧开头。",
+          "check": "修复后满足：在SDL虚拟显示下可绘制3帧并正常退出。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U3-L01-POS-01",
+          "setup": "pygame第一课需要安全初始化游戏窗口。",
+          "action": "pygame.init后创建640×360窗口，每帧清屏并flip。",
+          "expected": "在SDL虚拟显示下可绘制3帧并正常退出。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U3-L01-NEG-01",
+          "setup": "pygame第一课需要安全初始化游戏窗口。",
+          "action": "窗口循环缺少QUIT处理导致无法关闭。",
+          "expected": "检测失败并引导：把事件处理放在每一帧开头。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "在SDL虚拟显示下可绘制3帧并正常退出。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课游戏循环如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "把事件处理放在每一帧开头。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "改变背景颜色。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：pygame第一课需要安全初始化游戏窗口。",
+          "只实现核心步骤：pygame.init后创建640×360窗口，每帧清屏并flip。",
+          "如果失败：把事件处理放在每一帧开头。"
+        ],
+        "commonMistakes": [
+          "窗口循环缺少QUIT处理导致无法关闭。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u3-l01-asset-1",
+          "p1-u3-l01-asset-2",
+          "p1-u3-l01-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要pygame.init后创建640×360窗口，每帧清屏并flip。，再让他演示在SDL虚拟显示下可绘制3帧并正常退出。。"
+    },
+    {
+      "id": "P1-U3-L02",
+      "sourceUnitId": "P1-U3",
+      "title": "让小球移动",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "小球准备在舞台里匀速运动。",
+      "focusConcept": "游戏循环",
+      "knowledgePoints": [
+        "游戏循环"
+      ],
+      "prerequisites": [
+        "P1-U3-L01"
+      ],
+      "learningOutcome": "移动10帧保持边界内，左右两侧都能反弹。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "让小球移动",
+        "brief": "小球准备在舞台里匀速运动。",
+        "learnerBuild": "按位置+=速度×dt更新坐标，触碰边界反向。",
+        "successCriteria": "移动10帧保持边界内，左右两侧都能反弹。",
+        "creativeExtension": "加上下方向速度。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "小球准备在舞台里匀速运动。 先预测最终状态。",
+          "learnerAction": "记录目标：移动10帧保持边界内，左右两侧都能反弹。",
+          "check": "能口述「让小球移动」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、游戏循环处理和可见输出。",
+          "learnerAction": "分解具体操作：按位置+=速度×dt更新坐标，触碰边界反向。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "按位置+=速度×dt更新坐标，触碰边界反向。",
+          "check": "程序包含完成本课需要的游戏循环逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：移动10帧保持边界内，左右两侧都能反弹。",
+          "check": "移动10帧保持边界内，左右两侧都能反弹。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：dt忽略导致不同帧率速度不同。",
+          "learnerAction": "复现失败再尝试修复：统一将秒作为时间单位。",
+          "check": "修复后满足：移动10帧保持边界内，左右两侧都能反弹。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U3-L02-POS-01",
+          "setup": "小球准备在舞台里匀速运动。",
+          "action": "按位置+=速度×dt更新坐标，触碰边界反向。",
+          "expected": "移动10帧保持边界内，左右两侧都能反弹。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U3-L02-NEG-01",
+          "setup": "小球准备在舞台里匀速运动。",
+          "action": "dt忽略导致不同帧率速度不同。",
+          "expected": "检测失败并引导：统一将秒作为时间单位。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "移动10帧保持边界内，左右两侧都能反弹。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课游戏循环如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "统一将秒作为时间单位。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加上下方向速度。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：小球准备在舞台里匀速运动。",
+          "只实现核心步骤：按位置+=速度×dt更新坐标，触碰边界反向。",
+          "如果失败：统一将秒作为时间单位。"
+        ],
+        "commonMistakes": [
+          "dt忽略导致不同帧率速度不同。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u3-l02-asset-1",
+          "p1-u3-l02-asset-2",
+          "p1-u3-l02-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要按位置+=速度×dt更新坐标，触碰边界反向。，再让他演示移动10帧保持边界内，左右两侧都能反弹。。"
+    },
+    {
+      "id": "P1-U3-L03",
+      "sourceUnitId": "P1-U3",
+      "title": "键盘操控飞船",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "玩家用箭头键控制太空船左右飞行。",
+      "focusConcept": "事件",
+      "knowledgePoints": [
+        "游戏循环",
+        "事件"
+      ],
+      "prerequisites": [
+        "P1-U3-L02"
+      ],
+      "learningOutcome": "按右后x增加，松开后x保持，飞船不穿边界。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "键盘操控飞船",
+        "brief": "玩家用箭头键控制太空船左右飞行。",
+        "learnerBuild": "读取KEYDOWN/KEYUP维护方向，再按dt移动飞船。",
+        "successCriteria": "按右后x增加，松开后x保持，飞船不穿边界。",
+        "creativeExtension": "允许空格发射。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "玩家用箭头键控制太空船左右飞行。 先预测最终状态。",
+          "learnerAction": "记录目标：按右后x增加，松开后x保持，飞船不穿边界。",
+          "check": "能口述「键盘操控飞船」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、事件处理和可见输出。",
+          "learnerAction": "分解具体操作：读取KEYDOWN/KEYUP维护方向，再按dt移动飞船。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "读取KEYDOWN/KEYUP维护方向，再按dt移动飞船。",
+          "check": "程序包含完成本课需要的事件逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：按右后x增加，松开后x保持，飞船不穿边界。",
+          "check": "按右后x增加，松开后x保持，飞船不穿边界。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：飞船超过窗口宽度消失。",
+          "learnerAction": "复现失败再尝试修复：在每帧移动后将x夹在有效区间。",
+          "check": "修复后满足：按右后x增加，松开后x保持，飞船不穿边界。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U3-L03-POS-01",
+          "setup": "玩家用箭头键控制太空船左右飞行。",
+          "action": "读取KEYDOWN/KEYUP维护方向，再按dt移动飞船。",
+          "expected": "按右后x增加，松开后x保持，飞船不穿边界。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U3-L03-NEG-01",
+          "setup": "玩家用箭头键控制太空船左右飞行。",
+          "action": "飞船超过窗口宽度消失。",
+          "expected": "检测失败并引导：在每帧移动后将x夹在有效区间。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "按右后x增加，松开后x保持，飞船不穿边界。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课事件如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "在每帧移动后将x夹在有效区间。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "允许空格发射。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：玩家用箭头键控制太空船左右飞行。",
+          "只实现核心步骤：读取KEYDOWN/KEYUP维护方向，再按dt移动飞船。",
+          "如果失败：在每帧移动后将x夹在有效区间。"
+        ],
+        "commonMistakes": [
+          "飞船超过窗口宽度消失。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u3-l03-asset-1",
+          "p1-u3-l03-asset-2",
+          "p1-u3-l03-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要读取KEYDOWN/KEYUP维护方向，再按dt移动飞船。，再让他演示按右后x增加，松开后x保持，飞船不穿边界。。"
+    },
+    {
+      "id": "P1-U3-L04",
+      "sourceUnitId": "P1-U3",
+      "title": "障碍物碰撞",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "打砖块的球必须碰到墙和挡板才能改变运动方向。",
+      "focusConcept": "事件",
+      "knowledgePoints": [
+        "游戏循环",
+        "事件"
+      ],
+      "prerequisites": [
+        "P1-U3-L03"
+      ],
+      "learningOutcome": "碰挡板反弹；撞砖块后砖块消失且分数增加。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "障碍物碰撞",
+        "brief": "打砖块的球必须碰到墙和挡板才能改变运动方向。",
+        "learnerBuild": "实现球-墙、球-挡板、球-砖块的矩形碰撞。",
+        "successCriteria": "碰挡板反弹；撞砖块后砖块消失且分数增加。",
+        "creativeExtension": "根据碰撞点改变反弹角度。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "打砖块的球必须碰到墙和挡板才能改变运动方向。 先预测最终状态。",
+          "learnerAction": "记录目标：碰挡板反弹；撞砖块后砖块消失且分数增加。",
+          "check": "能口述「障碍物碰撞」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、事件处理和可见输出。",
+          "learnerAction": "分解具体操作：实现球-墙、球-挡板、球-砖块的矩形碰撞。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "实现球-墙、球-挡板、球-砖块的矩形碰撞。",
+          "check": "程序包含完成本课需要的事件逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：碰挡板反弹；撞砖块后砖块消失且分数增加。",
+          "check": "碰挡板反弹；撞砖块后砖块消失且分数增加。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：碰到同一砖块在连续帧重复加分。",
+          "learnerAction": "复现失败再尝试修复：先移除已碰到砖块再进行下一帧检查。",
+          "check": "修复后满足：碰挡板反弹；撞砖块后砖块消失且分数增加。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U3-L04-POS-01",
+          "setup": "打砖块的球必须碰到墙和挡板才能改变运动方向。",
+          "action": "实现球-墙、球-挡板、球-砖块的矩形碰撞。",
+          "expected": "碰挡板反弹；撞砖块后砖块消失且分数增加。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U3-L04-NEG-01",
+          "setup": "打砖块的球必须碰到墙和挡板才能改变运动方向。",
+          "action": "碰到同一砖块在连续帧重复加分。",
+          "expected": "检测失败并引导：先移除已碰到砖块再进行下一帧检查。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "碰挡板反弹；撞砖块后砖块消失且分数增加。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课事件如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "先移除已碰到砖块再进行下一帧检查。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "根据碰撞点改变反弹角度。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：打砖块的球必须碰到墙和挡板才能改变运动方向。",
+          "只实现核心步骤：实现球-墙、球-挡板、球-砖块的矩形碰撞。",
+          "如果失败：先移除已碰到砖块再进行下一帧检查。"
+        ],
+        "commonMistakes": [
+          "碰到同一砖块在连续帧重复加分。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u3-l04-asset-1",
+          "p1-u3-l04-asset-2",
+          "p1-u3-l04-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要实现球-墙、球-挡板、球-砖块的矩形碰撞。，再让他演示碰挡板反弹；撞砖块后砖块消失且分数增加。。"
+    },
+    {
+      "id": "P1-U3-L05",
+      "sourceUnitId": "P1-U3",
+      "title": "积分生命值与音效",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "游戏中要显示生命、积分和反馈音效。",
+      "focusConcept": "碰撞",
+      "knowledgePoints": [
+        "游戏循环",
+        "事件",
+        "碰撞"
+      ],
+      "prerequisites": [
+        "P1-U3-L04"
+      ],
+      "learningOutcome": "生命为0时显示失败且停止更新；积分不为负。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "积分生命值与音效",
+        "brief": "游戏中要显示生命、积分和反馈音效。",
+        "learnerBuild": "击中砖块+10，球落底失去1条生命，播放不同短音。",
+        "successCriteria": "生命为0时显示失败且停止更新；积分不为负。",
+        "creativeExtension": "加连击特效。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "游戏中要显示生命、积分和反馈音效。 先预测最终状态。",
+          "learnerAction": "记录目标：生命为0时显示失败且停止更新；积分不为负。",
+          "check": "能口述「积分生命值与音效」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、碰撞处理和可见输出。",
+          "learnerAction": "分解具体操作：击中砖块+10，球落底失去1条生命，播放不同短音。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "击中砖块+10，球落底失去1条生命，播放不同短音。",
+          "check": "程序包含完成本课需要的碰撞逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：生命为0时显示失败且停止更新；积分不为负。",
+          "check": "生命为0时显示失败且停止更新；积分不为负。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：落底在每一帧都连续扣生命。",
+          "learnerAction": "复现失败再尝试修复：损失生命后重置球到发球台等待继续。",
+          "check": "修复后满足：生命为0时显示失败且停止更新；积分不为负。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U3-L05-POS-01",
+          "setup": "游戏中要显示生命、积分和反馈音效。",
+          "action": "击中砖块+10，球落底失去1条生命，播放不同短音。",
+          "expected": "生命为0时显示失败且停止更新；积分不为负。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U3-L05-NEG-01",
+          "setup": "游戏中要显示生命、积分和反馈音效。",
+          "action": "落底在每一帧都连续扣生命。",
+          "expected": "检测失败并引导：损失生命后重置球到发球台等待继续。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "生命为0时显示失败且停止更新；积分不为负。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课碰撞如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "损失生命后重置球到发球台等待继续。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加连击特效。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：游戏中要显示生命、积分和反馈音效。",
+          "只实现核心步骤：击中砖块+10，球落底失去1条生命，播放不同短音。",
+          "如果失败：损失生命后重置球到发球台等待继续。"
+        ],
+        "commonMistakes": [
+          "落底在每一帧都连续扣生命。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u3-l05-asset-1",
+          "p1-u3-l05-asset-2",
+          "p1-u3-l05-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要击中砖块+10，球落底失去1条生命，播放不同短音。，再让他演示生命为0时显示失败且停止更新；积分不为负。。"
+    },
+    {
+      "id": "P1-U3-L06",
+      "sourceUnitId": "P1-U3",
+      "title": "打砖块小游戏",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "为毕业作业做一款能玩的打砖块小游戏。",
+      "focusConcept": "碰撞",
+      "knowledgePoints": [
+        "游戏循环",
+        "事件",
+        "碰撞"
+      ],
+      "prerequisites": [
+        "P1-U3-L05"
+      ],
+      "learningOutcome": "球击碎所有砖块显示win，落底3次显示lose，可重新开始。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "打砖块小游戏",
+        "brief": "为毕业作业做一款能玩的打砖块小游戏。",
+        "learnerBuild": "组合pygame窗口、球、挡板、砖块布局、积分和重试按钮。",
+        "successCriteria": "球击碎所有砖块显示win，落底3次显示lose，可重新开始。",
+        "creativeExtension": "增加两关不同砖块阵列。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "为毕业作业做一款能玩的打砖块小游戏。 先预测最终状态。",
+          "learnerAction": "记录目标：球击碎所有砖块显示win，落底3次显示lose，可重新开始。",
+          "check": "能口述「打砖块小游戏」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、碰撞处理和可见输出。",
+          "learnerAction": "分解具体操作：组合pygame窗口、球、挡板、砖块布局、积分和重试按钮。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "组合pygame窗口、球、挡板、砖块布局、积分和重试按钮。",
+          "check": "程序包含完成本课需要的碰撞逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：球击碎所有砖块显示win，落底3次显示lose，可重新开始。",
+          "check": "球击碎所有砖块显示win，落底3次显示lose，可重新开始。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：输掉后仍发生碰撞计分或重试保留旧砖块。",
+          "learnerAction": "复现失败再尝试修复：reset时重建球和砖块列表并清零状态。",
+          "check": "修复后满足：球击碎所有砖块显示win，落底3次显示lose，可重新开始。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U3-L06-POS-01",
+          "setup": "为毕业作业做一款能玩的打砖块小游戏。",
+          "action": "组合pygame窗口、球、挡板、砖块布局、积分和重试按钮。",
+          "expected": "球击碎所有砖块显示win，落底3次显示lose，可重新开始。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U3-L06-NEG-01",
+          "setup": "为毕业作业做一款能玩的打砖块小游戏。",
+          "action": "输掉后仍发生碰撞计分或重试保留旧砖块。",
+          "expected": "检测失败并引导：reset时重建球和砖块列表并清零状态。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "球击碎所有砖块显示win，落底3次显示lose，可重新开始。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课碰撞如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "reset时重建球和砖块列表并清零状态。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加两关不同砖块阵列。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：为毕业作业做一款能玩的打砖块小游戏。",
+          "只实现核心步骤：组合pygame窗口、球、挡板、砖块布局、积分和重试按钮。",
+          "如果失败：reset时重建球和砖块列表并清零状态。"
+        ],
+        "commonMistakes": [
+          "输掉后仍发生碰撞计分或重试保留旧砖块。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u3-l06-asset-1",
+          "p1-u3-l06-asset-2",
+          "p1-u3-l06-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要组合pygame窗口、球、挡板、砖块布局、积分和重试按钮。，再让他演示球击碎所有砖块显示win，落底3次显示lose，可重新开始。。"
+    },
+    {
+      "id": "P1-U4-L01",
+      "sourceUnitId": "P1-U4",
+      "title": "设计游戏菜单",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "太空游戏需要一个可以操作的菜单。",
+      "focusConcept": "模块",
+      "knowledgePoints": [
+        "模块"
+      ],
+      "prerequisites": [
+        "P1-U3-L06"
+      ],
+      "learningOutcome": "开始前不能开火，按Enter进入playing。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "设计游戏菜单",
+        "brief": "太空游戏需要一个可以操作的菜单。",
+        "learnerBuild": "实现menu/playing/game_over三个状态并绘制不同标题。",
+        "successCriteria": "开始前不能开火，按Enter进入playing。",
+        "creativeExtension": "增加操作说明菜单。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "太空游戏需要一个可以操作的菜单。 先预测最终状态。",
+          "learnerAction": "记录目标：开始前不能开火，按Enter进入playing。",
+          "check": "能口述「设计游戏菜单」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、模块处理和可见输出。",
+          "learnerAction": "分解具体操作：实现menu/playing/game_over三个状态并绘制不同标题。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "实现menu/playing/game_over三个状态并绘制不同标题。",
+          "check": "程序包含完成本课需要的模块逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：开始前不能开火，按Enter进入playing。",
+          "check": "开始前不能开火，按Enter进入playing。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：主菜单显示时仍在生成敌人。",
+          "learnerAction": "复现失败再尝试修复：根据当前gameState选择更新函数。",
+          "check": "修复后满足：开始前不能开火，按Enter进入playing。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U4-L01-POS-01",
+          "setup": "太空游戏需要一个可以操作的菜单。",
+          "action": "实现menu/playing/game_over三个状态并绘制不同标题。",
+          "expected": "开始前不能开火，按Enter进入playing。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U4-L01-NEG-01",
+          "setup": "太空游戏需要一个可以操作的菜单。",
+          "action": "主菜单显示时仍在生成敌人。",
+          "expected": "检测失败并引导：根据当前gameState选择更新函数。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "开始前不能开火，按Enter进入playing。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课模块如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "根据当前gameState选择更新函数。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "增加操作说明菜单。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：太空游戏需要一个可以操作的菜单。",
+          "只实现核心步骤：实现menu/playing/game_over三个状态并绘制不同标题。",
+          "如果失败：根据当前gameState选择更新函数。"
+        ],
+        "commonMistakes": [
+          "主菜单显示时仍在生成敌人。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u4-l01-asset-1",
+          "p1-u4-l01-asset-2",
+          "p1-u4-l01-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要实现menu/playing/game_over三个状态并绘制不同标题。，再让他演示开始前不能开火，按Enter进入playing。。"
+    },
+    {
+      "id": "P1-U4-L02",
+      "sourceUnitId": "P1-U4",
+      "title": "载入原创角色资源",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "星际探险家设计了一架三色小飞船。",
+      "focusConcept": "模块",
+      "knowledgePoints": [
+        "模块"
+      ],
+      "prerequisites": [
+        "P1-U4-L01"
+      ],
+      "learningOutcome": "画面有飞船且图像边界透明、未使用外部版权资源。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "载入原创角色资源",
+        "brief": "星际探险家设计了一架三色小飞船。",
+        "learnerBuild": "通过形状绘制或原创SVG资源绘制飞船，再在pygame blit。",
+        "successCriteria": "画面有飞船且图像边界透明、未使用外部版权资源。",
+        "creativeExtension": "做一帧推进器动画。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "星际探险家设计了一架三色小飞船。 先预测最终状态。",
+          "learnerAction": "记录目标：画面有飞船且图像边界透明、未使用外部版权资源。",
+          "check": "能口述「载入原创角色资源」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、模块处理和可见输出。",
+          "learnerAction": "分解具体操作：通过形状绘制或原创SVG资源绘制飞船，再在pygame blit。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "通过形状绘制或原创SVG资源绘制飞船，再在pygame blit。",
+          "check": "程序包含完成本课需要的模块逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：画面有飞船且图像边界透明、未使用外部版权资源。",
+          "check": "画面有飞船且图像边界透明、未使用外部版权资源。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：加载不存在的素材路径导致游戏崩溃。",
+          "learnerAction": "复现失败再尝试修复：加入缺失文件的可见占位和明确报错。",
+          "check": "修复后满足：画面有飞船且图像边界透明、未使用外部版权资源。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U4-L02-POS-01",
+          "setup": "星际探险家设计了一架三色小飞船。",
+          "action": "通过形状绘制或原创SVG资源绘制飞船，再在pygame blit。",
+          "expected": "画面有飞船且图像边界透明、未使用外部版权资源。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U4-L02-NEG-01",
+          "setup": "星际探险家设计了一架三色小飞船。",
+          "action": "加载不存在的素材路径导致游戏崩溃。",
+          "expected": "检测失败并引导：加入缺失文件的可见占位和明确报错。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "画面有飞船且图像边界透明、未使用外部版权资源。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课模块如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "加入缺失文件的可见占位和明确报错。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "做一帧推进器动画。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：星际探险家设计了一架三色小飞船。",
+          "只实现核心步骤：通过形状绘制或原创SVG资源绘制飞船，再在pygame blit。",
+          "如果失败：加入缺失文件的可见占位和明确报错。"
+        ],
+        "commonMistakes": [
+          "加载不存在的素材路径导致游戏崩溃。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u4-l02-asset-1",
+          "p1-u4-l02-asset-2",
+          "p1-u4-l02-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要通过形状绘制或原创SVG资源绘制飞船，再在pygame blit。，再让他演示画面有飞船且图像边界透明、未使用外部版权资源。。"
+    },
+    {
+      "id": "P1-U4-L03",
+      "sourceUnitId": "P1-U4",
+      "title": "敌人生成与难度",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "敌方飞船会越来越快地朝地面飞来。",
+      "focusConcept": "资源",
+      "knowledgePoints": [
+        "模块",
+        "资源"
+      ],
+      "prerequisites": [
+        "P1-U4-L02"
+      ],
+      "learningOutcome": "level升高敌人更快，但活动敌人数不超过限制。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "敌人生成与难度",
+        "brief": "敌方飞船会越来越快地朝地面飞来。",
+        "learnerBuild": "使用level改变spawn_interval和enemy_speed，设置屏幕敌人数上限。",
+        "successCriteria": "level升高敌人更快，但活动敌人数不超过限制。",
+        "creativeExtension": "加入两种尺寸的敌人。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "敌方飞船会越来越快地朝地面飞来。 先预测最终状态。",
+          "learnerAction": "记录目标：level升高敌人更快，但活动敌人数不超过限制。",
+          "check": "能口述「敌人生成与难度」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、资源处理和可见输出。",
+          "learnerAction": "分解具体操作：使用level改变spawn_interval和enemy_speed，设置屏幕敌人数上限。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "使用level改变spawn_interval和enemy_speed，设置屏幕敌人数上限。",
+          "check": "程序包含完成本课需要的资源逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：level升高敌人更快，但活动敌人数不超过限制。",
+          "check": "level升高敌人更快，但活动敌人数不超过限制。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：定时器无限产生敌人使帧率持续下降。",
+          "learnerAction": "复现失败再尝试修复：限制同时存在的敌人并回收出界对象。",
+          "check": "修复后满足：level升高敌人更快，但活动敌人数不超过限制。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U4-L03-POS-01",
+          "setup": "敌方飞船会越来越快地朝地面飞来。",
+          "action": "使用level改变spawn_interval和enemy_speed，设置屏幕敌人数上限。",
+          "expected": "level升高敌人更快，但活动敌人数不超过限制。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U4-L03-NEG-01",
+          "setup": "敌方飞船会越来越快地朝地面飞来。",
+          "action": "定时器无限产生敌人使帧率持续下降。",
+          "expected": "检测失败并引导：限制同时存在的敌人并回收出界对象。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "level升高敌人更快，但活动敌人数不超过限制。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课资源如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "限制同时存在的敌人并回收出界对象。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入两种尺寸的敌人。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：敌方飞船会越来越快地朝地面飞来。",
+          "只实现核心步骤：使用level改变spawn_interval和enemy_speed，设置屏幕敌人数上限。",
+          "如果失败：限制同时存在的敌人并回收出界对象。"
+        ],
+        "commonMistakes": [
+          "定时器无限产生敌人使帧率持续下降。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u4-l03-asset-1",
+          "p1-u4-l03-asset-2",
+          "p1-u4-l03-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要使用level改变spawn_interval和enemy_speed，设置屏幕敌人数上限。，再让他演示level升高敌人更快，但活动敌人数不超过限制。。"
+    },
+    {
+      "id": "P1-U4-L04",
+      "sourceUnitId": "P1-U4",
+      "title": "关卡保存与恢复",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "小飞船通关后应该能从已保存的关卡重新开始。",
+      "focusConcept": "资源",
+      "knowledgePoints": [
+        "模块",
+        "资源"
+      ],
+      "prerequisites": [
+        "P1-U4-L03"
+      ],
+      "learningOutcome": "保存后读回状态一致，非法JSON返回清晰错误。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "关卡保存与恢复",
+        "brief": "小飞船通关后应该能从已保存的关卡重新开始。",
+        "learnerBuild": "使用JSON存level、score、life，不保存文件路径或个人信息。",
+        "successCriteria": "保存后读回状态一致，非法JSON返回清晰错误。",
+        "creativeExtension": "提供删除存档按钮。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "小飞船通关后应该能从已保存的关卡重新开始。 先预测最终状态。",
+          "learnerAction": "记录目标：保存后读回状态一致，非法JSON返回清晰错误。",
+          "check": "能口述「关卡保存与恢复」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、资源处理和可见输出。",
+          "learnerAction": "分解具体操作：使用JSON存level、score、life，不保存文件路径或个人信息。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "使用JSON存level、score、life，不保存文件路径或个人信息。",
+          "check": "程序包含完成本课需要的资源逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：保存后读回状态一致，非法JSON返回清晰错误。",
+          "check": "保存后读回状态一致，非法JSON返回清晰错误。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：读取不存在的字段使游戏异常退出。",
+          "learnerAction": "复现失败再尝试修复：写明确白名单字段并验证范围。",
+          "check": "修复后满足：保存后读回状态一致，非法JSON返回清晰错误。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U4-L04-POS-01",
+          "setup": "小飞船通关后应该能从已保存的关卡重新开始。",
+          "action": "使用JSON存level、score、life，不保存文件路径或个人信息。",
+          "expected": "保存后读回状态一致，非法JSON返回清晰错误。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U4-L04-NEG-01",
+          "setup": "小飞船通关后应该能从已保存的关卡重新开始。",
+          "action": "读取不存在的字段使游戏异常退出。",
+          "expected": "检测失败并引导：写明确白名单字段并验证范围。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "保存后读回状态一致，非法JSON返回清晰错误。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课资源如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "写明确白名单字段并验证范围。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "提供删除存档按钮。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：小飞船通关后应该能从已保存的关卡重新开始。",
+          "只实现核心步骤：使用JSON存level、score、life，不保存文件路径或个人信息。",
+          "如果失败：写明确白名单字段并验证范围。"
+        ],
+        "commonMistakes": [
+          "读取不存在的字段使游戏异常退出。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u4-l04-asset-1",
+          "p1-u4-l04-asset-2",
+          "p1-u4-l04-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要使用JSON存level、score、life，不保存文件路径或个人信息。，再让他演示保存后读回状态一致，非法JSON返回清晰错误。。"
+    },
+    {
+      "id": "P1-U4-L05",
+      "sourceUnitId": "P1-U4",
+      "title": "用户试玩数据",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "新版本游戏需要观察玩家会在哪里失败。",
+      "focusConcept": "调试",
+      "knowledgePoints": [
+        "模块",
+        "资源",
+        "调试"
+      ],
+      "prerequisites": [
+        "P1-U4-L04"
+      ],
+      "learningOutcome": "同样事件列表统计结果可重现，不记录设备ID。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "用户试玩数据",
+        "brief": "新版本游戏需要观察玩家会在哪里失败。",
+        "learnerBuild": "记录匿名事件序列start/hit/retry/win，统计各类次数。",
+        "successCriteria": "同样事件列表统计结果可重现，不记录设备ID。",
+        "creativeExtension": "生成一张关卡难度汇总图。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "新版本游戏需要观察玩家会在哪里失败。 先预测最终状态。",
+          "learnerAction": "记录目标：同样事件列表统计结果可重现，不记录设备ID。",
+          "check": "能口述「用户试玩数据」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、调试处理和可见输出。",
+          "learnerAction": "分解具体操作：记录匿名事件序列start/hit/retry/win，统计各类次数。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "记录匿名事件序列start/hit/retry/win，统计各类次数。",
+          "check": "程序包含完成本课需要的调试逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：同样事件列表统计结果可重现，不记录设备ID。",
+          "check": "同样事件列表统计结果可重现，不记录设备ID。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：埋点记录儿童姓名或完整输入内容。",
+          "learnerAction": "复现失败再尝试修复：仅保留匿名事件类型并允许清空。",
+          "check": "修复后满足：同样事件列表统计结果可重现，不记录设备ID。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U4-L05-POS-01",
+          "setup": "新版本游戏需要观察玩家会在哪里失败。",
+          "action": "记录匿名事件序列start/hit/retry/win，统计各类次数。",
+          "expected": "同样事件列表统计结果可重现，不记录设备ID。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U4-L05-NEG-01",
+          "setup": "新版本游戏需要观察玩家会在哪里失败。",
+          "action": "埋点记录儿童姓名或完整输入内容。",
+          "expected": "检测失败并引导：仅保留匿名事件类型并允许清空。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "同样事件列表统计结果可重现，不记录设备ID。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课调试如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "仅保留匿名事件类型并允许清空。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "生成一张关卡难度汇总图。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：新版本游戏需要观察玩家会在哪里失败。",
+          "只实现核心步骤：记录匿名事件序列start/hit/retry/win，统计各类次数。",
+          "如果失败：仅保留匿名事件类型并允许清空。"
+        ],
+        "commonMistakes": [
+          "埋点记录儿童姓名或完整输入内容。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u4-l05-asset-1",
+          "p1-u4-l05-asset-2",
+          "p1-u4-l05-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要记录匿名事件序列start/hit/retry/win，统计各类次数。，再让他演示同样事件列表统计结果可重现，不记录设备ID。。"
+    },
+    {
+      "id": "P1-U4-L06",
+      "sourceUnitId": "P1-U4",
+      "title": "发布迷你太空游戏",
+      "engine": "python",
+      "ageRange": "10-15",
+      "status": "detailed_not_published",
+      "story": "把菜单、飞船、敌人、分数和存档组成作品。",
+      "focusConcept": "调试",
+      "knowledgePoints": [
+        "模块",
+        "资源",
+        "调试"
+      ],
+      "prerequisites": [
+        "P1-U4-L05"
+      ],
+      "learningOutcome": "运行1分钟不卡死，能启动、暂停、结束、重试。",
+      "environment": "Python3及可选pygame/turtle图形运行器",
+      "project": {
+        "title": "发布迷你太空游戏",
+        "brief": "把菜单、飞船、敌人、分数和存档组成作品。",
+        "learnerBuild": "完成可玩的太空生存小游戏和至少两个结局。",
+        "successCriteria": "运行1分钟不卡死，能启动、暂停、结束、重试。",
+        "creativeExtension": "加入原创片头动画。"
+      },
+      "teachingSteps": [
+        {
+          "step": 1,
+          "phase": "任务观察",
+          "teacherPrompt": "把菜单、飞船、敌人、分数和存档组成作品。 先预测最终状态。",
+          "learnerAction": "记录目标：运行1分钟不卡死，能启动、暂停、结束、重试。",
+          "check": "能口述「发布迷你太空游戏」的开始状态和完成状态"
+        },
+        {
+          "step": 2,
+          "phase": "逻辑分解",
+          "teacherPrompt": "将问题拆分成输入、调试处理和可见输出。",
+          "learnerAction": "分解具体操作：完成可玩的太空生存小游戏和至少两个结局。",
+          "check": "列出至少两步具体动作及先后关系"
+        },
+        {
+          "step": 3,
+          "phase": "编程实现",
+          "teacherPrompt": "独立构造最小可运行作品，检查素材与事件。",
+          "learnerAction": "完成可玩的太空生存小游戏和至少两个结局。",
+          "check": "程序包含完成本课需要的调试逻辑"
+        },
+        {
+          "step": 4,
+          "phase": "执行验收",
+          "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
+          "learnerAction": "运行并检查：运行1分钟不卡死，能启动、暂停、结束、重试。",
+          "check": "运行1分钟不卡死，能启动、暂停、结束、重试。"
+        },
+        {
+          "step": 5,
+          "phase": "故障排查",
+          "teacherPrompt": "本课常见故障：重新开始后保留上一局敌人或音效永不停止。",
+          "learnerAction": "复现失败再尝试修复：集中管理状态重置和资源释放。",
+          "check": "修复后满足：运行1分钟不卡死，能启动、暂停、结束、重试。"
+        }
+      ],
+      "assessment": {
+        "positive": {
+          "caseId": "P1-U4-L06-POS-01",
+          "setup": "把菜单、飞船、敌人、分数和存档组成作品。",
+          "action": "完成可玩的太空生存小游戏和至少两个结局。",
+          "expected": "运行1分钟不卡死，能启动、暂停、结束、重试。",
+          "executionStatus": "spec_only"
+        },
+        "negative": {
+          "caseId": "P1-U4-L06-NEG-01",
+          "setup": "把菜单、飞船、敌人、分数和存档组成作品。",
+          "action": "重新开始后保留上一局敌人或音效永不停止。",
+          "expected": "检测失败并引导：集中管理状态重置和资源释放。",
+          "executionStatus": "spec_only"
+        },
+        "rubric": [
+          {
+            "criterion": "可验证的运行结果",
+            "weight": 40,
+            "description": "运行1分钟不卡死，能启动、暂停、结束、重试。"
+          },
+          {
+            "criterion": "知识点解释",
+            "weight": 25,
+            "description": "解释本课调试如何影响作品"
+          },
+          {
+            "criterion": "错误定位与修复",
+            "weight": 20,
+            "description": "集中管理状态重置和资源释放。"
+          },
+          {
+            "criterion": "个人化设计",
+            "weight": 15,
+            "description": "加入原创片头动画。"
+          }
+        ]
+      },
+      "feedback": {
+        "hints": [
+          "先说出要完成的场景：把菜单、飞船、敌人、分数和存档组成作品。",
+          "只实现核心步骤：完成可玩的太空生存小游戏和至少两个结局。",
+          "如果失败：集中管理状态重置和资源释放。"
+        ],
+        "commonMistakes": [
+          "重新开始后保留上一局敌人或音效永不停止。",
+          "事件或状态错位导致无法重现结果",
+          "只观察画面，没有验证边界条件"
+        ]
+      },
+      "assets": {
+        "required": [
+          "p1-u4-l06-asset-1",
+          "p1-u4-l06-asset-2",
+          "p1-u4-l06-asset-3"
+        ],
+        "licenseGate": "must_verify_original_or_authorized",
+        "productionStatus": "not_produced"
+      },
+      "delivery": {
+        "lessonCodeStatus": "requires_individual_implementation",
+        "runtimeVerification": "not_verified",
+        "materialsApproval": "pending",
+        "releaseAllowed": false
+      },
+      "parentReview": "请孩子先解释为什么要完成可玩的太空生存小游戏和至少两个结局。，再让他演示运行1分钟不卡死，能启动、暂停、结束、重试。。"
+    }
+  ]
+}
