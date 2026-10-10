@@ -76,7 +76,7 @@ export function ScratchVMTrial() {
       window.removeEventListener('message',listener)
       frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*')
     }
-  }, [loaded])
+  }, [])
 
   const clones=sprites.filter(t=>t.visible&&!t.original)
   const spritesInBounds=clones.filter(t=>Number.isFinite(t.x)&&Number.isFinite(t.y)).slice(0,100)
