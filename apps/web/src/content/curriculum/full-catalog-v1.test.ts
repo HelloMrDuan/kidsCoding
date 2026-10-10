@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import catalog from './full-catalog-v1.json'
+import blueprint from './unit-capstone-blueprints-v1.json'
 import guides from './foundation-guides-v1.json'
 import { launchLessons } from './launch-lessons'
 
@@ -30,6 +31,19 @@ describe('expanded curriculum content assets', () => {
       expect(lesson.tieredHints).toHaveLength(3)
       expect(lesson.commonErrors.length).toBeGreaterThanOrEqual(3)
       expect(lesson.publicationStatus).toBe('content_ready_engine_unverified')
+    }
+  })
+})
+
+describe('unit capstone blueprints', () => {
+  it('covers each of the 72 units exactly once', () => {
+    const ids = catalog.tracks.flatMap(track => track.units.map(unit => unit.id))
+    expect(blueprint.projects).toHaveLength(72)
+    expect(new Set(blueprint.projects.map(project => project.unitId))).toEqual(new Set(ids))
+    for (const project of blueprint.projects) {
+      expect(project.missionSequence).toHaveLength(5)
+      expect(project.rubric.reduce((sum, item) => sum + item.points, 0)).toBe(100)
+      expect(project.publicationStatus).toBe('project_blueprint_not_playable')
     }
   })
 })

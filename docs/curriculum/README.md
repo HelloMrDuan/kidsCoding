@@ -60,3 +60,6 @@
 - Code.org 课程组织指南：https://support.code.org/hc/en-us/articles/4404186145293-Navigating-the-New-Curriculum-Overview-Page —— 用教学概念分组的课程/单元结构。
 
 **待开发内容**：每节课的逐屏指引、完整评测用例、配音素材、课程项目代码及后台发布链路；本批未声称完成。
+## 72个单元毕业项目蓝图
+
+新增 `apps/web/src/content/curriculum/unit-capstone-blueprints-v1.json`，涵盖每单元5阶段作品制作、逐项证据、100分评价、分层任务、素材需求以及领域特定执行与安全约束。**此资产仍是设计蓝图，不是72个已经编写完成的可玩项目。**
