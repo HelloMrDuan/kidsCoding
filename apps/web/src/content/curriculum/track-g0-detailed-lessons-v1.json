@@ -1,0 +1,4014 @@
+{
+  "schemaVersion": "1.0.0",
+  "trackId": "G0",
+  "maturity": "lesson_script_review_needed",
+  "description": "图形化启蒙24节逐课原创详案，提供剧情、5步教学、易错点、分层提示、评价规则与可观察验收。代码计划仅为概念，不可直接执行，仍需引擎支持与素材制作。",
+  "lessons": [
+    {
+      "id": "G0-U1-L01",
+      "sourceCatalogUnitId": "G0-U1",
+      "storyTitle": "小狐狸认识按钮",
+      "lessonTitle": "小狐狸认识按钮",
+      "stage": "起步森林",
+      "story": "狐狸发现两张神秘指令牌，只有先启动再前进才能走出树屋。",
+      "focusConcept": "事件入口与一条动作顺序",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "movement",
+        "direction",
+        "path_obstacles"
+      ],
+      "prerequisiteLessonIds": [],
+      "learningObjectives": [
+        "能够解释「事件入口与一条动作顺序」在「小狐狸认识按钮」中的作用",
+        "在作品中完成可观察的指令操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "起步森林",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "森林网格地图和箭头标记",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "狐狸发现两张神秘指令牌，只有先启动再前进才能走出树屋。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "狐狸发现两张神秘指令牌，只有先启动再前进才能走出树屋。",
+        "studentFacingGoal": "完成「小狐狸认识按钮」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "目标角色从左侧移动到右侧；缺少开始事件不得自动行动"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：观察小狐狸在树屋左侧的初始位置",
+          "childAction": "观察小狐狸在树屋左侧的初始位置",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，观察小狐狸在树屋左侧的初始位置。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：选择“开始时”牌作为程序入口",
+          "childAction": "选择“开始时”牌作为程序入口",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，选择“开始时”牌作为程序入口。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：把“向右移动”接在开始后方",
+          "childAction": "把“向右移动”接在开始后方",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，把“向右移动”接在开始后方。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：按下运行，标记狐狸的新位置",
+          "childAction": "按下运行，标记狐狸的新位置",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，按下运行，标记狐狸的新位置。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：删去开始牌再次试运行，比较结果",
+          "childAction": "删去开始牌再次试运行，比较结果",
+          "observableCheck": "目标角色从左侧移动到右侧；缺少开始事件不得自动行动",
+          "voiceover": "第5步，删去开始牌再次试运行，比较结果。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "把方向按钮当作启动按钮",
+          "diagnosis": "检查「事件入口与一条动作顺序」的输入条件与对象。",
+          "recovery": "先看看哪块积木告诉程序何时开始"
+        },
+        {
+          "symptom": "把开始牌放在末尾",
+          "diagnosis": "检查「事件入口与一条动作顺序」的积木连接或动作次数。",
+          "recovery": "让手指沿着积木从上往下走"
+        },
+        {
+          "symptom": "没运行就宣布任务完成",
+          "diagnosis": "检查「事件入口与一条动作顺序」的运行验证与完成条件。",
+          "recovery": "比较有无开始积木时的舞台反应"
+        }
+      ],
+      "hints": [
+        "先看看哪块积木告诉程序何时开始",
+        "让手指沿着积木从上往下走",
+        "比较有无开始积木时的舞台反应"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "目标角色从左侧移动到右侧；缺少开始事件不得自动行动"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明事件入口与一条动作顺序关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排事件入口与一条动作顺序"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示小狐狸认识按钮并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "目标角色从左侧移动到右侧；缺少开始事件不得自动行动",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「把方向按钮当作启动按钮」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「把开始牌放在末尾」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「没运行就宣布任务完成」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "事件入口与一条动作顺序",
+        "expectedRun": "目标角色从左侧移动到右侧；缺少开始事件不得自动行动",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "给动作换一个方向，解释不同结局。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「小狐狸认识按钮」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "小狐狸认识按钮",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U1-L02",
+      "sourceCatalogUnitId": "G0-U1",
+      "storyTitle": "给森林邮差指路",
+      "lessonTitle": "给森林邮差指路",
+      "stage": "森林邮局",
+      "story": "邮差要把明信片送到小兔子住的第二棵树，不能绕到河边。",
+      "focusConcept": "方位辨认与路线排列",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "movement",
+        "direction",
+        "path_obstacles"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U1-L01"
+      ],
+      "learningObjectives": [
+        "能够解释「方位辨认与路线排列」在「给森林邮差指路」中的作用",
+        "在作品中完成可观察的指令操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "森林邮局",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "森林网格地图和箭头标记",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "邮差要把明信片送到小兔子住的第二棵树，不能绕到河边。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "邮差要把明信片送到小兔子住的第二棵树，不能绕到河边。",
+        "studentFacingGoal": "完成「给森林邮差指路」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "邮差经过指定两段路线并抵达兔子树屋，无额外绕行"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：找出起点邮局和目标树屋",
+          "childAction": "找出起点邮局和目标树屋",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，找出起点邮局和目标树屋。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：用箭头标出先向右再向上的路线",
+          "childAction": "用箭头标出先向右再向上的路线",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，用箭头标出先向右再向上的路线。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：把相应方向积木按路线排好",
+          "childAction": "把相应方向积木按路线排好",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，把相应方向积木按路线排好。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：预测每一步后邮差站在哪里",
+          "childAction": "预测每一步后邮差站在哪里",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，预测每一步后邮差站在哪里。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：运行并逐步核对是否抵达树屋",
+          "childAction": "运行并逐步核对是否抵达树屋",
+          "observableCheck": "邮差经过指定两段路线并抵达兔子树屋，无额外绕行",
+          "voiceover": "第5步，运行并逐步核对是否抵达树屋。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "左右方向看反",
+          "diagnosis": "检查「方位辨认与路线排列」的输入条件与对象。",
+          "recovery": "先把起点和终点圈出来"
+        },
+        {
+          "symptom": "路线次序交换",
+          "diagnosis": "检查「方位辨认与路线排列」的积木连接或动作次数。",
+          "recovery": "站在邮差的视角说方向"
+        },
+        {
+          "symptom": "走到目标后又多走一步",
+          "diagnosis": "检查「方位辨认与路线排列」的运行验证与完成条件。",
+          "recovery": "用两根箭头卡片替代积木预演"
+        }
+      ],
+      "hints": [
+        "先把起点和终点圈出来",
+        "站在邮差的视角说方向",
+        "用两根箭头卡片替代积木预演"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "邮差经过指定两段路线并抵达兔子树屋，无额外绕行"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明方位辨认与路线排列关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排方位辨认与路线排列"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示给森林邮差指路并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "邮差经过指定两段路线并抵达兔子树屋，无额外绕行",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「左右方向看反」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「路线次序交换」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「走到目标后又多走一步」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "方位辨认与路线排列",
+        "expectedRun": "邮差经过指定两段路线并抵达兔子树屋，无额外绕行",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "为邮差规划另一条同样可达的路线。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「给森林邮差指路」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "给森林邮差指路",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U1-L03",
+      "sourceCatalogUnitId": "G0-U1",
+      "storyTitle": "向右走三步",
+      "lessonTitle": "向右走三步",
+      "stage": "三步到蘑菇屋",
+      "story": "小狐狸需要走三格才能到蘑菇屋，少一步到不了，多一步会撞到石头。",
+      "focusConcept": "步数与顺序计数",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "movement",
+        "direction",
+        "path_obstacles"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U1-L02"
+      ],
+      "learningObjectives": [
+        "能够解释「步数与顺序计数」在「向右走三步」中的作用",
+        "在作品中完成可观察的顺序操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "三步到蘑菇屋",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "森林网格地图和箭头标记",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小狐狸需要走三格才能到蘑菇屋，少一步到不了，多一步会撞到石头。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小狐狸需要走三格才能到蘑菇屋，少一步到不了，多一步会撞到石头。",
+        "studentFacingGoal": "完成「向右走三步」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "准确走三格且停在目标格；验证两格和四格都是错误路线"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：在地面标出三块连续格子",
+          "childAction": "在地面标出三块连续格子",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，在地面标出三块连续格子。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：放入开始积木",
+          "childAction": "放入开始积木",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，放入开始积木。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：接上三次单格向右移动",
+          "childAction": "接上三次单格向右移动",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，接上三次单格向右移动。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：手指逐格数到第三格",
+          "childAction": "手指逐格数到第三格",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，手指逐格数到第三格。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：运行检查是否刚好停在蘑菇屋",
+          "childAction": "运行检查是否刚好停在蘑菇屋",
+          "observableCheck": "准确走三格且停在目标格；验证两格和四格都是错误路线",
+          "voiceover": "第5步，运行检查是否刚好停在蘑菇屋。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "少一个移动块",
+          "diagnosis": "检查「步数与顺序计数」的输入条件与对象。",
+          "recovery": "每经过一格数一声"
+        },
+        {
+          "symptom": "把动作接成独立的浮块",
+          "diagnosis": "检查「步数与顺序计数」的积木连接或动作次数。",
+          "recovery": "检查每块积木是否连接"
+        },
+        {
+          "symptom": "重复添加多余动作",
+          "diagnosis": "检查「步数与顺序计数」的运行验证与完成条件。",
+          "recovery": "用格子纸标出运行位置"
+        }
+      ],
+      "hints": [
+        "每经过一格数一声",
+        "检查每块积木是否连接",
+        "用格子纸标出运行位置"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "准确走三格且停在目标格；验证两格和四格都是错误路线"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明步数与顺序计数关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排步数与顺序计数"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示向右走三步并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "准确走三格且停在目标格；验证两格和四格都是错误路线",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「少一个移动块」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「把动作接成独立的浮块」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「重复添加多余动作」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "步数与顺序计数",
+        "expectedRun": "准确走三格且停在目标格；验证两格和四格都是错误路线",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "尝试用次数参数替代三块重复指令。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「向右走三步」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "向右走三步",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U1-L04",
+      "sourceCatalogUnitId": "G0-U1",
+      "storyTitle": "转弯避开石头",
+      "lessonTitle": "转弯避开石头",
+      "stage": "避开路上的石头",
+      "story": "一块大石头挡住笔直道路，狐狸必须转弯走过小桥。",
+      "focusConcept": "转向与路径分解",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "movement",
+        "direction",
+        "path_obstacles"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U1-L03"
+      ],
+      "learningObjectives": [
+        "能够解释「转向与路径分解」在「转弯避开石头」中的作用",
+        "在作品中完成可观察的顺序操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "避开路上的石头",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "森林网格地图和箭头标记",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "一块大石头挡住笔直道路，狐狸必须转弯走过小桥。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "一块大石头挡住笔直道路，狐狸必须转弯走过小桥。",
+        "studentFacingGoal": "完成「转弯避开石头」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "角色绕过石头到达终点，路径中不穿越障碍格"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：找到石头障碍所在格",
+          "childAction": "找到石头障碍所在格",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，找到石头障碍所在格。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：画出不碰石头的折线路线",
+          "childAction": "画出不碰石头的折线路线",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，画出不碰石头的折线路线。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：把前进与转向指令按路线连接",
+          "childAction": "把前进与转向指令按路线连接",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，把前进与转向指令按路线连接。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：按运行并观察每一步的朝向",
+          "childAction": "按运行并观察每一步的朝向",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，按运行并观察每一步的朝向。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：发现碰撞就修改转向位置再试",
+          "childAction": "发现碰撞就修改转向位置再试",
+          "observableCheck": "角色绕过石头到达终点，路径中不穿越障碍格",
+          "voiceover": "第5步，发现碰撞就修改转向位置再试。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "只移动不转向",
+          "diagnosis": "检查「转向与路径分解」的输入条件与对象。",
+          "recovery": "先用手指走一遍折线"
+        },
+        {
+          "symptom": "在碰到石头之后才转",
+          "diagnosis": "检查「转向与路径分解」的积木连接或动作次数。",
+          "recovery": "哪一格必须改变方向"
+        },
+        {
+          "symptom": "转向次数过多",
+          "diagnosis": "检查「转向与路径分解」的运行验证与完成条件。",
+          "recovery": "只调整发生碰撞之前的一块积木"
+        }
+      ],
+      "hints": [
+        "先用手指走一遍折线",
+        "哪一格必须改变方向",
+        "只调整发生碰撞之前的一块积木"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "角色绕过石头到达终点，路径中不穿越障碍格"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明转向与路径分解关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排转向与路径分解"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示转弯避开石头并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "角色绕过石头到达终点，路径中不穿越障碍格",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「只移动不转向」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「在碰到石头之后才转」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「转向次数过多」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "转向与路径分解",
+        "expectedRun": "角色绕过石头到达终点，路径中不穿越障碍格",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "添加第二块石头，设计新的安全路线。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「转弯避开石头」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "转弯避开石头",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U1-L05",
+      "sourceCatalogUnitId": "G0-U1",
+      "storyTitle": "先开门再前进",
+      "lessonTitle": "先开门再前进",
+      "stage": "钥匙开门",
+      "story": "小狐狸拿到金钥匙后才能穿过树洞门，顺序颠倒门会保持关闭。",
+      "focusConcept": "前置条件与动作依赖",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "movement",
+        "direction",
+        "path_obstacles"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U1-L04"
+      ],
+      "learningObjectives": [
+        "能够解释「前置条件与动作依赖」在「先开门再前进」中的作用",
+        "在作品中完成可观察的方位操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "钥匙开门",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "森林网格地图和箭头标记",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小狐狸拿到金钥匙后才能穿过树洞门，顺序颠倒门会保持关闭。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小狐狸拿到金钥匙后才能穿过树洞门，顺序颠倒门会保持关闭。",
+        "studentFacingGoal": "完成「先开门再前进」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "先取得钥匙再开门前进；错误次序不会通过锁门"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：观察门和钥匙的摆放位置",
+          "childAction": "观察门和钥匙的摆放位置",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，观察门和钥匙的摆放位置。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：选择先拾取钥匙的动作",
+          "childAction": "选择先拾取钥匙的动作",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，选择先拾取钥匙的动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：把开门放在拾取之后",
+          "childAction": "把开门放在拾取之后",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，把开门放在拾取之后。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：再添加穿门前进的动作",
+          "childAction": "再添加穿门前进的动作",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，再添加穿门前进的动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：分别运行正确和颠倒的顺序",
+          "childAction": "分别运行正确和颠倒的顺序",
+          "observableCheck": "先取得钥匙再开门前进；错误次序不会通过锁门",
+          "voiceover": "第5步，分别运行正确和颠倒的顺序。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "先开门后找钥匙",
+          "diagnosis": "检查「前置条件与动作依赖」的输入条件与对象。",
+          "recovery": "门为什么现在打不开"
+        },
+        {
+          "symptom": "漏掉拾取动作",
+          "diagnosis": "检查「前置条件与动作依赖」的积木连接或动作次数。",
+          "recovery": "有没有先拿到钥匙"
+        },
+        {
+          "symptom": "把开门与走路看成一回事",
+          "diagnosis": "检查「前置条件与动作依赖」的运行验证与完成条件。",
+          "recovery": "把程序拆成拿钥匙、开门、前进三段"
+        }
+      ],
+      "hints": [
+        "门为什么现在打不开",
+        "有没有先拿到钥匙",
+        "把程序拆成拿钥匙、开门、前进三段"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "先取得钥匙再开门前进；错误次序不会通过锁门"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明前置条件与动作依赖关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排前置条件与动作依赖"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示先开门再前进并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "先取得钥匙再开门前进；错误次序不会通过锁门",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「先开门后找钥匙」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「漏掉拾取动作」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「把开门与走路看成一回事」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "前置条件与动作依赖",
+        "expectedRun": "先取得钥匙再开门前进；错误次序不会通过锁门",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "设计两道门并复用同一把钥匙。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「先开门再前进」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "先开门再前进",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U1-L06",
+      "sourceCatalogUnitId": "G0-U1",
+      "storyTitle": "制作森林寻路卡",
+      "lessonTitle": "制作森林寻路卡",
+      "stage": "制作森林寻路卡",
+      "story": "森林向导邀请你设计一张给新伙伴使用的寻路卡。",
+      "focusConcept": "方向、顺序、调试综合",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "movement",
+        "direction",
+        "path_obstacles"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U1-L05"
+      ],
+      "learningObjectives": [
+        "能够解释「方向、顺序、调试综合」在「制作森林寻路卡」中的作用",
+        "在作品中完成可观察的方位操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "制作森林寻路卡",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "森林网格地图和箭头标记",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "森林向导邀请你设计一张给新伙伴使用的寻路卡。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "森林向导邀请你设计一张给新伙伴使用的寻路卡。",
+        "studentFacingGoal": "完成「制作森林寻路卡」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "作品包含可演示路线，抵达目的地且能解释一个修正"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：在网格纸画出起终点及两处地标",
+          "childAction": "在网格纸画出起终点及两处地标",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，在网格纸画出起终点及两处地标。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：给路线拆成不超过六段动作",
+          "childAction": "给路线拆成不超过六段动作",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，给路线拆成不超过六段动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：将动作按正确顺序连接",
+          "childAction": "将动作按正确顺序连接",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，将动作按正确顺序连接。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：让同伴先预测路径再运行",
+          "childAction": "让同伴先预测路径再运行",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，让同伴先预测路径再运行。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：检查终点和碰撞结果并修复一处问题",
+          "childAction": "检查终点和碰撞结果并修复一处问题",
+          "observableCheck": "作品包含可演示路线，抵达目的地且能解释一个修正",
+          "voiceover": "第5步，检查终点和碰撞结果并修复一处问题。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "只画图没有程序",
+          "diagnosis": "检查「方向、顺序、调试综合」的输入条件与对象。",
+          "recovery": "先确定终点再写路线"
+        },
+        {
+          "symptom": "终点错误但没有检查",
+          "diagnosis": "检查「方向、顺序、调试综合」的积木连接或动作次数。",
+          "recovery": "每一段动作都要有对应的箭头"
+        },
+        {
+          "symptom": "未让别人试玩",
+          "diagnosis": "检查「方向、顺序、调试综合」的运行验证与完成条件。",
+          "recovery": "找出第一次测试与预测不同的位置"
+        }
+      ],
+      "hints": [
+        "先确定终点再写路线",
+        "每一段动作都要有对应的箭头",
+        "找出第一次测试与预测不同的位置"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "作品包含可演示路线，抵达目的地且能解释一个修正"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明方向、顺序、调试综合关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排方向、顺序、调试综合"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示制作森林寻路卡并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "作品包含可演示路线，抵达目的地且能解释一个修正",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「只画图没有程序」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「终点错误但没有检查」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「未让别人试玩」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "方向、顺序、调试综合",
+        "expectedRun": "作品包含可演示路线，抵达目的地且能解释一个修正",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "加入一条隐藏捷径并比较路径长度。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「制作森林寻路卡」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "制作森林寻路卡",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U2-L01",
+      "sourceCatalogUnitId": "G0-U2",
+      "storyTitle": "点击叫醒小狐狸",
+      "lessonTitle": "点击叫醒小狐狸",
+      "stage": "叫醒小狐狸",
+      "story": "清晨到了，只有按下舞台开始按钮狐狸才会睁眼打招呼。",
+      "focusConcept": "开始事件与触发时机",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "when_clicked",
+        "message_event",
+        "character_selection"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U1-L06"
+      ],
+      "learningObjectives": [
+        "能够解释「开始事件与触发时机」在「点击叫醒小狐狸」中的作用",
+        "在作品中完成可观察的事件操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "叫醒小狐狸",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "舞台角色、表情、事件提示",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "清晨到了，只有按下舞台开始按钮狐狸才会睁眼打招呼。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "清晨到了，只有按下舞台开始按钮狐狸才会睁眼打招呼。",
+        "studentFacingGoal": "完成「点击叫醒小狐狸」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "开始前保持静止，触发后出现问候反馈"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：观察狐狸初始静止状态",
+          "childAction": "观察狐狸初始静止状态",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，观察狐狸初始静止状态。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：选择舞台开始事件",
+          "childAction": "选择舞台开始事件",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，选择舞台开始事件。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：将打招呼动作接在事件后",
+          "childAction": "将打招呼动作接在事件后",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，将打招呼动作接在事件后。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：不点击开始先观察画面",
+          "childAction": "不点击开始先观察画面",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，不点击开始先观察画面。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：触发开始并对比狐狸的反应",
+          "childAction": "触发开始并对比狐狸的反应",
+          "observableCheck": "开始前保持静止，触发后出现问候反馈",
+          "voiceover": "第5步，触发开始并对比狐狸的反应。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "把问候放在事件上方",
+          "diagnosis": "检查「开始事件与触发时机」的输入条件与对象。",
+          "recovery": "先不要点开始试一试"
+        },
+        {
+          "symptom": "误触别的角色",
+          "diagnosis": "检查「开始事件与触发时机」的积木连接或动作次数。",
+          "recovery": "哪种操作才是启动信号"
+        },
+        {
+          "symptom": "没比较触发前状态",
+          "diagnosis": "检查「开始事件与触发时机」的运行验证与完成条件。",
+          "recovery": "比较按钮前后狐狸有什么变化"
+        }
+      ],
+      "hints": [
+        "先不要点开始试一试",
+        "哪种操作才是启动信号",
+        "比较按钮前后狐狸有什么变化"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "开始前保持静止，触发后出现问候反馈"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明开始事件与触发时机关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排开始事件与触发时机"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示点击叫醒小狐狸并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "开始前保持静止，触发后出现问候反馈",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「把问候放在事件上方」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「误触别的角色」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「没比较触发前状态」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "开始事件与触发时机",
+        "expectedRun": "开始前保持静止，触发后出现问候反馈",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "为狐狸加一段起床伸懒腰动画。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「点击叫醒小狐狸」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "点击叫醒小狐狸",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U2-L02",
+      "sourceCatalogUnitId": "G0-U2",
+      "storyTitle": "开始旗帜响起",
+      "lessonTitle": "开始旗帜响起",
+      "stage": "森林开幕式",
+      "story": "森林舞台的彩旗要在主持人宣布开始后升起。",
+      "focusConcept": "事件与表演顺序",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "when_clicked",
+        "message_event",
+        "character_selection"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U2-L01"
+      ],
+      "learningObjectives": [
+        "能够解释「事件与表演顺序」在「开始旗帜响起」中的作用",
+        "在作品中完成可观察的事件操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "森林开幕式",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "舞台角色、表情、事件提示",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "森林舞台的彩旗要在主持人宣布开始后升起。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "森林舞台的彩旗要在主持人宣布开始后升起。",
+        "studentFacingGoal": "完成「开始旗帜响起」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "开幕口令先出现，彩旗随后升起；重播顺序一致"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：识别主持人和彩旗两个对象",
+          "childAction": "识别主持人和彩旗两个对象",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，识别主持人和彩旗两个对象。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：设置“开始”作为表演触发",
+          "childAction": "设置“开始”作为表演触发",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，设置“开始”作为表演触发。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：先播放主持开场再升旗",
+          "childAction": "先播放主持开场再升旗",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，先播放主持开场再升旗。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：不启动时确认彩旗没有变化",
+          "childAction": "不启动时确认彩旗没有变化",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，不启动时确认彩旗没有变化。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：运行并复核主持人与彩旗先后",
+          "childAction": "运行并复核主持人与彩旗先后",
+          "observableCheck": "开幕口令先出现，彩旗随后升起；重播顺序一致",
+          "voiceover": "第5步，运行并复核主持人与彩旗先后。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "彩旗先升起",
+          "diagnosis": "检查「事件与表演顺序」的输入条件与对象。",
+          "recovery": "演出最先应发生什么"
+        },
+        {
+          "symptom": "放了两个开始事件相互干扰",
+          "diagnosis": "检查「事件与表演顺序」的积木连接或动作次数。",
+          "recovery": "请沿着积木说出顺序"
+        },
+        {
+          "symptom": "没有把演出接到触发下",
+          "diagnosis": "检查「事件与表演顺序」的运行验证与完成条件。",
+          "recovery": "先只实现主持人这一段"
+        }
+      ],
+      "hints": [
+        "演出最先应发生什么",
+        "请沿着积木说出顺序",
+        "先只实现主持人这一段"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "开幕口令先出现，彩旗随后升起；重播顺序一致"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明事件与表演顺序关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排事件与表演顺序"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示开始旗帜响起并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "开幕口令先出现，彩旗随后升起；重播顺序一致",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「彩旗先升起」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「放了两个开始事件相互干扰」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「没有把演出接到触发下」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "事件与表演顺序",
+        "expectedRun": "开幕口令先出现，彩旗随后升起；重播顺序一致",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "加入观众掌声作为第三段表演。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「开始旗帜响起」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "开始旗帜响起",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U2-L03",
+      "sourceCatalogUnitId": "G0-U2",
+      "storyTitle": "兔子收到消息",
+      "lessonTitle": "兔子收到消息",
+      "stage": "兔子的神秘消息",
+      "story": "小兔子收到松鼠的消息时，头顶会出现一个惊喜表情。",
+      "focusConcept": "消息触发与角色响应",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "when_clicked",
+        "message_event",
+        "character_selection"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U2-L02"
+      ],
+      "learningObjectives": [
+        "能够解释「消息触发与角色响应」在「兔子收到消息」中的作用",
+        "在作品中完成可观察的角色操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "兔子的神秘消息",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "舞台角色、表情、事件提示",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小兔子收到松鼠的消息时，头顶会出现一个惊喜表情。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小兔子收到松鼠的消息时，头顶会出现一个惊喜表情。",
+        "studentFacingGoal": "完成「兔子收到消息」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "无消息时兔子不反应；正确消息发出后才显示表情"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：让松鼠作为消息发送者",
+          "childAction": "让松鼠作为消息发送者",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，让松鼠作为消息发送者。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：给兔子绑定“收到消息”事件",
+          "childAction": "给兔子绑定“收到消息”事件",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，给兔子绑定“收到消息”事件。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：在响应下方放置惊喜表情",
+          "childAction": "在响应下方放置惊喜表情",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，在响应下方放置惊喜表情。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：先不发送消息检验兔子状态",
+          "childAction": "先不发送消息检验兔子状态",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，先不发送消息检验兔子状态。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：发送消息并确认兔子才出现表情",
+          "childAction": "发送消息并确认兔子才出现表情",
+          "observableCheck": "无消息时兔子不反应；正确消息发出后才显示表情",
+          "voiceover": "第5步，发送消息并确认兔子才出现表情。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "发送者和接收者弄反",
+          "diagnosis": "检查「消息触发与角色响应」的输入条件与对象。",
+          "recovery": "谁在发消息谁在收消息"
+        },
+        {
+          "symptom": "所有消息都触发同一动画",
+          "diagnosis": "检查「消息触发与角色响应」的积木连接或动作次数。",
+          "recovery": "把消息看成一封信"
+        },
+        {
+          "symptom": "兔子一开始就出现表情",
+          "diagnosis": "检查「消息触发与角色响应」的运行验证与完成条件。",
+          "recovery": "先确认兔子自己是否有事件入口"
+        }
+      ],
+      "hints": [
+        "谁在发消息谁在收消息",
+        "把消息看成一封信",
+        "先确认兔子自己是否有事件入口"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "无消息时兔子不反应；正确消息发出后才显示表情"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明消息触发与角色响应关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排消息触发与角色响应"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示兔子收到消息并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "无消息时兔子不反应；正确消息发出后才显示表情",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「发送者和接收者弄反」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「所有消息都触发同一动画」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「兔子一开始就出现表情」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "消息触发与角色响应",
+        "expectedRun": "无消息时兔子不反应；正确消息发出后才显示表情",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "让兔子回信，并让松鼠收到回信后挥手。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「兔子收到消息」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "兔子收到消息",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U2-L04",
+      "sourceCatalogUnitId": "G0-U2",
+      "storyTitle": "切换两位朋友",
+      "lessonTitle": "切换两位朋友",
+      "stage": "轮流上场",
+      "story": "小狐狸和小鸟要分两次登台，不能撞在一起。",
+      "focusConcept": "角色身份与多事件",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "when_clicked",
+        "message_event",
+        "character_selection"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U2-L03"
+      ],
+      "learningObjectives": [
+        "能够解释「角色身份与多事件」在「切换两位朋友」中的作用",
+        "在作品中完成可观察的角色操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "轮流上场",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "舞台角色、表情、事件提示",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小狐狸和小鸟要分两次登台，不能撞在一起。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小狐狸和小鸟要分两次登台，不能撞在一起。",
+        "studentFacingGoal": "完成「切换两位朋友」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "狐狸先登台，小鸟按第二次事件进入，角色之间不相撞"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：为狐狸选择第一段开始事件",
+          "childAction": "为狐狸选择第一段开始事件",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，为狐狸选择第一段开始事件。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：让狐狸移动到舞台中央",
+          "childAction": "让狐狸移动到舞台中央",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，让狐狸移动到舞台中央。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：为小鸟选择下一次触发条件",
+          "childAction": "为小鸟选择下一次触发条件",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，为小鸟选择下一次触发条件。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：将小鸟飞入动作放在触发之后",
+          "childAction": "将小鸟飞入动作放在触发之后",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，将小鸟飞入动作放在触发之后。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：分别触发并观察谁先出现",
+          "childAction": "分别触发并观察谁先出现",
+          "observableCheck": "狐狸先登台，小鸟按第二次事件进入，角色之间不相撞",
+          "voiceover": "第5步，分别触发并观察谁先出现。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "脚本绑错角色",
+          "diagnosis": "检查「角色身份与多事件」的输入条件与对象。",
+          "recovery": "先看当前编辑的是谁"
+        },
+        {
+          "symptom": "小鸟在狐狸之前出现",
+          "diagnosis": "检查「角色身份与多事件」的积木连接或动作次数。",
+          "recovery": "把两位角色的路线画成不同颜色"
+        },
+        {
+          "symptom": "两段脚本都没有触发",
+          "diagnosis": "检查「角色身份与多事件」的运行验证与完成条件。",
+          "recovery": "分开触发检查再合起来"
+        }
+      ],
+      "hints": [
+        "先看当前编辑的是谁",
+        "把两位角色的路线画成不同颜色",
+        "分开触发检查再合起来"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "狐狸先登台，小鸟按第二次事件进入，角色之间不相撞"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明角色身份与多事件关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排角色身份与多事件"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示切换两位朋友并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "狐狸先登台，小鸟按第二次事件进入，角色之间不相撞",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「脚本绑错角色」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「小鸟在狐狸之前出现」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「两段脚本都没有触发」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "角色身份与多事件",
+        "expectedRun": "狐狸先登台，小鸟按第二次事件进入，角色之间不相撞",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "加入第三位角色作为压轴演员。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「切换两位朋友」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "切换两位朋友",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U2-L05",
+      "sourceCatalogUnitId": "G0-U2",
+      "storyTitle": "点击苹果让它落下",
+      "lessonTitle": "点击苹果让它落下",
+      "stage": "掉落的苹果",
+      "story": "只有点击树上的苹果，它才会落到地面。",
+      "focusConcept": "点击事件与对象识别",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "when_clicked",
+        "message_event",
+        "character_selection"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U2-L04"
+      ],
+      "learningObjectives": [
+        "能够解释「点击事件与对象识别」在「点击苹果让它落下」中的作用",
+        "在作品中完成可观察的触发操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "掉落的苹果",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "舞台角色、表情、事件提示",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "只有点击树上的苹果，它才会落到地面。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "只有点击树上的苹果，它才会落到地面。",
+        "studentFacingGoal": "完成「点击苹果让它落下」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "点击苹果才下落；点击其他地方不触发"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：先观察苹果悬在树上",
+          "childAction": "先观察苹果悬在树上",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，先观察苹果悬在树上。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：为苹果添加被点击事件",
+          "childAction": "为苹果添加被点击事件",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，为苹果添加被点击事件。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：在事件下方安排下落动作",
+          "childAction": "在事件下方安排下落动作",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，在事件下方安排下落动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：点击空白地面并记录结果",
+          "childAction": "点击空白地面并记录结果",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，点击空白地面并记录结果。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：点击苹果确认它落到地面",
+          "childAction": "点击苹果确认它落到地面",
+          "observableCheck": "点击苹果才下落；点击其他地方不触发",
+          "voiceover": "第5步，点击苹果确认它落到地面。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "把事件挂到树上",
+          "diagnosis": "检查「点击事件与对象识别」的输入条件与对象。",
+          "recovery": "这块事件属于谁"
+        },
+        {
+          "symptom": "苹果自动掉落",
+          "diagnosis": "检查「点击事件与对象识别」的积木连接或动作次数。",
+          "recovery": "没点时苹果应该怎样"
+        },
+        {
+          "symptom": "点击错误位置也使苹果落下",
+          "diagnosis": "检查「点击事件与对象识别」的运行验证与完成条件。",
+          "recovery": "分别点苹果与背景比较结果"
+        }
+      ],
+      "hints": [
+        "这块事件属于谁",
+        "没点时苹果应该怎样",
+        "分别点苹果与背景比较结果"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "点击苹果才下落；点击其他地方不触发"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明点击事件与对象识别关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排点击事件与对象识别"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示点击苹果让它落下并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "点击苹果才下落；点击其他地方不触发",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「把事件挂到树上」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「苹果自动掉落」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「点击错误位置也使苹果落下」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "点击事件与对象识别",
+        "expectedRun": "点击苹果才下落；点击其他地方不触发",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "掉落后给苹果增加一个反弹效果。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「点击苹果让它落下」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "点击苹果让它落下",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U2-L06",
+      "sourceCatalogUnitId": "G0-U2",
+      "storyTitle": "森林伙伴见面会",
+      "lessonTitle": "森林伙伴见面会",
+      "stage": "森林伙伴见面会",
+      "story": "狐狸、兔子与小鸟策划一个观众可以参与的见面会。",
+      "focusConcept": "事件、角色配合、作品编排",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "when_start",
+        "when_clicked",
+        "message_event",
+        "character_selection"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U2-L05"
+      ],
+      "learningObjectives": [
+        "能够解释「事件、角色配合、作品编排」在「森林伙伴见面会」中的作用",
+        "在作品中完成可观察的触发操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "森林伙伴见面会",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "舞台角色、表情、事件提示",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "狐狸、兔子与小鸟策划一个观众可以参与的见面会。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "狐狸、兔子与小鸟策划一个观众可以参与的见面会。",
+        "studentFacingGoal": "完成「森林伙伴见面会」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "作品至少有两个不同触发行为，角色响应清晰且可回放"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：绘制三位角色的出场顺序图",
+          "childAction": "绘制三位角色的出场顺序图",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，绘制三位角色的出场顺序图。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：设置一个开始事件与一个点击事件",
+          "childAction": "设置一个开始事件与一个点击事件",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，设置一个开始事件与一个点击事件。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：给每位角色添加独立的响应",
+          "childAction": "给每位角色添加独立的响应",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，给每位角色添加独立的响应。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：邀请同伴按说明触发舞台",
+          "childAction": "邀请同伴按说明触发舞台",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，邀请同伴按说明触发舞台。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：记录没有响应或出场冲突的位置再修复",
+          "childAction": "记录没有响应或出场冲突的位置再修复",
+          "observableCheck": "作品至少有两个不同触发行为，角色响应清晰且可回放",
+          "voiceover": "第5步，记录没有响应或出场冲突的位置再修复。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "所有角色跟着同一个点击乱动",
+          "diagnosis": "检查「事件、角色配合、作品编排」的输入条件与对象。",
+          "recovery": "每位角色有自己的任务吗"
+        },
+        {
+          "symptom": "事件说明不足玩家不知道点哪里",
+          "diagnosis": "检查「事件、角色配合、作品编排」的积木连接或动作次数。",
+          "recovery": "先分开测试每个事件"
+        },
+        {
+          "symptom": "只测试一种触发",
+          "diagnosis": "检查「事件、角色配合、作品编排」的运行验证与完成条件。",
+          "recovery": "请朋友不看说明来操作"
+        }
+      ],
+      "hints": [
+        "每位角色有自己的任务吗",
+        "先分开测试每个事件",
+        "请朋友不看说明来操作"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "作品至少有两个不同触发行为，角色响应清晰且可回放"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明事件、角色配合、作品编排关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排事件、角色配合、作品编排"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示森林伙伴见面会并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "作品至少有两个不同触发行为，角色响应清晰且可回放",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「所有角色跟着同一个点击乱动」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「事件说明不足玩家不知道点哪里」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「只测试一种触发」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "事件、角色配合、作品编排",
+        "expectedRun": "作品至少有两个不同触发行为，角色响应清晰且可回放",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "制作观众可以投票选下一位演员的版本。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「森林伙伴见面会」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "森林伙伴见面会",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U3-L01",
+      "sourceCatalogUnitId": "G0-U3",
+      "storyTitle": "蘑菇小路的规律",
+      "lessonTitle": "蘑菇小路的规律",
+      "stage": "蘑菇脚印",
+      "story": "小熊留下红蓝交替的脚印，狐狸要发现规律并复现。",
+      "focusConcept": "模式识别与顺序重复",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "finite_repeat",
+        "movement",
+        "visual_effect",
+        "sound"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U2-L06"
+      ],
+      "learningObjectives": [
+        "能够解释「模式识别与顺序重复」在「蘑菇小路的规律」中的作用",
+        "在作品中完成可观察的重复操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "蘑菇脚印",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "循环动作与节拍素材",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小熊留下红蓝交替的脚印，狐狸要发现规律并复现。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小熊留下红蓝交替的脚印，狐狸要发现规律并复现。",
+        "studentFacingGoal": "完成「蘑菇小路的规律」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "正确生成红蓝交替的八个脚印，找出一处打乱模式的错误"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：观察脚印红蓝红蓝的排列",
+          "childAction": "观察脚印红蓝红蓝的排列",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，观察脚印红蓝红蓝的排列。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：说出下一枚脚印颜色",
+          "childAction": "说出下一枚脚印颜色",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，说出下一枚脚印颜色。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：用动作或颜色积木写出一个红蓝单元",
+          "childAction": "用动作或颜色积木写出一个红蓝单元",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，用动作或颜色积木写出一个红蓝单元。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：重复该单元形成四对脚印",
+          "childAction": "重复该单元形成四对脚印",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，重复该单元形成四对脚印。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：核对每一对都保持红蓝顺序",
+          "childAction": "核对每一对都保持红蓝顺序",
+          "observableCheck": "正确生成红蓝交替的八个脚印，找出一处打乱模式的错误",
+          "voiceover": "第5步，核对每一对都保持红蓝顺序。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "把红红蓝当成规律",
+          "diagnosis": "检查「模式识别与顺序重复」的输入条件与对象。",
+          "recovery": "先圈出最小重复单元"
+        },
+        {
+          "symptom": "只画一对就停止",
+          "diagnosis": "检查「模式识别与顺序重复」的积木连接或动作次数。",
+          "recovery": "用两张颜色卡重排"
+        },
+        {
+          "symptom": "蓝红次序互换",
+          "diagnosis": "检查「模式识别与顺序重复」的运行验证与完成条件。",
+          "recovery": "数一数一共重复几次"
+        }
+      ],
+      "hints": [
+        "先圈出最小重复单元",
+        "用两张颜色卡重排",
+        "数一数一共重复几次"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "正确生成红蓝交替的八个脚印，找出一处打乱模式的错误"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明模式识别与顺序重复关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排模式识别与顺序重复"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示蘑菇小路的规律并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "正确生成红蓝交替的八个脚印，找出一处打乱模式的错误",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「把红红蓝当成规律」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「只画一对就停止」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「蓝红次序互换」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "模式识别与顺序重复",
+        "expectedRun": "正确生成红蓝交替的八个脚印，找出一处打乱模式的错误",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "尝试红红蓝三色节奏并说明最小单元。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「蘑菇小路的规律」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "蘑菇小路的规律",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U3-L02",
+      "sourceCatalogUnitId": "G0-U3",
+      "storyTitle": "重复走两步",
+      "lessonTitle": "重复走两步",
+      "stage": "跳两下",
+      "story": "小兔子需要连续跳两下才能越过小水坑。",
+      "focusConcept": "固定次数重复",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "finite_repeat",
+        "movement",
+        "visual_effect",
+        "sound"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U3-L01"
+      ],
+      "learningObjectives": [
+        "能够解释「固定次数重复」在「重复走两步」中的作用",
+        "在作品中完成可观察的重复操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "跳两下",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "循环动作与节拍素材",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小兔子需要连续跳两下才能越过小水坑。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小兔子需要连续跳两下才能越过小水坑。",
+        "studentFacingGoal": "完成「重复走两步」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "连续跳跃恰好两次后落在安全地面"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：观察水坑的宽度和每次跳跃距离",
+          "childAction": "观察水坑的宽度和每次跳跃距离",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，观察水坑的宽度和每次跳跃距离。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：创建一次跳跃动作",
+          "childAction": "创建一次跳跃动作",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，创建一次跳跃动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：给跳跃动作设置重复两次",
+          "childAction": "给跳跃动作设置重复两次",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，给跳跃动作设置重复两次。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：手指提前比划两次跳跃的落点",
+          "childAction": "手指提前比划两次跳跃的落点",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，手指提前比划两次跳跃的落点。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：运行检验刚好跨过水坑",
+          "childAction": "运行检验刚好跨过水坑",
+          "observableCheck": "连续跳跃恰好两次后落在安全地面",
+          "voiceover": "第5步，运行检验刚好跨过水坑。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "只跳一次",
+          "diagnosis": "检查「固定次数重复」的输入条件与对象。",
+          "recovery": "一次跳多远"
+        },
+        {
+          "symptom": "无限循环无法停下",
+          "diagnosis": "检查「固定次数重复」的积木连接或动作次数。",
+          "recovery": "有没有标记次数为二"
+        },
+        {
+          "symptom": "把重复块套在开始事件外",
+          "diagnosis": "检查「固定次数重复」的运行验证与完成条件。",
+          "recovery": "看清运行后是否会停止"
+        }
+      ],
+      "hints": [
+        "一次跳多远",
+        "有没有标记次数为二",
+        "看清运行后是否会停止"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "连续跳跃恰好两次后落在安全地面"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明固定次数重复关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排固定次数重复"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示重复走两步并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "连续跳跃恰好两次后落在安全地面",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「只跳一次」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「无限循环无法停下」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「把重复块套在开始事件外」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "固定次数重复",
+        "expectedRun": "连续跳跃恰好两次后落在安全地面",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "改成三个小水坑，计算要跳的次数。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「重复走两步」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "重复走两步",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U3-L03",
+      "sourceCatalogUnitId": "G0-U3",
+      "storyTitle": "花园浇水机器",
+      "lessonTitle": "花园浇水机器",
+      "stage": "花园浇水助手",
+      "story": "机器人每天要给四盆花各浇一次水。",
+      "focusConcept": "循环与批量任务",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "finite_repeat",
+        "movement",
+        "visual_effect",
+        "sound"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U3-L02"
+      ],
+      "learningObjectives": [
+        "能够解释「循环与批量任务」在「花园浇水机器」中的作用",
+        "在作品中完成可观察的循环操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "花园浇水助手",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "循环动作与节拍素材",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "机器人每天要给四盆花各浇一次水。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "机器人每天要给四盆花各浇一次水。",
+        "studentFacingGoal": "完成「花园浇水机器」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "四盆花各收到一次浇水，不能漏浇或重复浇"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：在四盆花旁标出机器人巡回方向",
+          "childAction": "在四盆花旁标出机器人巡回方向",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，在四盆花旁标出机器人巡回方向。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：创建给当前花盆浇水动作",
+          "childAction": "创建给当前花盆浇水动作",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，创建给当前花盆浇水动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：将移动到下一盆和浇水组合",
+          "childAction": "将移动到下一盆和浇水组合",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，将移动到下一盆和浇水组合。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：重复组合直到四盆都完成",
+          "childAction": "重复组合直到四盆都完成",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，重复组合直到四盆都完成。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：核对每盆的水滴数量是否恰好一份",
+          "childAction": "核对每盆的水滴数量是否恰好一份",
+          "observableCheck": "四盆花各收到一次浇水，不能漏浇或重复浇",
+          "voiceover": "第5步，核对每盆的水滴数量是否恰好一份。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "重复次数为三",
+          "diagnosis": "检查「循环与批量任务」的输入条件与对象。",
+          "recovery": "数一数花盆总数"
+        },
+        {
+          "symptom": "只重复移动没重复浇水",
+          "diagnosis": "检查「循环与批量任务」的积木连接或动作次数。",
+          "recovery": "每次循环里必须完成什么"
+        },
+        {
+          "symptom": "最后一盆浇水后越界",
+          "diagnosis": "检查「循环与批量任务」的运行验证与完成条件。",
+          "recovery": "检查最后一盆是否也有水滴"
+        }
+      ],
+      "hints": [
+        "数一数花盆总数",
+        "每次循环里必须完成什么",
+        "检查最后一盆是否也有水滴"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "四盆花各收到一次浇水，不能漏浇或重复浇"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明循环与批量任务关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排循环与批量任务"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示花园浇水机器并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "四盆花各收到一次浇水，不能漏浇或重复浇",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「重复次数为三」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「只重复移动没重复浇水」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「最后一盆浇水后越界」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "循环与批量任务",
+        "expectedRun": "四盆花各收到一次浇水，不能漏浇或重复浇",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "增加两盆花并用参数调整次数。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「花园浇水机器」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "花园浇水机器",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U3-L04",
+      "sourceCatalogUnitId": "G0-U3",
+      "storyTitle": "萤火虫闪三次",
+      "lessonTitle": "萤火虫闪三次",
+      "stage": "萤火虫舞会",
+      "story": "三只萤火虫约好闪烁三轮，每轮要同时发亮再熄灭。",
+      "focusConcept": "重复节奏与同步",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "finite_repeat",
+        "movement",
+        "visual_effect",
+        "sound"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U3-L03"
+      ],
+      "learningObjectives": [
+        "能够解释「重复节奏与同步」在「萤火虫闪三次」中的作用",
+        "在作品中完成可观察的循环操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "萤火虫舞会",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "循环动作与节拍素材",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "三只萤火虫约好闪烁三轮，每轮要同时发亮再熄灭。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "三只萤火虫约好闪烁三轮，每轮要同时发亮再熄灭。",
+        "studentFacingGoal": "完成「萤火虫闪三次」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "灯光按亮-灭循环三次，最后熄灭"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：选择所有萤火虫作为同一表演组",
+          "childAction": "选择所有萤火虫作为同一表演组",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，选择所有萤火虫作为同一表演组。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：安排亮起与熄灭两个动作",
+          "childAction": "安排亮起与熄灭两个动作",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，安排亮起与熄灭两个动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：将这组动作设置重复三轮",
+          "childAction": "将这组动作设置重复三轮",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，将这组动作设置重复三轮。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：预测第六个动作后灯光状态",
+          "childAction": "预测第六个动作后灯光状态",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，预测第六个动作后灯光状态。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：运行并记录亮灭序列是否正确",
+          "childAction": "运行并记录亮灭序列是否正确",
+          "observableCheck": "灯光按亮-灭循环三次，最后熄灭",
+          "voiceover": "第5步，运行并记录亮灭序列是否正确。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "只重复亮起不熄灭",
+          "diagnosis": "检查「重复节奏与同步」的输入条件与对象。",
+          "recovery": "完整一轮包含哪两个动作"
+        },
+        {
+          "symptom": "重复次数错误",
+          "diagnosis": "检查「重复节奏与同步」的积木连接或动作次数。",
+          "recovery": "先数一轮再数三轮"
+        },
+        {
+          "symptom": "角色闪烁相位不同",
+          "diagnosis": "检查「重复节奏与同步」的运行验证与完成条件。",
+          "recovery": "观察结束时灯应该是亮还是灭"
+        }
+      ],
+      "hints": [
+        "完整一轮包含哪两个动作",
+        "先数一轮再数三轮",
+        "观察结束时灯应该是亮还是灭"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "灯光按亮-灭循环三次，最后熄灭"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明重复节奏与同步关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排重复节奏与同步"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示萤火虫闪三次并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "灯光按亮-灭循环三次，最后熄灭",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「只重复亮起不熄灭」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「重复次数错误」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「角色闪烁相位不同」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "重复节奏与同步",
+        "expectedRun": "灯光按亮-灭循环三次，最后熄灭",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "把三轮改成五轮并加入不同颜色。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「萤火虫闪三次」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "萤火虫闪三次",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U3-L05",
+      "sourceCatalogUnitId": "G0-U3",
+      "storyTitle": "用循环画围栏",
+      "lessonTitle": "用循环画围栏",
+      "stage": "循环画围栏",
+      "story": "小熊要给方形花圃建围栏，重复相同的直走和转弯。",
+      "focusConcept": "循环嵌套与几何图案",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "finite_repeat",
+        "movement",
+        "visual_effect",
+        "sound"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U3-L04"
+      ],
+      "learningObjectives": [
+        "能够解释「循环嵌套与几何图案」在「用循环画围栏」中的作用",
+        "在作品中完成可观察的模式操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "循环画围栏",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "循环动作与节拍素材",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小熊要给方形花圃建围栏，重复相同的直走和转弯。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小熊要给方形花圃建围栏，重复相同的直走和转弯。",
+        "studentFacingGoal": "完成「用循环画围栏」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "四条边等长且闭合，角色最终回到原始方向"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：先画出花圃四条相等的边",
+          "childAction": "先画出花圃四条相等的边",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，先画出花圃四条相等的边。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：写出一条边前进再右转的动作",
+          "childAction": "写出一条边前进再右转的动作",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，写出一条边前进再右转的动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：将这一组动作重复四次",
+          "childAction": "将这一组动作重复四次",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，将这一组动作重复四次。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：预测第四次后朝向",
+          "childAction": "预测第四次后朝向",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，预测第四次后朝向。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：运行检查围栏能否闭合",
+          "childAction": "运行检查围栏能否闭合",
+          "observableCheck": "四条边等长且闭合，角色最终回到原始方向",
+          "voiceover": "第5步，运行检查围栏能否闭合。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "只重复前进忘记转弯",
+          "diagnosis": "检查「循环嵌套与几何图案」的输入条件与对象。",
+          "recovery": "方形有几条边"
+        },
+        {
+          "symptom": "转角不是90度",
+          "diagnosis": "检查「循环嵌套与几何图案」的积木连接或动作次数。",
+          "recovery": "走完一边需要做什么"
+        },
+        {
+          "symptom": "循环次数不足四次",
+          "diagnosis": "检查「循环嵌套与几何图案」的运行验证与完成条件。",
+          "recovery": "最后能回到起点吗"
+        }
+      ],
+      "hints": [
+        "方形有几条边",
+        "走完一边需要做什么",
+        "最后能回到起点吗"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "四条边等长且闭合，角色最终回到原始方向"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明循环嵌套与几何图案关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排循环嵌套与几何图案"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示用循环画围栏并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "四条边等长且闭合，角色最终回到原始方向",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「只重复前进忘记转弯」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「转角不是90度」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「循环次数不足四次」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "循环嵌套与几何图案",
+        "expectedRun": "四条边等长且闭合，角色最终回到原始方向",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "让花圃变成三角形并调整循环次数与角度。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「用循环画围栏」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "用循环画围栏",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U3-L06",
+      "sourceCatalogUnitId": "G0-U3",
+      "storyTitle": "森林节奏演出",
+      "lessonTitle": "森林节奏演出",
+      "stage": "森林节奏演出",
+      "story": "动物乐队邀请你给鼓点和跳舞动作编一个可循环的节奏。",
+      "focusConcept": "节拍、循环、同步综合",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "finite_repeat",
+        "movement",
+        "visual_effect",
+        "sound"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U3-L05"
+      ],
+      "learningObjectives": [
+        "能够解释「节拍、循环、同步综合」在「森林节奏演出」中的作用",
+        "在作品中完成可观察的模式操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "森林节奏演出",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "循环动作与节拍素材",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "动物乐队邀请你给鼓点和跳舞动作编一个可循环的节奏。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "动物乐队邀请你给鼓点和跳舞动作编一个可循环的节奏。",
+        "studentFacingGoal": "完成「森林节奏演出」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "至少四轮节拍与动作同步，停止后不继续播放"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：设计两拍鼓声加一次跳跃的节奏单元",
+          "childAction": "设计两拍鼓声加一次跳跃的节奏单元",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，设计两拍鼓声加一次跳跃的节奏单元。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：选出对应声音与动作资源",
+          "childAction": "选出对应声音与动作资源",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，选出对应声音与动作资源。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：把完整节奏单元装入有限循环",
+          "childAction": "把完整节奏单元装入有限循环",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，把完整节奏单元装入有限循环。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：与另一位角色的入场事件结合",
+          "childAction": "与另一位角色的入场事件结合",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，与另一位角色的入场事件结合。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：播放并让同伴指出第几轮开始不同步",
+          "childAction": "播放并让同伴指出第几轮开始不同步",
+          "observableCheck": "至少四轮节拍与动作同步，停止后不继续播放",
+          "voiceover": "第5步，播放并让同伴指出第几轮开始不同步。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "音乐一直播放不能停止",
+          "diagnosis": "检查「节拍、循环、同步综合」的输入条件与对象。",
+          "recovery": "先拍手演奏一遍节奏"
+        },
+        {
+          "symptom": "声音动作不同步",
+          "diagnosis": "检查「节拍、循环、同步综合」的积木连接或动作次数。",
+          "recovery": "每轮包含哪些动作"
+        },
+        {
+          "symptom": "重复空指令",
+          "diagnosis": "检查「节拍、循环、同步综合」的运行验证与完成条件。",
+          "recovery": "数四轮结束的时机"
+        }
+      ],
+      "hints": [
+        "先拍手演奏一遍节奏",
+        "每轮包含哪些动作",
+        "数四轮结束的时机"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "至少四轮节拍与动作同步，停止后不继续播放"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明节拍、循环、同步综合关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排节拍、循环、同步综合"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示森林节奏演出并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "至少四轮节拍与动作同步，停止后不继续播放",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「音乐一直播放不能停止」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「声音动作不同步」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「重复空指令」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "节拍、循环、同步综合",
+        "expectedRun": "至少四轮节拍与动作同步，停止后不继续播放",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "加入第二种节奏作为副歌。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「森林节奏演出」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "森林节奏演出",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U4-L01",
+      "sourceCatalogUnitId": "G0-U4",
+      "storyTitle": "遇到河流怎么办",
+      "lessonTitle": "遇到河流怎么办",
+      "stage": "河流守门员",
+      "story": "小狐狸来到岔路口：木桥可通行，涨水的河面不可通行。",
+      "focusConcept": "条件判断与环境状态",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "if_else",
+        "state",
+        "counter",
+        "movement"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U3-L06"
+      ],
+      "learningObjectives": [
+        "能够解释「条件判断与环境状态」在「遇到河流怎么办」中的作用",
+        "在作品中完成可观察的判断操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "河流守门员",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "障碍、状态灯与目标反馈",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小狐狸来到岔路口：木桥可通行，涨水的河面不可通行。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小狐狸来到岔路口：木桥可通行，涨水的河面不可通行。",
+        "studentFacingGoal": "完成「遇到河流怎么办」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "桥开放时通行，关闭时不进入危险河面"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：观察桥是否开放的状态灯",
+          "childAction": "观察桥是否开放的状态灯",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，观察桥是否开放的状态灯。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：写下如果桥开放就通行的条件",
+          "childAction": "写下如果桥开放就通行的条件",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，写下如果桥开放就通行的条件。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：给不开放情况安排等待或绕行",
+          "childAction": "给不开放情况安排等待或绕行",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，给不开放情况安排等待或绕行。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：分别模拟开放与关闭两种情况",
+          "childAction": "分别模拟开放与关闭两种情况",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，分别模拟开放与关闭两种情况。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：记录小狐狸是否选择安全路线",
+          "childAction": "记录小狐狸是否选择安全路线",
+          "observableCheck": "桥开放时通行，关闭时不进入危险河面",
+          "voiceover": "第5步，记录小狐狸是否选择安全路线。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "忽略条件直接走",
+          "diagnosis": "检查「条件判断与环境状态」的输入条件与对象。",
+          "recovery": "先看桥是什么状态"
+        },
+        {
+          "symptom": "只有真分支没有失败反馈",
+          "diagnosis": "检查「条件判断与环境状态」的积木连接或动作次数。",
+          "recovery": "如果关门还能做什么"
+        },
+        {
+          "symptom": "判断了错误对象",
+          "diagnosis": "检查「条件判断与环境状态」的运行验证与完成条件。",
+          "recovery": "请两次测试不同状态"
+        }
+      ],
+      "hints": [
+        "先看桥是什么状态",
+        "如果关门还能做什么",
+        "请两次测试不同状态"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "桥开放时通行，关闭时不进入危险河面"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明条件判断与环境状态关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排条件判断与环境状态"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示遇到河流怎么办并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "桥开放时通行，关闭时不进入危险河面",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「忽略条件直接走」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「只有真分支没有失败反馈」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「判断了错误对象」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "条件判断与环境状态",
+        "expectedRun": "桥开放时通行，关闭时不进入危险河面",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "加入河面水位作为第二个判断条件。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「遇到河流怎么办」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "遇到河流怎么办",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U4-L02",
+      "sourceCatalogUnitId": "G0-U4",
+      "storyTitle": "收集三颗松果",
+      "lessonTitle": "收集三颗松果",
+      "stage": "寻找松果",
+      "story": "小松鼠要收集三颗松果，遇到空篮子时不能把数量加一。",
+      "focusConcept": "计数变量与拾取事件",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "if_else",
+        "state",
+        "counter",
+        "movement"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U4-L01"
+      ],
+      "learningObjectives": [
+        "能够解释「计数变量与拾取事件」在「收集三颗松果」中的作用",
+        "在作品中完成可观察的判断操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "寻找松果",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "障碍、状态灯与目标反馈",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小松鼠要收集三颗松果，遇到空篮子时不能把数量加一。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小松鼠要收集三颗松果，遇到空篮子时不能把数量加一。",
+        "studentFacingGoal": "完成「收集三颗松果」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "成功收集三颗时显示3；再次触碰已收集位置不增加计数"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：把收集数量初始设置为零",
+          "childAction": "把收集数量初始设置为零",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，把收集数量初始设置为零。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：碰到第一颗松果后数量加一",
+          "childAction": "碰到第一颗松果后数量加一",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，碰到第一颗松果后数量加一。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：拾取第二颗和第三颗",
+          "childAction": "拾取第二颗和第三颗",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，拾取第二颗和第三颗。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：尝试碰到已经捡过的空位置",
+          "childAction": "尝试碰到已经捡过的空位置",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，尝试碰到已经捡过的空位置。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：确认计数停在三且没有重复计数",
+          "childAction": "确认计数停在三且没有重复计数",
+          "observableCheck": "成功收集三颗时显示3；再次触碰已收集位置不增加计数",
+          "voiceover": "第5步，确认计数停在三且没有重复计数。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "开始时计数不是零",
+          "diagnosis": "检查「计数变量与拾取事件」的输入条件与对象。",
+          "recovery": "先想想初始有几颗"
+        },
+        {
+          "symptom": "每碰一次任何东西都加一",
+          "diagnosis": "检查「计数变量与拾取事件」的积木连接或动作次数。",
+          "recovery": "只有真的拿到松果才加一"
+        },
+        {
+          "symptom": "重复拾取同一松果",
+          "diagnosis": "检查「计数变量与拾取事件」的运行验证与完成条件。",
+          "recovery": "同一颗能不能捡两遍"
+        }
+      ],
+      "hints": [
+        "先想想初始有几颗",
+        "只有真的拿到松果才加一",
+        "同一颗能不能捡两遍"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "成功收集三颗时显示3；再次触碰已收集位置不增加计数"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明计数变量与拾取事件关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排计数变量与拾取事件"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示收集三颗松果并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "成功收集三颗时显示3；再次触碰已收集位置不增加计数",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「开始时计数不是零」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「每碰一次任何东西都加一」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「重复拾取同一松果」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "计数变量与拾取事件",
+        "expectedRun": "成功收集三颗时显示3；再次触碰已收集位置不增加计数",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "给四颗松果添加颜色分类统计。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「收集三颗松果」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "收集三颗松果",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U4-L03",
+      "sourceCatalogUnitId": "G0-U4",
+      "storyTitle": "红绿灯过马路",
+      "lessonTitle": "红绿灯过马路",
+      "stage": "红绿灯任务",
+      "story": "小狐狸要过马路，只有绿灯亮起才可以前进。",
+      "focusConcept": "如果判断与状态切换",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "if_else",
+        "state",
+        "counter",
+        "movement"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U4-L02"
+      ],
+      "learningObjectives": [
+        "能够解释「如果判断与状态切换」在「红绿灯过马路」中的作用",
+        "在作品中完成可观察的调试操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "红绿灯任务",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "障碍、状态灯与目标反馈",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小狐狸要过马路，只有绿灯亮起才可以前进。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小狐狸要过马路，只有绿灯亮起才可以前进。",
+        "studentFacingGoal": "完成「红绿灯过马路」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "绿灯向前，红灯停住；两种状态都能正确响应"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：观察红灯和绿灯状态",
+          "childAction": "观察红灯和绿灯状态",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，观察红灯和绿灯状态。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：设置当绿灯时可以前进",
+          "childAction": "设置当绿灯时可以前进",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，设置当绿灯时可以前进。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：给红灯情况安排原地等待",
+          "childAction": "给红灯情况安排原地等待",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，给红灯情况安排原地等待。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：切换两种灯各运行一次",
+          "childAction": "切换两种灯各运行一次",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，切换两种灯各运行一次。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：比较安全通行和等待结果",
+          "childAction": "比较安全通行和等待结果",
+          "observableCheck": "绿灯向前，红灯停住；两种状态都能正确响应",
+          "voiceover": "第5步，比较安全通行和等待结果。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "红灯也继续走",
+          "diagnosis": "检查「如果判断与状态切换」的输入条件与对象。",
+          "recovery": "看到红灯身体应该怎样"
+        },
+        {
+          "symptom": "判断逻辑写反",
+          "diagnosis": "检查「如果判断与状态切换」的积木连接或动作次数。",
+          "recovery": "如果不满足条件就做什么"
+        },
+        {
+          "symptom": "没有等待动作",
+          "diagnosis": "检查「如果判断与状态切换」的运行验证与完成条件。",
+          "recovery": "逐个颜色测试"
+        }
+      ],
+      "hints": [
+        "看到红灯身体应该怎样",
+        "如果不满足条件就做什么",
+        "逐个颜色测试"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "绿灯向前，红灯停住；两种状态都能正确响应"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明如果判断与状态切换关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排如果判断与状态切换"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示红绿灯过马路并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "绿灯向前，红灯停住；两种状态都能正确响应",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「红灯也继续走」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「判断逻辑写反」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「没有等待动作」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "如果判断与状态切换",
+        "expectedRun": "绿灯向前，红灯停住；两种状态都能正确响应",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "加入黄灯减速提示。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「红绿灯过马路」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "红绿灯过马路",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U4-L04",
+      "sourceCatalogUnitId": "G0-U4",
+      "storyTitle": "迷宫找错路线",
+      "lessonTitle": "迷宫找错路线",
+      "stage": "迷宫排错",
+      "story": "机器人总在同一处撞墙，需要找出积木顺序中的一个错误。",
+      "focusConcept": "调试与差异定位",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "if_else",
+        "state",
+        "counter",
+        "movement"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U4-L03"
+      ],
+      "learningObjectives": [
+        "能够解释「调试与差异定位」在「迷宫找错路线」中的作用",
+        "在作品中完成可观察的调试操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "迷宫排错",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "障碍、状态灯与目标反馈",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "机器人总在同一处撞墙，需要找出积木顺序中的一个错误。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "机器人总在同一处撞墙，需要找出积木顺序中的一个错误。",
+        "studentFacingGoal": "完成「迷宫找错路线」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "能指出错在哪一步、为什么错，修复后抵达终点"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：运行提供的错误路线记录撞墙位置",
+          "childAction": "运行提供的错误路线记录撞墙位置",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，运行提供的错误路线记录撞墙位置。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：标记错误发生前最后一个动作",
+          "childAction": "标记错误发生前最后一个动作",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，标记错误发生前最后一个动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：将程序顺序与地图路线逐格比较",
+          "childAction": "将程序顺序与地图路线逐格比较",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，将程序顺序与地图路线逐格比较。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：只替换那一块错误积木",
+          "childAction": "只替换那一块错误积木",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，只替换那一块错误积木。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：重新运行确认到达终点并解释修改",
+          "childAction": "重新运行确认到达终点并解释修改",
+          "observableCheck": "能指出错在哪一步、为什么错，修复后抵达终点",
+          "voiceover": "第5步，重新运行确认到达终点并解释修改。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "一次换掉全部积木无法复盘",
+          "diagnosis": "检查「调试与差异定位」的输入条件与对象。",
+          "recovery": "停在第一次出错的位置"
+        },
+        {
+          "symptom": "只盯终点不检查中间",
+          "diagnosis": "检查「调试与差异定位」的积木连接或动作次数。",
+          "recovery": "只检查出错前一块积木"
+        },
+        {
+          "symptom": "改动后不重新测试",
+          "diagnosis": "检查「调试与差异定位」的运行验证与完成条件。",
+          "recovery": "一次只改一个地方"
+        }
+      ],
+      "hints": [
+        "停在第一次出错的位置",
+        "只检查出错前一块积木",
+        "一次只改一个地方"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "能指出错在哪一步、为什么错，修复后抵达终点"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明调试与差异定位关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排调试与差异定位"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示迷宫找错路线并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "能指出错在哪一步、为什么错，修复后抵达终点",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「一次换掉全部积木无法复盘」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「只盯终点不检查中间」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「改动后不重新测试」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "调试与差异定位",
+        "expectedRun": "能指出错在哪一步、为什么错，修复后抵达终点",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "设计一条含两个错误的路线让同伴调试。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「迷宫找错路线」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "迷宫找错路线",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U4-L05",
+      "sourceCatalogUnitId": "G0-U4",
+      "storyTitle": "救援落单小鸟",
+      "lessonTitle": "救援落单小鸟",
+      "stage": "救援小鸟",
+      "story": "落单的小鸟在树冠上，狐狸要判断道路是否畅通再带它回家。",
+      "focusConcept": "条件与路径规划",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "if_else",
+        "state",
+        "counter",
+        "movement"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U4-L04"
+      ],
+      "learningObjectives": [
+        "能够解释「条件与路径规划」在「救援落单小鸟」中的作用",
+        "在作品中完成可观察的创作操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "救援小鸟",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "障碍、状态灯与目标反馈",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "落单的小鸟在树冠上，狐狸要判断道路是否畅通再带它回家。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "落单的小鸟在树冠上，狐狸要判断道路是否畅通再带它回家。",
+        "studentFacingGoal": "完成「救援落单小鸟」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "两种测试布局都能安全接近小鸟并返回起点"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：找出小鸟所在位置与安全出口",
+          "childAction": "找出小鸟所在位置与安全出口",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，找出小鸟所在位置与安全出口。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：观察两条路线是否有障碍",
+          "childAction": "观察两条路线是否有障碍",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，观察两条路线是否有障碍。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：为阻塞路线添加绕行条件",
+          "childAction": "为阻塞路线添加绕行条件",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，为阻塞路线添加绕行条件。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：把接近小鸟、救援、返回排成顺序",
+          "childAction": "把接近小鸟、救援、返回排成顺序",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，把接近小鸟、救援、返回排成顺序。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：用两种障碍布局测试救援任务",
+          "childAction": "用两种障碍布局测试救援任务",
+          "observableCheck": "两种测试布局都能安全接近小鸟并返回起点",
+          "voiceover": "第5步，用两种障碍布局测试救援任务。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "只到达小鸟没有返回",
+          "diagnosis": "检查「条件与路径规划」的输入条件与对象。",
+          "recovery": "救援任务什么时候才算结束"
+        },
+        {
+          "symptom": "阻塞时继续撞墙",
+          "diagnosis": "检查「条件与路径规划」的积木连接或动作次数。",
+          "recovery": "路被挡住还有哪条可走"
+        },
+        {
+          "symptom": "没有确认真正救援成功",
+          "diagnosis": "检查「条件与路径规划」的运行验证与完成条件。",
+          "recovery": "回家的路线是否也安全"
+        }
+      ],
+      "hints": [
+        "救援任务什么时候才算结束",
+        "路被挡住还有哪条可走",
+        "回家的路线是否也安全"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "两种测试布局都能安全接近小鸟并返回起点"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明条件与路径规划关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排条件与路径规划"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示救援落单小鸟并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "两种测试布局都能安全接近小鸟并返回起点",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「只到达小鸟没有返回」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「阻塞时继续撞墙」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「没有确认真正救援成功」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "条件与路径规划",
+        "expectedRun": "两种测试布局都能安全接近小鸟并返回起点",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "加入救援倒计时并设计暂停策略。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「救援落单小鸟」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "救援落单小鸟",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    },
+    {
+      "id": "G0-U4-L06",
+      "sourceCatalogUnitId": "G0-U4",
+      "storyTitle": "制作森林毕业冒险",
+      "lessonTitle": "制作森林毕业冒险",
+      "stage": "森林毕业冒险",
+      "story": "小狐狸带队通过钥匙门、灯光路口和松果林到达毕业舞台。",
+      "focusConcept": "顺序、循环、判断、调试综合",
+      "ageRange": "5-7",
+      "engine": "blockly",
+      "contentStage": "detailed_script",
+      "playable": false,
+      "engineVerified": false,
+      "requiredEngineCapabilities": [
+        "if_else",
+        "state",
+        "counter",
+        "movement"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U4-L05"
+      ],
+      "learningObjectives": [
+        "能够解释「顺序、循环、判断、调试综合」在「制作森林毕业冒险」中的作用",
+        "在作品中完成可观察的创作操作并预测结果",
+        "能对照任务目标指出一次运行差异并尝试修正"
+      ],
+      "starterScene": {
+        "setting": "森林毕业冒险",
+        "characters": [
+          "小狐狸",
+          "小兔子"
+        ],
+        "materials": [
+          "障碍、状态灯与目标反馈",
+          "任务目标标记",
+          "成功与错误反馈"
+        ],
+        "initialCondition": "小狐狸带队通过钥匙门、灯光路口和松果林到达毕业舞台。 初始状态不可预先触发成功效果。"
+      },
+      "mission": {
+        "prompt": "小狐狸带队通过钥匙门、灯光路口和松果林到达毕业舞台。",
+        "studentFacingGoal": "完成「制作森林毕业冒险」，让舞台符合目标并亲自解释程序。",
+        "successEvidence": "顺利完成钥匙、松果、红绿灯三类任务，并说明修复过程"
+      },
+      "teachingSteps": [
+        {
+          "order": 1,
+          "teacherPrompt": "先观察：画出从树屋到毕业舞台的全程路线",
+          "childAction": "画出从树屋到毕业舞台的全程路线",
+          "observableCheck": "学生能展示第1步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第1步，画出从树屋到毕业舞台的全程路线。做完以后试着说说为什么。"
+        },
+        {
+          "order": 2,
+          "teacherPrompt": "操作第2步：为钥匙门安排先拾取再开门的动作",
+          "childAction": "为钥匙门安排先拾取再开门的动作",
+          "observableCheck": "学生能展示第2步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第2步，为钥匙门安排先拾取再开门的动作。做完以后试着说说为什么。"
+        },
+        {
+          "order": 3,
+          "teacherPrompt": "操作第3步：用循环完成松果林连续拾取",
+          "childAction": "用循环完成松果林连续拾取",
+          "observableCheck": "学生能展示第3步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第3步，用循环完成松果林连续拾取。做完以后试着说说为什么。"
+        },
+        {
+          "order": 4,
+          "teacherPrompt": "操作第4步：通过红绿灯判断确保安全通行",
+          "childAction": "通过红绿灯判断确保安全通行",
+          "observableCheck": "学生能展示第4步操作结果，并说明这一步为何放在这里。",
+          "voiceover": "第4步，通过红绿灯判断确保安全通行。做完以后试着说说为什么。"
+        },
+        {
+          "order": 5,
+          "teacherPrompt": "完成后检验：运行两组测试并修复一处错误",
+          "childAction": "运行两组测试并修复一处错误",
+          "observableCheck": "顺利完成钥匙、松果、红绿灯三类任务，并说明修复过程",
+          "voiceover": "第5步，运行两组测试并修复一处错误。做完以后试着说说为什么。"
+        }
+      ],
+      "commonMistakes": [
+        {
+          "symptom": "漏掉钥匙开门前置",
+          "diagnosis": "检查「顺序、循环、判断、调试综合」的输入条件与对象。",
+          "recovery": "先检查每个关卡分别能通过吗"
+        },
+        {
+          "symptom": "重复收集同一松果",
+          "diagnosis": "检查「顺序、循环、判断、调试综合」的积木连接或动作次数。",
+          "recovery": "把一整关拆成三小段"
+        },
+        {
+          "symptom": "红灯时未等待",
+          "diagnosis": "检查「顺序、循环、判断、调试综合」的运行验证与完成条件。",
+          "recovery": "看失败时是哪一小段出问题"
+        }
+      ],
+      "hints": [
+        "先检查每个关卡分别能通过吗",
+        "把一整关拆成三小段",
+        "看失败时是哪一小段出问题"
+      ],
+      "assessment": {
+        "rubric": [
+          {
+            "criterion": "核心任务完成",
+            "weight": 40,
+            "evidence": "顺利完成钥匙、松果、红绿灯三类任务，并说明修复过程"
+          },
+          {
+            "criterion": "程序顺序与逻辑",
+            "weight": 25,
+            "evidence": "能够说明顺序、循环、判断、调试综合关键步骤的先后或触发条件"
+          },
+          {
+            "criterion": "测试调试",
+            "weight": 20,
+            "evidence": "用一次错误或边界测试说明为何这样安排顺序、循环、判断、调试综合"
+          },
+          {
+            "criterion": "作品表达",
+            "weight": 15,
+            "evidence": "演示制作森林毕业冒险并用自己的话讲述设计"
+          }
+        ],
+        "mustPass": [
+          "顺利完成钥匙、松果、红绿灯三类任务，并说明修复过程",
+          "主动进行至少一次运行或模拟验证",
+          "能解释一块关键积木的作用"
+        ],
+        "negativeCases": [
+          "如果出现「漏掉钥匙开门前置」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「重复收集同一松果」，不应判定通过；需根据画面或运行结果解释问题。",
+          "如果出现「红灯时未等待」，不应判定通过；需根据画面或运行结果解释问题。"
+        ]
+      },
+      "codePlan": {
+        "kind": "blockly_conceptual_not_executable",
+        "entry": "开始或指定事件",
+        "logic": "顺序、循环、判断、调试综合",
+        "expectedRun": "顺利完成钥匙、松果、红绿灯三类任务，并说明修复过程",
+        "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
+      },
+      "extension": {
+        "prompt": "设计一个可以由玩家选择路径的隐藏结局。",
+        "successCheck": "学生能展示与基础任务不同的第二种结果，并解释修改的具体代码/积木。"
+      },
+      "parentConversation": "请孩子展示「制作森林毕业冒险」，问他：「如果把其中一块关键积木改变，作品会发生什么？」",
+      "artifact": {
+        "type": "演示作品及调试记录",
+        "title": "制作森林毕业冒险",
+        "minimumEvidence": [
+          "运行前预测",
+          "操作结果",
+          "一次修正或边界比较"
+        ]
+      },
+      "review": {
+        "teacherReviewRequired": true,
+        "assetsReady": false,
+        "codeReady": false,
+        "automatedAssessmentReady": false,
+        "publicationStatus": "content_ready_not_playable"
+      }
+    }
+  ]
+}
