@@ -110,6 +110,13 @@ test('extra unrequired blocks prevent progression', async ({ page }) => {
   // Add extra move_right block
   await moveBtn.click()
 
+  // Verify the workspace actually contains 3 blocks (when_start + move_right + move_right).
+  // The blockly SVG path nodes (the blocks themselves) can be counted. `blocklyPath` is usually the class for a block shape.
+  // Alternatively, just count the blockly text nodes that say '向右移动'. There should be 3 of them inside the workspace area SVG total (1 in toolbox flyout, 2 in workspace).
+  // Let's count how many times '向右移动' appears.
+  const moveRightNodes = workspaceArea.locator('text.blocklyText', { hasText: '向右移动' })
+  await expect(moveRightNodes).toHaveCount(3, { timeout: 10000 })
+
   // Run
   await page.getByTestId('run-code-button').click()
 
