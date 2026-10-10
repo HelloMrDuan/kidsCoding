@@ -30,5 +30,7 @@ License:
 - [13 类页面具体实现与布局尺寸规范](docs/roadmap/06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md)
 - [逐 PR 任务拆解、文件与验收清单](docs/roadmap/07-PR-BY-PR-IMPLEMENTATION-BACKLOG.md)
 - [432 课教学质量门槛与单元推进](docs/roadmap/08-CURRICULUM-QUALITY-AND-432-ROADMAP.md)
+- [课程教学品质独立 100 分评分与硬否决](docs/roadmap/09-TEACHING-QUALITY-GATE.md)
+- [Blockly / Python / Scratch 精品课示范验收](docs/roadmap/10-TEACHING-QUALITY-EXEMPLARS.md)
 
 全量课程目录不等于可运行/已发布课程。后续开发按阶段计划执行，PR 记录测试与合并证据。
