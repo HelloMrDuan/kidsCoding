@@ -4,6 +4,10 @@ import detailed from '@/content/curriculum/track-g0-detailed-lessons-v1.json'
 import g1 from '@/content/curriculum/track-g1-detailed-lessons-v1.json'
 import g2 from '@/content/curriculum/track-g2-detailed-lessons-v1.json'
 import p0 from '@/content/curriculum/track-p0-detailed-lessons-v1.json'
+import g3 from '@/content/curriculum/track-g3-detailed-lessons-v2.json'
+import p1 from '@/content/curriculum/track-p1-detailed-lessons-v2.json'
+import p2 from '@/content/curriculum/track-p2-detailed-lessons-v2.json'
+import advancedAssets from '@/content/curriculum/advanced-asset-requirements-v2.json'
 import assets from '@/content/curriculum/priority-asset-requirements-v1.json'
 import foundation from '@/content/curriculum/foundation-guides-v1.json'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
@@ -16,8 +20,8 @@ describe('curriculum content and read-only discovery contract', () => {
   it('keeps all 432 catalog lessons separate from the 12 live curriculum entries', () => {
     const stats = getCatalogStatistics()
     expect(stats).toEqual({
-      tracks: 18, units: 72, lessons: 432, detailedNewLessons: 96,
-      detailedTracks: ['G0', 'G1', 'G2', 'P0'], remainingOutlineLessons: 336,
+      tracks: 18, units: 72, lessons: 432, detailedNewLessons: 168,
+      detailedTracks: ['G0', 'G1', 'G2', 'G3', 'P0', 'P1', 'P2'], remainingOutlineLessons: 264,
       existingFoundationGuides: 12, unitProjectBlueprints: 72,
       existingLaunchLessonEntries: 12,
     })
@@ -110,5 +114,42 @@ describe('G1 Scratch and Python detailed coursework', () => {
       expect(getLessonGuide(lessonId)?.isPlayable).toBe(false)
     }
     expect(getOfflinePythonExample('G1-U1-L01')).toBeNull()
+  })
+})
+
+describe('G3/P1/P2 advanced lesson content maturity and resource gates', () => {
+  const tracks = [g3, p1, p2]
+
+  it('matches the 72 canonical lesson IDs, 5 actions, and meaningful positive/negative assessment specifications', () => {
+    for (const collection of tracks) {
+      const original = catalog.tracks.find(track => track.id === collection.trackId)
+      expect(original).toBeDefined()
+      expect(collection.lessons).toHaveLength(24)
+      expect(collection.lessons.map(lesson => lesson.id)).toEqual(
+        original!.units.flatMap(unit => unit.lessons.map(lesson => lesson.id)),
+      )
+      for (const lesson of collection.lessons) {
+        expect(lesson.teachingSteps).toHaveLength(5)
+        expect(lesson.feedback.hints).toHaveLength(3)
+        expect(lesson.assessment.rubric.reduce((sum, item) => sum + item.weight, 0)).toBe(100)
+        expect(lesson.assessment.positive.executionStatus).toBe('spec_only')
+        expect(lesson.assessment.negative.executionStatus).toBe('spec_only')
+        expect(lesson.status).toBe('detailed_not_published')
+        expect(getLessonContentStage(lesson.id)).toBe('detailed')
+        expect(getLessonGuide(lesson.id)?.steps).toHaveLength(5)
+        expect(getLessonGuide(lesson.id)?.isPlayable).toBe(false)
+      }
+    }
+  })
+
+  it('registers 240 assets only as requirements (not licensed or published)', () => {
+    expect(advancedAssets.assets).toHaveLength(240)
+    const ids = new Set(tracks.flatMap(track => track.lessons.map(lesson => lesson.id)))
+    for (const asset of advancedAssets.assets) {
+      expect(ids.has(asset.lessonId)).toBe(true)
+      expect(asset.license).toBe('not_yet_cleared')
+      expect(asset.productionStatus).toBe('requirements_only')
+      expect(asset.isPublished).toBe(false)
+    }
   })
 })

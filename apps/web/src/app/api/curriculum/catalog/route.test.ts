@@ -8,7 +8,7 @@ describe('GET /api/curriculum/catalog', () => {
     const response = GET(request())
     expect(response.status).toBe(200)
     const body = await response.json()
-    expect(body.stats).toMatchObject({ tracks: 18, units: 72, lessons: 432, detailedNewLessons: 96 })
+    expect(body.stats).toMatchObject({ tracks: 18, units: 72, lessons: 432, detailedNewLessons: 168 })
     expect(body.tracks).toHaveLength(18)
     expect(JSON.stringify(body)).not.toContain('teacherPrompt')
   })

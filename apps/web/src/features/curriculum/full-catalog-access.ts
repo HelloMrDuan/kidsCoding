@@ -3,6 +3,9 @@ import detailed from '@/content/curriculum/track-g0-detailed-lessons-v1.json'
 import g1 from '@/content/curriculum/track-g1-detailed-lessons-v1.json'
 import g2 from '@/content/curriculum/track-g2-detailed-lessons-v1.json'
 import p0 from '@/content/curriculum/track-p0-detailed-lessons-v1.json'
+import g3 from '@/content/curriculum/track-g3-detailed-lessons-v2.json'
+import p1 from '@/content/curriculum/track-p1-detailed-lessons-v2.json'
+import p2 from '@/content/curriculum/track-p2-detailed-lessons-v2.json'
 import foundation from '@/content/curriculum/foundation-guides-v1.json'
 import capstones from '@/content/curriculum/unit-capstone-blueprints-v1.json'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
@@ -23,9 +26,9 @@ export function getCatalogStatistics() {
       (sum, track) => sum + track.units.reduce((count, unit) => count + unit.lessons.length, 0),
       0,
     ),
-    detailedNewLessons: detailed.lessons.length + g1.lessons.length + g2.lessons.length + p0.lessons.length,
-    detailedTracks: ['G0', 'G1', 'G2', 'P0'],
-    remainingOutlineLessons: catalog.tracks.reduce((sum, track) => sum + track.units.reduce((n, unit) => n + unit.lessons.length, 0), 0) - detailed.lessons.length - g1.lessons.length - g2.lessons.length - p0.lessons.length,
+    detailedNewLessons: detailed.lessons.length + g1.lessons.length + g2.lessons.length + p0.lessons.length + g3.lessons.length + p1.lessons.length + p2.lessons.length,
+    detailedTracks: ['G0', 'G1', 'G2', 'G3', 'P0', 'P1', 'P2'],
+    remainingOutlineLessons: catalog.tracks.reduce((sum, track) => sum + track.units.reduce((n, unit) => n + unit.lessons.length, 0), 0) - detailed.lessons.length - g1.lessons.length - g2.lessons.length - p0.lessons.length - g3.lessons.length - p1.lessons.length - p2.lessons.length,
     existingFoundationGuides: foundation.lessons.length,
     unitProjectBlueprints: capstones.projects.length,
     existingLaunchLessonEntries: launchLessons.length,
@@ -47,7 +50,7 @@ export function getCatalogLesson(id: string) {
 }
 
 export function getLessonContentStage(id: string) {
-  if (detailed.lessons.some((lesson) => lesson.id === id) || g1.lessons.some((lesson) => lesson.id === id) || g2.lessons.some((lesson) => lesson.id === id) || p0.lessons.some((lesson) => lesson.id === id)) return 'detailed'
+  if (detailed.lessons.some((lesson) => lesson.id === id) || g1.lessons.some((lesson) => lesson.id === id) || g2.lessons.some((lesson) => lesson.id === id) || p0.lessons.some((lesson) => lesson.id === id) || g3.lessons.some((lesson) => lesson.id === id) || p1.lessons.some((lesson) => lesson.id === id) || p2.lessons.some((lesson) => lesson.id === id)) return 'detailed'
   if (foundation.lessons.some((lesson) => lesson.id === id)) return 'foundation'
   return 'outline'
 }
@@ -57,6 +60,37 @@ export function getUnitProject(unitId: string) {
 }
 
 export function getLessonGuide(id: string) {
+  const advanced = [...g3.lessons, ...p1.lessons, ...p2.lessons].find((lesson) => lesson.id === id)
+  if (advanced) {
+    return {
+      id: advanced.id,
+      title: advanced.title,
+      story: advanced.story,
+      goals: [advanced.learningOutcome, advanced.project.learnerBuild],
+      steps: advanced.teachingSteps.map((step) => ({
+        order: step.step,
+        prompt: step.teacherPrompt,
+        action: step.learnerAction,
+        check: step.check,
+        voiceover: step.teacherPrompt,
+      })),
+      errors: advanced.feedback.commonMistakes.map((symptom, index) => ({
+        symptom,
+        suggestion: advanced.feedback.hints[index],
+      })),
+      hints: advanced.feedback.hints,
+      rubric: advanced.assessment.rubric.map((item) => ({
+        criterion: item.criterion,
+        weight: item.weight,
+        evidence: item.description,
+      })),
+      acceptance: [advanced.assessment.positive.expected, advanced.assessment.negative.expected],
+      extension: advanced.project.creativeExtension,
+      capabilities: [advanced.environment],
+      status: advanced.status,
+      isPlayable: false,
+    }
+  }
   const expanded = [...g1.lessons, ...g2.lessons, ...p0.lessons].find((lesson) => lesson.id === id)
   if (expanded) {
     return {
