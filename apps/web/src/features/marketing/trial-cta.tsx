@@ -68,12 +68,17 @@ export function TrialCta() {
             ))}
           </div>
 
-          <Link
-            className="kc-button-3d mt-5 inline-flex items-center justify-center bg-[#ff9b54] px-6 py-4 text-base font-black text-slate-950 transition hover:bg-[#ffb16f]"
-            href="/onboarding/age"
-          >
-            立即开始启蒙主线
-          </Link>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              className="kc-button-3d inline-flex items-center justify-center bg-[#ff9b54] px-6 py-4 text-base font-black text-slate-950 transition hover:bg-[#ffb16f]"
+              href="/onboarding/age"
+            >
+              立即开始启蒙主线
+            </Link>
+            <Link href="/learn/catalog" className="inline-flex items-center rounded-full border border-white/20 px-6 py-4 text-sm font-bold text-white transition hover:bg-white/10" data-testid="home-catalog-entry">
+              先看看完整课程路线 →
+            </Link>
+          </div>
         </div>
       </div>
     </section>
