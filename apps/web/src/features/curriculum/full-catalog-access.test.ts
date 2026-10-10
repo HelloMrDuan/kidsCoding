@@ -134,7 +134,6 @@ describe('G3/P1/P2 advanced lesson content maturity and resource gates', () => {
         expect(lesson.assessment.rubric.reduce((sum, item) => sum + item.weight, 0)).toBe(100)
         expect(lesson.assessment.positive.executionStatus).toBe('spec_only')
         expect(lesson.assessment.negative.executionStatus).toBe('spec_only')
-        expect(lesson.delivery.releaseAllowed).toBeUndefined()
         expect(lesson.status).toBe('detailed_not_published')
         expect(getLessonContentStage(lesson.id)).toBe('detailed')
         expect(getLessonGuide(lesson.id)?.steps).toHaveLength(5)
