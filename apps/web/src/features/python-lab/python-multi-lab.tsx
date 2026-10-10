@@ -55,7 +55,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
       if(event.data.kind==='FRAME_READY') {clearInterval(probe);setReady(true);return}
       if(!active.current||event.data.id!==id.current)return
       if(event.data.kind==='LOADED') {
-        setStatus('Python 已加载，正在对3组不同参数逐一执行……')
+        setStatus(`Python 已加载，正在对${lesson.cases.length}组不同参数逐一执行……`)
         if(timeout.current)clearTimeout(timeout.current)
         timeout.current=setTimeout(()=>{frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*');active.current=false;setBusy(false);setStatus('程序运行超时，已停止。请检查是否存在无限循环。')},8000)
       }else if(event.data.kind==='RESULT'){
@@ -89,7 +89,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
         <p className="text-sm font-extrabold text-emerald-700">Python 多题评测实验室 · 浏览器本地试验</p>
         <h1 className="mt-3 text-3xl font-black">{lesson.title}</h1>
         <p className="mt-3 leading-8 text-slate-600">{lesson.prompt}</p>
-        <p className="mt-2 text-xs leading-6 text-amber-800">真正执行 Python 函数并测试3组不同参数。结果保存在当前浏览器，不是可信的正式考核成绩，也不代表课程已发布。</p>
+        <p className="mt-2 text-xs leading-6 text-amber-800">真正执行 Python 函数并测试{lesson.cases.length}组不同参数。结果保存在当前浏览器，不是可信的正式考核成绩，也不代表课程已发布。</p>
       </header>
       <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
         <section className="rounded-[2rem] bg-white p-6 shadow-sm">
@@ -98,7 +98,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
             spellCheck={false} className="mt-4 min-h-64 w-full rounded-xl bg-slate-950 p-5 font-mono text-sm leading-7 text-emerald-200 disabled:opacity-50" />
           <div className="mt-4 flex flex-wrap gap-3">
             <button data-testid="python-multi-run" disabled={!ready||busy} type="button" onClick={run} className="rounded-full bg-emerald-700 px-6 py-3 font-bold text-white disabled:opacity-50">
-              {busy?'运行中…':'▶ 运行3组测试'}
+              {busy?'运行中…':`▶ 运行${lesson.cases.length}组测试`}
             </button>
             <button type="button" onClick={()=>{setSource(lesson.startCode);setPassed(false);setObserved([]);setStatus('已重置编辑区。')}} className="rounded-full bg-slate-100 px-6 py-3 font-bold">恢复初始代码</button>
           </div>
@@ -107,7 +107,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
         <section className="rounded-[2rem] bg-white p-6 shadow-sm">
           <h2 className="text-xl font-black">2 · 真实 Python 测试反馈</h2>
           <p role="status" data-testid="python-multi-feedback" className="mt-4 rounded-xl bg-sky-50 p-4 text-sm leading-7">{status}</p>
-          <p className="mt-4 font-black">通过：<span data-testid="python-multi-count">{passedCount}/3</span></p>
+          <p className="mt-4 font-black">通过：<span data-testid="python-multi-count">{passedCount}/{lesson.cases.length}</span></p>
           <div className="mt-4 space-y-3">
             {lesson.cases.map((item,index)=>(
               <div key={index} className="rounded-xl border border-slate-100 p-3 text-sm">
@@ -117,7 +117,14 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
               </div>
             ))}
           </div>
-          {passed?<p data-testid="python-multi-passed" className="mt-5 rounded-xl bg-emerald-50 p-4 font-black text-emerald-800">⭐ 全部3组真实测试通过！这只是本机练习记录。</p>:null}
+          {passed?<p data-testid="python-multi-passed" className="mt-5 rounded-xl bg-emerald-50 p-4 font-black text-emerald-800">⭐ 全部{lesson.cases.length}组真实测试通过！这只是本机练习记录。</p>:null}
+          {lessonId === 'P0-U1-L06' && passed && observed[0] ? (
+            <section data-testid="python-card-preview" aria-label="由真实 Python 结果生成的名片预览" className="mt-5 rounded-2xl border border-violet-300 bg-gradient-to-br from-violet-50 to-sky-50 p-5">
+              <h3 className="font-black text-violet-800">作品预览 · 真实 Python 返回的示例名片</h3>
+              <pre className="mt-3 whitespace-pre-wrap text-base leading-8 text-slate-800">{observed[0]}</pre>
+              <p className="mt-2 text-xs text-slate-600">展示的是虚构测试数据，不会上传真实个人信息。</p>
+            </section>
+          ) : null}
           <p className="mt-4 text-sm text-slate-500">提示：{lesson.hint}</p>
         </section>
       </div>
