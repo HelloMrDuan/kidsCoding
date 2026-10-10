@@ -17,38 +17,50 @@
         {
           "step": 1,
           "teacherPrompt": "先找角色和起点",
-          "childAction": "先找角色和起点",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "选择森林舞台，指出小狐狸的起点和木桥终点",
+          "check": "能找到正确入口",
+          "voiceover": "第1步：先找角色和起点 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "拖入开始时积木",
-          "childAction": "拖入开始时积木",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "将开始时积木放入工作区并确认它是程序入口",
+          "check": "工作区含开始事件",
+          "voiceover": "第2步：拖入开始时积木 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "连接向右移动积木",
-          "childAction": "连接向右移动积木",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "把向右移动积木接在开始时的后面",
+          "check": "动作积木正确连接",
+          "voiceover": "第3步：连接向右移动积木 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "预测小狐狸终点",
-          "childAction": "预测小狐狸终点",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "不运行先用手指指出狐狸预计移动到的位置",
+          "check": "预测方向正确",
+          "voiceover": "第4步：预测小狐狸终点 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "点击运行观察移动",
-          "childAction": "点击运行观察移动",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "按运行，观察小狐狸与木桥的相对位置",
+          "check": "运行产生可见移动",
+          "voiceover": "第5步：点击运行观察移动 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "说出刚才程序做了什么",
-          "childAction": "说出刚才程序做了什么",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "指着两块积木按执行顺序讲一遍程序",
+          "check": "能复述触发和顺序",
+          "voiceover": "第6步：说出刚才程序做了什么 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -72,6 +84,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "没有事件积木就直接添加移动",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -81,7 +99,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-02-forest-greeting",
@@ -97,38 +116,50 @@
         {
           "step": 1,
           "teacherPrompt": "观察小兔子的位置",
-          "childAction": "观察小兔子的位置",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "在舞台上定位小兔子并确定要说的话",
+          "check": "认识两个角色",
+          "voiceover": "第1步：观察小兔子的位置 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "复用出发代码",
-          "childAction": "复用出发代码",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "运行现有移动积木确认狐狸能靠近兔子",
+          "check": "移动可单独运行",
+          "voiceover": "第2步：复用出发代码 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "选中对白积木",
-          "childAction": "选中对白积木",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "从工具箱选择对白积木并填写友好内容",
+          "check": "对白内容友好且可读",
+          "voiceover": "第3步：选中对白积木 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "把说话安排在移动之后",
-          "childAction": "把说话安排在移动之后",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "把对白接在移动积木之后",
+          "check": "顺序是先移动后对白",
+          "voiceover": "第4步：把说话安排在移动之后 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "运行观察气泡",
-          "childAction": "运行观察气泡",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "运行观察狐狸是否先走再显示气泡",
+          "check": "气泡在运行后出现",
+          "voiceover": "第5步：运行观察气泡 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "让同伴复述程序顺序",
-          "childAction": "让同伴复述程序顺序",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "把程序顺序讲给另一位小朋友听",
+          "check": "能够解释动作和说话的先后",
+          "voiceover": "第6步：让同伴复述程序顺序 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -152,6 +183,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "对白比移动先发生",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -161,7 +198,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-03-forest-story",
@@ -178,38 +216,50 @@
         {
           "step": 1,
           "teacherPrompt": "画三格故事草图",
-          "childAction": "画三格故事草图",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "把故事分成开场、遇见、问好并画三格草图",
+          "check": "三幕情节明确",
+          "voiceover": "第1步：画三格故事草图 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "设置森林场景",
-          "childAction": "设置森林场景",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "为第一幕选择森林背景和角色位置",
+          "check": "背景与故事一致",
+          "voiceover": "第2步：设置森林场景 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "规划角色入场",
-          "childAction": "规划角色入场",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "使用开始与移动积木实现入场",
+          "check": "角色有实际入场",
+          "voiceover": "第3步：规划角色入场 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "组合移动和对白",
-          "childAction": "组合移动和对白",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "把对白放在角色相遇之后",
+          "check": "对白随情节出现",
+          "voiceover": "第4步：组合移动和对白 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "对照草图检查顺序",
-          "childAction": "对照草图检查顺序",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "逐幕运行，标出与草图不一致的一处",
+          "check": "能定位一处次序问题",
+          "voiceover": "第5步：对照草图检查顺序 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "发布三幕短故事",
-          "childAction": "发布三幕短故事",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "从开头播放完整作品并讲述三幕故事",
+          "check": "完整剧情可回放",
+          "voiceover": "第6步：发布三幕短故事 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -233,6 +283,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "把对白写在故事开头",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -242,7 +298,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-04-meadow-scene",
@@ -257,38 +314,50 @@
         {
           "step": 1,
           "teacherPrompt": "观察森林和草地差异",
-          "childAction": "观察森林和草地差异",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "指出森林、草地两张背景的不同特征",
+          "check": "两张背景可区分",
+          "voiceover": "第1步：观察森林和草地差异 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "放置开始积木",
-          "childAction": "放置开始积木",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "设置森林为开场背景",
+          "check": "开场背景正确",
+          "voiceover": "第2步：放置开始积木 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "追加移动动作",
-          "childAction": "追加移动动作",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "将开始与移动积木按顺序连接",
+          "check": "动作链完整",
+          "voiceover": "第3步：追加移动动作 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "插入切换场景",
-          "childAction": "插入切换场景",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "把切换场景放到出发动作后",
+          "check": "切换动作在后",
+          "voiceover": "第4步：插入切换场景 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "预想切换时机",
-          "childAction": "预想切换时机",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "在运行前说出什么时候会变成草地",
+          "check": "预言切换点",
+          "voiceover": "第5步：预想切换时机 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "运行并核对故事",
-          "childAction": "运行并核对故事",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "运行并指出屏幕发生切换的准确时刻",
+          "check": "看到草地并指出切换原因",
+          "voiceover": "第6步：运行并核对故事 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -312,6 +381,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "先换场景再移动",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -321,7 +396,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-05-meadow-order",
@@ -337,38 +413,50 @@
         {
           "step": 1,
           "teacherPrompt": "阅读旅行路线图",
-          "childAction": "阅读旅行路线图",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "按出发、到达、继续前进绘制路线序列",
+          "check": "路线图完整",
+          "voiceover": "第1步：阅读旅行路线图 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "摆好出发顺序",
-          "childAction": "摆好出发顺序",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "先摆放开始和第一次移动",
+          "check": "出发动作正确",
+          "voiceover": "第2步：摆好出发顺序 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "标记场景切换点",
-          "childAction": "标记场景切换点",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "把切换背景放在到达的位置",
+          "check": "转场在合理时机",
+          "voiceover": "第3步：标记场景切换点 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "加入第二次行动",
-          "childAction": "加入第二次行动",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "把第二段行动排到场景切换之后",
+          "check": "第二段动作存在",
+          "voiceover": "第4步：加入第二次行动 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "逐帧核对时间线",
-          "childAction": "逐帧核对时间线",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "逐步比较路线图与程序行为",
+          "check": "至少核对一次预期",
+          "voiceover": "第5步：逐帧核对时间线 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "用语言解释结果",
-          "childAction": "用语言解释结果",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "用自己的话描述重复与先后顺序",
+          "check": "解释顺序与重复的差别",
+          "voiceover": "第6步：用语言解释结果 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -392,6 +480,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "把重复理解成无条件循环",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -401,7 +495,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-06-meadow-story",
@@ -418,38 +513,50 @@
         {
           "step": 1,
           "teacherPrompt": "规划旅行路线",
-          "childAction": "规划旅行路线",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "写出一次旅行的起点、终点与感受",
+          "check": "明确旅行目标",
+          "voiceover": "第1步：规划旅行路线 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "制作出发镜头",
-          "childAction": "制作出发镜头",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "让角色从森林出发并展示动作",
+          "check": "森林段有运动",
+          "voiceover": "第2步：制作出发镜头 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "加入草地镜头",
-          "childAction": "加入草地镜头",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "切换至草地背景并核对时机",
+          "check": "出现草地段",
+          "voiceover": "第3步：加入草地镜头 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "编排行动与对白",
-          "childAction": "编排行动与对白",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "在草地中添加后续动作与对白",
+          "check": "对白随镜头出现",
+          "voiceover": "第4步：编排行动与对白 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "检查每处转场",
-          "childAction": "检查每处转场",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "从头播放，记录不合理的一处转场",
+          "check": "能指出一次不合理现象",
+          "voiceover": "第5步：检查每处转场 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "完整播放并展示作品",
-          "childAction": "完整播放并展示作品",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "完整讲述旅行故事并展示作品",
+          "check": "完整演示有起止",
+          "voiceover": "第6步：完整播放并展示作品 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -473,6 +580,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "只有多个背景没有故事",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -482,7 +595,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-07-garden-click",
@@ -497,38 +611,50 @@
         {
           "step": 1,
           "teacherPrompt": "观察静止蝴蝶",
-          "childAction": "观察静止蝴蝶",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "观察蝴蝶静止的画面，预测点击前会怎样",
+          "check": "能说出预测",
+          "voiceover": "第1步：观察静止蝴蝶 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "区分开始和点击事件",
-          "childAction": "区分开始和点击事件",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "分别指出开始事件和点击事件的区别",
+          "check": "知道点击与开始区别",
+          "voiceover": "第2步：区分开始和点击事件 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "选择点击时积木",
-          "childAction": "选择点击时积木",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "在蝴蝶的程序里选择被点击时积木",
+          "check": "事件绑定在蝴蝶",
+          "voiceover": "第3步：选择点击时积木 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "连接动作",
-          "childAction": "连接动作",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "连接一个可见的动作反馈",
+          "check": "动作反馈可见",
+          "voiceover": "第4步：连接动作 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "运行验证不点击",
-          "childAction": "运行验证不点击",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "先不点击验证没有自动反应",
+          "check": "未点击保持静止",
+          "voiceover": "第5步：运行验证不点击 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "点击验证响应",
-          "childAction": "点击验证响应",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "点击蝴蝶，确认只有此时才触发动作",
+          "check": "点击后响应正确",
+          "voiceover": "第6步：点击验证响应 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -552,6 +678,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "误以为点击舞台就行",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -561,7 +693,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-08-garden-dialogue",
@@ -577,38 +710,50 @@
         {
           "step": 1,
           "teacherPrompt": "阅读秘密提示",
-          "childAction": "阅读秘密提示",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "阅读花园暗号并选择要说话的蝴蝶",
+          "check": "找到互动主角",
+          "voiceover": "第1步：阅读秘密提示 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "确认可点击角色",
-          "childAction": "确认可点击角色",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "在角色上绑定被点击时事件",
+          "check": "事件绑定正确",
+          "voiceover": "第2步：确认可点击角色 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "添加点击事件",
-          "childAction": "添加点击事件",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "添加对白积木并填写秘密暗号",
+          "check": "对白与暗号一致",
+          "voiceover": "第3步：添加点击事件 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "接上对白",
-          "childAction": "接上对白",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "运行但不点击，确认气泡暂不出现",
+          "check": "触发前无气泡",
+          "voiceover": "第4步：接上对白 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "比较触发前后",
-          "childAction": "比较触发前后",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "点蝴蝶，观察对白是否出现",
+          "check": "触发后有气泡",
+          "voiceover": "第5步：比较触发前后 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "邀请同伴找彩蛋",
-          "childAction": "邀请同伴找彩蛋",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "邀请同伴找出正确的交互触发方式",
+          "check": "玩家能发现交互方式",
+          "voiceover": "第6步：邀请同伴找彩蛋 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -632,6 +777,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "对白在点击前显示",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -641,7 +792,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-09-garden-story",
@@ -657,38 +809,50 @@
         {
           "step": 1,
           "teacherPrompt": "画交互关系图",
-          "childAction": "画交互关系图",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "画出花园里两个可互动角色及不同响应",
+          "check": "两个互动对象清楚",
+          "voiceover": "第1步：画交互关系图 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "设置花园场景",
-          "childAction": "设置花园场景",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "给第一只动物添加点击事件与动作",
+          "check": "第一互动可触发",
+          "voiceover": "第2步：设置花园场景 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "设计第一位角色",
-          "childAction": "设计第一位角色",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "给第二只动物设计不同对白或动作",
+          "check": "第二互动行为不同",
+          "voiceover": "第3步：设计第一位角色 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "设计第二次互动",
-          "childAction": "设计第二次互动",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "逐个运行，确保事件没有串到别的角色",
+          "check": "脚本归属不混乱",
+          "voiceover": "第4步：设计第二次互动 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "从未触发状态测试",
-          "childAction": "从未触发状态测试",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "请同伴盲测并记录看不懂的提示",
+          "check": "收集至少一条反馈",
+          "voiceover": "第5步：从未触发状态测试 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "邀请同伴试玩",
-          "childAction": "邀请同伴试玩",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "根据反馈修改，再展示完整交互故事",
+          "check": "互动故事可从头演示",
+          "voiceover": "第6步：邀请同伴试玩 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -712,6 +876,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "两个角色响应完全相同",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -721,7 +891,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-10-second-friend",
@@ -737,38 +908,50 @@
         {
           "step": 1,
           "teacherPrompt": "认识两位舞台角色",
-          "childAction": "认识两位舞台角色",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "为森林舞台挑选两位不同角色",
+          "check": "可识别两位角色",
+          "voiceover": "第1步：认识两位舞台角色 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "确定谁先出现",
-          "childAction": "确定谁先出现",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "写下角色出场的先后顺序",
+          "check": "顺序安排合理",
+          "voiceover": "第2步：确定谁先出现 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "给第一位角色编程",
-          "childAction": "给第一位角色编程",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "在第一位角色的脚本区实现入场",
+          "check": "角色A行为正确",
+          "voiceover": "第3步：给第一位角色编程 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "给第二位角色编程",
-          "childAction": "给第二位角色编程",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "切换到第二位角色，建立它自己的触发和动作",
+          "check": "角色B有独立脚本",
+          "voiceover": "第4步：给第二位角色编程 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "逐个触发测试",
-          "childAction": "逐个触发测试",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "分开触发两个角色检查脚本归属",
+          "check": "分开测试都能运行",
+          "voiceover": "第5步：逐个触发测试 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "完整演出",
-          "childAction": "完整演出",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "合并演示双角色出场并解释区别",
+          "check": "双角色演出成功",
+          "voiceover": "第6步：完整演出 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -792,6 +975,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "两个角色用了同一个脚本",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -801,7 +990,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-11-duo-rehearsal",
@@ -817,38 +1007,50 @@
         {
           "step": 1,
           "teacherPrompt": "查看排练清单",
-          "childAction": "查看排练清单",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "将排练流程分成两位演员各自的任务",
+          "check": "排练顺序明确",
+          "voiceover": "第1步：查看排练清单 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "标注角色脚本",
-          "childAction": "标注角色脚本",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "检查角色A的脚本和触发时机",
+          "check": "角色A有正确触发",
+          "voiceover": "第2步：标注角色脚本 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "模拟第一次排练",
-          "childAction": "模拟第一次排练",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "检查角色B的脚本和触发时机",
+          "check": "角色B有正确触发",
+          "voiceover": "第3步：模拟第一次排练 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "记录错位现象",
-          "childAction": "记录错位现象",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "演示一遍并记录同时说话或遮挡问题",
+          "check": "记录至少一个错位",
+          "voiceover": "第4步：记录错位现象 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "调整互动顺序",
-          "childAction": "调整互动顺序",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "只调整一个顺序冲突并再次运行",
+          "check": "有一处修正和回归",
+          "voiceover": "第5步：调整互动顺序 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "第二次排练验收",
-          "childAction": "第二次排练验收",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "让两位角色完成协调的排练",
+          "check": "演出节奏合理",
+          "voiceover": "第6步：第二次排练验收 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -872,6 +1074,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "脚本互相覆盖",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -881,7 +1089,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     },
     {
       "id": "lesson-12-graduation-show",
@@ -898,38 +1107,50 @@
         {
           "step": 1,
           "teacherPrompt": "写下演出主题",
-          "childAction": "写下演出主题",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "给毕业演出写一个名字并画故事路线图",
+          "check": "演出主题清楚",
+          "voiceover": "第1步：写下演出主题 试一试，完成后说说你看到了什么。",
+          "interactionType": "observe"
         },
         {
           "step": 2,
           "teacherPrompt": "安排至少两位角色",
-          "childAction": "安排至少两位角色",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "确定两位主演和各自的动作任务",
+          "check": "两个主角有明确分工",
+          "voiceover": "第2步：安排至少两位角色 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 3,
           "teacherPrompt": "制作一段顺序剧情",
-          "childAction": "制作一段顺序剧情",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "实现开场、移动与对白的核心片段",
+          "check": "开场剧情可运行",
+          "voiceover": "第3步：制作一段顺序剧情 试一试，完成后说说你看到了什么。",
+          "interactionType": "build"
         },
         {
           "step": 4,
           "teacherPrompt": "加入一次观众互动",
-          "childAction": "加入一次观众互动",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "加入一次需要观众操作的触发事件",
+          "check": "至少一种互动可触发",
+          "voiceover": "第4步：加入一次观众互动 试一试，完成后说说你看到了什么。",
+          "interactionType": "predict"
         },
         {
           "step": 5,
           "teacherPrompt": "执行完整测试清单",
-          "childAction": "执行完整测试清单",
-          "check": "观察操作结果与预期是否一致"
+          "childAction": "按清单从头测试所有场景和角色",
+          "check": "完整测试均有记录",
+          "voiceover": "第5步：执行完整测试清单 试一试，完成后说说你看到了什么。",
+          "interactionType": "test"
         },
         {
           "step": 6,
           "teacherPrompt": "展示并讲解作品",
-          "childAction": "展示并讲解作品",
-          "check": "学生能展示完成效果并解释关键步骤"
+          "childAction": "展示作品、解释最满意的设计并提出改进点",
+          "check": "作品可讲述并回放",
+          "voiceover": "第6步：展示并讲解作品 试一试，完成后说说你看到了什么。",
+          "interactionType": "reflect"
         }
       ],
       "commonErrors": [
@@ -953,6 +1174,12 @@
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
+        ],
+        "sampleFailureCase": "只有堆积木没有连贯剧情",
+        "instructorEvidence": [
+          "能复述触发与执行顺序",
+          "能独立演示当前课的核心动作",
+          "能指出一次调试或修改原因"
         ]
       },
       "assetsNeeded": [
@@ -962,7 +1189,8 @@
         "操作示范片段",
         "错误提示与奖励反馈"
       ],
-      "publicationStatus": "content_ready_engine_unverified"
+      "publicationStatus": "content_ready_engine_unverified",
+      "guideMaturity": "lesson_script_with_learner_actions"
     }
   ]
 }
