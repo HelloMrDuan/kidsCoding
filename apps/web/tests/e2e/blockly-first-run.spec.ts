@@ -22,8 +22,7 @@ test('first forest Blockly lesson requires actual execution before each step and
 test('bad Blockly program cannot be passed off as actual execution',async({page})=>{
   test.setTimeout(100_000)
   await page.goto('/learn/lesson/lesson-01-forest-hello')
-  await page.getByTestId('lesson-add-when_start').click()
-  await page.getByTestId('lesson-add-move_right').click()
+  // The first task intentionally offers only the start block. Run without it.
   await page.getByTestId('run-code-button').click()
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('积木好像不太对',{timeout:12_000})
   await page.getByTestId('lesson-complete-step').click()
