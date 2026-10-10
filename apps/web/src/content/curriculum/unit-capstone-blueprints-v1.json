@@ -1,0 +1,6203 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "project_blueprint_not_playable",
+  "description": "72个单元毕业作品教学蓝图，每项目5阶段及100分评价，尚非可运行课程。",
+  "projects": [
+    {
+      "id": "G0-U1-PROJECT",
+      "trackId": "G0",
+      "unitId": "G0-U1",
+      "title": "制作森林寻路卡",
+      "engine": "blockly",
+      "ageRange": "5-7",
+      "concepts": [
+        "指令",
+        "顺序",
+        "方位"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U1-L01",
+        "G0-U1-L02",
+        "G0-U1-L03",
+        "G0-U1-L04",
+        "G0-U1-L05",
+        "G0-U1-L06"
+      ],
+      "environment": "Blockly 与二维舞台",
+      "theme": "认识程序与方向：制作森林寻路卡",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作森林寻路卡」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「小狐狸认识按钮」和「给森林邮差指路」，选择需要的指令、顺序、方位知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「向右走三步」与「转弯避开石头」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「先开门再前进」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作森林寻路卡」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "程序触发后角色按顺序响应，修改关键积木后应出现可解释的差异"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：指令、顺序、方位"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作森林寻路卡」的核心流程，并说明指令如何起作用。",
+      "extension": "在「制作森林寻路卡」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「转弯避开石头」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "角色动作",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G0-U2-PROJECT",
+      "trackId": "G0",
+      "unitId": "G0-U2",
+      "title": "森林伙伴见面会",
+      "engine": "blockly",
+      "ageRange": "5-7",
+      "concepts": [
+        "事件",
+        "角色",
+        "触发"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U2-L01",
+        "G0-U2-L02",
+        "G0-U2-L03",
+        "G0-U2-L04",
+        "G0-U2-L05",
+        "G0-U2-L06"
+      ],
+      "environment": "Blockly 与二维舞台",
+      "theme": "事件与角色：森林伙伴见面会",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「森林伙伴见面会」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「点击叫醒小狐狸」和「开始旗帜响起」，选择需要的事件、角色、触发知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「兔子收到消息」与「切换两位朋友」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「点击苹果让它落下」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「森林伙伴见面会」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "程序触发后角色按顺序响应，修改关键积木后应出现可解释的差异"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：事件、角色、触发"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「森林伙伴见面会」的核心流程，并说明事件如何起作用。",
+      "extension": "在「森林伙伴见面会」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「切换两位朋友」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "角色动作",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G0-U3-PROJECT",
+      "trackId": "G0",
+      "unitId": "G0-U3",
+      "title": "森林节奏演出",
+      "engine": "blockly",
+      "ageRange": "5-7",
+      "concepts": [
+        "重复",
+        "循环",
+        "模式"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U3-L01",
+        "G0-U3-L02",
+        "G0-U3-L03",
+        "G0-U3-L04",
+        "G0-U3-L05",
+        "G0-U3-L06"
+      ],
+      "environment": "Blockly 与二维舞台",
+      "theme": "循环与规律：森林节奏演出",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「森林节奏演出」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「蘑菇小路的规律」和「重复走两步」，选择需要的重复、循环、模式知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「花园浇水机器」与「萤火虫闪三次」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「用循环画围栏」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「森林节奏演出」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "程序触发后角色按顺序响应，修改关键积木后应出现可解释的差异"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：重复、循环、模式"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「森林节奏演出」的核心流程，并说明重复如何起作用。",
+      "extension": "在「森林节奏演出」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「萤火虫闪三次」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "角色动作",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G0-U4-PROJECT",
+      "trackId": "G0",
+      "unitId": "G0-U4",
+      "title": "制作森林毕业冒险",
+      "engine": "blockly",
+      "ageRange": "5-7",
+      "concepts": [
+        "判断",
+        "调试",
+        "创作"
+      ],
+      "prerequisiteLessonIds": [
+        "G0-U4-L01",
+        "G0-U4-L02",
+        "G0-U4-L03",
+        "G0-U4-L04",
+        "G0-U4-L05",
+        "G0-U4-L06"
+      ],
+      "environment": "Blockly 与二维舞台",
+      "theme": "条件与小游戏：制作森林毕业冒险",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作森林毕业冒险」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「遇到河流怎么办」和「收集三颗松果」，选择需要的判断、调试、创作知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「红绿灯过马路」与「迷宫找错路线」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「救援落单小鸟」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作森林毕业冒险」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "程序触发后角色按顺序响应，修改关键积木后应出现可解释的差异"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：判断、调试、创作"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作森林毕业冒险」的核心流程，并说明判断如何起作用。",
+      "extension": "在「制作森林毕业冒险」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「迷宫找错路线」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "角色动作",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G1-U1-PROJECT",
+      "trackId": "G1",
+      "unitId": "G1-U1",
+      "title": "完整森林童话",
+      "engine": "blockly",
+      "ageRange": "6-9",
+      "concepts": [
+        "对白",
+        "顺序",
+        "场景"
+      ],
+      "prerequisiteLessonIds": [
+        "G1-U1-L01",
+        "G1-U1-L02",
+        "G1-U1-L03",
+        "G1-U1-L04",
+        "G1-U1-L05",
+        "G1-U1-L06"
+      ],
+      "environment": "Blockly 与二维舞台",
+      "theme": "会说话的故事：完整森林童话",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「完整森林童话」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「给狐狸一个开场」和「与兔子轮流说话」，选择需要的对白、顺序、场景知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「设置故事背景」与「角色出场退场」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「字幕与旁白」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「完整森林童话」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "程序触发后角色按顺序响应，修改关键积木后应出现可解释的差异"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：对白、顺序、场景"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「完整森林童话」的核心流程，并说明对白如何起作用。",
+      "extension": "在「完整森林童话」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「角色出场退场」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "角色动作",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G1-U2-PROJECT",
+      "trackId": "G1",
+      "unitId": "G1-U2",
+      "title": "小兔子运动会",
+      "engine": "blockly",
+      "ageRange": "6-9",
+      "concepts": [
+        "坐标",
+        "移动",
+        "速度"
+      ],
+      "prerequisiteLessonIds": [
+        "G1-U2-L01",
+        "G1-U2-L02",
+        "G1-U2-L03",
+        "G1-U2-L04",
+        "G1-U2-L05",
+        "G1-U2-L06"
+      ],
+      "environment": "Blockly 与二维舞台",
+      "theme": "动作与坐标：小兔子运动会",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「小兔子运动会」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「认识舞台坐标」和「移动到目标点」，选择需要的坐标、移动、速度知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「让角色沿路走」与「快慢不同的追逐」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「角色朝向与旋转」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「小兔子运动会」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "程序触发后角色按顺序响应，修改关键积木后应出现可解释的差异"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：坐标、移动、速度"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「小兔子运动会」的核心流程，并说明坐标如何起作用。",
+      "extension": "在「小兔子运动会」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「快慢不同的追逐」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "角色动作",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G1-U3-PROJECT",
+      "trackId": "G1",
+      "unitId": "G1-U3",
+      "title": "互动故事分支",
+      "engine": "blockly",
+      "ageRange": "6-9",
+      "concepts": [
+        "事件",
+        "条件",
+        "变量"
+      ],
+      "prerequisiteLessonIds": [
+        "G1-U3-L01",
+        "G1-U3-L02",
+        "G1-U3-L03",
+        "G1-U3-L04",
+        "G1-U3-L05",
+        "G1-U3-L06"
+      ],
+      "environment": "Blockly 与二维舞台",
+      "theme": "互动与状态：互动故事分支",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「互动故事分支」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「点击打开宝箱」和「判断是否拿钥匙」，选择需要的事件、条件、变量知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「记录得到的星星」与「碰到障碍停下来」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「按钮切换白天黑夜」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「互动故事分支」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "程序触发后角色按顺序响应，修改关键积木后应出现可解释的差异"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：事件、条件、变量"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「互动故事分支」的核心流程，并说明事件如何起作用。",
+      "extension": "在「互动故事分支」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「碰到障碍停下来」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "角色动作",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G1-U4-PROJECT",
+      "trackId": "G1",
+      "unitId": "G1-U4",
+      "title": "森林剧场首映",
+      "engine": "blockly",
+      "ageRange": "6-9",
+      "concepts": [
+        "剧情",
+        "调试",
+        "发布"
+      ],
+      "prerequisiteLessonIds": [
+        "G1-U4-L01",
+        "G1-U4-L02",
+        "G1-U4-L03",
+        "G1-U4-L04",
+        "G1-U4-L05",
+        "G1-U4-L06"
+      ],
+      "environment": "Blockly 与二维舞台",
+      "theme": "作品设计：森林剧场首映",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「森林剧场首映」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「规划三幕故事」和「绘制场景草图」，选择需要的剧情、调试、发布知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「给人物分配任务」与「修复对白顺序」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「邀请朋友试玩」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「森林剧场首映」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "程序触发后角色按顺序响应，修改关键积木后应出现可解释的差异"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：剧情、调试、发布"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「森林剧场首映」的核心流程，并说明剧情如何起作用。",
+      "extension": "在「森林剧场首映」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「修复对白顺序」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "角色动作",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G2-U1-PROJECT",
+      "trackId": "G2",
+      "unitId": "G2-U1",
+      "title": "制作生日贺卡",
+      "engine": "scratch",
+      "ageRange": "7-11",
+      "concepts": [
+        "精灵",
+        "造型",
+        "积木"
+      ],
+      "prerequisiteLessonIds": [
+        "G2-U1-L01",
+        "G2-U1-L02",
+        "G2-U1-L03",
+        "G2-U1-L04",
+        "G2-U1-L05",
+        "G2-U1-L06"
+      ],
+      "environment": "Scratch 3.0 多角色舞台",
+      "theme": "Scratch 工作台：制作生日贺卡",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作生日贺卡」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「认识舞台与精灵」和「角色换造型」，选择需要的精灵、造型、积木知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「设置背景和声音」与「运动积木初体验」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「广播第一条消息」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作生日贺卡」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "旗帜与按键等事件触发后，角色和胜负规则可验证"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：精灵、造型、积木"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作生日贺卡」的核心流程，并说明精灵如何起作用。",
+      "extension": "在「制作生日贺卡」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「运动积木初体验」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "精灵造型",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G2-U2-PROJECT",
+      "trackId": "G2",
+      "unitId": "G2-U2",
+      "title": "音乐动画短片",
+      "engine": "scratch",
+      "ageRange": "7-11",
+      "concepts": [
+        "循环",
+        "时间",
+        "音效"
+      ],
+      "prerequisiteLessonIds": [
+        "G2-U2-L01",
+        "G2-U2-L02",
+        "G2-U2-L03",
+        "G2-U2-L04",
+        "G2-U2-L05",
+        "G2-U2-L06"
+      ],
+      "environment": "Scratch 3.0 多角色舞台",
+      "theme": "动画制作：音乐动画短片",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「音乐动画短片」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「让角色走路有帧动画」和「制作昼夜交替」，选择需要的循环、时间、音效知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「音乐节奏舞台」与「循环飞舞的蝴蝶」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「两只精灵同步表演」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「音乐动画短片」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "旗帜与按键等事件触发后，角色和胜负规则可验证"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：循环、时间、音效"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「音乐动画短片」的核心流程，并说明循环如何起作用。",
+      "extension": "在「音乐动画短片」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「循环飞舞的蝴蝶」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "精灵造型",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G2-U3-PROJECT",
+      "trackId": "G2",
+      "unitId": "G2-U3",
+      "title": "水果接力挑战",
+      "engine": "scratch",
+      "ageRange": "7-11",
+      "concepts": [
+        "侦测",
+        "判断",
+        "随机"
+      ],
+      "prerequisiteLessonIds": [
+        "G2-U3-L01",
+        "G2-U3-L02",
+        "G2-U3-L03",
+        "G2-U3-L04",
+        "G2-U3-L05",
+        "G2-U3-L06"
+      ],
+      "environment": "Scratch 3.0 多角色舞台",
+      "theme": "互动游戏：水果接力挑战",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「水果接力挑战」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「键盘控制小船」和「接住掉落水果」，选择需要的侦测、判断、随机知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「随机出现的礼物」与「判断碰撞得分」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「倒计时游戏结束」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「水果接力挑战」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "旗帜与按键等事件触发后，角色和胜负规则可验证"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：侦测、判断、随机"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「水果接力挑战」的核心流程，并说明侦测如何起作用。",
+      "extension": "在「水果接力挑战」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「判断碰撞得分」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "精灵造型",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G2-U4-PROJECT",
+      "trackId": "G2",
+      "unitId": "G2-U4",
+      "title": "发布个人第一款游戏",
+      "engine": "scratch",
+      "ageRange": "7-11",
+      "concepts": [
+        "变量",
+        "关卡",
+        "测试"
+      ],
+      "prerequisiteLessonIds": [
+        "G2-U4-L01",
+        "G2-U4-L02",
+        "G2-U4-L03",
+        "G2-U4-L04",
+        "G2-U4-L05",
+        "G2-U4-L06"
+      ],
+      "environment": "Scratch 3.0 多角色舞台",
+      "theme": "综合创作：发布个人第一款游戏",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「发布个人第一款游戏」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「游戏规则说明书」和「设计三种障碍」，选择需要的变量、关卡、测试知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「制作胜负提示」与「给游戏加难度」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「试玩记录与修复」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「发布个人第一款游戏」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "旗帜与按键等事件触发后，角色和胜负规则可验证"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：变量、关卡、测试"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「发布个人第一款游戏」的核心流程，并说明变量如何起作用。",
+      "extension": "在「发布个人第一款游戏」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「给游戏加难度」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "精灵造型",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G3-U1-PROJECT",
+      "trackId": "G3",
+      "unitId": "G3-U1",
+      "title": "星际防御小游戏",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "concepts": [
+        "自制积木",
+        "克隆",
+        "列表"
+      ],
+      "prerequisiteLessonIds": [
+        "G3-U1-L01",
+        "G3-U1-L02",
+        "G3-U1-L03",
+        "G3-U1-L04",
+        "G3-U1-L05",
+        "G3-U1-L06"
+      ],
+      "environment": "Scratch 3.0 多角色舞台",
+      "theme": "算法积木与分身：星际防御小游戏",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「星际防御小游戏」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「用自制积木画图」和「克隆流星雨」，选择需要的自制积木、克隆、列表知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「列表管理背包」与「角色状态切换」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「批量生成敌人」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「星际防御小游戏」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "旗帜与按键等事件触发后，角色和胜负规则可验证"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：自制积木、克隆、列表"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「星际防御小游戏」的核心流程，并说明自制积木如何起作用。",
+      "extension": "在「星际防御小游戏」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「角色状态切换」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "精灵造型",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G3-U2-PROJECT",
+      "trackId": "G3",
+      "unitId": "G3-U2",
+      "title": "奇幻城堡冒险",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "concepts": [
+        "状态机",
+        "关卡",
+        "碰撞"
+      ],
+      "prerequisiteLessonIds": [
+        "G3-U2-L01",
+        "G3-U2-L02",
+        "G3-U2-L03",
+        "G3-U2-L04",
+        "G3-U2-L05",
+        "G3-U2-L06"
+      ],
+      "environment": "Scratch 3.0 多角色舞台",
+      "theme": "多场景与关卡：奇幻城堡冒险",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「奇幻城堡冒险」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「设计关卡入口」和「多背景切换」，选择需要的状态机、关卡、碰撞知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「收集与解锁道具」与「制作移动平台」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「失败后重新挑战」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「奇幻城堡冒险」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "旗帜与按键等事件触发后，角色和胜负规则可验证"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：状态机、关卡、碰撞"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「奇幻城堡冒险」的核心流程，并说明状态机如何起作用。",
+      "extension": "在「奇幻城堡冒险」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「制作移动平台」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "精灵造型",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G3-U3-PROJECT",
+      "trackId": "G3",
+      "unitId": "G3-U3",
+      "title": "科学互动展板",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "concepts": [
+        "模型",
+        "变量",
+        "数据"
+      ],
+      "prerequisiteLessonIds": [
+        "G3-U3-L01",
+        "G3-U3-L02",
+        "G3-U3-L03",
+        "G3-U3-L04",
+        "G3-U3-L05",
+        "G3-U3-L06"
+      ],
+      "environment": "Scratch 3.0 多角色舞台",
+      "theme": "仿真与科学：科学互动展板",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「科学互动展板」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「模拟昼夜温度」和「雨滴落下规律」，选择需要的模型、变量、数据知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「掷骰子概率实验」与「小球反弹物理」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「生态食物链模拟」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「科学互动展板」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "旗帜与按键等事件触发后，角色和胜负规则可验证"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：模型、变量、数据"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「科学互动展板」的核心流程，并说明模型如何起作用。",
+      "extension": "在「科学互动展板」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「小球反弹物理」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "精灵造型",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "G3-U4-PROJECT",
+      "trackId": "G3",
+      "unitId": "G3-U4",
+      "title": "个人创作发布会",
+      "engine": "scratch",
+      "ageRange": "9-13",
+      "concepts": [
+        "设计思维",
+        "协作",
+        "迭代"
+      ],
+      "prerequisiteLessonIds": [
+        "G3-U4-L01",
+        "G3-U4-L02",
+        "G3-U4-L03",
+        "G3-U4-L04",
+        "G3-U4-L05",
+        "G3-U4-L06"
+      ],
+      "environment": "Scratch 3.0 多角色舞台",
+      "theme": "自由创作毕业：个人创作发布会",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「个人创作发布会」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「提出自己的游戏点子」和「制作角色与世界观」，选择需要的设计思维、协作、迭代知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「完成试玩版本」与「三轮用户反馈」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「优化玩法与表现」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「个人创作发布会」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "旗帜与按键等事件触发后，角色和胜负规则可验证"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：设计思维、协作、迭代"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「个人创作发布会」的核心流程，并说明设计思维如何起作用。",
+      "extension": "在「个人创作发布会」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「三轮用户反馈」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "精灵造型",
+        "场景",
+        "音效"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P0-U1-PROJECT",
+      "trackId": "P0",
+      "unitId": "P0-U1",
+      "title": "制作个人名片生成器",
+      "engine": "python",
+      "ageRange": "9-13",
+      "concepts": [
+        "输入输出",
+        "变量",
+        "类型"
+      ],
+      "prerequisiteLessonIds": [
+        "P0-U1-L01",
+        "P0-U1-L02",
+        "P0-U1-L03",
+        "P0-U1-L04",
+        "P0-U1-L05",
+        "P0-U1-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "认识 Python：制作个人名片生成器",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作个人名片生成器」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「运行第一行代码」和「让程序自我介绍」，选择需要的输入输出、变量、类型知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「文字拼接小助手」与「数字和字符串」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「输入你的名字」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作个人名片生成器」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：输入输出、变量、类型"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作个人名片生成器」的核心流程，并说明输入输出如何起作用。",
+      "extension": "在「制作个人名片生成器」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「数字和字符串」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P0-U2-PROJECT",
+      "trackId": "P0",
+      "unitId": "P0-U2",
+      "title": "制作幸运抽奖器",
+      "engine": "python",
+      "ageRange": "9-13",
+      "concepts": [
+        "if",
+        "for",
+        "while"
+      ],
+      "prerequisiteLessonIds": [
+        "P0-U2-L01",
+        "P0-U2-L02",
+        "P0-U2-L03",
+        "P0-U2-L04",
+        "P0-U2-L05",
+        "P0-U2-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "分支与循环：制作幸运抽奖器",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作幸运抽奖器」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「判断今天穿什么」和「猜数字小游戏」，选择需要的if、for、while知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「用循环画星星」与「计算累计积分」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「密码尝试规则」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作幸运抽奖器」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：if、for、while"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作幸运抽奖器」的核心流程，并说明if如何起作用。",
+      "extension": "在「制作幸运抽奖器」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「计算累计积分」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P0-U3-PROJECT",
+      "trackId": "P0",
+      "unitId": "P0-U3",
+      "title": "图书馆借阅助手",
+      "engine": "python",
+      "ageRange": "9-13",
+      "concepts": [
+        "字符串",
+        "列表",
+        "字典"
+      ],
+      "prerequisiteLessonIds": [
+        "P0-U3-L01",
+        "P0-U3-L02",
+        "P0-U3-L03",
+        "P0-U3-L04",
+        "P0-U3-L05",
+        "P0-U3-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "字符串与集合：图书馆借阅助手",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「图书馆借阅助手」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「统计一句话的字数」和「整理旅行清单」，选择需要的字符串、列表、字典知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「查找常见单词」与「记录小组得分」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「字典制作词典」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「图书馆借阅助手」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：字符串、列表、字典"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「图书馆借阅助手」的核心流程，并说明字符串如何起作用。",
+      "extension": "在「图书馆借阅助手」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「记录小组得分」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P0-U4-PROJECT",
+      "trackId": "P0",
+      "unitId": "P0-U4",
+      "title": "校园任务管理器",
+      "engine": "python",
+      "ageRange": "9-13",
+      "concepts": [
+        "函数",
+        "模块",
+        "异常"
+      ],
+      "prerequisiteLessonIds": [
+        "P0-U4-L01",
+        "P0-U4-L02",
+        "P0-U4-L03",
+        "P0-U4-L04",
+        "P0-U4-L05",
+        "P0-U4-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "函数与项目：校园任务管理器",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「校园任务管理器」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「封装问候函数」和「参数让程序更灵活」，选择需要的函数、模块、异常知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「随机数小游戏」与「发现并处理输入错误」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「拆分多文件工具」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「校园任务管理器」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：函数、模块、异常"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「校园任务管理器」的核心流程，并说明函数如何起作用。",
+      "extension": "在「校园任务管理器」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「发现并处理输入错误」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P1-U1-PROJECT",
+      "trackId": "P1",
+      "unitId": "P1-U1",
+      "title": "制作数学艺术画",
+      "engine": "python",
+      "ageRange": "10-15",
+      "concepts": [
+        "坐标",
+        "循环",
+        "绘图"
+      ],
+      "prerequisiteLessonIds": [
+        "P1-U1-L01",
+        "P1-U1-L02",
+        "P1-U1-L03",
+        "P1-U1-L04",
+        "P1-U1-L05",
+        "P1-U1-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "Turtle 视觉艺术：制作数学艺术画",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作数学艺术画」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「画一座彩色房子」和「多边形规律」，选择需要的坐标、循环、绘图知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「旋转花瓣图案」与「随机星空」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「递归雪花入门」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作数学艺术画」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：坐标、循环、绘图"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作数学艺术画」的核心流程，并说明坐标如何起作用。",
+      "extension": "在「制作数学艺术画」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「随机星空」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P1-U2-PROJECT",
+      "trackId": "P1",
+      "unitId": "P1-U2",
+      "title": "神秘洞穴冒险",
+      "engine": "python",
+      "ageRange": "10-15",
+      "concepts": [
+        "流程",
+        "状态",
+        "输入"
+      ],
+      "prerequisiteLessonIds": [
+        "P1-U2-L01",
+        "P1-U2-L02",
+        "P1-U2-L03",
+        "P1-U2-L04",
+        "P1-U2-L05",
+        "P1-U2-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "交互式文本游戏：神秘洞穴冒险",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「神秘洞穴冒险」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「冒险故事选项」和「背包道具收集」，选择需要的流程、状态、输入知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「战斗回合计数」与「随机事件发生」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「多结局剧情」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「神秘洞穴冒险」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：流程、状态、输入"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「神秘洞穴冒险」的核心流程，并说明流程如何起作用。",
+      "extension": "在「神秘洞穴冒险」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「随机事件发生」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P1-U3-PROJECT",
+      "trackId": "P1",
+      "unitId": "P1-U3",
+      "title": "打砖块小游戏",
+      "engine": "python",
+      "ageRange": "10-15",
+      "concepts": [
+        "游戏循环",
+        "事件",
+        "碰撞"
+      ],
+      "prerequisiteLessonIds": [
+        "P1-U3-L01",
+        "P1-U3-L02",
+        "P1-U3-L03",
+        "P1-U3-L04",
+        "P1-U3-L05",
+        "P1-U3-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "pygame 初阶：打砖块小游戏",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「打砖块小游戏」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「创建游戏窗口」和「让小球移动」，选择需要的游戏循环、事件、碰撞知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「键盘操控飞船」与「障碍物碰撞」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「积分生命值与音效」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「打砖块小游戏」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：游戏循环、事件、碰撞"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「打砖块小游戏」的核心流程，并说明游戏循环如何起作用。",
+      "extension": "在「打砖块小游戏」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「障碍物碰撞」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P1-U4-PROJECT",
+      "trackId": "P1",
+      "unitId": "P1-U4",
+      "title": "发布迷你太空游戏",
+      "engine": "python",
+      "ageRange": "10-15",
+      "concepts": [
+        "模块",
+        "资源",
+        "调试"
+      ],
+      "prerequisiteLessonIds": [
+        "P1-U4-L01",
+        "P1-U4-L02",
+        "P1-U4-L03",
+        "P1-U4-L04",
+        "P1-U4-L05",
+        "P1-U4-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "完整游戏制作：发布迷你太空游戏",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「发布迷你太空游戏」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「设计游戏菜单」和「载入原创角色资源」，选择需要的模块、资源、调试知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「敌人生成与难度」与「关卡保存与恢复」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「用户试玩数据」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「发布迷你太空游戏」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：模块、资源、调试"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「发布迷你太空游戏」的核心流程，并说明模块如何起作用。",
+      "extension": "在「发布迷你太空游戏」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「关卡保存与恢复」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P2-U1-PROJECT",
+      "trackId": "P2",
+      "unitId": "P2-U1",
+      "title": "整理全班成绩",
+      "engine": "python",
+      "ageRange": "11-16",
+      "concepts": [
+        "复杂度",
+        "分解",
+        "排序"
+      ],
+      "prerequisiteLessonIds": [
+        "P2-U1-L01",
+        "P2-U1-L02",
+        "P2-U1-L03",
+        "P2-U1-L04",
+        "P2-U1-L05",
+        "P2-U1-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "算法思维：整理全班成绩",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「整理全班成绩」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「比较两种找书方法」和「线性与二分查找」，选择需要的复杂度、分解、排序知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「冒泡排序动画」与「选择与插入排序」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「算法耗时实验」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「整理全班成绩」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：复杂度、分解、排序"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「整理全班成绩」的核心流程，并说明复杂度如何起作用。",
+      "extension": "在「整理全班成绩」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「选择与插入排序」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P2-U2-PROJECT",
+      "trackId": "P2",
+      "unitId": "P2-U2",
+      "title": "设计简易消息中心",
+      "engine": "python",
+      "ageRange": "11-16",
+      "concepts": [
+        "栈",
+        "队列",
+        "集合",
+        "映射"
+      ],
+      "prerequisiteLessonIds": [
+        "P2-U2-L01",
+        "P2-U2-L02",
+        "P2-U2-L03",
+        "P2-U2-L04",
+        "P2-U2-L05",
+        "P2-U2-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "常用数据结构：设计简易消息中心",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「设计简易消息中心」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「用栈撤销操作」和「排队取号系统」，选择需要的栈、队列、集合、映射知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「集合去重」与「词频字典」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「二维地图数组」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「设计简易消息中心」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：栈、队列、集合、映射"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「设计简易消息中心」的核心流程，并说明栈如何起作用。",
+      "extension": "在「设计简易消息中心」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「词频字典」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P2-U3-PROJECT",
+      "trackId": "P2",
+      "unitId": "P2-U3",
+      "title": "迷宫自动寻路器",
+      "engine": "python",
+      "ageRange": "11-16",
+      "concepts": [
+        "递归",
+        "回溯",
+        "图"
+      ],
+      "prerequisiteLessonIds": [
+        "P2-U3-L01",
+        "P2-U3-L02",
+        "P2-U3-L03",
+        "P2-U3-L04",
+        "P2-U3-L05",
+        "P2-U3-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "递归与问题求解：迷宫自动寻路器",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「迷宫自动寻路器」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「树枝递归绘图」和「汉诺塔实验」，选择需要的递归、回溯、图知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「走迷宫回溯」与「广度优先找最短路」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「分治寻找最大值」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「迷宫自动寻路器」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：递归、回溯、图"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「迷宫自动寻路器」的核心流程，并说明递归如何起作用。",
+      "extension": "在「迷宫自动寻路器」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「广度优先找最短路」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P2-U4-PROJECT",
+      "trackId": "P2",
+      "unitId": "P2-U4",
+      "title": "智能班级排课原型",
+      "engine": "python",
+      "ageRange": "11-16",
+      "concepts": [
+        "测试",
+        "性能",
+        "优化"
+      ],
+      "prerequisiteLessonIds": [
+        "P2-U4-L01",
+        "P2-U4-L02",
+        "P2-U4-L03",
+        "P2-U4-L04",
+        "P2-U4-L05",
+        "P2-U4-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "工程化算法项目：智能班级排课原型",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「智能班级排课原型」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「为函数写测试」和「设计异常输入」，选择需要的测试、性能、优化知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「读取CSV数据」与「验证算法正确性」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「比较内存耗用」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「智能班级排课原型」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：测试、性能、优化"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「智能班级排课原型」的核心流程，并说明测试如何起作用。",
+      "extension": "在「智能班级排课原型」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「验证算法正确性」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P3-U1-PROJECT",
+      "trackId": "P3",
+      "unitId": "P3-U1",
+      "title": "个人学习统计器",
+      "engine": "python",
+      "ageRange": "11-17",
+      "concepts": [
+        "CSV",
+        "JSON",
+        "文件"
+      ],
+      "prerequisiteLessonIds": [
+        "P3-U1-L01",
+        "P3-U1-L02",
+        "P3-U1-L03",
+        "P3-U1-L04",
+        "P3-U1-L05",
+        "P3-U1-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "数据读写：个人学习统计器",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「个人学习统计器」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「读写日记文本」和「制作CSV记账表」，选择需要的CSV、JSON、文件知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「JSON通讯录」与「文件名批量整理」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「数据清洗缺失值」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「个人学习统计器」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：CSV、JSON、文件"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「个人学习统计器」的核心流程，并说明CSV如何起作用。",
+      "extension": "在「个人学习统计器」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「文件名批量整理」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P3-U2-PROJECT",
+      "trackId": "P3",
+      "unitId": "P3-U2",
+      "title": "生成校园数据报告",
+      "engine": "python",
+      "ageRange": "11-17",
+      "concepts": [
+        "聚合",
+        "统计",
+        "图表"
+      ],
+      "prerequisiteLessonIds": [
+        "P3-U2-L01",
+        "P3-U2-L02",
+        "P3-U2-L03",
+        "P3-U2-L04",
+        "P3-U2-L05",
+        "P3-U2-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "数据可视化：生成校园数据报告",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「生成校园数据报告」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「计算平均与中位数」和「天气数据折线图」，选择需要的聚合、统计、图表知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「班级运动柱状图」与「预算组成饼图」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「识别异常数据」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「生成校园数据报告」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：聚合、统计、图表"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「生成校园数据报告」的核心流程，并说明聚合如何起作用。",
+      "extension": "在「生成校园数据报告」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「预算组成饼图」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P3-U3-PROJECT",
+      "trackId": "P3",
+      "unitId": "P3-U3",
+      "title": "制作天气提醒助手",
+      "engine": "python",
+      "ageRange": "11-17",
+      "concepts": [
+        "HTTP",
+        "JSON",
+        "安全"
+      ],
+      "prerequisiteLessonIds": [
+        "P3-U3-L01",
+        "P3-U3-L02",
+        "P3-U3-L03",
+        "P3-U3-L04",
+        "P3-U3-L05",
+        "P3-U3-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "网络与 API：制作天气提醒助手",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作天气提醒助手」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「理解请求与响应」和「读取公共天气接口」，选择需要的HTTP、JSON、安全知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「处理网络超时」与「使用环境变量保管密钥」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「遵守网站访问规则」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作天气提醒助手」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：HTTP、JSON、安全"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作天气提醒助手」的核心流程，并说明HTTP如何起作用。",
+      "extension": "在「制作天气提醒助手」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「使用环境变量保管密钥」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "P3-U4-PROJECT",
+      "trackId": "P3",
+      "unitId": "P3-U4",
+      "title": "个人效率工具套件",
+      "engine": "python",
+      "ageRange": "11-17",
+      "concepts": [
+        "任务调度",
+        "测试",
+        "文档"
+      ],
+      "prerequisiteLessonIds": [
+        "P3-U4-L01",
+        "P3-U4-L02",
+        "P3-U4-L03",
+        "P3-U4-L04",
+        "P3-U4-L05",
+        "P3-U4-L06"
+      ],
+      "environment": "Python 隔离运行环境",
+      "theme": "综合自动化：个人效率工具套件",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「个人效率工具套件」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「每周任务清单」和「筛选邮件模拟数据」，选择需要的任务调度、测试、文档知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「表格批量转换」与「记录程序日志」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「模拟定时提醒」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「个人效率工具套件」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "包含正常输入、空输入和边界测试，不执行未授权命令"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：任务调度、测试、文档"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「个人效率工具套件」的核心流程，并说明任务调度如何起作用。",
+      "extension": "在「个人效率工具套件」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「记录程序日志」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "样例数据",
+        "标准输出",
+        "错误示例"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "C0-U1-PROJECT",
+      "trackId": "C0",
+      "unitId": "C0-U1",
+      "title": "校园计算工具箱",
+      "engine": "cpp",
+      "ageRange": "11-16",
+      "concepts": [
+        "输入输出",
+        "类型",
+        "表达式"
+      ],
+      "prerequisiteLessonIds": [
+        "C0-U1-L01",
+        "C0-U1-L02",
+        "C0-U1-L03",
+        "C0-U1-L04",
+        "C0-U1-L05",
+        "C0-U1-L06"
+      ],
+      "environment": "C++17 编译运行器",
+      "theme": "C++ 语言基础：校园计算工具箱",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「校园计算工具箱」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「第一个Hello程序」和「整数与浮点数」，选择需要的输入输出、类型、表达式知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「计算圆的面积」与「逻辑比较与布尔值」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「字符与字符串」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「校园计算工具箱」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "算法正确并说明关键边界及复杂度"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：输入输出、类型、表达式"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「校园计算工具箱」的核心流程，并说明输入输出如何起作用。",
+      "extension": "在「校园计算工具箱」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「逻辑比较与布尔值」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "输入输出样例",
+        "编译反馈",
+        "算法图解"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "C0-U2-PROJECT",
+      "trackId": "C0",
+      "unitId": "C0-U2",
+      "title": "自动售票计费器",
+      "engine": "cpp",
+      "ageRange": "11-16",
+      "concepts": [
+        "if",
+        "for",
+        "while"
+      ],
+      "prerequisiteLessonIds": [
+        "C0-U2-L01",
+        "C0-U2-L02",
+        "C0-U2-L03",
+        "C0-U2-L04",
+        "C0-U2-L05",
+        "C0-U2-L06"
+      ],
+      "environment": "C++17 编译运行器",
+      "theme": "分支与循环：自动售票计费器",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「自动售票计费器」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「判断成绩等级」和「求整数和」，选择需要的if、for、while知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「质数初步判断」与「绘制字符三角形」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「循环边界排错」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「自动售票计费器」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "算法正确并说明关键边界及复杂度"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：if、for、while"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「自动售票计费器」的核心流程，并说明if如何起作用。",
+      "extension": "在「自动售票计费器」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「绘制字符三角形」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "输入输出样例",
+        "编译反馈",
+        "算法图解"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "C0-U3-PROJECT",
+      "trackId": "C0",
+      "unitId": "C0-U3",
+      "title": "学生成绩管理器",
+      "engine": "cpp",
+      "ageRange": "11-16",
+      "concepts": [
+        "数组",
+        "函数",
+        "引用"
+      ],
+      "prerequisiteLessonIds": [
+        "C0-U3-L01",
+        "C0-U3-L02",
+        "C0-U3-L03",
+        "C0-U3-L04",
+        "C0-U3-L05",
+        "C0-U3-L06"
+      ],
+      "environment": "C++17 编译运行器",
+      "theme": "数组字符串函数：学生成绩管理器",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「学生成绩管理器」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「统计一周温度」和「寻找数组最大值」，选择需要的数组、函数、引用知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「反转字符串」与「函数拆分程序」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「理解值传递与引用」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「学生成绩管理器」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "算法正确并说明关键边界及复杂度"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：数组、函数、引用"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「学生成绩管理器」的核心流程，并说明数组如何起作用。",
+      "extension": "在「学生成绩管理器」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「函数拆分程序」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "输入输出样例",
+        "编译反馈",
+        "算法图解"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "C0-U4-PROJECT",
+      "trackId": "C0",
+      "unitId": "C0-U4",
+      "title": "基础算法挑战赛",
+      "engine": "cpp",
+      "ageRange": "11-16",
+      "concepts": [
+        "模拟",
+        "枚举",
+        "排序"
+      ],
+      "prerequisiteLessonIds": [
+        "C0-U4-L01",
+        "C0-U4-L02",
+        "C0-U4-L03",
+        "C0-U4-L04",
+        "C0-U4-L05",
+        "C0-U4-L06"
+      ],
+      "environment": "C++17 编译运行器",
+      "theme": "基础题型练习：基础算法挑战赛",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「基础算法挑战赛」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「时间换算模拟」和「枚举硬币组合」，选择需要的模拟、枚举、排序知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「简单冒泡排序」与「统计字符频率」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「多组测试数据」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「基础算法挑战赛」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "算法正确并说明关键边界及复杂度"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：模拟、枚举、排序"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「基础算法挑战赛」的核心流程，并说明模拟如何起作用。",
+      "extension": "在「基础算法挑战赛」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「统计字符频率」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "输入输出样例",
+        "编译反馈",
+        "算法图解"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "C1-U1-PROJECT",
+      "trackId": "C1",
+      "unitId": "C1-U1",
+      "title": "区间统计小挑战",
+      "engine": "cpp",
+      "ageRange": "12-18",
+      "concepts": [
+        "复杂度",
+        "二分",
+        "前缀和"
+      ],
+      "prerequisiteLessonIds": [
+        "C1-U1-L01",
+        "C1-U1-L02",
+        "C1-U1-L03",
+        "C1-U1-L04",
+        "C1-U1-L05",
+        "C1-U1-L06"
+      ],
+      "environment": "C++17 编译运行器",
+      "theme": "经典算法：区间统计小挑战",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「区间统计小挑战」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「估算时间复杂度」和「二分答案练习」，选择需要的复杂度、二分、前缀和知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「前缀和区间查询」与「差分优化更新」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「双指针配对」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「区间统计小挑战」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "算法正确并说明关键边界及复杂度"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：复杂度、二分、前缀和"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「区间统计小挑战」的核心流程，并说明复杂度如何起作用。",
+      "extension": "在「区间统计小挑战」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「差分优化更新」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "输入输出样例",
+        "编译反馈",
+        "算法图解"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "C1-U2-PROJECT",
+      "trackId": "C1",
+      "unitId": "C1-U2",
+      "title": "闯关资源最优分配",
+      "engine": "cpp",
+      "ageRange": "12-18",
+      "concepts": [
+        "DFS",
+        "BFS",
+        "DP"
+      ],
+      "prerequisiteLessonIds": [
+        "C1-U2-L01",
+        "C1-U2-L02",
+        "C1-U2-L03",
+        "C1-U2-L04",
+        "C1-U2-L05",
+        "C1-U2-L06"
+      ],
+      "environment": "C++17 编译运行器",
+      "theme": "递归与动态规划：闯关资源最优分配",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「闯关资源最优分配」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「迷宫深度搜索」和「最短路径广度搜索」，选择需要的DFS、BFS、DP知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「记忆化递归」与「背包选物问题」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「最长上升子序列」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「闯关资源最优分配」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "算法正确并说明关键边界及复杂度"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：DFS、BFS、DP"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「闯关资源最优分配」的核心流程，并说明DFS如何起作用。",
+      "extension": "在「闯关资源最优分配」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「背包选物问题」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "输入输出样例",
+        "编译反馈",
+        "算法图解"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "C1-U3-PROJECT",
+      "trackId": "C1",
+      "unitId": "C1-U3",
+      "title": "城市交通路径规划",
+      "engine": "cpp",
+      "ageRange": "12-18",
+      "concepts": [
+        "图",
+        "树",
+        "堆",
+        "并查集"
+      ],
+      "prerequisiteLessonIds": [
+        "C1-U3-L01",
+        "C1-U3-L02",
+        "C1-U3-L03",
+        "C1-U3-L04",
+        "C1-U3-L05",
+        "C1-U3-L06"
+      ],
+      "environment": "C++17 编译运行器",
+      "theme": "图与数据结构：城市交通路径规划",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「城市交通路径规划」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「地图建图」和「堆维护排行榜」，选择需要的图、树、堆、并查集知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「并查集合并社团」与「树的遍历」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「最短路Dijkstra」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「城市交通路径规划」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "算法正确并说明关键边界及复杂度"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：图、树、堆、并查集"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「城市交通路径规划」的核心流程，并说明图如何起作用。",
+      "extension": "在「城市交通路径规划」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「树的遍历」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "输入输出样例",
+        "编译反馈",
+        "算法图解"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "C1-U4-PROJECT",
+      "trackId": "C1",
+      "unitId": "C1-U4",
+      "title": "综合题目答辩",
+      "engine": "cpp",
+      "ageRange": "12-18",
+      "concepts": [
+        "证明",
+        "测试",
+        "赛后复盘"
+      ],
+      "prerequisiteLessonIds": [
+        "C1-U4-L01",
+        "C1-U4-L02",
+        "C1-U4-L03",
+        "C1-U4-L04",
+        "C1-U4-L05",
+        "C1-U4-L06"
+      ],
+      "environment": "C++17 编译运行器",
+      "theme": "竞赛综合训练：综合题目答辩",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「综合题目答辩」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「读题抽象模型」和「构建随机测试器」，选择需要的证明、测试、赛后复盘知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「分析边界样例」与「优化空间复杂度」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「模拟竞赛复盘」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「综合题目答辩」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "算法正确并说明关键边界及复杂度"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：证明、测试、赛后复盘"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「综合题目答辩」的核心流程，并说明证明如何起作用。",
+      "extension": "在「综合题目答辩」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「优化空间复杂度」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "输入输出样例",
+        "编译反馈",
+        "算法图解"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "W0-U1-PROJECT",
+      "trackId": "W0",
+      "unitId": "W0-U1",
+      "title": "个人知识主页",
+      "engine": "web",
+      "ageRange": "11-16",
+      "concepts": [
+        "标签",
+        "语义",
+        "可访问性"
+      ],
+      "prerequisiteLessonIds": [
+        "W0-U1-L01",
+        "W0-U1-L02",
+        "W0-U1-L03",
+        "W0-U1-L04",
+        "W0-U1-L05",
+        "W0-U1-L06"
+      ],
+      "environment": "独立前端开发工作区",
+      "theme": "HTML 结构：个人知识主页",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「个人知识主页」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「写出我的第一张网页」和「标题与段落」，选择需要的标签、语义、可访问性知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「图片和替代文本」与「语义化网页导航」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「制作表单」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「个人知识主页」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "可在桌面和移动端使用，交互控件能通过键盘操作"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：标签、语义、可访问性"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「个人知识主页」的核心流程，并说明标签如何起作用。",
+      "extension": "在「个人知识主页」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「语义化网页导航」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "UI组件",
+        "原创图像",
+        "测试数据"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "W0-U2-PROJECT",
+      "trackId": "W0",
+      "unitId": "W0-U2",
+      "title": "自适应作品展",
+      "engine": "web",
+      "ageRange": "11-16",
+      "concepts": [
+        "选择器",
+        "盒模型",
+        "Flex"
+      ],
+      "prerequisiteLessonIds": [
+        "W0-U2-L01",
+        "W0-U2-L02",
+        "W0-U2-L03",
+        "W0-U2-L04",
+        "W0-U2-L05",
+        "W0-U2-L06"
+      ],
+      "environment": "独立前端开发工作区",
+      "theme": "CSS 与布局：自适应作品展",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「自适应作品展」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「认识盒模型」和「配色与字体系统」，选择需要的选择器、盒模型、Flex知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「制作导航卡片」与「Flex弹性布局」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「Grid画廊」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「自适应作品展」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "可在桌面和移动端使用，交互控件能通过键盘操作"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：选择器、盒模型、Flex"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「自适应作品展」的核心流程，并说明选择器如何起作用。",
+      "extension": "在「自适应作品展」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「Flex弹性布局」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "UI组件",
+        "原创图像",
+        "测试数据"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "W0-U3-PROJECT",
+      "trackId": "W0",
+      "unitId": "W0-U3",
+      "title": "互动阅读笔记",
+      "engine": "web",
+      "ageRange": "11-16",
+      "concepts": [
+        "DOM",
+        "事件",
+        "状态"
+      ],
+      "prerequisiteLessonIds": [
+        "W0-U3-L01",
+        "W0-U3-L02",
+        "W0-U3-L03",
+        "W0-U3-L04",
+        "W0-U3-L05",
+        "W0-U3-L06"
+      ],
+      "environment": "独立前端开发工作区",
+      "theme": "JavaScript 交互：互动阅读笔记",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「互动阅读笔记」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「点按钮变颜色」和「表单输入检查」，选择需要的DOM、事件、状态知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「制作倒计时」与「收藏喜欢的作品」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「可展开知识卡」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「互动阅读笔记」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "可在桌面和移动端使用，交互控件能通过键盘操作"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：DOM、事件、状态"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「互动阅读笔记」的核心流程，并说明DOM如何起作用。",
+      "extension": "在「互动阅读笔记」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「收藏喜欢的作品」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "UI组件",
+        "原创图像",
+        "测试数据"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "W0-U4-PROJECT",
+      "trackId": "W0",
+      "unitId": "W0-U4",
+      "title": "发布校园社团网站",
+      "engine": "web",
+      "ageRange": "11-16",
+      "concepts": [
+        "响应式",
+        "测试",
+        "发布"
+      ],
+      "prerequisiteLessonIds": [
+        "W0-U4-L01",
+        "W0-U4-L02",
+        "W0-U4-L03",
+        "W0-U4-L04",
+        "W0-U4-L05",
+        "W0-U4-L06"
+      ],
+      "environment": "独立前端开发工作区",
+      "theme": "网站完整项目：发布校园社团网站",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「发布校园社团网站」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「规划网站结构」和「移动端适配」，选择需要的响应式、测试、发布知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「图片压缩优化」与「键盘无障碍测试」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「离线预览」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「发布校园社团网站」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "可在桌面和移动端使用，交互控件能通过键盘操作"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：响应式、测试、发布"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「发布校园社团网站」的核心流程，并说明响应式如何起作用。",
+      "extension": "在「发布校园社团网站」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「键盘无障碍测试」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "UI组件",
+        "原创图像",
+        "测试数据"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "W1-U1-PROJECT",
+      "trackId": "W1",
+      "unitId": "W1-U1",
+      "title": "制作问答引擎",
+      "engine": "web",
+      "ageRange": "12-18",
+      "concepts": [
+        "数组",
+        "对象",
+        "函数",
+        "模块"
+      ],
+      "prerequisiteLessonIds": [
+        "W1-U1-L01",
+        "W1-U1-L02",
+        "W1-U1-L03",
+        "W1-U1-L04",
+        "W1-U1-L05",
+        "W1-U1-L06"
+      ],
+      "environment": "独立前端开发工作区",
+      "theme": "JavaScript 进阶：制作问答引擎",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作问答引擎」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「对象表示游戏角色」和「数组管理道具」，选择需要的数组、对象、函数、模块知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「函数与闭包」与「使用模块组织代码」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「处理错误与异步」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作问答引擎」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "可在桌面和移动端使用，交互控件能通过键盘操作"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：数组、对象、函数、模块"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作问答引擎」的核心流程，并说明数组如何起作用。",
+      "extension": "在「制作问答引擎」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「使用模块组织代码」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "UI组件",
+        "原创图像",
+        "测试数据"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "W1-U2-PROJECT",
+      "trackId": "W1",
+      "unitId": "W1-U2",
+      "title": "制作弹跳小球",
+      "engine": "web",
+      "ageRange": "12-18",
+      "concepts": [
+        "动画帧",
+        "碰撞",
+        "状态"
+      ],
+      "prerequisiteLessonIds": [
+        "W1-U2-L01",
+        "W1-U2-L02",
+        "W1-U2-L03",
+        "W1-U2-L04",
+        "W1-U2-L05",
+        "W1-U2-L06"
+      ],
+      "environment": "独立前端开发工作区",
+      "theme": "Canvas 游戏：制作弹跳小球",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作弹跳小球」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「Canvas画角色」和「用帧动画移动」，选择需要的动画帧、碰撞、状态知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「键盘输入事件」与「几何碰撞判断」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「积分和暂停菜单」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作弹跳小球」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "可在桌面和移动端使用，交互控件能通过键盘操作"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：动画帧、碰撞、状态"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作弹跳小球」的核心流程，并说明动画帧如何起作用。",
+      "extension": "在「制作弹跳小球」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「几何碰撞判断」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "UI组件",
+        "原创图像",
+        "测试数据"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "W1-U3-PROJECT",
+      "trackId": "W1",
+      "unitId": "W1-U3",
+      "title": "发布活动报名模拟器",
+      "engine": "web",
+      "ageRange": "12-18",
+      "concepts": [
+        "表单",
+        "存储",
+        "API"
+      ],
+      "prerequisiteLessonIds": [
+        "W1-U3-L01",
+        "W1-U3-L02",
+        "W1-U3-L03",
+        "W1-U3-L04",
+        "W1-U3-L05",
+        "W1-U3-L06"
+      ],
+      "environment": "独立前端开发工作区",
+      "theme": "Web 应用：发布活动报名模拟器",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「发布活动报名模拟器」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「用本地存储保留进度」和「待办清单应用」，选择需要的表单、存储、API知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「搜索过滤页面」与「访问公开API」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「控制请求错误」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「发布活动报名模拟器」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "可在桌面和移动端使用，交互控件能通过键盘操作"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：表单、存储、API"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「发布活动报名模拟器」的核心流程，并说明表单如何起作用。",
+      "extension": "在「发布活动报名模拟器」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「访问公开API」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "UI组件",
+        "原创图像",
+        "测试数据"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "W1-U4-PROJECT",
+      "trackId": "W1",
+      "unitId": "W1-U4",
+      "title": "发布联合制作小游戏",
+      "engine": "web",
+      "ageRange": "12-18",
+      "concepts": [
+        "Git",
+        "代码审查",
+        "发布"
+      ],
+      "prerequisiteLessonIds": [
+        "W1-U4-L01",
+        "W1-U4-L02",
+        "W1-U4-L03",
+        "W1-U4-L04",
+        "W1-U4-L05",
+        "W1-U4-L06"
+      ],
+      "environment": "独立前端开发工作区",
+      "theme": "团队作品：发布联合制作小游戏",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「发布联合制作小游戏」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「使用Git提交」和「分支与合并请求」，选择需要的Git、代码审查、发布知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「评审同伴代码」与「性能检查」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「修复测试问题」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「发布联合制作小游戏」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "可在桌面和移动端使用，交互控件能通过键盘操作"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：Git、代码审查、发布"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「发布联合制作小游戏」的核心流程，并说明Git如何起作用。",
+      "extension": "在「发布联合制作小游戏」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「性能检查」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "UI组件",
+        "原创图像",
+        "测试数据"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "A0-U1-PROJECT",
+      "trackId": "A0",
+      "unitId": "A0-U1",
+      "title": "设计垃圾分类助手",
+      "engine": "ai",
+      "ageRange": "7-13",
+      "concepts": [
+        "分类",
+        "样本",
+        "推理"
+      ],
+      "prerequisiteLessonIds": [
+        "A0-U1-L01",
+        "A0-U1-L02",
+        "A0-U1-L03",
+        "A0-U1-L04",
+        "A0-U1-L05",
+        "A0-U1-L06"
+      ],
+      "environment": "匿名样例与可审计的 AI 教学工具",
+      "theme": "认识人工智能：设计垃圾分类助手",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「设计垃圾分类助手」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「AI在哪里出现」和「人和机器的判断」，选择需要的分类、样本、推理知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「体验图片分类」与「好样本与坏样本」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「训练集测试集区别」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「设计垃圾分类助手」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "指出至少一例模型误判，不上传未授权个人资料"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：分类、样本、推理"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「设计垃圾分类助手」的核心流程，并说明分类如何起作用。",
+      "extension": "在「设计垃圾分类助手」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「好样本与坏样本」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "匿名数据",
+        "偏差案例",
+        "安全说明"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "A0-U2-PROJECT",
+      "trackId": "A0",
+      "unitId": "A0-U2",
+      "title": "制作科普小海报",
+      "engine": "ai",
+      "ageRange": "7-13",
+      "concepts": [
+        "提示词",
+        "事实核验",
+        "版权"
+      ],
+      "prerequisiteLessonIds": [
+        "A0-U2-L01",
+        "A0-U2-L02",
+        "A0-U2-L03",
+        "A0-U2-L04",
+        "A0-U2-L05",
+        "A0-U2-L06"
+      ],
+      "environment": "匿名样例与可审计的 AI 教学工具",
+      "theme": "生成式 AI 入门：制作科普小海报",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作科普小海报」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「描述一张创意插画」和「让AI解释一段程序」，选择需要的提示词、事实核验、版权知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「比较不同提示词」与「查证AI回答的错误」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「尊重原创作品」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作科普小海报」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "指出至少一例模型误判，不上传未授权个人资料"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：提示词、事实核验、版权"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作科普小海报」的核心流程，并说明提示词如何起作用。",
+      "extension": "在「制作科普小海报」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「查证AI回答的错误」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "匿名数据",
+        "偏差案例",
+        "安全说明"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "A0-U3-PROJECT",
+      "trackId": "A0",
+      "unitId": "A0-U3",
+      "title": "制作课堂问答机器人",
+      "engine": "ai",
+      "ageRange": "7-13",
+      "concepts": [
+        "语音",
+        "文本",
+        "规则"
+      ],
+      "prerequisiteLessonIds": [
+        "A0-U3-L01",
+        "A0-U3-L02",
+        "A0-U3-L03",
+        "A0-U3-L04",
+        "A0-U3-L05",
+        "A0-U3-L06"
+      ],
+      "environment": "匿名样例与可审计的 AI 教学工具",
+      "theme": "智能交互：制作课堂问答机器人",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作课堂问答机器人」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「认识语音识别」和「情绪词与误判」，选择需要的语音、文本、规则知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「规则机器人对话」与「多轮问题设计」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「隐私信息不能输入」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作课堂问答机器人」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "指出至少一例模型误判，不上传未授权个人资料"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：语音、文本、规则"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作课堂问答机器人」的核心流程，并说明语音如何起作用。",
+      "extension": "在「制作课堂问答机器人」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「多轮问题设计」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "匿名数据",
+        "偏差案例",
+        "安全说明"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "A0-U4-PROJECT",
+      "trackId": "A0",
+      "unitId": "A0-U4",
+      "title": "我的AI使用公约",
+      "engine": "ai",
+      "ageRange": "7-13",
+      "concepts": [
+        "公平",
+        "偏差",
+        "隐私"
+      ],
+      "prerequisiteLessonIds": [
+        "A0-U4-L01",
+        "A0-U4-L02",
+        "A0-U4-L03",
+        "A0-U4-L04",
+        "A0-U4-L05",
+        "A0-U4-L06"
+      ],
+      "environment": "匿名样例与可审计的 AI 教学工具",
+      "theme": "负责任的 AI：我的AI使用公约",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「我的AI使用公约」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「数据偏见小游戏」和「照片授权和同意」，选择需要的公平、偏差、隐私知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「深度伪造辨识」与「系统为何会出错」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「标注AI辅助创作」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「我的AI使用公约」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "指出至少一例模型误判，不上传未授权个人资料"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：公平、偏差、隐私"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「我的AI使用公约」的核心流程，并说明公平如何起作用。",
+      "extension": "在「我的AI使用公约」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「系统为何会出错」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "匿名数据",
+        "偏差案例",
+        "安全说明"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "A1-U1-PROJECT",
+      "trackId": "A1",
+      "unitId": "A1-U1",
+      "title": "手写数字识别实验",
+      "engine": "ai-python",
+      "ageRange": "12-18",
+      "concepts": [
+        "特征",
+        "训练",
+        "评估"
+      ],
+      "prerequisiteLessonIds": [
+        "A1-U1-L01",
+        "A1-U1-L02",
+        "A1-U1-L03",
+        "A1-U1-L04",
+        "A1-U1-L05",
+        "A1-U1-L06"
+      ],
+      "environment": "独立 Python 环境与授权样例数据",
+      "theme": "机器学习基础：手写数字识别实验",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「手写数字识别实验」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「观察水果数据」和「选择合适特征」，选择需要的特征、训练、评估知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「划分训练与测试」与「训练简单分类器」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「混淆矩阵基础」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「手写数字识别实验」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "分开训练与测试数据，记录模型失败与使用局限"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：特征、训练、评估"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「手写数字识别实验」的核心流程，并说明特征如何起作用。",
+      "extension": "在「手写数字识别实验」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「训练简单分类器」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "许可数据",
+        "评测表",
+        "模型卡"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "A1-U2-PROJECT",
+      "trackId": "A1",
+      "unitId": "A1-U2",
+      "title": "制作模型说明卡",
+      "engine": "ai-python",
+      "ageRange": "12-18",
+      "concepts": [
+        "偏差",
+        "数据质量",
+        "泛化"
+      ],
+      "prerequisiteLessonIds": [
+        "A1-U2-L01",
+        "A1-U2-L02",
+        "A1-U2-L03",
+        "A1-U2-L04",
+        "A1-U2-L05",
+        "A1-U2-L06"
+      ],
+      "environment": "独立 Python 环境与授权样例数据",
+      "theme": "数据与模型可靠性：制作模型说明卡",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作模型说明卡」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「清理不完整数据」和「发现类别不均衡」，选择需要的偏差、数据质量、泛化知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「区分过拟合」与「评估不同测试集」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「错误样本复盘」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作模型说明卡」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "分开训练与测试数据，记录模型失败与使用局限"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：偏差、数据质量、泛化"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作模型说明卡」的核心流程，并说明偏差如何起作用。",
+      "extension": "在「制作模型说明卡」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「评估不同测试集」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "许可数据",
+        "评测表",
+        "模型卡"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "A1-U3-PROJECT",
+      "trackId": "A1",
+      "unitId": "A1-U3",
+      "title": "制作学习问答助手",
+      "engine": "ai-python",
+      "ageRange": "12-18",
+      "concepts": [
+        "API",
+        "提示词",
+        "安全"
+      ],
+      "prerequisiteLessonIds": [
+        "A1-U3-L01",
+        "A1-U3-L02",
+        "A1-U3-L03",
+        "A1-U3-L04",
+        "A1-U3-L05",
+        "A1-U3-L06"
+      ],
+      "environment": "独立 Python 环境与授权样例数据",
+      "theme": "生成式应用开发：制作学习问答助手",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作学习问答助手」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「建立安全的模型调用」和「实现文本摘要」，选择需要的API、提示词、安全知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「结构化JSON输出」与「检索可信资料」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「引用与幻觉核对」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作学习问答助手」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "分开训练与测试数据，记录模型失败与使用局限"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：API、提示词、安全"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作学习问答助手」的核心流程，并说明API如何起作用。",
+      "extension": "在「制作学习问答助手」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「检索可信资料」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "许可数据",
+        "评测表",
+        "模型卡"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "A1-U4-PROJECT",
+      "trackId": "A1",
+      "unitId": "A1-U4",
+      "title": "展示并答辩AI作品",
+      "engine": "ai-python",
+      "ageRange": "12-18",
+      "concepts": [
+        "需求",
+        "原型",
+        "评测",
+        "伦理"
+      ],
+      "prerequisiteLessonIds": [
+        "A1-U4-L01",
+        "A1-U4-L02",
+        "A1-U4-L03",
+        "A1-U4-L04",
+        "A1-U4-L05",
+        "A1-U4-L06"
+      ],
+      "environment": "独立 Python 环境与授权样例数据",
+      "theme": "端到端 AI 项目：展示并答辩AI作品",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「展示并答辩AI作品」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「提出校园真实问题」和「建立数据使用许可」，选择需要的需求、原型、评测、伦理知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「开发AI原型」与「编写失败案例测试」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「记录安全边界」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「展示并答辩AI作品」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "分开训练与测试数据，记录模型失败与使用局限"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：需求、原型、评测、伦理"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「展示并答辩AI作品」的核心流程，并说明需求如何起作用。",
+      "extension": "在「展示并答辩AI作品」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「编写失败案例测试」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "许可数据",
+        "评测表",
+        "模型卡"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "R0-U1-PROJECT",
+      "trackId": "R0",
+      "unitId": "R0-U1",
+      "title": "制作电子欢迎牌",
+      "engine": "hardware",
+      "ageRange": "8-15",
+      "concepts": [
+        "传感器",
+        "执行器",
+        "安全"
+      ],
+      "prerequisiteLessonIds": [
+        "R0-U1-L01",
+        "R0-U1-L02",
+        "R0-U1-L03",
+        "R0-U1-L04",
+        "R0-U1-L05",
+        "R0-U1-L06"
+      ],
+      "environment": "低压开发板或教学仿真器",
+      "theme": "认识实体计算：制作电子欢迎牌",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作电子欢迎牌」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「认识开发板与供电」和「点亮第一颗LED」，选择需要的传感器、执行器、安全知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「按钮控制灯光」与「蜂鸣器播放旋律」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「理解电路安全」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作电子欢迎牌」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "保证断电接线、安全供电和输入误差记录"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：传感器、执行器、安全"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作电子欢迎牌」的核心流程，并说明传感器如何起作用。",
+      "extension": "在「制作电子欢迎牌」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「蜂鸣器播放旋律」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "低压器件",
+        "电路图",
+        "安全卡"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "R0-U2-PROJECT",
+      "trackId": "R0",
+      "unitId": "R0-U2",
+      "title": "制作桌面气象站",
+      "engine": "hardware",
+      "ageRange": "8-15",
+      "concepts": [
+        "输入",
+        "采样",
+        "校准"
+      ],
+      "prerequisiteLessonIds": [
+        "R0-U2-L01",
+        "R0-U2-L02",
+        "R0-U2-L03",
+        "R0-U2-L04",
+        "R0-U2-L05",
+        "R0-U2-L06"
+      ],
+      "environment": "低压开发板或教学仿真器",
+      "theme": "传感器互动：制作桌面气象站",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作桌面气象站」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「读取光线强度」和「温湿度显示」，选择需要的输入、采样、校准知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「测距报警」与「按键去抖动」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「传感器误差比较」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作桌面气象站」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "保证断电接线、安全供电和输入误差记录"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：输入、采样、校准"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作桌面气象站」的核心流程，并说明输入如何起作用。",
+      "extension": "在「制作桌面气象站」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「按键去抖动」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "低压器件",
+        "电路图",
+        "安全卡"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "R0-U3-PROJECT",
+      "trackId": "R0",
+      "unitId": "R0-U3",
+      "title": "制作迷你巡线车",
+      "engine": "hardware",
+      "ageRange": "8-15",
+      "concepts": [
+        "状态",
+        "反馈",
+        "PWM"
+      ],
+      "prerequisiteLessonIds": [
+        "R0-U3-L01",
+        "R0-U3-L02",
+        "R0-U3-L03",
+        "R0-U3-L04",
+        "R0-U3-L05",
+        "R0-U3-L06"
+      ],
+      "environment": "低压开发板或教学仿真器",
+      "theme": "控制与自动化：制作迷你巡线车",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作迷你巡线车」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「自动夜灯」和「电机速度调节」，选择需要的状态、反馈、PWM知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「设计交通信号灯」与「检测并避开障碍」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「状态机控制动作」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作迷你巡线车」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "保证断电接线、安全供电和输入误差记录"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：状态、反馈、PWM"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作迷你巡线车」的核心流程，并说明状态如何起作用。",
+      "extension": "在「制作迷你巡线车」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「检测并避开障碍」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "低压器件",
+        "电路图",
+        "安全卡"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "R0-U4-PROJECT",
+      "trackId": "R0",
+      "unitId": "R0-U4",
+      "title": "创客作品答辩",
+      "engine": "hardware",
+      "ageRange": "8-15",
+      "concepts": [
+        "迭代",
+        "工程",
+        "展示"
+      ],
+      "prerequisiteLessonIds": [
+        "R0-U4-L01",
+        "R0-U4-L02",
+        "R0-U4-L03",
+        "R0-U4-L04",
+        "R0-U4-L05",
+        "R0-U4-L06"
+      ],
+      "environment": "低压开发板或教学仿真器",
+      "theme": "综合创客项目：创客作品答辩",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「创客作品答辩」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「校园节能观察」和「设计智慧浇水机」，选择需要的迭代、工程、展示知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「零件装配与安全」与「数据记录改进」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「制作演示视频」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「创客作品答辩」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "保证断电接线、安全供电和输入误差记录"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：迭代、工程、展示"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「创客作品答辩」的核心流程，并说明迭代如何起作用。",
+      "extension": "在「创客作品答辩」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「数据记录改进」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "低压器件",
+        "电路图",
+        "安全卡"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "S0-U1-PROJECT",
+      "trackId": "S0",
+      "unitId": "S0-U1",
+      "title": "设计个人数字整理计划",
+      "engine": "literacy",
+      "ageRange": "8-16",
+      "concepts": [
+        "设备",
+        "文件",
+        "网络"
+      ],
+      "prerequisiteLessonIds": [
+        "S0-U1-L01",
+        "S0-U1-L02",
+        "S0-U1-L03",
+        "S0-U1-L04",
+        "S0-U1-L05",
+        "S0-U1-L06"
+      ],
+      "environment": "离线模拟账号与脱敏案例",
+      "theme": "计算机与网络：设计个人数字整理计划",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「设计个人数字整理计划」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「认识计算机部件」和「创建规范文件夹」，选择需要的设备、文件、网络知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「理解互联网如何通信」与「比较浏览器与网站」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「识别可靠网址」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「设计个人数字整理计划」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "准确指出风险并提供防范动作，不触碰真实账号"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：设备、文件、网络"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「设计个人数字整理计划」的核心流程，并说明设备如何起作用。",
+      "extension": "在「设计个人数字整理计划」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「比较浏览器与网站」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "安全模拟案例",
+        "指导卡",
+        "家长告知"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "S0-U2-PROJECT",
+      "trackId": "S0",
+      "unitId": "S0-U2",
+      "title": "家庭网络安全海报",
+      "engine": "literacy",
+      "ageRange": "8-16",
+      "concepts": [
+        "认证",
+        "隐私",
+        "安全"
+      ],
+      "prerequisiteLessonIds": [
+        "S0-U2-L01",
+        "S0-U2-L02",
+        "S0-U2-L03",
+        "S0-U2-L04",
+        "S0-U2-L05",
+        "S0-U2-L06"
+      ],
+      "environment": "离线模拟账号与脱敏案例",
+      "theme": "密码与隐私：家庭网络安全海报",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「家庭网络安全海报」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「为账号创建口令」和「体验双因素验证」，选择需要的认证、隐私、安全知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「保护个人隐私信息」与「识别钓鱼消息」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「设置应用权限」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「家庭网络安全海报」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "准确指出风险并提供防范动作，不触碰真实账号"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：认证、隐私、安全"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「家庭网络安全海报」的核心流程，并说明认证如何起作用。",
+      "extension": "在「家庭网络安全海报」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「识别钓鱼消息」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "安全模拟案例",
+        "指导卡",
+        "家长告知"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "S0-U3-PROJECT",
+      "trackId": "S0",
+      "unitId": "S0-U3",
+      "title": "设计网络文明倡议",
+      "engine": "literacy",
+      "ageRange": "8-16",
+      "concepts": [
+        "版权",
+        "信息素养",
+        "协作"
+      ],
+      "prerequisiteLessonIds": [
+        "S0-U3-L01",
+        "S0-U3-L02",
+        "S0-U3-L03",
+        "S0-U3-L04",
+        "S0-U3-L05",
+        "S0-U3-L06"
+      ],
+      "environment": "离线模拟账号与脱敏案例",
+      "theme": "网络公民：设计网络文明倡议",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「设计网络文明倡议」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「如何判断一条消息」和「标注图片素材来源」，选择需要的版权、信息素养、协作知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「尊重创作者授权」与「友善的网络表达」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「安全地与同伴协作」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「设计网络文明倡议」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "准确指出风险并提供防范动作，不触碰真实账号"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：版权、信息素养、协作"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「设计网络文明倡议」的核心流程，并说明版权如何起作用。",
+      "extension": "在「设计网络文明倡议」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「友善的网络表达」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "安全模拟案例",
+        "指导卡",
+        "家长告知"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "S0-U4-PROJECT",
+      "trackId": "S0",
+      "unitId": "S0-U4",
+      "title": "制作班级数字安全指南",
+      "engine": "literacy",
+      "ageRange": "8-16",
+      "concepts": [
+        "威胁建模",
+        "备份",
+        "恢复"
+      ],
+      "prerequisiteLessonIds": [
+        "S0-U4-L01",
+        "S0-U4-L02",
+        "S0-U4-L03",
+        "S0-U4-L04",
+        "S0-U4-L05",
+        "S0-U4-L06"
+      ],
+      "environment": "离线模拟账号与脱敏案例",
+      "theme": "安全工程入门：制作班级数字安全指南",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作班级数字安全指南」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「简单威胁模型」和「认识软件更新」，选择需要的威胁建模、备份、恢复知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「备份作品文件」与「模拟误删恢复」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「理解日志与异常」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作班级数字安全指南」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "准确指出风险并提供防范动作，不触碰真实账号"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：威胁建模、备份、恢复"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作班级数字安全指南」的核心流程，并说明威胁建模如何起作用。",
+      "extension": "在「制作班级数字安全指南」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「模拟误删恢复」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "安全模拟案例",
+        "指导卡",
+        "家长告知"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "M0-U1-PROJECT",
+      "trackId": "M0",
+      "unitId": "M0-U1",
+      "title": "制作几何艺术馆",
+      "engine": "math",
+      "ageRange": "7-14",
+      "concepts": [
+        "角度",
+        "坐标",
+        "对称"
+      ],
+      "prerequisiteLessonIds": [
+        "M0-U1-L01",
+        "M0-U1-L02",
+        "M0-U1-L03",
+        "M0-U1-L04",
+        "M0-U1-L05",
+        "M0-U1-L06"
+      ],
+      "environment": "图形化数学模拟工作区",
+      "theme": "图形与几何：制作几何艺术馆",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作几何艺术馆」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「用积木绘制方形」和「认识旋转角度」，选择需要的角度、坐标、对称知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「镜像对称小花」与「画出规则多边形」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「分形树木图案」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作几何艺术馆」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "通过实验/计算验证发现，区分猜想与证明"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：角度、坐标、对称"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作几何艺术馆」的核心流程，并说明角度如何起作用。",
+      "extension": "在「制作几何艺术馆」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「画出规则多边形」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "数字实验",
+        "图表",
+        "记录单"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "M0-U2-PROJECT",
+      "trackId": "M0",
+      "unitId": "M0-U2",
+      "title": "数学规律闯关",
+      "engine": "math",
+      "ageRange": "7-14",
+      "concepts": [
+        "模式",
+        "循环",
+        "递推"
+      ],
+      "prerequisiteLessonIds": [
+        "M0-U2-L01",
+        "M0-U2-L02",
+        "M0-U2-L03",
+        "M0-U2-L04",
+        "M0-U2-L05",
+        "M0-U2-L06"
+      ],
+      "environment": "图形化数学模拟工作区",
+      "theme": "规律与数列：数学规律闯关",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「数学规律闯关」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「发现颜色序列」和「制作九九乘法游戏」，选择需要的模式、循环、递推知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「寻找奇数偶数」与「斐波那契小兔子」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「比较两种计数算法」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「数学规律闯关」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "通过实验/计算验证发现，区分猜想与证明"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：模式、循环、递推"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「数学规律闯关」的核心流程，并说明模式如何起作用。",
+      "extension": "在「数学规律闯关」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「斐波那契小兔子」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "数字实验",
+        "图表",
+        "记录单"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "M0-U3-PROJECT",
+      "trackId": "M0",
+      "unitId": "M0-U3",
+      "title": "制作班级数据展",
+      "engine": "math",
+      "ageRange": "7-14",
+      "concepts": [
+        "随机",
+        "样本",
+        "数据"
+      ],
+      "prerequisiteLessonIds": [
+        "M0-U3-L01",
+        "M0-U3-L02",
+        "M0-U3-L03",
+        "M0-U3-L04",
+        "M0-U3-L05",
+        "M0-U3-L06"
+      ],
+      "environment": "图形化数学模拟工作区",
+      "theme": "概率与统计：制作班级数据展",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「制作班级数据展」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「模拟抛硬币」和「掷骰子统计」，选择需要的随机、样本、数据知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「设计抽奖公平性」与「记录调查结果」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「用图表解释发现」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「制作班级数据展」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "通过实验/计算验证发现，区分猜想与证明"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：随机、样本、数据"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「制作班级数据展」的核心流程，并说明随机如何起作用。",
+      "extension": "在「制作班级数据展」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「记录调查结果」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "数字实验",
+        "图表",
+        "记录单"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "M0-U4-PROJECT",
+      "trackId": "M0",
+      "unitId": "M0-U4",
+      "title": "社区小小规划师",
+      "engine": "math",
+      "ageRange": "7-14",
+      "concepts": [
+        "面积",
+        "路径",
+        "推理"
+      ],
+      "prerequisiteLessonIds": [
+        "M0-U4-L01",
+        "M0-U4-L02",
+        "M0-U4-L03",
+        "M0-U4-L04",
+        "M0-U4-L05",
+        "M0-U4-L06"
+      ],
+      "environment": "图形化数学模拟工作区",
+      "theme": "建模与优化：社区小小规划师",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「社区小小规划师」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「计算操场周长」和「选择最短寻路路线」，选择需要的面积、路径、推理知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「预算购物小游戏」与「模拟排队等待」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「设计最省步数策略」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「社区小小规划师」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "通过实验/计算验证发现，区分猜想与证明"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：面积、路径、推理"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「社区小小规划师」的核心流程，并说明面积如何起作用。",
+      "extension": "在「社区小小规划师」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「模拟排队等待」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "数字实验",
+        "图表",
+        "记录单"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "D0-U1-PROJECT",
+      "trackId": "D0",
+      "unitId": "D0-U1",
+      "title": "发布数字音乐贺卡",
+      "engine": "steam",
+      "ageRange": "8-16",
+      "concepts": [
+        "颜色",
+        "节奏",
+        "图形"
+      ],
+      "prerequisiteLessonIds": [
+        "D0-U1-L01",
+        "D0-U1-L02",
+        "D0-U1-L03",
+        "D0-U1-L04",
+        "D0-U1-L05",
+        "D0-U1-L06"
+      ],
+      "environment": "跨学科模型与安全模拟实验",
+      "theme": "数字绘画与音乐：发布数字音乐贺卡",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「发布数字音乐贺卡」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「用代码画彩虹」和「设计角色配色」，选择需要的颜色、节奏、图形知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「编写节拍循环」与「让形状跟着音乐跳」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「制作动态图案」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「发布数字音乐贺卡」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "完成问题定义、测试记录和实际改进说明"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：颜色、节奏、图形"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「发布数字音乐贺卡」的核心流程，并说明颜色如何起作用。",
+      "extension": "在「发布数字音乐贺卡」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「让形状跟着音乐跳」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "模型素材",
+        "实验数据",
+        "展览模板"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "D0-U2-PROJECT",
+      "trackId": "D0",
+      "unitId": "D0-U2",
+      "title": "设计环保互动展",
+      "engine": "steam",
+      "ageRange": "8-16",
+      "concepts": [
+        "观察",
+        "假设",
+        "模型"
+      ],
+      "prerequisiteLessonIds": [
+        "D0-U2-L01",
+        "D0-U2-L02",
+        "D0-U2-L03",
+        "D0-U2-L04",
+        "D0-U2-L05",
+        "D0-U2-L06"
+      ],
+      "environment": "跨学科模型与安全模拟实验",
+      "theme": "自然科学模拟：设计环保互动展",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「设计环保互动展」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「模拟植物生长」和「地球月相变化」，选择需要的观察、假设、模型知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「垃圾分类路径」与「认识生态平衡」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「简易能源统计」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「设计环保互动展」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "完成问题定义、测试记录和实际改进说明"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：观察、假设、模型"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「设计环保互动展」的核心流程，并说明观察如何起作用。",
+      "extension": "在「设计环保互动展」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「认识生态平衡」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "模型素材",
+        "实验数据",
+        "展览模板"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "D0-U3-PROJECT",
+      "trackId": "D0",
+      "unitId": "D0-U3",
+      "title": "工程挑战成果展",
+      "engine": "steam",
+      "ageRange": "8-16",
+      "concepts": [
+        "需求",
+        "原型",
+        "测试"
+      ],
+      "prerequisiteLessonIds": [
+        "D0-U3-L01",
+        "D0-U3-L02",
+        "D0-U3-L03",
+        "D0-U3-L04",
+        "D0-U3-L05",
+        "D0-U3-L06"
+      ],
+      "environment": "跨学科模型与安全模拟实验",
+      "theme": "工程设计挑战：工程挑战成果展",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「工程挑战成果展」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「纸桥承重模拟」和「设计防洪警报」，选择需要的需求、原型、测试知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「规划交通信号」与「制作智能导览」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「观察用户反馈」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「工程挑战成果展」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "完成问题定义、测试记录和实际改进说明"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：需求、原型、测试"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「工程挑战成果展」的核心流程，并说明需求如何起作用。",
+      "extension": "在「工程挑战成果展」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「制作智能导览」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "模型素材",
+        "实验数据",
+        "展览模板"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    },
+    {
+      "id": "D0-U4-PROJECT",
+      "trackId": "D0",
+      "unitId": "D0-U4",
+      "title": "举办小小创客博览会",
+      "engine": "steam",
+      "ageRange": "8-16",
+      "concepts": [
+        "叙事",
+        "数据",
+        "协作"
+      ],
+      "prerequisiteLessonIds": [
+        "D0-U4-L01",
+        "D0-U4-L02",
+        "D0-U4-L03",
+        "D0-U4-L04",
+        "D0-U4-L05",
+        "D0-U4-L06"
+      ],
+      "environment": "跨学科模型与安全模拟实验",
+      "theme": "跨学科作品展：举办小小创客博览会",
+      "missionSequence": [
+        {
+          "stage": "提出挑战",
+          "prompt": "你能把「举办小小创客博览会」变成自己的作品吗？先说出任务要解决的问题。",
+          "action": "写下目标，画一张能展示结果的草图。",
+          "evidence": "一份明确的目标与草图"
+        },
+        {
+          "stage": "分析与拆解",
+          "prompt": "回忆「写一段科普剧情」和「把数据变成动画」，选择需要的叙事、数据、协作知识。",
+          "action": "拆成输入、处理、输出三个部分或对应故事步骤。",
+          "evidence": "一张执行流程图"
+        },
+        {
+          "stage": "搭建原型",
+          "prompt": "参考「制作博物馆导览」与「无障碍内容检查」，先完成最小可演示版本。",
+          "action": "实现一条核心流程，记录一组输入与预期结果。",
+          "evidence": "作品第一次运行记录"
+        },
+        {
+          "stage": "测试迭代",
+          "prompt": "借鉴「三轮创作迭代」的练习，找一个错误或边界条件。",
+          "action": "独立自测，再邀请一位同伴试用并修改一处问题。",
+          "evidence": "修改前后验证记录"
+        },
+        {
+          "stage": "展示分享",
+          "prompt": "现在向大家展示「举办小小创客博览会」，说明你的选择。",
+          "action": "演示正常场景、解释两个设计决定、提出一项后续改进。",
+          "evidence": "最终作品和自评"
+        }
+      ],
+      "rubric": [
+        {
+          "criterion": "功能与结果",
+          "points": 40,
+          "requirement": "完成问题定义、测试记录和实际改进说明"
+        },
+        {
+          "criterion": "知识理解",
+          "points": 25,
+          "requirement": "解释至少两项概念：叙事、数据、协作"
+        },
+        {
+          "criterion": "测试与复盘",
+          "points": 20,
+          "requirement": "有一条边界或失败记录和验证过程"
+        },
+        {
+          "criterion": "原创与表达",
+          "points": 15,
+          "requirement": "有自主设计选择并能说明原因"
+        }
+      ],
+      "minimum": "能够演示「举办小小创客博览会」的核心流程，并说明叙事如何起作用。",
+      "extension": "在「举办小小创客博览会」中设计第二种玩法/输入/结局，并提供新的验收例子。",
+      "scaffolding": "先只完成「无障碍内容检查」对应的最小任务，再逐步加功能。",
+      "assetsNeeded": [
+        "模型素材",
+        "实验数据",
+        "展览模板"
+      ],
+      "publicationStatus": "project_blueprint_not_playable"
+    }
+  ]
+}

@@ -1,0 +1,3655 @@
+{
+  "schemaVersion": "1.0.0",
+  "trackId": "G1",
+  "contentLevel": "lesson_script_and_assessment_design",
+  "published": false,
+  "runtimeVerification": "not_yet_verified",
+  "lessons": [
+    {
+      "id": "G1-U1-L01",
+      "unitId": "G1-U1",
+      "title": "给狐狸一个开场",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "会说话的故事",
+      "story": "狐狸被选作森林主持人，可它总在故事开头沉默。",
+      "concepts": [
+        "对白"
+      ],
+      "prerequisites": [],
+      "objectives": [
+        "理解并能解释对白",
+        "在「给狐狸一个开场」完成具体任务：把开场对白设为“欢迎来到森林剧场”，放在开始事件后。",
+        "用实际运行结果验证：点击开始后狐狸先打招呼再移动。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "狐狸被选作森林主持人，可它总在故事开头沉默。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「给狐狸一个开场」的初始状态，写下目标：点击开始后狐狸先打招呼再移动。",
+          "verification": "完成一个可核对的预测：点击开始后狐狸先打招呼再移动。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「对白」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：把开场对白设为“欢迎来到森林剧场”，放在开始事件后。",
+          "verification": "方案包含对白及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "把开场对白设为“欢迎来到森林剧场”，放在开始事件后。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：点击开始后狐狸先打招呼再移动。",
+          "verification": "点击开始后狐狸先打招呼再移动。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：只有移动没有对白时不能算完成。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查对白积木是否接在事件之后，且属于狐狸。",
+          "verification": "失败场景可解释，修正后重新满足：点击开始后狐狸先打招呼再移动。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「给狐狸一个开场」：点击开始后狐狸先打招呼再移动。",
+        "commonMistakes": [
+          {
+            "symptom": "只有移动没有对白时不能算完成。",
+            "diagnosis": "观察对白的输入、触发与状态是否符合目标",
+            "repair": "检查对白积木是否接在事件之后，且属于狐狸。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：把开场对白设为“欢迎来到森林剧场”，放在开始事件后。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：点击开始后狐狸先打招呼再移动。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，狐狸被选作森林主持人，可它总在故事开头沉默。",
+          "把问题缩小到关键动作：把开场对白设为“欢迎来到森林剧场”，放在开始事件后。",
+          "按步骤重试：检查对白积木是否接在事件之后，且属于狐狸。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U1-L01-PASS-01",
+            "kind": "positive",
+            "given": "狐狸被选作森林主持人，可它总在故事开头沉默。",
+            "when": "把开场对白设为“欢迎来到森林剧场”，放在开始事件后。",
+            "then": "点击开始后狐狸先打招呼再移动。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U1-L01-FAIL-01",
+            "kind": "negative",
+            "given": "狐狸被选作森林主持人，可它总在故事开头沉默。",
+            "when": "只有移动没有对白时不能算完成。",
+            "then": "应识别问题并引导：检查对白积木是否接在事件之后，且属于狐狸。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "点击开始后狐狸先打招呼再移动。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释对白与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：只有移动没有对白时不能算完成。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加一段向观众提问的对白。"
+          }
+        ],
+        "mustPass": [
+          "点击开始后狐狸先打招呼再移动。",
+          "不能出现：只有移动没有对白时不能算完成。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加一段向观众提问的对白。",
+      "parentsPrompt": "让孩子展示「给狐狸一个开场」，请他先预测再运行，并说出为什么出错时应当检查对白积木是否接在事件之后，且属于狐狸。",
+      "assetIds": [
+        "g1-g1-u1-01-scene",
+        "g1-g1-u1-01-guide",
+        "g1-g1-u1-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U1-L02",
+      "unitId": "G1-U1",
+      "title": "与兔子轮流说话",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "会说话的故事",
+      "story": "兔子和狐狸第一次见面，要轮流介绍自己的名字。",
+      "concepts": [
+        "对白"
+      ],
+      "prerequisites": [
+        "G1-U1-L01"
+      ],
+      "objectives": [
+        "理解并能解释对白",
+        "在「与兔子轮流说话」完成具体任务：安排狐狸说“你好”，兔子再回应“很高兴见到你”。",
+        "用实际运行结果验证：两句对白按狐狸→兔子的顺序出现。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "兔子和狐狸第一次见面，要轮流介绍自己的名字。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「与兔子轮流说话」的初始状态，写下目标：两句对白按狐狸→兔子的顺序出现。",
+          "verification": "完成一个可核对的预测：两句对白按狐狸→兔子的顺序出现。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「对白」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：安排狐狸说“你好”，兔子再回应“很高兴见到你”。",
+          "verification": "方案包含对白及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "安排狐狸说“你好”，兔子再回应“很高兴见到你”。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：两句对白按狐狸→兔子的顺序出现。",
+          "verification": "两句对白按狐狸→兔子的顺序出现。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：两位角色同时说话造成重叠。",
+          "learnerAction": "尝试重现错误，利用提示改正：拆开两个角色的说话时机，逐句运行对照。",
+          "verification": "失败场景可解释，修正后重新满足：两句对白按狐狸→兔子的顺序出现。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「与兔子轮流说话」：两句对白按狐狸→兔子的顺序出现。",
+        "commonMistakes": [
+          {
+            "symptom": "两位角色同时说话造成重叠。",
+            "diagnosis": "观察对白的输入、触发与状态是否符合目标",
+            "repair": "拆开两个角色的说话时机，逐句运行对照。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：安排狐狸说“你好”，兔子再回应“很高兴见到你”。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：两句对白按狐狸→兔子的顺序出现。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，兔子和狐狸第一次见面，要轮流介绍自己的名字。",
+          "把问题缩小到关键动作：安排狐狸说“你好”，兔子再回应“很高兴见到你”。",
+          "按步骤重试：拆开两个角色的说话时机，逐句运行对照。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U1-L02-PASS-01",
+            "kind": "positive",
+            "given": "兔子和狐狸第一次见面，要轮流介绍自己的名字。",
+            "when": "安排狐狸说“你好”，兔子再回应“很高兴见到你”。",
+            "then": "两句对白按狐狸→兔子的顺序出现。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U1-L02-FAIL-01",
+            "kind": "negative",
+            "given": "兔子和狐狸第一次见面，要轮流介绍自己的名字。",
+            "when": "两位角色同时说话造成重叠。",
+            "then": "应识别问题并引导：拆开两个角色的说话时机，逐句运行对照。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "两句对白按狐狸→兔子的顺序出现。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释对白与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：两位角色同时说话造成重叠。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加入第三句角色告别台词。"
+          }
+        ],
+        "mustPass": [
+          "两句对白按狐狸→兔子的顺序出现。",
+          "不能出现：两位角色同时说话造成重叠。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加入第三句角色告别台词。",
+      "parentsPrompt": "让孩子展示「与兔子轮流说话」，请他先预测再运行，并说出为什么出错时应当拆开两个角色的说话时机，逐句运行对照。",
+      "assetIds": [
+        "g1-g1-u1-02-scene",
+        "g1-g1-u1-02-guide",
+        "g1-g1-u1-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U1-L03",
+      "unitId": "G1-U1",
+      "title": "设置故事背景",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "会说话的故事",
+      "story": "舞台后台出现了雪山和森林两张背景，导演需要挑对地点。",
+      "concepts": [
+        "对白",
+        "顺序"
+      ],
+      "prerequisites": [
+        "G1-U1-L02"
+      ],
+      "objectives": [
+        "理解并能解释顺序",
+        "在「设置故事背景」完成具体任务：开场使用森林场景，狐狸走进树屋后切到夜晚森林。",
+        "用实际运行结果验证：前半段为白天森林，转场后为夜晚森林。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "舞台后台出现了雪山和森林两张背景，导演需要挑对地点。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「设置故事背景」的初始状态，写下目标：前半段为白天森林，转场后为夜晚森林。",
+          "verification": "完成一个可核对的预测：前半段为白天森林，转场后为夜晚森林。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「顺序」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：开场使用森林场景，狐狸走进树屋后切到夜晚森林。",
+          "verification": "方案包含顺序及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "开场使用森林场景，狐狸走进树屋后切到夜晚森林。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：前半段为白天森林，转场后为夜晚森林。",
+          "verification": "前半段为白天森林，转场后为夜晚森林。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：一开始就显示结尾背景。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查场景切换在时间线中的位置。",
+          "verification": "失败场景可解释，修正后重新满足：前半段为白天森林，转场后为夜晚森林。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「设置故事背景」：前半段为白天森林，转场后为夜晚森林。",
+        "commonMistakes": [
+          {
+            "symptom": "一开始就显示结尾背景。",
+            "diagnosis": "观察顺序的输入、触发与状态是否符合目标",
+            "repair": "检查场景切换在时间线中的位置。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：开场使用森林场景，狐狸走进树屋后切到夜晚森林。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：前半段为白天森林，转场后为夜晚森林。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，舞台后台出现了雪山和森林两张背景，导演需要挑对地点。",
+          "把问题缩小到关键动作：开场使用森林场景，狐狸走进树屋后切到夜晚森林。",
+          "按步骤重试：检查场景切换在时间线中的位置。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U1-L03-PASS-01",
+            "kind": "positive",
+            "given": "舞台后台出现了雪山和森林两张背景，导演需要挑对地点。",
+            "when": "开场使用森林场景，狐狸走进树屋后切到夜晚森林。",
+            "then": "前半段为白天森林，转场后为夜晚森林。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U1-L03-FAIL-01",
+            "kind": "negative",
+            "given": "舞台后台出现了雪山和森林两张背景，导演需要挑对地点。",
+            "when": "一开始就显示结尾背景。",
+            "then": "应识别问题并引导：检查场景切换在时间线中的位置。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "前半段为白天森林，转场后为夜晚森林。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释顺序与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：一开始就显示结尾背景。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：自己绘制一张日落背景。"
+          }
+        ],
+        "mustPass": [
+          "前半段为白天森林，转场后为夜晚森林。",
+          "不能出现：一开始就显示结尾背景。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "自己绘制一张日落背景。",
+      "parentsPrompt": "让孩子展示「设置故事背景」，请他先预测再运行，并说出为什么出错时应当检查场景切换在时间线中的位置。",
+      "assetIds": [
+        "g1-g1-u1-03-scene",
+        "g1-g1-u1-03-guide",
+        "g1-g1-u1-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U1-L04",
+      "unitId": "G1-U1",
+      "title": "角色出场退场",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "会说话的故事",
+      "story": "角色下台也要有动作，不可以突然消失。",
+      "concepts": [
+        "对白",
+        "顺序"
+      ],
+      "prerequisites": [
+        "G1-U1-L03"
+      ],
+      "objectives": [
+        "理解并能解释顺序",
+        "在「角色出场退场」完成具体任务：让狐狸从左进入舞台，打招呼后向右退出。",
+        "用实际运行结果验证：出场与退场发生在对白两侧。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "角色下台也要有动作，不可以突然消失。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「角色出场退场」的初始状态，写下目标：出场与退场发生在对白两侧。",
+          "verification": "完成一个可核对的预测：出场与退场发生在对白两侧。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「顺序」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：让狐狸从左进入舞台，打招呼后向右退出。",
+          "verification": "方案包含顺序及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "让狐狸从左进入舞台，打招呼后向右退出。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：出场与退场发生在对白两侧。",
+          "verification": "出场与退场发生在对白两侧。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：退场先于问候，观众看不到角色。",
+          "learnerAction": "尝试重现错误，利用提示改正：把入场、问候、退场标在三个时间节点。",
+          "verification": "失败场景可解释，修正后重新满足：出场与退场发生在对白两侧。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「角色出场退场」：出场与退场发生在对白两侧。",
+        "commonMistakes": [
+          {
+            "symptom": "退场先于问候，观众看不到角色。",
+            "diagnosis": "观察顺序的输入、触发与状态是否符合目标",
+            "repair": "把入场、问候、退场标在三个时间节点。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：让狐狸从左进入舞台，打招呼后向右退出。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：出场与退场发生在对白两侧。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，角色下台也要有动作，不可以突然消失。",
+          "把问题缩小到关键动作：让狐狸从左进入舞台，打招呼后向右退出。",
+          "按步骤重试：把入场、问候、退场标在三个时间节点。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U1-L04-PASS-01",
+            "kind": "positive",
+            "given": "角色下台也要有动作，不可以突然消失。",
+            "when": "让狐狸从左进入舞台，打招呼后向右退出。",
+            "then": "出场与退场发生在对白两侧。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U1-L04-FAIL-01",
+            "kind": "negative",
+            "given": "角色下台也要有动作，不可以突然消失。",
+            "when": "退场先于问候，观众看不到角色。",
+            "then": "应识别问题并引导：把入场、问候、退场标在三个时间节点。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "出场与退场发生在对白两侧。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释顺序与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：退场先于问候，观众看不到角色。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：让兔子从另一侧接替入场。"
+          }
+        ],
+        "mustPass": [
+          "出场与退场发生在对白两侧。",
+          "不能出现：退场先于问候，观众看不到角色。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "让兔子从另一侧接替入场。",
+      "parentsPrompt": "让孩子展示「角色出场退场」，请他先预测再运行，并说出为什么出错时应当把入场、问候、退场标在三个时间节点。",
+      "assetIds": [
+        "g1-g1-u1-04-scene",
+        "g1-g1-u1-04-guide",
+        "g1-g1-u1-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U1-L05",
+      "unitId": "G1-U1",
+      "title": "字幕与旁白",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "会说话的故事",
+      "story": "剧场字幕员抱怨解说的文字总是挡住角色。",
+      "concepts": [
+        "对白",
+        "顺序",
+        "场景"
+      ],
+      "prerequisites": [
+        "G1-U1-L04"
+      ],
+      "objectives": [
+        "理解并能解释场景",
+        "在「字幕与旁白」完成具体任务：给片头加标题字幕，剧情中改用短旁白。",
+        "用实际运行结果验证：片头字幕结束后才出现角色对白。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "剧场字幕员抱怨解说的文字总是挡住角色。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「字幕与旁白」的初始状态，写下目标：片头字幕结束后才出现角色对白。",
+          "verification": "完成一个可核对的预测：片头字幕结束后才出现角色对白。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「场景」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：给片头加标题字幕，剧情中改用短旁白。",
+          "verification": "方案包含场景及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "给片头加标题字幕，剧情中改用短旁白。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：片头字幕结束后才出现角色对白。",
+          "verification": "片头字幕结束后才出现角色对白。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：长字幕一直不消失遮挡人物。",
+          "learnerAction": "尝试重现错误，利用提示改正：核对字幕显示时间与对话开始时间。",
+          "verification": "失败场景可解释，修正后重新满足：片头字幕结束后才出现角色对白。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「字幕与旁白」：片头字幕结束后才出现角色对白。",
+        "commonMistakes": [
+          {
+            "symptom": "长字幕一直不消失遮挡人物。",
+            "diagnosis": "观察场景的输入、触发与状态是否符合目标",
+            "repair": "核对字幕显示时间与对话开始时间。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：给片头加标题字幕，剧情中改用短旁白。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：片头字幕结束后才出现角色对白。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，剧场字幕员抱怨解说的文字总是挡住角色。",
+          "把问题缩小到关键动作：给片头加标题字幕，剧情中改用短旁白。",
+          "按步骤重试：核对字幕显示时间与对话开始时间。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U1-L05-PASS-01",
+            "kind": "positive",
+            "given": "剧场字幕员抱怨解说的文字总是挡住角色。",
+            "when": "给片头加标题字幕，剧情中改用短旁白。",
+            "then": "片头字幕结束后才出现角色对白。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U1-L05-FAIL-01",
+            "kind": "negative",
+            "given": "剧场字幕员抱怨解说的文字总是挡住角色。",
+            "when": "长字幕一直不消失遮挡人物。",
+            "then": "应识别问题并引导：核对字幕显示时间与对话开始时间。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "片头字幕结束后才出现角色对白。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释场景与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：长字幕一直不消失遮挡人物。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：提供一句无障碍说明字幕。"
+          }
+        ],
+        "mustPass": [
+          "片头字幕结束后才出现角色对白。",
+          "不能出现：长字幕一直不消失遮挡人物。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "提供一句无障碍说明字幕。",
+      "parentsPrompt": "让孩子展示「字幕与旁白」，请他先预测再运行，并说出为什么出错时应当核对字幕显示时间与对话开始时间。",
+      "assetIds": [
+        "g1-g1-u1-05-scene",
+        "g1-g1-u1-05-guide",
+        "g1-g1-u1-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U1-L06",
+      "unitId": "G1-U1",
+      "title": "完整森林童话",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "会说话的故事",
+      "story": "森林剧院迎来第一场正式的童话首演。",
+      "concepts": [
+        "对白",
+        "顺序",
+        "场景"
+      ],
+      "prerequisites": [
+        "G1-U1-L05"
+      ],
+      "objectives": [
+        "理解并能解释场景",
+        "在「完整森林童话」完成具体任务：完成开场、相遇、冲突、结尾四部分的狐狸兔子故事。",
+        "用实际运行结果验证：作品可完整播放且至少两位角色有不同对白。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林剧院迎来第一场正式的童话首演。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「完整森林童话」的初始状态，写下目标：作品可完整播放且至少两位角色有不同对白。",
+          "verification": "完成一个可核对的预测：作品可完整播放且至少两位角色有不同对白。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「场景」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：完成开场、相遇、冲突、结尾四部分的狐狸兔子故事。",
+          "verification": "方案包含场景及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "完成开场、相遇、冲突、结尾四部分的狐狸兔子故事。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：作品可完整播放且至少两位角色有不同对白。",
+          "verification": "作品可完整播放且至少两位角色有不同对白。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：故事跳过结尾或对白顺序混乱。",
+          "learnerAction": "尝试重现错误，利用提示改正：使用四格分镜对照播放时间线。",
+          "verification": "失败场景可解释，修正后重新满足：作品可完整播放且至少两位角色有不同对白。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「完整森林童话」：作品可完整播放且至少两位角色有不同对白。",
+        "commonMistakes": [
+          {
+            "symptom": "故事跳过结尾或对白顺序混乱。",
+            "diagnosis": "观察场景的输入、触发与状态是否符合目标",
+            "repair": "使用四格分镜对照播放时间线。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：完成开场、相遇、冲突、结尾四部分的狐狸兔子故事。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：作品可完整播放且至少两位角色有不同对白。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林剧院迎来第一场正式的童话首演。",
+          "把问题缩小到关键动作：完成开场、相遇、冲突、结尾四部分的狐狸兔子故事。",
+          "按步骤重试：使用四格分镜对照播放时间线。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U1-L06-PASS-01",
+            "kind": "positive",
+            "given": "森林剧院迎来第一场正式的童话首演。",
+            "when": "完成开场、相遇、冲突、结尾四部分的狐狸兔子故事。",
+            "then": "作品可完整播放且至少两位角色有不同对白。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U1-L06-FAIL-01",
+            "kind": "negative",
+            "given": "森林剧院迎来第一场正式的童话首演。",
+            "when": "故事跳过结尾或对白顺序混乱。",
+            "then": "应识别问题并引导：使用四格分镜对照播放时间线。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "作品可完整播放且至少两位角色有不同对白。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释场景与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：故事跳过结尾或对白顺序混乱。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：设计两个不同的结局。"
+          }
+        ],
+        "mustPass": [
+          "作品可完整播放且至少两位角色有不同对白。",
+          "不能出现：故事跳过结尾或对白顺序混乱。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "设计两个不同的结局。",
+      "parentsPrompt": "让孩子展示「完整森林童话」，请他先预测再运行，并说出为什么出错时应当使用四格分镜对照播放时间线。",
+      "assetIds": [
+        "g1-g1-u1-06-scene",
+        "g1-g1-u1-06-guide",
+        "g1-g1-u1-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U2-L01",
+      "unitId": "G1-U2",
+      "title": "认识舞台坐标",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动作与坐标",
+      "story": "小狐狸找不到舞台中心，导演在地上画出坐标网格。",
+      "concepts": [
+        "坐标"
+      ],
+      "prerequisites": [
+        "G1-U1-L06"
+      ],
+      "objectives": [
+        "理解并能解释坐标",
+        "在「认识舞台坐标」完成具体任务：将狐狸放到(x=0,y=0)，再分别移动到(60,0)和(60,40)。",
+        "用实际运行结果验证：角色最终定位在(60,40)。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "小狐狸找不到舞台中心，导演在地上画出坐标网格。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「认识舞台坐标」的初始状态，写下目标：角色最终定位在(60,40)。",
+          "verification": "完成一个可核对的预测：角色最终定位在(60,40)。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「坐标」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：将狐狸放到(x=0,y=0)，再分别移动到(60,0)和(60,40)。",
+          "verification": "方案包含坐标及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "将狐狸放到(x=0,y=0)，再分别移动到(60,0)和(60,40)。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：角色最终定位在(60,40)。",
+          "verification": "角色最终定位在(60,40)。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：把x和y调换而停在(40,60)。",
+          "learnerAction": "尝试重现错误，利用提示改正：先看横轴，再看纵轴，逐个读出坐标值。",
+          "verification": "失败场景可解释，修正后重新满足：角色最终定位在(60,40)。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「认识舞台坐标」：角色最终定位在(60,40)。",
+        "commonMistakes": [
+          {
+            "symptom": "把x和y调换而停在(40,60)。",
+            "diagnosis": "观察坐标的输入、触发与状态是否符合目标",
+            "repair": "先看横轴，再看纵轴，逐个读出坐标值。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：将狐狸放到(x=0,y=0)，再分别移动到(60,0)和(60,40)。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：角色最终定位在(60,40)。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，小狐狸找不到舞台中心，导演在地上画出坐标网格。",
+          "把问题缩小到关键动作：将狐狸放到(x=0,y=0)，再分别移动到(60,0)和(60,40)。",
+          "按步骤重试：先看横轴，再看纵轴，逐个读出坐标值。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U2-L01-PASS-01",
+            "kind": "positive",
+            "given": "小狐狸找不到舞台中心，导演在地上画出坐标网格。",
+            "when": "将狐狸放到(x=0,y=0)，再分别移动到(60,0)和(60,40)。",
+            "then": "角色最终定位在(60,40)。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U2-L01-FAIL-01",
+            "kind": "negative",
+            "given": "小狐狸找不到舞台中心，导演在地上画出坐标网格。",
+            "when": "把x和y调换而停在(40,60)。",
+            "then": "应识别问题并引导：先看横轴，再看纵轴，逐个读出坐标值。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "角色最终定位在(60,40)。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释坐标与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：把x和y调换而停在(40,60)。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：标出左上、右下的坐标点。"
+          }
+        ],
+        "mustPass": [
+          "角色最终定位在(60,40)。",
+          "不能出现：把x和y调换而停在(40,60)。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "标出左上、右下的坐标点。",
+      "parentsPrompt": "让孩子展示「认识舞台坐标」，请他先预测再运行，并说出为什么出错时应当先看横轴，再看纵轴，逐个读出坐标值。",
+      "assetIds": [
+        "g1-g1-u2-01-scene",
+        "g1-g1-u2-01-guide",
+        "g1-g1-u2-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U2-L02",
+      "unitId": "G1-U2",
+      "title": "移动到目标点",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动作与坐标",
+      "story": "兔子收到一张藏宝地图，坐标标的是(-80,20)。",
+      "concepts": [
+        "坐标"
+      ],
+      "prerequisites": [
+        "G1-U2-L01"
+      ],
+      "objectives": [
+        "理解并能解释坐标",
+        "在「移动到目标点」完成具体任务：通过设置坐标让兔子直接到达藏宝点。",
+        "用实际运行结果验证：精灵最终x=-80,y=20。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "兔子收到一张藏宝地图，坐标标的是(-80,20)。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「移动到目标点」的初始状态，写下目标：精灵最终x=-80,y=20。",
+          "verification": "完成一个可核对的预测：精灵最终x=-80,y=20。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「坐标」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：通过设置坐标让兔子直接到达藏宝点。",
+          "verification": "方案包含坐标及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "通过设置坐标让兔子直接到达藏宝点。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：精灵最终x=-80,y=20。",
+          "verification": "精灵最终x=-80,y=20。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：坐标超出舞台或符号写反。",
+          "learnerAction": "尝试重现错误，利用提示改正：对照地图的零点和负数方向。",
+          "verification": "失败场景可解释，修正后重新满足：精灵最终x=-80,y=20。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「移动到目标点」：精灵最终x=-80,y=20。",
+        "commonMistakes": [
+          {
+            "symptom": "坐标超出舞台或符号写反。",
+            "diagnosis": "观察坐标的输入、触发与状态是否符合目标",
+            "repair": "对照地图的零点和负数方向。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：通过设置坐标让兔子直接到达藏宝点。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：精灵最终x=-80,y=20。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，兔子收到一张藏宝地图，坐标标的是(-80,20)。",
+          "把问题缩小到关键动作：通过设置坐标让兔子直接到达藏宝点。",
+          "按步骤重试：对照地图的零点和负数方向。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U2-L02-PASS-01",
+            "kind": "positive",
+            "given": "兔子收到一张藏宝地图，坐标标的是(-80,20)。",
+            "when": "通过设置坐标让兔子直接到达藏宝点。",
+            "then": "精灵最终x=-80,y=20。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U2-L02-FAIL-01",
+            "kind": "negative",
+            "given": "兔子收到一张藏宝地图，坐标标的是(-80,20)。",
+            "when": "坐标超出舞台或符号写反。",
+            "then": "应识别问题并引导：对照地图的零点和负数方向。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "精灵最终x=-80,y=20。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释坐标与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：坐标超出舞台或符号写反。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：另加一个目标点让玩家二选一。"
+          }
+        ],
+        "mustPass": [
+          "精灵最终x=-80,y=20。",
+          "不能出现：坐标超出舞台或符号写反。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "另加一个目标点让玩家二选一。",
+      "parentsPrompt": "让孩子展示「移动到目标点」，请他先预测再运行，并说出为什么出错时应当对照地图的零点和负数方向。",
+      "assetIds": [
+        "g1-g1-u2-02-scene",
+        "g1-g1-u2-02-guide",
+        "g1-g1-u2-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U2-L03",
+      "unitId": "G1-U2",
+      "title": "让角色沿路走",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动作与坐标",
+      "story": "森林邮差需要先向东后向北送信。",
+      "concepts": [
+        "坐标",
+        "移动"
+      ],
+      "prerequisites": [
+        "G1-U2-L02"
+      ],
+      "objectives": [
+        "理解并能解释移动",
+        "在「让角色沿路走」完成具体任务：分解为向右80、向上40、向右20三段移动。",
+        "用实际运行结果验证：角色最终位移(+100,+40)。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林邮差需要先向东后向北送信。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「让角色沿路走」的初始状态，写下目标：角色最终位移(+100,+40)。",
+          "verification": "完成一个可核对的预测：角色最终位移(+100,+40)。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「移动」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：分解为向右80、向上40、向右20三段移动。",
+          "verification": "方案包含移动及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "分解为向右80、向上40、向右20三段移动。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：角色最终位移(+100,+40)。",
+          "verification": "角色最终位移(+100,+40)。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：漏走第二段导致目标点错误。",
+          "learnerAction": "尝试重现错误，利用提示改正：在每次位移后记录当前位置。",
+          "verification": "失败场景可解释，修正后重新满足：角色最终位移(+100,+40)。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「让角色沿路走」：角色最终位移(+100,+40)。",
+        "commonMistakes": [
+          {
+            "symptom": "漏走第二段导致目标点错误。",
+            "diagnosis": "观察移动的输入、触发与状态是否符合目标",
+            "repair": "在每次位移后记录当前位置。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：分解为向右80、向上40、向右20三段移动。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：角色最终位移(+100,+40)。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林邮差需要先向东后向北送信。",
+          "把问题缩小到关键动作：分解为向右80、向上40、向右20三段移动。",
+          "按步骤重试：在每次位移后记录当前位置。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U2-L03-PASS-01",
+            "kind": "positive",
+            "given": "森林邮差需要先向东后向北送信。",
+            "when": "分解为向右80、向上40、向右20三段移动。",
+            "then": "角色最终位移(+100,+40)。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U2-L03-FAIL-01",
+            "kind": "negative",
+            "given": "森林邮差需要先向东后向北送信。",
+            "when": "漏走第二段导致目标点错误。",
+            "then": "应识别问题并引导：在每次位移后记录当前位置。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "角色最终位移(+100,+40)。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释移动与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：漏走第二段导致目标点错误。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：设一个障碍要求走折线。"
+          }
+        ],
+        "mustPass": [
+          "角色最终位移(+100,+40)。",
+          "不能出现：漏走第二段导致目标点错误。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "设一个障碍要求走折线。",
+      "parentsPrompt": "让孩子展示「让角色沿路走」，请他先预测再运行，并说出为什么出错时应当在每次位移后记录当前位置。",
+      "assetIds": [
+        "g1-g1-u2-03-scene",
+        "g1-g1-u2-03-guide",
+        "g1-g1-u2-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U2-L04",
+      "unitId": "G1-U2",
+      "title": "快慢不同的追逐",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动作与坐标",
+      "story": "狐狸和兔子比赛谁先到达河边，但两人的速度不同。",
+      "concepts": [
+        "坐标",
+        "移动"
+      ],
+      "prerequisites": [
+        "G1-U2-L03"
+      ],
+      "objectives": [
+        "理解并能解释移动",
+        "在「快慢不同的追逐」完成具体任务：给狐狸每帧移动4步、兔子每帧移动2步，同时从零出发。",
+        "用实际运行结果验证：相同时间狐狸位移为兔子两倍。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "狐狸和兔子比赛谁先到达河边，但两人的速度不同。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「快慢不同的追逐」的初始状态，写下目标：相同时间狐狸位移为兔子两倍。",
+          "verification": "完成一个可核对的预测：相同时间狐狸位移为兔子两倍。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「移动」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：给狐狸每帧移动4步、兔子每帧移动2步，同时从零出发。",
+          "verification": "方案包含移动及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "给狐狸每帧移动4步、兔子每帧移动2步，同时从零出发。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：相同时间狐狸位移为兔子两倍。",
+          "verification": "相同时间狐狸位移为兔子两倍。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：只改变狐狸起点却声称速度更快。",
+          "learnerAction": "尝试重现错误，利用提示改正：比较同一时间内的位移量，而非终点位置。",
+          "verification": "失败场景可解释，修正后重新满足：相同时间狐狸位移为兔子两倍。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「快慢不同的追逐」：相同时间狐狸位移为兔子两倍。",
+        "commonMistakes": [
+          {
+            "symptom": "只改变狐狸起点却声称速度更快。",
+            "diagnosis": "观察移动的输入、触发与状态是否符合目标",
+            "repair": "比较同一时间内的位移量，而非终点位置。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：给狐狸每帧移动4步、兔子每帧移动2步，同时从零出发。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：相同时间狐狸位移为兔子两倍。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，狐狸和兔子比赛谁先到达河边，但两人的速度不同。",
+          "把问题缩小到关键动作：给狐狸每帧移动4步、兔子每帧移动2步，同时从零出发。",
+          "按步骤重试：比较同一时间内的位移量，而非终点位置。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U2-L04-PASS-01",
+            "kind": "positive",
+            "given": "狐狸和兔子比赛谁先到达河边，但两人的速度不同。",
+            "when": "给狐狸每帧移动4步、兔子每帧移动2步，同时从零出发。",
+            "then": "相同时间狐狸位移为兔子两倍。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U2-L04-FAIL-01",
+            "kind": "negative",
+            "given": "狐狸和兔子比赛谁先到达河边，但两人的速度不同。",
+            "when": "只改变狐狸起点却声称速度更快。",
+            "then": "应识别问题并引导：比较同一时间内的位移量，而非终点位置。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "相同时间狐狸位移为兔子两倍。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释移动与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：只改变狐狸起点却声称速度更快。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加入加速阶段。"
+          }
+        ],
+        "mustPass": [
+          "相同时间狐狸位移为兔子两倍。",
+          "不能出现：只改变狐狸起点却声称速度更快。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加入加速阶段。",
+      "parentsPrompt": "让孩子展示「快慢不同的追逐」，请他先预测再运行，并说出为什么出错时应当比较同一时间内的位移量，而非终点位置。",
+      "assetIds": [
+        "g1-g1-u2-04-scene",
+        "g1-g1-u2-04-guide",
+        "g1-g1-u2-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U2-L05",
+      "unitId": "G1-U2",
+      "title": "角色朝向与旋转",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动作与坐标",
+      "story": "转弯时小兔子头朝向了反方向，跑步看起来像倒退。",
+      "concepts": [
+        "坐标",
+        "移动",
+        "速度"
+      ],
+      "prerequisites": [
+        "G1-U2-L04"
+      ],
+      "objectives": [
+        "理解并能解释速度",
+        "在「角色朝向与旋转」完成具体任务：沿四边形路线让兔子依次朝东、朝北、朝西、朝南。",
+        "用实际运行结果验证：四次转向后角色回到初始朝向。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "转弯时小兔子头朝向了反方向，跑步看起来像倒退。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「角色朝向与旋转」的初始状态，写下目标：四次转向后角色回到初始朝向。",
+          "verification": "完成一个可核对的预测：四次转向后角色回到初始朝向。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「速度」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：沿四边形路线让兔子依次朝东、朝北、朝西、朝南。",
+          "verification": "方案包含速度及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "沿四边形路线让兔子依次朝东、朝北、朝西、朝南。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：四次转向后角色回到初始朝向。",
+          "verification": "四次转向后角色回到初始朝向。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：位置移动了但朝向未改变。",
+          "learnerAction": "尝试重现错误，利用提示改正：分别观察位置和朝向两个属性。",
+          "verification": "失败场景可解释，修正后重新满足：四次转向后角色回到初始朝向。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「角色朝向与旋转」：四次转向后角色回到初始朝向。",
+        "commonMistakes": [
+          {
+            "symptom": "位置移动了但朝向未改变。",
+            "diagnosis": "观察速度的输入、触发与状态是否符合目标",
+            "repair": "分别观察位置和朝向两个属性。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：沿四边形路线让兔子依次朝东、朝北、朝西、朝南。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：四次转向后角色回到初始朝向。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，转弯时小兔子头朝向了反方向，跑步看起来像倒退。",
+          "把问题缩小到关键动作：沿四边形路线让兔子依次朝东、朝北、朝西、朝南。",
+          "按步骤重试：分别观察位置和朝向两个属性。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U2-L05-PASS-01",
+            "kind": "positive",
+            "given": "转弯时小兔子头朝向了反方向，跑步看起来像倒退。",
+            "when": "沿四边形路线让兔子依次朝东、朝北、朝西、朝南。",
+            "then": "四次转向后角色回到初始朝向。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U2-L05-FAIL-01",
+            "kind": "negative",
+            "given": "转弯时小兔子头朝向了反方向，跑步看起来像倒退。",
+            "when": "位置移动了但朝向未改变。",
+            "then": "应识别问题并引导：分别观察位置和朝向两个属性。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "四次转向后角色回到初始朝向。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释速度与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：位置移动了但朝向未改变。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：为转向增加小幅旋转动画。"
+          }
+        ],
+        "mustPass": [
+          "四次转向后角色回到初始朝向。",
+          "不能出现：位置移动了但朝向未改变。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "为转向增加小幅旋转动画。",
+      "parentsPrompt": "让孩子展示「角色朝向与旋转」，请他先预测再运行，并说出为什么出错时应当分别观察位置和朝向两个属性。",
+      "assetIds": [
+        "g1-g1-u2-05-scene",
+        "g1-g1-u2-05-guide",
+        "g1-g1-u2-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U2-L06",
+      "unitId": "G1-U2",
+      "title": "小兔子运动会",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动作与坐标",
+      "story": "森林运动会设了赛跑和跳跃两项比赛。",
+      "concepts": [
+        "坐标",
+        "移动",
+        "速度"
+      ],
+      "prerequisites": [
+        "G1-U2-L05"
+      ],
+      "objectives": [
+        "理解并能解释速度",
+        "在「小兔子运动会」完成具体任务：设计起跑事件、计时、到达终点和结果播报。",
+        "用实际运行结果验证：竞赛开始后计时变化，到达终点才显示结果。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林运动会设了赛跑和跳跃两项比赛。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「小兔子运动会」的初始状态，写下目标：竞赛开始后计时变化，到达终点才显示结果。",
+          "verification": "完成一个可核对的预测：竞赛开始后计时变化，到达终点才显示结果。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「速度」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：设计起跑事件、计时、到达终点和结果播报。",
+          "verification": "方案包含速度及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "设计起跑事件、计时、到达终点和结果播报。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：竞赛开始后计时变化，到达终点才显示结果。",
+          "verification": "竞赛开始后计时变化，到达终点才显示结果。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：未出发便显示胜利结果。",
+          "learnerAction": "尝试重现错误，利用提示改正：确认终点判断依赖角色实时位置。",
+          "verification": "失败场景可解释，修正后重新满足：竞赛开始后计时变化，到达终点才显示结果。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「小兔子运动会」：竞赛开始后计时变化，到达终点才显示结果。",
+        "commonMistakes": [
+          {
+            "symptom": "未出发便显示胜利结果。",
+            "diagnosis": "观察速度的输入、触发与状态是否符合目标",
+            "repair": "确认终点判断依赖角色实时位置。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：设计起跑事件、计时、到达终点和结果播报。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：竞赛开始后计时变化，到达终点才显示结果。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林运动会设了赛跑和跳跃两项比赛。",
+          "把问题缩小到关键动作：设计起跑事件、计时、到达终点和结果播报。",
+          "按步骤重试：确认终点判断依赖角色实时位置。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U2-L06-PASS-01",
+            "kind": "positive",
+            "given": "森林运动会设了赛跑和跳跃两项比赛。",
+            "when": "设计起跑事件、计时、到达终点和结果播报。",
+            "then": "竞赛开始后计时变化，到达终点才显示结果。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U2-L06-FAIL-01",
+            "kind": "negative",
+            "given": "森林运动会设了赛跑和跳跃两项比赛。",
+            "when": "未出发便显示胜利结果。",
+            "then": "应识别问题并引导：确认终点判断依赖角色实时位置。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "竞赛开始后计时变化，到达终点才显示结果。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释速度与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：未出发便显示胜利结果。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加双人竞赛成绩榜。"
+          }
+        ],
+        "mustPass": [
+          "竞赛开始后计时变化，到达终点才显示结果。",
+          "不能出现：未出发便显示胜利结果。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加双人竞赛成绩榜。",
+      "parentsPrompt": "让孩子展示「小兔子运动会」，请他先预测再运行，并说出为什么出错时应当确认终点判断依赖角色实时位置。",
+      "assetIds": [
+        "g1-g1-u2-06-scene",
+        "g1-g1-u2-06-guide",
+        "g1-g1-u2-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U3-L01",
+      "unitId": "G1-U3",
+      "title": "点击打开宝箱",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动与状态",
+      "story": "宝箱封着一张奖励卡，要点箱子才能打开。",
+      "concepts": [
+        "事件"
+      ],
+      "prerequisites": [
+        "G1-U2-L06"
+      ],
+      "objectives": [
+        "理解并能解释事件",
+        "在「点击打开宝箱」完成具体任务：绑定宝箱点击事件，使封闭造型变成打开造型。",
+        "用实际运行结果验证：未点击时保持关闭，点击一次才开启。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "宝箱封着一张奖励卡，要点箱子才能打开。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「点击打开宝箱」的初始状态，写下目标：未点击时保持关闭，点击一次才开启。",
+          "verification": "完成一个可核对的预测：未点击时保持关闭，点击一次才开启。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「事件」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：绑定宝箱点击事件，使封闭造型变成打开造型。",
+          "verification": "方案包含事件及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "绑定宝箱点击事件，使封闭造型变成打开造型。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：未点击时保持关闭，点击一次才开启。",
+          "verification": "未点击时保持关闭，点击一次才开启。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：点击空白背景也打开宝箱。",
+          "learnerAction": "尝试重现错误，利用提示改正：核对事件究竟绑定哪个精灵。",
+          "verification": "失败场景可解释，修正后重新满足：未点击时保持关闭，点击一次才开启。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「点击打开宝箱」：未点击时保持关闭，点击一次才开启。",
+        "commonMistakes": [
+          {
+            "symptom": "点击空白背景也打开宝箱。",
+            "diagnosis": "观察事件的输入、触发与状态是否符合目标",
+            "repair": "核对事件究竟绑定哪个精灵。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：绑定宝箱点击事件，使封闭造型变成打开造型。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：未点击时保持关闭，点击一次才开启。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，宝箱封着一张奖励卡，要点箱子才能打开。",
+          "把问题缩小到关键动作：绑定宝箱点击事件，使封闭造型变成打开造型。",
+          "按步骤重试：核对事件究竟绑定哪个精灵。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U3-L01-PASS-01",
+            "kind": "positive",
+            "given": "宝箱封着一张奖励卡，要点箱子才能打开。",
+            "when": "绑定宝箱点击事件，使封闭造型变成打开造型。",
+            "then": "未点击时保持关闭，点击一次才开启。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U3-L01-FAIL-01",
+            "kind": "negative",
+            "given": "宝箱封着一张奖励卡，要点箱子才能打开。",
+            "when": "点击空白背景也打开宝箱。",
+            "then": "应识别问题并引导：核对事件究竟绑定哪个精灵。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "未点击时保持关闭，点击一次才开启。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释事件与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：点击空白背景也打开宝箱。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加一次性防重复开启状态。"
+          }
+        ],
+        "mustPass": [
+          "未点击时保持关闭，点击一次才开启。",
+          "不能出现：点击空白背景也打开宝箱。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加一次性防重复开启状态。",
+      "parentsPrompt": "让孩子展示「点击打开宝箱」，请他先预测再运行，并说出为什么出错时应当核对事件究竟绑定哪个精灵。",
+      "assetIds": [
+        "g1-g1-u3-01-scene",
+        "g1-g1-u3-01-guide",
+        "g1-g1-u3-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U3-L02",
+      "unitId": "G1-U3",
+      "title": "判断是否拿钥匙",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动与状态",
+      "story": "森林钥匙门设置了门卫，没钥匙不能通过。",
+      "concepts": [
+        "事件"
+      ],
+      "prerequisites": [
+        "G1-U3-L01"
+      ],
+      "objectives": [
+        "理解并能解释事件",
+        "在「判断是否拿钥匙」完成具体任务：引入hasKey布尔变量，拿钥匙后允许开门。",
+        "用实际运行结果验证：hasKey=true通行，false禁止通行并提示。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林钥匙门设置了门卫，没钥匙不能通过。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「判断是否拿钥匙」的初始状态，写下目标：hasKey=true通行，false禁止通行并提示。",
+          "verification": "完成一个可核对的预测：hasKey=true通行，false禁止通行并提示。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「事件」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：引入hasKey布尔变量，拿钥匙后允许开门。",
+          "verification": "方案包含事件及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "引入hasKey布尔变量，拿钥匙后允许开门。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：hasKey=true通行，false禁止通行并提示。",
+          "verification": "hasKey=true通行，false禁止通行并提示。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：不检查钥匙直接打开门。",
+          "learnerAction": "尝试重现错误，利用提示改正：把开门指令放入判断条件内。",
+          "verification": "失败场景可解释，修正后重新满足：hasKey=true通行，false禁止通行并提示。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「判断是否拿钥匙」：hasKey=true通行，false禁止通行并提示。",
+        "commonMistakes": [
+          {
+            "symptom": "不检查钥匙直接打开门。",
+            "diagnosis": "观察事件的输入、触发与状态是否符合目标",
+            "repair": "把开门指令放入判断条件内。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：引入hasKey布尔变量，拿钥匙后允许开门。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：hasKey=true通行，false禁止通行并提示。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林钥匙门设置了门卫，没钥匙不能通过。",
+          "把问题缩小到关键动作：引入hasKey布尔变量，拿钥匙后允许开门。",
+          "按步骤重试：把开门指令放入判断条件内。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U3-L02-PASS-01",
+            "kind": "positive",
+            "given": "森林钥匙门设置了门卫，没钥匙不能通过。",
+            "when": "引入hasKey布尔变量，拿钥匙后允许开门。",
+            "then": "hasKey=true通行，false禁止通行并提示。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U3-L02-FAIL-01",
+            "kind": "negative",
+            "given": "森林钥匙门设置了门卫，没钥匙不能通过。",
+            "when": "不检查钥匙直接打开门。",
+            "then": "应识别问题并引导：把开门指令放入判断条件内。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "hasKey=true通行，false禁止通行并提示。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释事件与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：不检查钥匙直接打开门。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加入银钥匙与金钥匙。"
+          }
+        ],
+        "mustPass": [
+          "hasKey=true通行，false禁止通行并提示。",
+          "不能出现：不检查钥匙直接打开门。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加入银钥匙与金钥匙。",
+      "parentsPrompt": "让孩子展示「判断是否拿钥匙」，请他先预测再运行，并说出为什么出错时应当把开门指令放入判断条件内。",
+      "assetIds": [
+        "g1-g1-u3-02-scene",
+        "g1-g1-u3-02-guide",
+        "g1-g1-u3-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U3-L03",
+      "unitId": "G1-U3",
+      "title": "记录得到的星星",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动与状态",
+      "story": "小狐狸获得一颗星星，记分板应及时变化。",
+      "concepts": [
+        "事件",
+        "条件"
+      ],
+      "prerequisites": [
+        "G1-U3-L02"
+      ],
+      "objectives": [
+        "理解并能解释条件",
+        "在「记录得到的星星」完成具体任务：score初始0，每拿到新星星加1，展示在屏幕。",
+        "用实际运行结果验证：拾取3颗不同星星得到score=3。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "小狐狸获得一颗星星，记分板应及时变化。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「记录得到的星星」的初始状态，写下目标：拾取3颗不同星星得到score=3。",
+          "verification": "完成一个可核对的预测：拾取3颗不同星星得到score=3。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「条件」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：score初始0，每拿到新星星加1，展示在屏幕。",
+          "verification": "方案包含条件及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "score初始0，每拿到新星星加1，展示在屏幕。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：拾取3颗不同星星得到score=3。",
+          "verification": "拾取3颗不同星星得到score=3。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：重复碰同一星星导致重复加分。",
+          "learnerAction": "尝试重现错误，利用提示改正：为被拾取对象设置已收集状态。",
+          "verification": "失败场景可解释，修正后重新满足：拾取3颗不同星星得到score=3。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「记录得到的星星」：拾取3颗不同星星得到score=3。",
+        "commonMistakes": [
+          {
+            "symptom": "重复碰同一星星导致重复加分。",
+            "diagnosis": "观察条件的输入、触发与状态是否符合目标",
+            "repair": "为被拾取对象设置已收集状态。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：score初始0，每拿到新星星加1，展示在屏幕。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：拾取3颗不同星星得到score=3。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，小狐狸获得一颗星星，记分板应及时变化。",
+          "把问题缩小到关键动作：score初始0，每拿到新星星加1，展示在屏幕。",
+          "按步骤重试：为被拾取对象设置已收集状态。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U3-L03-PASS-01",
+            "kind": "positive",
+            "given": "小狐狸获得一颗星星，记分板应及时变化。",
+            "when": "score初始0，每拿到新星星加1，展示在屏幕。",
+            "then": "拾取3颗不同星星得到score=3。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U3-L03-FAIL-01",
+            "kind": "negative",
+            "given": "小狐狸获得一颗星星，记分板应及时变化。",
+            "when": "重复碰同一星星导致重复加分。",
+            "then": "应识别问题并引导：为被拾取对象设置已收集状态。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "拾取3颗不同星星得到score=3。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释条件与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：重复碰同一星星导致重复加分。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：设置达5分才解锁彩蛋。"
+          }
+        ],
+        "mustPass": [
+          "拾取3颗不同星星得到score=3。",
+          "不能出现：重复碰同一星星导致重复加分。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "设置达5分才解锁彩蛋。",
+      "parentsPrompt": "让孩子展示「记录得到的星星」，请他先预测再运行，并说出为什么出错时应当为被拾取对象设置已收集状态。",
+      "assetIds": [
+        "g1-g1-u3-03-scene",
+        "g1-g1-u3-03-guide",
+        "g1-g1-u3-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U3-L04",
+      "unitId": "G1-U3",
+      "title": "碰到障碍停下来",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动与状态",
+      "story": "乌龟在森林小径行走，碰到石头就必须停下。",
+      "concepts": [
+        "事件",
+        "条件"
+      ],
+      "prerequisites": [
+        "G1-U3-L03"
+      ],
+      "objectives": [
+        "理解并能解释条件",
+        "在「碰到障碍停下来」完成具体任务：通过触碰检测，碰到障碍时速度设为0并播放警告。",
+        "用实际运行结果验证：未碰撞可移动，碰撞后保持静止。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "乌龟在森林小径行走，碰到石头就必须停下。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「碰到障碍停下来」的初始状态，写下目标：未碰撞可移动，碰撞后保持静止。",
+          "verification": "完成一个可核对的预测：未碰撞可移动，碰撞后保持静止。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「条件」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：通过触碰检测，碰到障碍时速度设为0并播放警告。",
+          "verification": "方案包含条件及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "通过触碰检测，碰到障碍时速度设为0并播放警告。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：未碰撞可移动，碰撞后保持静止。",
+          "verification": "未碰撞可移动，碰撞后保持静止。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：撞到石头之后仍继续移动。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查碰撞判断和停止动作是否放在同一控制路径。",
+          "verification": "失败场景可解释，修正后重新满足：未碰撞可移动，碰撞后保持静止。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「碰到障碍停下来」：未碰撞可移动，碰撞后保持静止。",
+        "commonMistakes": [
+          {
+            "symptom": "撞到石头之后仍继续移动。",
+            "diagnosis": "观察条件的输入、触发与状态是否符合目标",
+            "repair": "检查碰撞判断和停止动作是否放在同一控制路径。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：通过触碰检测，碰到障碍时速度设为0并播放警告。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：未碰撞可移动，碰撞后保持静止。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，乌龟在森林小径行走，碰到石头就必须停下。",
+          "把问题缩小到关键动作：通过触碰检测，碰到障碍时速度设为0并播放警告。",
+          "按步骤重试：检查碰撞判断和停止动作是否放在同一控制路径。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U3-L04-PASS-01",
+            "kind": "positive",
+            "given": "乌龟在森林小径行走，碰到石头就必须停下。",
+            "when": "通过触碰检测，碰到障碍时速度设为0并播放警告。",
+            "then": "未碰撞可移动，碰撞后保持静止。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U3-L04-FAIL-01",
+            "kind": "negative",
+            "given": "乌龟在森林小径行走，碰到石头就必须停下。",
+            "when": "撞到石头之后仍继续移动。",
+            "then": "应识别问题并引导：检查碰撞判断和停止动作是否放在同一控制路径。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "未碰撞可移动，碰撞后保持静止。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释条件与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：撞到石头之后仍继续移动。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：设计绕开障碍的二级方案。"
+          }
+        ],
+        "mustPass": [
+          "未碰撞可移动，碰撞后保持静止。",
+          "不能出现：撞到石头之后仍继续移动。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "设计绕开障碍的二级方案。",
+      "parentsPrompt": "让孩子展示「碰到障碍停下来」，请他先预测再运行，并说出为什么出错时应当检查碰撞判断和停止动作是否放在同一控制路径。",
+      "assetIds": [
+        "g1-g1-u3-04-scene",
+        "g1-g1-u3-04-guide",
+        "g1-g1-u3-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U3-L05",
+      "unitId": "G1-U3",
+      "title": "按钮切换白天黑夜",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动与状态",
+      "story": "森林剧院有白天和夜晚按钮，点击后切换灯光。",
+      "concepts": [
+        "事件",
+        "条件",
+        "变量"
+      ],
+      "prerequisites": [
+        "G1-U3-L04"
+      ],
+      "objectives": [
+        "理解并能解释变量",
+        "在「按钮切换白天黑夜」完成具体任务：用sceneMode在day/night之间切换并选择对应背景。",
+        "用实际运行结果验证：连续点击两次后回到白天。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林剧院有白天和夜晚按钮，点击后切换灯光。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「按钮切换白天黑夜」的初始状态，写下目标：连续点击两次后回到白天。",
+          "verification": "完成一个可核对的预测：连续点击两次后回到白天。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「变量」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用sceneMode在day/night之间切换并选择对应背景。",
+          "verification": "方案包含变量及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用sceneMode在day/night之间切换并选择对应背景。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：连续点击两次后回到白天。",
+          "verification": "连续点击两次后回到白天。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：模式变量切换了但背景没有更新。",
+          "learnerAction": "尝试重现错误，利用提示改正：观察变量值与舞台背景是否同步。",
+          "verification": "失败场景可解释，修正后重新满足：连续点击两次后回到白天。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「按钮切换白天黑夜」：连续点击两次后回到白天。",
+        "commonMistakes": [
+          {
+            "symptom": "模式变量切换了但背景没有更新。",
+            "diagnosis": "观察变量的输入、触发与状态是否符合目标",
+            "repair": "观察变量值与舞台背景是否同步。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用sceneMode在day/night之间切换并选择对应背景。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：连续点击两次后回到白天。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林剧院有白天和夜晚按钮，点击后切换灯光。",
+          "把问题缩小到关键动作：用sceneMode在day/night之间切换并选择对应背景。",
+          "按步骤重试：观察变量值与舞台背景是否同步。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U3-L05-PASS-01",
+            "kind": "positive",
+            "given": "森林剧院有白天和夜晚按钮，点击后切换灯光。",
+            "when": "用sceneMode在day/night之间切换并选择对应背景。",
+            "then": "连续点击两次后回到白天。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U3-L05-FAIL-01",
+            "kind": "negative",
+            "given": "森林剧院有白天和夜晚按钮，点击后切换灯光。",
+            "when": "模式变量切换了但背景没有更新。",
+            "then": "应识别问题并引导：观察变量值与舞台背景是否同步。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "连续点击两次后回到白天。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释变量与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：模式变量切换了但背景没有更新。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加黄昏第三种模式。"
+          }
+        ],
+        "mustPass": [
+          "连续点击两次后回到白天。",
+          "不能出现：模式变量切换了但背景没有更新。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加黄昏第三种模式。",
+      "parentsPrompt": "让孩子展示「按钮切换白天黑夜」，请他先预测再运行，并说出为什么出错时应当观察变量值与舞台背景是否同步。",
+      "assetIds": [
+        "g1-g1-u3-05-scene",
+        "g1-g1-u3-05-guide",
+        "g1-g1-u3-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U3-L06",
+      "unitId": "G1-U3",
+      "title": "互动故事分支",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动与状态",
+      "story": "故事书的读者可以选“去河边”或“去山坡”两条路。",
+      "concepts": [
+        "事件",
+        "条件",
+        "变量"
+      ],
+      "prerequisites": [
+        "G1-U3-L05"
+      ],
+      "objectives": [
+        "理解并能解释变量",
+        "在「互动故事分支」完成具体任务：设置choice选择与两段分支剧情，走完后显示不同结局。",
+        "用实际运行结果验证：choice=river看到河边，choice=hill看到山坡。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "故事书的读者可以选“去河边”或“去山坡”两条路。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「互动故事分支」的初始状态，写下目标：choice=river看到河边，choice=hill看到山坡。",
+          "verification": "完成一个可核对的预测：choice=river看到河边，choice=hill看到山坡。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「变量」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：设置choice选择与两段分支剧情，走完后显示不同结局。",
+          "verification": "方案包含变量及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "设置choice选择与两段分支剧情，走完后显示不同结局。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：choice=river看到河边，choice=hill看到山坡。",
+          "verification": "choice=river看到河边，choice=hill看到山坡。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：两个按钮都显示相同场景。",
+          "learnerAction": "尝试重现错误，利用提示改正：逐条运行两种选择，对照不同的结果。",
+          "verification": "失败场景可解释，修正后重新满足：choice=river看到河边，choice=hill看到山坡。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「互动故事分支」：choice=river看到河边，choice=hill看到山坡。",
+        "commonMistakes": [
+          {
+            "symptom": "两个按钮都显示相同场景。",
+            "diagnosis": "观察变量的输入、触发与状态是否符合目标",
+            "repair": "逐条运行两种选择，对照不同的结果。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：设置choice选择与两段分支剧情，走完后显示不同结局。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：choice=river看到河边，choice=hill看到山坡。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，故事书的读者可以选“去河边”或“去山坡”两条路。",
+          "把问题缩小到关键动作：设置choice选择与两段分支剧情，走完后显示不同结局。",
+          "按步骤重试：逐条运行两种选择，对照不同的结果。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U3-L06-PASS-01",
+            "kind": "positive",
+            "given": "故事书的读者可以选“去河边”或“去山坡”两条路。",
+            "when": "设置choice选择与两段分支剧情，走完后显示不同结局。",
+            "then": "choice=river看到河边，choice=hill看到山坡。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U3-L06-FAIL-01",
+            "kind": "negative",
+            "given": "故事书的读者可以选“去河边”或“去山坡”两条路。",
+            "when": "两个按钮都显示相同场景。",
+            "then": "应识别问题并引导：逐条运行两种选择，对照不同的结果。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "choice=river看到河边，choice=hill看到山坡。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释变量与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：两个按钮都显示相同场景。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加隐藏的第三结局。"
+          }
+        ],
+        "mustPass": [
+          "choice=river看到河边，choice=hill看到山坡。",
+          "不能出现：两个按钮都显示相同场景。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加隐藏的第三结局。",
+      "parentsPrompt": "让孩子展示「互动故事分支」，请他先预测再运行，并说出为什么出错时应当逐条运行两种选择，对照不同的结果。",
+      "assetIds": [
+        "g1-g1-u3-06-scene",
+        "g1-g1-u3-06-guide",
+        "g1-g1-u3-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U4-L01",
+      "unitId": "G1-U4",
+      "title": "规划三幕故事",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "作品设计",
+      "story": "校园戏剧节要求团队先规划三幕故事再开始编码。",
+      "concepts": [
+        "剧情"
+      ],
+      "prerequisites": [
+        "G1-U3-L06"
+      ],
+      "objectives": [
+        "理解并能解释剧情",
+        "在「规划三幕故事」完成具体任务：制作开端、冲突、解决三幕剧情时间线。",
+        "用实际运行结果验证：每幕有一条可辨识的事件与人物目标。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "校园戏剧节要求团队先规划三幕故事再开始编码。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「规划三幕故事」的初始状态，写下目标：每幕有一条可辨识的事件与人物目标。",
+          "verification": "完成一个可核对的预测：每幕有一条可辨识的事件与人物目标。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「剧情」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：制作开端、冲突、解决三幕剧情时间线。",
+          "verification": "方案包含剧情及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "制作开端、冲突、解决三幕剧情时间线。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：每幕有一条可辨识的事件与人物目标。",
+          "verification": "每幕有一条可辨识的事件与人物目标。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：只有开场没有问题或解决段落。",
+          "learnerAction": "尝试重现错误，利用提示改正：写下三幕各自发生的变化。",
+          "verification": "失败场景可解释，修正后重新满足：每幕有一条可辨识的事件与人物目标。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「规划三幕故事」：每幕有一条可辨识的事件与人物目标。",
+        "commonMistakes": [
+          {
+            "symptom": "只有开场没有问题或解决段落。",
+            "diagnosis": "观察剧情的输入、触发与状态是否符合目标",
+            "repair": "写下三幕各自发生的变化。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：制作开端、冲突、解决三幕剧情时间线。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：每幕有一条可辨识的事件与人物目标。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，校园戏剧节要求团队先规划三幕故事再开始编码。",
+          "把问题缩小到关键动作：制作开端、冲突、解决三幕剧情时间线。",
+          "按步骤重试：写下三幕各自发生的变化。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U4-L01-PASS-01",
+            "kind": "positive",
+            "given": "校园戏剧节要求团队先规划三幕故事再开始编码。",
+            "when": "制作开端、冲突、解决三幕剧情时间线。",
+            "then": "每幕有一条可辨识的事件与人物目标。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U4-L01-FAIL-01",
+            "kind": "negative",
+            "given": "校园戏剧节要求团队先规划三幕故事再开始编码。",
+            "when": "只有开场没有问题或解决段落。",
+            "then": "应识别问题并引导：写下三幕各自发生的变化。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "每幕有一条可辨识的事件与人物目标。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释剧情与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：只有开场没有问题或解决段落。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：为每幕加入一句旁白。"
+          }
+        ],
+        "mustPass": [
+          "每幕有一条可辨识的事件与人物目标。",
+          "不能出现：只有开场没有问题或解决段落。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "为每幕加入一句旁白。",
+      "parentsPrompt": "让孩子展示「规划三幕故事」，请他先预测再运行，并说出为什么出错时应当写下三幕各自发生的变化。",
+      "assetIds": [
+        "g1-g1-u4-01-scene",
+        "g1-g1-u4-01-guide",
+        "g1-g1-u4-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U4-L02",
+      "unitId": "G1-U4",
+      "title": "绘制场景草图",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "作品设计",
+      "story": "场景美术师需要把脑中的故事变成能操作的画面。",
+      "concepts": [
+        "剧情"
+      ],
+      "prerequisites": [
+        "G1-U4-L01"
+      ],
+      "objectives": [
+        "理解并能解释剧情",
+        "在「绘制场景草图」完成具体任务：绘制三张分镜草图并标注角色位置与道具。",
+        "用实际运行结果验证：每张草图标明角色、背景和触发事件。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "场景美术师需要把脑中的故事变成能操作的画面。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「绘制场景草图」的初始状态，写下目标：每张草图标明角色、背景和触发事件。",
+          "verification": "完成一个可核对的预测：每张草图标明角色、背景和触发事件。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「剧情」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：绘制三张分镜草图并标注角色位置与道具。",
+          "verification": "方案包含剧情及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "绘制三张分镜草图并标注角色位置与道具。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：每张草图标明角色、背景和触发事件。",
+          "verification": "每张草图标明角色、背景和触发事件。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：图画漂亮却没有动作或触发标记。",
+          "learnerAction": "尝试重现错误，利用提示改正：用不同颜色框出角色与交互对象。",
+          "verification": "失败场景可解释，修正后重新满足：每张草图标明角色、背景和触发事件。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「绘制场景草图」：每张草图标明角色、背景和触发事件。",
+        "commonMistakes": [
+          {
+            "symptom": "图画漂亮却没有动作或触发标记。",
+            "diagnosis": "观察剧情的输入、触发与状态是否符合目标",
+            "repair": "用不同颜色框出角色与交互对象。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：绘制三张分镜草图并标注角色位置与道具。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：每张草图标明角色、背景和触发事件。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，场景美术师需要把脑中的故事变成能操作的画面。",
+          "把问题缩小到关键动作：绘制三张分镜草图并标注角色位置与道具。",
+          "按步骤重试：用不同颜色框出角色与交互对象。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U4-L02-PASS-01",
+            "kind": "positive",
+            "given": "场景美术师需要把脑中的故事变成能操作的画面。",
+            "when": "绘制三张分镜草图并标注角色位置与道具。",
+            "then": "每张草图标明角色、背景和触发事件。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U4-L02-FAIL-01",
+            "kind": "negative",
+            "given": "场景美术师需要把脑中的故事变成能操作的画面。",
+            "when": "图画漂亮却没有动作或触发标记。",
+            "then": "应识别问题并引导：用不同颜色框出角色与交互对象。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "每张草图标明角色、背景和触发事件。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释剧情与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：图画漂亮却没有动作或触发标记。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：把草图做成简单动画原型。"
+          }
+        ],
+        "mustPass": [
+          "每张草图标明角色、背景和触发事件。",
+          "不能出现：图画漂亮却没有动作或触发标记。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "把草图做成简单动画原型。",
+      "parentsPrompt": "让孩子展示「绘制场景草图」，请他先预测再运行，并说出为什么出错时应当用不同颜色框出角色与交互对象。",
+      "assetIds": [
+        "g1-g1-u4-02-scene",
+        "g1-g1-u4-02-guide",
+        "g1-g1-u4-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U4-L03",
+      "unitId": "G1-U4",
+      "title": "给人物分配任务",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "作品设计",
+      "story": "两位小演员都想控制同一辆小车。",
+      "concepts": [
+        "剧情",
+        "调试"
+      ],
+      "prerequisites": [
+        "G1-U4-L02"
+      ],
+      "objectives": [
+        "理解并能解释调试",
+        "在「给人物分配任务」完成具体任务：将狐狸脚本负责行驶、兔子脚本负责提示与计时。",
+        "用实际运行结果验证：两位角色有独立任务，不重复控制小车。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "两位小演员都想控制同一辆小车。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「给人物分配任务」的初始状态，写下目标：两位角色有独立任务，不重复控制小车。",
+          "verification": "完成一个可核对的预测：两位角色有独立任务，不重复控制小车。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「调试」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：将狐狸脚本负责行驶、兔子脚本负责提示与计时。",
+          "verification": "方案包含调试及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "将狐狸脚本负责行驶、兔子脚本负责提示与计时。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：两位角色有独立任务，不重复控制小车。",
+          "verification": "两位角色有独立任务，不重复控制小车。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：同一动作被两个脚本同时执行造成抖动。",
+          "learnerAction": "尝试重现错误，利用提示改正：在任务单上写清角色职责与脚本归属。",
+          "verification": "失败场景可解释，修正后重新满足：两位角色有独立任务，不重复控制小车。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「给人物分配任务」：两位角色有独立任务，不重复控制小车。",
+        "commonMistakes": [
+          {
+            "symptom": "同一动作被两个脚本同时执行造成抖动。",
+            "diagnosis": "观察调试的输入、触发与状态是否符合目标",
+            "repair": "在任务单上写清角色职责与脚本归属。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：将狐狸脚本负责行驶、兔子脚本负责提示与计时。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：两位角色有独立任务，不重复控制小车。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，两位小演员都想控制同一辆小车。",
+          "把问题缩小到关键动作：将狐狸脚本负责行驶、兔子脚本负责提示与计时。",
+          "按步骤重试：在任务单上写清角色职责与脚本归属。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U4-L03-PASS-01",
+            "kind": "positive",
+            "given": "两位小演员都想控制同一辆小车。",
+            "when": "将狐狸脚本负责行驶、兔子脚本负责提示与计时。",
+            "then": "两位角色有独立任务，不重复控制小车。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U4-L03-FAIL-01",
+            "kind": "negative",
+            "given": "两位小演员都想控制同一辆小车。",
+            "when": "同一动作被两个脚本同时执行造成抖动。",
+            "then": "应识别问题并引导：在任务单上写清角色职责与脚本归属。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "两位角色有独立任务，不重复控制小车。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释调试与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：同一动作被两个脚本同时执行造成抖动。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加第三位记录员角色。"
+          }
+        ],
+        "mustPass": [
+          "两位角色有独立任务，不重复控制小车。",
+          "不能出现：同一动作被两个脚本同时执行造成抖动。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加第三位记录员角色。",
+      "parentsPrompt": "让孩子展示「给人物分配任务」，请他先预测再运行，并说出为什么出错时应当在任务单上写清角色职责与脚本归属。",
+      "assetIds": [
+        "g1-g1-u4-03-scene",
+        "g1-g1-u4-03-guide",
+        "g1-g1-u4-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U4-L04",
+      "unitId": "G1-U4",
+      "title": "修复对白顺序",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "作品设计",
+      "story": "第一次彩排总有两个人同时喊台词。",
+      "concepts": [
+        "剧情",
+        "调试"
+      ],
+      "prerequisites": [
+        "G1-U4-L03"
+      ],
+      "objectives": [
+        "理解并能解释调试",
+        "在「修复对白顺序」完成具体任务：对照时间轴逐句调整事件与等待时间。",
+        "用实际运行结果验证：狐狸说完之后兔子再说，不出现重叠。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "第一次彩排总有两个人同时喊台词。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「修复对白顺序」的初始状态，写下目标：狐狸说完之后兔子再说，不出现重叠。",
+          "verification": "完成一个可核对的预测：狐狸说完之后兔子再说，不出现重叠。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「调试」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：对照时间轴逐句调整事件与等待时间。",
+          "verification": "方案包含调试及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "对照时间轴逐句调整事件与等待时间。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：狐狸说完之后兔子再说，不出现重叠。",
+          "verification": "狐狸说完之后兔子再说，不出现重叠。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：减少等待导致两句重叠。",
+          "learnerAction": "尝试重现错误，利用提示改正：让动画暂停在两段对白交接点。",
+          "verification": "失败场景可解释，修正后重新满足：狐狸说完之后兔子再说，不出现重叠。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「修复对白顺序」：狐狸说完之后兔子再说，不出现重叠。",
+        "commonMistakes": [
+          {
+            "symptom": "减少等待导致两句重叠。",
+            "diagnosis": "观察调试的输入、触发与状态是否符合目标",
+            "repair": "让动画暂停在两段对白交接点。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：对照时间轴逐句调整事件与等待时间。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：狐狸说完之后兔子再说，不出现重叠。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，第一次彩排总有两个人同时喊台词。",
+          "把问题缩小到关键动作：对照时间轴逐句调整事件与等待时间。",
+          "按步骤重试：让动画暂停在两段对白交接点。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U4-L04-PASS-01",
+            "kind": "positive",
+            "given": "第一次彩排总有两个人同时喊台词。",
+            "when": "对照时间轴逐句调整事件与等待时间。",
+            "then": "狐狸说完之后兔子再说，不出现重叠。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U4-L04-FAIL-01",
+            "kind": "negative",
+            "given": "第一次彩排总有两个人同时喊台词。",
+            "when": "减少等待导致两句重叠。",
+            "then": "应识别问题并引导：让动画暂停在两段对白交接点。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "狐狸说完之后兔子再说，不出现重叠。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释调试与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：减少等待导致两句重叠。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：让观众点击才触发下一段。"
+          }
+        ],
+        "mustPass": [
+          "狐狸说完之后兔子再说，不出现重叠。",
+          "不能出现：减少等待导致两句重叠。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "让观众点击才触发下一段。",
+      "parentsPrompt": "让孩子展示「修复对白顺序」，请他先预测再运行，并说出为什么出错时应当让动画暂停在两段对白交接点。",
+      "assetIds": [
+        "g1-g1-u4-04-scene",
+        "g1-g1-u4-04-guide",
+        "g1-g1-u4-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U4-L05",
+      "unitId": "G1-U4",
+      "title": "邀请朋友试玩",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "作品设计",
+      "story": "导演邀请朋友试演新故事，收集真实建议。",
+      "concepts": [
+        "剧情",
+        "调试",
+        "发布"
+      ],
+      "prerequisites": [
+        "G1-U4-L04"
+      ],
+      "objectives": [
+        "理解并能解释发布",
+        "在「邀请朋友试玩」完成具体任务：编写试玩任务单，让同伴检查触发入口、对白和结尾。",
+        "用实际运行结果验证：记录至少3条反馈和一次可追踪的修复。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "导演邀请朋友试演新故事，收集真实建议。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「邀请朋友试玩」的初始状态，写下目标：记录至少3条反馈和一次可追踪的修复。",
+          "verification": "完成一个可核对的预测：记录至少3条反馈和一次可追踪的修复。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「发布」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：编写试玩任务单，让同伴检查触发入口、对白和结尾。",
+          "verification": "方案包含发布及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "编写试玩任务单，让同伴检查触发入口、对白和结尾。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：记录至少3条反馈和一次可追踪的修复。",
+          "verification": "记录至少3条反馈和一次可追踪的修复。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：只问喜欢不喜欢，却没有复现问题。",
+          "learnerAction": "尝试重现错误，利用提示改正：为反馈写操作步骤、预期、实际三列。",
+          "verification": "失败场景可解释，修正后重新满足：记录至少3条反馈和一次可追踪的修复。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「邀请朋友试玩」：记录至少3条反馈和一次可追踪的修复。",
+        "commonMistakes": [
+          {
+            "symptom": "只问喜欢不喜欢，却没有复现问题。",
+            "diagnosis": "观察发布的输入、触发与状态是否符合目标",
+            "repair": "为反馈写操作步骤、预期、实际三列。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：编写试玩任务单，让同伴检查触发入口、对白和结尾。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：记录至少3条反馈和一次可追踪的修复。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，导演邀请朋友试演新故事，收集真实建议。",
+          "把问题缩小到关键动作：编写试玩任务单，让同伴检查触发入口、对白和结尾。",
+          "按步骤重试：为反馈写操作步骤、预期、实际三列。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U4-L05-PASS-01",
+            "kind": "positive",
+            "given": "导演邀请朋友试演新故事，收集真实建议。",
+            "when": "编写试玩任务单，让同伴检查触发入口、对白和结尾。",
+            "then": "记录至少3条反馈和一次可追踪的修复。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U4-L05-FAIL-01",
+            "kind": "negative",
+            "given": "导演邀请朋友试演新故事，收集真实建议。",
+            "when": "只问喜欢不喜欢，却没有复现问题。",
+            "then": "应识别问题并引导：为反馈写操作步骤、预期、实际三列。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "记录至少3条反馈和一次可追踪的修复。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释发布与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：只问喜欢不喜欢，却没有复现问题。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：邀请第二个朋友复测修复结果。"
+          }
+        ],
+        "mustPass": [
+          "记录至少3条反馈和一次可追踪的修复。",
+          "不能出现：只问喜欢不喜欢，却没有复现问题。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "邀请第二个朋友复测修复结果。",
+      "parentsPrompt": "让孩子展示「邀请朋友试玩」，请他先预测再运行，并说出为什么出错时应当为反馈写操作步骤、预期、实际三列。",
+      "assetIds": [
+        "g1-g1-u4-05-scene",
+        "g1-g1-u4-05-guide",
+        "g1-g1-u4-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G1-U4-L06",
+      "unitId": "G1-U4",
+      "title": "森林剧场首映",
+      "ageRange": "6-9",
+      "engine": "blockly",
+      "courseState": "detailed_not_published",
+      "projectTheme": "作品设计",
+      "story": "森林剧场正式首映，需要介绍幕后制作思路。",
+      "concepts": [
+        "剧情",
+        "调试",
+        "发布"
+      ],
+      "prerequisites": [
+        "G1-U4-L05"
+      ],
+      "objectives": [
+        "理解并能解释发布",
+        "在「森林剧场首映」完成具体任务：整合剧本、动画、交互和两轮测试后展示。",
+        "用实际运行结果验证：作品能从开头完整运行，角色行为与三幕目标一致。"
+      ],
+      "environment": "图形化故事编辑工作台",
+      "requiredCapabilities": [
+        "story_events",
+        "dialogue",
+        "scene_or_coordinate",
+        "role_animation"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林剧场正式首映，需要介绍幕后制作思路。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「森林剧场首映」的初始状态，写下目标：作品能从开头完整运行，角色行为与三幕目标一致。",
+          "verification": "完成一个可核对的预测：作品能从开头完整运行，角色行为与三幕目标一致。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「发布」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：整合剧本、动画、交互和两轮测试后展示。",
+          "verification": "方案包含发布及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "整合剧本、动画、交互和两轮测试后展示。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「图形化故事编辑工作台」执行，并确认：作品能从开头完整运行，角色行为与三幕目标一致。",
+          "verification": "作品能从开头完整运行，角色行为与三幕目标一致。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：最后一幕缺失或一个触发事件没有响应。",
+          "learnerAction": "尝试重现错误，利用提示改正：按开场-转折-结尾检查每幕验收清单。",
+          "verification": "失败场景可解释，修正后重新满足：作品能从开头完整运行，角色行为与三幕目标一致。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「森林剧场首映」：作品能从开头完整运行，角色行为与三幕目标一致。",
+        "commonMistakes": [
+          {
+            "symptom": "最后一幕缺失或一个触发事件没有响应。",
+            "diagnosis": "观察发布的输入、触发与状态是否符合目标",
+            "repair": "按开场-转折-结尾检查每幕验收清单。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：整合剧本、动画、交互和两轮测试后展示。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：作品能从开头完整运行，角色行为与三幕目标一致。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林剧场正式首映，需要介绍幕后制作思路。",
+          "把问题缩小到关键动作：整合剧本、动画、交互和两轮测试后展示。",
+          "按步骤重试：按开场-转折-结尾检查每幕验收清单。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G1-U4-L06-PASS-01",
+            "kind": "positive",
+            "given": "森林剧场正式首映，需要介绍幕后制作思路。",
+            "when": "整合剧本、动画、交互和两轮测试后展示。",
+            "then": "作品能从开头完整运行，角色行为与三幕目标一致。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G1-U4-L06-FAIL-01",
+            "kind": "negative",
+            "given": "森林剧场正式首映，需要介绍幕后制作思路。",
+            "when": "最后一幕缺失或一个触发事件没有响应。",
+            "then": "应识别问题并引导：按开场-转折-结尾检查每幕验收清单。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "作品能从开头完整运行，角色行为与三幕目标一致。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释发布与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：最后一幕缺失或一个触发事件没有响应。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：制作一张原创宣传海报。"
+          }
+        ],
+        "mustPass": [
+          "作品能从开头完整运行，角色行为与三幕目标一致。",
+          "不能出现：最后一幕缺失或一个触发事件没有响应。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "制作一张原创宣传海报。",
+      "parentsPrompt": "让孩子展示「森林剧场首映」，请他先预测再运行，并说出为什么出错时应当按开场-转折-结尾检查每幕验收清单。",
+      "assetIds": [
+        "g1-g1-u4-06-scene",
+        "g1-g1-u4-06-guide",
+        "g1-g1-u4-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    }
+  ]
+}

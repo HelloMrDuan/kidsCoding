@@ -1,0 +1,52 @@
+name: KidsCoding curriculum content checks
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/content/curriculum/**'
+      - 'apps/web/src/features/curriculum/**'
+      - 'apps/web/src/app/learn/catalog/**'
+      - 'apps/web/src/app/admin/catalog/**'
+      - 'apps/web/src/app/api/curriculum/catalog/**'
+      - 'apps/web/src/app/learn/map/page.tsx'
+      - 'apps/web/src/app/admin/page.tsx'
+      - 'examples/python/p0/**'
+      - '.github/workflows/curriculum-content.yml'
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  curriculum-web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: ESLint
+        run: npm run lint
+      - name: Curriculum contract tests
+        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts
+      - name: Production build
+        run: npm run build
+
+  offline-python-projects:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 4 P0 examples and 16 offline unit tests
+        run: python -m unittest discover -s examples/python/p0 -p 'test_course_projects.py' -v

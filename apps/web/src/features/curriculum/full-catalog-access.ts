@@ -1,0 +1,185 @@
+import catalog from '@/content/curriculum/full-catalog-v1.json'
+import detailed from '@/content/curriculum/track-g0-detailed-lessons-v1.json'
+import g1 from '@/content/curriculum/track-g1-detailed-lessons-v1.json'
+import g2 from '@/content/curriculum/track-g2-detailed-lessons-v1.json'
+import p0 from '@/content/curriculum/track-p0-detailed-lessons-v1.json'
+import foundation from '@/content/curriculum/foundation-guides-v1.json'
+import capstones from '@/content/curriculum/unit-capstone-blueprints-v1.json'
+import { launchLessons } from '@/content/curriculum/launch-lessons'
+
+// Content assets are separate from the published seed lessons and Supabase publications.
+// Never infer that "detailed" means the learning engine supports or has published a lesson.
+export type CatalogTrack = (typeof catalog.tracks)[number]
+export type CatalogUnit = CatalogTrack['units'][number]
+export type CatalogLesson = CatalogUnit['lessons'][number]
+
+export const curriculumTracks = catalog.tracks
+
+export function getCatalogStatistics() {
+  return {
+    tracks: catalog.tracks.length,
+    units: catalog.tracks.reduce((sum, track) => sum + track.units.length, 0),
+    lessons: catalog.tracks.reduce(
+      (sum, track) => sum + track.units.reduce((count, unit) => count + unit.lessons.length, 0),
+      0,
+    ),
+    detailedNewLessons: detailed.lessons.length + g1.lessons.length + g2.lessons.length + p0.lessons.length,
+    detailedTracks: ['G0', 'G1', 'G2', 'P0'],
+    remainingOutlineLessons: catalog.tracks.reduce((sum, track) => sum + track.units.reduce((n, unit) => n + unit.lessons.length, 0), 0) - detailed.lessons.length - g1.lessons.length - g2.lessons.length - p0.lessons.length,
+    existingFoundationGuides: foundation.lessons.length,
+    unitProjectBlueprints: capstones.projects.length,
+    existingLaunchLessonEntries: launchLessons.length,
+  }
+}
+
+export function getCatalogTrack(id: string) {
+  return catalog.tracks.find((track) => track.id === id) ?? null
+}
+
+export function getCatalogLesson(id: string) {
+  for (const track of catalog.tracks) {
+    for (const unit of track.units) {
+      const lesson = unit.lessons.find((entry) => entry.id === id)
+      if (lesson) return { lesson, track, unit }
+    }
+  }
+  return null
+}
+
+export function getLessonContentStage(id: string) {
+  if (detailed.lessons.some((lesson) => lesson.id === id) || g1.lessons.some((lesson) => lesson.id === id) || g2.lessons.some((lesson) => lesson.id === id) || p0.lessons.some((lesson) => lesson.id === id)) return 'detailed'
+  if (foundation.lessons.some((lesson) => lesson.id === id)) return 'foundation'
+  return 'outline'
+}
+
+export function getUnitProject(unitId: string) {
+  return capstones.projects.find((project) => project.unitId === unitId) ?? null
+}
+
+export function getLessonGuide(id: string) {
+  const expanded = [...g1.lessons, ...g2.lessons, ...p0.lessons].find((lesson) => lesson.id === id)
+  if (expanded) {
+    return {
+      id: expanded.id,
+      title: expanded.title,
+      story: expanded.story,
+      goals: expanded.objectives,
+      steps: expanded.learningSteps.map((step) => ({
+        order: step.order,
+        prompt: step.teacherPrompt,
+        action: step.learnerAction,
+        check: step.verification,
+        voiceover: step.teacherPrompt,
+      })),
+      errors: expanded.feedback.commonMistakes.map((item) => ({
+        symptom: item.symptom,
+        suggestion: item.repair,
+      })),
+      hints: expanded.feedback.tieredHints,
+      rubric: expanded.assessment.scoring,
+      acceptance: expanded.assessment.mustPass,
+      extension: expanded.extension,
+      capabilities: expanded.requiredCapabilities,
+      status: expanded.courseState,
+      isPlayable: false,
+    }
+  }
+  const draft = detailed.lessons.find((lesson) => lesson.id === id)
+  if (draft) {
+    return {
+      id: draft.id,
+      title: draft.lessonTitle,
+      story: draft.story,
+      goals: draft.learningObjectives,
+      steps: draft.teachingSteps.map((step) => ({
+        order: step.order,
+        prompt: step.teacherPrompt,
+        action: step.childAction,
+        check: step.observableCheck,
+        voiceover: step.voiceover,
+      })),
+      errors: draft.commonMistakes.map((item) => ({
+        symptom: item.symptom,
+        suggestion: item.recovery,
+      })),
+      hints: draft.hints,
+      rubric: draft.assessment.rubric,
+      acceptance: draft.assessment.mustPass,
+      extension: draft.extension.prompt,
+      capabilities: draft.requiredEngineCapabilities,
+      status: draft.review.publicationStatus,
+      isPlayable: false,
+    }
+  }
+  const prior = foundation.lessons.find((lesson) => lesson.id === id)
+  if (!prior) return null
+  return {
+    id: prior.id,
+    title: prior.title,
+    story: prior.story,
+    goals: [prior.learningOutcome],
+    steps: prior.instructionSequence.map((step) => ({
+      order: step.step,
+      prompt: step.teacherPrompt,
+      action: step.childAction,
+      check: step.check,
+      voiceover: step.voiceover,
+    })),
+    errors: prior.commonErrors.map((symptom, index) => ({
+      symptom,
+      suggestion: prior.tieredHints[index] ?? '',
+    })),
+    hints: prior.tieredHints,
+    rubric: [
+      { criterion: '完成核心任务', weight: 60, evidence: prior.learningOutcome },
+      { criterion: '解释与自测', weight: 40, evidence: prior.assessment.pass.join('；') },
+    ],
+    acceptance: prior.assessment.pass,
+    extension: prior.extension,
+    capabilities: [] as string[],
+    status: prior.publicationStatus,
+    isPlayable: false,
+  }
+}
+
+export function getPublicCatalogTracks() {
+  return catalog.tracks.map((track) => ({
+    id: track.id,
+    title: track.title,
+    ageRange: track.ageRange,
+    engine: track.engine,
+    prerequisites: track.prerequisites,
+    unitCount: track.units.length,
+    lessonCount: track.units.reduce((sum, unit) => sum + unit.lessons.length, 0),
+  }))
+}
+
+export function getPublicCatalogUnit(unit: CatalogUnit) {
+  return {
+    id: unit.id,
+    title: unit.title,
+    concepts: unit.concepts,
+    lessons: unit.lessons.map((lesson) => ({
+      id: lesson.id,
+      title: lesson.title,
+      phase: lesson.phase,
+      focusConcept: lesson.focusConcept,
+      learningOutcome: lesson.learningOutcome,
+      contentStage: getLessonContentStage(lesson.id),
+      playable: false,
+    })),
+    finalProject: unit.lessons.at(-1)?.title ?? '',
+  }
+}
+
+
+export const offlinePythonExamples: Record<string, string> = {
+  'P0-U1-L06': 'examples/python/p0/course_projects.py → make_profile',
+  'P0-U2-L06': 'examples/python/p0/course_projects.py → assign_tasks',
+  'P0-U3-L06': 'examples/python/p0/course_projects.py → LibraryDesk',
+  'P0-U4-L06': 'examples/python/p0/course_projects.py → TaskBoard',
+}
+
+export function getOfflinePythonExample(id: string) {
+  return offlinePythonExamples[id] ?? null
+}

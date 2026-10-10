@@ -1,0 +1,3655 @@
+{
+  "schemaVersion": "1.0.0",
+  "trackId": "P0",
+  "contentLevel": "lesson_script_and_assessment_design",
+  "published": false,
+  "runtimeVerification": "not_yet_verified",
+  "lessons": [
+    {
+      "id": "P0-U1-L01",
+      "unitId": "P0-U1",
+      "title": "运行第一行代码",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "认识 Python",
+      "story": "新同学在控制台看到一片空白，要让电脑打招呼。",
+      "concepts": [
+        "输入输出"
+      ],
+      "prerequisites": [],
+      "objectives": [
+        "理解并能解释输入输出",
+        "在「运行第一行代码」完成具体任务：编写print('你好，编程世界')并运行。",
+        "用实际运行结果验证：终端输出一行“你好，编程世界”。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "新同学在控制台看到一片空白，要让电脑打招呼。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「运行第一行代码」的初始状态，写下目标：终端输出一行“你好，编程世界”。",
+          "verification": "完成一个可核对的预测：终端输出一行“你好，编程世界”。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「输入输出」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：编写print('你好，编程世界')并运行。",
+          "verification": "方案包含输入输出及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "编写print('你好，编程世界')并运行。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：终端输出一行“你好，编程世界”。",
+          "verification": "终端输出一行“你好，编程世界”。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：忘记引号产生NameError。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查字符串是否包在匹配的引号中。",
+          "verification": "失败场景可解释，修正后重新满足：终端输出一行“你好，编程世界”。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「运行第一行代码」：终端输出一行“你好，编程世界”。",
+        "commonMistakes": [
+          {
+            "symptom": "忘记引号产生NameError。",
+            "diagnosis": "观察输入输出的输入、触发与状态是否符合目标",
+            "repair": "检查字符串是否包在匹配的引号中。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：编写print('你好，编程世界')并运行。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：终端输出一行“你好，编程世界”。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，新同学在控制台看到一片空白，要让电脑打招呼。",
+          "把问题缩小到关键动作：编写print('你好，编程世界')并运行。",
+          "按步骤重试：检查字符串是否包在匹配的引号中。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U1-L01-PASS-01",
+            "kind": "positive",
+            "given": "新同学在控制台看到一片空白，要让电脑打招呼。",
+            "when": "编写print('你好，编程世界')并运行。",
+            "then": "终端输出一行“你好，编程世界”。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U1-L01-FAIL-01",
+            "kind": "negative",
+            "given": "新同学在控制台看到一片空白，要让电脑打招呼。",
+            "when": "忘记引号产生NameError。",
+            "then": "应识别问题并引导：检查字符串是否包在匹配的引号中。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "终端输出一行“你好，编程世界”。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释输入输出与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：忘记引号产生NameError。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：再打印一句自我介绍。"
+          }
+        ],
+        "mustPass": [
+          "终端输出一行“你好，编程世界”。",
+          "不能出现：忘记引号产生NameError。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "再打印一句自我介绍。",
+      "parentsPrompt": "让孩子展示「运行第一行代码」，请他先预测再运行，并说出为什么出错时应当检查字符串是否包在匹配的引号中。",
+      "assetIds": [
+        "p0-p0-u1-01-scene",
+        "p0-p0-u1-01-guide",
+        "p0-p0-u1-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U1-L02",
+      "unitId": "P0-U1",
+      "title": "让程序自我介绍",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "认识 Python",
+      "story": "小小机器人想介绍自己的名字和爱好。",
+      "concepts": [
+        "输入输出"
+      ],
+      "prerequisites": [
+        "P0-U1-L01"
+      ],
+      "objectives": [
+        "理解并能解释输入输出",
+        "在「让程序自我介绍」完成具体任务：将名字、爱好存到变量，使用print拼成一句话。",
+        "用实际运行结果验证：输出包含两段变量值并保持顺序。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "小小机器人想介绍自己的名字和爱好。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「让程序自我介绍」的初始状态，写下目标：输出包含两段变量值并保持顺序。",
+          "verification": "完成一个可核对的预测：输出包含两段变量值并保持顺序。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「输入输出」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：将名字、爱好存到变量，使用print拼成一句话。",
+          "verification": "方案包含输入输出及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "将名字、爱好存到变量，使用print拼成一句话。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：输出包含两段变量值并保持顺序。",
+          "verification": "输出包含两段变量值并保持顺序。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：把变量名写进引号导致原样打印。",
+          "learnerAction": "尝试重现错误，利用提示改正：比较print(name)与print('name')区别。",
+          "verification": "失败场景可解释，修正后重新满足：输出包含两段变量值并保持顺序。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「让程序自我介绍」：输出包含两段变量值并保持顺序。",
+        "commonMistakes": [
+          {
+            "symptom": "把变量名写进引号导致原样打印。",
+            "diagnosis": "观察输入输出的输入、触发与状态是否符合目标",
+            "repair": "比较print(name)与print('name')区别。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：将名字、爱好存到变量，使用print拼成一句话。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：输出包含两段变量值并保持顺序。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，小小机器人想介绍自己的名字和爱好。",
+          "把问题缩小到关键动作：将名字、爱好存到变量，使用print拼成一句话。",
+          "按步骤重试：比较print(name)与print('name')区别。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U1-L02-PASS-01",
+            "kind": "positive",
+            "given": "小小机器人想介绍自己的名字和爱好。",
+            "when": "将名字、爱好存到变量，使用print拼成一句话。",
+            "then": "输出包含两段变量值并保持顺序。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U1-L02-FAIL-01",
+            "kind": "negative",
+            "given": "小小机器人想介绍自己的名字和爱好。",
+            "when": "把变量名写进引号导致原样打印。",
+            "then": "应识别问题并引导：比较print(name)与print('name')区别。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "输出包含两段变量值并保持顺序。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释输入输出与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：把变量名写进引号导致原样打印。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加入最喜欢的颜色。"
+          }
+        ],
+        "mustPass": [
+          "输出包含两段变量值并保持顺序。",
+          "不能出现：把变量名写进引号导致原样打印。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加入最喜欢的颜色。",
+      "parentsPrompt": "让孩子展示「让程序自我介绍」，请他先预测再运行，并说出为什么出错时应当比较print(name)与print('name')区别。",
+      "assetIds": [
+        "p0-p0-u1-02-scene",
+        "p0-p0-u1-02-guide",
+        "p0-p0-u1-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U1-L03",
+      "unitId": "P0-U1",
+      "title": "文字拼接小助手",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "认识 Python",
+      "story": "制作一个把城市与天气词拼起来的小助手。",
+      "concepts": [
+        "输入输出",
+        "变量"
+      ],
+      "prerequisites": [
+        "P0-U1-L02"
+      ],
+      "objectives": [
+        "理解并能解释变量",
+        "在「文字拼接小助手」完成具体任务：使用f-string组合city和weather变量。",
+        "用实际运行结果验证：city=北京、weather=晴输出“北京今天晴”。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "制作一个把城市与天气词拼起来的小助手。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「文字拼接小助手」的初始状态，写下目标：city=北京、weather=晴输出“北京今天晴”。",
+          "verification": "完成一个可核对的预测：city=北京、weather=晴输出“北京今天晴”。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「变量」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：使用f-string组合city和weather变量。",
+          "verification": "方案包含变量及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "使用f-string组合city和weather变量。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：city=北京、weather=晴输出“北京今天晴”。",
+          "verification": "city=北京、weather=晴输出“北京今天晴”。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：直接用+拼接整数温度出现TypeError。",
+          "learnerAction": "尝试重现错误，利用提示改正：用str或f-string统一格式化数据。",
+          "verification": "失败场景可解释，修正后重新满足：city=北京、weather=晴输出“北京今天晴”。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「文字拼接小助手」：city=北京、weather=晴输出“北京今天晴”。",
+        "commonMistakes": [
+          {
+            "symptom": "直接用+拼接整数温度出现TypeError。",
+            "diagnosis": "观察变量的输入、触发与状态是否符合目标",
+            "repair": "用str或f-string统一格式化数据。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：使用f-string组合city和weather变量。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：city=北京、weather=晴输出“北京今天晴”。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，制作一个把城市与天气词拼起来的小助手。",
+          "把问题缩小到关键动作：使用f-string组合city和weather变量。",
+          "按步骤重试：用str或f-string统一格式化数据。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U1-L03-PASS-01",
+            "kind": "positive",
+            "given": "制作一个把城市与天气词拼起来的小助手。",
+            "when": "使用f-string组合city和weather变量。",
+            "then": "city=北京、weather=晴输出“北京今天晴”。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U1-L03-FAIL-01",
+            "kind": "negative",
+            "given": "制作一个把城市与天气词拼起来的小助手。",
+            "when": "直接用+拼接整数温度出现TypeError。",
+            "then": "应识别问题并引导：用str或f-string统一格式化数据。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "city=北京、weather=晴输出“北京今天晴”。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释变量与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：直接用+拼接整数温度出现TypeError。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：支持同时显示摄氏温度。"
+          }
+        ],
+        "mustPass": [
+          "city=北京、weather=晴输出“北京今天晴”。",
+          "不能出现：直接用+拼接整数温度出现TypeError。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "支持同时显示摄氏温度。",
+      "parentsPrompt": "让孩子展示「文字拼接小助手」，请他先预测再运行，并说出为什么出错时应当用str或f-string统一格式化数据。",
+      "assetIds": [
+        "p0-p0-u1-03-scene",
+        "p0-p0-u1-03-guide",
+        "p0-p0-u1-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U1-L04",
+      "unitId": "P0-U1",
+      "title": "数字和字符串",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "认识 Python",
+      "story": "程序把年龄当成字符串导致1+1变成11。",
+      "concepts": [
+        "输入输出",
+        "变量"
+      ],
+      "prerequisites": [
+        "P0-U1-L03"
+      ],
+      "objectives": [
+        "理解并能解释变量",
+        "在「数字和字符串」完成具体任务：比较字符串'1'拼接与整数1相加的差异。",
+        "用实际运行结果验证：两个整数相加得到2，两个字符串拼接得到11。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "程序把年龄当成字符串导致1+1变成11。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「数字和字符串」的初始状态，写下目标：两个整数相加得到2，两个字符串拼接得到11。",
+          "verification": "完成一个可核对的预测：两个整数相加得到2，两个字符串拼接得到11。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「变量」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：比较字符串'1'拼接与整数1相加的差异。",
+          "verification": "方案包含变量及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "比较字符串'1'拼接与整数1相加的差异。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：两个整数相加得到2，两个字符串拼接得到11。",
+          "verification": "两个整数相加得到2，两个字符串拼接得到11。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：把'12'+3当作合法加法。",
+          "learnerAction": "尝试重现错误，利用提示改正：先用type检查值，再根据意图转换。",
+          "verification": "失败场景可解释，修正后重新满足：两个整数相加得到2，两个字符串拼接得到11。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「数字和字符串」：两个整数相加得到2，两个字符串拼接得到11。",
+        "commonMistakes": [
+          {
+            "symptom": "把'12'+3当作合法加法。",
+            "diagnosis": "观察变量的输入、触发与状态是否符合目标",
+            "repair": "先用type检查值，再根据意图转换。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：比较字符串'1'拼接与整数1相加的差异。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：两个整数相加得到2，两个字符串拼接得到11。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，程序把年龄当成字符串导致1+1变成11。",
+          "把问题缩小到关键动作：比较字符串'1'拼接与整数1相加的差异。",
+          "按步骤重试：先用type检查值，再根据意图转换。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U1-L04-PASS-01",
+            "kind": "positive",
+            "given": "程序把年龄当成字符串导致1+1变成11。",
+            "when": "比较字符串'1'拼接与整数1相加的差异。",
+            "then": "两个整数相加得到2，两个字符串拼接得到11。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U1-L04-FAIL-01",
+            "kind": "negative",
+            "given": "程序把年龄当成字符串导致1+1变成11。",
+            "when": "把'12'+3当作合法加法。",
+            "then": "应识别问题并引导：先用type检查值，再根据意图转换。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "两个整数相加得到2，两个字符串拼接得到11。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释变量与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：把'12'+3当作合法加法。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：实现可输入的加法小工具。"
+          }
+        ],
+        "mustPass": [
+          "两个整数相加得到2，两个字符串拼接得到11。",
+          "不能出现：把'12'+3当作合法加法。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "实现可输入的加法小工具。",
+      "parentsPrompt": "让孩子展示「数字和字符串」，请他先预测再运行，并说出为什么出错时应当先用type检查值，再根据意图转换。",
+      "assetIds": [
+        "p0-p0-u1-04-scene",
+        "p0-p0-u1-04-guide",
+        "p0-p0-u1-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U1-L05",
+      "unitId": "P0-U1",
+      "title": "输入你的名字",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "认识 Python",
+      "story": "欢迎程序需要知道来访者怎么称呼。",
+      "concepts": [
+        "输入输出",
+        "变量",
+        "类型"
+      ],
+      "prerequisites": [
+        "P0-U1-L04"
+      ],
+      "objectives": [
+        "理解并能解释类型",
+        "在「输入你的名字」完成具体任务：读取用户输入，去除首尾空格后输出问候。",
+        "用实际运行结果验证：输入“ 小明 ”应输出“你好，小明”。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "欢迎程序需要知道来访者怎么称呼。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「输入你的名字」的初始状态，写下目标：输入“ 小明 ”应输出“你好，小明”。",
+          "verification": "完成一个可核对的预测：输入“ 小明 ”应输出“你好，小明”。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「类型」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：读取用户输入，去除首尾空格后输出问候。",
+          "verification": "方案包含类型及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "读取用户输入，去除首尾空格后输出问候。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：输入“ 小明 ”应输出“你好，小明”。",
+          "verification": "输入“ 小明 ”应输出“你好，小明”。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：空白输入导致姓名为空。",
+          "learnerAction": "尝试重现错误，利用提示改正：使用strip检查空值并给出重新输入提示。",
+          "verification": "失败场景可解释，修正后重新满足：输入“ 小明 ”应输出“你好，小明”。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「输入你的名字」：输入“ 小明 ”应输出“你好，小明”。",
+        "commonMistakes": [
+          {
+            "symptom": "空白输入导致姓名为空。",
+            "diagnosis": "观察类型的输入、触发与状态是否符合目标",
+            "repair": "使用strip检查空值并给出重新输入提示。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：读取用户输入，去除首尾空格后输出问候。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：输入“ 小明 ”应输出“你好，小明”。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，欢迎程序需要知道来访者怎么称呼。",
+          "把问题缩小到关键动作：读取用户输入，去除首尾空格后输出问候。",
+          "按步骤重试：使用strip检查空值并给出重新输入提示。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U1-L05-PASS-01",
+            "kind": "positive",
+            "given": "欢迎程序需要知道来访者怎么称呼。",
+            "when": "读取用户输入，去除首尾空格后输出问候。",
+            "then": "输入“ 小明 ”应输出“你好，小明”。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U1-L05-FAIL-01",
+            "kind": "negative",
+            "given": "欢迎程序需要知道来访者怎么称呼。",
+            "when": "空白输入导致姓名为空。",
+            "then": "应识别问题并引导：使用strip检查空值并给出重新输入提示。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "输入“ 小明 ”应输出“你好，小明”。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释类型与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：空白输入导致姓名为空。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：支持自定义称呼前缀。"
+          }
+        ],
+        "mustPass": [
+          "输入“ 小明 ”应输出“你好，小明”。",
+          "不能出现：空白输入导致姓名为空。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "支持自定义称呼前缀。",
+      "parentsPrompt": "让孩子展示「输入你的名字」，请他先预测再运行，并说出为什么出错时应当使用strip检查空值并给出重新输入提示。",
+      "assetIds": [
+        "p0-p0-u1-05-scene",
+        "p0-p0-u1-05-guide",
+        "p0-p0-u1-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U1-L06",
+      "unitId": "P0-U1",
+      "title": "制作个人名片生成器",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "认识 Python",
+      "story": "校园活动需要自动生成一张不含敏感个人信息的名片。",
+      "concepts": [
+        "输入输出",
+        "变量",
+        "类型"
+      ],
+      "prerequisites": [
+        "P0-U1-L05"
+      ],
+      "objectives": [
+        "理解并能解释类型",
+        "在「制作个人名片生成器」完成具体任务：接收昵称、爱好、喜欢的颜色，格式化三行名片。",
+        "用实际运行结果验证：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "校园活动需要自动生成一张不含敏感个人信息的名片。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「制作个人名片生成器」的初始状态，写下目标：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。",
+          "verification": "完成一个可核对的预测：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「类型」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：接收昵称、爱好、喜欢的颜色，格式化三行名片。",
+          "verification": "方案包含类型及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "接收昵称、爱好、喜欢的颜色，格式化三行名片。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。",
+          "verification": "昵称小雨、爱好画画、颜色蓝输出对应三行卡片。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：空昵称或过长昵称应有清楚提示。",
+          "learnerAction": "尝试重现错误，利用提示改正：先验证输入再拼接展示内容。",
+          "verification": "失败场景可解释，修正后重新满足：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「制作个人名片生成器」：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。",
+        "commonMistakes": [
+          {
+            "symptom": "空昵称或过长昵称应有清楚提示。",
+            "diagnosis": "观察类型的输入、触发与状态是否符合目标",
+            "repair": "先验证输入再拼接展示内容。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：接收昵称、爱好、喜欢的颜色，格式化三行名片。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：昵称小雨、爱好画画、颜色蓝输出对应三行卡片。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，校园活动需要自动生成一张不含敏感个人信息的名片。",
+          "把问题缩小到关键动作：接收昵称、爱好、喜欢的颜色，格式化三行名片。",
+          "按步骤重试：先验证输入再拼接展示内容。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U1-L06-PASS-01",
+            "kind": "positive",
+            "given": "校园活动需要自动生成一张不含敏感个人信息的名片。",
+            "when": "接收昵称、爱好、喜欢的颜色，格式化三行名片。",
+            "then": "昵称小雨、爱好画画、颜色蓝输出对应三行卡片。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U1-L06-FAIL-01",
+            "kind": "negative",
+            "given": "校园活动需要自动生成一张不含敏感个人信息的名片。",
+            "when": "空昵称或过长昵称应有清楚提示。",
+            "then": "应识别问题并引导：先验证输入再拼接展示内容。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "昵称小雨、爱好画画、颜色蓝输出对应三行卡片。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释类型与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：空昵称或过长昵称应有清楚提示。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加个性化边框与安全提示。"
+          }
+        ],
+        "mustPass": [
+          "昵称小雨、爱好画画、颜色蓝输出对应三行卡片。",
+          "不能出现：空昵称或过长昵称应有清楚提示。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加个性化边框与安全提示。",
+      "parentsPrompt": "让孩子展示「制作个人名片生成器」，请他先预测再运行，并说出为什么出错时应当先验证输入再拼接展示内容。",
+      "assetIds": [
+        "p0-p0-u1-06-scene",
+        "p0-p0-u1-06-guide",
+        "p0-p0-u1-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U2-L01",
+      "unitId": "P0-U2",
+      "title": "判断今天穿什么",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "分支与循环",
+      "story": "晨跑前要根据温度提醒同学穿衣。",
+      "concepts": [
+        "if"
+      ],
+      "prerequisites": [
+        "P0-U1-L06"
+      ],
+      "objectives": [
+        "理解并能解释if",
+        "在「判断今天穿什么」完成具体任务：通过if/elif/else区分低于10、10-24、25以上的建议。",
+        "用实际运行结果验证：9度提醒外套，20度轻便，30度注意防晒。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "晨跑前要根据温度提醒同学穿衣。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「判断今天穿什么」的初始状态，写下目标：9度提醒外套，20度轻便，30度注意防晒。",
+          "verification": "完成一个可核对的预测：9度提醒外套，20度轻便，30度注意防晒。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「if」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：通过if/elif/else区分低于10、10-24、25以上的建议。",
+          "verification": "方案包含if及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "通过if/elif/else区分低于10、10-24、25以上的建议。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：9度提醒外套，20度轻便，30度注意防晒。",
+          "verification": "9度提醒外套，20度轻便，30度注意防晒。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：10度正好落在两个区间或都没有命中。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查条件边界是否连贯且不重叠。",
+          "verification": "失败场景可解释，修正后重新满足：9度提醒外套，20度轻便，30度注意防晒。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「判断今天穿什么」：9度提醒外套，20度轻便，30度注意防晒。",
+        "commonMistakes": [
+          {
+            "symptom": "10度正好落在两个区间或都没有命中。",
+            "diagnosis": "观察if的输入、触发与状态是否符合目标",
+            "repair": "检查条件边界是否连贯且不重叠。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：通过if/elif/else区分低于10、10-24、25以上的建议。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：9度提醒外套，20度轻便，30度注意防晒。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，晨跑前要根据温度提醒同学穿衣。",
+          "把问题缩小到关键动作：通过if/elif/else区分低于10、10-24、25以上的建议。",
+          "按步骤重试：检查条件边界是否连贯且不重叠。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U2-L01-PASS-01",
+            "kind": "positive",
+            "given": "晨跑前要根据温度提醒同学穿衣。",
+            "when": "通过if/elif/else区分低于10、10-24、25以上的建议。",
+            "then": "9度提醒外套，20度轻便，30度注意防晒。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U2-L01-FAIL-01",
+            "kind": "negative",
+            "given": "晨跑前要根据温度提醒同学穿衣。",
+            "when": "10度正好落在两个区间或都没有命中。",
+            "then": "应识别问题并引导：检查条件边界是否连贯且不重叠。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "9度提醒外套，20度轻便，30度注意防晒。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释if与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：10度正好落在两个区间或都没有命中。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加入下雨提示，不调用真实天气接口。"
+          }
+        ],
+        "mustPass": [
+          "9度提醒外套，20度轻便，30度注意防晒。",
+          "不能出现：10度正好落在两个区间或都没有命中。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加入下雨提示，不调用真实天气接口。",
+      "parentsPrompt": "让孩子展示「判断今天穿什么」，请他先预测再运行，并说出为什么出错时应当检查条件边界是否连贯且不重叠。",
+      "assetIds": [
+        "p0-p0-u2-01-scene",
+        "p0-p0-u2-01-guide",
+        "p0-p0-u2-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U2-L02",
+      "unitId": "P0-U2",
+      "title": "猜数字小游戏",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "分支与循环",
+      "story": "森林侦探猜一个1到10的数字。",
+      "concepts": [
+        "if"
+      ],
+      "prerequisites": [
+        "P0-U2-L01"
+      ],
+      "objectives": [
+        "理解并能解释if",
+        "在「猜数字小游戏」完成具体任务：比较猜测值和答案，分别提示大了、小了、猜中了。",
+        "用实际运行结果验证：答案7时猜3提示小了、猜9提示大了、猜7成功。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林侦探猜一个1到10的数字。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「猜数字小游戏」的初始状态，写下目标：答案7时猜3提示小了、猜9提示大了、猜7成功。",
+          "verification": "完成一个可核对的预测：答案7时猜3提示小了、猜9提示大了、猜7成功。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「if」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：比较猜测值和答案，分别提示大了、小了、猜中了。",
+          "verification": "方案包含if及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "比较猜测值和答案，分别提示大了、小了、猜中了。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：答案7时猜3提示小了、猜9提示大了、猜7成功。",
+          "verification": "答案7时猜3提示小了、猜9提示大了、猜7成功。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：用户输入文字引发ValueError。",
+          "learnerAction": "尝试重现错误，利用提示改正：用try/except转换输入并提供重试。",
+          "verification": "失败场景可解释，修正后重新满足：答案7时猜3提示小了、猜9提示大了、猜7成功。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「猜数字小游戏」：答案7时猜3提示小了、猜9提示大了、猜7成功。",
+        "commonMistakes": [
+          {
+            "symptom": "用户输入文字引发ValueError。",
+            "diagnosis": "观察if的输入、触发与状态是否符合目标",
+            "repair": "用try/except转换输入并提供重试。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：比较猜测值和答案，分别提示大了、小了、猜中了。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：答案7时猜3提示小了、猜9提示大了、猜7成功。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林侦探猜一个1到10的数字。",
+          "把问题缩小到关键动作：比较猜测值和答案，分别提示大了、小了、猜中了。",
+          "按步骤重试：用try/except转换输入并提供重试。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U2-L02-PASS-01",
+            "kind": "positive",
+            "given": "森林侦探猜一个1到10的数字。",
+            "when": "比较猜测值和答案，分别提示大了、小了、猜中了。",
+            "then": "答案7时猜3提示小了、猜9提示大了、猜7成功。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U2-L02-FAIL-01",
+            "kind": "negative",
+            "given": "森林侦探猜一个1到10的数字。",
+            "when": "用户输入文字引发ValueError。",
+            "then": "应识别问题并引导：用try/except转换输入并提供重试。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "答案7时猜3提示小了、猜9提示大了、猜7成功。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释if与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：用户输入文字引发ValueError。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：用三次机会结束游戏。"
+          }
+        ],
+        "mustPass": [
+          "答案7时猜3提示小了、猜9提示大了、猜7成功。",
+          "不能出现：用户输入文字引发ValueError。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "用三次机会结束游戏。",
+      "parentsPrompt": "让孩子展示「猜数字小游戏」，请他先预测再运行，并说出为什么出错时应当用try/except转换输入并提供重试。",
+      "assetIds": [
+        "p0-p0-u2-02-scene",
+        "p0-p0-u2-02-guide",
+        "p0-p0-u2-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U2-L03",
+      "unitId": "P0-U2",
+      "title": "用循环画星星",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "分支与循环",
+      "story": "庆典要在终端打印整齐的三角形星星。",
+      "concepts": [
+        "if",
+        "for"
+      ],
+      "prerequisites": [
+        "P0-U2-L02"
+      ],
+      "objectives": [
+        "理解并能解释for",
+        "在「用循环画星星」完成具体任务：用for循环依次打印1到4颗星星。",
+        "用实际运行结果验证：输出四行分别1、2、3、4个星号。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "庆典要在终端打印整齐的三角形星星。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「用循环画星星」的初始状态，写下目标：输出四行分别1、2、3、4个星号。",
+          "verification": "完成一个可核对的预测：输出四行分别1、2、3、4个星号。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「for」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用for循环依次打印1到4颗星星。",
+          "verification": "方案包含for及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用for循环依次打印1到4颗星星。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：输出四行分别1、2、3、4个星号。",
+          "verification": "输出四行分别1、2、3、4个星号。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：range(4)从0开始第一行是空行。",
+          "learnerAction": "尝试重现错误，利用提示改正：观察range起止边界和计数下标。",
+          "verification": "失败场景可解释，修正后重新满足：输出四行分别1、2、3、4个星号。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「用循环画星星」：输出四行分别1、2、3、4个星号。",
+        "commonMistakes": [
+          {
+            "symptom": "range(4)从0开始第一行是空行。",
+            "diagnosis": "观察for的输入、触发与状态是否符合目标",
+            "repair": "观察range起止边界和计数下标。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用for循环依次打印1到4颗星星。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：输出四行分别1、2、3、4个星号。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，庆典要在终端打印整齐的三角形星星。",
+          "把问题缩小到关键动作：用for循环依次打印1到4颗星星。",
+          "按步骤重试：观察range起止边界和计数下标。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U2-L03-PASS-01",
+            "kind": "positive",
+            "given": "庆典要在终端打印整齐的三角形星星。",
+            "when": "用for循环依次打印1到4颗星星。",
+            "then": "输出四行分别1、2、3、4个星号。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U2-L03-FAIL-01",
+            "kind": "negative",
+            "given": "庆典要在终端打印整齐的三角形星星。",
+            "when": "range(4)从0开始第一行是空行。",
+            "then": "应识别问题并引导：观察range起止边界和计数下标。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "输出四行分别1、2、3、4个星号。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释for与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：range(4)从0开始第一行是空行。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：打印反向倒三角。"
+          }
+        ],
+        "mustPass": [
+          "输出四行分别1、2、3、4个星号。",
+          "不能出现：range(4)从0开始第一行是空行。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "打印反向倒三角。",
+      "parentsPrompt": "让孩子展示「用循环画星星」，请他先预测再运行，并说出为什么出错时应当观察range起止边界和计数下标。",
+      "assetIds": [
+        "p0-p0-u2-03-scene",
+        "p0-p0-u2-03-guide",
+        "p0-p0-u2-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U2-L04",
+      "unitId": "P0-U2",
+      "title": "计算累计积分",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "分支与循环",
+      "story": "小朋友在四项小任务分别得分。",
+      "concepts": [
+        "if",
+        "for"
+      ],
+      "prerequisites": [
+        "P0-U2-L03"
+      ],
+      "objectives": [
+        "理解并能解释for",
+        "在「计算累计积分」完成具体任务：将[3,5,2,4]用for循环累加。",
+        "用实际运行结果验证：返回总分14，空列表得分0。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "小朋友在四项小任务分别得分。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「计算累计积分」的初始状态，写下目标：返回总分14，空列表得分0。",
+          "verification": "完成一个可核对的预测：返回总分14，空列表得分0。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「for」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：将[3,5,2,4]用for循环累加。",
+          "verification": "方案包含for及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "将[3,5,2,4]用for循环累加。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：返回总分14，空列表得分0。",
+          "verification": "返回总分14，空列表得分0。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：第一次循环前没有total=0。",
+          "learnerAction": "尝试重现错误，利用提示改正：用表格记录每次累加后total变化。",
+          "verification": "失败场景可解释，修正后重新满足：返回总分14，空列表得分0。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「计算累计积分」：返回总分14，空列表得分0。",
+        "commonMistakes": [
+          {
+            "symptom": "第一次循环前没有total=0。",
+            "diagnosis": "观察for的输入、触发与状态是否符合目标",
+            "repair": "用表格记录每次累加后total变化。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：将[3,5,2,4]用for循环累加。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：返回总分14，空列表得分0。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，小朋友在四项小任务分别得分。",
+          "把问题缩小到关键动作：将[3,5,2,4]用for循环累加。",
+          "按步骤重试：用表格记录每次累加后total变化。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U2-L04-PASS-01",
+            "kind": "positive",
+            "given": "小朋友在四项小任务分别得分。",
+            "when": "将[3,5,2,4]用for循环累加。",
+            "then": "返回总分14，空列表得分0。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U2-L04-FAIL-01",
+            "kind": "negative",
+            "given": "小朋友在四项小任务分别得分。",
+            "when": "第一次循环前没有total=0。",
+            "then": "应识别问题并引导：用表格记录每次累加后total变化。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "返回总分14，空列表得分0。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释for与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：第一次循环前没有total=0。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：返回平均分但注意空列表。"
+          }
+        ],
+        "mustPass": [
+          "返回总分14，空列表得分0。",
+          "不能出现：第一次循环前没有total=0。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "返回平均分但注意空列表。",
+      "parentsPrompt": "让孩子展示「计算累计积分」，请他先预测再运行，并说出为什么出错时应当用表格记录每次累加后total变化。",
+      "assetIds": [
+        "p0-p0-u2-04-scene",
+        "p0-p0-u2-04-guide",
+        "p0-p0-u2-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U2-L05",
+      "unitId": "P0-U2",
+      "title": "密码尝试规则",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "分支与循环",
+      "story": "班级电脑有模拟口令输入，需要限制尝试次数。",
+      "concepts": [
+        "if",
+        "for",
+        "while"
+      ],
+      "prerequisites": [
+        "P0-U2-L04"
+      ],
+      "objectives": [
+        "理解并能解释while",
+        "在「密码尝试规则」完成具体任务：使用while最多允许三次输入，不保存真实密码。",
+        "用实际运行结果验证：第三次正确成功，三次错误后停止。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "班级电脑有模拟口令输入，需要限制尝试次数。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「密码尝试规则」的初始状态，写下目标：第三次正确成功，三次错误后停止。",
+          "verification": "完成一个可核对的预测：第三次正确成功，三次错误后停止。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「while」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：使用while最多允许三次输入，不保存真实密码。",
+          "verification": "方案包含while及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "使用while最多允许三次输入，不保存真实密码。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：第三次正确成功，三次错误后停止。",
+          "verification": "第三次正确成功，三次错误后停止。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：第四次仍能尝试或进入无限循环。",
+          "learnerAction": "尝试重现错误，利用提示改正：每轮尝试后减少剩余次数并检查退出条件。",
+          "verification": "失败场景可解释，修正后重新满足：第三次正确成功，三次错误后停止。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「密码尝试规则」：第三次正确成功，三次错误后停止。",
+        "commonMistakes": [
+          {
+            "symptom": "第四次仍能尝试或进入无限循环。",
+            "diagnosis": "观察while的输入、触发与状态是否符合目标",
+            "repair": "每轮尝试后减少剩余次数并检查退出条件。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：使用while最多允许三次输入，不保存真实密码。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：第三次正确成功，三次错误后停止。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，班级电脑有模拟口令输入，需要限制尝试次数。",
+          "把问题缩小到关键动作：使用while最多允许三次输入，不保存真实密码。",
+          "按步骤重试：每轮尝试后减少剩余次数并检查退出条件。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U2-L05-PASS-01",
+            "kind": "positive",
+            "given": "班级电脑有模拟口令输入，需要限制尝试次数。",
+            "when": "使用while最多允许三次输入，不保存真实密码。",
+            "then": "第三次正确成功，三次错误后停止。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U2-L05-FAIL-01",
+            "kind": "negative",
+            "given": "班级电脑有模拟口令输入，需要限制尝试次数。",
+            "when": "第四次仍能尝试或进入无限循环。",
+            "then": "应识别问题并引导：每轮尝试后减少剩余次数并检查退出条件。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "第三次正确成功，三次错误后停止。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释while与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：第四次仍能尝试或进入无限循环。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加输入提示但不要记录用户原始口令。"
+          }
+        ],
+        "mustPass": [
+          "第三次正确成功，三次错误后停止。",
+          "不能出现：第四次仍能尝试或进入无限循环。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加输入提示但不要记录用户原始口令。",
+      "parentsPrompt": "让孩子展示「密码尝试规则」，请他先预测再运行，并说出为什么出错时应当每轮尝试后减少剩余次数并检查退出条件。",
+      "assetIds": [
+        "p0-p0-u2-05-scene",
+        "p0-p0-u2-05-guide",
+        "p0-p0-u2-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U2-L06",
+      "unitId": "P0-U2",
+      "title": "制作幸运抽奖器",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "分支与循环",
+      "story": "班级要公平随机分配四种任务卡给小组。",
+      "concepts": [
+        "if",
+        "for",
+        "while"
+      ],
+      "prerequisites": [
+        "P0-U2-L05"
+      ],
+      "objectives": [
+        "理解并能解释while",
+        "在「制作幸运抽奖器」完成具体任务：用random.choice从非空任务列表选一张，设定可复现随机种子。",
+        "用实际运行结果验证：抽选结果必属于任务列表，空列表给出错误提示。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "班级要公平随机分配四种任务卡给小组。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「制作幸运抽奖器」的初始状态，写下目标：抽选结果必属于任务列表，空列表给出错误提示。",
+          "verification": "完成一个可核对的预测：抽选结果必属于任务列表，空列表给出错误提示。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「while」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用random.choice从非空任务列表选一张，设定可复现随机种子。",
+          "verification": "方案包含while及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用random.choice从非空任务列表选一张，设定可复现随机种子。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：抽选结果必属于任务列表，空列表给出错误提示。",
+          "verification": "抽选结果必属于任务列表，空列表给出错误提示。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：空列表直接choice抛异常。",
+          "learnerAction": "尝试重现错误，利用提示改正：随机抽选前先检查列表是否为空。",
+          "verification": "失败场景可解释，修正后重新满足：抽选结果必属于任务列表，空列表给出错误提示。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「制作幸运抽奖器」：抽选结果必属于任务列表，空列表给出错误提示。",
+        "commonMistakes": [
+          {
+            "symptom": "空列表直接choice抛异常。",
+            "diagnosis": "观察while的输入、触发与状态是否符合目标",
+            "repair": "随机抽选前先检查列表是否为空。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用random.choice从非空任务列表选一张，设定可复现随机种子。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：抽选结果必属于任务列表，空列表给出错误提示。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，班级要公平随机分配四种任务卡给小组。",
+          "把问题缩小到关键动作：用random.choice从非空任务列表选一张，设定可复现随机种子。",
+          "按步骤重试：随机抽选前先检查列表是否为空。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U2-L06-PASS-01",
+            "kind": "positive",
+            "given": "班级要公平随机分配四种任务卡给小组。",
+            "when": "用random.choice从非空任务列表选一张，设定可复现随机种子。",
+            "then": "抽选结果必属于任务列表，空列表给出错误提示。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U2-L06-FAIL-01",
+            "kind": "negative",
+            "given": "班级要公平随机分配四种任务卡给小组。",
+            "when": "空列表直接choice抛异常。",
+            "then": "应识别问题并引导：随机抽选前先检查列表是否为空。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "抽选结果必属于任务列表，空列表给出错误提示。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释while与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：空列表直接choice抛异常。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：抽取后不放回，确保每人任务不同。"
+          }
+        ],
+        "mustPass": [
+          "抽选结果必属于任务列表，空列表给出错误提示。",
+          "不能出现：空列表直接choice抛异常。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "抽取后不放回，确保每人任务不同。",
+      "parentsPrompt": "让孩子展示「制作幸运抽奖器」，请他先预测再运行，并说出为什么出错时应当随机抽选前先检查列表是否为空。",
+      "assetIds": [
+        "p0-p0-u2-06-scene",
+        "p0-p0-u2-06-guide",
+        "p0-p0-u2-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U3-L01",
+      "unitId": "P0-U3",
+      "title": "统计一句话的字数",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "字符串与集合",
+      "story": "读书笔记需要知道一段文字有多少字符。",
+      "concepts": [
+        "字符串"
+      ],
+      "prerequisites": [
+        "P0-U2-L06"
+      ],
+      "objectives": [
+        "理解并能解释字符串",
+        "在「统计一句话的字数」完成具体任务：使用len统计去掉首尾空格后的文本长度。",
+        "用实际运行结果验证：输入“ 你好 ”返回2，空白返回0。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "读书笔记需要知道一段文字有多少字符。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「统计一句话的字数」的初始状态，写下目标：输入“ 你好 ”返回2，空白返回0。",
+          "verification": "完成一个可核对的预测：输入“ 你好 ”返回2，空白返回0。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「字符串」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：使用len统计去掉首尾空格后的文本长度。",
+          "verification": "方案包含字符串及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "使用len统计去掉首尾空格后的文本长度。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：输入“ 你好 ”返回2，空白返回0。",
+          "verification": "输入“ 你好 ”返回2，空白返回0。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：错误地按字节长度统计中文字符。",
+          "learnerAction": "尝试重现错误，利用提示改正：比较len('你好')与UTF-8字节长度。",
+          "verification": "失败场景可解释，修正后重新满足：输入“ 你好 ”返回2，空白返回0。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「统计一句话的字数」：输入“ 你好 ”返回2，空白返回0。",
+        "commonMistakes": [
+          {
+            "symptom": "错误地按字节长度统计中文字符。",
+            "diagnosis": "观察字符串的输入、触发与状态是否符合目标",
+            "repair": "比较len('你好')与UTF-8字节长度。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：使用len统计去掉首尾空格后的文本长度。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：输入“ 你好 ”返回2，空白返回0。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，读书笔记需要知道一段文字有多少字符。",
+          "把问题缩小到关键动作：使用len统计去掉首尾空格后的文本长度。",
+          "按步骤重试：比较len('你好')与UTF-8字节长度。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U3-L01-PASS-01",
+            "kind": "positive",
+            "given": "读书笔记需要知道一段文字有多少字符。",
+            "when": "使用len统计去掉首尾空格后的文本长度。",
+            "then": "输入“ 你好 ”返回2，空白返回0。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U3-L01-FAIL-01",
+            "kind": "negative",
+            "given": "读书笔记需要知道一段文字有多少字符。",
+            "when": "错误地按字节长度统计中文字符。",
+            "then": "应识别问题并引导：比较len('你好')与UTF-8字节长度。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "输入“ 你好 ”返回2，空白返回0。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释字符串与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：错误地按字节长度统计中文字符。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：扩展统计标点数量。"
+          }
+        ],
+        "mustPass": [
+          "输入“ 你好 ”返回2，空白返回0。",
+          "不能出现：错误地按字节长度统计中文字符。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "扩展统计标点数量。",
+      "parentsPrompt": "让孩子展示「统计一句话的字数」，请他先预测再运行，并说出为什么出错时应当比较len('你好')与UTF-8字节长度。",
+      "assetIds": [
+        "p0-p0-u3-01-scene",
+        "p0-p0-u3-01-guide",
+        "p0-p0-u3-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U3-L02",
+      "unitId": "P0-U3",
+      "title": "整理旅行清单",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "字符串与集合",
+      "story": "旅行队要携带地图、水壶、帽子。",
+      "concepts": [
+        "字符串"
+      ],
+      "prerequisites": [
+        "P0-U3-L01"
+      ],
+      "objectives": [
+        "理解并能解释字符串",
+        "在「整理旅行清单」完成具体任务：用list创建清单、append加物品、remove删物品。",
+        "用实际运行结果验证：增加“手电”后清单长度4，移除“帽子”后长度3。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "旅行队要携带地图、水壶、帽子。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「整理旅行清单」的初始状态，写下目标：增加“手电”后清单长度4，移除“帽子”后长度3。",
+          "verification": "完成一个可核对的预测：增加“手电”后清单长度4，移除“帽子”后长度3。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「字符串」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用list创建清单、append加物品、remove删物品。",
+          "verification": "方案包含字符串及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用list创建清单、append加物品、remove删物品。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：增加“手电”后清单长度4，移除“帽子”后长度3。",
+          "verification": "增加“手电”后清单长度4，移除“帽子”后长度3。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：删除不存在的项目引发ValueError。",
+          "learnerAction": "尝试重现错误，利用提示改正：先用in检查项目是否存在。",
+          "verification": "失败场景可解释，修正后重新满足：增加“手电”后清单长度4，移除“帽子”后长度3。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「整理旅行清单」：增加“手电”后清单长度4，移除“帽子”后长度3。",
+        "commonMistakes": [
+          {
+            "symptom": "删除不存在的项目引发ValueError。",
+            "diagnosis": "观察字符串的输入、触发与状态是否符合目标",
+            "repair": "先用in检查项目是否存在。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用list创建清单、append加物品、remove删物品。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：增加“手电”后清单长度4，移除“帽子”后长度3。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，旅行队要携带地图、水壶、帽子。",
+          "把问题缩小到关键动作：用list创建清单、append加物品、remove删物品。",
+          "按步骤重试：先用in检查项目是否存在。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U3-L02-PASS-01",
+            "kind": "positive",
+            "given": "旅行队要携带地图、水壶、帽子。",
+            "when": "用list创建清单、append加物品、remove删物品。",
+            "then": "增加“手电”后清单长度4，移除“帽子”后长度3。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U3-L02-FAIL-01",
+            "kind": "negative",
+            "given": "旅行队要携带地图、水壶、帽子。",
+            "when": "删除不存在的项目引发ValueError。",
+            "then": "应识别问题并引导：先用in检查项目是否存在。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "增加“手电”后清单长度4，移除“帽子”后长度3。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释字符串与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：删除不存在的项目引发ValueError。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：按类别生成两个旅行清单。"
+          }
+        ],
+        "mustPass": [
+          "增加“手电”后清单长度4，移除“帽子”后长度3。",
+          "不能出现：删除不存在的项目引发ValueError。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "按类别生成两个旅行清单。",
+      "parentsPrompt": "让孩子展示「整理旅行清单」，请他先预测再运行，并说出为什么出错时应当先用in检查项目是否存在。",
+      "assetIds": [
+        "p0-p0-u3-02-scene",
+        "p0-p0-u3-02-guide",
+        "p0-p0-u3-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U3-L03",
+      "unitId": "P0-U3",
+      "title": "查找常见单词",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "字符串与集合",
+      "story": "单词闯关需要判断一个词是否在词库里。",
+      "concepts": [
+        "字符串",
+        "列表"
+      ],
+      "prerequisites": [
+        "P0-U3-L02"
+      ],
+      "objectives": [
+        "理解并能解释列表",
+        "在「查找常见单词」完成具体任务：用小写转换和in实现大小写无关查询。",
+        "用实际运行结果验证：查询CAT可匹配cat，查询dog返回未收录。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "单词闯关需要判断一个词是否在词库里。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「查找常见单词」的初始状态，写下目标：查询CAT可匹配cat，查询dog返回未收录。",
+          "verification": "完成一个可核对的预测：查询CAT可匹配cat，查询dog返回未收录。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「列表」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用小写转换和in实现大小写无关查询。",
+          "verification": "方案包含列表及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用小写转换和in实现大小写无关查询。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：查询CAT可匹配cat，查询dog返回未收录。",
+          "verification": "查询CAT可匹配cat，查询dog返回未收录。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：直接比较大小写导致同词判错。",
+          "learnerAction": "尝试重现错误，利用提示改正：查询词和词库使用相同的大小写规范。",
+          "verification": "失败场景可解释，修正后重新满足：查询CAT可匹配cat，查询dog返回未收录。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「查找常见单词」：查询CAT可匹配cat，查询dog返回未收录。",
+        "commonMistakes": [
+          {
+            "symptom": "直接比较大小写导致同词判错。",
+            "diagnosis": "观察列表的输入、触发与状态是否符合目标",
+            "repair": "查询词和词库使用相同的大小写规范。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用小写转换和in实现大小写无关查询。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：查询CAT可匹配cat，查询dog返回未收录。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，单词闯关需要判断一个词是否在词库里。",
+          "把问题缩小到关键动作：用小写转换和in实现大小写无关查询。",
+          "按步骤重试：查询词和词库使用相同的大小写规范。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U3-L03-PASS-01",
+            "kind": "positive",
+            "given": "单词闯关需要判断一个词是否在词库里。",
+            "when": "用小写转换和in实现大小写无关查询。",
+            "then": "查询CAT可匹配cat，查询dog返回未收录。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U3-L03-FAIL-01",
+            "kind": "negative",
+            "given": "单词闯关需要判断一个词是否在词库里。",
+            "when": "直接比较大小写导致同词判错。",
+            "then": "应识别问题并引导：查询词和词库使用相同的大小写规范。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "查询CAT可匹配cat，查询dog返回未收录。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释列表与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：直接比较大小写导致同词判错。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：统计词出现的频率。"
+          }
+        ],
+        "mustPass": [
+          "查询CAT可匹配cat，查询dog返回未收录。",
+          "不能出现：直接比较大小写导致同词判错。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "统计词出现的频率。",
+      "parentsPrompt": "让孩子展示「查找常见单词」，请他先预测再运行，并说出为什么出错时应当查询词和词库使用相同的大小写规范。",
+      "assetIds": [
+        "p0-p0-u3-03-scene",
+        "p0-p0-u3-03-guide",
+        "p0-p0-u3-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U3-L04",
+      "unitId": "P0-U3",
+      "title": "记录小组得分",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "字符串与集合",
+      "story": "小组积分板记录三组同学的任务得分。",
+      "concepts": [
+        "字符串",
+        "列表"
+      ],
+      "prerequisites": [
+        "P0-U3-L03"
+      ],
+      "objectives": [
+        "理解并能解释列表",
+        "在「记录小组得分」完成具体任务：用字典保存组名到分数，更新指定小组加分。",
+        "用实际运行结果验证：A组3分加2变5，不影响B组。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "小组积分板记录三组同学的任务得分。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「记录小组得分」的初始状态，写下目标：A组3分加2变5，不影响B组。",
+          "verification": "完成一个可核对的预测：A组3分加2变5，不影响B组。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「列表」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用字典保存组名到分数，更新指定小组加分。",
+          "verification": "方案包含列表及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用字典保存组名到分数，更新指定小组加分。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：A组3分加2变5，不影响B组。",
+          "verification": "A组3分加2变5，不影响B组。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：更新一个组却覆盖整个分数字典。",
+          "learnerAction": "尝试重现错误，利用提示改正：用scores[group]赋值只改变单个键。",
+          "verification": "失败场景可解释，修正后重新满足：A组3分加2变5，不影响B组。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「记录小组得分」：A组3分加2变5，不影响B组。",
+        "commonMistakes": [
+          {
+            "symptom": "更新一个组却覆盖整个分数字典。",
+            "diagnosis": "观察列表的输入、触发与状态是否符合目标",
+            "repair": "用scores[group]赋值只改变单个键。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用字典保存组名到分数，更新指定小组加分。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：A组3分加2变5，不影响B组。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，小组积分板记录三组同学的任务得分。",
+          "把问题缩小到关键动作：用字典保存组名到分数，更新指定小组加分。",
+          "按步骤重试：用scores[group]赋值只改变单个键。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U3-L04-PASS-01",
+            "kind": "positive",
+            "given": "小组积分板记录三组同学的任务得分。",
+            "when": "用字典保存组名到分数，更新指定小组加分。",
+            "then": "A组3分加2变5，不影响B组。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U3-L04-FAIL-01",
+            "kind": "negative",
+            "given": "小组积分板记录三组同学的任务得分。",
+            "when": "更新一个组却覆盖整个分数字典。",
+            "then": "应识别问题并引导：用scores[group]赋值只改变单个键。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "A组3分加2变5，不影响B组。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释列表与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：更新一个组却覆盖整个分数字典。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：显示排行榜并处理并列。"
+          }
+        ],
+        "mustPass": [
+          "A组3分加2变5，不影响B组。",
+          "不能出现：更新一个组却覆盖整个分数字典。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "显示排行榜并处理并列。",
+      "parentsPrompt": "让孩子展示「记录小组得分」，请他先预测再运行，并说出为什么出错时应当用scores[group]赋值只改变单个键。",
+      "assetIds": [
+        "p0-p0-u3-04-scene",
+        "p0-p0-u3-04-guide",
+        "p0-p0-u3-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U3-L05",
+      "unitId": "P0-U3",
+      "title": "字典制作词典",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "字符串与集合",
+      "story": "学校想做一个迷你词典方便查询。",
+      "concepts": [
+        "字符串",
+        "列表",
+        "字典"
+      ],
+      "prerequisites": [
+        "P0-U3-L04"
+      ],
+      "objectives": [
+        "理解并能解释字典",
+        "在「字典制作词典」完成具体任务：用dict存单词释义，支持添加、查找和更新。",
+        "用实际运行结果验证：查已有词返回释义；查未知词返回友好提示。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "学校想做一个迷你词典方便查询。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「字典制作词典」的初始状态，写下目标：查已有词返回释义；查未知词返回友好提示。",
+          "verification": "完成一个可核对的预测：查已有词返回释义；查未知词返回友好提示。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「字典」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用dict存单词释义，支持添加、查找和更新。",
+          "verification": "方案包含字典及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用dict存单词释义，支持添加、查找和更新。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：查已有词返回释义；查未知词返回友好提示。",
+          "verification": "查已有词返回释义；查未知词返回友好提示。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：直接dict[key]查未知词抛KeyError。",
+          "learnerAction": "尝试重现错误，利用提示改正：用get读取并处理None。",
+          "verification": "失败场景可解释，修正后重新满足：查已有词返回释义；查未知词返回友好提示。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「字典制作词典」：查已有词返回释义；查未知词返回友好提示。",
+        "commonMistakes": [
+          {
+            "symptom": "直接dict[key]查未知词抛KeyError。",
+            "diagnosis": "观察字典的输入、触发与状态是否符合目标",
+            "repair": "用get读取并处理None。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用dict存单词释义，支持添加、查找和更新。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：查已有词返回释义；查未知词返回友好提示。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，学校想做一个迷你词典方便查询。",
+          "把问题缩小到关键动作：用dict存单词释义，支持添加、查找和更新。",
+          "按步骤重试：用get读取并处理None。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U3-L05-PASS-01",
+            "kind": "positive",
+            "given": "学校想做一个迷你词典方便查询。",
+            "when": "用dict存单词释义，支持添加、查找和更新。",
+            "then": "查已有词返回释义；查未知词返回友好提示。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U3-L05-FAIL-01",
+            "kind": "negative",
+            "given": "学校想做一个迷你词典方便查询。",
+            "when": "直接dict[key]查未知词抛KeyError。",
+            "then": "应识别问题并引导：用get读取并处理None。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "查已有词返回释义；查未知词返回友好提示。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释字典与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：直接dict[key]查未知词抛KeyError。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：支持按首字母检索。"
+          }
+        ],
+        "mustPass": [
+          "查已有词返回释义；查未知词返回友好提示。",
+          "不能出现：直接dict[key]查未知词抛KeyError。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "支持按首字母检索。",
+      "parentsPrompt": "让孩子展示「字典制作词典」，请他先预测再运行，并说出为什么出错时应当用get读取并处理None。",
+      "assetIds": [
+        "p0-p0-u3-05-scene",
+        "p0-p0-u3-05-guide",
+        "p0-p0-u3-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U3-L06",
+      "unitId": "P0-U3",
+      "title": "图书馆借阅助手",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "字符串与集合",
+      "story": "图书室借书登记要避免一本书被重复借出。",
+      "concepts": [
+        "字符串",
+        "列表",
+        "字典"
+      ],
+      "prerequisites": [
+        "P0-U3-L05"
+      ],
+      "objectives": [
+        "理解并能解释字典",
+        "在「图书馆借阅助手」完成具体任务：维护图书可借状态，提供borrow和return_book功能。",
+        "用实际运行结果验证：第一次借阅成功、第二次被拒、归还后再次可借。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "图书室借书登记要避免一本书被重复借出。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「图书馆借阅助手」的初始状态，写下目标：第一次借阅成功、第二次被拒、归还后再次可借。",
+          "verification": "完成一个可核对的预测：第一次借阅成功、第二次被拒、归还后再次可借。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「字典」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：维护图书可借状态，提供borrow和return_book功能。",
+          "verification": "方案包含字典及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "维护图书可借状态，提供borrow和return_book功能。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：第一次借阅成功、第二次被拒、归还后再次可借。",
+          "verification": "第一次借阅成功、第二次被拒、归还后再次可借。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：同一本书连续借两次却都成功。",
+          "learnerAction": "尝试重现错误，利用提示改正：在更新状态前验证当前是否可借。",
+          "verification": "失败场景可解释，修正后重新满足：第一次借阅成功、第二次被拒、归还后再次可借。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「图书馆借阅助手」：第一次借阅成功、第二次被拒、归还后再次可借。",
+        "commonMistakes": [
+          {
+            "symptom": "同一本书连续借两次却都成功。",
+            "diagnosis": "观察字典的输入、触发与状态是否符合目标",
+            "repair": "在更新状态前验证当前是否可借。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：维护图书可借状态，提供borrow和return_book功能。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：第一次借阅成功、第二次被拒、归还后再次可借。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，图书室借书登记要避免一本书被重复借出。",
+          "把问题缩小到关键动作：维护图书可借状态，提供borrow和return_book功能。",
+          "按步骤重试：在更新状态前验证当前是否可借。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U3-L06-PASS-01",
+            "kind": "positive",
+            "given": "图书室借书登记要避免一本书被重复借出。",
+            "when": "维护图书可借状态，提供borrow和return_book功能。",
+            "then": "第一次借阅成功、第二次被拒、归还后再次可借。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U3-L06-FAIL-01",
+            "kind": "negative",
+            "given": "图书室借书登记要避免一本书被重复借出。",
+            "when": "同一本书连续借两次却都成功。",
+            "then": "应识别问题并引导：在更新状态前验证当前是否可借。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "第一次借阅成功、第二次被拒、归还后再次可借。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释字典与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：同一本书连续借两次却都成功。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加借阅历史，但只用匿名昵称。"
+          }
+        ],
+        "mustPass": [
+          "第一次借阅成功、第二次被拒、归还后再次可借。",
+          "不能出现：同一本书连续借两次却都成功。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加借阅历史，但只用匿名昵称。",
+      "parentsPrompt": "让孩子展示「图书馆借阅助手」，请他先预测再运行，并说出为什么出错时应当在更新状态前验证当前是否可借。",
+      "assetIds": [
+        "p0-p0-u3-06-scene",
+        "p0-p0-u3-06-guide",
+        "p0-p0-u3-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U4-L01",
+      "unitId": "P0-U4",
+      "title": "封装问候函数",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "函数与项目",
+      "story": "班级里多处都要说“欢迎来上课”。",
+      "concepts": [
+        "函数"
+      ],
+      "prerequisites": [
+        "P0-U3-L06"
+      ],
+      "objectives": [
+        "理解并能解释函数",
+        "在「封装问候函数」完成具体任务：把问候语封装成greet函数并调用两次。",
+        "用实际运行结果验证：greet('小雨')返回包含昵称的问候语。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "班级里多处都要说“欢迎来上课”。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「封装问候函数」的初始状态，写下目标：greet('小雨')返回包含昵称的问候语。",
+          "verification": "完成一个可核对的预测：greet('小雨')返回包含昵称的问候语。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「函数」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：把问候语封装成greet函数并调用两次。",
+          "verification": "方案包含函数及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "把问候语封装成greet函数并调用两次。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：greet('小雨')返回包含昵称的问候语。",
+          "verification": "greet('小雨')返回包含昵称的问候语。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：函数只打印不返回导致调用结果None。",
+          "learnerAction": "尝试重现错误，利用提示改正：明确print与return在函数中的区别。",
+          "verification": "失败场景可解释，修正后重新满足：greet('小雨')返回包含昵称的问候语。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「封装问候函数」：greet('小雨')返回包含昵称的问候语。",
+        "commonMistakes": [
+          {
+            "symptom": "函数只打印不返回导致调用结果None。",
+            "diagnosis": "观察函数的输入、触发与状态是否符合目标",
+            "repair": "明确print与return在函数中的区别。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：把问候语封装成greet函数并调用两次。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：greet('小雨')返回包含昵称的问候语。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，班级里多处都要说“欢迎来上课”。",
+          "把问题缩小到关键动作：把问候语封装成greet函数并调用两次。",
+          "按步骤重试：明确print与return在函数中的区别。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U4-L01-PASS-01",
+            "kind": "positive",
+            "given": "班级里多处都要说“欢迎来上课”。",
+            "when": "把问候语封装成greet函数并调用两次。",
+            "then": "greet('小雨')返回包含昵称的问候语。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U4-L01-FAIL-01",
+            "kind": "negative",
+            "given": "班级里多处都要说“欢迎来上课”。",
+            "when": "函数只打印不返回导致调用结果None。",
+            "then": "应识别问题并引导：明确print与return在函数中的区别。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "greet('小雨')返回包含昵称的问候语。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释函数与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：函数只打印不返回导致调用结果None。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加语言风格参数。"
+          }
+        ],
+        "mustPass": [
+          "greet('小雨')返回包含昵称的问候语。",
+          "不能出现：函数只打印不返回导致调用结果None。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加语言风格参数。",
+      "parentsPrompt": "让孩子展示「封装问候函数」，请他先预测再运行，并说出为什么出错时应当明确print与return在函数中的区别。",
+      "assetIds": [
+        "p0-p0-u4-01-scene",
+        "p0-p0-u4-01-guide",
+        "p0-p0-u4-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U4-L02",
+      "unitId": "P0-U4",
+      "title": "参数让程序更灵活",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "函数与项目",
+      "story": "同一个计算器要处理不同长度的清单。",
+      "concepts": [
+        "函数"
+      ],
+      "prerequisites": [
+        "P0-U4-L01"
+      ],
+      "objectives": [
+        "理解并能解释函数",
+        "在「参数让程序更灵活」完成具体任务：写sum_scores(scores)函数，参数为数字列表。",
+        "用实际运行结果验证：[1,2,3]得6，[]得0。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "同一个计算器要处理不同长度的清单。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「参数让程序更灵活」的初始状态，写下目标：[1,2,3]得6，[]得0。",
+          "verification": "完成一个可核对的预测：[1,2,3]得6，[]得0。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「函数」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：写sum_scores(scores)函数，参数为数字列表。",
+          "verification": "方案包含函数及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "写sum_scores(scores)函数，参数为数字列表。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：[1,2,3]得6，[]得0。",
+          "verification": "[1,2,3]得6，[]得0。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：函数内部修改外部列表导致副作用。",
+          "learnerAction": "尝试重现错误，利用提示改正：使用内置sum而不是修改传入数据。",
+          "verification": "失败场景可解释，修正后重新满足：[1,2,3]得6，[]得0。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「参数让程序更灵活」：[1,2,3]得6，[]得0。",
+        "commonMistakes": [
+          {
+            "symptom": "函数内部修改外部列表导致副作用。",
+            "diagnosis": "观察函数的输入、触发与状态是否符合目标",
+            "repair": "使用内置sum而不是修改传入数据。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：写sum_scores(scores)函数，参数为数字列表。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：[1,2,3]得6，[]得0。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，同一个计算器要处理不同长度的清单。",
+          "把问题缩小到关键动作：写sum_scores(scores)函数，参数为数字列表。",
+          "按步骤重试：使用内置sum而不是修改传入数据。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U4-L02-PASS-01",
+            "kind": "positive",
+            "given": "同一个计算器要处理不同长度的清单。",
+            "when": "写sum_scores(scores)函数，参数为数字列表。",
+            "then": "[1,2,3]得6，[]得0。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U4-L02-FAIL-01",
+            "kind": "negative",
+            "given": "同一个计算器要处理不同长度的清单。",
+            "when": "函数内部修改外部列表导致副作用。",
+            "then": "应识别问题并引导：使用内置sum而不是修改传入数据。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "[1,2,3]得6，[]得0。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释函数与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：函数内部修改外部列表导致副作用。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加取平均分的可选参数。"
+          }
+        ],
+        "mustPass": [
+          "[1,2,3]得6，[]得0。",
+          "不能出现：函数内部修改外部列表导致副作用。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加取平均分的可选参数。",
+      "parentsPrompt": "让孩子展示「参数让程序更灵活」，请他先预测再运行，并说出为什么出错时应当使用内置sum而不是修改传入数据。",
+      "assetIds": [
+        "p0-p0-u4-02-scene",
+        "p0-p0-u4-02-guide",
+        "p0-p0-u4-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U4-L03",
+      "unitId": "P0-U4",
+      "title": "随机数小游戏",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "函数与项目",
+      "story": "太空伙伴随机抽一张行动卡。",
+      "concepts": [
+        "函数",
+        "模块"
+      ],
+      "prerequisites": [
+        "P0-U4-L02"
+      ],
+      "objectives": [
+        "理解并能解释模块",
+        "在「随机数小游戏」完成具体任务：从random模块调用choice，并注入Random种子便于测试。",
+        "用实际运行结果验证：指定种子时重复运行结果一致。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "太空伙伴随机抽一张行动卡。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「随机数小游戏」的初始状态，写下目标：指定种子时重复运行结果一致。",
+          "verification": "完成一个可核对的预测：指定种子时重复运行结果一致。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「模块」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：从random模块调用choice，并注入Random种子便于测试。",
+          "verification": "方案包含模块及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "从random模块调用choice，并注入Random种子便于测试。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：指定种子时重复运行结果一致。",
+          "verification": "指定种子时重复运行结果一致。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：以未固定随机结果作为唯一断言导致测试不稳定。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查结果是否属于候选集合并固定测试种子。",
+          "verification": "失败场景可解释，修正后重新满足：指定种子时重复运行结果一致。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「随机数小游戏」：指定种子时重复运行结果一致。",
+        "commonMistakes": [
+          {
+            "symptom": "以未固定随机结果作为唯一断言导致测试不稳定。",
+            "diagnosis": "观察模块的输入、触发与状态是否符合目标",
+            "repair": "检查结果是否属于候选集合并固定测试种子。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：从random模块调用choice，并注入Random种子便于测试。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：指定种子时重复运行结果一致。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，太空伙伴随机抽一张行动卡。",
+          "把问题缩小到关键动作：从random模块调用choice，并注入Random种子便于测试。",
+          "按步骤重试：检查结果是否属于候选集合并固定测试种子。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U4-L03-PASS-01",
+            "kind": "positive",
+            "given": "太空伙伴随机抽一张行动卡。",
+            "when": "从random模块调用choice，并注入Random种子便于测试。",
+            "then": "指定种子时重复运行结果一致。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U4-L03-FAIL-01",
+            "kind": "negative",
+            "given": "太空伙伴随机抽一张行动卡。",
+            "when": "以未固定随机结果作为唯一断言导致测试不稳定。",
+            "then": "应识别问题并引导：检查结果是否属于候选集合并固定测试种子。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "指定种子时重复运行结果一致。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释模块与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：以未固定随机结果作为唯一断言导致测试不稳定。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：为每张卡设计不同文字反馈。"
+          }
+        ],
+        "mustPass": [
+          "指定种子时重复运行结果一致。",
+          "不能出现：以未固定随机结果作为唯一断言导致测试不稳定。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "为每张卡设计不同文字反馈。",
+      "parentsPrompt": "让孩子展示「随机数小游戏」，请他先预测再运行，并说出为什么出错时应当检查结果是否属于候选集合并固定测试种子。",
+      "assetIds": [
+        "p0-p0-u4-03-scene",
+        "p0-p0-u4-03-guide",
+        "p0-p0-u4-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U4-L04",
+      "unitId": "P0-U4",
+      "title": "发现并处理输入错误",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "函数与项目",
+      "story": "同学输入的积分有时是“abc”导致程序崩溃。",
+      "concepts": [
+        "函数",
+        "模块"
+      ],
+      "prerequisites": [
+        "P0-U4-L03"
+      ],
+      "objectives": [
+        "理解并能解释模块",
+        "在「发现并处理输入错误」完成具体任务：用try/except捕获非整数输入，并返回可读错误。",
+        "用实际运行结果验证：输入12成功、输入abc提示必须是整数。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "同学输入的积分有时是“abc”导致程序崩溃。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「发现并处理输入错误」的初始状态，写下目标：输入12成功、输入abc提示必须是整数。",
+          "verification": "完成一个可核对的预测：输入12成功、输入abc提示必须是整数。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「模块」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用try/except捕获非整数输入，并返回可读错误。",
+          "verification": "方案包含模块及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用try/except捕获非整数输入，并返回可读错误。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：输入12成功、输入abc提示必须是整数。",
+          "verification": "输入12成功、输入abc提示必须是整数。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：捕获所有异常掩盖实际代码缺陷。",
+          "learnerAction": "尝试重现错误，利用提示改正：只捕获ValueError并展示提示。",
+          "verification": "失败场景可解释，修正后重新满足：输入12成功、输入abc提示必须是整数。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「发现并处理输入错误」：输入12成功、输入abc提示必须是整数。",
+        "commonMistakes": [
+          {
+            "symptom": "捕获所有异常掩盖实际代码缺陷。",
+            "diagnosis": "观察模块的输入、触发与状态是否符合目标",
+            "repair": "只捕获ValueError并展示提示。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用try/except捕获非整数输入，并返回可读错误。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：输入12成功、输入abc提示必须是整数。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，同学输入的积分有时是“abc”导致程序崩溃。",
+          "把问题缩小到关键动作：用try/except捕获非整数输入，并返回可读错误。",
+          "按步骤重试：只捕获ValueError并展示提示。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U4-L04-PASS-01",
+            "kind": "positive",
+            "given": "同学输入的积分有时是“abc”导致程序崩溃。",
+            "when": "用try/except捕获非整数输入，并返回可读错误。",
+            "then": "输入12成功、输入abc提示必须是整数。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U4-L04-FAIL-01",
+            "kind": "negative",
+            "given": "同学输入的积分有时是“abc”导致程序崩溃。",
+            "when": "捕获所有异常掩盖实际代码缺陷。",
+            "then": "应识别问题并引导：只捕获ValueError并展示提示。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "输入12成功、输入abc提示必须是整数。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释模块与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：捕获所有异常掩盖实际代码缺陷。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：支持限定分数在0-100范围。"
+          }
+        ],
+        "mustPass": [
+          "输入12成功、输入abc提示必须是整数。",
+          "不能出现：捕获所有异常掩盖实际代码缺陷。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "支持限定分数在0-100范围。",
+      "parentsPrompt": "让孩子展示「发现并处理输入错误」，请他先预测再运行，并说出为什么出错时应当只捕获ValueError并展示提示。",
+      "assetIds": [
+        "p0-p0-u4-04-scene",
+        "p0-p0-u4-04-guide",
+        "p0-p0-u4-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U4-L05",
+      "unitId": "P0-U4",
+      "title": "拆分多文件工具",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "函数与项目",
+      "story": "作品逐渐变大，需要拆成两个Python模块。",
+      "concepts": [
+        "函数",
+        "模块",
+        "异常"
+      ],
+      "prerequisites": [
+        "P0-U4-L04"
+      ],
+      "objectives": [
+        "理解并能解释异常",
+        "在「拆分多文件工具」完成具体任务：创建logic.py放计算函数，main.py只负责用户交互。",
+        "用实际运行结果验证：运行main能调用logic里的函数，单测可独立导入logic。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "作品逐渐变大，需要拆成两个Python模块。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「拆分多文件工具」的初始状态，写下目标：运行main能调用logic里的函数，单测可独立导入logic。",
+          "verification": "完成一个可核对的预测：运行main能调用logic里的函数，单测可独立导入logic。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「异常」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：创建logic.py放计算函数，main.py只负责用户交互。",
+          "verification": "方案包含异常及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "创建logic.py放计算函数，main.py只负责用户交互。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：运行main能调用logic里的函数，单测可独立导入logic。",
+          "verification": "运行main能调用logic里的函数，单测可独立导入logic。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：模块循环导入导致ImportError。",
+          "learnerAction": "尝试重现错误，利用提示改正：把通用逻辑独立成无副作用的模块。",
+          "verification": "失败场景可解释，修正后重新满足：运行main能调用logic里的函数，单测可独立导入logic。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「拆分多文件工具」：运行main能调用logic里的函数，单测可独立导入logic。",
+        "commonMistakes": [
+          {
+            "symptom": "模块循环导入导致ImportError。",
+            "diagnosis": "观察异常的输入、触发与状态是否符合目标",
+            "repair": "把通用逻辑独立成无副作用的模块。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：创建logic.py放计算函数，main.py只负责用户交互。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：运行main能调用logic里的函数，单测可独立导入logic。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，作品逐渐变大，需要拆成两个Python模块。",
+          "把问题缩小到关键动作：创建logic.py放计算函数，main.py只负责用户交互。",
+          "按步骤重试：把通用逻辑独立成无副作用的模块。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U4-L05-PASS-01",
+            "kind": "positive",
+            "given": "作品逐渐变大，需要拆成两个Python模块。",
+            "when": "创建logic.py放计算函数，main.py只负责用户交互。",
+            "then": "运行main能调用logic里的函数，单测可独立导入logic。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U4-L05-FAIL-01",
+            "kind": "negative",
+            "given": "作品逐渐变大，需要拆成两个Python模块。",
+            "when": "模块循环导入导致ImportError。",
+            "then": "应识别问题并引导：把通用逻辑独立成无副作用的模块。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "运行main能调用logic里的函数，单测可独立导入logic。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释异常与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：模块循环导入导致ImportError。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：把输入验证也独立成模块。"
+          }
+        ],
+        "mustPass": [
+          "运行main能调用logic里的函数，单测可独立导入logic。",
+          "不能出现：模块循环导入导致ImportError。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "把输入验证也独立成模块。",
+      "parentsPrompt": "让孩子展示「拆分多文件工具」，请他先预测再运行，并说出为什么出错时应当把通用逻辑独立成无副作用的模块。",
+      "assetIds": [
+        "p0-p0-u4-05-scene",
+        "p0-p0-u4-05-guide",
+        "p0-p0-u4-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "P0-U4-L06",
+      "unitId": "P0-U4",
+      "title": "校园任务管理器",
+      "ageRange": "9-13",
+      "engine": "python",
+      "courseState": "detailed_not_published",
+      "projectTheme": "函数与项目",
+      "story": "校园班级任务越来越多，大家需要一个小工具记录待办。",
+      "concepts": [
+        "函数",
+        "模块",
+        "异常"
+      ],
+      "prerequisites": [
+        "P0-U4-L05"
+      ],
+      "objectives": [
+        "理解并能解释异常",
+        "在「校园任务管理器」完成具体任务：用函数管理添加、完成、查看任务，使用列表存储。",
+        "用实际运行结果验证：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。"
+      ],
+      "environment": "Python 3 标准库教学运行器",
+      "requiredCapabilities": [
+        "python3",
+        "standard_library",
+        "text_io",
+        "unit_testing"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "校园班级任务越来越多，大家需要一个小工具记录待办。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「校园任务管理器」的初始状态，写下目标：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。",
+          "verification": "完成一个可核对的预测：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「异常」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用函数管理添加、完成、查看任务，使用列表存储。",
+          "verification": "方案包含异常及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用函数管理添加、完成、查看任务，使用列表存储。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Python 3 标准库教学运行器」执行，并确认：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。",
+          "verification": "添加两项、完成一项后状态正确；查询不存在编号有友好反馈。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：完成不存在的任务导致越界崩溃。",
+          "learnerAction": "尝试重现错误，利用提示改正：先校验任务编号，再更新对应状态。",
+          "verification": "失败场景可解释，修正后重新满足：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「校园任务管理器」：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。",
+        "commonMistakes": [
+          {
+            "symptom": "完成不存在的任务导致越界崩溃。",
+            "diagnosis": "观察异常的输入、触发与状态是否符合目标",
+            "repair": "先校验任务编号，再更新对应状态。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用函数管理添加、完成、查看任务，使用列表存储。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：添加两项、完成一项后状态正确；查询不存在编号有友好反馈。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，校园班级任务越来越多，大家需要一个小工具记录待办。",
+          "把问题缩小到关键动作：用函数管理添加、完成、查看任务，使用列表存储。",
+          "按步骤重试：先校验任务编号，再更新对应状态。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "P0-U4-L06-PASS-01",
+            "kind": "positive",
+            "given": "校园班级任务越来越多，大家需要一个小工具记录待办。",
+            "when": "用函数管理添加、完成、查看任务，使用列表存储。",
+            "then": "添加两项、完成一项后状态正确；查询不存在编号有友好反馈。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "P0-U4-L06-FAIL-01",
+            "kind": "negative",
+            "given": "校园班级任务越来越多，大家需要一个小工具记录待办。",
+            "when": "完成不存在的任务导致越界崩溃。",
+            "then": "应识别问题并引导：先校验任务编号，再更新对应状态。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "添加两项、完成一项后状态正确；查询不存在编号有友好反馈。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释异常与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：完成不存在的任务导致越界崩溃。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：将任务保存为不含个人信息的JSON文件。"
+          }
+        ],
+        "mustPass": [
+          "添加两项、完成一项后状态正确；查询不存在编号有友好反馈。",
+          "不能出现：完成不存在的任务导致越界崩溃。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "将任务保存为不含个人信息的JSON文件。",
+      "parentsPrompt": "让孩子展示「校园任务管理器」，请他先预测再运行，并说出为什么出错时应当先校验任务编号，再更新对应状态。",
+      "assetIds": [
+        "p0-p0-u4-06-scene",
+        "p0-p0-u4-06-guide",
+        "p0-p0-u4-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    }
+  ]
+}

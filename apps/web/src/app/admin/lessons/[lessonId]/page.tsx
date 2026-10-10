@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import { notFound, redirect } from 'next/navigation'
 
 import { assertAdminUser } from '@/features/admin/admin-auth'
@@ -36,6 +38,7 @@ export default async function AdminLessonPage({
   return (
     <main className="min-h-screen bg-[#fffaf2] px-6 py-8">
       <section className="mx-auto max-w-5xl space-y-6">
+        <Link href={`/admin/catalog/${lessonId}`} className="inline-flex rounded-full bg-emerald-50 px-5 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100" data-testid="admin-lesson-open-guide">查看此课的完整教案与评价标准 →</Link>
         <LessonEditor
           lesson={pageData.lesson}
           draftUpdatedAt={pageData.draftUpdatedAt}

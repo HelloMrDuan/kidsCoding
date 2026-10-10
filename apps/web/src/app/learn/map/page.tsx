@@ -130,6 +130,10 @@ export default function LearnMapPage() {
           </div>
         </header>
 
+        <Link href="/learn/catalog" className="block rounded-[1.5rem] border border-sky-100 bg-white px-6 py-4 font-bold text-sky-900 shadow-sm transition hover:bg-sky-50" data-testid="learning-map-catalog-link">
+          浏览完整学习路线：Scratch、Python、C++、AI、机器人等18条路径（规划目录，未开放的课程不会直接闯关） →
+        </Link>
+
         <MapView
           hasCourseEntitlement={hasCourseEntitlement}
           lessons={allLessons}

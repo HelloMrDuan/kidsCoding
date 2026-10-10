@@ -1,0 +1,3655 @@
+{
+  "schemaVersion": "1.0.0",
+  "trackId": "G2",
+  "contentLevel": "lesson_script_and_assessment_design",
+  "published": false,
+  "runtimeVerification": "not_yet_verified",
+  "lessons": [
+    {
+      "id": "G2-U1-L01",
+      "unitId": "G2-U1",
+      "title": "认识舞台与精灵",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "Scratch 工作台",
+      "story": "刚打开Scratch工作台，猫咪站在舞台中央找不到脚本区。",
+      "concepts": [
+        "精灵"
+      ],
+      "prerequisites": [],
+      "objectives": [
+        "理解并能解释精灵",
+        "在「认识舞台与精灵」完成具体任务：指出舞台、精灵、积木分类、脚本区四个位置。",
+        "用实际运行结果验证：能选择猫咪并在脚本区看到对应积木。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "刚打开Scratch工作台，猫咪站在舞台中央找不到脚本区。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「认识舞台与精灵」的初始状态，写下目标：能选择猫咪并在脚本区看到对应积木。",
+          "verification": "完成一个可核对的预测：能选择猫咪并在脚本区看到对应积木。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「精灵」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：指出舞台、精灵、积木分类、脚本区四个位置。",
+          "verification": "方案包含精灵及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "指出舞台、精灵、积木分类、脚本区四个位置。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：能选择猫咪并在脚本区看到对应积木。",
+          "verification": "能选择猫咪并在脚本区看到对应积木。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：误把背景当精灵并试图移动背景。",
+          "learnerAction": "尝试重现错误，利用提示改正：使用角色列表与舞台背景图片区分对象。",
+          "verification": "失败场景可解释，修正后重新满足：能选择猫咪并在脚本区看到对应积木。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「认识舞台与精灵」：能选择猫咪并在脚本区看到对应积木。",
+        "commonMistakes": [
+          {
+            "symptom": "误把背景当精灵并试图移动背景。",
+            "diagnosis": "观察精灵的输入、触发与状态是否符合目标",
+            "repair": "使用角色列表与舞台背景图片区分对象。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：指出舞台、精灵、积木分类、脚本区四个位置。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：能选择猫咪并在脚本区看到对应积木。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，刚打开Scratch工作台，猫咪站在舞台中央找不到脚本区。",
+          "把问题缩小到关键动作：指出舞台、精灵、积木分类、脚本区四个位置。",
+          "按步骤重试：使用角色列表与舞台背景图片区分对象。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U1-L01-PASS-01",
+            "kind": "positive",
+            "given": "刚打开Scratch工作台，猫咪站在舞台中央找不到脚本区。",
+            "when": "指出舞台、精灵、积木分类、脚本区四个位置。",
+            "then": "能选择猫咪并在脚本区看到对应积木。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U1-L01-FAIL-01",
+            "kind": "negative",
+            "given": "刚打开Scratch工作台，猫咪站在舞台中央找不到脚本区。",
+            "when": "误把背景当精灵并试图移动背景。",
+            "then": "应识别问题并引导：使用角色列表与舞台背景图片区分对象。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "能选择猫咪并在脚本区看到对应积木。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释精灵与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：误把背景当精灵并试图移动背景。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：自己加入一位小伙伴精灵。"
+          }
+        ],
+        "mustPass": [
+          "能选择猫咪并在脚本区看到对应积木。",
+          "不能出现：误把背景当精灵并试图移动背景。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "自己加入一位小伙伴精灵。",
+      "parentsPrompt": "让孩子展示「认识舞台与精灵」，请他先预测再运行，并说出为什么出错时应当使用角色列表与舞台背景图片区分对象。",
+      "assetIds": [
+        "g2-g2-u1-01-scene",
+        "g2-g2-u1-01-guide",
+        "g2-g2-u1-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U1-L02",
+      "unitId": "G2-U1",
+      "title": "角色换造型",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "Scratch 工作台",
+      "story": "猫咪准备演出时需要换成挥手造型。",
+      "concepts": [
+        "精灵"
+      ],
+      "prerequisites": [
+        "G2-U1-L01"
+      ],
+      "objectives": [
+        "理解并能解释精灵",
+        "在「角色换造型」完成具体任务：为精灵设置两个造型，用下一造型积木切换。",
+        "用实际运行结果验证：连续触发时造型在A/B间切换。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "猫咪准备演出时需要换成挥手造型。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「角色换造型」的初始状态，写下目标：连续触发时造型在A/B间切换。",
+          "verification": "完成一个可核对的预测：连续触发时造型在A/B间切换。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「精灵」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：为精灵设置两个造型，用下一造型积木切换。",
+          "verification": "方案包含精灵及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "为精灵设置两个造型，用下一造型积木切换。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：连续触发时造型在A/B间切换。",
+          "verification": "连续触发时造型在A/B间切换。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：选择了舞台背景造型而没有切换精灵。",
+          "learnerAction": "尝试重现错误，利用提示改正：先选中精灵再查看造型标签页。",
+          "verification": "失败场景可解释，修正后重新满足：连续触发时造型在A/B间切换。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「角色换造型」：连续触发时造型在A/B间切换。",
+        "commonMistakes": [
+          {
+            "symptom": "选择了舞台背景造型而没有切换精灵。",
+            "diagnosis": "观察精灵的输入、触发与状态是否符合目标",
+            "repair": "先选中精灵再查看造型标签页。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：为精灵设置两个造型，用下一造型积木切换。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：连续触发时造型在A/B间切换。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，猫咪准备演出时需要换成挥手造型。",
+          "把问题缩小到关键动作：为精灵设置两个造型，用下一造型积木切换。",
+          "按步骤重试：先选中精灵再查看造型标签页。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U1-L02-PASS-01",
+            "kind": "positive",
+            "given": "猫咪准备演出时需要换成挥手造型。",
+            "when": "为精灵设置两个造型，用下一造型积木切换。",
+            "then": "连续触发时造型在A/B间切换。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U1-L02-FAIL-01",
+            "kind": "negative",
+            "given": "猫咪准备演出时需要换成挥手造型。",
+            "when": "选择了舞台背景造型而没有切换精灵。",
+            "then": "应识别问题并引导：先选中精灵再查看造型标签页。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "连续触发时造型在A/B间切换。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释精灵与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：选择了舞台背景造型而没有切换精灵。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：绘制一个原创的眨眼造型。"
+          }
+        ],
+        "mustPass": [
+          "连续触发时造型在A/B间切换。",
+          "不能出现：选择了舞台背景造型而没有切换精灵。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "绘制一个原创的眨眼造型。",
+      "parentsPrompt": "让孩子展示「角色换造型」，请他先预测再运行，并说出为什么出错时应当先选中精灵再查看造型标签页。",
+      "assetIds": [
+        "g2-g2-u1-02-scene",
+        "g2-g2-u1-02-guide",
+        "g2-g2-u1-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U1-L03",
+      "unitId": "G2-U1",
+      "title": "设置背景和声音",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "Scratch 工作台",
+      "story": "森林音乐会需要绿色草地和短提示音。",
+      "concepts": [
+        "精灵",
+        "造型"
+      ],
+      "prerequisites": [
+        "G2-U1-L02"
+      ],
+      "objectives": [
+        "理解并能解释造型",
+        "在「设置背景和声音」完成具体任务：选择草地背景，按开幕事件播放一次音效。",
+        "用实际运行结果验证：绿旗触发后背景正确且音效播放一次。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林音乐会需要绿色草地和短提示音。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「设置背景和声音」的初始状态，写下目标：绿旗触发后背景正确且音效播放一次。",
+          "verification": "完成一个可核对的预测：绿旗触发后背景正确且音效播放一次。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「造型」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：选择草地背景，按开幕事件播放一次音效。",
+          "verification": "方案包含造型及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "选择草地背景，按开幕事件播放一次音效。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：绿旗触发后背景正确且音效播放一次。",
+          "verification": "绿旗触发后背景正确且音效播放一次。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：声音一直循环遮住旁白。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查声音积木是否放在无限循环之外。",
+          "verification": "失败场景可解释，修正后重新满足：绿旗触发后背景正确且音效播放一次。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「设置背景和声音」：绿旗触发后背景正确且音效播放一次。",
+        "commonMistakes": [
+          {
+            "symptom": "声音一直循环遮住旁白。",
+            "diagnosis": "观察造型的输入、触发与状态是否符合目标",
+            "repair": "检查声音积木是否放在无限循环之外。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：选择草地背景，按开幕事件播放一次音效。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：绿旗触发后背景正确且音效播放一次。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林音乐会需要绿色草地和短提示音。",
+          "把问题缩小到关键动作：选择草地背景，按开幕事件播放一次音效。",
+          "按步骤重试：检查声音积木是否放在无限循环之外。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U1-L03-PASS-01",
+            "kind": "positive",
+            "given": "森林音乐会需要绿色草地和短提示音。",
+            "when": "选择草地背景，按开幕事件播放一次音效。",
+            "then": "绿旗触发后背景正确且音效播放一次。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U1-L03-FAIL-01",
+            "kind": "negative",
+            "given": "森林音乐会需要绿色草地和短提示音。",
+            "when": "声音一直循环遮住旁白。",
+            "then": "应识别问题并引导：检查声音积木是否放在无限循环之外。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "绿旗触发后背景正确且音效播放一次。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释造型与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：声音一直循环遮住旁白。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：制作两段不同场景的开场音效。"
+          }
+        ],
+        "mustPass": [
+          "绿旗触发后背景正确且音效播放一次。",
+          "不能出现：声音一直循环遮住旁白。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "制作两段不同场景的开场音效。",
+      "parentsPrompt": "让孩子展示「设置背景和声音」，请他先预测再运行，并说出为什么出错时应当检查声音积木是否放在无限循环之外。",
+      "assetIds": [
+        "g2-g2-u1-03-scene",
+        "g2-g2-u1-03-guide",
+        "g2-g2-u1-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U1-L04",
+      "unitId": "G2-U1",
+      "title": "运动积木初体验",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "Scratch 工作台",
+      "story": "猫咪要从舞台中央向右滑行一段距离。",
+      "concepts": [
+        "精灵",
+        "造型"
+      ],
+      "prerequisites": [
+        "G2-U1-L03"
+      ],
+      "objectives": [
+        "理解并能解释造型",
+        "在「运动积木初体验」完成具体任务：用移动10步和面向90度实现两次连续移动。",
+        "用实际运行结果验证：最终沿右方向移动20步。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "猫咪要从舞台中央向右滑行一段距离。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「运动积木初体验」的初始状态，写下目标：最终沿右方向移动20步。",
+          "verification": "完成一个可核对的预测：最终沿右方向移动20步。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「造型」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用移动10步和面向90度实现两次连续移动。",
+          "verification": "方案包含造型及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用移动10步和面向90度实现两次连续移动。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：最终沿右方向移动20步。",
+          "verification": "最终沿右方向移动20步。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：面向-90度导致向左离开舞台。",
+          "learnerAction": "尝试重现错误，利用提示改正：先查看精灵方向值，再跟踪x坐标。",
+          "verification": "失败场景可解释，修正后重新满足：最终沿右方向移动20步。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「运动积木初体验」：最终沿右方向移动20步。",
+        "commonMistakes": [
+          {
+            "symptom": "面向-90度导致向左离开舞台。",
+            "diagnosis": "观察造型的输入、触发与状态是否符合目标",
+            "repair": "先查看精灵方向值，再跟踪x坐标。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用移动10步和面向90度实现两次连续移动。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：最终沿右方向移动20步。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，猫咪要从舞台中央向右滑行一段距离。",
+          "把问题缩小到关键动作：用移动10步和面向90度实现两次连续移动。",
+          "按步骤重试：先查看精灵方向值，再跟踪x坐标。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U1-L04-PASS-01",
+            "kind": "positive",
+            "given": "猫咪要从舞台中央向右滑行一段距离。",
+            "when": "用移动10步和面向90度实现两次连续移动。",
+            "then": "最终沿右方向移动20步。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U1-L04-FAIL-01",
+            "kind": "negative",
+            "given": "猫咪要从舞台中央向右滑行一段距离。",
+            "when": "面向-90度导致向左离开舞台。",
+            "then": "应识别问题并引导：先查看精灵方向值，再跟踪x坐标。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "最终沿右方向移动20步。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释造型与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：面向-90度导致向左离开舞台。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：改成滑行1秒的平滑运动。"
+          }
+        ],
+        "mustPass": [
+          "最终沿右方向移动20步。",
+          "不能出现：面向-90度导致向左离开舞台。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "改成滑行1秒的平滑运动。",
+      "parentsPrompt": "让孩子展示「运动积木初体验」，请他先预测再运行，并说出为什么出错时应当先查看精灵方向值，再跟踪x坐标。",
+      "assetIds": [
+        "g2-g2-u1-04-scene",
+        "g2-g2-u1-04-guide",
+        "g2-g2-u1-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U1-L05",
+      "unitId": "G2-U1",
+      "title": "广播第一条消息",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "Scratch 工作台",
+      "story": "兔子等猫咪的广播才会上场。",
+      "concepts": [
+        "精灵",
+        "造型",
+        "积木"
+      ],
+      "prerequisites": [
+        "G2-U1-L04"
+      ],
+      "objectives": [
+        "理解并能解释积木",
+        "在「广播第一条消息」完成具体任务：猫咪广播“入场”，兔子收到消息后移动并说欢迎。",
+        "用实际运行结果验证：收到正确消息兔子才移动并显示对白。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "兔子等猫咪的广播才会上场。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「广播第一条消息」的初始状态，写下目标：收到正确消息兔子才移动并显示对白。",
+          "verification": "完成一个可核对的预测：收到正确消息兔子才移动并显示对白。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「积木」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：猫咪广播“入场”，兔子收到消息后移动并说欢迎。",
+          "verification": "方案包含积木及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "猫咪广播“入场”，兔子收到消息后移动并说欢迎。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：收到正确消息兔子才移动并显示对白。",
+          "verification": "收到正确消息兔子才移动并显示对白。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：不同广播也触发兔子出场。",
+          "learnerAction": "尝试重现错误，利用提示改正：确认发送和接收的消息名称完全一致。",
+          "verification": "失败场景可解释，修正后重新满足：收到正确消息兔子才移动并显示对白。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「广播第一条消息」：收到正确消息兔子才移动并显示对白。",
+        "commonMistakes": [
+          {
+            "symptom": "不同广播也触发兔子出场。",
+            "diagnosis": "观察积木的输入、触发与状态是否符合目标",
+            "repair": "确认发送和接收的消息名称完全一致。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：猫咪广播“入场”，兔子收到消息后移动并说欢迎。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：收到正确消息兔子才移动并显示对白。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，兔子等猫咪的广播才会上场。",
+          "把问题缩小到关键动作：猫咪广播“入场”，兔子收到消息后移动并说欢迎。",
+          "按步骤重试：确认发送和接收的消息名称完全一致。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U1-L05-PASS-01",
+            "kind": "positive",
+            "given": "兔子等猫咪的广播才会上场。",
+            "when": "猫咪广播“入场”，兔子收到消息后移动并说欢迎。",
+            "then": "收到正确消息兔子才移动并显示对白。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U1-L05-FAIL-01",
+            "kind": "negative",
+            "given": "兔子等猫咪的广播才会上场。",
+            "when": "不同广播也触发兔子出场。",
+            "then": "应识别问题并引导：确认发送和接收的消息名称完全一致。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "收到正确消息兔子才移动并显示对白。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释积木与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：不同广播也触发兔子出场。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：再加一条“谢幕”广播。"
+          }
+        ],
+        "mustPass": [
+          "收到正确消息兔子才移动并显示对白。",
+          "不能出现：不同广播也触发兔子出场。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "再加一条“谢幕”广播。",
+      "parentsPrompt": "让孩子展示「广播第一条消息」，请他先预测再运行，并说出为什么出错时应当确认发送和接收的消息名称完全一致。",
+      "assetIds": [
+        "g2-g2-u1-05-scene",
+        "g2-g2-u1-05-guide",
+        "g2-g2-u1-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U1-L06",
+      "unitId": "G2-U1",
+      "title": "制作生日贺卡",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "Scratch 工作台",
+      "story": "为朋友制作会动会说话的生日贺卡。",
+      "concepts": [
+        "精灵",
+        "造型",
+        "积木"
+      ],
+      "prerequisites": [
+        "G2-U1-L05"
+      ],
+      "objectives": [
+        "理解并能解释积木",
+        "在「制作生日贺卡」完成具体任务：组合背景、两个造型、音乐、互动祝福。",
+        "用实际运行结果验证：点击绿旗后有动画，点击礼物出现祝福。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "为朋友制作会动会说话的生日贺卡。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「制作生日贺卡」的初始状态，写下目标：点击绿旗后有动画，点击礼物出现祝福。",
+          "verification": "完成一个可核对的预测：点击绿旗后有动画，点击礼物出现祝福。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「积木」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：组合背景、两个造型、音乐、互动祝福。",
+          "verification": "方案包含积木及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "组合背景、两个造型、音乐、互动祝福。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：点击绿旗后有动画，点击礼物出现祝福。",
+          "verification": "点击绿旗后有动画，点击礼物出现祝福。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：礼物在点击前就显示所有彩蛋。",
+          "learnerAction": "尝试重现错误，利用提示改正：分开测试开场和礼物点击两条事件。",
+          "verification": "失败场景可解释，修正后重新满足：点击绿旗后有动画，点击礼物出现祝福。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「制作生日贺卡」：点击绿旗后有动画，点击礼物出现祝福。",
+        "commonMistakes": [
+          {
+            "symptom": "礼物在点击前就显示所有彩蛋。",
+            "diagnosis": "观察积木的输入、触发与状态是否符合目标",
+            "repair": "分开测试开场和礼物点击两条事件。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：组合背景、两个造型、音乐、互动祝福。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：点击绿旗后有动画，点击礼物出现祝福。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，为朋友制作会动会说话的生日贺卡。",
+          "把问题缩小到关键动作：组合背景、两个造型、音乐、互动祝福。",
+          "按步骤重试：分开测试开场和礼物点击两条事件。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U1-L06-PASS-01",
+            "kind": "positive",
+            "given": "为朋友制作会动会说话的生日贺卡。",
+            "when": "组合背景、两个造型、音乐、互动祝福。",
+            "then": "点击绿旗后有动画，点击礼物出现祝福。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U1-L06-FAIL-01",
+            "kind": "negative",
+            "given": "为朋友制作会动会说话的生日贺卡。",
+            "when": "礼物在点击前就显示所有彩蛋。",
+            "then": "应识别问题并引导：分开测试开场和礼物点击两条事件。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "点击绿旗后有动画，点击礼物出现祝福。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释积木与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：礼物在点击前就显示所有彩蛋。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：换成春节或毕业主题贺卡。"
+          }
+        ],
+        "mustPass": [
+          "点击绿旗后有动画，点击礼物出现祝福。",
+          "不能出现：礼物在点击前就显示所有彩蛋。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "换成春节或毕业主题贺卡。",
+      "parentsPrompt": "让孩子展示「制作生日贺卡」，请他先预测再运行，并说出为什么出错时应当分开测试开场和礼物点击两条事件。",
+      "assetIds": [
+        "g2-g2-u1-06-scene",
+        "g2-g2-u1-06-guide",
+        "g2-g2-u1-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U2-L01",
+      "unitId": "G2-U2",
+      "title": "让角色走路有帧动画",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动画制作",
+      "story": "小猫行走时只有一张图片，看起来像在滑动。",
+      "concepts": [
+        "循环"
+      ],
+      "prerequisites": [
+        "G2-U1-L06"
+      ],
+      "objectives": [
+        "理解并能解释循环",
+        "在「让角色走路有帧动画」完成具体任务：制作两帧腿部不同的造型，配合移动与等待交替。",
+        "用实际运行结果验证：连续播放后角色既位移又逐帧换造型。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "小猫行走时只有一张图片，看起来像在滑动。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「让角色走路有帧动画」的初始状态，写下目标：连续播放后角色既位移又逐帧换造型。",
+          "verification": "完成一个可核对的预测：连续播放后角色既位移又逐帧换造型。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「循环」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：制作两帧腿部不同的造型，配合移动与等待交替。",
+          "verification": "方案包含循环及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "制作两帧腿部不同的造型，配合移动与等待交替。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：连续播放后角色既位移又逐帧换造型。",
+          "verification": "连续播放后角色既位移又逐帧换造型。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：只换造型却没有移动。",
+          "learnerAction": "尝试重现错误，利用提示改正：观察造型编号与x坐标是否同时变化。",
+          "verification": "失败场景可解释，修正后重新满足：连续播放后角色既位移又逐帧换造型。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「让角色走路有帧动画」：连续播放后角色既位移又逐帧换造型。",
+        "commonMistakes": [
+          {
+            "symptom": "只换造型却没有移动。",
+            "diagnosis": "观察循环的输入、触发与状态是否符合目标",
+            "repair": "观察造型编号与x坐标是否同时变化。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：制作两帧腿部不同的造型，配合移动与等待交替。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：连续播放后角色既位移又逐帧换造型。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，小猫行走时只有一张图片，看起来像在滑动。",
+          "把问题缩小到关键动作：制作两帧腿部不同的造型，配合移动与等待交替。",
+          "按步骤重试：观察造型编号与x坐标是否同时变化。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U2-L01-PASS-01",
+            "kind": "positive",
+            "given": "小猫行走时只有一张图片，看起来像在滑动。",
+            "when": "制作两帧腿部不同的造型，配合移动与等待交替。",
+            "then": "连续播放后角色既位移又逐帧换造型。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U2-L01-FAIL-01",
+            "kind": "negative",
+            "given": "小猫行走时只有一张图片，看起来像在滑动。",
+            "when": "只换造型却没有移动。",
+            "then": "应识别问题并引导：观察造型编号与x坐标是否同时变化。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "连续播放后角色既位移又逐帧换造型。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释循环与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：只换造型却没有移动。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：把两帧扩展为四帧。"
+          }
+        ],
+        "mustPass": [
+          "连续播放后角色既位移又逐帧换造型。",
+          "不能出现：只换造型却没有移动。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "把两帧扩展为四帧。",
+      "parentsPrompt": "让孩子展示「让角色走路有帧动画」，请他先预测再运行，并说出为什么出错时应当观察造型编号与x坐标是否同时变化。",
+      "assetIds": [
+        "g2-g2-u2-01-scene",
+        "g2-g2-u2-01-guide",
+        "g2-g2-u2-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U2-L02",
+      "unitId": "G2-U2",
+      "title": "制作昼夜交替",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动画制作",
+      "story": "猫咪想展示白天变晚上，再回到白天的故事。",
+      "concepts": [
+        "循环"
+      ],
+      "prerequisites": [
+        "G2-U2-L01"
+      ],
+      "objectives": [
+        "理解并能解释循环",
+        "在「制作昼夜交替」完成具体任务：创建白天与夜晚背景，定时切换两次。",
+        "用实际运行结果验证：2秒后切夜晚，4秒后恢复白天。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "猫咪想展示白天变晚上，再回到白天的故事。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「制作昼夜交替」的初始状态，写下目标：2秒后切夜晚，4秒后恢复白天。",
+          "verification": "完成一个可核对的预测：2秒后切夜晚，4秒后恢复白天。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「循环」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：创建白天与夜晚背景，定时切换两次。",
+          "verification": "方案包含循环及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "创建白天与夜晚背景，定时切换两次。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：2秒后切夜晚，4秒后恢复白天。",
+          "verification": "2秒后切夜晚，4秒后恢复白天。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：进入夜晚后不返回白天。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查第二次切换是不是在重复或等待序列里。",
+          "verification": "失败场景可解释，修正后重新满足：2秒后切夜晚，4秒后恢复白天。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「制作昼夜交替」：2秒后切夜晚，4秒后恢复白天。",
+        "commonMistakes": [
+          {
+            "symptom": "进入夜晚后不返回白天。",
+            "diagnosis": "观察循环的输入、触发与状态是否符合目标",
+            "repair": "检查第二次切换是不是在重复或等待序列里。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：创建白天与夜晚背景，定时切换两次。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：2秒后切夜晚，4秒后恢复白天。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，猫咪想展示白天变晚上，再回到白天的故事。",
+          "把问题缩小到关键动作：创建白天与夜晚背景，定时切换两次。",
+          "按步骤重试：检查第二次切换是不是在重复或等待序列里。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U2-L02-PASS-01",
+            "kind": "positive",
+            "given": "猫咪想展示白天变晚上，再回到白天的故事。",
+            "when": "创建白天与夜晚背景，定时切换两次。",
+            "then": "2秒后切夜晚，4秒后恢复白天。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U2-L02-FAIL-01",
+            "kind": "negative",
+            "given": "猫咪想展示白天变晚上，再回到白天的故事。",
+            "when": "进入夜晚后不返回白天。",
+            "then": "应识别问题并引导：检查第二次切换是不是在重复或等待序列里。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "2秒后切夜晚，4秒后恢复白天。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释循环与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：进入夜晚后不返回白天。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加入星空和月亮精灵。"
+          }
+        ],
+        "mustPass": [
+          "2秒后切夜晚，4秒后恢复白天。",
+          "不能出现：进入夜晚后不返回白天。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加入星空和月亮精灵。",
+      "parentsPrompt": "让孩子展示「制作昼夜交替」，请他先预测再运行，并说出为什么出错时应当检查第二次切换是不是在重复或等待序列里。",
+      "assetIds": [
+        "g2-g2-u2-02-scene",
+        "g2-g2-u2-02-guide",
+        "g2-g2-u2-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U2-L03",
+      "unitId": "G2-U2",
+      "title": "音乐节奏舞台",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动画制作",
+      "story": "森林音乐节有鼓和铃两种声音。",
+      "concepts": [
+        "循环",
+        "时间"
+      ],
+      "prerequisites": [
+        "G2-U2-L02"
+      ],
+      "objectives": [
+        "理解并能解释时间",
+        "在「音乐节奏舞台」完成具体任务：设计两拍鼓声一拍铃声，重复4次。",
+        "用实际运行结果验证：总计12个音效事件，顺序为鼓鼓铃。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "森林音乐节有鼓和铃两种声音。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「音乐节奏舞台」的初始状态，写下目标：总计12个音效事件，顺序为鼓鼓铃。",
+          "verification": "完成一个可核对的预测：总计12个音效事件，顺序为鼓鼓铃。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「时间」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：设计两拍鼓声一拍铃声，重复4次。",
+          "verification": "方案包含时间及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "设计两拍鼓声一拍铃声，重复4次。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：总计12个音效事件，顺序为鼓鼓铃。",
+          "verification": "总计12个音效事件，顺序为鼓鼓铃。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：音效重叠导致节奏无法辨认。",
+          "learnerAction": "尝试重现错误，利用提示改正：用等待积木分隔各拍，逐拍计数。",
+          "verification": "失败场景可解释，修正后重新满足：总计12个音效事件，顺序为鼓鼓铃。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「音乐节奏舞台」：总计12个音效事件，顺序为鼓鼓铃。",
+        "commonMistakes": [
+          {
+            "symptom": "音效重叠导致节奏无法辨认。",
+            "diagnosis": "观察时间的输入、触发与状态是否符合目标",
+            "repair": "用等待积木分隔各拍，逐拍计数。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：设计两拍鼓声一拍铃声，重复4次。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：总计12个音效事件，顺序为鼓鼓铃。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，森林音乐节有鼓和铃两种声音。",
+          "把问题缩小到关键动作：设计两拍鼓声一拍铃声，重复4次。",
+          "按步骤重试：用等待积木分隔各拍，逐拍计数。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U2-L03-PASS-01",
+            "kind": "positive",
+            "given": "森林音乐节有鼓和铃两种声音。",
+            "when": "设计两拍鼓声一拍铃声，重复4次。",
+            "then": "总计12个音效事件，顺序为鼓鼓铃。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U2-L03-FAIL-01",
+            "kind": "negative",
+            "given": "森林音乐节有鼓和铃两种声音。",
+            "when": "音效重叠导致节奏无法辨认。",
+            "then": "应识别问题并引导：用等待积木分隔各拍，逐拍计数。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "总计12个音效事件，顺序为鼓鼓铃。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释时间与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：音效重叠导致节奏无法辨认。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加入角色随节拍跳跃。"
+          }
+        ],
+        "mustPass": [
+          "总计12个音效事件，顺序为鼓鼓铃。",
+          "不能出现：音效重叠导致节奏无法辨认。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加入角色随节拍跳跃。",
+      "parentsPrompt": "让孩子展示「音乐节奏舞台」，请他先预测再运行，并说出为什么出错时应当用等待积木分隔各拍，逐拍计数。",
+      "assetIds": [
+        "g2-g2-u2-03-scene",
+        "g2-g2-u2-03-guide",
+        "g2-g2-u2-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U2-L04",
+      "unitId": "G2-U2",
+      "title": "循环飞舞的蝴蝶",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动画制作",
+      "story": "彩蝶需要围绕花朵一直上下轻轻飞舞。",
+      "concepts": [
+        "循环",
+        "时间"
+      ],
+      "prerequisites": [
+        "G2-U2-L03"
+      ],
+      "objectives": [
+        "理解并能解释时间",
+        "在「循环飞舞的蝴蝶」完成具体任务：设置循环，每轮向上移动再向下移动。",
+        "用实际运行结果验证：重复两轮后回到初始y坐标。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "彩蝶需要围绕花朵一直上下轻轻飞舞。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「循环飞舞的蝴蝶」的初始状态，写下目标：重复两轮后回到初始y坐标。",
+          "verification": "完成一个可核对的预测：重复两轮后回到初始y坐标。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「时间」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：设置循环，每轮向上移动再向下移动。",
+          "verification": "方案包含时间及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "设置循环，每轮向上移动再向下移动。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：重复两轮后回到初始y坐标。",
+          "verification": "重复两轮后回到初始y坐标。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：只向上移动导致飞出舞台。",
+          "learnerAction": "尝试重现错误，利用提示改正：把一上和一下视为完整周期。",
+          "verification": "失败场景可解释，修正后重新满足：重复两轮后回到初始y坐标。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「循环飞舞的蝴蝶」：重复两轮后回到初始y坐标。",
+        "commonMistakes": [
+          {
+            "symptom": "只向上移动导致飞出舞台。",
+            "diagnosis": "观察时间的输入、触发与状态是否符合目标",
+            "repair": "把一上和一下视为完整周期。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：设置循环，每轮向上移动再向下移动。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：重复两轮后回到初始y坐标。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，彩蝶需要围绕花朵一直上下轻轻飞舞。",
+          "把问题缩小到关键动作：设置循环，每轮向上移动再向下移动。",
+          "按步骤重试：把一上和一下视为完整周期。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U2-L04-PASS-01",
+            "kind": "positive",
+            "given": "彩蝶需要围绕花朵一直上下轻轻飞舞。",
+            "when": "设置循环，每轮向上移动再向下移动。",
+            "then": "重复两轮后回到初始y坐标。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U2-L04-FAIL-01",
+            "kind": "negative",
+            "given": "彩蝶需要围绕花朵一直上下轻轻飞舞。",
+            "when": "只向上移动导致飞出舞台。",
+            "then": "应识别问题并引导：把一上和一下视为完整周期。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "重复两轮后回到初始y坐标。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释时间与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：只向上移动导致飞出舞台。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加入左右摆动和颜色变化。"
+          }
+        ],
+        "mustPass": [
+          "重复两轮后回到初始y坐标。",
+          "不能出现：只向上移动导致飞出舞台。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加入左右摆动和颜色变化。",
+      "parentsPrompt": "让孩子展示「循环飞舞的蝴蝶」，请他先预测再运行，并说出为什么出错时应当把一上和一下视为完整周期。",
+      "assetIds": [
+        "g2-g2-u2-04-scene",
+        "g2-g2-u2-04-guide",
+        "g2-g2-u2-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U2-L05",
+      "unitId": "G2-U2",
+      "title": "两只精灵同步表演",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动画制作",
+      "story": "狐狸跳舞时兔子要在同一声口令下登台。",
+      "concepts": [
+        "循环",
+        "时间",
+        "音效"
+      ],
+      "prerequisites": [
+        "G2-U2-L04"
+      ],
+      "objectives": [
+        "理解并能解释音效",
+        "在「两只精灵同步表演」完成具体任务：用广播事件同时启动两个角色，并调整不同的延迟。",
+        "用实际运行结果验证：收到口令后两位角色按指定时机完成各自动作。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "狐狸跳舞时兔子要在同一声口令下登台。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「两只精灵同步表演」的初始状态，写下目标：收到口令后两位角色按指定时机完成各自动作。",
+          "verification": "完成一个可核对的预测：收到口令后两位角色按指定时机完成各自动作。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「音效」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：用广播事件同时启动两个角色，并调整不同的延迟。",
+          "verification": "方案包含音效及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "用广播事件同时启动两个角色，并调整不同的延迟。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：收到口令后两位角色按指定时机完成各自动作。",
+          "verification": "收到口令后两位角色按指定时机完成各自动作。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：一位精灵不响应广播。",
+          "learnerAction": "尝试重现错误，利用提示改正：检查两个角色是否都有对应广播接收积木。",
+          "verification": "失败场景可解释，修正后重新满足：收到口令后两位角色按指定时机完成各自动作。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「两只精灵同步表演」：收到口令后两位角色按指定时机完成各自动作。",
+        "commonMistakes": [
+          {
+            "symptom": "一位精灵不响应广播。",
+            "diagnosis": "观察音效的输入、触发与状态是否符合目标",
+            "repair": "检查两个角色是否都有对应广播接收积木。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：用广播事件同时启动两个角色，并调整不同的延迟。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：收到口令后两位角色按指定时机完成各自动作。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，狐狸跳舞时兔子要在同一声口令下登台。",
+          "把问题缩小到关键动作：用广播事件同时启动两个角色，并调整不同的延迟。",
+          "按步骤重试：检查两个角色是否都有对应广播接收积木。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U2-L05-PASS-01",
+            "kind": "positive",
+            "given": "狐狸跳舞时兔子要在同一声口令下登台。",
+            "when": "用广播事件同时启动两个角色，并调整不同的延迟。",
+            "then": "收到口令后两位角色按指定时机完成各自动作。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U2-L05-FAIL-01",
+            "kind": "negative",
+            "given": "狐狸跳舞时兔子要在同一声口令下登台。",
+            "when": "一位精灵不响应广播。",
+            "then": "应识别问题并引导：检查两个角色是否都有对应广播接收积木。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "收到口令后两位角色按指定时机完成各自动作。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释音效与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：一位精灵不响应广播。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：加一个结束口令让全员同时谢幕。"
+          }
+        ],
+        "mustPass": [
+          "收到口令后两位角色按指定时机完成各自动作。",
+          "不能出现：一位精灵不响应广播。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "加一个结束口令让全员同时谢幕。",
+      "parentsPrompt": "让孩子展示「两只精灵同步表演」，请他先预测再运行，并说出为什么出错时应当检查两个角色是否都有对应广播接收积木。",
+      "assetIds": [
+        "g2-g2-u2-05-scene",
+        "g2-g2-u2-05-guide",
+        "g2-g2-u2-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U2-L06",
+      "unitId": "G2-U2",
+      "title": "音乐动画短片",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "动画制作",
+      "story": "制作一分钟内的音乐动画短片。",
+      "concepts": [
+        "循环",
+        "时间",
+        "音效"
+      ],
+      "prerequisites": [
+        "G2-U2-L05"
+      ],
+      "objectives": [
+        "理解并能解释音效",
+        "在「音乐动画短片」完成具体任务：结合变造型、背景、节拍和至少一次角色互动。",
+        "用实际运行结果验证：完整播放包含开头、中段、收尾和同步的背景音乐。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "制作一分钟内的音乐动画短片。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「音乐动画短片」的初始状态，写下目标：完整播放包含开头、中段、收尾和同步的背景音乐。",
+          "verification": "完成一个可核对的预测：完整播放包含开头、中段、收尾和同步的背景音乐。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「音效」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：结合变造型、背景、节拍和至少一次角色互动。",
+          "verification": "方案包含音效及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "结合变造型、背景、节拍和至少一次角色互动。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：完整播放包含开头、中段、收尾和同步的背景音乐。",
+          "verification": "完整播放包含开头、中段、收尾和同步的背景音乐。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：音乐播放结束动画仍然无限循环。",
+          "learnerAction": "尝试重现错误，利用提示改正：对比动画时间线与音乐时长。",
+          "verification": "失败场景可解释，修正后重新满足：完整播放包含开头、中段、收尾和同步的背景音乐。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「音乐动画短片」：完整播放包含开头、中段、收尾和同步的背景音乐。",
+        "commonMistakes": [
+          {
+            "symptom": "音乐播放结束动画仍然无限循环。",
+            "diagnosis": "观察音效的输入、触发与状态是否符合目标",
+            "repair": "对比动画时间线与音乐时长。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：结合变造型、背景、节拍和至少一次角色互动。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：完整播放包含开头、中段、收尾和同步的背景音乐。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，制作一分钟内的音乐动画短片。",
+          "把问题缩小到关键动作：结合变造型、背景、节拍和至少一次角色互动。",
+          "按步骤重试：对比动画时间线与音乐时长。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U2-L06-PASS-01",
+            "kind": "positive",
+            "given": "制作一分钟内的音乐动画短片。",
+            "when": "结合变造型、背景、节拍和至少一次角色互动。",
+            "then": "完整播放包含开头、中段、收尾和同步的背景音乐。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U2-L06-FAIL-01",
+            "kind": "negative",
+            "given": "制作一分钟内的音乐动画短片。",
+            "when": "音乐播放结束动画仍然无限循环。",
+            "then": "应识别问题并引导：对比动画时间线与音乐时长。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "完整播放包含开头、中段、收尾和同步的背景音乐。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释音效与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：音乐播放结束动画仍然无限循环。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：创作原创片头字幕和片尾署名。"
+          }
+        ],
+        "mustPass": [
+          "完整播放包含开头、中段、收尾和同步的背景音乐。",
+          "不能出现：音乐播放结束动画仍然无限循环。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "创作原创片头字幕和片尾署名。",
+      "parentsPrompt": "让孩子展示「音乐动画短片」，请他先预测再运行，并说出为什么出错时应当对比动画时间线与音乐时长。",
+      "assetIds": [
+        "g2-g2-u2-06-scene",
+        "g2-g2-u2-06-guide",
+        "g2-g2-u2-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U3-L01",
+      "unitId": "G2-U3",
+      "title": "键盘控制小船",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动游戏",
+      "story": "海洋巡逻小船需要接受左右方向键指挥。",
+      "concepts": [
+        "侦测"
+      ],
+      "prerequisites": [
+        "G2-U2-L06"
+      ],
+      "objectives": [
+        "理解并能解释侦测",
+        "在「键盘控制小船」完成具体任务：按右键使x加10，按左键使x减10。",
+        "用实际运行结果验证：右键后位置+10、左键后回到原位。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "海洋巡逻小船需要接受左右方向键指挥。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「键盘控制小船」的初始状态，写下目标：右键后位置+10、左键后回到原位。",
+          "verification": "完成一个可核对的预测：右键后位置+10、左键后回到原位。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「侦测」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：按右键使x加10，按左键使x减10。",
+          "verification": "方案包含侦测及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "按右键使x加10，按左键使x减10。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：右键后位置+10、左键后回到原位。",
+          "verification": "右键后位置+10、左键后回到原位。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：不按键小船也持续漂移。",
+          "learnerAction": "尝试重现错误，利用提示改正：观察键盘触发与移动指令的连接。",
+          "verification": "失败场景可解释，修正后重新满足：右键后位置+10、左键后回到原位。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「键盘控制小船」：右键后位置+10、左键后回到原位。",
+        "commonMistakes": [
+          {
+            "symptom": "不按键小船也持续漂移。",
+            "diagnosis": "观察侦测的输入、触发与状态是否符合目标",
+            "repair": "观察键盘触发与移动指令的连接。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：按右键使x加10，按左键使x减10。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：右键后位置+10、左键后回到原位。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，海洋巡逻小船需要接受左右方向键指挥。",
+          "把问题缩小到关键动作：按右键使x加10，按左键使x减10。",
+          "按步骤重试：观察键盘触发与移动指令的连接。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U3-L01-PASS-01",
+            "kind": "positive",
+            "given": "海洋巡逻小船需要接受左右方向键指挥。",
+            "when": "按右键使x加10，按左键使x减10。",
+            "then": "右键后位置+10、左键后回到原位。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U3-L01-FAIL-01",
+            "kind": "negative",
+            "given": "海洋巡逻小船需要接受左右方向键指挥。",
+            "when": "不按键小船也持续漂移。",
+            "then": "应识别问题并引导：观察键盘触发与移动指令的连接。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "右键后位置+10、左键后回到原位。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释侦测与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：不按键小船也持续漂移。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加上下方向控制。"
+          }
+        ],
+        "mustPass": [
+          "右键后位置+10、左键后回到原位。",
+          "不能出现：不按键小船也持续漂移。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加上下方向控制。",
+      "parentsPrompt": "让孩子展示「键盘控制小船」，请他先预测再运行，并说出为什么出错时应当观察键盘触发与移动指令的连接。",
+      "assetIds": [
+        "g2-g2-u3-01-scene",
+        "g2-g2-u3-01-guide",
+        "g2-g2-u3-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U3-L02",
+      "unitId": "G2-U3",
+      "title": "接住掉落水果",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动游戏",
+      "story": "水果从天上落下，篮子要在底部接住。",
+      "concepts": [
+        "侦测"
+      ],
+      "prerequisites": [
+        "G2-U3-L01"
+      ],
+      "objectives": [
+        "理解并能解释侦测",
+        "在「接住掉落水果」完成具体任务：让水果向下运动，篮子用鼠标横向跟随。",
+        "用实际运行结果验证：水果触碰篮子即记为接到，否则落地失败。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "水果从天上落下，篮子要在底部接住。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「接住掉落水果」的初始状态，写下目标：水果触碰篮子即记为接到，否则落地失败。",
+          "verification": "完成一个可核对的预测：水果触碰篮子即记为接到，否则落地失败。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「侦测」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：让水果向下运动，篮子用鼠标横向跟随。",
+          "verification": "方案包含侦测及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "让水果向下运动，篮子用鼠标横向跟随。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：水果触碰篮子即记为接到，否则落地失败。",
+          "verification": "水果触碰篮子即记为接到，否则落地失败。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：水果穿过篮子仍增加分数。",
+          "learnerAction": "尝试重现错误，利用提示改正：用侦测触碰而不是仅判断y坐标。",
+          "verification": "失败场景可解释，修正后重新满足：水果触碰篮子即记为接到，否则落地失败。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「接住掉落水果」：水果触碰篮子即记为接到，否则落地失败。",
+        "commonMistakes": [
+          {
+            "symptom": "水果穿过篮子仍增加分数。",
+            "diagnosis": "观察侦测的输入、触发与状态是否符合目标",
+            "repair": "用侦测触碰而不是仅判断y坐标。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：让水果向下运动，篮子用鼠标横向跟随。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：水果触碰篮子即记为接到，否则落地失败。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，水果从天上落下，篮子要在底部接住。",
+          "把问题缩小到关键动作：让水果向下运动，篮子用鼠标横向跟随。",
+          "按步骤重试：用侦测触碰而不是仅判断y坐标。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U3-L02-PASS-01",
+            "kind": "positive",
+            "given": "水果从天上落下，篮子要在底部接住。",
+            "when": "让水果向下运动，篮子用鼠标横向跟随。",
+            "then": "水果触碰篮子即记为接到，否则落地失败。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U3-L02-FAIL-01",
+            "kind": "negative",
+            "given": "水果从天上落下，篮子要在底部接住。",
+            "when": "水果穿过篮子仍增加分数。",
+            "then": "应识别问题并引导：用侦测触碰而不是仅判断y坐标。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "水果触碰篮子即记为接到，否则落地失败。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释侦测与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：水果穿过篮子仍增加分数。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加第二种不同分值水果。"
+          }
+        ],
+        "mustPass": [
+          "水果触碰篮子即记为接到，否则落地失败。",
+          "不能出现：水果穿过篮子仍增加分数。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加第二种不同分值水果。",
+      "parentsPrompt": "让孩子展示「接住掉落水果」，请他先预测再运行，并说出为什么出错时应当用侦测触碰而不是仅判断y坐标。",
+      "assetIds": [
+        "g2-g2-u3-02-scene",
+        "g2-g2-u3-02-guide",
+        "g2-g2-u3-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U3-L03",
+      "unitId": "G2-U3",
+      "title": "随机出现的礼物",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动游戏",
+      "story": "舞台每次都会在随机位置出现一个礼物。",
+      "concepts": [
+        "侦测",
+        "判断"
+      ],
+      "prerequisites": [
+        "G2-U3-L02"
+      ],
+      "objectives": [
+        "理解并能解释判断",
+        "在「随机出现的礼物」完成具体任务：生成x在-180到180之间的随机数，设置礼物x。",
+        "用实际运行结果验证：重复10次，礼物位置保持在舞台范围内。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "舞台每次都会在随机位置出现一个礼物。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「随机出现的礼物」的初始状态，写下目标：重复10次，礼物位置保持在舞台范围内。",
+          "verification": "完成一个可核对的预测：重复10次，礼物位置保持在舞台范围内。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「判断」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：生成x在-180到180之间的随机数，设置礼物x。",
+          "verification": "方案包含判断及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "生成x在-180到180之间的随机数，设置礼物x。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：重复10次，礼物位置保持在舞台范围内。",
+          "verification": "重复10次，礼物位置保持在舞台范围内。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：随机坐标超出舞台导致礼物不可见。",
+          "learnerAction": "尝试重现错误，利用提示改正：限制随机数上下界并在屏幕上显示x。",
+          "verification": "失败场景可解释，修正后重新满足：重复10次，礼物位置保持在舞台范围内。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「随机出现的礼物」：重复10次，礼物位置保持在舞台范围内。",
+        "commonMistakes": [
+          {
+            "symptom": "随机坐标超出舞台导致礼物不可见。",
+            "diagnosis": "观察判断的输入、触发与状态是否符合目标",
+            "repair": "限制随机数上下界并在屏幕上显示x。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：生成x在-180到180之间的随机数，设置礼物x。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：重复10次，礼物位置保持在舞台范围内。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，舞台每次都会在随机位置出现一个礼物。",
+          "把问题缩小到关键动作：生成x在-180到180之间的随机数，设置礼物x。",
+          "按步骤重试：限制随机数上下界并在屏幕上显示x。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U3-L03-PASS-01",
+            "kind": "positive",
+            "given": "舞台每次都会在随机位置出现一个礼物。",
+            "when": "生成x在-180到180之间的随机数，设置礼物x。",
+            "then": "重复10次，礼物位置保持在舞台范围内。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U3-L03-FAIL-01",
+            "kind": "negative",
+            "given": "舞台每次都会在随机位置出现一个礼物。",
+            "when": "随机坐标超出舞台导致礼物不可见。",
+            "then": "应识别问题并引导：限制随机数上下界并在屏幕上显示x。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "重复10次，礼物位置保持在舞台范围内。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释判断与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：随机坐标超出舞台导致礼物不可见。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：随机选择不同礼物造型。"
+          }
+        ],
+        "mustPass": [
+          "重复10次，礼物位置保持在舞台范围内。",
+          "不能出现：随机坐标超出舞台导致礼物不可见。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "随机选择不同礼物造型。",
+      "parentsPrompt": "让孩子展示「随机出现的礼物」，请他先预测再运行，并说出为什么出错时应当限制随机数上下界并在屏幕上显示x。",
+      "assetIds": [
+        "g2-g2-u3-03-scene",
+        "g2-g2-u3-03-guide",
+        "g2-g2-u3-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U3-L04",
+      "unitId": "G2-U3",
+      "title": "判断碰撞得分",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动游戏",
+      "story": "小球碰到篮子才得分，不能把落在地上的球也算进去。",
+      "concepts": [
+        "侦测",
+        "判断"
+      ],
+      "prerequisites": [
+        "G2-U3-L03"
+      ],
+      "objectives": [
+        "理解并能解释判断",
+        "在「判断碰撞得分」完成具体任务：在触碰篮子的条件里增加score 1，并隐藏已接小球。",
+        "用实际运行结果验证：一次接球加1分，同一小球不重复计分。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "小球碰到篮子才得分，不能把落在地上的球也算进去。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「判断碰撞得分」的初始状态，写下目标：一次接球加1分，同一小球不重复计分。",
+          "verification": "完成一个可核对的预测：一次接球加1分，同一小球不重复计分。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「判断」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：在触碰篮子的条件里增加score 1，并隐藏已接小球。",
+          "verification": "方案包含判断及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "在触碰篮子的条件里增加score 1，并隐藏已接小球。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：一次接球加1分，同一小球不重复计分。",
+          "verification": "一次接球加1分，同一小球不重复计分。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：同一球被循环多次检测导致连加3分。",
+          "learnerAction": "尝试重现错误，利用提示改正：得分后立即隐藏或设置已收集标记。",
+          "verification": "失败场景可解释，修正后重新满足：一次接球加1分，同一小球不重复计分。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「判断碰撞得分」：一次接球加1分，同一小球不重复计分。",
+        "commonMistakes": [
+          {
+            "symptom": "同一球被循环多次检测导致连加3分。",
+            "diagnosis": "观察判断的输入、触发与状态是否符合目标",
+            "repair": "得分后立即隐藏或设置已收集标记。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：在触碰篮子的条件里增加score 1，并隐藏已接小球。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：一次接球加1分，同一小球不重复计分。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，小球碰到篮子才得分，不能把落在地上的球也算进去。",
+          "把问题缩小到关键动作：在触碰篮子的条件里增加score 1，并隐藏已接小球。",
+          "按步骤重试：得分后立即隐藏或设置已收集标记。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U3-L04-PASS-01",
+            "kind": "positive",
+            "given": "小球碰到篮子才得分，不能把落在地上的球也算进去。",
+            "when": "在触碰篮子的条件里增加score 1，并隐藏已接小球。",
+            "then": "一次接球加1分，同一小球不重复计分。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U3-L04-FAIL-01",
+            "kind": "negative",
+            "given": "小球碰到篮子才得分，不能把落在地上的球也算进去。",
+            "when": "同一球被循环多次检测导致连加3分。",
+            "then": "应识别问题并引导：得分后立即隐藏或设置已收集标记。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "一次接球加1分，同一小球不重复计分。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释判断与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：同一球被循环多次检测导致连加3分。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加连续三次接球的奖励。"
+          }
+        ],
+        "mustPass": [
+          "一次接球加1分，同一小球不重复计分。",
+          "不能出现：同一球被循环多次检测导致连加3分。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加连续三次接球的奖励。",
+      "parentsPrompt": "让孩子展示「判断碰撞得分」，请他先预测再运行，并说出为什么出错时应当得分后立即隐藏或设置已收集标记。",
+      "assetIds": [
+        "g2-g2-u3-04-scene",
+        "g2-g2-u3-04-guide",
+        "g2-g2-u3-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U3-L05",
+      "unitId": "G2-U3",
+      "title": "倒计时游戏结束",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动游戏",
+      "story": "限时接水果比赛需要在倒计时归零后停止。",
+      "concepts": [
+        "侦测",
+        "判断",
+        "随机"
+      ],
+      "prerequisites": [
+        "G2-U3-L04"
+      ],
+      "objectives": [
+        "理解并能解释随机",
+        "在「倒计时游戏结束」完成具体任务：设置timeLeft=10，每秒减1，归零广播游戏结束。",
+        "用实际运行结果验证：10秒内可以得分，归零后分数不再变化。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "限时接水果比赛需要在倒计时归零后停止。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「倒计时游戏结束」的初始状态，写下目标：10秒内可以得分，归零后分数不再变化。",
+          "verification": "完成一个可核对的预测：10秒内可以得分，归零后分数不再变化。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「随机」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：设置timeLeft=10，每秒减1，归零广播游戏结束。",
+          "verification": "方案包含随机及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "设置timeLeft=10，每秒减1，归零广播游戏结束。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：10秒内可以得分，归零后分数不再变化。",
+          "verification": "10秒内可以得分，归零后分数不再变化。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：时间变成负数仍然运行。",
+          "learnerAction": "尝试重现错误，利用提示改正：使用大于零判断并在结束时停止相关脚本。",
+          "verification": "失败场景可解释，修正后重新满足：10秒内可以得分，归零后分数不再变化。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「倒计时游戏结束」：10秒内可以得分，归零后分数不再变化。",
+        "commonMistakes": [
+          {
+            "symptom": "时间变成负数仍然运行。",
+            "diagnosis": "观察随机的输入、触发与状态是否符合目标",
+            "repair": "使用大于零判断并在结束时停止相关脚本。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：设置timeLeft=10，每秒减1，归零广播游戏结束。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：10秒内可以得分，归零后分数不再变化。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，限时接水果比赛需要在倒计时归零后停止。",
+          "把问题缩小到关键动作：设置timeLeft=10，每秒减1，归零广播游戏结束。",
+          "按步骤重试：使用大于零判断并在结束时停止相关脚本。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U3-L05-PASS-01",
+            "kind": "positive",
+            "given": "限时接水果比赛需要在倒计时归零后停止。",
+            "when": "设置timeLeft=10，每秒减1，归零广播游戏结束。",
+            "then": "10秒内可以得分，归零后分数不再变化。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U3-L05-FAIL-01",
+            "kind": "negative",
+            "given": "限时接水果比赛需要在倒计时归零后停止。",
+            "when": "时间变成负数仍然运行。",
+            "then": "应识别问题并引导：使用大于零判断并在结束时停止相关脚本。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "10秒内可以得分，归零后分数不再变化。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释随机与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：时间变成负数仍然运行。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加3秒准备倒计时。"
+          }
+        ],
+        "mustPass": [
+          "10秒内可以得分，归零后分数不再变化。",
+          "不能出现：时间变成负数仍然运行。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加3秒准备倒计时。",
+      "parentsPrompt": "让孩子展示「倒计时游戏结束」，请他先预测再运行，并说出为什么出错时应当使用大于零判断并在结束时停止相关脚本。",
+      "assetIds": [
+        "g2-g2-u3-05-scene",
+        "g2-g2-u3-05-guide",
+        "g2-g2-u3-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U3-L06",
+      "unitId": "G2-U3",
+      "title": "水果接力挑战",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "互动游戏",
+      "story": "做一款完整的水果接力挑战小游戏。",
+      "concepts": [
+        "侦测",
+        "判断",
+        "随机"
+      ],
+      "prerequisites": [
+        "G2-U3-L05"
+      ],
+      "objectives": [
+        "理解并能解释随机",
+        "在「水果接力挑战」完成具体任务：组合随机落果、篮子移动、碰撞记分和结束条件。",
+        "用实际运行结果验证：成功接到5颗或倒计时结束后能显示结果。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "做一款完整的水果接力挑战小游戏。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「水果接力挑战」的初始状态，写下目标：成功接到5颗或倒计时结束后能显示结果。",
+          "verification": "完成一个可核对的预测：成功接到5颗或倒计时结束后能显示结果。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「随机」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：组合随机落果、篮子移动、碰撞记分和结束条件。",
+          "verification": "方案包含随机及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "组合随机落果、篮子移动、碰撞记分和结束条件。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：成功接到5颗或倒计时结束后能显示结果。",
+          "verification": "成功接到5颗或倒计时结束后能显示结果。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：过期水果继续加分或比赛结束后仍能移动。",
+          "learnerAction": "尝试重现错误，利用提示改正：分别测试获胜、失败和重复触碰三种路线。",
+          "verification": "失败场景可解释，修正后重新满足：成功接到5颗或倒计时结束后能显示结果。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「水果接力挑战」：成功接到5颗或倒计时结束后能显示结果。",
+        "commonMistakes": [
+          {
+            "symptom": "过期水果继续加分或比赛结束后仍能移动。",
+            "diagnosis": "观察随机的输入、触发与状态是否符合目标",
+            "repair": "分别测试获胜、失败和重复触碰三种路线。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：组合随机落果、篮子移动、碰撞记分和结束条件。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：成功接到5颗或倒计时结束后能显示结果。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，做一款完整的水果接力挑战小游戏。",
+          "把问题缩小到关键动作：组合随机落果、篮子移动、碰撞记分和结束条件。",
+          "按步骤重试：分别测试获胜、失败和重复触碰三种路线。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U3-L06-PASS-01",
+            "kind": "positive",
+            "given": "做一款完整的水果接力挑战小游戏。",
+            "when": "组合随机落果、篮子移动、碰撞记分和结束条件。",
+            "then": "成功接到5颗或倒计时结束后能显示结果。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U3-L06-FAIL-01",
+            "kind": "negative",
+            "given": "做一款完整的水果接力挑战小游戏。",
+            "when": "过期水果继续加分或比赛结束后仍能移动。",
+            "then": "应识别问题并引导：分别测试获胜、失败和重复触碰三种路线。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "成功接到5颗或倒计时结束后能显示结果。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释随机与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：过期水果继续加分或比赛结束后仍能移动。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：设计难度等级与速度选择。"
+          }
+        ],
+        "mustPass": [
+          "成功接到5颗或倒计时结束后能显示结果。",
+          "不能出现：过期水果继续加分或比赛结束后仍能移动。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "设计难度等级与速度选择。",
+      "parentsPrompt": "让孩子展示「水果接力挑战」，请他先预测再运行，并说出为什么出错时应当分别测试获胜、失败和重复触碰三种路线。",
+      "assetIds": [
+        "g2-g2-u3-06-scene",
+        "g2-g2-u3-06-guide",
+        "g2-g2-u3-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U4-L01",
+      "unitId": "G2-U4",
+      "title": "游戏规则说明书",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "综合创作",
+      "story": "同伴试玩时不知道游戏规则，设计师需要写一页说明。",
+      "concepts": [
+        "变量"
+      ],
+      "prerequisites": [
+        "G2-U3-L06"
+      ],
+      "objectives": [
+        "理解并能解释变量",
+        "在「游戏规则说明书」完成具体任务：写清控制方法、得分条件、失败条件和重试操作。",
+        "用实际运行结果验证：首次试玩者不经口头解释能完成一局。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "同伴试玩时不知道游戏规则，设计师需要写一页说明。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「游戏规则说明书」的初始状态，写下目标：首次试玩者不经口头解释能完成一局。",
+          "verification": "完成一个可核对的预测：首次试玩者不经口头解释能完成一局。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「变量」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：写清控制方法、得分条件、失败条件和重试操作。",
+          "verification": "方案包含变量及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "写清控制方法、得分条件、失败条件和重试操作。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：首次试玩者不经口头解释能完成一局。",
+          "verification": "首次试玩者不经口头解释能完成一局。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：说明里写了得分但没有说明如何操作。",
+          "learnerAction": "尝试重现错误，利用提示改正：让同伴依说明逐条操作验证。",
+          "verification": "失败场景可解释，修正后重新满足：首次试玩者不经口头解释能完成一局。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「游戏规则说明书」：首次试玩者不经口头解释能完成一局。",
+        "commonMistakes": [
+          {
+            "symptom": "说明里写了得分但没有说明如何操作。",
+            "diagnosis": "观察变量的输入、触发与状态是否符合目标",
+            "repair": "让同伴依说明逐条操作验证。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：写清控制方法、得分条件、失败条件和重试操作。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：首次试玩者不经口头解释能完成一局。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，同伴试玩时不知道游戏规则，设计师需要写一页说明。",
+          "把问题缩小到关键动作：写清控制方法、得分条件、失败条件和重试操作。",
+          "按步骤重试：让同伴依说明逐条操作验证。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U4-L01-PASS-01",
+            "kind": "positive",
+            "given": "同伴试玩时不知道游戏规则，设计师需要写一页说明。",
+            "when": "写清控制方法、得分条件、失败条件和重试操作。",
+            "then": "首次试玩者不经口头解释能完成一局。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U4-L01-FAIL-01",
+            "kind": "negative",
+            "given": "同伴试玩时不知道游戏规则，设计师需要写一页说明。",
+            "when": "说明里写了得分但没有说明如何操作。",
+            "then": "应识别问题并引导：让同伴依说明逐条操作验证。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "首次试玩者不经口头解释能完成一局。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释变量与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：说明里写了得分但没有说明如何操作。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：添加图标化操作说明。"
+          }
+        ],
+        "mustPass": [
+          "首次试玩者不经口头解释能完成一局。",
+          "不能出现：说明里写了得分但没有说明如何操作。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "添加图标化操作说明。",
+      "parentsPrompt": "让孩子展示「游戏规则说明书」，请他先预测再运行，并说出为什么出错时应当让同伴依说明逐条操作验证。",
+      "assetIds": [
+        "g2-g2-u4-01-scene",
+        "g2-g2-u4-01-guide",
+        "g2-g2-u4-01-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U4-L02",
+      "unitId": "G2-U4",
+      "title": "设计三种障碍",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "综合创作",
+      "story": "猫咪闯关要遇到三种不同障碍。",
+      "concepts": [
+        "变量"
+      ],
+      "prerequisites": [
+        "G2-U4-L01"
+      ],
+      "objectives": [
+        "理解并能解释变量",
+        "在「设计三种障碍」完成具体任务：设计静止石头、移动小鸟、定时火焰三种障碍。",
+        "用实际运行结果验证：碰到每种障碍都触发不同反馈。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "猫咪闯关要遇到三种不同障碍。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「设计三种障碍」的初始状态，写下目标：碰到每种障碍都触发不同反馈。",
+          "verification": "完成一个可核对的预测：碰到每种障碍都触发不同反馈。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「变量」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：设计静止石头、移动小鸟、定时火焰三种障碍。",
+          "verification": "方案包含变量及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "设计静止石头、移动小鸟、定时火焰三种障碍。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：碰到每种障碍都触发不同反馈。",
+          "verification": "碰到每种障碍都触发不同反馈。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：三类障碍行为完全相同无差异。",
+          "learnerAction": "尝试重现错误，利用提示改正：列出触发条件和危害区别。",
+          "verification": "失败场景可解释，修正后重新满足：碰到每种障碍都触发不同反馈。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「设计三种障碍」：碰到每种障碍都触发不同反馈。",
+        "commonMistakes": [
+          {
+            "symptom": "三类障碍行为完全相同无差异。",
+            "diagnosis": "观察变量的输入、触发与状态是否符合目标",
+            "repair": "列出触发条件和危害区别。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：设计静止石头、移动小鸟、定时火焰三种障碍。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：碰到每种障碍都触发不同反馈。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，猫咪闯关要遇到三种不同障碍。",
+          "把问题缩小到关键动作：设计静止石头、移动小鸟、定时火焰三种障碍。",
+          "按步骤重试：列出触发条件和危害区别。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U4-L02-PASS-01",
+            "kind": "positive",
+            "given": "猫咪闯关要遇到三种不同障碍。",
+            "when": "设计静止石头、移动小鸟、定时火焰三种障碍。",
+            "then": "碰到每种障碍都触发不同反馈。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U4-L02-FAIL-01",
+            "kind": "negative",
+            "given": "猫咪闯关要遇到三种不同障碍。",
+            "when": "三类障碍行为完全相同无差异。",
+            "then": "应识别问题并引导：列出触发条件和危害区别。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "碰到每种障碍都触发不同反馈。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释变量与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：三类障碍行为完全相同无差异。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：让玩家选择一种道具抵消障碍。"
+          }
+        ],
+        "mustPass": [
+          "碰到每种障碍都触发不同反馈。",
+          "不能出现：三类障碍行为完全相同无差异。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "让玩家选择一种道具抵消障碍。",
+      "parentsPrompt": "让孩子展示「设计三种障碍」，请他先预测再运行，并说出为什么出错时应当列出触发条件和危害区别。",
+      "assetIds": [
+        "g2-g2-u4-02-scene",
+        "g2-g2-u4-02-guide",
+        "g2-g2-u4-02-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U4-L03",
+      "unitId": "G2-U4",
+      "title": "制作胜负提示",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "综合创作",
+      "story": "游戏结束时玩家总看不到自己获胜还是失败。",
+      "concepts": [
+        "变量",
+        "关卡"
+      ],
+      "prerequisites": [
+        "G2-U4-L02"
+      ],
+      "objectives": [
+        "理解并能解释关卡",
+        "在「制作胜负提示」完成具体任务：在胜利与失败条件中分别广播不同消息并显示字幕。",
+        "用实际运行结果验证：score达到目标显示胜利、生命为0显示失败。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "游戏结束时玩家总看不到自己获胜还是失败。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「制作胜负提示」的初始状态，写下目标：score达到目标显示胜利、生命为0显示失败。",
+          "verification": "完成一个可核对的预测：score达到目标显示胜利、生命为0显示失败。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「关卡」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：在胜利与失败条件中分别广播不同消息并显示字幕。",
+          "verification": "方案包含关卡及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "在胜利与失败条件中分别广播不同消息并显示字幕。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：score达到目标显示胜利、生命为0显示失败。",
+          "verification": "score达到目标显示胜利、生命为0显示失败。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：同时出现胜利和失败两块提示。",
+          "learnerAction": "尝试重现错误，利用提示改正：将游戏状态设置为唯一值并只显示对应结局。",
+          "verification": "失败场景可解释，修正后重新满足：score达到目标显示胜利、生命为0显示失败。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「制作胜负提示」：score达到目标显示胜利、生命为0显示失败。",
+        "commonMistakes": [
+          {
+            "symptom": "同时出现胜利和失败两块提示。",
+            "diagnosis": "观察关卡的输入、触发与状态是否符合目标",
+            "repair": "将游戏状态设置为唯一值并只显示对应结局。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：在胜利与失败条件中分别广播不同消息并显示字幕。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：score达到目标显示胜利、生命为0显示失败。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，游戏结束时玩家总看不到自己获胜还是失败。",
+          "把问题缩小到关键动作：在胜利与失败条件中分别广播不同消息并显示字幕。",
+          "按步骤重试：将游戏状态设置为唯一值并只显示对应结局。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U4-L03-PASS-01",
+            "kind": "positive",
+            "given": "游戏结束时玩家总看不到自己获胜还是失败。",
+            "when": "在胜利与失败条件中分别广播不同消息并显示字幕。",
+            "then": "score达到目标显示胜利、生命为0显示失败。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U4-L03-FAIL-01",
+            "kind": "negative",
+            "given": "游戏结束时玩家总看不到自己获胜还是失败。",
+            "when": "同时出现胜利和失败两块提示。",
+            "then": "应识别问题并引导：将游戏状态设置为唯一值并只显示对应结局。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "score达到目标显示胜利、生命为0显示失败。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释关卡与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：同时出现胜利和失败两块提示。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加重新开始按钮。"
+          }
+        ],
+        "mustPass": [
+          "score达到目标显示胜利、生命为0显示失败。",
+          "不能出现：同时出现胜利和失败两块提示。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加重新开始按钮。",
+      "parentsPrompt": "让孩子展示「制作胜负提示」，请他先预测再运行，并说出为什么出错时应当将游戏状态设置为唯一值并只显示对应结局。",
+      "assetIds": [
+        "g2-g2-u4-03-scene",
+        "g2-g2-u4-03-guide",
+        "g2-g2-u4-03-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U4-L04",
+      "unitId": "G2-U4",
+      "title": "给游戏加难度",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "综合创作",
+      "story": "同一个关卡玩三次就腻了，设计师准备升级难度。",
+      "concepts": [
+        "变量",
+        "关卡"
+      ],
+      "prerequisites": [
+        "G2-U4-L03"
+      ],
+      "objectives": [
+        "理解并能解释关卡",
+        "在「给游戏加难度」完成具体任务：根据level变量调整水果落下速度和障碍数量。",
+        "用实际运行结果验证：第2关速度比第1关快，分数保持或按规则清零。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "同一个关卡玩三次就腻了，设计师准备升级难度。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「给游戏加难度」的初始状态，写下目标：第2关速度比第1关快，分数保持或按规则清零。",
+          "verification": "完成一个可核对的预测：第2关速度比第1关快，分数保持或按规则清零。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「关卡」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：根据level变量调整水果落下速度和障碍数量。",
+          "verification": "方案包含关卡及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "根据level变量调整水果落下速度和障碍数量。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：第2关速度比第1关快，分数保持或按规则清零。",
+          "verification": "第2关速度比第1关快，分数保持或按规则清零。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：升级后速度没有变化。",
+          "learnerAction": "尝试重现错误，利用提示改正：在换关卡时记录level和速度两个变量。",
+          "verification": "失败场景可解释，修正后重新满足：第2关速度比第1关快，分数保持或按规则清零。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「给游戏加难度」：第2关速度比第1关快，分数保持或按规则清零。",
+        "commonMistakes": [
+          {
+            "symptom": "升级后速度没有变化。",
+            "diagnosis": "观察关卡的输入、触发与状态是否符合目标",
+            "repair": "在换关卡时记录level和速度两个变量。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：根据level变量调整水果落下速度和障碍数量。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：第2关速度比第1关快，分数保持或按规则清零。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，同一个关卡玩三次就腻了，设计师准备升级难度。",
+          "把问题缩小到关键动作：根据level变量调整水果落下速度和障碍数量。",
+          "按步骤重试：在换关卡时记录level和速度两个变量。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U4-L04-PASS-01",
+            "kind": "positive",
+            "given": "同一个关卡玩三次就腻了，设计师准备升级难度。",
+            "when": "根据level变量调整水果落下速度和障碍数量。",
+            "then": "第2关速度比第1关快，分数保持或按规则清零。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U4-L04-FAIL-01",
+            "kind": "negative",
+            "given": "同一个关卡玩三次就腻了，设计师准备升级难度。",
+            "when": "升级后速度没有变化。",
+            "then": "应识别问题并引导：在换关卡时记录level和速度两个变量。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "第2关速度比第1关快，分数保持或按规则清零。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释关卡与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：升级后速度没有变化。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加简单/普通/困难三个难度档。"
+          }
+        ],
+        "mustPass": [
+          "第2关速度比第1关快，分数保持或按规则清零。",
+          "不能出现：升级后速度没有变化。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加简单/普通/困难三个难度档。",
+      "parentsPrompt": "让孩子展示「给游戏加难度」，请他先预测再运行，并说出为什么出错时应当在换关卡时记录level和速度两个变量。",
+      "assetIds": [
+        "g2-g2-u4-04-scene",
+        "g2-g2-u4-04-guide",
+        "g2-g2-u4-04-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U4-L05",
+      "unitId": "G2-U4",
+      "title": "试玩记录与修复",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "综合创作",
+      "story": "测试员发现复活后分数没有清零。",
+      "concepts": [
+        "变量",
+        "关卡",
+        "测试"
+      ],
+      "prerequisites": [
+        "G2-U4-L04"
+      ],
+      "objectives": [
+        "理解并能解释测试",
+        "在「试玩记录与修复」完成具体任务：写出问题复现步骤、修复初始化逻辑、重新测试。",
+        "用实际运行结果验证：重新开始时score=0、timeLeft恢复初始值。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "测试员发现复活后分数没有清零。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「试玩记录与修复」的初始状态，写下目标：重新开始时score=0、timeLeft恢复初始值。",
+          "verification": "完成一个可核对的预测：重新开始时score=0、timeLeft恢复初始值。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「测试」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：写出问题复现步骤、修复初始化逻辑、重新测试。",
+          "verification": "方案包含测试及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "写出问题复现步骤、修复初始化逻辑、重新测试。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：重新开始时score=0、timeLeft恢复初始值。",
+          "verification": "重新开始时score=0、timeLeft恢复初始值。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：重新开始保留旧分数和旧计时。",
+          "learnerAction": "尝试重现错误，利用提示改正：把所有初始变量放在开始事件下。",
+          "verification": "失败场景可解释，修正后重新满足：重新开始时score=0、timeLeft恢复初始值。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「试玩记录与修复」：重新开始时score=0、timeLeft恢复初始值。",
+        "commonMistakes": [
+          {
+            "symptom": "重新开始保留旧分数和旧计时。",
+            "diagnosis": "观察测试的输入、触发与状态是否符合目标",
+            "repair": "把所有初始变量放在开始事件下。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：写出问题复现步骤、修复初始化逻辑、重新测试。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：重新开始时score=0、timeLeft恢复初始值。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，测试员发现复活后分数没有清零。",
+          "把问题缩小到关键动作：写出问题复现步骤、修复初始化逻辑、重新测试。",
+          "按步骤重试：把所有初始变量放在开始事件下。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U4-L05-PASS-01",
+            "kind": "positive",
+            "given": "测试员发现复活后分数没有清零。",
+            "when": "写出问题复现步骤、修复初始化逻辑、重新测试。",
+            "then": "重新开始时score=0、timeLeft恢复初始值。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U4-L05-FAIL-01",
+            "kind": "negative",
+            "given": "测试员发现复活后分数没有清零。",
+            "when": "重新开始保留旧分数和旧计时。",
+            "then": "应识别问题并引导：把所有初始变量放在开始事件下。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "重新开始时score=0、timeLeft恢复初始值。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释测试与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：重新开始保留旧分数和旧计时。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：邀请新同学做第二轮回归测试。"
+          }
+        ],
+        "mustPass": [
+          "重新开始时score=0、timeLeft恢复初始值。",
+          "不能出现：重新开始保留旧分数和旧计时。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "邀请新同学做第二轮回归测试。",
+      "parentsPrompt": "让孩子展示「试玩记录与修复」，请他先预测再运行，并说出为什么出错时应当把所有初始变量放在开始事件下。",
+      "assetIds": [
+        "g2-g2-u4-05-scene",
+        "g2-g2-u4-05-guide",
+        "g2-g2-u4-05-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    },
+    {
+      "id": "G2-U4-L06",
+      "unitId": "G2-U4",
+      "title": "发布个人第一款游戏",
+      "ageRange": "7-11",
+      "engine": "scratch",
+      "courseState": "detailed_not_published",
+      "projectTheme": "综合创作",
+      "story": "小小游戏工作室要公开自己的首款作品。",
+      "concepts": [
+        "变量",
+        "关卡",
+        "测试"
+      ],
+      "prerequisites": [
+        "G2-U4-L05"
+      ],
+      "objectives": [
+        "理解并能解释测试",
+        "在「发布个人第一款游戏」完成具体任务：整理玩法说明、完整源码、测试记录和原创素材信息。",
+        "用实际运行结果验证：游戏完整可玩一局，能重开且胜负规则明确。"
+      ],
+      "environment": "Scratch 3 兼容舞台",
+      "requiredCapabilities": [
+        "scratch3_runtime",
+        "sprite_controls",
+        "event_or_loop",
+        "state_inspection"
+      ],
+      "learningSteps": [
+        {
+          "order": 1,
+          "mode": "观察与预测",
+          "teacherPrompt": "小小游戏工作室要公开自己的首款作品。 开始前先说一说：什么变化能证明任务成功？",
+          "learnerAction": "观察「发布个人第一款游戏」的初始状态，写下目标：游戏完整可玩一局，能重开且胜负规则明确。",
+          "verification": "完成一个可核对的预测：游戏完整可玩一局，能重开且胜负规则明确。"
+        },
+        {
+          "order": 2,
+          "mode": "拆解与设计",
+          "teacherPrompt": "围绕「测试」设计操作顺序，为什么不能直接跳到最后？",
+          "learnerAction": "画出或写出操作顺序，并说出关键步骤：整理玩法说明、完整源码、测试记录和原创素材信息。",
+          "verification": "方案包含测试及对应的触发、输入或输出"
+        },
+        {
+          "order": 3,
+          "mode": "编码与搭建",
+          "teacherPrompt": "将计划变成工作区内实际可运行的指令，留意状态与对象。",
+          "learnerAction": "整理玩法说明、完整源码、测试记录和原创素材信息。",
+          "verification": "可以展示独立完成的操作成果，等待运行检验"
+        },
+        {
+          "order": 4,
+          "mode": "运行与验收",
+          "teacherPrompt": "先预测结果，再运行观察；只看文本或截图还不算程序验证。",
+          "learnerAction": "在「Scratch 3 兼容舞台」执行，并确认：游戏完整可玩一局，能重开且胜负规则明确。",
+          "verification": "游戏完整可玩一局，能重开且胜负规则明确。"
+        },
+        {
+          "order": 5,
+          "mode": "边界与修复",
+          "teacherPrompt": "故意测试一种错误情形：游戏只有开场动画，没有可完成的任务。",
+          "learnerAction": "尝试重现错误，利用提示改正：按操作、得分、胜负、重玩逐项验收。",
+          "verification": "失败场景可解释，修正后重新满足：游戏完整可玩一局，能重开且胜负规则明确。"
+        }
+      ],
+      "feedback": {
+        "success": "完成「发布个人第一款游戏」：游戏完整可玩一局，能重开且胜负规则明确。",
+        "commonMistakes": [
+          {
+            "symptom": "游戏只有开场动画，没有可完成的任务。",
+            "diagnosis": "观察测试的输入、触发与状态是否符合目标",
+            "repair": "按操作、得分、胜负、重玩逐项验收。"
+          },
+          {
+            "symptom": "程序可以运行但输出不符合所描述的目标",
+            "diagnosis": "对照每步状态，检查执行顺序或边界值",
+            "repair": "逐个执行关键步骤，重点检查：整理玩法说明、完整源码、测试记录和原创素材信息。"
+          },
+          {
+            "symptom": "只照抄示例，不能解释为何成功",
+            "diagnosis": "更换一个输入或初始状态后可能无法独立处理",
+            "repair": "尝试说明：游戏完整可玩一局，能重开且胜负规则明确。"
+          }
+        ],
+        "tieredHints": [
+          "先辨认题目需要变化的对象和目标，小小游戏工作室要公开自己的首款作品。",
+          "把问题缩小到关键动作：整理玩法说明、完整源码、测试记录和原创素材信息。",
+          "按步骤重试：按操作、得分、胜负、重玩逐项验收。"
+        ]
+      },
+      "assessment": {
+        "passCases": [
+          {
+            "caseId": "G2-U4-L06-PASS-01",
+            "kind": "positive",
+            "given": "小小游戏工作室要公开自己的首款作品。",
+            "when": "整理玩法说明、完整源码、测试记录和原创素材信息。",
+            "then": "游戏完整可玩一局，能重开且胜负规则明确。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "failCases": [
+          {
+            "caseId": "G2-U4-L06-FAIL-01",
+            "kind": "negative",
+            "given": "小小游戏工作室要公开自己的首款作品。",
+            "when": "游戏只有开场动画，没有可完成的任务。",
+            "then": "应识别问题并引导：按操作、得分、胜负、重玩逐项验收。",
+            "oracle": "manual_or_engine_specific",
+            "status": "assessment_spec_not_executed"
+          }
+        ],
+        "scoring": [
+          {
+            "criterion": "功能完成",
+            "weight": 40,
+            "evidence": "游戏完整可玩一局，能重开且胜负规则明确。"
+          },
+          {
+            "criterion": "知识理解",
+            "weight": 25,
+            "evidence": "能解释测试与操作的关系"
+          },
+          {
+            "criterion": "调试能力",
+            "weight": 20,
+            "evidence": "解释并修正：游戏只有开场动画，没有可完成的任务。"
+          },
+          {
+            "criterion": "原创表达",
+            "weight": 15,
+            "evidence": "完成拓展挑战：增加一个供朋友挑选的隐藏角色。"
+          }
+        ],
+        "mustPass": [
+          "游戏完整可玩一局，能重开且胜负规则明确。",
+          "不能出现：游戏只有开场动画，没有可完成的任务。",
+          "需要一次运行与调试证据"
+        ],
+        "evaluationType": "teacher_or_real_engine_pending"
+      },
+      "extension": "增加一个供朋友挑选的隐藏角色。",
+      "parentsPrompt": "让孩子展示「发布个人第一款游戏」，请他先预测再运行，并说出为什么出错时应当按操作、得分、胜负、重玩逐项验收。",
+      "assetIds": [
+        "g2-g2-u4-06-scene",
+        "g2-g2-u4-06-guide",
+        "g2-g2-u4-06-feedback"
+      ],
+      "runtimeVerified": false,
+      "published": false
+    }
+  ]
+}
