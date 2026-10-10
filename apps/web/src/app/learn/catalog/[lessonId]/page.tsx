@@ -44,6 +44,14 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
             <Link data-testid="scratch-trial-entry" href="/learn/scratch-lab/G3-U1-L02" className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">体验 Scratch VM →</Link>
           </section>
         ) : null}
+        {['P0-U1-L02','P0-U1-L03'].includes(lesson.id) ? (
+          <section className="rounded-[2rem] border-2 border-emerald-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-bold text-emerald-700">Python 真运行 · 3组自动评测 · 浏览器草稿</p>
+            <h2 className="mt-2 text-xl font-black">编写函数，使用三组不同数据验证</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">真实运行函数并检查不同参数的结果，自动保存本机草稿和试验完成状态。正式课程仍未发布。</p>
+            <Link href={`/learn/python-lab/${lesson.id}`} data-testid="python-multi-trial-entry" className="mt-4 inline-flex rounded-full bg-emerald-700 px-6 py-3 font-bold text-white">开始多用例练习 →</Link>
+          </section>
+        ) : null}
         {lesson.id === 'P0-U1-L01' ? (
           <section className="rounded-[2rem] border-2 border-emerald-200 bg-white p-6 shadow-sm">
             <p className="text-xs font-bold text-emerald-700">独立实验关卡 · Python 真运行</p>

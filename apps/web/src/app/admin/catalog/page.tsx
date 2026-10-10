@@ -8,6 +8,7 @@ import {
   getLessonContentStage,
 } from '@/features/curriculum/full-catalog-access'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
+import {evaluateReleaseReadiness,releasePilotEvidence} from '@/features/curriculum/release-readiness'
 
 export default async function AdminCatalogPage({ searchParams }: { searchParams: Promise<{ track?: string }> }) {
   await requireCurriculumAdmin()
@@ -31,6 +32,20 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
             <span className="rounded-xl bg-rose-50 p-3">毕业项目蓝图：{stats.unitProjectBlueprints}</span>
           </div>
         </header>
+        <section className="rounded-[1.5rem] border border-amber-200 bg-white p-6" data-testid="admin-release-readiness">
+          <h2 className="text-xl font-black">实验关卡发布验收 · 全部仍未获正式发布授权</h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">内容完整、能运行一次、测试通过，不等于已经可以向儿童正式发布。下表逐课列出独立阻塞条件，不会触发任何发布 API。</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {Object.entries(releasePilotEvidence).map(([id,evidence])=>{
+              const result=evaluateReleaseReadiness(evidence)
+              return <div key={id} className="rounded-xl bg-amber-50 p-4 text-sm" data-testid={`release-readiness-${id}`}>
+                <p className="font-black text-slate-900">{id} · {result.ready?'允许进入正式发布审核':'禁止正式发布'}</p>
+                <p className="mt-2 text-amber-900">剩余 {result.missing.length} 项：</p>
+                <p className="mt-1 leading-7 text-slate-700">{result.missing.map(item=>item.label).join('、')}</p>
+              </div>
+            })}
+          </div>
+        </section>
         <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
           <nav className="self-start rounded-[1.5rem] bg-white p-4 lg:sticky lg:top-5" aria-label="后台课程路径">
             <h2 className="px-2 pb-3 text-lg font-black">路径筛选</h2>
