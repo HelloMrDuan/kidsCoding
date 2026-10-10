@@ -13,6 +13,7 @@
   let timer = null;
   let currentId = null;
   let ready = false;
+  let currentProgram={spawnCount:10,fallStep:13};
   function send(kind, info = {}) {
     window.parent.postMessage({kind,id:currentId,...info},'*');
   }
@@ -74,10 +75,48 @@
         }
         updateNativeNumber('repeat','TIMES',program.spawnCount);
         updateNativeNumber('move_y','DY',-program.fallStep);
-        send('CONFIGURED',{program:{spawnCount:program.spawnCount,fallStep:program.fallStep}});
+        currentProgram={spawnCount:program.spawnCount,fallStep:program.fallStep};
+        send('CONFIGURED',{program:currentProgram});
         snapshot();
       } catch (error) {
         send('ERROR',{error:'修改 Scratch VM 积木失败：'+String(error).slice(0,400)});
+      }
+      return;
+    }
+
+    if (data.kind === 'EXPORT' && data.id === currentId && vm && ready) {
+      let checker = null;
+      try {
+        vm.stopAll();
+        // The official Scratch VM produces the genuine editable Scratch 3 zip,
+        // including original SVG costumes. Do not serialize a fake JSON-only file.
+        const blob = await vm.saveProjectSb3();
+        if (!(blob instanceof Blob) || blob.size < 300 || blob.size > 5_000_000) {
+          throw new Error('导出文件大小不符合要求');
+        }
+        const archive = await blob.arrayBuffer();
+        checker = new window.VirtualMachine();
+        await checker.loadProject(archive.slice(0));
+        const sprite = checker.runtime.targets.find(t=>!t.isStage && t.isOriginal && t.getName()==='流星');
+        if (!sprite) throw new Error('导出后缺少流星角色');
+        function readNativeNumber(parentId,inputName) {
+          const block = sprite.blocks.getBlock(parentId);
+          const inputId = block?.inputs?.[inputName]?.block;
+          const inputBlock = sprite.blocks.getBlock(inputId);
+          return Number(inputBlock?.fields?.NUM?.value);
+        }
+        const count = readNativeNumber('repeat','TIMES');
+        const fall = -readNativeNumber('move_y','DY');
+        if (count !== currentProgram.spawnCount || fall !== currentProgram.fallStep) {
+          throw new Error('重新载入后的 Scratch 数字积木不匹配');
+        }
+        window.parent.postMessage({kind:'PROJECT_EXPORTED',id:currentId,archive,program:{spawnCount:count,fallStep:fall}},'*',[archive]);
+      } catch (error) {
+        send('ERROR',{error:'Scratch VM 项目导出或回读失败：'+String(error).slice(0,500)});
+      } finally {
+        if (checker) {
+          try { checker.quit(); } catch (_error) {}
+        }
       }
       return;
     }
@@ -95,6 +134,7 @@
     reset();
     currentId=data.id;
     ready=false;
+    currentProgram={spawnCount:10,fallStep:13};
     if (!window.VirtualMachine) {
       send('ERROR',{error:'Scratch VM 未加载。请检查 CDN 网络。'});
       return;

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {ScratchMeteorBlocks,type MeteorProgram} from './scratch-meteor-blocks'
 
 type Sprite = { id: string; name: string; x: number; y: number; visible: boolean; original: boolean }
-type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram }
+type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'PROJECT_EXPORTED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram; archive?:ArrayBuffer }
 
 export function ScratchVMTrial() {
   const frame = useRef<HTMLIFrameElement>(null)
@@ -15,6 +15,8 @@ export function ScratchVMTrial() {
   const [draft, setDraft] = useState<MeteorProgram|null>(null)
   const [applied, setApplied] = useState<MeteorProgram|null>(null)
   const [createdTotal, setCreatedTotal] = useState(0)
+  const [exporting,setExporting] = useState(false)
+  const [exportDetails,setExportDetails] = useState('尚未导出项目。')
   const seenClones = useRef<Set<string>>(new Set())
   const [status, setStatus] = useState('正在加载 Scratch VM，请稍候……')
   const [sprites, setSprites] = useState<Sprite[]>([])
@@ -78,6 +80,25 @@ export function ScratchVMTrial() {
       } else if(msg.kind==='CONFIGURED') {
         setApplied(msg.program??null)
         setStatus('参数已写入真实 Scratch VM，点击绿旗验证变化。')
+      } else if(msg.kind==='PROJECT_EXPORTED') {
+        setExporting(false)
+        const archive=msg.archive
+        if (!(archive instanceof ArrayBuffer) || archive.byteLength<300 || archive.byteLength>5_000_000 ||
+            new Uint8Array(archive)[0]!==0x50 || new Uint8Array(archive)[1]!==0x4b) {
+          setStatus('Scratch VM 导出结果无效，没有下载文件。')
+          return
+        }
+        const blob=new Blob([archive],{type:'application/x.scratch.sb3'})
+        const url=URL.createObjectURL(blob)
+        const anchor=document.createElement('a')
+        anchor.href=url
+        anchor.download='KidsCoding-流星分身雨.sb3'
+        document.body.appendChild(anchor)
+        anchor.click()
+        anchor.remove()
+        window.setTimeout(()=>URL.revokeObjectURL(url),5_000)
+        setExportDetails('Scratch VM 已导出并在独立 VM 重新载入验证：'+msg.program?.spawnCount+'颗 / 每步'+msg.program?.fallStep)
+        setStatus('作品已从真实 Scratch VM 导出为 .sb3，可以用兼容 Scratch 3 的编辑器打开。')
       } else if(msg.kind==='STARTED') {
         vmRunning.current=true
         setRunning(true)
@@ -91,6 +112,7 @@ export function ScratchVMTrial() {
         vmRunning.current=false
         knownCloneIds.current.clear()
         setRunning(false)
+        setExporting(false)
         setStatus(msg.error??'Scratch VM 执行失败')
       }
     }
@@ -115,7 +137,7 @@ export function ScratchVMTrial() {
           <p className="text-sm font-extrabold text-indigo-700">Scratch VM 实验室 · 官方运行引擎试用</p>
           <h1 className="mt-3 text-3xl font-black">流星分身雨</h1>
           <p className="mt-3 text-slate-600">拖动积木，改变生成数量和下落步长，写入真正的 Scratch VM 后观察流星分身运行。</p>
-          <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；不上传作品、不保存正式成绩、不开放其他 Scratch 课程。</p>
+          <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；可将作品下载为 .sb3，但不上传云端、不保存正式成绩、不开放其他 Scratch 课程。</p>
         </header>
         <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <section className="rounded-[2rem] bg-white p-5 shadow-sm">
@@ -132,13 +154,18 @@ export function ScratchVMTrial() {
               ))}
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||!draft}
+              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||exporting||!draft}
                 className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{if(draft){setApplied(null);frame.current?.contentWindow?.postMessage({kind:'CONFIGURE',id:id.current,program:draft},'*')}}}>应用积木到 VM</button>
-              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||exporting||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();seenClones.current.clear();setCreatedTotal(0);setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
                 ▶ 绿旗运行
+              </button>
+              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!applied||!draft||running||exporting||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+                className="rounded-full bg-amber-100 px-6 py-3 font-bold text-amber-950 disabled:opacity-40"
+                onClick={()=>{setExporting(true);setExportDetails('正在由真实 Scratch VM 打包，并重新载入检查……');frame.current?.contentWindow?.postMessage({kind:'EXPORT',id:id.current},'*')}}>
+                {exporting?'导出中…':'↓ 保存为 .sb3'}
               </button>
               <button data-testid="scratch-stop" type="button" disabled={!loaded}
                 className="rounded-full bg-rose-100 px-6 py-3 font-bold text-rose-800 disabled:opacity-40"
@@ -148,6 +175,7 @@ export function ScratchVMTrial() {
           <section className="rounded-[2rem] bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black">Scratch VM 实时观察</h2>
             <p role="status" data-testid="scratch-vm-status" className="mt-4 rounded-xl bg-indigo-50 p-4 text-sm leading-7">{status}</p>
+            <p data-testid="scratch-export-status" className="mt-5 text-sm text-indigo-700">{exportDetails}</p>
             <p className="mt-5 text-sm">已应用 VM 积木：<strong data-testid="scratch-applied-program">{applied?`${applied.spawnCount}颗 / 每步${applied.fallStep}`:'等待应用'}</strong></p>
             <p className="mt-2 text-sm">本轮 VM 实际创建分身总数：<strong data-testid="scratch-created-total">{createdTotal}</strong></p>
             <p className="mt-5 text-sm">正在运行：<strong>{running?'是':'否'}</strong></p>
