@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {ScratchMeteorBlocks,type MeteorProgram} from './scratch-meteor-blocks'
+import {readScratchDraft,saveScratchDraft,removeScratchDraft,isScratchArchive} from './scratch-local-draft'
 
 type Sprite = { id: string; name: string; x: number; y: number; visible: boolean; original: boolean }
-type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'PROJECT_EXPORTED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram; archive?:ArrayBuffer; imported?:boolean }
+type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram; archive?:ArrayBuffer; imported?:boolean; source?:'sample'|'file'|'saved' }
 
 export function ScratchVMTrial() {
   const frame = useRef<HTMLIFrameElement>(null)
@@ -17,6 +18,8 @@ export function ScratchVMTrial() {
   const [createdTotal, setCreatedTotal] = useState(0)
   const [exporting,setExporting] = useState(false)
   const [importing,setImporting] = useState(false)
+  const [saving,setSaving] = useState(false)
+  const [draftStatus,setDraftStatus] = useState('本机作品还未自动保存；修改积木后点击“应用”即可自动保存。')
   const [editorRevision,setEditorRevision] = useState(0)
   const [editorSeed,setEditorSeed] = useState<MeteorProgram>({spawnCount:10,fallStep:13})
   const [exportDetails,setExportDetails] = useState('尚未导出项目。')
@@ -33,17 +36,29 @@ export function ScratchVMTrial() {
   useEffect(() => {
     let destroyed=false
     let fetching=false
+    let loadingSaved=false
+    const loadOriginal = async () => {
+      const response=await fetch('/scratch-samples/meteor-clones.sb3',{cache:'no-store'})
+      if(!response.ok)throw new Error('没有找到示例 .sb3')
+      const archive=await response.arrayBuffer()
+      if(destroyed)return
+      id.current+=1
+      frame.current?.contentWindow?.postMessage({kind:'LOAD',id:id.current,archive,source:'sample'},'*',[archive])
+    }
     const start = async () => {
-      if (fetching || destroyed) return
+      if(fetching||destroyed)return
       fetching=true
-      try {
-        const response=await fetch('/scratch-samples/meteor-clones.sb3',{cache:'no-store'})
-        if(!response.ok)throw new Error('没有找到示例.sb3项目')
-        const archive=await response.arrayBuffer()
+      try{
+        let saved:ArrayBuffer|null=null
+        try{saved=await readScratchDraft()}catch{ /* Browsers can deny local IndexedDB; sample still loads. */ }
         if(destroyed)return
-        id.current+=1
-        frame.current?.contentWindow?.postMessage({kind:'LOAD',id:id.current,archive,imported:false},'*',[archive])
-      } catch(error) {
+        if(saved){
+          loadingSaved=true
+          setDraftStatus('正在从本机 IndexedDB 恢复以前保存的 Scratch .sb3……')
+          id.current+=1
+          frame.current?.contentWindow?.postMessage({kind:'LOAD',id:id.current,archive:saved,source:'saved'},'*',[saved])
+        }else await loadOriginal()
+      }catch(error){
         if(!destroyed)setStatus('项目加载失败：'+String(error))
       }
     }
@@ -59,6 +74,7 @@ export function ScratchVMTrial() {
       if(msg.kind==='PROJECT_LOADED') {
         setLoaded(true)
         setImporting(false)
+        loadingSaved=false
         setApplied(msg.program??null)
         if(msg.program){
           setEditorSeed(msg.program)
@@ -75,7 +91,13 @@ export function ScratchVMTrial() {
         setObservedMovement(false)
         setObservedDeletion(false)
         setRunning(false)
-        setStatus(msg.imported?'Scratch VM 已重新导入作品，积木参数已恢复，可继续编辑运行。':'真实 Scratch VM 已加载项目，点击绿旗开始运行。')
+        if(msg.source==='file'){
+          setSaving(true)
+          frame.current?.contentWindow?.postMessage({kind:'SAVE_DRAFT',id:id.current},'*')
+        }else if(msg.source==='saved'){
+          setDraftStatus('已恢复本机保存的真实 Scratch .sb3 作品，可继续编辑。')
+        }
+        setStatus(msg.source==='saved'?'已从本机草稿恢复 Scratch 项目。':msg.imported?'Scratch VM 已重新导入作品，积木参数已恢复，可继续编辑运行。':'真实 Scratch VM 已加载项目，点击绿旗开始运行。')
       } else if(msg.kind==='SNAPSHOT') {
         const current=msg.targets??[]
         setSprites(current)
@@ -98,7 +120,23 @@ export function ScratchVMTrial() {
         }
       } else if(msg.kind==='CONFIGURED') {
         setApplied(msg.program??null)
+        setSaving(true)
+        frame.current?.contentWindow?.postMessage({kind:'SAVE_DRAFT',id:id.current},'*')
         setStatus('参数已写入真实 Scratch VM，点击绿旗验证变化。')
+      } else if(msg.kind==='DRAFT_EXPORTED') {
+        if(!isScratchArchive(msg.archive)){
+          setSaving(false)
+          setDraftStatus('Scratch VM 返回的草稿无效，原本机草稿未改动。')
+        }else{
+          void saveScratchDraft(msg.archive).then(()=>{
+            if(!destroyed)setDraftStatus('已在本机自动保存真实 Scratch .sb3，关闭或刷新页面后仍可恢复。')
+          }).catch(error=>{
+            if(!destroyed)setDraftStatus('本机自动保存失败：'+String(error))
+          }).finally(()=>{if(!destroyed)setSaving(false)})
+        }
+      } else if(msg.kind==='DRAFT_SAVE_FAILED') {
+        setSaving(false)
+        setDraftStatus(msg.error??'Scratch VM 本机草稿打包失败。')
       } else if(msg.kind==='PROJECT_EXPORTED') {
         setExporting(false)
         const archive=msg.archive
@@ -133,7 +171,14 @@ export function ScratchVMTrial() {
         setRunning(false)
         setExporting(false)
         setImporting(false)
-        setStatus(msg.error??'Scratch VM 执行失败')
+        setSaving(false)
+        if(loadingSaved){
+          loadingSaved=false
+          setDraftStatus('本机旧草稿不兼容，正在恢复课程示例；原文件未自动上传。')
+          void loadOriginal().catch(error=>setStatus('恢复课程示例失败：'+String(error)))
+        }else{
+          setStatus(msg.error??'Scratch VM 执行失败')
+        }
       }
     }
     window.addEventListener('message',listener)
@@ -147,6 +192,22 @@ export function ScratchVMTrial() {
   }, [])
 
   const changeProgram = useCallback((value:MeteorProgram|null)=>setDraft(value),[])
+  async function resetOriginal() {
+    if(running||exporting||importing||saving)return
+    setImporting(true)
+    try {
+      await removeScratchDraft()
+      setDraftStatus('已清理这台设备保存的 Scratch 草稿。')
+      const response=await fetch('/scratch-samples/meteor-clones.sb3',{cache:'no-store'})
+      if(!response.ok)throw new Error('示例项目下载失败')
+      const archive=await response.arrayBuffer()
+      id.current+=1
+      frame.current?.contentWindow?.postMessage({kind:'LOAD',id:id.current,archive,source:'sample'},'*',[archive])
+    } catch(error) {
+      setImporting(false)
+      setStatus('恢复初始项目失败：'+String(error))
+    }
+  }
   async function importFile(file:File|null) {
     if(!file || importing || running || exporting || !frame.current?.contentWindow) return
     if(!file.name.toLowerCase().endsWith('.sb3') || file.size<300 || file.size>5_000_000){
@@ -163,7 +224,7 @@ export function ScratchVMTrial() {
       setImporting(true)
       setStatus('正在使用真实 Scratch VM 检查并载入作品……')
       id.current+=1
-      frame.current.contentWindow.postMessage({kind:'LOAD',id:id.current,archive,imported:true},'*',[archive])
+      frame.current.contentWindow.postMessage({kind:'LOAD',id:id.current,archive,imported:true,source:'file'},'*',[archive])
     }catch(error){
       setImporting(false)
       setStatus('读取文件失败：'+String(error))
@@ -179,7 +240,7 @@ export function ScratchVMTrial() {
           <p className="text-sm font-extrabold text-indigo-700">Scratch VM 实验室 · 官方运行引擎试用</p>
           <h1 className="mt-3 text-3xl font-black">流星分身雨</h1>
           <p className="mt-3 text-slate-600">拖动积木，改变生成数量和下落步长，写入真正的 Scratch VM 后观察流星分身运行。</p>
-          <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；可以下载并重新导入本课程 .sb3 继续编辑，但不上传云端、不保存正式成绩、不开放其他 Scratch 课程。</p>
+          <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；可下载或重新导入 .sb3；应用积木后本机自动保存真正的 .sb3，但不上传云端、不保存正式成绩、不开放其他 Scratch 课程。</p>
         </header>
         <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <section className="rounded-[2rem] bg-white p-5 shadow-sm">
@@ -196,24 +257,27 @@ export function ScratchVMTrial() {
               ))}
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||exporting||importing||!draft}
+              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||exporting||importing||saving||!draft}
                 className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{if(draft){setApplied(null);frame.current?.contentWindow?.postMessage({kind:'CONFIGURE',id:id.current,program:draft},'*')}}}>应用积木到 VM</button>
-              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();seenClones.current.clear();setCreatedTotal(0);setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
                 ▶ 绿旗运行
               </button>
-              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
                 className="rounded-full bg-amber-100 px-6 py-3 font-bold text-amber-950 disabled:opacity-40"
                 onClick={()=>{setExporting(true);setExportDetails('正在由真实 Scratch VM 打包，并重新载入检查……');frame.current?.contentWindow?.postMessage({kind:'EXPORT',id:id.current},'*')}}>
                 {exporting?'导出中…':'↓ 保存为 .sb3'}
               </button>
               <label className="cursor-pointer rounded-full bg-sky-100 px-6 py-3 font-bold text-sky-900">
                 ↑ 重新导入 .sb3
-                <input data-testid="scratch-import-sb3" type="file" accept=".sb3" disabled={!loaded||running||exporting||importing}
+                <input data-testid="scratch-import-sb3" type="file" accept=".sb3" disabled={!loaded||running||exporting||importing||saving}
                   className="sr-only" onChange={event=>{const file=event.target.files?.[0]??null;event.target.value='';void importFile(file)}}/>
               </label>
+              <button data-testid="scratch-reset-draft" type="button" disabled={!loaded||running||exporting||importing||saving}
+                className="rounded-full bg-slate-100 px-6 py-3 font-bold text-slate-800 disabled:opacity-40"
+                onClick={()=>void resetOriginal()}>恢复课程初始程序</button>
               <button data-testid="scratch-stop" type="button" disabled={!loaded}
                 className="rounded-full bg-rose-100 px-6 py-3 font-bold text-rose-800 disabled:opacity-40"
                 onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*')}}>■ 停止</button>
@@ -223,6 +287,7 @@ export function ScratchVMTrial() {
             <h2 className="text-xl font-black">Scratch VM 实时观察</h2>
             <p role="status" data-testid="scratch-vm-status" className="mt-4 rounded-xl bg-indigo-50 p-4 text-sm leading-7">{status}</p>
             <p data-testid="scratch-export-status" className="mt-5 text-sm text-indigo-700">{exportDetails}</p>
+            <p data-testid="scratch-local-save-status" className="mt-3 text-sm text-emerald-800">{draftStatus}</p>
             <p className="mt-5 text-sm">已应用 VM 积木：<strong data-testid="scratch-applied-program">{applied?`${applied.spawnCount}颗 / 每步${applied.fallStep}`:'等待应用'}</strong></p>
             <p className="mt-2 text-sm">本轮 VM 实际创建分身总数：<strong data-testid="scratch-created-total">{createdTotal}</strong></p>
             <p className="mt-5 text-sm">正在运行：<strong>{running?'是':'否'}</strong></p>
