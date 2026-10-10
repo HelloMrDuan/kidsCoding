@@ -38,9 +38,9 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
         </section>
         {lesson.id === 'G3-U1-L02' ? (
           <section className="rounded-[2rem] border-2 border-indigo-200 bg-white p-6 shadow-sm">
-            <p className="text-xs font-bold text-indigo-700">Scratch VM 真实执行 · 只读实验入口</p>
+            <p className="text-xs font-bold text-indigo-700">Scratch VM 真实执行 · 受限积木编辑</p>
             <h2 className="mt-2 text-xl font-black">运行原创流星分身 Scratch 项目</h2>
-            <p className="mt-2 text-sm leading-7 text-slate-600">加载真正的 .sb3 文件，点击绿旗，在舞台上观察 Scratch VM 计算出的分身坐标变化。当前仍是实验关卡，不保存正式成绩。</p>
+            <p className="mt-2 text-sm leading-7 text-slate-600">加载真正的 .sb3 文件，通过课程专用 Blockly 编辑生成数量和下落步长，再让 Scratch VM 真正运行。此实验仍不保存正式成绩。</p>
             <Link data-testid="scratch-trial-entry" href="/learn/scratch-lab/G3-U1-L02" className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">体验 Scratch VM →</Link>
           </section>
         ) : null}
