@@ -110,6 +110,17 @@
       return;
     }
 
+    if (data.kind === 'SAVE_DRAFT' && data.id === currentId && vm && ready) {
+      try {
+        const blob=await vm.saveProjectSb3();
+        if(!(blob instanceof Blob)||blob.size<300||blob.size>5_000_000)throw new Error('Scratch 文件大小异常');
+        const archive=await blob.arrayBuffer();
+        window.parent.postMessage({kind:'DRAFT_EXPORTED',id:currentId,archive},'*',[archive]);
+      }catch(error){
+        send('DRAFT_SAVE_FAILED',{error:'本机草稿打包失败：'+String(error).slice(0,350)});
+      }
+      return;
+    }
     if (data.kind === 'EXPORT' && data.id === currentId && vm && ready) {
       let checker = null;
       try {
