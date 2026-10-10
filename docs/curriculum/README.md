@@ -63,3 +63,12 @@
 ## 72个单元毕业项目蓝图
 
 新增 `apps/web/src/content/curriculum/unit-capstone-blueprints-v1.json`，涵盖每单元5阶段作品制作、逐项证据、100分评价、分层任务、素材需求以及领域特定执行与安全约束。**此资产仍是设计蓝图，不是72个已经编写完成的可玩项目。**
+
+## 应用接入状态（第二批）
+
+- 前台：`/learn/catalog` 可查看18条路径、按方向选择72个单元、了解432课的简介；`/learn/catalog/[lessonId]` 展示学习目标、项目作品和验收证据。未完成执行引擎的课只可预览，**不会路由到假的编程课**。
+- 公开 API：`GET /api/curriculum/catalog` 获取目录统计与路径；`?trackId=G0` 获取路径与单元；`?lessonId=G0-U1-L01` 获取单课安全元数据，404 用于未知路径与课程。**不返回教师内部详细教案。**
+- 后台：`/admin/catalog` 和 `/admin/catalog/[lessonId]` 复用现有管理员认证策略；可逐课审阅24节新增详细教案和12节原启蒙教案，同时查看其他课程的纲要。**只读，不写入在线出版表、无批量发布操作。**
+- 新增图形化启蒙 `track-g0-detailed-lessons-v1.json` 共24份原创详细教案（独立故事、五步引导、典型失败、三层提示、评价条件、所需引擎能力），全部标记尚不可玩。
+- 测试：`apps/web/src/features/curriculum/full-catalog-access.test.ts` 校验 432/24/12/72 数量、ID一致性、评价权重、发布边界和公开元数据。
+- 现有 `launch-lessons.ts`、线上编辑/发布和学习进度保持不变；后续逐课升级需要真实 Block/Scratch/Python 引擎实现和独立测试。
