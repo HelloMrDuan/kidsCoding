@@ -71,12 +71,18 @@ export function PlayableStage({
     characterPosition,
     characterMessage,
     stageScene,
+    partnerPosition,
+    partnerMessage,
+    activeActor,
+    actionLog,
     run,
     reset,
     clickCharacter,
-  } = useBlockExecutor(blocks, requiredBlocks, stepIndex)
+  } = useBlockExecutor(blocks, requiredBlocks, stepIndex,template?.id==='forest-graduation-show')
 
   const { mainLabel, secondLabel, sceneCopy } = getTemplateCharacterLabels(template)
+  const duoLesson=template?.id==='forest-graduation-show'
+  const giftCollected=duoLesson&&characterPosition>=100&&partnerPosition>=200
   const clickLesson=requiredBlocks[0]==='when_clicked'
   const [prediction,setPrediction]=useState<'automatic'|'needs-click'|null>(null)
   const visualScene=stageScene==='meadow'?'草地':template?.starterScene==='garden'?'花园':'森林'
@@ -115,6 +121,12 @@ export function PlayableStage({
               {prediction==='needs-click'?'你预测对了：点击事件发生后，积木才开始执行。':'观察到了吗？只有点击蝴蝶后程序才执行，再想想“被点击时”的意义。'}
             </p>
           ) : null}
+        </div>
+      ) : null}
+      {duoLesson ? (
+        <div className="mb-5 rounded-2xl bg-indigo-50 p-4 text-sm text-indigo-950">
+          <p className="font-black">双角色任务：先控制第一位朋友，再用“切换到另一位朋友”让第二位执行后续积木。</p>
+          <p className="mt-2">观察两位朋友的坐标分别变化，而不是两个角色一起跟着走。</p>
         </div>
       ) : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -181,18 +193,35 @@ export function PlayableStage({
               </button>
 
               {secondLabel ? (
-                <div className="flex flex-col items-center gap-2 transition-opacity duration-300 opacity-70">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400 text-xs font-black text-white shadow-[0_16px_30px_rgba(52,211,153,0.22)]">
+                <div className="relative flex flex-col items-center gap-2 transition-transform duration-500"
+                  style={{transform: `translateX(${partnerPosition}px)`}}
+                  data-testid="stage-character-partner">
+                  <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400 text-xs font-black text-white shadow-[0_16px_30px_rgba(52,211,153,0.22)]">
                     {secondLabel}
+                    {partnerMessage && (
+                      <div data-testid="stage-partner-speech" className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-2xl bg-white px-3 py-2 text-xs font-bold text-slate-800 shadow-lg">{partnerMessage}</div>
+                    )}
                   </div>
                   <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] font-bold text-emerald-700">
-                    舞台伙伴
+                    {duoLesson?(activeActor==='partner'?'正在编程的角色':'等待加入'):'舞台伙伴'}
                   </span>
                 </div>
               ) : null}
             </div>
 
+            {duoLesson ? (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <span data-testid="stage-main-distance" className="rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-700">第一位：{characterPosition} 步</span>
+                <span data-testid="stage-partner-distance" className="rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-700">第二位：{partnerPosition} 步</span>
+                <span data-testid="stage-gift-status" className="rounded-xl bg-amber-100 px-3 py-2 text-sm font-bold text-amber-900">{giftCollected?'🎁 已找到毕业礼物':'🎁 礼物等待伙伴一起完成旅程'}</span>
+              </div>
+            ):null}
             <div className="mt-5 h-6 rounded-full bg-[linear-gradient(90deg,#ffdd94_0%,#ffeec1_100%)] opacity-80" />
+            {duoLesson&&actionLog.length>0 ? (
+              <ol data-testid="stage-duo-actions" className="mt-3 list-inside list-decimal rounded-2xl bg-white/85 p-3 text-xs text-slate-700">
+                {actionLog.map((item,index)=><li key={index}>{item}</li>)}
+              </ol>
+            ):null}
 
             {clickLesson && executionState==='armed' ? (
               <div data-testid="garden-await-click" className="mt-4 rounded-2xl bg-indigo-100 p-3 text-sm font-bold text-indigo-900">

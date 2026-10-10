@@ -155,7 +155,7 @@ export default function LessonPage() {
   }
 
   async function handleNext() {
-    const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id)
+    const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story','lesson-10-second-friend','lesson-11-duo-rehearsal','lesson-12-graduation-show'].includes(currentLesson.id)
     const correct=evaluateStep(step.requiredBlockTypes,blocksRef.current) && (!needsRun || blocksRef.current.length===step.requiredBlockTypes.length)
     if (!correct || (needsRun && !hasRunSuccess)) {
       const nextFailedAttempts = failedAttempts + 1
@@ -167,7 +167,7 @@ export default function LessonPage() {
       setFailedAttempts(nextFailedAttempts)
       setFeedback(
         needsRun && correct && !hasRunSuccess
-          ? (currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一步。')
+          ? (currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : currentLesson.id.includes('duo-')||currentLesson.id.includes('second-friend')||currentLesson.id.includes('graduation-show') ? '积木拼好了，还要运行，观察两位朋友各自的动作后才能完成。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一步。')
           : nextHintState.activeHint?.copy ?? getFoundationLessonFeedback(currentLesson.id, 'retry'),
       )
       return
@@ -289,7 +289,7 @@ export default function LessonPage() {
             />
           ) : (
             <div className="space-y-6">
-              {['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
+              {['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story','lesson-10-second-friend','lesson-11-duo-rehearsal','lesson-12-graduation-show'].includes(currentLesson.id) ? (
                 <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
                   requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex}
                   onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
