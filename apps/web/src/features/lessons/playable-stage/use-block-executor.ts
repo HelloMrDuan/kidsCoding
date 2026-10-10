@@ -6,6 +6,7 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
   const [executionState, setExecutionState] = useState<ExecutionState>('idle')
   const [characterPosition, setCharacterPosition] = useState(0)
   const [characterMessage, setCharacterMessage] = useState<string | null>(null)
+  const [stageScene,setStageScene] = useState<'forest'|'meadow'>('forest')
   const runIdRef = useRef(0)
 
   const reset = useCallback(() => {
@@ -13,6 +14,7 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
     setExecutionState('idle')
     setCharacterPosition(0)
     setCharacterMessage(null)
+    setStageScene('forest')
   }, [])
 
   const run = useCallback(async () => {
@@ -44,8 +46,16 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
         // Just standard delay
       } else if (block.type === 'move_right') {
         setCharacterPosition(prev => prev + 100)
+      } else if (block.type === 'switch_scene') {
+        setStageScene('meadow')
+      } else if (block.type === 'repeat_twice') {
+        if (!blocks.slice(0,i).some(item=>item.type==='move_right')) {
+          setExecutionState('error')
+          return
+        }
+        setCharacterPosition(prev=>prev+100)
       } else if (block.type === 'say_line') {
-        setCharacterMessage('你好！')
+        setCharacterMessage(blocks.slice(0,i).some(item=>item.type==='switch_scene') ? '我到草地啦！' : '你好！')
       } else {
         // Unsupported block type
         setExecutionState('error')
@@ -72,6 +82,7 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
     setExecutionState('idle')
     setCharacterMessage(null)
     setCharacterPosition(0)
+    setStageScene('forest')
 
     // Increment run ID but do it via state since we can't mutate ref during render.
     // Actually, we don't strictly need to increment runIdRef here during render.
@@ -96,6 +107,7 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
     executionState,
     characterPosition,
     characterMessage,
+    stageScene,
     run,
     reset
   }

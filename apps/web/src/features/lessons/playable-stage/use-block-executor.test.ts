@@ -87,6 +87,24 @@ describe('useBlockExecutor', () => {
     expect(result.current.characterMessage).toBe('你好！')
   })
 
+  it('runs real meadow transition, repeat move and travel speech',async()=>{
+    const sequence=['when_start','move_right','switch_scene','repeat_twice','say_line']
+    const blocks=sequence.map(type=>({type}))
+    const {result}=renderHook(()=>useBlockExecutor(blocks,sequence))
+    await act(async()=>{await result.current.run()})
+    expect(result.current.executionState).toBe('success')
+    expect(result.current.characterPosition).toBe(200)
+    expect(result.current.stageScene).toBe('meadow')
+    expect(result.current.characterMessage).toBe('我到草地啦！')
+  })
+
+  it('refuses to repeat a movement that does not exist',async()=>{
+    const sequence=['when_start','repeat_twice']
+    const {result}=renderHook(()=>useBlockExecutor(sequence.map(type=>({type})),sequence))
+    await act(async()=>{await result.current.run()})
+    expect(result.current.executionState).toBe('error')
+  })
+
   it('cancels pending updates on unmount', async () => {
     const { result, unmount } = renderHook(() =>
       useBlockExecutor([{ type: 'when_start' }], ['when_start']),

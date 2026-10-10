@@ -70,6 +70,7 @@ export function PlayableStage({
     executionState,
     characterPosition,
     characterMessage,
+    stageScene,
     run,
     reset,
   } = useBlockExecutor(blocks, requiredBlocks, stepIndex)
@@ -133,9 +134,10 @@ export function PlayableStage({
           <span className="rounded-full bg-white/80 px-3 py-1 text-[11px] font-bold tracking-[0.2em] text-slate-500">
             {sceneCopy.badge}
           </span>
+          <span data-testid="stage-current-scene" className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-900">当前实际场景：{stageScene==='meadow'?'草地':'森林'}</span>
         </div>
 
-        <div className="mt-6 rounded-[1.75rem] bg-[linear-gradient(180deg,#84d2ff_0%,#daf4ff_58%,#f8f2e7_100%)] px-5 pb-6 pt-8 shadow-[0_20px_36px_rgba(125,211,252,0.18)]">
+        <div className={`mt-6 rounded-[1.75rem] px-5 pb-6 pt-8 shadow-[0_20px_36px_rgba(125,211,252,0.18)] ${stageScene === "meadow" ? "bg-[linear-gradient(180deg,#8ed6ae_0%,#d5f5b4_60%,#fff4bc_100%)]" : "bg-[linear-gradient(180deg,#84d2ff_0%,#daf4ff_58%,#f8f2e7_100%)]"}`}>
           <div className="relative overflow-hidden rounded-[1.5rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_100%)] px-4 pb-8 pt-6 min-h-[200px]">
             <div className="absolute left-1/2 top-0 h-24 w-24 -translate-x-1/2 rounded-full bg-white/35 blur-2xl" />
 

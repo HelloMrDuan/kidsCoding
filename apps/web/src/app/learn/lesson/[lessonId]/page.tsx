@@ -155,7 +155,7 @@ export default function LessonPage() {
   }
 
   async function handleNext() {
-    const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story'].includes(currentLesson.id)
+    const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story'].includes(currentLesson.id)
     const correct=evaluateStep(step.requiredBlockTypes,blocksRef.current) && (!needsRun || blocksRef.current.length===step.requiredBlockTypes.length)
     if (!correct || (needsRun && !hasRunSuccess)) {
       const nextFailedAttempts = failedAttempts + 1
@@ -289,7 +289,7 @@ export default function LessonPage() {
             />
           ) : (
             <div className="space-y-6">
-              {['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story'].includes(currentLesson.id) ? (
+              {['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story'].includes(currentLesson.id) ? (
                 <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
                   requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex}
                   onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
