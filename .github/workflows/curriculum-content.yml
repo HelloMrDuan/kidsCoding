@@ -3,6 +3,8 @@ name: KidsCoding curriculum content checks
 on:
   pull_request:
     paths:
+      - 'docs/roadmap/**'
+      - 'README.md'
       - 'apps/web/src/content/curriculum/**'
       - 'apps/web/src/features/curriculum/**'
       - 'apps/web/src/content/curriculum/track-g3-detailed-lessons-v2.json'

@@ -17,3 +17,12 @@ Current MVP scope:
 
 License:
 - Apache-2.0 in `LICENSE`
+
+
+## 产品开发主线（先读）
+
+- [产品总纲：开发唯一入口](docs/roadmap/README.md)
+- [当前真实仓库盘点](docs/roadmap/01-REPO-BASELINE.md)
+- [分阶段开发、逐批验收计划](docs/roadmap/02-PHASED-DELIVERY.md)
+
+全量课程目录不等于可运行/已发布课程。后续开发按阶段计划执行，PR 记录测试与合并证据。
