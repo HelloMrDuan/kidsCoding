@@ -29,7 +29,7 @@ test('loads a real .sb3 using Scratch VM, executes clones and moves them, then s
 
 test('Scratch engine is only exposed as a controlled trial, no published learner grade', async ({ page }) => {
   await page.goto('/learn/scratch-lab/G3-U1-L02')
-  await expect(page.getByText('不保存正式成绩')).toBeVisible()
+  await expect(page.getByText('不保存正式成绩').first()).toBeVisible()
   await expect(page.getByTestId('scratch-vm-status')).toContainText('已加载项目',{timeout:60_000})
   await expect(page.getByTestId('scratch-green-flag')).toBeEnabled()
   await expect(page.getByRole('heading',{name:'流星分身雨'})).toBeVisible()
@@ -155,4 +155,51 @@ test('Scratch VM genuine sb3 is auto-saved in IndexedDB and restored after brows
   await page.reload()
   await expect(page.getByTestId('scratch-green-flag')).toBeEnabled({timeout:60_000})
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('10颗 / 每步13')
+})
+
+test('account cloud buttons save an actual Scratch VM sb3 and restore it in a fresh browser context',async({page,browser})=>{
+  test.setTimeout(180_000)
+  let stored=''
+  await page.route('**/api/practice/scratch',async route=>{
+    if(route.request().method()==='PUT'){
+      const payload=route.request().postDataJSON()
+      expect(payload.lessonId).toBe('G3-U1-L02')
+      stored=payload.archiveBase64
+      expect(stored.length).toBeGreaterThan(400)
+      await route.fulfill({status:200,json:{synced:true,verifiedGrade:false}})
+      return
+    }
+    await route.fulfill({status:200,json:{draft:null}})
+  })
+  await page.goto('/learn/scratch-lab/G3-U1-L02')
+  await expect(page.getByTestId('scratch-green-flag')).toBeEnabled({timeout:60_000})
+  await page.getByTestId('scratch-edit-spawn-count').fill('3')
+  await page.getByTestId('scratch-edit-fall-step').fill('21')
+  await page.getByTestId('scratch-apply-blocks').click()
+  await expect(page.getByTestId('scratch-local-save-status')).toContainText('已在本机自动保存',{timeout:40_000})
+  await page.getByTestId('scratch-cloud-save').click()
+  await expect(page.getByTestId('scratch-cloud-status')).toContainText('已保存到当前登录账号',{timeout:30_000})
+
+  // New isolated browser context deliberately has no IndexedDB draft.
+  // Only the HTTP transport is stubbed; both project loads use the real VM.
+  const separateDevice=await browser.newContext()
+  try{
+    await separateDevice.route('**/api/practice/scratch',route=>route.fulfill({status:200,json:{
+      draft:{lessonId:'G3-U1-L02',archiveBase64:stored,updatedAt:'2026-10-10T16:00:00Z'},
+    }}))
+    const other=await separateDevice.newPage()
+    await other.goto('/learn/scratch-lab/G3-U1-L02')
+    await expect(other.getByTestId('scratch-green-flag')).toBeEnabled({timeout:60_000})
+    await expect(other.getByTestId('scratch-edit-spawn-count')).toHaveValue('10')
+    await other.getByTestId('scratch-cloud-restore').click()
+    await expect(other.getByTestId('scratch-vm-status')).toContainText('已从当前登录账号恢复',{timeout:50_000})
+    await expect(other.getByTestId('scratch-applied-program')).toHaveText('3颗 / 每步21')
+    await expect(other.getByTestId('scratch-edit-spawn-count')).toHaveValue('3')
+    await other.getByTestId('scratch-green-flag').click()
+    await expect(other.getByTestId('scratch-created-total')).toHaveText('3',{timeout:18_000})
+    await other.getByTestId('scratch-stop').click()
+    await expect(other.getByTestId('scratch-live-clones')).toHaveText('0')
+  }finally{
+    await separateDevice.close()
+  }
 })

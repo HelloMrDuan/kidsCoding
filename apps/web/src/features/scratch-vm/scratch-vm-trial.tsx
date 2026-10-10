@@ -3,10 +3,11 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {ScratchMeteorBlocks,type MeteorProgram} from './scratch-meteor-blocks'
-import {readScratchDraft,saveScratchDraft,removeScratchDraft,isScratchArchive} from './scratch-local-draft'
+import {readScratchDraft,saveScratchDraft,removeScratchDraft,isScratchArchive,SCRATCH_DRAFT_LESSON_ID} from './scratch-local-draft'
+import {encodeScratchDraft,parseScratchCloudResponse} from './scratch-cloud-draft'
 
 type Sprite = { id: string; name: string; x: number; y: number; visible: boolean; original: boolean }
-type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram; archive?:ArrayBuffer; imported?:boolean; source?:'sample'|'file'|'saved' }
+type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram; archive?:ArrayBuffer; imported?:boolean; source?:'sample'|'file'|'saved'|'cloud' }
 
 export function ScratchVMTrial() {
   const frame = useRef<HTMLIFrameElement>(null)
@@ -19,6 +20,8 @@ export function ScratchVMTrial() {
   const [exporting,setExporting] = useState(false)
   const [importing,setImporting] = useState(false)
   const [saving,setSaving] = useState(false)
+  const [cloudBusy,setCloudBusy] = useState(false)
+  const [cloudStatus,setCloudStatus] = useState('云端保存需要登录。仅在你手动点击时读写自己的账号，不保存正式成绩。')
   const [draftStatus,setDraftStatus] = useState('本机作品还未自动保存；修改积木后点击“应用”即可自动保存。')
   const [editorRevision,setEditorRevision] = useState(0)
   const [editorSeed,setEditorSeed] = useState<MeteorProgram>({spawnCount:10,fallStep:13})
@@ -91,13 +94,13 @@ export function ScratchVMTrial() {
         setObservedMovement(false)
         setObservedDeletion(false)
         setRunning(false)
-        if(msg.source==='file'){
+        if(msg.source==='file'||msg.source==='cloud'){
           setSaving(true)
           frame.current?.contentWindow?.postMessage({kind:'SAVE_DRAFT',id:id.current},'*')
         }else if(msg.source==='saved'){
           setDraftStatus('已恢复本机保存的真实 Scratch .sb3 作品，可继续编辑。')
         }
-        setStatus(msg.source==='saved'?'已从本机草稿恢复 Scratch 项目。':msg.imported?'Scratch VM 已重新导入作品，积木参数已恢复，可继续编辑运行。':'真实 Scratch VM 已加载项目，点击绿旗开始运行。')
+        setStatus(msg.source==='cloud'?'已从当前登录账号恢复 Scratch 项目，可继续编辑。':msg.source==='saved'?'已从本机草稿恢复 Scratch 项目。':msg.imported?'Scratch VM 已重新导入作品，积木参数已恢复，可继续编辑运行。':'真实 Scratch VM 已加载项目，点击绿旗开始运行。')
       } else if(msg.kind==='SNAPSHOT') {
         const current=msg.targets??[]
         setSprites(current)
@@ -192,8 +195,49 @@ export function ScratchVMTrial() {
   }, [])
 
   const changeProgram = useCallback((value:MeteorProgram|null)=>setDraft(value),[])
+  async function saveToCloud() {
+    if(cloudBusy||saving||running||exporting||importing||!draft||!applied||
+      applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep)return
+    setCloudBusy(true)
+    setCloudStatus('正在把当前 Scratch .sb3 保存到登录账号……')
+    try {
+      const local=await readScratchDraft()
+      const archiveBase64=local?encodeScratchDraft(local):null
+      if(!archiveBase64)throw new Error('本机尚无有效项目，请先应用积木')
+      const response=await fetch('/api/practice/scratch',{
+        method:'PUT',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({lessonId:SCRATCH_DRAFT_LESSON_ID,archiveBase64}),
+      })
+      if(response.status===401)throw new Error('请先登录账号，再保存云端作品')
+      if(!response.ok)throw new Error('云端保存失败（HTTP '+response.status+'），本机作品仍然保留')
+      setCloudStatus('作品已保存到当前登录账号；可在其他设备登录后点“恢复云端作品”。')
+    }catch(error){setCloudStatus(String(error))}
+    finally{setCloudBusy(false)}
+  }
+  async function restoreFromCloud() {
+    if(cloudBusy||saving||running||exporting||importing||!frame.current?.contentWindow)return
+    setCloudBusy(true)
+    setCloudStatus('正在读取当前账号的 Scratch 云端作品……')
+    try {
+      const response=await fetch('/api/practice/scratch',{cache:'no-store'})
+      if(response.status===401)throw new Error('请先登录账号再恢复云端作品')
+      if(!response.ok)throw new Error('云端读取失败（HTTP '+response.status+'）')
+      const payload:unknown=await response.json()
+      if(!payload||typeof payload!=='object'||!('draft' in payload)||!payload.draft) {
+        setCloudStatus('当前账号还没有保存 Scratch 云端作品。')
+        return
+      }
+      const archive=parseScratchCloudResponse((payload as {draft:unknown}).draft)
+      if(!archive)throw new Error('云端项目数据格式无效，原作品不变')
+      setImporting(true)
+      id.current+=1
+      frame.current.contentWindow.postMessage({kind:'LOAD',id:id.current,archive,source:'cloud'},'*',[archive])
+      setCloudStatus('已获取账号私有项目，正在交由真实 Scratch VM 校验……')
+    }catch(error){setCloudStatus(String(error))}
+    finally{setCloudBusy(false)}
+  }
   async function resetOriginal() {
-    if(running||exporting||importing||saving)return
+    if(running||exporting||importing||saving||cloudBusy)return
     setImporting(true)
     try {
       await removeScratchDraft()
@@ -209,7 +253,7 @@ export function ScratchVMTrial() {
     }
   }
   async function importFile(file:File|null) {
-    if(!file || importing || running || exporting || !frame.current?.contentWindow) return
+    if(!file || importing || running || exporting || cloudBusy || !frame.current?.contentWindow) return
     if(!file.name.toLowerCase().endsWith('.sb3') || file.size<300 || file.size>5_000_000){
       setStatus('仅支持小于 5 MB 的本课程 .sb3 文件，原作品没有改变。')
       return
@@ -240,7 +284,7 @@ export function ScratchVMTrial() {
           <p className="text-sm font-extrabold text-indigo-700">Scratch VM 实验室 · 官方运行引擎试用</p>
           <h1 className="mt-3 text-3xl font-black">流星分身雨</h1>
           <p className="mt-3 text-slate-600">拖动积木，改变生成数量和下落步长，写入真正的 Scratch VM 后观察流星分身运行。</p>
-          <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；可下载或重新导入 .sb3；应用积木后本机自动保存真正的 .sb3，但不上传云端、不保存正式成绩、不开放其他 Scratch 课程。</p>
+          <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；可下载或重新导入 .sb3；应用积木后本机自动保存真正的 .sb3，云端保存需登录后主动点击，不保存正式成绩、不开放其他 Scratch 课程。</p>
         </header>
         <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <section className="rounded-[2rem] bg-white p-5 shadow-sm">
@@ -257,25 +301,34 @@ export function ScratchVMTrial() {
               ))}
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||exporting||importing||saving||!draft}
+              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||exporting||importing||saving||cloudBusy||!draft}
                 className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{if(draft){setApplied(null);frame.current?.contentWindow?.postMessage({kind:'CONFIGURE',id:id.current,program:draft},'*')}}}>应用积木到 VM</button>
-              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||cloudBusy||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();seenClones.current.clear();setCreatedTotal(0);setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
                 ▶ 绿旗运行
               </button>
-              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||cloudBusy||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
                 className="rounded-full bg-amber-100 px-6 py-3 font-bold text-amber-950 disabled:opacity-40"
                 onClick={()=>{setExporting(true);setExportDetails('正在由真实 Scratch VM 打包，并重新载入检查……');frame.current?.contentWindow?.postMessage({kind:'EXPORT',id:id.current},'*')}}>
                 {exporting?'导出中…':'↓ 保存为 .sb3'}
               </button>
               <label className="cursor-pointer rounded-full bg-sky-100 px-6 py-3 font-bold text-sky-900">
                 ↑ 重新导入 .sb3
-                <input data-testid="scratch-import-sb3" type="file" accept=".sb3" disabled={!loaded||running||exporting||importing||saving}
+                <input data-testid="scratch-import-sb3" type="file" accept=".sb3" disabled={!loaded||running||exporting||importing||saving||cloudBusy}
                   className="sr-only" onChange={event=>{const file=event.target.files?.[0]??null;event.target.value='';void importFile(file)}}/>
               </label>
-              <button data-testid="scratch-reset-draft" type="button" disabled={!loaded||running||exporting||importing||saving}
+              <button data-testid="scratch-cloud-save" type="button"
+                disabled={!loaded||!applied||!draft||saving||running||importing||exporting||cloudBusy||
+                  applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+                className="rounded-full bg-violet-700 px-6 py-3 font-bold text-white disabled:opacity-40"
+                onClick={()=>void saveToCloud()}>保存到我的账号</button>
+              <button data-testid="scratch-cloud-restore" type="button"
+                disabled={!loaded||saving||running||importing||exporting||cloudBusy}
+                className="rounded-full bg-violet-100 px-6 py-3 font-bold text-violet-900 disabled:opacity-40"
+                onClick={()=>void restoreFromCloud()}>恢复云端作品</button>
+              <button data-testid="scratch-reset-draft" type="button" disabled={!loaded||running||exporting||importing||saving||cloudBusy}
                 className="rounded-full bg-slate-100 px-6 py-3 font-bold text-slate-800 disabled:opacity-40"
                 onClick={()=>void resetOriginal()}>恢复课程初始程序</button>
               <button data-testid="scratch-stop" type="button" disabled={!loaded}
@@ -288,6 +341,7 @@ export function ScratchVMTrial() {
             <p role="status" data-testid="scratch-vm-status" className="mt-4 rounded-xl bg-indigo-50 p-4 text-sm leading-7">{status}</p>
             <p data-testid="scratch-export-status" className="mt-5 text-sm text-indigo-700">{exportDetails}</p>
             <p data-testid="scratch-local-save-status" className="mt-3 text-sm text-emerald-800">{draftStatus}</p>
+            <p data-testid="scratch-cloud-status" className="mt-3 text-sm text-violet-800">{cloudStatus}</p>
             <p className="mt-5 text-sm">已应用 VM 积木：<strong data-testid="scratch-applied-program">{applied?`${applied.spawnCount}颗 / 每步${applied.fallStep}`:'等待应用'}</strong></p>
             <p className="mt-2 text-sm">本轮 VM 实际创建分身总数：<strong data-testid="scratch-created-total">{createdTotal}</strong></p>
             <p className="mt-5 text-sm">正在运行：<strong>{running?'是':'否'}</strong></p>
