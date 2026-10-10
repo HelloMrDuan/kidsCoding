@@ -17,7 +17,7 @@
 - **内容**：按编程猫公开 6E 情境/探究/创造/迁移/评估、核桃编程公开的多次动手和学习报告、西瓜创客公开 PBL/创作螺旋等方法建立自己的教学流程。每课要有新知识、运行、试错、分层提示、自主改造、作品、反思，真实课程不同于静态教案。
 - **页面**：学习地图、课堂分屏、角色/舞台、积木编辑、Scratch/Python 工作台、作品、家长、后台与首页都要以国内成熟少儿编程产品的视觉完成度、信息密度、儿童可操作性为标杆。**页面既要吸引孩子，又要能真正完成学习任务。**
 - **证据**：每个教学/页面 PR 必须有可核实竞品来源、采用/舍弃理由，视觉改造须有 Before/After、1440×900/768×1024/375×812 三断点截图、实际交互回归及原创素材授权记录。
-- **执行文件**：[03 内容和页面对标矩阵](./03-COMPETITOR-CONTENT-UI-BENCHMARK.md)、[04 页面 UI/UX 设计与验收规范](./04-UI-EXPERIENCE-BLUEPRINT.md)，它们是正式开发约束，不是可选参考。**更细的可执行实施文件**： [05 对标界面参考图谱](./05-CN-PRODUCT-REFERENCE-ATLAS.md)、[06 逐页面规格与布局数值](./06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md)、[07 逐 PR 开发任务与严格验收](./07-PR-BY-PR-IMPLEMENTATION-BACKLOG.md)、[08 全课程质量合同](./08-CURRICULUM-QUALITY-AND-432-ROADMAP.md)。
+- **执行文件**：[03 内容和页面对标矩阵](./03-COMPETITOR-CONTENT-UI-BENCHMARK.md)、[04 页面 UI/UX 设计与验收规范](./04-UI-EXPERIENCE-BLUEPRINT.md)，它们是正式开发约束，不是可选参考。**更细的可执行实施文件**： [05 对标界面参考图谱](./05-CN-PRODUCT-REFERENCE-ATLAS.md)、[06 逐页面规格与布局数值](./06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md)、[07 逐 PR 开发任务与严格验收](./07-PR-BY-PR-IMPLEMENTATION-BACKLOG.md)、[08 全课程质量合同](./08-CURRICULUM-QUALITY-AND-432-ROADMAP.md)、[09 课程独立质量评分](./09-TEACHING-QUALITY-GATE.md)、[10 真课程质量样板](./10-TEACHING-QUALITY-EXEMPLARS.md)。
 
 允许参考公开的教学框架、组件布局、交互方式、色彩搭配思路；不能直接搬运对方专有角色、logo、图片/音效、付费课件、题库或源码。
 
@@ -79,8 +79,8 @@
 - 执行阶段以 [02 分阶段计划的勾选状态](./02-PHASED-DELIVERY.md) 为准；完成后在**同一 PR**更新状态和真实证据链接。
 - 新发现问题先修当前阶段 P0 阻塞，再决定是否扩张课程。未经批准不批量将 432 节变成「已发布」。
 - 内容与 UI 双验收：增加课程须有能力递进、真实动手、错误和作品；改页面须有可点击真实控件、三断点截图、原创资源、移动端与无障碍回归。不得只用新的渐变和圆角宣称已经对齐成熟产品。
-- **视觉高相似目标必须有量化门禁**：按 07 的 100 分制评审（视觉30/功能30/教学20/跨端10/可信10），候选成熟体验需 ≥90 分且无硬否决；这是 KidsCoding 自己的验收标准，并非竞品公开评分。未达到时照实写待改进，不许虚报完成。
+- **课程内容和页面体验各有独立质量门禁**：页面按 07 的百评分审查，教学课程按 09 的另一套百评分（知识20/思维15/实操25/纠错15/作品15/反思10）。两项必须各自≥90且无硬否决；不能以页面漂亮弥补教学空洞，也不能用能运行弥补糟糕的儿童体验。分数为本项目自定的内部目标，不是竞品评分。
 - 不复制编程猫、核桃编程、西瓜创客等未经授权的商业音视频、IP、课件和题库；原创素材需留来源/许可记录。
 - 如果本文件与现有代码冲突，以可验证的 main 代码为事实依据，并提交修订此计划的 PR。
 
-**阅读顺序：** [01 基线](./01-REPO-BASELINE.md) → [05 竞品参考图谱](./05-CN-PRODUCT-REFERENCE-ATLAS.md) → [06 详细页面规格](./06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md) → [08 课程合同](./08-CURRICULUM-QUALITY-AND-432-ROADMAP.md) → [07 PR 任务排期](./07-PR-BY-PR-IMPLEMENTATION-BACKLOG.md) → [02 阶段计划](./02-PHASED-DELIVERY.md) → 实际 PR 和 CI。
+**阅读顺序：** [01 基线](./01-REPO-BASELINE.md) → [05 竞品参考图谱](./05-CN-PRODUCT-REFERENCE-ATLAS.md) → [06 详细页面规格](./06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md) → [08 课程合同](./08-CURRICULUM-QUALITY-AND-432-ROADMAP.md) → [09 课程质量百分制](./09-TEACHING-QUALITY-GATE.md) → [10 优质课样板](./10-TEACHING-QUALITY-EXEMPLARS.md) → [07 PR 任务排期](./07-PR-BY-PR-IMPLEMENTATION-BACKLOG.md) → [02 阶段计划](./02-PHASED-DELIVERY.md) → 实际 PR 和 CI。
