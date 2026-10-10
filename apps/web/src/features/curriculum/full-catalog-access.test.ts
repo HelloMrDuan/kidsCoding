@@ -7,6 +7,7 @@ import p0 from '@/content/curriculum/track-p0-detailed-lessons-v1.json'
 import g3 from '@/content/curriculum/track-g3-detailed-lessons-v2.json'
 import p1 from '@/content/curriculum/track-p1-detailed-lessons-v2.json'
 import p2 from '@/content/curriculum/track-p2-detailed-lessons-v2.json'
+import a0 from '@/content/curriculum/track-a0-detailed-lessons-v1.json'
 import advancedAssets from '@/content/curriculum/advanced-asset-requirements-v2.json'
 import assets from '@/content/curriculum/priority-asset-requirements-v1.json'
 import foundation from '@/content/curriculum/foundation-guides-v1.json'
@@ -20,8 +21,8 @@ describe('curriculum content and read-only discovery contract', () => {
   it('keeps all 432 catalog lessons separate from the 12 live curriculum entries', () => {
     const stats = getCatalogStatistics()
     expect(stats).toEqual({
-      tracks: 18, units: 72, lessons: 432, detailedNewLessons: 168,
-      detailedTracks: ['G0', 'G1', 'G2', 'G3', 'P0', 'P1', 'P2'], remainingOutlineLessons: 264,
+      tracks: 18, units: 72, lessons: 432, detailedNewLessons: 192,
+      detailedTracks: ['G0', 'G1', 'G2', 'G3', 'P0', 'P1', 'P2', 'A0'], remainingOutlineLessons: 240,
       existingFoundationGuides: 12, unitProjectBlueprints: 72,
       existingLaunchLessonEntries: 12,
     })
@@ -150,6 +151,23 @@ describe('G3/P1/P2 advanced lesson content maturity and resource gates', () => {
       expect(asset.license).toBe('not_yet_cleared')
       expect(asset.productionStatus).toBe('requirements_only')
       expect(asset.isPublished).toBe(false)
+    }
+  })
+})
+
+describe('A0 responsible AI teaching guides', () => {
+  it('matches 24 canonical AI lessons with observable evidence and no publication', () => {
+    const canonical = catalog.tracks.find(track => track.id === 'A0')!
+    expect(a0.lessons.map(lesson => lesson.id)).toEqual(canonical.units.flatMap(unit => unit.lessons.map(lesson => lesson.id)))
+    for (const lesson of a0.lessons) {
+      expect(lesson.steps).toHaveLength(5)
+      expect(lesson.diagnostics).toHaveLength(3)
+      expect(lesson.assessment.criteria.reduce((sum, item) => sum + item.points, 0)).toBe(100)
+      expect(lesson.delivery.published).toBe(false)
+      expect(lesson.delivery.engineVerified).toBe(false)
+      expect(lesson.delivery.doesNotCollectPersonalData).toBe(true)
+      expect(getLessonContentStage(lesson.id)).toBe('detailed')
+      expect(getLessonGuide(lesson.id)?.steps).toHaveLength(5)
     }
   })
 })
