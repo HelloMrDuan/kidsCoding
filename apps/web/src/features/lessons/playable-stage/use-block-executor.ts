@@ -1,12 +1,12 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 
-export type ExecutionState = 'idle' | 'running' | 'success' | 'error'
+export type ExecutionState = 'idle' | 'armed' | 'running' | 'success' | 'error'
 
 export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks: string[], stepIndex: number = 0) {
   const [executionState, setExecutionState] = useState<ExecutionState>('idle')
   const [characterPosition, setCharacterPosition] = useState(0)
   const [characterMessage, setCharacterMessage] = useState<string | null>(null)
-  const [stageScene,setStageScene] = useState<'forest'|'meadow'>('forest')
+  const [stageScene, setStageScene] = useState<'forest' | 'meadow'>('forest')
   const runIdRef = useRef(0)
 
   const reset = useCallback(() => {
@@ -17,98 +17,79 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
     setStageScene('forest')
   }, [])
 
-  const run = useCallback(async () => {
-    reset()
-    runIdRef.current += 1
-    const currentRunId = runIdRef.current
-
+  // Execute the actual lesson block program. The event hat alone never
+  // moves a sprite: click-triggered code only starts after a real UI click.
+  const execute = useCallback(async (id: number) => {
     setExecutionState('running')
-
-    // Check if blocks match required exactly
-    if (blocks.length !== requiredBlocks.length || !requiredBlocks.every((b, i) => b === blocks[i]?.type)) {
-      setExecutionState('error')
-      return
-    }
-
-    if (blocks[0]?.type !== 'when_start') {
-      setExecutionState('error')
-      return
-    }
-
-    for (let i = 0; i < blocks.length; i++) {
-      const block = blocks[i]
-
-      // Delay for animation
-      await new Promise(resolve => setTimeout(resolve, 800))
-      if (runIdRef.current !== currentRunId) return
-
-      if (block.type === 'when_start') {
-        // Just standard delay
-      } else if (block.type === 'move_right') {
+    for (let i = 1; i < blocks.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 330))
+      if (runIdRef.current !== id) return
+      const type = blocks[i].type
+      if (type === 'move_right') {
         setCharacterPosition(prev => prev + 100)
-      } else if (block.type === 'switch_scene') {
+      } else if (type === 'switch_scene') {
         setStageScene('meadow')
-      } else if (block.type === 'repeat_twice') {
-        if (!blocks.slice(0,i).some(item=>item.type==='move_right')) {
+      } else if (type === 'repeat_twice') {
+        if (!blocks.slice(0, i).some(b => b.type === 'move_right')) {
           setExecutionState('error')
           return
         }
-        setCharacterPosition(prev=>prev+100)
-      } else if (block.type === 'say_line') {
-        setCharacterMessage(blocks.slice(0,i).some(item=>item.type==='switch_scene') ? '我到草地啦！' : '你好！')
+        setCharacterPosition(prev => prev + 100)
+      } else if (type === 'say_line') {
+        setCharacterMessage(blocks.slice(0, i).some(b => b.type === 'switch_scene')
+          ? '我到草地啦！'
+          : blocks[0].type === 'when_clicked' ? '蝴蝶收到你的点击啦！' : '你好！')
       } else {
-        // Unsupported block type
         setExecutionState('error')
         return
       }
-
-      await new Promise(resolve => setTimeout(resolve, 500))
-      if (runIdRef.current !== currentRunId) return
+      await new Promise(resolve => setTimeout(resolve, 180))
+      if (runIdRef.current !== id) return
     }
+    if (runIdRef.current === id) setExecutionState('success')
+  }, [blocks])
 
-    setExecutionState('success')
-  }, [blocks, requiredBlocks, reset])
+  const run = useCallback(async () => {
+    reset()
+    const id = ++runIdRef.current
+    setExecutionState('running')
+    if (blocks.length !== requiredBlocks.length || !requiredBlocks.every((type, i) => type === blocks[i]?.type)) {
+      setExecutionState('error')
+      return
+    }
+    if (blocks[0]?.type !== 'when_start' && blocks[0]?.type !== 'when_clicked') {
+      setExecutionState('error')
+      return
+    }
+    if (blocks[0].type === 'when_clicked') {
+      setExecutionState('armed')
+      return
+    }
+    // The start event is immediately dispatched by the Run button.
+    await new Promise(resolve => setTimeout(resolve, 330))
+    if (runIdRef.current !== id) return
+    await execute(id)
+  }, [blocks, requiredBlocks, reset, execute])
 
-  // Watch blocks stringified and stepIndex to detect changes and reset
-  // We use standard React derived state pattern to reset without causing loops or ref mutation during render.
+  const clickCharacter = useCallback(async () => {
+    if (executionState !== 'armed' || blocks[0]?.type !== 'when_clicked') return
+    await execute(runIdRef.current)
+  }, [executionState, blocks, execute])
+
   const [prevStepIndex, setPrevStepIndex] = useState(stepIndex)
   const [prevBlocksKey, setPrevBlocksKey] = useState(JSON.stringify(blocks))
-
   const currentBlocksKey = JSON.stringify(blocks)
   if (stepIndex !== prevStepIndex || currentBlocksKey !== prevBlocksKey) {
     setPrevStepIndex(stepIndex)
     setPrevBlocksKey(currentBlocksKey)
-    // Reset internal state synchronously during render without causing infinite loops
     setExecutionState('idle')
     setCharacterMessage(null)
     setCharacterPosition(0)
     setStageScene('forest')
-
-    // Increment run ID but do it via state since we can't mutate ref during render.
-    // Actually, we don't strictly need to increment runIdRef here during render.
-    // The previous async `run` function relies on runIdRef to check stale states.
-    // If we just reset the state here synchronously, it might get overwritten by an ongoing async run if we don't bump the ID.
-    // However, if we move the ID bump to a layout effect, it will be perfectly synchronized before the next paint.
   }
 
-  // Bump run ID immediately in layout effect if step/blocks changed to invalidate async chains
-  useEffect(() => {
-    runIdRef.current += 1
-  }, [stepIndex, currentBlocksKey])
+  useEffect(() => { runIdRef.current += 1 }, [stepIndex, currentBlocksKey])
+  useEffect(() => () => { runIdRef.current += 1 }, [])
 
-  // Component unmount cleanup
-  useEffect(() => {
-    return () => {
-      runIdRef.current += 1
-    }
-  }, [])
-
-  return {
-    executionState,
-    characterPosition,
-    characterMessage,
-    stageScene,
-    run,
-    reset
-  }
+  return { executionState, characterPosition, characterMessage, stageScene, run, reset, clickCharacter }
 }

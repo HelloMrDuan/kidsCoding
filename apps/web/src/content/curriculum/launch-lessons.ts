@@ -204,6 +204,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
   },
   {
     id: 'lesson-07-garden-click',
+    templateId: 'garden-interaction-stage',
     title: '点一下，蝴蝶飞起来',
     goal: '学会让角色在被点击时做出反应。',
     recommendedLevel: 'foundation',
@@ -227,6 +228,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
   },
   {
     id: 'lesson-08-garden-dialogue',
+    templateId: 'garden-interaction-stage',
     title: '点一下，再说一句话',
     goal: '让角色在点击后先动起来，再说一句话回应你。',
     recommendedLevel: 'foundation',
