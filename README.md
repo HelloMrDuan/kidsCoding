@@ -24,5 +24,7 @@ License:
 - [产品总纲：开发唯一入口](docs/roadmap/README.md)
 - [当前真实仓库盘点](docs/roadmap/01-REPO-BASELINE.md)
 - [分阶段开发、逐批验收计划](docs/roadmap/02-PHASED-DELIVERY.md)
+- [国内成熟产品课程 + 页面对标规范](docs/roadmap/03-COMPETITOR-CONTENT-UI-BENCHMARK.md)
+- [儿童学习网站页面蓝图与 UI 验收](docs/roadmap/04-UI-EXPERIENCE-BLUEPRINT.md)
 
 全量课程目录不等于可运行/已发布课程。后续开发按阶段计划执行，PR 记录测试与合并证据。
