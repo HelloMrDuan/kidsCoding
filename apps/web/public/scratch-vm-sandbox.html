@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Scratch VM 受限实验沙箱</title>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/scratch-vm@5.0.300/dist/web/scratch-vm.min.js"></script>
+<script>
+(() => {
+  let vm = null;
+  let timer = null;
+  let currentId = null;
+  let ready = false;
+  function send(kind, info = {}) {
+    window.parent.postMessage({kind,id:currentId,...info},'*');
+  }
+  function reset() {
+    if (timer) clearInterval(timer);
+    timer = null;
+    if (vm) {
+      try { vm.stopAll(); } catch (_error) {}
+      try { vm.quit(); } catch (_error) {}
+    }
+    vm = null;
+  }
+  function snapshot() {
+    if (!vm || !vm.runtime) return;
+    const targets = vm.runtime.targets.filter(t => !t.isStage).map(t => ({
+      name: typeof t.getName === 'function' ? t.getName() : t.sprite?.name,
+      x: Number(t.x), y: Number(t.y), visible: Boolean(t.visible),
+      original: Boolean(t.isOriginal)
+    }));
+    send('SNAPSHOT',{targets, activeThreads: vm.runtime.threads?.length ?? 0});
+  }
+  window.addEventListener('message', async (event) => {
+    if (event.source !== window.parent || !event.data) return;
+    const data = event.data;
+    if (data.kind === 'PING') {
+      send('FRAME_READY',{available: typeof window.VirtualMachine === 'function'});
+      return;
+    }
+    if (data.kind === 'STOP' && data.id === currentId) {
+      try { vm?.stopAll(); } catch (_error) {}
+      snapshot();
+      send('STOPPED');
+      return;
+    }
+    if (data.kind === 'RUN' && data.id === currentId && vm && ready) {
+      try {
+        vm.greenFlag();
+        snapshot();
+        send('STARTED');
+      } catch (error) {
+        send('ERROR',{error:String(error).slice(0,600)});
+      }
+      return;
+    }
+    if (data.kind !== 'LOAD' || !Number.isSafeInteger(data.id) || !(data.archive instanceof ArrayBuffer)) return;
+    reset();
+    currentId=data.id;
+    ready=false;
+    if (!window.VirtualMachine) {
+      send('ERROR',{error:'Scratch VM 未加载。请检查 CDN 网络。'});
+      return;
+    }
+    try {
+      vm=new window.VirtualMachine();
+      await vm.loadProject(data.archive);
+      vm.start();
+      ready=true;
+      send('PROJECT_LOADED',{targetNames:vm.runtime.targets.map(t=>typeof t.getName==='function'?t.getName():'')});
+      snapshot();
+      timer=setInterval(snapshot,100);
+    } catch(error) {
+      send('ERROR',{error:'Scratch VM 加载项目失败：'+String(error).slice(0,700)});
+      reset();
+    }
+  });
+})();
+</script>
+</body>
+</html>
