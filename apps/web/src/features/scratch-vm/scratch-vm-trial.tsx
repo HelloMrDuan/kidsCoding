@@ -1,16 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {ScratchMeteorBlocks,type MeteorProgram} from './scratch-meteor-blocks'
 
 type Sprite = { id: string; name: string; x: number; y: number; visible: boolean; original: boolean }
-type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[] }
+type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram }
 
 export function ScratchVMTrial() {
   const frame = useRef<HTMLIFrameElement>(null)
   const id = useRef(0)
   const [loaded, setLoaded] = useState(false)
   const [running, setRunning] = useState(false)
+  const [draft, setDraft] = useState<MeteorProgram|null>(null)
+  const [applied, setApplied] = useState<MeteorProgram|null>(null)
+  const [createdTotal, setCreatedTotal] = useState(0)
+  const seenClones = useRef<Set<string>>(new Set())
   const [status, setStatus] = useState('正在加载 Scratch VM，请稍候……')
   const [sprites, setSprites] = useState<Sprite[]>([])
   const [observedClones, setObservedClones] = useState(false)
@@ -48,6 +53,7 @@ export function ScratchVMTrial() {
       if(msg.id!==id.current)return
       if(msg.kind==='PROJECT_LOADED') {
         setLoaded(true)
+        setApplied({spawnCount:10,fallStep:13})
         setStatus('真实 Scratch VM 已加载项目，点击绿旗开始运行。')
       } else if(msg.kind==='SNAPSHOT') {
         const current=msg.targets??[]
@@ -58,6 +64,10 @@ export function ScratchVMTrial() {
           setObservedDeletion(true)
         }
         knownCloneIds.current=liveCloneIds
+        if(vmRunning.current) {
+          for (const target of current.filter(t=>!t.original)) seenClones.current.add(target.id)
+          setCreatedTotal(seenClones.current.size)
+        }
         if(clones.length)setObservedClones(true)
         for(const target of clones) {
           const key=target.id
@@ -65,6 +75,9 @@ export function ScratchVMTrial() {
           if(prior!==undefined&&target.y<prior-1)setObservedMovement(true)
           latestY.current.set(key,target.y)
         }
+      } else if(msg.kind==='CONFIGURED') {
+        setApplied(msg.program??null)
+        setStatus('参数已写入真实 Scratch VM，点击绿旗验证变化。')
       } else if(msg.kind==='STARTED') {
         vmRunning.current=true
         setRunning(true)
@@ -91,6 +104,7 @@ export function ScratchVMTrial() {
     }
   }, [])
 
+  const changeProgram = useCallback((value:MeteorProgram|null)=>setDraft(value),[])
   const clones=sprites.filter(t=>t.visible&&!t.original)
   const spritesInBounds=clones.filter(t=>Number.isFinite(t.x)&&Number.isFinite(t.y)).slice(0,100)
   return (
@@ -100,8 +114,8 @@ export function ScratchVMTrial() {
         <header className="rounded-[2rem] bg-white p-7 shadow-sm">
           <p className="text-sm font-extrabold text-indigo-700">Scratch VM 实验室 · 官方运行引擎试用</p>
           <h1 className="mt-3 text-3xl font-black">流星分身雨</h1>
-          <p className="mt-3 text-slate-600">已编好的原创 Scratch 3 项目，观察绿旗如何创建流星分身，分身为什么会往下落、最后消失。</p>
-          <p className="mt-3 text-sm text-amber-700">当前是只读演示：不上传项目、不保存正式成绩、不开放其他 Scratch 课程。</p>
+          <p className="mt-3 text-slate-600">拖动积木，改变生成数量和下落步长，写入真正的 Scratch VM 后观察流星分身运行。</p>
+          <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；不上传作品、不保存正式成绩、不开放其他 Scratch 课程。</p>
         </header>
         <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <section className="rounded-[2rem] bg-white p-5 shadow-sm">
@@ -118,9 +132,12 @@ export function ScratchVMTrial() {
               ))}
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button data-testid="scratch-green-flag" type="button" disabled={!loaded}
+              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||!draft}
+                className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40"
+                onClick={()=>{if(draft){setApplied(null);frame.current?.contentWindow?.postMessage({kind:'CONFIGURE',id:id.current,program:draft},'*')}}}>应用积木到 VM</button>
+              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||running}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
-                onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
+                onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();seenClones.current.clear();setCreatedTotal(0);setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
                 ▶ 绿旗运行
               </button>
               <button data-testid="scratch-stop" type="button" disabled={!loaded}
@@ -131,6 +148,8 @@ export function ScratchVMTrial() {
           <section className="rounded-[2rem] bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black">Scratch VM 实时观察</h2>
             <p role="status" data-testid="scratch-vm-status" className="mt-4 rounded-xl bg-indigo-50 p-4 text-sm leading-7">{status}</p>
+            <p className="mt-5 text-sm">已应用 VM 积木：<strong data-testid="scratch-applied-program">{applied?`${applied.spawnCount}颗 / 每步${applied.fallStep}`:'等待应用'}</strong></p>
+            <p className="mt-2 text-sm">本轮 VM 实际创建分身总数：<strong data-testid="scratch-created-total">{createdTotal}</strong></p>
             <p className="mt-5 text-sm">正在运行：<strong>{running?'是':'否'}</strong></p>
             <p className="mt-2 text-sm">实际可见流星分身：<strong data-testid="scratch-live-clones">{clones.length}</strong></p>
             <p className="mt-2 text-sm">VM 已创建分身：<strong data-testid="scratch-clone-observed">{observedClones?'是':'否'}</strong></p>
@@ -139,6 +158,7 @@ export function ScratchVMTrial() {
             <p className="mt-5 text-xs leading-6 text-slate-500">流星的实时坐标来自 Scratch VM 对象状态，前台只按坐标绘制简化图标，尚未接入 Scratch WebGL 渲染器。项目未上传用户数据。</p>
           </section>
         </div>
+        <ScratchMeteorBlocks onProgramChange={changeProgram}/>
         <iframe ref={frame} src="/scratch-vm-sandbox.html" sandbox="allow-scripts" title="Scratch VM 受限运行沙箱" className="hidden" aria-hidden="true" tabIndex={-1}/>
       </div>
     </main>

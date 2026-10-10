@@ -47,6 +47,40 @@
       send('STOPPED');
       return;
     }
+
+    if (data.kind === 'CONFIGURE' && data.id === currentId && vm && ready) {
+      const program = data.program;
+      if (!program || !Number.isInteger(program.spawnCount) || program.spawnCount < 1 || program.spawnCount > 15 ||
+          !Number.isInteger(program.fallStep) || program.fallStep < 5 || program.fallStep > 25) {
+        send('ERROR',{error:'积木参数无效，禁止执行。'});
+        return;
+      }
+      try {
+        vm.stopAll();
+        const sprite = vm.runtime.targets.find(t=>!t.isStage && t.isOriginal && t.getName()==='流星');
+        if (!sprite) throw new Error('找不到流星角色');
+        function updateNativeNumber(parentId,inputName,nextNumber) {
+          const parent = sprite.blocks.getBlock(parentId);
+          const inputId = parent?.inputs?.[inputName]?.block;
+          const inputBlock = sprite.blocks.getBlock(inputId);
+          if (!inputBlock || !inputBlock.fields?.NUM || !inputBlock.opcode.startsWith('math_')) {
+            throw new Error('Scratch 项目中缺少数字输入积木：'+parentId);
+          }
+          // Updates an actual Scratch VM block field. Scratch VM handles its
+          // script cache invalidation; this does not animate a fake executor.
+          sprite.blocks.changeBlock({id:inputId,element:'field',name:'NUM',value:String(nextNumber)});
+          const actual = Number(sprite.blocks.getBlock(inputId)?.fields?.NUM?.value);
+          if (actual !== nextNumber) throw new Error('Scratch VM 未接受数值变更');
+        }
+        updateNativeNumber('repeat','TIMES',program.spawnCount);
+        updateNativeNumber('move_y','DY',-program.fallStep);
+        send('CONFIGURED',{program:{spawnCount:program.spawnCount,fallStep:program.fallStep}});
+        snapshot();
+      } catch (error) {
+        send('ERROR',{error:'修改 Scratch VM 积木失败：'+String(error).slice(0,400)});
+      }
+      return;
+    }
     if (data.kind === 'RUN' && data.id === currentId && vm && ready) {
       try {
         vm.greenFlag();
