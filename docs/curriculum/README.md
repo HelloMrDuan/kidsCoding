@@ -72,3 +72,16 @@
 - 新增图形化启蒙 `track-g0-detailed-lessons-v1.json` 共24份原创详细教案（独立故事、五步引导、典型失败、三层提示、评价条件、所需引擎能力），全部标记尚不可玩。
 - 测试：`apps/web/src/features/curriculum/full-catalog-access.test.ts` 校验 432/24/12/72 数量、ID一致性、评价权重、发布边界和公开元数据。
 - 现有 `launch-lessons.ts`、线上编辑/发布和学习进度保持不变；后续逐课升级需要真实 Block/Scratch/Python 引擎实现和独立测试。
+
+## 第三批：图形化进阶、Scratch、Python 教案与资源标准
+
+- `track-g1-detailed-lessons-v1.json`：G1 故事编程和动画24节。
+- `track-g2-detailed-lessons-v1.json`：G2 Scratch基础24节。
+- `track-p0-detailed-lessons-v1.json`：P0 Python入门24节。
+- 共新增**72节逐课原创教案与72对正反测试情形（评测规格，尚非已运行测试）**。每节有五阶段操作、预期与失败场景、错因、分层提示、作品拓展及100分规则。
+- `priority-asset-requirements-v1.json`：216项资源需求，均明确标为 `spec_only`；**不是已生成或已获授权的插画/音频**。
+- 本批后独立目录中**96节已有详案、336节只具大纲**；另有与旧12节发布 ID 对齐的详案。后台现在可审阅 G0/G1/G2/P0 的教案，前台仅提供内容预览。
+- `examples/python/p0`：4份可运行的Python入门单元作品实现及16项本地离线`unittest`，不等于线上Python沙箱已接入。
+- G1/G2运行引擎尚未验收，不允许借用已有Blockly第一关的成功状态冒充 Scratch 课程已发布。
+
+所有资料需要经过知识点审核、引擎能力匹配、素材版权审查、自动评测、前端E2E后才能从未发布状态晋级。
