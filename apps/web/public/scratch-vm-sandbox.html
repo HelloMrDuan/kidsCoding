@@ -186,7 +186,7 @@
       candidate=null;
       ready=true;
       currentProgram=program;
-      send('PROJECT_LOADED',{program,imported,
+      send('PROJECT_LOADED',{program,imported,source:data.source??'sample',
         targetNames:vm.runtime.targets.map(t=>typeof t.getName==='function'?t.getName():'')});
       snapshot();
       timer=setInterval(snapshot,100);
