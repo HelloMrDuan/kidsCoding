@@ -42,6 +42,7 @@ test('Blockly editor changes the number and falling movement of real Scratch VM 
   await expect(page.getByTestId('scratch-editor-validity')).toContainText('连接正确')
   await page.getByTestId('scratch-edit-spawn-count').fill('2')
   await page.getByTestId('scratch-edit-fall-step').fill('25')
+  await expect(page.getByTestId('scratch-green-flag')).toBeDisabled() // no stale execution of unapplied blocks
   await page.getByTestId('scratch-apply-blocks').click()
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('2颗 / 每步25',{timeout:12_000})
   await page.getByTestId('scratch-green-flag').click()
@@ -52,6 +53,7 @@ test('Blockly editor changes the number and falling movement of real Scratch VM 
   await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
   // A second edited program must affect the VM, not just the React label.
   await page.getByTestId('scratch-edit-spawn-count').fill('5')
+  await expect(page.getByTestId('scratch-green-flag')).toBeDisabled()
   await page.getByTestId('scratch-apply-blocks').click()
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('5颗 / 每步25',{timeout:12_000})
   await page.getByTestId('scratch-green-flag').click()

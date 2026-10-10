@@ -135,7 +135,7 @@ export function ScratchVMTrial() {
               <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||!draft}
                 className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{if(draft){setApplied(null);frame.current?.contentWindow?.postMessage({kind:'CONFIGURE',id:id.current,program:draft},'*')}}}>应用积木到 VM</button>
-              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||running}
+              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();seenClones.current.clear();setCreatedTotal(0);setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
                 ▶ 绿旗运行
