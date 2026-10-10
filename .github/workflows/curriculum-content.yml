@@ -35,6 +35,7 @@ on:
       - 'apps/web/tests/e2e/blockly-first-run.spec.ts'
       - 'apps/web/tests/e2e/blockly-forest-sequence.spec.ts'
       - 'apps/web/tests/e2e/blockly-meadow-journey.spec.ts'
+      - 'apps/web/tests/e2e/blockly-garden-click.spec.ts'
       - 'apps/web/src/app/learn/scratch-lab/**'
       - '.github/workflows/curriculum-content.yml'
   push:
@@ -164,4 +165,4 @@ jobs:
       - name: Install actual Chrome
         run: npx playwright install chrome --with-deps
       - name: Run actual Scratch VM browser integration, no mocked VM
-        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts --project=desktop
+        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts --project=desktop
