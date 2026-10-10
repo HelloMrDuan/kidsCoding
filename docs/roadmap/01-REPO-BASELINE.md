@@ -58,6 +58,12 @@
 - 发布门禁 release-readiness.ts 要求内容、引擎、E2E、授权、进度、儿童隐私、人审 7 类证据；当前试点条目全部未放行。
 - Scratch 与 Python 的运行资源含外部 CDN/许可证风险，国内发布前须自托管、审查与真设备验证。
 
+## 用户页面基线与成熟产品视觉差距（补充于 2026-10-11）
+
+源码确认当前存在：`app/page.tsx`（StoryStage/GrowthPath/ParentConfidence/TrialCta）、`learn/map`、`learn/lesson/[lessonId]`、`learn/catalog`、`learn/portfolio`、`learn/scratch-lab`、`learn/python-lab`、`parent/overview`、`admin/catalog`；`app/globals.css` 有奶油/暖橙/云蓝等基础样式变量。**现有代码并不代表已达到成熟国内教育产品的视觉和移动端使用水平。**
+
+静态源码检查中暂缺：统一设计 token/组件规范、每个核心页面与竞品公开截图的逐屏对照、儿童手机触控的全路径视觉验收、全部原创角色与音频版权清单。详情与硬性验收见 [03 对标研究](./03-COMPETITOR-CONTENT-UI-BENCHMARK.md)、[04 页面蓝图](./04-UI-EXPERIENCE-BLUEPRINT.md)。**上述页面缺口尚未通过真实浏览器逐页审计**，不伪称已完成现场视觉测量。
+
 ## 4. 主要差距与风险（按优先级）
 
 | 优先 | 缺口 | 直接后果 | 应验收的证据 |
