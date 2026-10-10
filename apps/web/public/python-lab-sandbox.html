@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net; worker-src blob:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Isolated KidsCoding Python runtime</title>
+</head>
+<body>
+<script id="worker-source" type="text/plain">
+let pyodideInstance;
+async function getPython() {
+  if (pyodideInstance) return pyodideInstance;
+  self.importScripts('https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js');
+  pyodideInstance = await self.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'});
+  self.postMessage({kind:'LOADED'});
+  return pyodideInstance;
+}
+self.onmessage = async (event) => {
+  const source = event.data && event.data.source;
+  if (typeof source !== 'string' || source.length > 5000) {
+    self.postMessage({kind:'RESULT',output:'',error:'代码超出允许长度'});
+    return;
+  }
+  try {
+    const python = await getPython();
+    let output = '';
+    const addLine = (line) => {
+      if (output.length < 4000) output += line + '\n';
+    };
+    python.setStdout({batched:addLine});
+    python.setStderr({batched:addLine});
+    // Each run receives an independent Python namespace. Nothing executes on the Next.js server.
+    // This is a preview sandbox; do not treat local output grading as a trusted exam result.
+    python.runPython('exec(compile(' + JSON.stringify(source) + ', "<learner>", "exec"), {"__builtins__": __builtins__})');
+    self.postMessage({kind:'RESULT',output:output.slice(0,4000),error:null});
+  } catch (error) {
+    self.postMessage({kind:'RESULT',output:'',error:String(error).slice(0,800)});
+  }
+};
+</script>
+<script>
+(() => {
+  let activeWorker = null;
+  let activeId = null;
+  function stop() {
+    if (activeWorker) activeWorker.terminate();
+    activeWorker = null;
+    activeId = null;
+  }
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent || !event.data) return;
+    const data = event.data;
+    if (data.kind === 'STOP' && data.id === activeId) {
+      stop();
+      return;
+    }
+    if (data.kind !== 'RUN' || !Number.isSafeInteger(data.id)) return;
+    stop();
+    const blob = new Blob([document.getElementById('worker-source').textContent], {type:'text/javascript'});
+    const address = URL.createObjectURL(blob);
+    const worker = new Worker(address);
+    URL.revokeObjectURL(address);
+    activeId = data.id;
+    activeWorker = worker;
+    worker.onmessage = (message) => {
+      if (worker !== activeWorker) return;
+      window.parent.postMessage({kind:message.data.kind, id:activeId, output:message.data.output, error:message.data.error}, '*');
+      if (message.data.kind === 'RESULT') stop();
+    };
+    worker.onerror = () => {
+      window.parent.postMessage({kind:'RESULT',id:activeId,output:'',error:'Python 引擎加载或执行失败'},'*');
+      stop();
+    };
+    worker.postMessage({source:data.source});
+  });
+})();
+</script>
+</body>
+</html>
