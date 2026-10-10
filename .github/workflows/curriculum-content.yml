@@ -27,6 +27,10 @@ on:
       - 'apps/web/public/scratch-vm-sandbox.html'
       - 'apps/web/public/scratch-samples/**'
       - 'apps/web/src/features/scratch-vm/**'
+      - 'apps/web/src/features/lessons/playable-stage/**'
+      - 'apps/web/src/app/learn/lesson/**'
+      - 'apps/web/tests/e2e/guest-story.spec.ts'
+      - 'apps/web/tests/e2e/blockly-first-run.spec.ts'
       - 'apps/web/src/app/learn/scratch-lab/**'
       - '.github/workflows/curriculum-content.yml'
   push:
@@ -54,7 +58,7 @@ jobs:
       - name: ESLint
         run: npm run lint
       - name: Curriculum contract tests
-        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts src/features/progress/cloud-python-drafts.test.ts src/app/api/practice/drafts/route.test.ts src/features/scratch-vm/scratch-local-draft.test.ts
+        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts src/features/progress/cloud-python-drafts.test.ts src/app/api/practice/drafts/route.test.ts src/features/scratch-vm/scratch-local-draft.test.ts src/features/lessons/playable-stage/use-block-executor.test.ts
       - name: Production build
         run: npm run build
 
@@ -136,4 +140,4 @@ jobs:
       - name: Install actual Chrome
         run: npx playwright install chrome --with-deps
       - name: Run actual Scratch VM browser integration, no mocked VM
-        run: npx playwright test tests/e2e/scratch-vm.spec.ts --project=desktop
+        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts --project=desktop
