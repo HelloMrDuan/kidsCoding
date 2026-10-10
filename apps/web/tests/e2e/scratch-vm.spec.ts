@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import {readFile} from 'node:fs/promises'
 
 test('loads a real .sb3 using Scratch VM, executes clones and moves them, then stops', async ({ page }) => {
   test.setTimeout(180_000)
@@ -58,6 +59,34 @@ test('Blockly editor changes the number and falling movement of real Scratch VM 
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('5颗 / 每步25',{timeout:12_000})
   await page.getByTestId('scratch-green-flag').click()
   await expect(page.getByTestId('scratch-created-total')).toHaveText('5',{timeout:18_000})
+  await page.getByTestId('scratch-stop').click()
+  await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
+})
+
+test('exports a genuine Scratch VM .sb3 and reloads it in a fresh VM to verify edited block values',async({page})=>{
+  test.setTimeout(180_000)
+  await page.goto('/learn/scratch-lab/G3-U1-L02')
+  await expect(page.getByTestId('scratch-green-flag')).toBeEnabled({timeout:60_000})
+  await page.getByTestId('scratch-edit-spawn-count').fill('3')
+  await page.getByTestId('scratch-edit-fall-step').fill('20')
+  await expect(page.getByTestId('scratch-export-sb3')).toBeDisabled()
+  await page.getByTestId('scratch-apply-blocks').click()
+  await expect(page.getByTestId('scratch-applied-program')).toHaveText('3颗 / 每步20',{timeout:12_000})
+  const downloading = page.waitForEvent('download',{timeout:60_000})
+  await page.getByTestId('scratch-export-sb3').click()
+  const downloaded=await downloading
+  expect(downloaded.suggestedFilename()).toBe('KidsCoding-流星分身雨.sb3')
+  const path=await downloaded.path()
+  expect(path).not.toBeNull()
+  const zip=await readFile(path!)
+  expect(zip.byteLength).toBeGreaterThan(500)
+  expect(zip[0]).toBe(0x50)
+  expect(zip[1]).toBe(0x4b)
+  await expect(page.getByTestId('scratch-export-status')).toContainText('独立 VM 重新载入验证：3颗 / 每步20')
+  await expect(page.getByTestId('scratch-vm-status')).toContainText('已从真实 Scratch VM 导出')
+  // The export must not break the editor or its VM: green flag still runs the edited version.
+  await page.getByTestId('scratch-green-flag').click()
+  await expect(page.getByTestId('scratch-created-total')).toHaveText('3',{timeout:18_000})
   await page.getByTestId('scratch-stop').click()
   await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
 })
