@@ -143,6 +143,7 @@ export function PlayableStage({
               <div
                 className="relative flex h-24 w-24 items-center justify-center rounded-full bg-orange-400 text-sm font-black text-white shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-500 ease-in-out"
                 style={{ transform: `translateX(${characterPosition}px)` }}
+                data-testid="stage-character-main"
               >
                 {mainLabel}
 

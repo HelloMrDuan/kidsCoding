@@ -60,11 +60,26 @@ export function useBlockExecutor(blocks: Array<{ type: string }>, requiredBlocks
   }, [blocks, requiredBlocks, reset])
 
   // Watch blocks stringified and stepIndex to detect changes and reset
-  const blocksKey = JSON.stringify(blocks)
-  const requiredKey = JSON.stringify(requiredBlocks)
-  useEffect(() => {
-    reset()
-  }, [blocksKey, requiredKey, stepIndex, reset])
+  // We use a ref and layout effect to avoid cascading renders while ensuring sync.
+  // Actually, standard practice to avoid the "setState in effect" warning is to clear it in the event handlers
+  // (which we do in handleSnapshotChange and goToStep) and simply track the last known values to reset if they unexpectedly mismatch,
+  // or use key={} on the component. But here, we can just use the reset logic inside a generic useEffect with a setTimeout, or
+  // simply remove this useEffect and rely purely on the parent calling `onRunClear` / `onSnapshotChange` -> triggering a reset explicitly.
+  // However, `useBlockExecutor` needs its *internal* state reset.
+  // Let's use a ref to track the last values and reset during render, which is the React-recommended way to derive state.
+
+  const [prevStepIndex, setPrevStepIndex] = useState(stepIndex)
+  const [prevBlocksKey, setPrevBlocksKey] = useState(JSON.stringify(blocks))
+
+  if (stepIndex !== prevStepIndex || JSON.stringify(blocks) !== prevBlocksKey) {
+    setPrevStepIndex(stepIndex)
+    setPrevBlocksKey(JSON.stringify(blocks))
+    // Reset internal state synchronously during render
+    setExecutionState('idle')
+    setCharacterMessage(null)
+    setCharacterPosition(0)
+    runIdRef.current += 1
+  }
 
   // Component unmount cleanup
   useEffect(() => {
