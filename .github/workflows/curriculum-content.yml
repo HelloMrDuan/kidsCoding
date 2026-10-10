@@ -16,6 +16,9 @@ on:
       - 'examples/python/p0/**'
       - 'examples/python/advanced/**'
       - 'examples/scratch/g3/**'
+      - 'apps/web/src/features/python-lab/**'
+      - 'apps/web/src/app/learn/python-lab/**'
+      - 'apps/web/public/python-lab-sandbox.html'
       - '.github/workflows/curriculum-content.yml'
   push:
     branches:
@@ -42,7 +45,7 @@ jobs:
       - name: ESLint
         run: npm run lint
       - name: Curriculum contract tests
-        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts
+        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts
       - name: Production build
         run: npm run build
 
@@ -87,3 +90,22 @@ jobs:
         with:
           name: original-scratch-meteor-clones
           path: examples/scratch/g3/meteor_clones.sb3
+
+  python-browser-trial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run first lesson with actual Pyodide Python in a sandboxed browser
+        run: npx playwright test tests/e2e/python-lab.spec.ts --project=desktop

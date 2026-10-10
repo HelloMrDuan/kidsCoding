@@ -43,7 +43,7 @@ export default async function AdminPage() {
         />
         <PaymentReconcileCard />
         <Link href="/admin/catalog" className="block rounded-[1.5rem] border border-emerald-200 bg-emerald-50 px-6 py-5 font-bold text-emerald-900 transition hover:bg-emerald-100" data-testid="admin-catalog-entry">
-          查看全学段432课内容库、96节详细教案与72个单元项目（只读审阅，不会自动发布） →
+          查看全学段432课内容库、192节详细教案与72个单元项目（只读审阅，不会自动发布） →
         </Link>
         <CourseList lessons={dashboardData.lessons} />
         <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">

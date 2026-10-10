@@ -36,6 +36,14 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
           <h3 className="mt-6 text-lg font-black">本单元最终挑战</h3>
           <p className="mt-2 leading-8 text-slate-700">{capstone?.title ?? unit.title}</p>
         </section>
+        {lesson.id === 'P0-U1-L01' ? (
+          <section className="rounded-[2rem] border-2 border-emerald-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-bold text-emerald-700">独立实验关卡 · Python 真运行</p>
+            <h2 className="mt-2 text-xl font-black">试试亲手运行第一段 Python 程序</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">提供可修改的代码、实际 Python 标准输出和本地自动反馈。该入口不是正式课程发布，也不会提交成绩。</p>
+            <Link data-testid="python-trial-entry" href="/learn/python-lab/P0-U1-L01" className="mt-4 inline-flex rounded-full bg-emerald-700 px-6 py-3 font-bold text-white">进入 Python 实验室 →</Link>
+          </section>
+        ) : null}
         <div className="flex flex-wrap gap-3">
           <Link href="/learn/map" className="rounded-full bg-emerald-700 px-6 py-3 font-bold text-white">先去体验已有启蒙课程</Link>
           <Link href={`/learn/catalog?track=${track.id}`} className="rounded-full bg-white px-6 py-3 font-bold text-slate-700">浏览同路线课程</Link>

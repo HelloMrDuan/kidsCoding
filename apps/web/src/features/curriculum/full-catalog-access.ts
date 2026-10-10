@@ -6,6 +6,7 @@ import p0 from '@/content/curriculum/track-p0-detailed-lessons-v1.json'
 import g3 from '@/content/curriculum/track-g3-detailed-lessons-v2.json'
 import p1 from '@/content/curriculum/track-p1-detailed-lessons-v2.json'
 import p2 from '@/content/curriculum/track-p2-detailed-lessons-v2.json'
+import a0 from '@/content/curriculum/track-a0-detailed-lessons-v1.json'
 import foundation from '@/content/curriculum/foundation-guides-v1.json'
 import capstones from '@/content/curriculum/unit-capstone-blueprints-v1.json'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
@@ -26,9 +27,9 @@ export function getCatalogStatistics() {
       (sum, track) => sum + track.units.reduce((count, unit) => count + unit.lessons.length, 0),
       0,
     ),
-    detailedNewLessons: detailed.lessons.length + g1.lessons.length + g2.lessons.length + p0.lessons.length + g3.lessons.length + p1.lessons.length + p2.lessons.length,
-    detailedTracks: ['G0', 'G1', 'G2', 'G3', 'P0', 'P1', 'P2'],
-    remainingOutlineLessons: catalog.tracks.reduce((sum, track) => sum + track.units.reduce((n, unit) => n + unit.lessons.length, 0), 0) - detailed.lessons.length - g1.lessons.length - g2.lessons.length - p0.lessons.length - g3.lessons.length - p1.lessons.length - p2.lessons.length,
+    detailedNewLessons: detailed.lessons.length + g1.lessons.length + g2.lessons.length + p0.lessons.length + g3.lessons.length + p1.lessons.length + p2.lessons.length + a0.lessons.length,
+    detailedTracks: ['G0', 'G1', 'G2', 'G3', 'P0', 'P1', 'P2', 'A0'],
+    remainingOutlineLessons: catalog.tracks.reduce((sum, track) => sum + track.units.reduce((n, unit) => n + unit.lessons.length, 0), 0) - detailed.lessons.length - g1.lessons.length - g2.lessons.length - p0.lessons.length - g3.lessons.length - p1.lessons.length - p2.lessons.length - a0.lessons.length,
     existingFoundationGuides: foundation.lessons.length,
     unitProjectBlueprints: capstones.projects.length,
     existingLaunchLessonEntries: launchLessons.length,
@@ -50,7 +51,7 @@ export function getCatalogLesson(id: string) {
 }
 
 export function getLessonContentStage(id: string) {
-  if (detailed.lessons.some((lesson) => lesson.id === id) || g1.lessons.some((lesson) => lesson.id === id) || g2.lessons.some((lesson) => lesson.id === id) || p0.lessons.some((lesson) => lesson.id === id) || g3.lessons.some((lesson) => lesson.id === id) || p1.lessons.some((lesson) => lesson.id === id) || p2.lessons.some((lesson) => lesson.id === id)) return 'detailed'
+  if (detailed.lessons.some((lesson) => lesson.id === id) || g1.lessons.some((lesson) => lesson.id === id) || g2.lessons.some((lesson) => lesson.id === id) || p0.lessons.some((lesson) => lesson.id === id) || g3.lessons.some((lesson) => lesson.id === id) || p1.lessons.some((lesson) => lesson.id === id) || p2.lessons.some((lesson) => lesson.id === id) || a0.lessons.some((lesson) => lesson.id === id)) return 'detailed'
   if (foundation.lessons.some((lesson) => lesson.id === id)) return 'foundation'
   return 'outline'
 }
@@ -60,6 +61,24 @@ export function getUnitProject(unitId: string) {
 }
 
 export function getLessonGuide(id: string) {
+  const aiLesson = a0.lessons.find((lesson) => lesson.id === id)
+  if (aiLesson) {
+    return {
+      id: aiLesson.id,
+      title: aiLesson.title,
+      story: aiLesson.setting,
+      goals: [aiLesson.lessonGoal],
+      steps: aiLesson.steps.map((step) => ({order: step.order, prompt: step.teacher, action: step.child, check: step.check, voiceover: step.teacher})),
+      errors: aiLesson.diagnostics.map((item) => ({symptom: item.mistake, suggestion: item.help})),
+      hints: aiLesson.diagnostics.map((item) => item.help),
+      rubric: aiLesson.assessment.criteria.map((item) => ({criterion: item.name, weight: item.points, evidence: item.evidence})),
+      acceptance: [aiLesson.assessment.pass.then],
+      extension: aiLesson.extension,
+      capabilities: ['offline_card_exercise'],
+      status: aiLesson.stage,
+      isPlayable: false,
+    }
+  }
   const advanced = [...g3.lessons, ...p1.lessons, ...p2.lessons].find((lesson) => lesson.id === id)
   if (advanced) {
     return {
