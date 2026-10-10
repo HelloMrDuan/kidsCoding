@@ -37,7 +37,8 @@ def build_project() -> dict:
         "show":block("looks_show","set_y",parent="clone_flag"),
         "set_y":block("motion_sety","down",parent="show",inputs={"Y":[1,[4,"170"]]}),
         "down":block("control_repeat","delete",parent="set_y",inputs={"TIMES":[1,[4,"30"]],"SUBSTACK":[2,"move_y"]}),
-        "move_y":block("motion_changeyby",parent="down",inputs={"DY":[1,[4,"-13"]]}),
+        "move_y":block("motion_changeyby","move_pause",parent="down",inputs={"DY":[1,[4,"-13"]]}),
+        "move_pause":block("control_wait",parent="move_y",inputs={"DURATION":[1,[4,"0.05"]]}),
         "delete":block("control_delete_this_clone",parent="down")
     }
     stage = {"isStage":True,"name":"Stage","variables":{},"lists":{},"broadcasts":{},"blocks":{},"comments":{},"currentCostume":0,
