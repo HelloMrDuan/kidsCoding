@@ -1,0 +1,28 @@
+name: KidsCoding mandatory task accountability
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  task-ledger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out complete history for task changes
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate 61 product tasks, 432 lessons and one-task-per-PR rule
+        env:
+          TASK_VALIDATE_PR: ${{ github.event_name == 'pull_request' && '1' || '0' }}
+          TASK_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          TASK_PR_BODY: ${{ github.event.pull_request.body }}
+        run: python scripts/check-task-ledger.py
