@@ -21,6 +21,18 @@
 
 允许参考公开的教学框架、组件布局、交互方式、色彩搭配思路；不能直接搬运对方专有角色、logo、图片/音效、付费课件、题库或源码。
 
+## 新增强制过程：一次只做一个任务，完成就写状态与证据
+
+**新的最高约束（2026-10-11 起执行）：**
+
+1. 只准按一个 Task-ID 推进，一次领取一个可验收任务；任务过大先切为有独立目标和测试的子任务。
+2. 每个任务开工/PR/合并后main CI成功/受阻都有明确状态，不许只回复“继续”不留记录。
+3. 功能 PR 同时更新该任务的 JSON 台账；PR/合并/main CI 全通过后由**同一个任务的记录收尾**填 `completed` 并在 `TASK-CHANGELOG.md` 留一条具体成果。
+4. 新 CI 强制检查：每个 PR 必须声明唯一 Task-ID，任务主账有且只能有一条变化，432 课逐课 ID 完整，**没有真实 PR、合并 SHA、主分支 CI 和正反测试的任务不允许改为 completed**。
+5. 更新一个任务的记录并不代表已发布课程；页面和课程质量仍按各自的 100 分制和人工审核执行。
+
+**必须阅读和维护：** [11 单任务执行规则](./11-TASK-EXECUTION-POLICY.md) → [12 进度总览](./12-TASK-STATUS-BOARD.md) → [产品任务JSON](./task-register.json) / [432课任务JSON](./lesson-task-register.json) → [逐任务交付日志](./TASK-CHANGELOG.md)。这些与 02/07 阶段实施计划共同构成研发执行依据。
+
 ## 二、学习产品信息架构
 
 1. **选课入口**：按年龄/水平推荐，展示学习路径、前置知识、已发布课程；大纲与待开发课只预览，不提供假的「立即运行」。
@@ -83,4 +95,4 @@
 - 不复制编程猫、核桃编程、西瓜创客等未经授权的商业音视频、IP、课件和题库；原创素材需留来源/许可记录。
 - 如果本文件与现有代码冲突，以可验证的 main 代码为事实依据，并提交修订此计划的 PR。
 
-**阅读顺序：** [01 基线](./01-REPO-BASELINE.md) → [05 竞品参考图谱](./05-CN-PRODUCT-REFERENCE-ATLAS.md) → [06 详细页面规格](./06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md) → [08 课程合同](./08-CURRICULUM-QUALITY-AND-432-ROADMAP.md) → [09 课程质量百分制](./09-TEACHING-QUALITY-GATE.md) → [10 优质课样板](./10-TEACHING-QUALITY-EXEMPLARS.md) → [07 PR 任务排期](./07-PR-BY-PR-IMPLEMENTATION-BACKLOG.md) → [02 阶段计划](./02-PHASED-DELIVERY.md) → 实际 PR 和 CI。
+**阅读顺序：** **[11 单任务执行规则](./11-TASK-EXECUTION-POLICY.md) → [12 当前任务台账](./12-TASK-STATUS-BOARD.md)** → [01 基线](./01-REPO-BASELINE.md) → [05 竞品参考图谱](./05-CN-PRODUCT-REFERENCE-ATLAS.md) → [06 详细页面规格](./06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md) → [08 课程合同](./08-CURRICULUM-QUALITY-AND-432-ROADMAP.md) → [09 课程质量百分制](./09-TEACHING-QUALITY-GATE.md) → [10 优质课样板](./10-TEACHING-QUALITY-EXEMPLARS.md) → [07 PR 任务排期](./07-PR-BY-PR-IMPLEMENTATION-BACKLOG.md) → [02 阶段计划](./02-PHASED-DELIVERY.md) → 实际 PR 和 CI。

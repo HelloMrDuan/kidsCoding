@@ -32,5 +32,10 @@ License:
 - [432 课教学质量门槛与单元推进](docs/roadmap/08-CURRICULUM-QUALITY-AND-432-ROADMAP.md)
 - [课程教学品质独立 100 分评分与硬否决](docs/roadmap/09-TEACHING-QUALITY-GATE.md)
 - [Blockly / Python / Scratch 精品课示范验收](docs/roadmap/10-TEACHING-QUALITY-EXEMPLARS.md)
+- [**每次只交付一任务：状态更新与验收记录制度**](docs/roadmap/11-TASK-EXECUTION-POLICY.md)
+- [**任务进度总览**](docs/roadmap/12-TASK-STATUS-BOARD.md)
+- [**61 条产品/工程任务完整台账（JSON）**](docs/roadmap/task-register.json)
+- [**432 节课程逐课任务台账（JSON）**](docs/roadmap/lesson-task-register.json)
+- [**每次任务完成后必须更新的交付日志**](docs/roadmap/TASK-CHANGELOG.md)
 
 全量课程目录不等于可运行/已发布课程。后续开发按阶段计划执行，PR 记录测试与合并证据。
