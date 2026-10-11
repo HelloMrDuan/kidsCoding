@@ -18,13 +18,13 @@
         "README导航可用"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/25",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": "本批仅建立跟踪制度；CI与合并后验证待验收。"
+      "notes": "唯一交付任务：台账、432逐课、CI执行规则已提交PR #25；PR CI、合并和main CI等待真实验收，尚未 completed。"
     },
     {
       "id": "OPS-002",

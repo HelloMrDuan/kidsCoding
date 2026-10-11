@@ -6,7 +6,7 @@
 
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026-10-11 | OPS-001 | 建立产品任务和432逐课总账、单任务制度、GitHub校验（待PR验收） | 待填 | 待填 | 待填 | in_review；完成证据待合并后补记 |
+| 2026-10-11 | OPS-001 | 建立产品任务和432逐课总账、单任务制度、GitHub校验（待PR验收） | [#25](https://github.com/HelloMrDuan/kidsCoding/pull/25) | 待填 | 待填 | in_review；PR CI与合并后main CI待验收 |
 
 ## 每次完成后的记录模板
 ```markdown
