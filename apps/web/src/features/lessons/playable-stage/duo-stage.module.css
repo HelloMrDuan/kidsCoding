@@ -1,0 +1,33 @@
+.stage { --duo-ink: #23382e; --duo-leaf: #276449; --duo-cream: #fff9ed; --duo-edge: #dce7d8; --duo-space: 16px; background: var(--duo-cream); color: var(--duo-ink); border: 1px solid var(--duo-edge); border-radius: 28px; padding: clamp(14px, 3vw, 28px); box-shadow: 0 12px 32px #23412a12; }
+.heading, .toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.heading h3 { font-size: clamp(20px, 3vw, 28px); font-weight: 900; margin: 4px 0 12px; }
+.eyebrow { font-size: 12px; color: var(--duo-leaf); font-weight: 800; letter-spacing: .1em; }
+.badge { background: #e0eedb; border-radius: 20px; padding: 8px 12px; font-size: 12px; font-weight: 800; }
+.activity { background: white; border: 1px solid var(--duo-edge); border-radius: 18px; padding: var(--duo-space); margin: 16px 0; font-size: 14px; line-height: 1.8; }
+.activity p + p { margin-top: 8px; }
+.toolbar { margin: 20px 0 14px; font-size: 14px; }
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.buttons button { min-height: 44px; border: 1px solid #b3c4ad; border-radius: 14px; padding: 10px 14px; background: white; font-size: 14px; font-weight: 800; color: var(--duo-ink); }
+.buttons button[aria-pressed="true"], .buttons .run { background: var(--duo-leaf); color: white; border-color: var(--duo-leaf); }
+.buttons button:disabled { opacity: .55; cursor: default; }
+.buttons button:focus-visible { outline: 3px solid #9b4e17; outline-offset: 3px; }
+.landscape { background: linear-gradient(#d9eff1, #f1f5d7); border-radius: 20px; padding: 12px 16px 18px; border: 1px solid #cbddd3; }
+.sky { color: #365e55; font-size: 24px; text-align: right; letter-spacing: .4em; }
+.lane { margin-top: 12px; }
+.laneLabel { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; font-size: 13px; }
+.laneLabel span { font-variant-numeric: tabular-nums; }
+.track { position: relative; height: 110px; margin-right: 70px; border-bottom: 7px solid #b7ce87; }
+.friend { position: absolute; top: 14px; width: 66px; text-align: center; transition: left .35s ease-out; }
+.friend svg { width: 62px; height: 62px; border: 3px solid transparent; border-radius: 50%; }
+.active svg { border-color: #276449; background: #ffffffb0; box-shadow: 0 0 0 3px #ffffff80; }
+.friend span { display: block; font-size: 10px; font-weight: 800; background: #ffffffc0; border-radius: 8px; padding: 2px; }
+.friend em { position: absolute; top: -20px; left: 0; background: white; border-radius: 8px; padding: 3px 8px; font-size: 12px; white-space: nowrap; }
+.flag { position: absolute; left: 50%; top: 8px; color: #9b4e17; font-size: 30px; transform: translateX(52px); }
+.flag small { display: block; font-size: 11px; font-weight: 800; line-height: 1; }
+.start { position: absolute; bottom: -22px; left: 4px; font-size: 11px; }
+.result { margin: 18px 0 12px; background: white; border-radius: 14px; padding: 14px; font-size: 14px; line-height: 1.8; }
+.error { color: #a13522; }
+.log { padding: 10px 12px 10px 30px; background: #e9efdf; border-radius: 14px; font-size: 13px; line-height: 1.8; list-style: decimal; }
+.hint { margin: 8px 0; font-size: 14px; line-height: 1.8; padding: 8px 12px; border-left: 3px solid #d79b45; }
+@media (max-width: 440px) { .landscape { padding: 10px; } .friend { width: 54px; } .friend svg { width: 50px; height: 50px; } .flag { transform: translateX(42px); } .track { margin-right: 58px; height: 98px; } }
+@media (prefers-reduced-motion: reduce) { .friend { transition: none; } }

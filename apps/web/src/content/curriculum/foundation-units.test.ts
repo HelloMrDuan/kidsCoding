@@ -117,7 +117,7 @@ describe('foundation curriculum seed', () => {
     const longestChain = (lesson = lesson10) =>
       Math.max(...lesson.steps.map((step) => step.requiredBlockTypes.length))
 
-    expect(longestChain(lesson10)).toBe(3)
+    expect(longestChain(lesson10)).toBe(4)
     expect(longestChain(lesson11)).toBe(4)
     expect(longestChain(lesson12)).toBe(5)
     expect(lesson12?.steps[4]?.requiredBlockTypes).toEqual([

@@ -8,6 +8,7 @@ import { restoreBlockSequence } from './restore-block-sequence'
 
 type BlockSnapshot = {
   type: string
+  disconnected?: boolean
 }
 
 function collectSequence(block: Blockly.Block | null, result: BlockSnapshot[]) {
@@ -22,8 +23,10 @@ function collectSequence(block: Blockly.Block | null, result: BlockSnapshot[]) {
 function buildSnapshot(workspace: Blockly.WorkspaceSvg) {
   const snapshot: BlockSnapshot[] = []
 
-  workspace.getTopBlocks(true).forEach((block) => {
+  workspace.getTopBlocks(true).forEach((block, index) => {
+    const start = snapshot.length
     collectSequence(block, snapshot)
+    if (index > 0) snapshot[start].disconnected = true
   })
 
   return snapshot
@@ -59,10 +62,12 @@ export function BlocklyWorkspace({
   allowedBlocks,
   blocks,
   onSnapshotChange,
+  enableProgramTools = false,
 }: {
   allowedBlocks: string[]
   blocks: Array<{ type: string }>
   onSnapshotChange: (blocks: Array<{ type: string }>) => void
+  enableProgramTools?: boolean
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
@@ -114,15 +119,23 @@ export function BlocklyWorkspace({
       const block = workspace.newBlock(snapshot.type)
       block.initSvg()
       block.render()
-      positionOrConnectBlock(workspace, block)
+      if ((snapshot as BlockSnapshot).disconnected) block.moveBy(28, 230)
+      else positionOrConnectBlock(workspace, block)
     })
 
     const handleResize = () => {
       Blockly.svgResize(workspace)
     }
 
+    let previousSnapshot = JSON.stringify(latestBlocksRef.current)
     const handleChange = () => {
-      onSnapshotChange(buildSnapshot(workspace))
+      const next = buildSnapshot(workspace)
+      const key = JSON.stringify(next)
+      // Focus, selection and viewport changes do not edit the program.
+      if (key !== previousSnapshot) {
+        previousSnapshot = key
+        onSnapshotChange(next)
+      }
     }
 
     const resizeObserver = new ResizeObserver(() => {
@@ -170,6 +183,17 @@ export function BlocklyWorkspace({
     onSnapshotChange(buildSnapshot(workspace))
   }
 
+  function removeLastBlock() {
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    const tops = workspace.getTopBlocks(true)
+    let tail = tops[tops.length - 1]
+    if (!tail) return
+    while (tail.getNextBlock()) tail = tail.getNextBlock() as Blockly.BlockSvg
+    tail.dispose(false)
+    onSnapshotChange(buildSnapshot(workspace))
+  }
+
   return (
     <section className="space-y-4" data-testid="lesson-blockly-workspace">
       <div className="rounded-[2rem] border border-white/80 bg-[linear-gradient(180deg,#fff9f2_0%,#ffffff_100%)] px-5 py-4 shadow-[0_18px_36px_rgba(15,23,42,0.06)]">
@@ -213,6 +237,11 @@ export function BlocklyWorkspace({
         </p>
 
         <div className="mt-4 flex flex-wrap gap-3" data-testid="lesson-block-palette">
+          {enableProgramTools && <>
+            <button type="button" data-testid="lesson-remove-last" className="rounded-full bg-amber-100 px-4 py-3 text-sm font-bold text-slate-900" onClick={removeLastBlock}>撤回最后一块</button>
+            <button type="button" data-testid="lesson-clear-program" className="rounded-full bg-amber-100 px-4 py-3 text-sm font-bold text-slate-900"
+              onClick={() => { workspaceRef.current?.clear(); onSnapshotChange([]) }}>清空积木重拼</button>
+          </>}
           {stableAllowedBlocks.map((type) => (
             <button
               key={type}

@@ -624,7 +624,7 @@
       "title": "第10课第一二角色独立移动",
       "priority": "P0",
       "category": "EDU",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [],
       "scope": "use-block-executor.ts,launch-lessons.ts,单元/浏览器测试",
       "acceptance": [
@@ -636,10 +636,15 @@
         "pr": null,
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "Local: 121 Vitest tests across 20 suites passed, including 16 dual actor cases, original executor and course contracts",
+          "Local: production Next.js build passed; ESLint passed with 5 pre-existing warnings",
+          "Local: 30 actual Chrome E2E passed: lesson 10 across 1440/768/375 desktop+touch, including error/repair/reset/rerun/draft reload/project reload/edit/save and injected storage failure; lessons 01–09 desktop+touch regression",
+          "Evidence and independent teaching/UX rubric: docs/roadmap/evidence/EDU-101/README.md"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "本地完成第10课真实双角色执行、分层错误教学、可修改本机作品；集中验收中。第11、12课保持todo。独立人类教研与儿童试学未完成，不宣称正式发布。"
     },
     {
       "id": "EDU-102",

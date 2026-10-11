@@ -1,0 +1,118 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useBlockExecutor } from './use-block-executor'
+import styles from './duo-stage.module.css'
+
+function Friend({ bear = false }: { bear?: boolean }) {
+  return <svg viewBox="0 0 80 80" aria-hidden="true">
+    {bear ? <><circle cx="20" cy="22" r="13" fill="#a36a43"/><circle cx="60" cy="22" r="13" fill="#a36a43"/></> :
+      <><path d="M12 38 10 6 35 24M45 24 70 6 68 38" fill="#d96729"/><path d="m16 25-1-11 12 13m26 0 12-13-1 11" fill="#ffe0bd"/></>}
+    <ellipse cx="40" cy="44" rx="31" ry="29" fill={bear ? '#b47b51' : '#ed853f'}/>
+    <path d="M13 44Q24 44 40 60Q56 44 67 44Q65 72 40 73Q15 72 13 44" fill="#fff2dc"/>
+    <ellipse cx="28" cy="40" rx="3" ry="4" fill="#332f27"/><ellipse cx="52" cy="40" rx="3" ry="4" fill="#332f27"/>
+    <path d="M35 56Q40 52 45 56L40 61Z" fill="#332f27"/><path d="M34 64Q40 68 46 64" fill="none" stroke="#332f27" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+}
+
+const hints = [
+  '看看两条轨道：谁走过了头？谁还在起点？',
+  '每个角色有自己的位置。移动积木只交给当前操作的朋友，不会让大家一起走。',
+  '先开始 → 小狐狸移动 → 切换到另一位朋友 → 小熊移动。删掉多余移动，在两次移动中间插入切换。',
+]
+
+export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRunClear }: {
+  blocks: Array<{ type: string }>
+  requiredBlocks: string[]
+  stepIndex: number
+  onRunSuccess: () => void
+  onRunClear: () => void
+}) {
+  const executor = useBlockExecutor(blocks, requiredBlocks, stepIndex, true)
+  const [prediction, setPrediction] = useState<'bear' | 'both' | null>(null)
+  const [observedMistake, setObservedMistake] = useState(false)
+  const [reflection, setReflection] = useState<'own' | 'together' | null>(null)
+  const [hintCount, setHintCount] = useState(0)
+  const { executionState, characterPosition, partnerPosition, activeActor, characterMessage } = executor
+  const ready = executionState === 'success' && (stepIndex !== 0 || prediction !== null) &&
+    (stepIndex !== 3 || observedMistake) && (stepIndex !== 4 || reflection === 'own')
+
+  useEffect(() => {
+    if (ready) onRunSuccess()
+    else onRunClear()
+  }, [ready, onRunSuccess, onRunClear])
+
+  // Capture the observed result once; keep it when the child edits the repair.
+  if (!observedMistake && stepIndex === 3 && executionState === 'error' && characterPosition === 200 && partnerPosition === 0) {
+    setObservedMistake(true)
+  }
+
+  return <section className={styles.stage} data-testid="lesson-playable-stage" aria-label="双角色运行舞台">
+    <div className={styles.heading}>
+      <div><p className={styles.eyebrow}>森林朋友 · 独立行动</p><h3>两位朋友，各走自己的路</h3></div>
+      <span className={styles.badge}>一次移动 = 100 步</span>
+    </div>
+    {stepIndex === 0 && <div className={styles.activity}>
+      <p>小狐狸和小熊都在各自的 <strong>0 步起点</strong>。它们要分别走到 100 步的野餐旗。</p>
+      <p>先猜一猜：切换到小熊后，下一块“向右移动”会让谁走？</p>
+      <div className={styles.buttons}>
+        <button data-testid="duo-predict-bear" aria-pressed={prediction === 'bear'} onClick={() => setPrediction('bear')}>只有小熊</button>
+        <button data-testid="duo-predict-both" aria-pressed={prediction === 'both'} onClick={() => setPrediction('both')}>两个一起</button>
+      </div>
+      {prediction && <p role="status">记住你的预测，接下来亲自运行验证。猜错也可以继续实验。</p>}
+    </div>}
+    {stepIndex === 3 && <div className={styles.activity} data-testid="duo-debug-task">
+      <strong>实验：故意漏掉切换</strong>
+      <p>清空积木，亲自拼“开始时 → 向右移动 → 向右移动”并运行。观察小熊，再修好程序。</p>
+      <p>{observedMistake ? '已观察：小狐狸走了 200 步，小熊仍在 0 步。现在把切换补在两次移动中间。' : '这一步需要先观察漏切换的真实结果，再修复。'}</p>
+    </div>}
+    <div className={styles.toolbar}>
+      <p data-testid="duo-active-actor">当前操作：<strong>{activeActor === 'main' ? '小狐狸' : '小熊'}</strong></p>
+      <div className={styles.buttons}>
+        <button data-testid="reset-code-button" onClick={() => { executor.reset(); onRunClear() }}>重置舞台</button>
+        <button className={styles.run} data-testid="run-code-button" disabled={executionState === 'running' || (stepIndex === 0 && prediction === null)}
+          onClick={() => { onRunClear(); void executor.run() }}>{executionState === 'running' ? '正在行动…' : '▶ 运行积木'}</button>
+      </div>
+    </div>
+    <div className={styles.landscape}>
+      <div className={styles.sky} aria-hidden="true">☁　☀　☁</div>
+      {([{ label: '小狐狸', position: characterPosition, bear: false, active: activeActor === 'main', goal: stepIndex === 0 ? 0 : 100 },
+        { label: '小熊', position: partnerPosition, bear: true, active: activeActor === 'partner', goal: stepIndex < 2 ? 0 : 100 }]).map(friend =>
+        <div key={friend.label} className={styles.lane}>
+          <div className={styles.laneLabel}><strong>{friend.label}</strong><span data-testid={friend.bear ? 'duo-bear-distance' : 'duo-fox-distance'}>已走 {friend.position} / 目标 {friend.goal} 步</span></div>
+          <div className={styles.track}>
+            <div className={styles.flag} aria-hidden="true">⚑<small>100</small></div>
+            <div className={`${styles.friend} ${friend.active ? styles.active : ''}`}
+              data-testid={friend.bear ? 'stage-character-partner' : 'stage-character-main'} data-position={friend.position}
+              style={{ left: `${Math.min(friend.position, 200) / 2}%` }}>
+              <Friend bear={friend.bear}/><span>{executor.actorActions[friend.bear ? 'partner' : 'main'] === 'moving' ? '正在移动' : friend.active ? '正在操作' : '等待指令'}</span>
+              {!friend.bear && characterMessage && <em>{characterMessage}</em>}
+            </div>
+            <span className={styles.start}>0</span>
+          </div>
+        </div>)}
+    </div>
+    <div className={styles.result} role="status" aria-live="polite" data-testid="duo-result">
+      {executionState === 'idle' && '先拼好积木，再运行。重置只恢复舞台，保留你的代码。'}
+      {executionState === 'running' && '按顺序执行中，注意当前操作的朋友。'}
+      {executionState === 'error' && <strong className={styles.error}>{executor.errorMessage}</strong>}
+      {executionState === 'success' && <><strong>运行成功！两个角色的位置符合本步目标。</strong>
+        {stepIndex === 3 && !observedMistake && <p>还需要先完成上面的漏切换实验。</p>}
+        {stepIndex === 2 && <p>小狐狸停在 100 步，小熊接着走。切换的是操作权，已经走过的位置不会变。</p>}
+        {ready && <p>可以点击“完成这一步”继续。</p>}</>}
+    </div>
+    {executor.actionLog.length > 0 && <ol className={styles.log} data-testid="duo-action-log">{executor.actionLog.map((line, i) => <li key={i}>{line}</li>)}</ol>}
+    <div className={styles.buttons}><button data-testid="duo-show-hint" disabled={hintCount === hints.length} onClick={() => setHintCount(count => count + 1)}>看看提示（{hintCount}/3）</button></div>
+    {hints.slice(0, hintCount).map((hint, i) => <p className={styles.hint} key={hint}>{i + 1}. {hint}</p>)}
+    {stepIndex === 4 && <div className={styles.activity}>
+      <strong>我的野餐作品</strong><p>你可以保留两位朋友各走 100 步，也可以在切换前给小狐狸加一句问候。两种作品都能过关。</p>
+      <p>想一想：为什么两位朋友不会一起移动？</p>
+      <div className={styles.buttons}>
+        <button data-testid="duo-reflect-own" aria-pressed={reflection === 'own'} onClick={() => setReflection('own')}>动作只给当前角色</button>
+        <button data-testid="duo-reflect-together" aria-pressed={reflection === 'together'} onClick={() => setReflection('together')}>移动会让所有角色走</button>
+      </div>
+      {reflection && <p data-testid="duo-reflection">{reflection === 'own' ? '对！两个角色各有自己的位置，切换只改变后面动作的目标。' : '再观察两条轨道：第一块移动时，小熊还在原地。移动只给当前角色。'}</p>}
+      <p>完成后记录本机作品；当前编辑草稿只保留在本浏览器会话。这里是编程练习，不是认证成绩。</p>
+    </div>}
+  </section>
+}

@@ -14,3 +14,9 @@
 | YYYY-MM-DD | TASK-ID | 真正实现的功能/课程/页面与正反验收摘要 | https://github.com/.../pull/N | full SHA | https://github.com/.../actions/runs/N | completed；剩余缺口/下一个Task-ID |
 ```
 - 若验收不通过：状态改为 blocked/in_review，写出原因、需要的权限或日志、下次复验标准，不填写不存在的SHA或假CI。
+
+## EDU-101 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-11 | EDU-101 | 本地实施第10课双角色独立坐标/动作、真Blockly目标验证、漏切换错误练习与修复、预测复盘、可修改本机作品；集中验收证据见 evidence/EDU-101 | 待正式PR创建后回填 | 待合并 | 待main验收 | in_progress；仅本任务，第11/12课仍todo；不宣称人工教研或生产发布完成 |

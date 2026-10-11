@@ -897,75 +897,76 @@
     {
       "id": "lesson-10-second-friend",
       "title": "第二位朋友登场",
-      "story": "森林音乐会临时来了新朋友，舞台需要安排新的出场顺序。",
+      "story": "小狐狸和小熊要分别走到各自的野餐旗。一个朋友走路，另一个朋友的位置不会跟着变。",
       "concepts": [
-        "多角色",
-        "事件",
-        "独立脚本"
+        "角色独立状态",
+        "顺序执行",
+        "操作目标切换"
       ],
-      "learningOutcome": "能控制两位角色各自的触发与动作，不混淆脚本归属。",
+      "learningOutcome": "能在一条开始程序中先移动小狐狸，再切换操作目标并移动小熊；解释角色各自的位置。不是两个独立事件脚本。",
       "instructionSequence": [
         {
           "step": 1,
-          "teacherPrompt": "认识两位舞台角色",
-          "childAction": "为森林舞台挑选两位不同角色",
-          "check": "可识别两位角色",
-          "voiceover": "第1步：认识两位舞台角色 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "观察两条轨道",
+          "childAction": "指出小狐狸和小熊各自的0步起点",
+          "check": "两位朋友清晰可见",
+          "voiceover": "第1步：观察两条轨道。",
           "interactionType": "observe"
         },
         {
           "step": 2,
-          "teacherPrompt": "确定谁先出现",
-          "childAction": "写下角色出场的先后顺序",
-          "check": "顺序安排合理",
-          "voiceover": "第2步：确定谁先出现 试一试，完成后说说你看到了什么。",
-          "interactionType": "build"
+          "teacherPrompt": "预测操作目标",
+          "childAction": "猜切换到小熊后谁会移动；放开始时运行",
+          "check": "猜错可以继续实验",
+          "voiceover": "第2步：预测操作目标。",
+          "interactionType": "predict"
         },
         {
           "step": 3,
-          "teacherPrompt": "给第一位角色编程",
-          "childAction": "在第一位角色的脚本区实现入场",
-          "check": "角色A行为正确",
-          "voiceover": "第3步：给第一位角色编程 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "狐狸独立移动",
+          "childAction": "在开始后加移动并运行",
+          "check": "狐狸100步，小熊0步",
+          "voiceover": "第3步：狐狸独立移动。",
           "interactionType": "build"
         },
         {
           "step": 4,
-          "teacherPrompt": "给第二位角色编程",
-          "childAction": "切换到第二位角色，建立它自己的触发和动作",
-          "check": "角色B有独立脚本",
-          "voiceover": "第4步：给第二位角色编程 试一试，完成后说说你看到了什么。",
-          "interactionType": "predict"
+          "teacherPrompt": "切换再移动小熊",
+          "childAction": "在狐狸移动后加切换，再加移动",
+          "check": "狐狸100步，小熊100步",
+          "voiceover": "第4步：切换再移动小熊。",
+          "interactionType": "build"
         },
         {
           "step": 5,
-          "teacherPrompt": "逐个触发测试",
-          "childAction": "分开触发两个角色检查脚本归属",
-          "check": "分开测试都能运行",
-          "voiceover": "第5步：逐个触发测试 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "漏切换与修复",
+          "childAction": "亲自拼开始、移动、移动；观察错误，再在两次移动间补切换",
+          "check": "错误狐狸200步/小熊0步；修复各100步",
+          "voiceover": "第5步：漏切换与修复。",
           "interactionType": "test"
         },
         {
           "step": 6,
-          "teacherPrompt": "完整演出",
-          "childAction": "合并演示双角色出场并解释区别",
-          "check": "双角色演出成功",
-          "voiceover": "第6步：完整演出 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "改造、保存、复盘",
+          "childAction": "可在切换前给狐狸加问候；运行、解释动作归属、完成后重开修改保存",
+          "check": "两种有效作品；保存改造只在重新验证后可用",
+          "voiceover": "第6步：改造、保存、复盘。",
           "interactionType": "reflect"
         }
       ],
       "commonErrors": [
-        "两个角色用了同一个脚本",
-        "新角色没有开始事件",
-        "角色重叠看不清"
+        "没有切换，小狐狸走200步而小熊没动",
+        "先切换导致狐狸未走到目标",
+        "重复切换或把问候给错误角色",
+        "积木没有连在开始下面"
       ],
       "tieredHints": [
-        "先指出每段程序属于谁。",
-        "为新朋友设置自己的触发事件。",
-        "分开运行再一起运行。"
+        "看看谁走过了头，谁还在起点。",
+        "每个角色有自己的位置，动作只给当前角色。",
+        "开始、狐狸移动、切换、小熊移动；在两次移动中间补切换。"
       ],
-      "extension": "增加第三位朋友并安排错峰登场。",
-      "parentConversation": "要求孩子独立解释每位角色的职责。",
+      "extension": "保留独立移动，或在切换前让狐狸打招呼；两种作品均可运行、保存、重开和修改。",
+      "parentConversation": "请孩子演示漏切换与修复，解释为什么两个角色不会一起走。只记录本机练习，不代表认证成绩。",
       "assessment": {
         "pass": [
           "作品可以按任务要求演示",
@@ -976,7 +977,7 @@
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
         ],
-        "sampleFailureCase": "两个角色用了同一个脚本",
+        "sampleFailureCase": "未切换：狐狸200步，小熊0步，不能通过",
         "instructorEvidence": [
           "能复述触发与执行顺序",
           "能独立演示当前课的核心动作",
