@@ -79,3 +79,9 @@
 - 最终生产构建、生产 TypeScript 检查通过；ESLint 无错误，5 条既有警告。
 - 最终实际 Chrome 30/30 通过：第10课三尺寸 desktop+touch 8条，加原01–09 desktop+touch 22条。包含存储QuotaExceededError故障注入，反馈“尚未保存”，刷新后旧作品仍可运行；执行器从未被替换。
 - PR模式单任务台账校验通过，仅EDU-101记录改变；61产品任务与432课索引保持有效。
+
+## GitHub验收
+
+- [功能PR #27](https://github.com/HelloMrDuan/kidsCoding/pull/27)，head `af62e13c84888353c816fba104f9e1b4c1d0998a`；[PR课程7项通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38103776550)，[PR台账通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38103776597)。
+- 功能合并SHA：`25e41b482ef33bf53bc4c040cc8a1b5be5e9a5d7`；[main课程7项通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38104195809)，[main台账通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38104195800)。
+- 工程Task-ID EDU-101可以标completed；人类质量评分/儿童试学/生产发布没有凭CI自动标为完成。
