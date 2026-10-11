@@ -8,7 +8,7 @@
       "title": "建立强制追踪台账和CI校验",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "docs/roadmap/11,12,task-register.json,lesson-task-register.json,.github/workflows",
       "acceptance": [
@@ -19,12 +19,18 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/25",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "mergeCommit": "1dd292d9d0abe780ffdf8e12ff6b798fd110a133",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38101243423",
+        "tests": [
+          "PR curriculum CI #38101058926: 7/7 success",
+          "PR task-ledger CI #38101059023: success",
+          "main curriculum CI #38101243423: 7/7 success",
+          "main task-ledger CI #38101243415: success",
+          "432 lesson IDs match full-catalog-v1.json; task and dependency/schema validation passed"
+        ],
         "reviewer": null
       },
-      "notes": "唯一交付任务：台账、432逐课、CI执行规则已提交PR #25；PR CI、合并和main CI等待真实验收，尚未 completed。"
+      "notes": "本任务范围仅建立可审计任务追踪制度。PR #25 已合并，main 的课程7项+新增task-ledger校验通过；未对其它61工作包或432课程宣称完成。"
     },
     {
       "id": "OPS-002",

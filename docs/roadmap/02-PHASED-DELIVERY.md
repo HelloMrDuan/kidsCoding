@@ -12,7 +12,7 @@
 
 ## -1. 单任务闭环管理（必须先执行）
 
-- [ ] OPS-001 先合并两套任务台账、61 个独立工作包 + 432 节逐课任务与 CI 强制核验；以 PR 和主分支 CI 为完成证据，随后补交付日志。
+- [x] OPS-001 **已完成**：产品61任务、课程432课台账及强制单任务 CI；[PR #25](https://github.com/HelloMrDuan/kidsCoding/pull/25)，合并 `1dd292d9d0abe780ffdf8e12ff6b798fd110a133`，[课程main CI 7/7](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38101243423)，[任务main CI通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38101243415)；完成记录见 TASK-CHANGELOG。
 - [ ] OPS-002 强制 PR 任务模板与审核人检查：**每个 PR 有且仅有一个任务编号**，更新对应 JSON 条目，写清正反用例、剩余问题。
 - [ ] OPS-003 消化遗留 PR #1 与旧分支：逐项检查已移植功能，不再把冲突代码重新合并。
 - [ ] OPS-004 建立每次交付收尾机制：main CI success 后回填 completed、交付日志（同一任务的收尾，不算新的功能任务）。
