@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
@@ -27,6 +28,7 @@ type ProjectCompleteCardProps = {
   onReplay: () => void
   primaryHref: string
   primaryLabel: string
+  playableProject?: ReactNode
 }
 
 function RewardPills({
@@ -71,6 +73,7 @@ export function ProjectCompleteCard({
   onReplay,
   primaryHref,
   primaryLabel,
+  playableProject,
 }: ProjectCompleteCardProps) {
   const isMilestone = Boolean(
     completionCopy.spotlightTag &&
@@ -103,7 +106,7 @@ export function ProjectCompleteCard({
             data-testid="project-complete-lite-preview"
           >
             <div className="scale-[0.92] origin-top">
-              <PreviewStage blocks={blocks} template={template} />
+              {playableProject ?? <PreviewStage blocks={blocks} template={template} />}
             </div>
           </div>
 

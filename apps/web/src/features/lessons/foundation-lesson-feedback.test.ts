@@ -60,7 +60,7 @@ describe('getFoundationLessonFeedback', () => {
   it('uses a result-first progress line for lesson 10', () => {
     expect(
       getFoundationLessonFeedback('lesson-10-second-friend', 'progress'),
-    ).toBe('现在，第二位朋友已经上场了。')
+    ).toBe('继续观察两条轨道：移动只给当前操作的朋友，切换后才轮到小熊。')
   })
 
   it('uses a stronger cooperation result line for lesson 11', () => {

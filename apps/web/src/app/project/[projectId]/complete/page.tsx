@@ -9,6 +9,7 @@ import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
 import { buildProjectCompletionCopy } from '@/features/projects/build-project-completion-copy'
 import { ProjectCompleteCard } from '@/features/projects/project-complete-card'
+import { DuoProject } from '@/features/lessons/playable-stage/duo-project'
 import { resolveProjectContinueAction } from '@/features/projects/resolve-project-continue-action'
 import {
   defaultGuestProgress,
@@ -59,6 +60,7 @@ export default function ProjectCompletePage() {
       <ProjectCompleteCard
         key={`${lesson.id}-${replayCount}`}
         blocks={snapshotBlocks}
+        playableProject={lesson.id === 'lesson-10-second-friend' ? <DuoProject key={JSON.stringify(snapshotBlocks)} initialBlocks={snapshotBlocks}/> : undefined}
         completionCopy={completionCopy}
         isFoundationGraduate={isFoundationGraduate}
         lessonTitle={lesson.title}

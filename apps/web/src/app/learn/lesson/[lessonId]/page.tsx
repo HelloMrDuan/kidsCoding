@@ -12,6 +12,7 @@ import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { evaluateStep } from '@/features/lessons/blockly/evaluate-step'
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
 import { PlayableStage } from '@/features/lessons/playable-stage'
+import { DuoStage } from '@/features/lessons/playable-stage/duo-stage'
 import { buildHintState } from '@/features/lessons/build-hint-state'
 import { completeLaunchLesson } from '@/features/lessons/complete-launch-lesson'
 import { getFoundationLessonFeedback } from '@/features/lessons/foundation-lesson-feedback'
@@ -86,8 +87,14 @@ export default function LessonPage() {
     [lessonId, setHasRunSuccess],
   )
 
-  const handleRunSuccess=useCallback(()=>setHasRunSuccess(true),[setHasRunSuccess])
-  const handleRunClear=useCallback(()=>setHasRunSuccess(false),[setHasRunSuccess])
+  const handleRunSuccess=useCallback(() => {
+    setHasRunSuccess(true)
+    if (lessonId === 'lesson-10-second-friend') setFeedback('本步角色结果与学习活动已验证。看看两条轨道，再完成这一步。')
+  }, [lessonId, setHasRunSuccess, setFeedback])
+  const handleRunClear=useCallback(() => {
+    setHasRunSuccess(false)
+    if (lessonId === 'lesson-10-second-friend') setFeedback('先运行积木，观察两个朋友的实际位置，再完成本步学习活动。')
+  }, [lessonId, setHasRunSuccess, setFeedback])
 
   useEffect(() => {
     let isActive = true
@@ -156,7 +163,8 @@ export default function LessonPage() {
 
   async function handleNext() {
     const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id)
-    const correct=evaluateStep(step.requiredBlockTypes,blocksRef.current) && (!needsRun || blocksRef.current.length===step.requiredBlockTypes.length)
+    const duoLesson = currentLesson.id === 'lesson-10-second-friend'
+    const correct=duoLesson ? hasRunSuccess : evaluateStep(step.requiredBlockTypes,blocksRef.current) && (!needsRun || blocksRef.current.length===step.requiredBlockTypes.length)
     if (!correct || (needsRun && !hasRunSuccess)) {
       const nextFailedAttempts = failedAttempts + 1
       const nextHintState = buildHintState({
@@ -168,7 +176,7 @@ export default function LessonPage() {
       setFeedback(
         needsRun && correct && !hasRunSuccess
           ? (currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一步。')
-          : nextHintState.activeHint?.copy ?? getFoundationLessonFeedback(currentLesson.id, 'retry'),
+          : duoLesson ? '请先运行并观察角色结果，完成本步的预测、错误实验或复盘。舞台会告诉你还缺什么。' : nextHintState.activeHint?.copy ?? getFoundationLessonFeedback(currentLesson.id, 'retry'),
       )
       return
     }
@@ -289,7 +297,10 @@ export default function LessonPage() {
             />
           ) : (
             <div className="space-y-6">
-              {['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
+              {currentLesson.id === 'lesson-10-second-friend' ? (
+                <DuoStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} requiredBlocks={step.requiredBlockTypes}
+                  stepIndex={stepIndex} onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
+              ) : ['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
                 <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
                   requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex}
                   onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
@@ -297,6 +308,7 @@ export default function LessonPage() {
                 <PreviewStage blocks={blocks} template={currentTemplate}/>
               )}
               <BlocklyWorkspace
+                enableProgramTools={currentLesson.id === 'lesson-10-second-friend'}
                 allowedBlocks={step.allowedBlocks}
                 blocks={blocks}
                 onSnapshotChange={handleSnapshotChange}
