@@ -279,13 +279,13 @@
       "title": "设计Tokens规范化",
       "priority": "P0",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [],
-      "scope": "apps/web/src/app/globals.css,features/ui/tokens.ts",
+      "scope": "docs/design/kidscoding-v2/ 已审批视觉基线；后续实现 apps/web/src/app/globals.css 与 features/ui/tokens.ts",
       "acceptance": [
-        "暖橙/奶油/天空色语义token和对比度有测试",
-        "老页面不回归",
-        "三屏截图"
+        "V2海军蓝导航/科技蓝动作色/中性背景形成可复用语义token；WCAG 2.2 AA 对比度检验",
+        "不破坏现有页面、交互与现有学习数据",
+        "1440×900、768×1024、375×812 三断点实装前后截图与实际功能验收"
       ],
       "evidence": {
         "pr": null,
@@ -294,7 +294,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "2026-10-11 用户确认 V2 视觉方向，可提交原型与设计规范。此 PR 只固化基线，未实施 tokens/页面业务代码或完成 UX-001 的测试、CI/main 验收；不得改为 completed。"
     },
     {
       "id": "UX-002",

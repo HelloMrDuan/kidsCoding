@@ -38,3 +38,9 @@
 | 2026-10-11 | EDU-103 | 真实功能PR创建，154单测/48 Chrome/12截图；功能分支一次集中推送 | [#31](https://github.com/HelloMrDuan/kidsCoding/pull/31) | 待合并 | 待验收 | in_review；PR URL本地回填，收尾记录提交 |
 | 2026-10-11 | EDU-103 | 功能PR CI 8/8且无阻塞后合并，等待main复核 | [#31](https://github.com/HelloMrDuan/kidsCoding/pull/31) | `a43043b95706f002dc7bb304be72aac6c933d3c7` | 待main验收 | merged_waiting_ci |
 | 2026-10-11 | EDU-103 | **工程交付完成**：真实fox100/bear200毕业礼物、重复隔离/两方案/错误修复/可改本机作品/重复领奖；154单测、48 Chrome、12截图、PR/main各8/8全绿 | [#31](https://github.com/HelloMrDuan/kidsCoding/pull/31) | `a43043b95706f002dc7bb304be72aac6c933d3c7` | [课程main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38112165402) / [台账main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38112165401) | **completed**；下项SYS-101。人类质量/试学/实体手机/生产发布未验收 |
+
+## UX-001 设计基线冻结（本任务开发尚未完成）
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-11 | UX-001 | 项目方认可 V2 视觉方向；归档10页可交互HTML、可离线单文件原型、10项原创演示素材及Codex实施规范。没有改动任何业务界面或课程状态 | 本次设计归档PR，创建后见GitHub | 待本次设计归档合并 | 待本次设计归档主CI | in_progress；UX-001 设计tokens代码、对比度测试、三端真实业务截图均未实施，不得标 completed |
