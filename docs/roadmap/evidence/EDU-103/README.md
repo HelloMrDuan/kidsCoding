@@ -67,3 +67,9 @@ Before 从改动前生产服务获取；After/error 从最终生产服务的 Chr
 - 12张真实PNG包括上述9张及 [桌面重开作品](./desktop-project.png)、[平板重开作品](./tablet-project.png)、[手机重开作品](./phone-project.png)。
 - 浏览器发现并修复“改变积木方案后保存导致编辑器重挂载，成功提示和舞台结果丢失”；修复后重验三屏保存与第10–11课。最初桌面tap配置误判也已纠正，没有删除或放宽失败用例。
 - PR模式单任务追踪校验通过，只有EDU-103状态变化。全目录tsc仍失败于既有scripts/admin/auth/cards/progress夹具；本轮没有新增诊断或放宽配置。
+
+## GitHub集中验收
+
+- [功能PR #31](https://github.com/HelloMrDuan/kidsCoding/pull/31)；head `5cb0fc70a63aea89815e183c6ce3981e033ec26e`；[PR课程7项通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38111461619)、[PR台账通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38111461613)。
+- 功能完整合并SHA：`a43043b95706f002dc7bb304be72aac6c933d3c7`；[main课程7项通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38112165402)、[main台账通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38112165401)。
+- 同Task-ID收尾记录PR只回填上述真实证据，不领取新产品任务。功能分支仅一次集中推送。

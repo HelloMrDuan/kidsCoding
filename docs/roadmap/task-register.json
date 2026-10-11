@@ -690,7 +690,7 @@
       "title": "第12课双角色毕业作品",
       "priority": "P0",
       "category": "EDU",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "EDU-102"
       ],
@@ -700,18 +700,23 @@
         "自定义方案、作品可重开、重复领奖幂等"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/31",
+        "mergeCommit": "a43043b95706f002dc7bb304be72aac6c933d3c7",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38112165402",
         "tests": [
           "Local: 154 Vitest tests / 23 suites passed, including 17 graduation runtime cases, actual persistence failure and graduation reward idempotency",
           "Local: final production Next.js build and production TypeScript passed; ESLint zero errors, five existing warnings",
           "Local: 48 actual Chrome cases passed: lessons01–09 22; final lessons10–11 16; graduation10 (three sizes desktop/native touch, two full completions, editable reopened work, quota failure/retry, wrong repeat target, malformed trailing code and direct completion URL)",
-          "Evidence: docs/roadmap/evidence/EDU-103/README.md; 12 baseline/after/error/project PNGs, separate teaching/UX rubrics pending independent human scoring"
+          "Evidence: docs/roadmap/evidence/EDU-103/README.md; 12 baseline/after/error/project PNGs, separate teaching/UX rubrics pending independent human scoring",
+          "PR #31: 7 curriculum jobs + task-ledger success on 5cb0fc70a63aea89815e183c6ce3981e033ec26e",
+          "Merged main a43043b95706f002dc7bb304be72aac6c933d3c7: 7 curriculum jobs + task-ledger success, including actual Chrome desktop/native touch graduation and original engines"
         ],
-        "reviewer": null
+        "reviewer": null,
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38111461619",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38111461613",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38112165401"
       },
-      "notes": "本地集中验收通过，待唯一功能PR和PR/main CI；未提前completed。全目录tsc既有脚本/测试夹具诊断仍在，生产TypeScript通过；人类评分/儿童试学/实体手机/生产发布未验收。"
+      "notes": "EDU-103工程交付完成：fox100/bear200真实礼物、重复归属、两方案与可改重开作品、真实重复通关领奖幂等；PR/main各8/8绿色且无合并阻塞。两份100分证据分别登记，无独立人类评分/儿童试学/实体手机/生产Supabase发布或部署验收，不宣称正式发布。全目录tsc既有夹具诊断保留，生产TypeScript通过；SYS-101及432课状态未提前完成。"
     },
     {
       "id": "UX-301",

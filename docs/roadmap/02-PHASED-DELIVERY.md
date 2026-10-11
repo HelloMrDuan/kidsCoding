@@ -155,7 +155,7 @@
 | 0.8 | 优质课程评价与样板基线 | 09/10文档入库，后续逐课质量评分、教研复核、真实运行和作品 | 本轮规划更新 |
 | 1 | 第 10 课第二角色真正移动 | 双角色动作分离、Chrome 正反例、CI 全绿 | EDU-101 工程已合并验收：[PR #27](https://github.com/HelloMrDuan/kidsCoding/pull/27)，PR/main各8项全绿；见 [证据](./evidence/EDU-101/README.md)。人类质量/生产发布仍待验收 |
 | 2 | 第 11 课双角色移动与对白 | 真位置/台词、错误角色动作、刷新/重复运行 | EDU-102工程已合并验收：[PR #29](https://github.com/HelloMrDuan/kidsCoding/pull/29)，PR/main各8项全绿；见 [证据](./evidence/EDU-102/README.md)。人类质量/生产发布仍待验收 |
-| 3 | 第 12 课真实毕业作品 | 礼物目标、独立重试/改变作品、重复奖励防护 | EDU-103本地集中验收通过，待PR/main验收；见 [证据](./evidence/EDU-103/README.md) |
+| 3 | 第 12 课真实毕业作品 | 礼物目标、独立重试/改变作品、重复奖励防护 | EDU-103工程已合并验收：[PR #31](https://github.com/HelloMrDuan/kidsCoding/pull/31)，PR/main各8项全绿；见 [证据](./evidence/EDU-103/README.md)。人类质量/生产发布仍待验收 |
 | 3.5 | UX-2 成熟课堂界面与双角色执行整合 | 真实舞台+课堂分区+手机可操作+三断点 Chrome E2E | 未开始 |
 | 4 | 统一 12 课与 432 目录的 ID/成熟度 | 无双计、前后台统一状态、旧草稿兼容 | 未开始 |
 | 5 | 真实 Supabase 两账号两设备验收 | 数据隔离、迁移、恢复、失败冲突和安全记录 | 未开始 |
