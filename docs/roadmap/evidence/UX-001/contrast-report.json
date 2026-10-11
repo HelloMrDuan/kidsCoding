@@ -1,5 +1,5 @@
 {
-  "decision": "Owner explicitly retains all prototype text colors; AA gaps are unresolved, no completed status.",
+  "decision": "Owner explicitly retains approved prototype text colors and records AA gaps. Foundation acceptance follows this approved design tradeoff; no full WCAG AA compliance claim.",
   "pairs": [
     {
       "name": "text",

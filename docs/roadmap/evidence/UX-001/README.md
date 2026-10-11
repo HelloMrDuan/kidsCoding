@@ -4,7 +4,7 @@
 
 ## 实际代码与边界
 
-`globals.css` 与 `features/ui/tokens.ts` 实现原型色值、现代中文系统字体 14px/1.55、8px 操作圆角、14px 面板、10px 内域、轻边界/阴影、导航/顶部/内容宽度和响应式尺寸变量。真实旧基础类通过兼容别名改用 V2，去除全站奶油渐变、玻璃和夸张拟物阴影；现有业务 DOM、位置、网格、课程数据与持久化代码没有修改。原型未修改、演示素材未加入 production public。
+`globals.css` 与 `features/ui/tokens.ts` 实现原型色值、现代中文系统字体 14px/1.55、8px 操作圆角、14px 面板、10px 内域、轻边界/阴影、导航/顶部/内容宽度和响应式尺寸变量。真实旧基础类通过兼容别名改用 V2，去除全站奶油渐变、玻璃和夸张拟物阴影；现有业务 DOM、布局代码、课程数据与持久化代码没有修改。原型未修改、演示素材未加入 production public。
 
 [VISUAL-LOCK](../../../design/kidscoding-v2/VISUAL-LOCK.md) 已由根 AGENTS、开发总纲、阶段计划、04/06/07 UI 规范引用，新会话不得自行重做 V2。
 
@@ -23,9 +23,9 @@
 
 截图命名：`{home,map,lesson}-{desktop,tablet,mobile}-{before,after,reference}.png`；基础样本 `{desktop,tablet,mobile}-tokens-{reference,actual}.png`。前后测量见 [before](./before-measurements.json) / [after](./after-measurements.json)。可复现代码 `apps/web/scripts/capture-v2-foundation.mjs`：分别启动基线与候选生产版本，在仓库执行 `node apps/web/scripts/capture-v2-foundation.mjs before|after`；自动契约与浏览器检查在 `tokens.test.ts` / `v2-tokens.spec.ts`。
 
-## 对比度：未满足全 AA，不能 completed
+## 对比度：保留冻结原色，记录已裁定的 AA 缺口
 
-项目负责人明确裁定：**严格保持原型文字颜色，记录 AA 缺口**。没有批准加深颜色，也没有明确取消任务的全 AA 完成条件。
+项目负责人明确裁定：**严格保持原型文字颜色，记录 AA 缺口**。按照这项明确裁定，UX-001 的取舍是忠实保留批准色值、实际检验并公开记录缺口；不重新请求同一设计决定，不宣称完整 AA 合规。
 
 | 白底色值用途 | 实测比值 | 门槛 | 结果 |
 | --- | ---: | ---: | --- |
@@ -37,7 +37,7 @@
 | 错误小字 #d64c4c | 4.2022 | 4.5 | 未通过 |
 | 焦点环 #84afff | 2.1973 | 非文本 3 | 未通过 |
 
-精确数值见 [contrast-report.json](./contrast-report.json)。契约测试会断言这些例外存在，防止静默改色或假报 AA；测试通过表示实现遵守冻结设计，不表示这些颜色达到 AA。正常正文/主操作/导航 AA 另有正向断言。**UX-001 待负责人明确调整完成条件或批准最小设计变更，再验收关闭；此前不领取下一任务。**
+精确数值见 [contrast-report.json](./contrast-report.json)。契约测试会断言这些例外存在，防止静默改色或假报 AA；测试通过表示实现遵守冻结设计，不表示这些颜色达到 AA。正常正文/主操作/导航 AA 另有正向断言。**负责人已裁定保留原色并记录缺口。本任务基础工程按此裁定验收；后续任何改色仍必须先获明确批准。已知 AA 缺口继续追踪，不代表通过全 AA 或批准页面生产发布。**
 
 ## 素材与质量审核边界
 
@@ -48,3 +48,10 @@
 ## 实际验证结果
 
 160 条 Vitest / 24 文件通过；实际 Google Chrome 48 条原 1～12 课回归通过，0 失败/跳过/重试不稳；另 4 条 V2 基础视觉/键盘/触控/减少动效检查通过。课程包含正确/错误程序、角色隔离、重复运行、重置、保存重开/修改、配额失败恢复和奖励幂等，12 课含手机原生 tap。生产构建（含 TypeScript）通过；lint 0 错误、5 项既有警告；新代码专项 lint 通过。单任务台账通过。报告见 [单测](./unit-results.json)、[课程 Chrome](./course-browser-results.json)、[基础 Chrome](./theme-browser-results.json)、[视觉测量](./visual-comparison.json)。PR 与 main CI 实际 URL 将在同一 UX-001 收尾记录中回填。全 AA 缺口单独保留，不把自动检查成功当作全部完成。
+
+## GitHub 实际结果
+
+功能 [PR #34](https://github.com/HelloMrDuan/kidsCoding/pull/34)，head `ba480ef26d49a0c0d46f258b625a434d9471a8fb`，合并 `ee1cddaa63f8baf3db57b873930a3f25461a83ec`。
+PR [课程 CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132219257) / [台账 CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132219165)：8/8成功；main [课程 CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132983377) / [台账 CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132982986)：8/8成功。
+
+状态为 **completed（UX-001 基础工程）**，按负责人明确的保留冻结色/记录 AA 缺口取舍执行。完整 AA、十页布局迁移、素材生产权利和独立质量评分仍未完成。下一项 UX-002 实现 V2 按钮状态/真实错误反馈，本轮未领取。
