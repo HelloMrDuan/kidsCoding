@@ -1,0 +1,1376 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-11",
+  "policy": "11-TASK-EXECUTION-POLICY.md",
+  "tasks": [
+    {
+      "id": "OPS-001",
+      "title": "建立强制追踪台账和CI校验",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "docs/roadmap/11,12,task-register.json,lesson-task-register.json,.github/workflows",
+      "acceptance": [
+        "每个任务有唯一编号、前置、产物、正反验收",
+        "432课逐课索引",
+        "CI禁止无证据标完成",
+        "README导航可用"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/25",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "唯一交付任务：台账、432逐课、CI执行规则已提交PR #25；PR CI、合并和main CI等待真实验收，尚未 completed。"
+    },
+    {
+      "id": "OPS-002",
+      "title": "每批真实交付关联任务ID",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "todo",
+      "dependencies": [],
+      "scope": ".github/PULL_REQUEST_TEMPLATE.md 和任务CI",
+      "acceptance": [
+        "PR必须声明唯一任务编号",
+        "单批功能改动与任务范围一致",
+        "任务状态随PR和main CI复核"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "OPS-003",
+      "title": "收口冲突的遗留PR1",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "todo",
+      "dependencies": [],
+      "scope": "旧PR1/Blockly首关",
+      "acceptance": [
+        "比对有效代码和main已合并内容",
+        "保留证据并决定关闭或移植，避免重复合并"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "OPS-004",
+      "title": "每批完成后刷新任务记录",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "todo",
+      "dependencies": [
+        "OPS-001"
+      ],
+      "scope": "docs/roadmap/task-register.json 和 TASK-CHANGELOG.md",
+      "acceptance": [
+        "单一任务由待办到PR验收到完成有记录",
+        "证据包含PR、合并SHA、main CI、实际正反测试"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "OPS-005",
+      "title": "历史已合并功能建立事实对照",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "todo",
+      "dependencies": [
+        "OPS-001"
+      ],
+      "scope": "docs/roadmap/01-REPO-BASELINE.md 和任务台账",
+      "acceptance": [
+        "按已合并PR和实际运行能力核对已完、部分、未完成，不能自动认定正式发布"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "TQ-001",
+      "title": "逐课教学审核表与评分工具",
+      "priority": "P0",
+      "category": "TQ",
+      "status": "todo",
+      "dependencies": [],
+      "scope": "docs/roadmap/09,10、教研评审数据结构",
+      "acceptance": [
+        "每课独立100分、人工复核、硬否决、实际运行证据模板可填写且可复查"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "TQ-002",
+      "title": "前9节Blockly教学质量审计",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "todo",
+      "dependencies": [
+        "TQ-001"
+      ],
+      "scope": "lesson-01至09、Blockly真运行与课程文案",
+      "acceptance": [
+        "逐课指出是否有两次不同动手、纠错/开放创作/作品",
+        "九份差距与阻塞证据"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "TQ-003",
+      "title": "双角色毕业课教学质量复核",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "todo",
+      "dependencies": [
+        "EDU-103"
+      ],
+      "scope": "lesson-10至12",
+      "acceptance": [
+        "孩子能解释角色切换、独立动作、礼物目标",
+        "不同正确作品可演示且保存重开"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "TQ-004",
+      "title": "G0第一单元教学质量复核",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "todo",
+      "dependencies": [
+        "TQ-001"
+      ],
+      "scope": "G0-U1六节",
+      "acceptance": [
+        "六节知识递进且有两种有效练习、反例/分层提示、单元可演示作品"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "TQ-005",
+      "title": "P0第一单元Python教学质量复核",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "todo",
+      "dependencies": [
+        "TQ-001"
+      ],
+      "scope": "P0-U1-L01至06",
+      "acceptance": [
+        "真Pyodide、多输入错误反馈、两种不同练习、源码保存/恢复与分数可信边界"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "TQ-006",
+      "title": "G3 Scratch流星课程教研复核",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "todo",
+      "dependencies": [
+        "TQ-001"
+      ],
+      "scope": "G3-U1-L02",
+      "acceptance": [
+        "真VM克隆参数实验、失败重试、保存/导入、开放改造和限制显式标注"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "TQ-007",
+      "title": "建立432课逐课教研复核模板",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "todo",
+      "dependencies": [
+        "TQ-001"
+      ],
+      "scope": "lesson-task-register.json、课程内容schema",
+      "acceptance": [
+        "每课独立状态/评审证据、不能因有详案就变更可玩或发布"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-001",
+      "title": "设计Tokens规范化",
+      "priority": "P0",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [],
+      "scope": "apps/web/src/app/globals.css,features/ui/tokens.ts",
+      "acceptance": [
+        "暖橙/奶油/天空色语义token和对比度有测试",
+        "老页面不回归",
+        "三屏截图"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-002",
+      "title": "统一按钮状态与错误反馈组件",
+      "priority": "P0",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-001"
+      ],
+      "scope": "features/ui/button.tsx,status-tag.tsx,feedback-panel.tsx",
+      "acceptance": [
+        "loading、disabled、错误/成功语义和键盘可用",
+        "失败绝不假报成功"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-003",
+      "title": "统一任务卡进度与故事组件",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-002"
+      ],
+      "scope": "features/ui/story-dialog.tsx,lesson-card.tsx,progress-track.tsx",
+      "acceptance": [
+        "低龄可读、长标题/锁定态不溢出",
+        "进度和真实课时一致"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-004",
+      "title": "原创四世界插画资产规范与接入",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-001"
+      ],
+      "scope": "apps/web/public/kc-scenes,docs/roadmap/assets-register.md",
+      "acceptance": [
+        "狐狸/小熊/蝴蝶和森林草地花园毕业岛自有资源",
+        "许可台账/低带宽降级"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-101",
+      "title": "学习地图四世界分区",
+      "priority": "P0",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-003"
+      ],
+      "scope": "features/lessons/map-view.tsx,adventure-map.tsx",
+      "acceptance": [
+        "四区连续地形、真实课程节点",
+        "不是四组换色的卡片",
+        "原关卡入口保留"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-102",
+      "title": "地图节点与真实进度解锁",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-101"
+      ],
+      "scope": "features/lessons/map-view.tsx,app/learn/map/page.tsx",
+      "acceptance": [
+        "当前/已过/锁定/未发布完全按真实数据",
+        "锁关不能进入试玩"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-103",
+      "title": "地图曲线连线与重点关卡",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-102"
+      ],
+      "scope": "features/lessons/adventure-map.tsx 和原创SVG",
+      "acceptance": [
+        "12节点视觉路径完整",
+        "推荐下一课突出且不会遮挡触控目标"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-104",
+      "title": "地图桌面平板手机适配",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-103"
+      ],
+      "scope": "app/learn/map/page.tsx 与CSS",
+      "acceptance": [
+        "1440/768/375截图无溢出，手机单列地图，返回保持滚动状态"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-105",
+      "title": "学习地图真实浏览器视觉回归",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-104"
+      ],
+      "scope": "tests/e2e/learning-map-visual.spec.ts",
+      "acceptance": [
+        "空进度/部分进度/完成、锁定、奖励幂等、键盘/触控三屏E2E通过"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-201",
+      "title": "课堂顶部任务进度与保存状态",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-003"
+      ],
+      "scope": "features/lessons/guided-lesson-shell.tsx",
+      "acceptance": [
+        "当前步骤及上次进度真实、保存本机/云端不混淆",
+        "无内容与失败反馈"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-202",
+      "title": "课堂任务舞台积木三域布局",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-201"
+      ],
+      "scope": "app/learn/lesson/[lessonId]/page.tsx",
+      "acceptance": [
+        "1280以上三域合理、运行按钮始终可达",
+        "原1至9课真执行不回归"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-203",
+      "title": "Blockly工具箱分类缩放删除体验",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-202"
+      ],
+      "scope": "features/lessons/blockly/blockly-workspace.tsx",
+      "acceptance": [
+        "真实Blockly拖拽连接删除缩放和键盘可用",
+        "错误和空程序不假成功"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-204",
+      "title": "角色舞台可观察互动反馈",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "EDU-103",
+        "UX-203"
+      ],
+      "scope": "features/lessons/playable-stage/playable-stage.tsx",
+      "acceptance": [
+        "点击/移动/对白/重复/双角色观测正确",
+        "重置与未触发状态准确"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-205",
+      "title": "手机课堂分区切换不丢代码",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-203"
+      ],
+      "scope": "app/learn/lesson/[lessonId]/page.tsx",
+      "acceptance": [
+        "375手机任务/舞台/积木/结果切换不卸载工作区",
+        "软键盘和吸底动作可用"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-206",
+      "title": "课堂多端完整E2E与截图",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-204",
+        "UX-205"
+      ],
+      "scope": "tests/e2e/lesson-ui-responsive.spec.ts",
+      "acceptance": [
+        "1/5/9/12关成功/错误/恢复/奖励",
+        "1440、768、375截图和触控链路"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "EDU-101",
+      "title": "第10课第一二角色独立移动",
+      "priority": "P0",
+      "category": "EDU",
+      "status": "todo",
+      "dependencies": [],
+      "scope": "use-block-executor.ts,launch-lessons.ts,单元/浏览器测试",
+      "acceptance": [
+        "fox100 bear100独立运动",
+        "未切换、重复切换不能虚假通过",
+        "CI真实Chrome回归"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "EDU-102",
+      "title": "第11课双角色各自对白",
+      "priority": "P0",
+      "category": "EDU",
+      "status": "todo",
+      "dependencies": [
+        "EDU-101"
+      ],
+      "scope": "use-block-executor.ts,launch-lessons.ts,Chrome E2E",
+      "acceptance": [
+        "仅小熊说指定对白",
+        "错误actor或缺动作失败",
+        "重新运行状态归零"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "EDU-103",
+      "title": "第12课双角色毕业作品",
+      "priority": "P0",
+      "category": "EDU",
+      "status": "todo",
+      "dependencies": [
+        "EDU-102"
+      ],
+      "scope": "use-block-executor.ts,launch-lessons.ts,毕业页及Chrome E2E",
+      "acceptance": [
+        "fox100 bear200目标产生礼物",
+        "自定义方案、作品可重开、重复领奖幂等"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-301",
+      "title": "作品夹真实作品卡与空状态",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-003"
+      ],
+      "scope": "app/learn/portfolio,features/progress",
+      "acceptance": [
+        "卡片显示真实课程/时间/封面、本机云端来源",
+        "无作品不展示假图"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-302",
+      "title": "作品继续编辑预览导出及恢复",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-301"
+      ],
+      "scope": "app/learn/portfolio、Scratch/Python草稿",
+      "acceptance": [
+        "作品关闭重开可编辑/导出，坏项目/离线/冲突有错误态"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-303",
+      "title": "作品夹云端隔离与三屏交互",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-302"
+      ],
+      "scope": "app/learn/portfolio,Postgres权限与E2E",
+      "acceptance": [
+        "账号A作品账号B不可读写",
+        "未登录本机解释，1440/768/375测试"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-401",
+      "title": "Scratch VM真实舞台工作台布局",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-002"
+      ],
+      "scope": "features/scratch-vm与app/learn/scratch-lab",
+      "acceptance": [
+        "绿旗/停止/分身结果真VM可观察",
+        "受限实验标注准确，PC/手机"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-402",
+      "title": "Scratch角色素材代码自由编辑",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-401"
+      ],
+      "scope": "features/scratch-vm与素材工作区",
+      "acceptance": [
+        "不同角色可编辑/运行，导入真实sb3失败恢复",
+        "不伪装完整Scratch"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-403",
+      "title": "Scratch真VM导入导出与国内网络回归",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-402"
+      ],
+      "scope": "tests/e2e/scratch-vm.spec.ts及离线包",
+      "acceptance": [
+        "实际VM反复绿旗、清克隆、损坏sb3、项目恢复和资源可达性有证据"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-411",
+      "title": "Python任务编辑输出三域布局",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-002"
+      ],
+      "scope": "features/python-lab与app/learn/python-lab",
+      "acceptance": [
+        "真Pyodide代码可编辑、运行结果/多用例可视且移动端可读"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-412",
+      "title": "Python错误调试分层提示与源码保存",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-411"
+      ],
+      "scope": "features/python-lab及草稿",
+      "acceptance": [
+        "真实TypeError/语法错误/失败案例有三层反馈",
+        "保存恢复与断线处理"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-413",
+      "title": "Python浏览器跨端完整回归",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-412"
+      ],
+      "scope": "tests/e2e/python-multi.spec.ts",
+      "acceptance": [
+        "实际Pyodide、超时错误/恢复、375/768/1440键盘截图与E2E"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-501",
+      "title": "课程目录按年龄路线与成熟度分级",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [],
+      "scope": "app/learn/catalog/*",
+      "acceptance": [
+        "18路线显示课程和真实L0-L5状态",
+        "大纲课不显示可运行入口"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-502",
+      "title": "纠错学习与奖励收藏状态一致",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-206"
+      ],
+      "scope": "app/learn/remedial,app/cards",
+      "acceptance": [
+        "失败恢复至原课、奖励幂等、不靠刷点击领星"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-503",
+      "title": "家长端真实成长报告",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-303"
+      ],
+      "scope": "app/parent/overview与家长作品",
+      "acceptance": [
+        "知识点/真实学习记录/孩子私有作品关联，无虚构掌握率或分数"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-504",
+      "title": "管理员课程发布审阅后台",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-501"
+      ],
+      "scope": "app/admin/catalog与审核门禁",
+      "acceptance": [
+        "引擎/内容/版权/隐私/人审证据可追溯，无权限不能发布"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-601",
+      "title": "首页成熟产品级真实体验入口",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-101"
+      ],
+      "scope": "app/page.tsx,features/marketing",
+      "acceptance": [
+        "原创世界观和年龄分层、真实作品入口",
+        "首屏CTA直达可玩课程"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-602",
+      "title": "年龄评估与账号流程适龄界面",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-002"
+      ],
+      "scope": "app/onboarding,app/auth",
+      "acceptance": [
+        "低龄选择流顺畅，刷新恢复",
+        "认证错误正确提示、移动端可操作"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "UX-603",
+      "title": "全站导航动效与性能回归",
+      "priority": "P1",
+      "category": "UX",
+      "status": "todo",
+      "dependencies": [
+        "UX-601"
+      ],
+      "scope": "app/全站、导航、CSS",
+      "acceptance": [
+        "低端设备性能、reduced-motion、触屏、慢网离线",
+        "无不可用假按钮"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "SYS-101",
+      "title": "12启蒙ID与G0目录关联映射",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "todo",
+      "dependencies": [
+        "EDU-103"
+      ],
+      "scope": "launch-lessons.ts,full-catalog-v1.json,映射表",
+      "acceptance": [
+        "不增加432总数，保留老进度和URL，映射语义经测试"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "SYS-102",
+      "title": "课程L0-L5状态统一数据模型",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "todo",
+      "dependencies": [
+        "SYS-101"
+      ],
+      "scope": "features/curriculum,api/catalog",
+      "acceptance": [
+        "目录/详情/后台读同一状态",
+        "未发布不会误显示可玩"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "SYS-103",
+      "title": "Blockly关卡改为可观察结果评测",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "todo",
+      "dependencies": [
+        "EDU-103"
+      ],
+      "scope": "evaluate-step/课程执行器",
+      "acceptance": [
+        "允许合理等价积木实现，反例失败，无法执行不授予完成"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "SYS-104",
+      "title": "课程审核发布状态前后台同步",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "todo",
+      "dependencies": [
+        "SYS-102"
+      ],
+      "scope": "app/admin/catalog与app/learn/catalog",
+      "acceptance": [
+        "实验/详案/可试玩/正式发布标记一致，缺证据不开放"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "SYS-105",
+      "title": "课程内容schema引擎需求和版权校验",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "todo",
+      "dependencies": [
+        "SYS-102"
+      ],
+      "scope": "scripts/lesson schema与CI",
+      "acceptance": [
+        "重复ID、无运行器、无素材授权、缺正反例变更必须失败"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "CLOUD-101",
+      "title": "真实Supabase迁移与回滚确认",
+      "priority": "P1",
+      "category": "CLOUD",
+      "status": "todo",
+      "dependencies": [],
+      "scope": "apps/web/supabase/migrations和部署记录",
+      "acceptance": [
+        "目标生产环境迁移版本、备份/回滚操作有可核验证据"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "CLOUD-102",
+      "title": "跨设备A账号登录草稿恢复",
+      "priority": "P1",
+      "category": "CLOUD",
+      "status": "todo",
+      "dependencies": [
+        "CLOUD-101"
+      ],
+      "scope": "Scratch/Python草稿API和真实设备",
+      "acceptance": [
+        "A设备1保存、设备2重登同用户读取",
+        "失败同步有可重试提示"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "CLOUD-103",
+      "title": "账号A/B的RLS越权及冲突保护",
+      "priority": "P1",
+      "category": "CLOUD",
+      "status": "todo",
+      "dependencies": [
+        "CLOUD-102"
+      ],
+      "scope": "Supabase真实环境与安全测试",
+      "acceptance": [
+        "B无法看到A作品或覆盖",
+        "并发冲突版本检查、错误态可观察"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "CLOUD-104",
+      "title": "作品大小类型资源及删除恢复审查",
+      "priority": "P1",
+      "category": "CLOUD",
+      "status": "todo",
+      "dependencies": [
+        "CLOUD-103"
+      ],
+      "scope": "草稿API、数据库约束和测试",
+      "acceptance": [
+        "坏sb3/巨大压缩数据被拒",
+        "删除恢复与限额/并发保护通过"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "CLOUD-105",
+      "title": "儿童私有作品同意与保留策略",
+      "priority": "P1",
+      "category": "CLOUD",
+      "status": "todo",
+      "dependencies": [
+        "CLOUD-103"
+      ],
+      "scope": "隐私流程和家长授权",
+      "acceptance": [
+        "最小采集、监护人同意、删除与分享审核流程实际验证"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "RELEASE-101",
+      "title": "Scratch Pyodide资源国内可达与许可",
+      "priority": "P1",
+      "category": "RELEASE",
+      "status": "todo",
+      "dependencies": [],
+      "scope": "沙箱资源本地化/依赖与许可报告",
+      "acceptance": [
+        "至少中国常见网络真实访问、许可合规、失败降级无假执行"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "RELEASE-102",
+      "title": "课程发布七门禁可追溯",
+      "priority": "P1",
+      "category": "RELEASE",
+      "status": "todo",
+      "dependencies": [
+        "SYS-105"
+      ],
+      "scope": "release-readiness.ts与admin",
+      "acceptance": [
+        "内容、引擎、E2E、授权、进度、隐私、人审均具证据才允许L5"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "RELEASE-103",
+      "title": "真实用户端试学与发布审核",
+      "priority": "P1",
+      "category": "RELEASE",
+      "status": "todo",
+      "dependencies": [
+        "RELEASE-102"
+      ],
+      "scope": "发布试点、完整儿童操作流程",
+      "acceptance": [
+        "经同意的适龄试学与人审记录",
+        "缺试学不冒称实测"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "RELEASE-104",
+      "title": "单元作品72份逐个追踪验收",
+      "priority": "P1",
+      "category": "RELEASE",
+      "status": "todo",
+      "dependencies": [
+        "RELEASE-102"
+      ],
+      "scope": "unit-capstone-blueprints-v1.json与作品运行器",
+      "acceptance": [
+        "每单元项目能执行、改动、保存与重开，按单元分任务状态"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
+      "id": "RELEASE-105",
+      "title": "剩余课程按能力逐批建设",
+      "priority": "P1",
+      "category": "RELEASE",
+      "status": "todo",
+      "dependencies": [
+        "SYS-105"
+      ],
+      "scope": "18路线432课的独立注册表",
+      "acceptance": [
+        "每次选一课实现真引擎+双练习+边界+作品+PR，不能批量标完成"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": ""
+    }
+  ]
+}

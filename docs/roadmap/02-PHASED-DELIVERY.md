@@ -6,7 +6,19 @@
 >
 > **执行原则**：每次只做一个可验收功能，逐批真实代码 → 自动测试 → PR → CI → 合并 main → main CI；不可用单纯增补 Markdown 代替功能成果。
 >
+> **2026-10-11新增不可跳过的任务纪律**：每批仅一个 Task-ID，开工/PR/合并后验收各留状态记录。唯一可写状态为 [task-register.json](./task-register.json)（61产品任务）、[lesson-task-register.json](./lesson-task-register.json)（432逐课任务）；完成后**必须**更新 [TASK-CHANGELOG.md](./TASK-CHANGELOG.md) 与完成证据。强制流程见 [11 单任务制度](./11-TASK-EXECUTION-POLICY.md)；[12 可读总览](./12-TASK-STATUS-BOARD.md)。`task-ledger` Actions 对无Task-ID、多个任务同时修改或无证据completed拒绝通过。
+>
 > **操作细则**：设计开发者必须以 [05 公开竞品图谱](./05-CN-PRODUCT-REFERENCE-ATLAS.md) 获取参考，以 [06 13 类页面规格](./06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md) 确定尺寸、结构和互动，以 [07 任务包清单](./07-PR-BY-PR-IMPLEMENTATION-BACKLOG.md) 按 PR 开发；教研/产品按 [08 课程质量规则](./08-CURRICULUM-QUALITY-AND-432-ROADMAP.md)、[09 独立内容百分制](./09-TEACHING-QUALITY-GATE.md)、[10 四种课程样板](./10-TEACHING-QUALITY-EXEMPLARS.md) 执行。课程品质与 UI 分别审核，不能互相抵分。前四份均属于 02 阶段计划的强制子规范。
+
+## -1. 单任务闭环管理（必须先执行）
+
+- [ ] OPS-001 先合并两套任务台账、61 个独立工作包 + 432 节逐课任务与 CI 强制核验；以 PR 和主分支 CI 为完成证据，随后补交付日志。
+- [ ] OPS-002 强制 PR 任务模板与审核人检查：**每个 PR 有且仅有一个任务编号**，更新对应 JSON 条目，写清正反用例、剩余问题。
+- [ ] OPS-003 消化遗留 PR #1 与旧分支：逐项检查已移植功能，不再把冲突代码重新合并。
+- [ ] OPS-004 建立每次交付收尾机制：main CI success 后回填 completed、交付日志（同一任务的收尾，不算新的功能任务）。
+- [ ] OPS-005 逐批核对历史 PR/CI 与现有运行资产的完成度，并真实回填状态，不复制未经核验的“已完成”。
+
+**每一轮只能领取其中一个 Task-ID，不能一次把多个任务勾上；旧规划中同一大阶段包含多项时，以产品 JSON 最小工作包为准。**
 
 ## 0. 本次规划版本（管理基线）
 
@@ -127,7 +139,7 @@
 - **安全/内容**：儿童隐私、版权、生产授权、云端隔离、客户端成绩边界。
 - **国内成熟产品双对标**：附公开页面/课程依据 URL、日期、采用/舍弃理由；课程 PR 展示新知识、练习、作品、正反例，UI PR 展示原创资源来源、三断点 Before/After、可用性交互测试。
 - **结果**：PR URL、最新 Commit SHA、每项 CI 结论、合并 SHA、main CI URL；失败读日志修复。
-- **状态回填**：勾选本文件对应子任务，更新基线数字（如有变动），注明仍未完成的内容。
+- **状态回填（强制）**：同一 PR 更新唯一Task-ID的JSON；真实合并与主分支CI通过后追加日志，并将该任务设为completed（可使用同一任务的收尾记录PR）；未完成标明具体失败/阻塞；不得同时把多项改为完成。
 - **下一批**：严格从未完成的最高优先级子任务领取，除真实阻塞外不临时转向装饰性功能。
 
 **阶段完成判定**：必须与现有 release-readiness.ts 的内容审核、引擎、测评 E2E、版权素材、进度、儿童隐私、人审七个发布要求一致。完成计划项≠课程正式发布。
