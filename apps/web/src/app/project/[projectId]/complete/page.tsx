@@ -60,7 +60,7 @@ export default function ProjectCompletePage() {
       <ProjectCompleteCard
         key={`${lesson.id}-${replayCount}`}
         blocks={snapshotBlocks}
-        playableProject={lesson.id === 'lesson-10-second-friend' ? <DuoProject key={JSON.stringify(snapshotBlocks)} initialBlocks={snapshotBlocks}/> : undefined}
+        playableProject={['lesson-10-second-friend', 'lesson-11-duo-rehearsal'].includes(lesson.id) ? <DuoProject lessonId={lesson.id} key={JSON.stringify(snapshotBlocks)} initialBlocks={snapshotBlocks}/> : undefined}
         completionCopy={completionCopy}
         isFoundationGraduate={isFoundationGraduate}
         lessonTitle={lesson.title}

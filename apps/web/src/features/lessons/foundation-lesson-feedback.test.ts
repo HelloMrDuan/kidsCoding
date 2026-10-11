@@ -66,7 +66,7 @@ describe('getFoundationLessonFeedback', () => {
   it('uses a stronger cooperation result line for lesson 11', () => {
     expect(
       getFoundationLessonFeedback('lesson-11-duo-rehearsal', 'progress'),
-    ).toBe('现在，两个朋友已经会配合行动，还会一起回应了。')
+    ).toBe('继续观察实际位置和对白：小熊说话，狐狸不会跟着说。')
   })
 
   it('keeps lesson 12 focused on the richer graduation project', () => {

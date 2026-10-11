@@ -997,75 +997,75 @@
     {
       "id": "lesson-11-duo-rehearsal",
       "title": "双人排练",
-      "story": "两位演员准备森林联欢会，但总是抢着讲话，需要彩排配合。",
+      "story": "狐狸和小熊各走100步排练出发，只有小熊说出发对白。说话和移动一样，只交给当前角色。",
       "concepts": [
-        "协作顺序",
-        "调试",
-        "脚本归属"
+        "对白归属",
+        "角色独立状态",
+        "顺序调试"
       ],
-      "learningOutcome": "完成两位角色的协作排练，排除抢话和不按顺序出场。",
+      "learningOutcome": "能在一条开始程序中切换角色，让小熊独立说指定对白，并通过实际错误修复解释对白归属。",
       "instructionSequence": [
         {
           "step": 1,
-          "teacherPrompt": "查看排练清单",
-          "childAction": "将排练流程分成两位演员各自的任务",
-          "check": "排练顺序明确",
-          "voiceover": "第1步：查看排练清单 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "观察起点与出发任务",
+          "childAction": "指出狐狸与小熊的0步起点，找出谁需要说目标对白",
+          "check": "两位朋友的位置和对白记录清晰可见",
+          "voiceover": "第1步：观察起点与出发任务。",
           "interactionType": "observe"
         },
         {
           "step": 2,
-          "teacherPrompt": "标注角色脚本",
-          "childAction": "检查角色A的脚本和触发时机",
-          "check": "角色A有正确触发",
-          "voiceover": "第2步：标注角色脚本 试一试，完成后说说你看到了什么。",
-          "interactionType": "build"
+          "teacherPrompt": "预测谁会开口",
+          "childAction": "指出两位朋友0步起点，猜切换后谁开口；放开始运行",
+          "check": "预测错误也能继续",
+          "voiceover": "第2步：预测谁会开口。",
+          "interactionType": "predict"
         },
         {
           "step": 3,
-          "teacherPrompt": "模拟第一次排练",
-          "childAction": "检查角色B的脚本和触发时机",
-          "check": "角色B有正确触发",
-          "voiceover": "第3步：模拟第一次排练 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "独立移动",
+          "childAction": "狐狸移动、切换、小熊移动",
+          "check": "各100步，两个对白为空",
+          "voiceover": "第3步：独立移动。",
           "interactionType": "build"
         },
         {
           "step": 4,
-          "teacherPrompt": "记录错位现象",
-          "childAction": "演示一遍并记录同时说话或遮挡问题",
-          "check": "记录至少一个错位",
-          "voiceover": "第4步：记录错位现象 试一试，完成后说说你看到了什么。",
-          "interactionType": "predict"
+          "teacherPrompt": "小熊独立说话",
+          "childAction": "切换后添加说话并运行",
+          "check": "小熊出发对白，狐狸对白为空",
+          "voiceover": "第4步：小熊独立说话。",
+          "interactionType": "build"
         },
         {
           "step": 5,
-          "teacherPrompt": "调整互动顺序",
-          "childAction": "只调整一个顺序冲突并再次运行",
-          "check": "有一处修正和回归",
-          "voiceover": "第5步：调整互动顺序 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "错角色实验与修复",
+          "childAction": "切换前说话，观察狐狸开口，再改到切换后",
+          "check": "实际错误对白被记录，修复后小熊开口",
+          "voiceover": "第5步：错角色实验与修复。",
           "interactionType": "test"
         },
         {
           "step": 6,
-          "teacherPrompt": "第二次排练验收",
-          "childAction": "让两位角色完成协调的排练",
-          "check": "演出节奏合理",
-          "voiceover": "第6步：第二次排练验收 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "改造与复盘",
+          "childAction": "可给狐狸另加问候；解释归属，完成并重开修改保存",
+          "check": "两种有效作品，重新验证后保存",
+          "voiceover": "第6步：改造与复盘。",
           "interactionType": "reflect"
         }
       ],
       "commonErrors": [
-        "脚本互相覆盖",
-        "同时出场造成遮挡",
-        "只检查一位角色"
+        "说话在切换前，狐狸开口而小熊没有目标对白",
+        "少了小熊移动或说话",
+        "重复切换或积木脱离开始"
       ],
       "tieredHints": [
-        "先明确谁负责哪段。",
-        "在哪一秒发生了冲突？",
-        "一次只改一个问题再测试。"
+        "谁头上出现了对白？",
+        "每个角色各有自己的对白，说话只给当前角色。",
+        "把小熊说话放在切换后，确认两位朋友各100步。"
       ],
-      "extension": "加入同步谢幕动作，并比较两种编排方式。",
-      "parentConversation": "鼓励孩子把每次修改的原因说出来。",
+      "extension": "保留小熊对白，或另加狐狸问候；作品能本机保存、重开、修改与运行。",
+      "parentConversation": "请孩子演示错角色对白与修复，解释角色不会一起开口。只记录本机练习。",
       "assessment": {
         "pass": [
           "作品可以按任务要求演示",
@@ -1076,7 +1076,7 @@
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
         ],
-        "sampleFailureCase": "脚本互相覆盖",
+        "sampleFailureCase": "切换前说话：狐狸说你好，小熊没有目标对白，不能通过",
         "instructorEvidence": [
           "能复述触发与执行顺序",
           "能独立演示当前课的核心动作",

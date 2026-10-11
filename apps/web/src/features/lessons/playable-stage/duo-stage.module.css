@@ -22,6 +22,10 @@
 .active svg { border-color: #276449; background: #ffffffb0; box-shadow: 0 0 0 3px #ffffff80; }
 .friend span { display: block; font-size: 10px; font-weight: 800; background: #ffffffc0; border-radius: 8px; padding: 2px; }
 .friend em { position: absolute; top: -20px; left: 0; background: white; border-radius: 8px; padding: 3px 8px; font-size: 12px; white-space: nowrap; }
+.dialogueStage .track { margin-top: 28px; }
+.dialogueStage .friend em { top: -32px; left: -20px; width: 110px; padding: 3px 5px; font-size: 11px; line-height: 1.4; font-style: normal; white-space: normal; }
+.dialogueBoard { display: grid; gap: 8px; margin-top: 14px; padding: 14px; background: #e9efdf; border-radius: 14px; font-size: 14px; line-height: 1.7; }
+.dialogueBoard small { font-size: 12px; }
 .flag { position: absolute; left: 50%; top: 8px; color: #9b4e17; font-size: 30px; transform: translateX(52px); }
 .flag small { display: block; font-size: 11px; font-weight: 800; line-height: 1; }
 .start { position: absolute; bottom: -22px; left: 4px; font-size: 11px; }
