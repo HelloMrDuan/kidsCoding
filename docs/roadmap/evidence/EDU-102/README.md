@@ -74,3 +74,9 @@
 - 38/38实际Chrome通过：第11课三尺寸desktop+touch 8项，第10课8项，第01–09课22项；包含气泡不遮挡距离、草稿/作品刷新、编辑修复与真实存储错误反馈。
 - PR模式单任务台账校验通过；61产品任务和432课索引有效，只有EDU-102状态改变。
 - 全目录tsc本轮实际复跑仍失败，诊断在未改动的脚本及admin/auth/cards/progress测试夹具；没有新增本任务源码/测试诊断，未删除测试或放宽类型配置。
+
+## GitHub集中验收
+
+- [功能PR #29](https://github.com/HelloMrDuan/kidsCoding/pull/29)，head `a7cde9e456b3cb73cc371e3457328a29703196d0`；[PR课程7项通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38106706991)、[PR台账通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38106706998)。
+- 完整功能合并SHA：`1f4b55fa3ec7a87243e954c3bafdccc504fddf24`；[main课程7项通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38107147501)、[main台账通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38107147455)。
+- 同Task-ID收尾记录PR仅回填证据，不是新产品任务；功能分支一次集中推送。工程EDU-102可标completed，人类质量与生产发布没有借CI自动标完成。

@@ -656,7 +656,7 @@
       "title": "第11课双角色各自对白",
       "priority": "P0",
       "category": "EDU",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "EDU-101"
       ],
@@ -667,18 +667,23 @@
         "重新运行状态归零"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/29",
+        "mergeCommit": "1f4b55fa3ec7a87243e954c3bafdccc504fddf24",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38107147501",
         "tests": [
           "Local: 135 Vitest tests across 21 suites passed, including 17 independent dialogue cases and prior actor/executor/course/project contracts",
           "Local: final production Next.js build and production TypeScript passed; ESLint no errors, 5 pre-existing warnings",
           "Local: 38/38 actual Chrome tests passed: lesson11 three sizes desktop+touch 8 cases; lesson10 desktop+touch 8; lessons01–09 desktop+touch 22, with real error/repair/rerun/reset/draft/project reload/edit/save/storage failure and non-overlapping speech assertions",
-          "Evidence: docs/roadmap/evidence/EDU-102/README.md; 9 before/after/error screenshots; separate teaching/UX rubric, no independent human score"
+          "Evidence: docs/roadmap/evidence/EDU-102/README.md; 9 before/after/error screenshots; separate teaching/UX rubric, no independent human score",
+          "PR #29: curriculum 7/7 + task-ledger success on a7cde9e456b3cb73cc371e3457328a29703196d0",
+          "Merged main 1f4b55fa3ec7a87243e954c3bafdccc504fddf24: curriculum 7/7 + task-ledger success; actual Chrome independent dialogue desktop/touch and original engines/regressions"
         ],
-        "reviewer": null
+        "reviewer": null,
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38106706991",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38106706998",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38107147455"
       },
-      "notes": "本地集中验收完成，唯一功能分支准备一次推送并创建PR。PR/main CI与合并尚未完成，不提前completed。全目录tsc复跑仍有未改动脚本及admin/auth/cards/progress测试夹具类型诊断，生产TypeScript通过，未放宽配置。人类教研/UX评分、儿童试学/手机硬件/生产发布未验收；EDU-103保持todo。"
+      "notes": "EDU-102工程验收完成：PR #29 CI 8/8、无合并阻塞，合并后main CI 8/8全绿。独立对白、speaking状态、错误角色/缺动作/修复/重跑/重置、可修改本机作品和三屏Chrome证据齐全。课程/UX各100分证据分别登记，尚无人类评分、儿童试学、真实手机硬件或生产Supabase已发布课件升级/部署验收，不宣称正式发布。全目录tsc既有测试夹具诊断保留，生产TypeScript通过。EDU-103保持todo。"
     },
     {
       "id": "EDU-103",
