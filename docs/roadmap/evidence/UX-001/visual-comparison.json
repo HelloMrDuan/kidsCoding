@@ -1,0 +1,77 @@
+{
+  "scope": "Foundation only, not complete page migration. See README table for exact legacy layout differences.",
+  "pairs": [
+    {
+      "page": "home",
+      "viewport": "desktop",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    },
+    {
+      "page": "map",
+      "viewport": "desktop",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    },
+    {
+      "page": "lesson",
+      "viewport": "desktop",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    },
+    {
+      "page": "home",
+      "viewport": "tablet",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    },
+    {
+      "page": "map",
+      "viewport": "tablet",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    },
+    {
+      "page": "lesson",
+      "viewport": "tablet",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    },
+    {
+      "page": "home",
+      "viewport": "mobile",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    },
+    {
+      "page": "map",
+      "viewport": "mobile",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    },
+    {
+      "page": "lesson",
+      "viewport": "mobile",
+      "noOverflowBefore": true,
+      "noOverflowAfter": true,
+      "panelGeometryUnchanged": true,
+      "bodyAfter": "rgb(243, 246, 251)"
+    }
+  ]
+}

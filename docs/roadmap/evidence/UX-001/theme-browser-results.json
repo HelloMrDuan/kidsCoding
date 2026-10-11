@@ -1,0 +1,12 @@
+{
+  "browser": "Actual Google Chrome",
+  "stats": {
+    "startTime": "2026-10-11T10:19:33.028Z",
+    "duration": 34260.889,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "scope": "Production CSS vs approved prototype CSS; exact measurements and PNG byte equality on all three viewports; keyboard, native touch, actual route, persistence, reduced motion."
+}

@@ -1,5 +1,7 @@
 # 07｜可直接开 PR 的详细实施排期、文件清单与阻塞验收
 
+> **V2 视觉冻结优先**：实施与验收必须先遵守 [VISUAL-LOCK](../design/kidscoding-v2/VISUAL-LOCK.md) 和完整 V2 HTML 原型。本文旧 V1 的颜色、字体、布局及美术建议仅为历史记录，不能覆盖已批准 V2；后续 AI/Codex 会话同样不得自行重新设计。
+
 > 注意：这是**执行队列，不是已完成清单**。所有条目初始未开始；一个工作包一条主任务/一个可复核 PR，必要时按 E2E 细分子 PR。**没有实际编码、截图和回归不能勾选**。页面标准见 [06](./06-PAGE-LEVEL-IMPLEMENTATION-SPEC.md)，竞品素材与参考见 [05](./05-CN-PRODUCT-REFERENCE-ATLAS.md)。
 >
 > **新增进度强制制度**：每批只有一个任务编号，状态以 [产品任务总账](./task-register.json)、[432课任务总账](./lesson-task-register.json)为准，PR合并/主分支CI成功后同步 [TASK-CHANGELOG](./TASK-CHANGELOG.md)。完整状态机与证据要求见 [11 单任务执行规则](./11-TASK-EXECUTION-POLICY.md)。任务过大必须先细拆、不能在一个PR宣称完成多个独立子任务。
@@ -31,7 +33,7 @@
 
 | 工作包 / 优先 | 实际文件或目录 | 必须实现的行为与视觉 | 正反验收 / 完成定义 |
 | --- | --- | --- | --- |
-| UX-001 / P0 | `apps/web/src/app/globals.css`；新 `features/ui/tokens.ts` | 从奶油/暖橙/云蓝做完整语义 token；成功/错误/选中/未发布/警告色与数字排版、按钮尺寸；移除局部互相冲突的色彩值 | 组件颜色对比检查；原页面无 UI 重大回退；对比截图 |
+| UX-001 / P0 | `apps/web/src/app/globals.css`；新 `features/ui/tokens.ts` | 严格落实 V2 海军蓝/科技蓝/中性底色语义 token、原型排版/圆角/阴影/尺寸；保留业务能力，旧页面结构按后续任务迁移 | 组件颜色对比检查；原页面无 UI 重大回退；对比截图 |
 | UX-002 / P0 | 新 `features/ui/button.tsx`、`status-tag.tsx`、`feedback-panel.tsx` | 自有按钮/状态/反馈组件、loading/disabled/focus/hover/active；状态来自真实逻辑 | Vitest 或 React 测试：禁用按钮不触发；保存失败不显示成功；键盘可激活 |
 | UX-003 / P0 | 新 `features/ui/story-dialog.tsx`、`lesson-card.tsx`、`progress-track.tsx` | 童趣任务卡、步骤进度、课程状态、安全操作尺寸 | 空任务/长标题/10 个完成进度/小屏不溢出；单元测试 |
 | UX-004 / P0 | 新 `apps/web/public/kc-scenes`、`docs/roadmap/assets-register.md`（原创素材入库时才创建） | 独立狐狸/蝴蝶/小熊和森林/草地/花园/毕业岛插画；统一透视、表情、封面尺寸、压缩/WebP/AVIF 可选 | 资源体积/版权登记；不包含竞品受保护素材；失败加载占位与 reduced motion |

@@ -1,0 +1,61 @@
+{
+  "decision": "Owner explicitly retains all prototype text colors; AA gaps are unresolved, no completed status.",
+  "pairs": [
+    {
+      "name": "text",
+      "color": "#18243a",
+      "background": "#ffffff",
+      "ratio": 15.5293,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "name": "action",
+      "color": "#2463eb",
+      "background": "#ffffff",
+      "ratio": 5.1732,
+      "minimum": 4.5,
+      "passes": true
+    },
+    {
+      "name": "muted",
+      "color": "#6f7d92",
+      "background": "#ffffff",
+      "ratio": 4.1796,
+      "minimum": 4.5,
+      "passes": false
+    },
+    {
+      "name": "success",
+      "color": "#148767",
+      "background": "#ffffff",
+      "ratio": 4.4765,
+      "minimum": 4.5,
+      "passes": false
+    },
+    {
+      "name": "warning",
+      "color": "#ad6b20",
+      "background": "#ffffff",
+      "ratio": 4.285,
+      "minimum": 4.5,
+      "passes": false
+    },
+    {
+      "name": "danger",
+      "color": "#d64c4c",
+      "background": "#ffffff",
+      "ratio": 4.2022,
+      "minimum": 4.5,
+      "passes": false
+    },
+    {
+      "name": "focus",
+      "color": "#84afff",
+      "background": "#ffffff",
+      "ratio": 2.1973,
+      "minimum": 3,
+      "passes": false
+    }
+  ]
+}
