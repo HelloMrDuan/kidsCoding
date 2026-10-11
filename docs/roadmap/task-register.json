@@ -656,7 +656,7 @@
       "title": "第11课双角色各自对白",
       "priority": "P0",
       "category": "EDU",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "EDU-101"
       ],
@@ -670,10 +670,15 @@
         "pr": null,
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "Local: 135 Vitest tests across 21 suites passed, including 17 independent dialogue cases and prior actor/executor/course/project contracts",
+          "Local: final production Next.js build and production TypeScript passed; ESLint no errors, 5 pre-existing warnings",
+          "Local: 38/38 actual Chrome tests passed: lesson11 three sizes desktop+touch 8 cases; lesson10 desktop+touch 8; lessons01–09 desktop+touch 22, with real error/repair/rerun/reset/draft/project reload/edit/save/storage failure and non-overlapping speech assertions",
+          "Evidence: docs/roadmap/evidence/EDU-102/README.md; 9 before/after/error screenshots; separate teaching/UX rubric, no independent human score"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "本地集中验收完成，唯一功能分支准备一次推送并创建PR。PR/main CI与合并尚未完成，不提前completed。全目录tsc复跑仍有未改动脚本及admin/auth/cards/progress测试夹具类型诊断，生产TypeScript通过，未放宽配置。人类教研/UX评分、儿童试学/手机硬件/生产发布未验收；EDU-103保持todo。"
     },
     {
       "id": "EDU-103",

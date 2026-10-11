@@ -2,14 +2,16 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 
 export type ExecutionState = 'idle' | 'armed' | 'running' | 'success' | 'error'
 
-export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: boolean }>, requiredBlocks: string[], stepIndex: number = 0, duoEnabled = false) {
+export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: boolean }>, requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' = false) {
+  const dialogueEnabled = duoEnabled === 'dialogue'
   const [executionState, setExecutionState] = useState<ExecutionState>('idle')
   const [characterPosition, setCharacterPosition] = useState(0)
   const [characterMessage, setCharacterMessage] = useState<string | null>(null)
   const [stageScene, setStageScene] = useState<'forest' | 'meadow'>('forest')
   const [partnerPosition, setPartnerPosition] = useState(0)
+  const [partnerMessage, setPartnerMessage] = useState<string | null>(null)
   const [activeActor, setActiveActor] = useState<'main' | 'partner'>('main')
-  const [actorActions, setActorActions] = useState<{ main: 'idle' | 'moving'; partner: 'idle' | 'moving' }>({ main: 'idle', partner: 'idle' })
+  const [actorActions, setActorActions] = useState<{ main: 'idle' | 'moving' | 'speaking'; partner: 'idle' | 'moving' | 'speaking' }>({ main: 'idle', partner: 'idle' })
   const [actionLog, setActionLog] = useState<string[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const runIdRef = useRef(0)
@@ -21,6 +23,7 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
     setCharacterMessage(null)
     setStageScene('forest')
     setPartnerPosition(0)
+    setPartnerMessage(null)
     setActiveActor('main')
     setActorActions({ main: 'idle', partner: 'idle' })
     setActionLog([])
@@ -39,6 +42,8 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
     let actor: 'main' | 'partner' = 'main'
     let fox = 0
     let bear = 0
+    let foxMessage: string | null = null
+    let bearMessage: string | null = null
     const fail = (message: string) => {
       setErrorMessage(message)
       setExecutionState('error')
@@ -48,7 +53,7 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
       if (runIdRef.current !== id) return
       const type = blocks[i].type
       if (duoEnabled) {
-        // Lesson 10 is a real sequential Blockly interpreter with two targets.
+        // Lessons 10–11 interpret the actual connected program with two targets.
         // Validate observed coordinates, not a precomputed answer animation.
         if (type === 'move_right') {
           setActorActions({ main: actor === 'main' ? 'moving' : 'idle', partner: actor === 'partner' ? 'moving' : 'idle' })
@@ -66,6 +71,16 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
           actor = 'partner'
           setActiveActor(actor)
           setActionLog(prev => [...prev, '切换到小熊：后面的动作只给小熊'])
+        } else if (type === 'say_line' && dialogueEnabled) {
+          setActorActions({ main: actor === 'main' ? 'speaking' : 'idle', partner: actor === 'partner' ? 'speaking' : 'idle' })
+          if (actor === 'main') {
+            foxMessage = '你好！'
+            setCharacterMessage(foxMessage)
+          } else {
+            bearMessage = '我们一起出发吧！'
+            setPartnerMessage(bearMessage)
+          }
+          setActionLog(prev => [...prev, `${actor === 'main' ? '小狐狸' : '小熊'}说：${actor === 'main' ? foxMessage : bearMessage}`])
         } else if (type === 'say_line' && actor === 'main' && stepIndex === 4) {
           setCharacterMessage('你好！')
           setActionLog(prev => [...prev, '小狐狸说：你好！'])
@@ -101,14 +116,28 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
     }
     if (duoEnabled) {
       const expectedFox = stepIndex === 0 ? 0 : 100
-      const expectedBear = stepIndex < 2 ? 0 : 100
+      const expectedBear = dialogueEnabled ? (stepIndex === 0 ? 0 : 100) : stepIndex < 2 ? 0 : 100
       if (fox !== expectedFox || bear !== expectedBear) {
         fail(`目标：小狐狸 ${expectedFox} 步、小熊 ${expectedBear} 步；实际：小狐狸 ${fox} 步、小熊 ${bear} 步。${bear === 0 && expectedBear > 0 ? '小熊还没动，看看操作权交给谁了。' : '检查移动次数和动作目标。'}`)
         return
       }
+      if (dialogueEnabled) {
+        if (foxMessage !== null && stepIndex < 4) {
+          fail('实际是小狐狸说了“你好！”，小熊的目标对白没有交给正确角色。把说话积木移到切换之后。')
+          return
+        }
+        if (stepIndex >= 2 && bearMessage !== '我们一起出发吧！') {
+          fail('两位朋友到位了，但小熊还没说“我们一起出发吧！”。检查切换后有没有说话积木。')
+          return
+        }
+        if (stepIndex < 2 && (foxMessage !== null || bearMessage !== null)) {
+          fail('这一步先观察起点或独立移动，暂时不用说话积木。')
+          return
+        }
+      }
     }
     if (runIdRef.current === id) setExecutionState('success')
-  }, [blocks, duoEnabled, stepIndex])
+  }, [blocks, duoEnabled, dialogueEnabled, stepIndex])
 
   const run = useCallback(async () => {
     reset()
@@ -150,6 +179,7 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
     setCharacterPosition(0)
     setStageScene('forest')
     setPartnerPosition(0)
+    setPartnerMessage(null)
     setActiveActor('main')
     setActorActions({ main: 'idle', partner: 'idle' })
     setActionLog([])
@@ -159,5 +189,5 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
   useEffect(() => { runIdRef.current += 1 }, [stepIndex, currentBlocksKey])
   useEffect(() => () => { runIdRef.current += 1 }, [])
 
-  return { executionState, characterPosition, characterMessage, partnerPosition, activeActor, actorActions, actionLog, errorMessage, stageScene, run, reset, clickCharacter }
+  return { executionState, characterPosition, characterMessage, partnerPosition, partnerMessage, activeActor, actorActions, actionLog, errorMessage, stageScene, run, reset, clickCharacter }
 }

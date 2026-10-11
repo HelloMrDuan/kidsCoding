@@ -23,3 +23,10 @@
 | 2026-10-11 | EDU-101 | 功能集中提交，121单测与30条Chrome、生产构建/lint/台账通过；功能head `af62e13c84888353c816fba104f9e1b4c1d0998a` | [#27](https://github.com/HelloMrDuan/kidsCoding/pull/27) | 待合并 | 待main验收 | in_review；真实PR URL本机记录，CI通过后随同一任务收尾记录PR回填，避免重复功能推送 |
 | 2026-10-11 | EDU-101 | PR #27 CI 8/8全绿且mergeable clean，已合并功能 | [#27](https://github.com/HelloMrDuan/kidsCoding/pull/27) | `25e41b482ef33bf53bc4c040cc8a1b5be5e9a5d7` | [课程main检查中](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38104195809) / [台账main通过](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38104195800) | merged_waiting_ci；记录本机待同任务收尾PR回填 |
 | 2026-10-11 | EDU-101 | **工程交付完成**：双角色独立坐标/动作、真Blockly结果核验、观察预测/两目标练习/漏切换纠错/分层提示/反思、可修改本机作品；121单测、Chrome30条、PR/main各8/8通过 | [#27](https://github.com/HelloMrDuan/kidsCoding/pull/27) | `25e41b482ef33bf53bc4c040cc8a1b5be5e9a5d7` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38104195809) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38104195800) | **completed**；下项EDU-102小熊对白。人类教研/儿童试学/真实硬件/生产部署未验收；11/12课及432课状态未提前完成 |
+
+## EDU-102 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-11 | EDU-102 | 基于已验收main `c6d893f90c00a8d5939bd7aeb23c9bf7f18d7bd9`领取第11课独立对白、错角色教学、可修改作品与三屏Chrome验收 | 待正式PR | 待合并 | 待main验收 | in_progress；仅本任务，EDU-103保持todo |
+| 2026-10-11 | EDU-102 | 本地集中验收：135单测、38实际Chrome、最终生产构建/lint/单任务台账通过；第11课独立对白/错角色修复/可改作品/三屏截图 | 待创建真实PR | 待合并 | 待main验收 | in_progress；人类评分/儿童试学/生产发布未验收，EDU-103未实施 |
