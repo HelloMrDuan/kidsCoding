@@ -624,7 +624,7 @@
       "title": "第10课第一二角色独立移动",
       "priority": "P0",
       "category": "EDU",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "use-block-executor.ts,launch-lessons.ts,单元/浏览器测试",
       "acceptance": [
@@ -633,18 +633,23 @@
         "CI真实Chrome回归"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/27",
+        "mergeCommit": "25e41b482ef33bf53bc4c040cc8a1b5be5e9a5d7",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38104195809",
         "tests": [
           "Local: 121 Vitest tests across 20 suites passed, including 16 dual actor cases, original executor and course contracts",
           "Local: production Next.js build passed; ESLint passed with 5 pre-existing warnings",
           "Local: 30 actual Chrome E2E passed: lesson 10 across 1440/768/375 desktop+touch, including error/repair/reset/rerun/draft reload/project reload/edit/save and injected storage failure; lessons 01–09 desktop+touch regression",
-          "Evidence and independent teaching/UX rubric: docs/roadmap/evidence/EDU-101/README.md"
+          "Evidence and independent teaching/UX rubric: docs/roadmap/evidence/EDU-101/README.md",
+          "PR #27: curriculum 7/7 + task-ledger success on af62e13c84888353c816fba104f9e1b4c1d0998a",
+          "Merged main 25e41b482ef33bf53bc4c040cc8a1b5be5e9a5d7: curriculum 7/7 + task-ledger success; actual Chrome lesson10 desktop and touch + original engines/regressions"
         ],
-        "reviewer": null
+        "reviewer": null,
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38103776550",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38103776597",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38104195800"
       },
-      "notes": "本地完成第10课真实双角色执行、分层错误教学、可修改本机作品；集中验收中。第11、12课保持todo。独立人类教研与儿童试学未完成，不宣称正式发布。"
+      "notes": "EDU-101工程验收完成：PR #27 CI 8/8全绿、无合并阻塞，合并后main CI 8/8全绿。第10课独立状态、两种有效作品、真实错误/修复/重复/重置/三屏Chrome证据齐全。课程/UX各100分证据分别登记，但独立人类评分、儿童试学、生产部署/既有已发布课件升级未验收，不宣称正式发布。EDU-102/103保持todo。"
     },
     {
       "id": "EDU-102",
