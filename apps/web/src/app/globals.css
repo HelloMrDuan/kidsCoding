@@ -1,107 +1,134 @@
 @import "tailwindcss";
 
+/* Frozen V2: docs/design/kidscoding-v2/VISUAL-LOCK.md.
+   Keep synchronized with features/ui/tokens.ts; no unapproved palette changes. */
 :root {
   color-scheme: light;
-  --kc-surface-cream: #fff8ef;
-  --kc-surface-peach: #fff0de;
-  --kc-surface-cloud: #eef6ff;
-  --kc-surface-mist: #f7fbff;
-  --kc-text-strong: #16233f;
-  --kc-text-soft: #5b6986;
-  --kc-accent-warm: #ff8b47;
-  --kc-accent-gold: #ffcb68;
-  --kc-accent-sky: #7ad4ff;
-  --kc-border-soft: rgba(255, 255, 255, 0.72);
-  --kc-shadow-soft: 0 20px 48px rgba(22, 35, 63, 0.1);
-  --kc-shadow-deep: 0 28px 70px rgba(22, 35, 63, 0.14);
-  --kc-shadow-stage: 0 24px 54px rgba(56, 189, 248, 0.12);
+  --kc-nav: #152238;
+  --kc-nav-secondary: #1c2c46;
+  --kc-nav-end: #112039;
+  --kc-nav-text: #bbcadc;
+  --kc-action: #2463eb;
+  --kc-action-dark: #1748b2;
+  --kc-action-hover: #1d54cb;
+  --kc-surface: #ffffff;
+  --kc-canvas: #f3f6fb;
+  --kc-text: #18243a;
+  --kc-text-muted: #6f7d92;
+  --kc-line: #e7edf5;
+  --kc-success: #148767;
+  --kc-warning: #ad6b20;
+  --kc-danger: #d64c4c;
+  --kc-focus: #84afff;
+  --kc-radius-button: 8px;
+  --kc-radius-panel: 14px;
+  --kc-radius-pane: 10px;
+  --kc-shadow-panel: 0 10px 32px rgba(30, 57, 96, 0.055);
+  --kc-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  --kc-font-code: Consolas, 'Courier New', monospace;
+  --kc-font-size-body: 14px;
+  --kc-font-size-small: 12px;
+  --kc-font-size-title: 26px;
+  --kc-font-line-height-body: 1.55;
+  --kc-space-1: 4px;
+  --kc-space-2: 8px;
+  --kc-space-3: 12px;
+  --kc-space-4: 16px;
+  --kc-space-6: 24px;
+  --kc-space-8: 32px;
+  --kc-sidebar-width: 222px;
+  --kc-sidebar-collapsed-width: 74px;
+  --kc-topbar-height: 76px;
+  --kc-topbar-tablet-height: 64px;
+  --kc-topbar-mobile-height: 58px;
+  --kc-mobile-nav-height: 62px;
+  --kc-content-max-width: 1700px;
+  --kc-button-padding-y: 10px;
+  --kc-button-padding-x: 16px;
+
+  /* Compatibility aliases while each existing page migrates in its own task. */
+  --kc-surface-cream: var(--kc-canvas);
+  --kc-surface-peach: var(--kc-canvas);
+  --kc-surface-cloud: var(--kc-canvas);
+  --kc-surface-mist: var(--kc-canvas);
+  --kc-text-strong: var(--kc-text);
+  --kc-text-soft: var(--kc-text-muted);
+  --kc-accent-warm: var(--kc-action);
+  --kc-accent-gold: var(--kc-warning);
+  --kc-accent-sky: var(--kc-action);
+  --kc-border-soft: var(--kc-line);
+  --kc-shadow-soft: var(--kc-shadow-panel);
+  --kc-shadow-deep: var(--kc-shadow-panel);
+  --kc-shadow-stage: var(--kc-shadow-panel);
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  background:
-    radial-gradient(circle at top, rgba(255, 216, 173, 0.72), transparent 34%),
-    radial-gradient(circle at right, rgba(216, 239, 255, 0.78), transparent 26%),
-    linear-gradient(180deg, var(--kc-surface-cream) 0%, #fff8f1 18%, #ffffff 52%, var(--kc-surface-cloud) 100%);
-  color: var(--kc-text-strong);
-  font-feature-settings: "ss01" 1;
+  background: var(--kc-canvas);
+  color: var(--kc-text);
+  font-family: var(--kc-font-body);
+  font-size: var(--kc-font-size-body);
+  line-height: var(--kc-font-line-height-body);
 }
-
-a {
-  text-decoration: none;
+a { text-decoration: none; }
+button { cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--kc-focus);
+  outline-offset: 2px;
 }
+.blocklySvg { display: block; width: 100% !important; height: 100% !important; }
+.blocklyFlyout { height: 100% !important; }
+.blocklyMainBackground { stroke: transparent; }
 
-button {
-  cursor: pointer;
+/* Paint only: preserve existing DOM, grid, spacing, execution and stored data.
+   Explicit page-local styles are migrated by their queued page tasks. */
+.kc-scene-shell { background: var(--kc-canvas); }
+.kc-surface-3d, .kc-panel-3d, .kc-panel {
+  border: 1px solid var(--kc-line);
+  border-radius: var(--kc-radius-panel);
+  background: var(--kc-surface);
+  box-shadow: var(--kc-shadow-panel);
 }
-
-.blocklySvg {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.blocklyFlyout {
-  height: 100% !important;
-}
-
-.blocklyMainBackground {
-  stroke: transparent;
-}
-
-.kc-scene-shell {
-  background:
-    radial-gradient(circle at top, rgba(255, 217, 170, 0.72), transparent 36%),
-    radial-gradient(circle at right, rgba(214, 238, 255, 0.78), transparent 28%),
-    linear-gradient(
-      160deg,
-      var(--kc-surface-cream) 0%,
-      var(--kc-surface-peach) 18%,
-      #ffffff 48%,
-      var(--kc-surface-cloud) 100%
-    );
-}
-
-.kc-surface-3d {
-  border: 1px solid var(--kc-border-soft);
-  border-radius: 2rem;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: var(--kc-shadow-soft);
-  backdrop-filter: blur(12px);
-}
-
-.kc-panel-3d {
-  border: 1px solid rgba(255, 255, 255, 0.76);
-  border-radius: 2.25rem;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.76) 100%);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.9),
-    var(--kc-shadow-soft);
-}
-
 .kc-stage-3d {
-  border-radius: 2.4rem;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.9), transparent 45%),
-    linear-gradient(180deg, #edf8ff 0%, #d9f0ff 100%);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.92),
-    var(--kc-shadow-stage);
+  border-radius: var(--kc-radius-pane);
+  background: var(--kc-surface);
+  box-shadow: var(--kc-shadow-panel);
 }
-
 .kc-button-3d {
-  border-radius: 9999px;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.76),
-    0 16px 28px rgba(249, 115, 22, 0.22);
+  border: 0;
+  border-radius: var(--kc-radius-button);
+  background: var(--kc-action);
+  color: var(--kc-surface);
+  box-shadow: none;
 }
+.kc-button-3d:hover { background: var(--kc-action-hover); }
+.kc-glow-warm, .kc-glow-sky { background: none; }
 
-.kc-glow-warm {
-  background: radial-gradient(circle, rgba(255, 222, 175, 0.92) 0%, rgba(255, 222, 175, 0) 74%);
+/* Opt-in V2 primitives; business components remain UX-002/003 tasks. */
+.kc-nav-surface {
+  background: linear-gradient(160deg, var(--kc-nav), var(--kc-nav-end));
+  color: var(--kc-nav-text);
 }
-
-.kc-glow-sky {
-  background: radial-gradient(circle, rgba(209, 240, 255, 0.92) 0%, rgba(209, 240, 255, 0) 74%);
+.kc-action-surface {
+  border: 0;
+  border-radius: var(--kc-radius-button);
+  background: var(--kc-action);
+  color: var(--kc-surface);
+  padding: var(--kc-button-padding-y) var(--kc-button-padding-x);
+  font: inherit;
+  font-weight: 720;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  white-space: nowrap;
+}
+.kc-action-surface:hover { background: var(--kc-action-hover); }
+.kc-text-muted { color: var(--kc-text-muted); }
+.kc-code-font { font-family: var(--kc-font-code); }
+.kc-numeric { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }

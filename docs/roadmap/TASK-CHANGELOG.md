@@ -44,3 +44,6 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-11 | UX-001 | 项目方认可 V2 视觉方向；归档10页可交互HTML、可离线单文件原型、10项原创演示素材及Codex实施规范。没有改动任何业务界面或课程状态 | 本次设计归档PR，创建后见GitHub | 待本次设计归档合并 | 待本次设计归档主CI | in_progress；UX-001 设计tokens代码、对比度测试、三端真实业务截图均未实施，不得标 completed |
+
+| 2026-10-11 | UX-001 | 确认设计 PR #33 合并与 main CI 8/8；开始冻结规则、V2 真实 tokens 和基础 CSS 实施，负责人裁定保留原型文字颜色并记录 AA 缺口 | [设计 #33](https://github.com/HelloMrDuan/kidsCoding/pull/33) | 2ab0687a908af41891794aa45d83d41fea7b434a | [基线 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38129176212) / [台账](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38129176215) | in_progress；全 AA 未满足，不标 completed，不领取 UX-002 |
+| 2026-10-11 | UX-001 | 本地真实 V2 tokens/基础 CSS/冻结规则实施；160 单测、52 真 Chrome、33 三屏对照图、生产构建/TypeScript/lint/单任务台账通过 | 待正式 PR | 待合并 | 待 main | in_progress；严格保留冻结色，完整 AA 缺口未关闭，不标 completed，不领取其他任务 |

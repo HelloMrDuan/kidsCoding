@@ -1,0 +1,126 @@
+{
+  "passed": 160,
+  "failed": 0,
+  "files": [
+    {
+      "file": "src/content/curriculum/foundation-units.test.ts",
+      "status": "passed",
+      "tests": 14
+    },
+    {
+      "file": "src/content/curriculum/full-catalog-v1.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "src/features/curriculum/full-catalog-access.test.ts",
+      "status": "passed",
+      "tests": 10
+    },
+    {
+      "file": "src/features/curriculum/release-readiness.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "src/features/lessons/complete-launch-lesson.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "src/features/lessons/foundation-lesson-feedback.test.ts",
+      "status": "passed",
+      "tests": 13
+    },
+    {
+      "file": "src/features/progress/cloud-python-drafts.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "src/features/progress/local-practice.test.ts",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "file": "src/features/progress/local-progress-storage.test.ts",
+      "status": "passed",
+      "tests": 1
+    },
+    {
+      "file": "src/features/projects/build-project-completion-copy.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "src/features/projects/project-complete-card.test.tsx",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "src/features/python-lab/python-lab-grade.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "src/features/python-lab/python-multi-grade.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "src/features/ui/tokens.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "src/features/scratch-vm/scratch-cloud-draft.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "src/features/scratch-vm/scratch-local-draft.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "src/features/lessons/blockly/restore-block-sequence.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "src/features/lessons/playable-stage/duo-dialogue-executor.test.ts",
+      "status": "passed",
+      "tests": 17
+    },
+    {
+      "file": "src/features/lessons/playable-stage/duo-executor.test.ts",
+      "status": "passed",
+      "tests": 16
+    },
+    {
+      "file": "src/features/lessons/playable-stage/duo-graduation-executor.test.ts",
+      "status": "passed",
+      "tests": 17
+    },
+    {
+      "file": "src/features/lessons/playable-stage/use-block-executor.test.ts",
+      "status": "passed",
+      "tests": 12
+    },
+    {
+      "file": "src/app/api/curriculum/catalog/route.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "src/app/api/practice/drafts/route.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "src/app/api/practice/scratch/route.test.ts",
+      "status": "passed",
+      "tests": 5
+    }
+  ]
+}

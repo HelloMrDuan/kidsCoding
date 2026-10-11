@@ -1,0 +1,253 @@
+{
+  "browser": "Actual Google Chrome",
+  "stats": {
+    "startTime": "2026-10-11T10:18:00.097Z",
+    "duration": 661003.041,
+    "expected": 48,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cases": [
+    {
+      "title": "real dialogue, wrong actor repair and editable saved work on desktop",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "real dialogue, wrong actor repair and editable saved work on tablet",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "real dialogue, wrong actor repair and editable saved work on phone",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "duplicate switching is a real error and repairs within the same lesson",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "real dialogue, wrong actor repair and editable saved work on desktop",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "real dialogue, wrong actor repair and editable saved work on tablet",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "real dialogue, wrong actor repair and editable saved work on phone",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "duplicate switching is a real error and repairs within the same lesson",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "graduation gift, repair, reopen and repeat rewards on desktop",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "graduation gift, repair, reopen and repeat rewards on tablet",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "graduation gift, repair, reopen and repeat rewards on phone",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "repetition never borrows the other actor’s move, and invalid trailing code hides the gift",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "opening the completion URL cannot invent graduation or a saved work",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "graduation gift, repair, reopen and repeat rewards on desktop",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "graduation gift, repair, reopen and repeat rewards on tablet",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "graduation gift, repair, reopen and repeat rewards on phone",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "repetition never borrows the other actor’s move, and invalid trailing code hides the gift",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "opening the completion URL cannot invent graduation or a saved work",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "real Blockly duo lesson completes, debugs and recovers on desktop",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "real Blockly duo lesson completes, debugs and recovers on tablet",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "real Blockly duo lesson completes, debugs and recovers on phone",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "duplicate switch cannot pass and can be repaired",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "real Blockly duo lesson completes, debugs and recovers on desktop",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "real Blockly duo lesson completes, debugs and recovers on tablet",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "real Blockly duo lesson completes, debugs and recovers on phone",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "duplicate switch cannot pass and can be repaired",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "first forest Blockly lesson requires actual execution before each step and awards completion once",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "bad Blockly program cannot be passed off as actual execution",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "first forest Blockly lesson requires actual execution before each step and awards completion once",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "bad Blockly program cannot be passed off as actual execution",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "forest greeting lesson really moves then speaks before completion",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "forest first story progresses from start to move to speech through real Blockly execution",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "forest greeting lesson really moves then speaks before completion",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "forest first story progresses from start to move to speech through real Blockly execution",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 7 teaches real click event: start alone never moves the butterfly",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 8 uses clicked event to move and then speak, with reflective feedback",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 9 has a distinct garden ending with clicked movement, speech and repeat",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "an incorrect first event cannot be used to bypass the click lesson",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 7 teaches real click event: start alone never moves the butterfly",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 8 uses clicked event to move and then speak, with reflective feedback",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 9 has a distinct garden ending with clicked movement, speech and repeat",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "an incorrect first event cannot be used to bypass the click lesson",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 4 switches real stage background after Scratch-like Blockly scene instruction",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 5 visibly repeats the prior movement after traveling to meadow",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 6 executes movement, scene change, repetition and speech in order",
+      "project": "desktop",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 4 switches real stage background after Scratch-like Blockly scene instruction",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 5 visibly repeats the prior movement after traveling to meadow",
+      "project": "mobile",
+      "status": "passed"
+    },
+    {
+      "title": "lesson 6 executes movement, scene change, repetition and speech in order",
+      "project": "mobile",
+      "status": "passed"
+    }
+  ]
+}

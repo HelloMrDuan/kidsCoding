@@ -1,0 +1,72 @@
+[
+  {
+    "name": "hero-studio.webp",
+    "bytes": 127472,
+    "sha256": "d55f401f11662b1d94e214aad2c2bf5b93a90d148651e0f4f1129f59c7c181f3",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "map-terrain.svg",
+    "bytes": 3410,
+    "sha256": "8f459d900cd7f61a12f51d1537bbe58eaeb4fe7be1b598d2a01d588f60cce1fe",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "track-blockly.webp",
+    "bytes": 30446,
+    "sha256": "14448f74797d8c37e0372f484c880749b544ef3662ebdf8c737be3753a4d06f4",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "track-python.webp",
+    "bytes": 18062,
+    "sha256": "6830924cf51dfdcdc14dd060e79689756d1591241257652fa52213b35785d488",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "track-scratch.webp",
+    "bytes": 31372,
+    "sha256": "3c1fd7dc442a3f095fc0a01d8387b94b85d5cbb8e48e3fc966ad71c233b26695",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "work-1.webp",
+    "bytes": 21172,
+    "sha256": "ebe1d46c518527d3c71a66507c83a2207f56a188319bcadac9cf5e976df3bacd",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "work-2.webp",
+    "bytes": 28404,
+    "sha256": "f4b043b61cd97081be4e2e7acb0226e2e090ecb1d1b8001514723005fa06c5e3",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "work-3.webp",
+    "bytes": 21226,
+    "sha256": "9cde11af7f1fb7b016cf1eac253ab5763c626fda4da9e44067f128371c025688",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "work-4.webp",
+    "bytes": 23132,
+    "sha256": "a022fc057e72d2bf2dd6d8906ad2fb0447549676e37489afe13e1ed920a30c66",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  },
+  {
+    "name": "work-5.webp",
+    "bytes": 29094,
+    "sha256": "76b1440a2daa1d126dea989ca81f68f0b2d22b772220dc2e6e8eecb2d6d47772",
+    "productionUse": false,
+    "rights": "Design README declares generated demo; source/creation/license trail not supplied. Production review required."
+  }
+]

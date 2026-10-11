@@ -291,10 +291,17 @@
         "pr": null,
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "tests": [
+          "160 Vitest / 24 files passed, including frozen V2 token parity and explicit contrast exceptions.",
+          "52 actual Google Chrome tests passed: 48 lesson 1-12 normal/error/isolation/rerun/reset/persistence/recovery/touch/reward regressions + 4 V2 production CSS/keyboard/touch/reduced-motion tests.",
+          "33 reference/before/after/component PNGs at 1440x900, 768x1024, 375x812; token attributes and PNG bytes identical; 9 route viewport combinations no overflow, panel x/width unchanged.",
+          "Production Next build and TypeScript passed; lint 0 errors with 5 existing warnings; ledger passed.",
+          "AA NOT satisfied: owner explicitly retains approved text colors; exact contrast gaps documented in docs/roadmap/evidence/UX-001/contrast-report.json."
+        ],
+        "reviewer": null,
+        "visualEvidence": "docs/roadmap/evidence/UX-001/README.md"
       },
-      "notes": "2026-10-11 用户确认 V2 视觉方向，可提交原型与设计规范。此 PR 只固化基线，未实施 tokens/页面业务代码或完成 UX-001 的测试、CI/main 验收；不得改为 completed。"
+      "notes": "2026-10-11 从已批准 PR #33 基线继续；实施冻结 V2 tokens、兼容基础样式与对比测试。负责人明确要求严格保留原型文字颜色并记录 AA 缺口，故全 AA 验收尚未满足，不标 completed。仅 UX-001，页面布局迁移仍按后续单任务。"
     },
     {
       "id": "UX-002",
