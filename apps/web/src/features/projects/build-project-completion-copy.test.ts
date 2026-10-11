@@ -42,7 +42,7 @@ describe('buildProjectCompletionCopy', () => {
     const copy = buildProjectCompletionCopy('lesson-12-graduation-show')
 
     expect(copy.summary).toBe(
-      '这次，两个动物朋友一起完成了一个完整故事。先回看作品，再看看高阶创作阶段。',
+      '这次，小狐狸走了 100 步，小熊走了 200 步，两个目标到位找到礼物。先回看作品，再看看高阶创作阶段。',
     )
     expect(copy.spotlightTag).toBe('启蒙毕业作品')
     expect(copy.spotlightTitle).toBe('你做出了一个完整作品')

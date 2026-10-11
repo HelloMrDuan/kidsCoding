@@ -135,20 +135,20 @@ export function ProjectCompleteCard({
   }
 
   return (
-    <section className="mx-auto max-w-5xl rounded-[2.5rem] bg-[linear-gradient(180deg,#fff9ef_0%,#ffffff_100%)] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.1)] md:p-8">
-      <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+    <section className={`mx-auto max-w-5xl rounded-[2.5rem] bg-[linear-gradient(180deg,#fff9ef_0%,#ffffff_100%)] ${playableProject ? 'p-3 md:p-8' : 'p-6 md:p-8'} shadow-[0_24px_60px_rgba(15,23,42,0.1)]`}>
+      <div className={`grid gap-6 ${playableProject ? '' : 'lg:grid-cols-[1.15fr_0.85fr]'} lg:items-start`}>
         <div className="space-y-5">
           <p className="inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold uppercase tracking-[0.28em] text-orange-500 shadow-[0_10px_24px_rgba(255,139,78,0.12)]">
             {completionCopy.spotlightTag}
           </p>
-          <div
+          {playableProject ? <div data-testid="project-complete-stage">{playableProject}</div> : <div
             className="kc-stage-3d rounded-[2rem] border border-[#dceef7] bg-[radial-gradient(circle_at_top,#fffdf8_0%,#fff0d9_24%,#dff4ff_58%,#ffffff_100%)] p-4 shadow-[0_20px_44px_rgba(56,189,248,0.12)]"
             data-testid="project-complete-stage"
           >
             <div className="rounded-[1.75rem] bg-white/70 p-3 backdrop-blur-sm">
               <PreviewStage blocks={blocks} template={template} />
             </div>
-          </div>
+          </div>}
         </div>
 
         <div className="space-y-5">
@@ -198,7 +198,7 @@ export function ProjectCompleteCard({
             </Link>
             {isFoundationGraduate ? (
               <p className="text-center text-sm font-semibold leading-7 text-violet-700">
-                你已经完成启蒙毕业作品，准备好再看看高阶创作阶段。
+                你已经完成启蒙毕业作品，准备好再看看高阶创作阶段。星星只在首次完成时增加，重学、回看和修改作品不会重复领奖。
               </p>
             ) : null}
           </div>

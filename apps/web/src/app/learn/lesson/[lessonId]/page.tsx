@@ -89,11 +89,11 @@ export default function LessonPage() {
 
   const handleRunSuccess=useCallback(() => {
     setHasRunSuccess(true)
-    if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal'].includes(lessonId)) setFeedback('本步角色结果与学习活动已验证。看看两条轨道，再完成这一步。')
+    if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('本步角色结果与学习活动已验证。看看两条轨道，再完成这一步。')
   }, [lessonId, setHasRunSuccess, setFeedback])
   const handleRunClear=useCallback(() => {
     setHasRunSuccess(false)
-    if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal'].includes(lessonId)) setFeedback('先运行积木，观察两个朋友的实际位置，再完成本步学习活动。')
+    if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('先运行积木，观察两个朋友的实际位置，再完成本步学习活动。')
   }, [lessonId, setHasRunSuccess, setFeedback])
 
   useEffect(() => {
@@ -163,7 +163,7 @@ export default function LessonPage() {
 
   async function handleNext() {
     const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id)
-    const duoLesson = ['lesson-10-second-friend', 'lesson-11-duo-rehearsal'].includes(currentLesson.id)
+    const duoLesson = ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)
     const correct=duoLesson ? hasRunSuccess : evaluateStep(step.requiredBlockTypes,blocksRef.current) && (!needsRun || blocksRef.current.length===step.requiredBlockTypes.length)
     if (!correct || (needsRun && !hasRunSuccess)) {
       const nextFailedAttempts = failedAttempts + 1
@@ -207,7 +207,13 @@ export default function LessonPage() {
       updatedAt: new Date().toISOString(),
     })
 
-    writeGuestProgress(nextProgress)
+    try {
+      writeGuestProgress(nextProgress)
+    } catch {
+      setHasRunSuccess(true)
+      setFeedback('本机存储失败，作品和奖励尚未保存。请检查浏览器存储空间后重试完成。')
+      return
+    }
     await syncGuestSnapshot({
       onboarding: readOnboardingSession(),
       progress: nextProgress,
@@ -297,9 +303,9 @@ export default function LessonPage() {
             />
           ) : (
             <div className="space-y-6">
-              {['lesson-10-second-friend', 'lesson-11-duo-rehearsal'].includes(currentLesson.id) ? (
+              {['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id) ? (
                 <DuoStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} requiredBlocks={step.requiredBlockTypes}
-                  dialogue={currentLesson.id === 'lesson-11-duo-rehearsal'} stepIndex={stepIndex} onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
+                  graduation={currentLesson.id === 'lesson-12-graduation-show'} dialogue={currentLesson.id === 'lesson-11-duo-rehearsal'} stepIndex={stepIndex} onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
               ) : ['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
                 <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
                   requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex}
@@ -308,7 +314,7 @@ export default function LessonPage() {
                 <PreviewStage blocks={blocks} template={currentTemplate}/>
               )}
               <BlocklyWorkspace
-                enableProgramTools={['lesson-10-second-friend', 'lesson-11-duo-rehearsal'].includes(currentLesson.id)}
+                enableProgramTools={['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)}
                 allowedBlocks={step.allowedBlocks}
                 blocks={blocks}
                 onSnapshotChange={handleSnapshotChange}

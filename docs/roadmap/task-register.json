@@ -690,7 +690,7 @@
       "title": "第12课双角色毕业作品",
       "priority": "P0",
       "category": "EDU",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "EDU-102"
       ],
@@ -703,10 +703,15 @@
         "pr": null,
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "Local: 154 Vitest tests / 23 suites passed, including 17 graduation runtime cases, actual persistence failure and graduation reward idempotency",
+          "Local: final production Next.js build and production TypeScript passed; ESLint zero errors, five existing warnings",
+          "Local: 48 actual Chrome cases passed: lessons01–09 22; final lessons10–11 16; graduation10 (three sizes desktop/native touch, two full completions, editable reopened work, quota failure/retry, wrong repeat target, malformed trailing code and direct completion URL)",
+          "Evidence: docs/roadmap/evidence/EDU-103/README.md; 12 baseline/after/error/project PNGs, separate teaching/UX rubrics pending independent human scoring"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "本地集中验收通过，待唯一功能PR和PR/main CI；未提前completed。全目录tsc既有脚本/测试夹具诊断仍在，生产TypeScript通过；人类评分/儿童试学/实体手机/生产发布未验收。"
     },
     {
       "id": "UX-301",

@@ -44,6 +44,21 @@ const progress: GuestProgress = {
 }
 
 describe('completeLaunchLesson', () => {
+  it('keeps graduation stars/cards/badges unique and updates only its work on real repeated completion', () => {
+    const lesson = { ...lessons[0], id: 'lesson-12-graduation-show', rewardCardId: 'commemorative-foundation-graduate' }
+    const reward = { stars: 3, badgeIds: ['lesson-lesson-12-graduation-show'], cardIds: ['commemorative-foundation-graduate'] }
+    const repeat = ['when_start', 'move_right', 'switch_character', 'move_right', 'repeat_twice'].map(type => ({ type }))
+    const explicit = ['when_start', 'move_right', 'switch_character', 'move_right', 'move_right'].map(type => ({ type }))
+    const first = completeLaunchLesson({ lesson, lessons: [lesson], progress, reward, blocks: repeat, updatedAt: '2026-10-11T00:00:00Z' })
+    const again = completeLaunchLesson({ lesson, lessons: [lesson], progress: first, reward, blocks: explicit, updatedAt: '2026-10-11T00:01:00Z' })
+    expect(again.stars).toBe(3)
+    expect(again.cardIds).toEqual(reward.cardIds)
+    expect(again.badgeIds).toEqual(reward.badgeIds)
+    expect(again.completedLessonIds).toEqual([lesson.id])
+    expect(again.completedProjectIds).toEqual([lesson.id])
+    expect(again.projectSnapshots).toHaveLength(1)
+    expect(again.projectSnapshots[0].blocks).toEqual(explicit)
+  })
   it('moves progress to the next lesson and records the latest project snapshot', () => {
     const result = completeLaunchLesson({
       blocks: [{ type: 'when_start' }, { type: 'move_right' }],

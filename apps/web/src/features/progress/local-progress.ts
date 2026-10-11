@@ -69,9 +69,9 @@ export function subscribeGuestProgress(onChange: () => void) {
 
 export function writeGuestProgress(next: GuestProgress) {
   const raw = JSON.stringify(next)
+  window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, raw)
   cachedGuestRaw = raw
   cachedGuestSnapshot = next
-  window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, raw)
   window.dispatchEvent(new Event(CHANGE_EVENT))
 }
 

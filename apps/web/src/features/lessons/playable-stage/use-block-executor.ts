@@ -2,8 +2,10 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 
 export type ExecutionState = 'idle' | 'armed' | 'running' | 'success' | 'error'
 
-export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: boolean }>, requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' = false) {
+export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: boolean }>, requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' | 'graduation' = false) {
   const dialogueEnabled = duoEnabled === 'dialogue'
+  const graduationEnabled = duoEnabled === 'graduation'
+  const [giftFound, setGiftFound] = useState(false)
   const [executionState, setExecutionState] = useState<ExecutionState>('idle')
   const [characterPosition, setCharacterPosition] = useState(0)
   const [characterMessage, setCharacterMessage] = useState<string | null>(null)
@@ -28,6 +30,7 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
     setActorActions({ main: 'idle', partner: 'idle' })
     setActionLog([])
     setErrorMessage(null)
+    setGiftFound(false)
   }, [])
 
   // Execute the actual lesson block program. The event hat alone never
@@ -53,7 +56,7 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
       if (runIdRef.current !== id) return
       const type = blocks[i].type
       if (duoEnabled) {
-        // Lessons 10–11 interpret the actual connected program with two targets.
+        // Lessons 10–12 interpret the actual connected program with two targets.
         // Validate observed coordinates, not a precomputed answer animation.
         if (type === 'move_right') {
           setActorActions({ main: actor === 'main' ? 'moving' : 'idle', partner: actor === 'partner' ? 'moving' : 'idle' })
@@ -71,13 +74,19 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
           actor = 'partner'
           setActiveActor(actor)
           setActionLog(prev => [...prev, '切换到小熊：后面的动作只给小熊'])
-        } else if (type === 'say_line' && dialogueEnabled) {
+        } else if (type === 'repeat_twice' && graduationEnabled) {
+          if (blocks[i - 1]?.type !== 'move_right') { fail('“再做一次”要接在当前角色的移动后面，切换不会把狐狸的移动交给小熊重复。'); return }
+          setActorActions({ main: actor === 'main' ? 'moving' : 'idle', partner: actor === 'partner' ? 'moving' : 'idle' })
+          if (actor === 'main') { fox += 100; setCharacterPosition(fox) }
+          else { bear += 100; setPartnerPosition(bear) }
+          setActionLog(prev => [...prev, `${actor === 'main' ? '小狐狸' : '小熊'}再移动 100 步（再做一次）`])
+        } else if (type === 'say_line' && (dialogueEnabled || graduationEnabled && stepIndex === 4)) {
           setActorActions({ main: actor === 'main' ? 'speaking' : 'idle', partner: actor === 'partner' ? 'speaking' : 'idle' })
           if (actor === 'main') {
             foxMessage = '你好！'
             setCharacterMessage(foxMessage)
           } else {
-            bearMessage = '我们一起出发吧！'
+            bearMessage = graduationEnabled ? '找到礼物啦！' : '我们一起出发吧！'
             setPartnerMessage(bearMessage)
           }
           setActionLog(prev => [...prev, `${actor === 'main' ? '小狐狸' : '小熊'}说：${actor === 'main' ? foxMessage : bearMessage}`])
@@ -116,7 +125,7 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
     }
     if (duoEnabled) {
       const expectedFox = stepIndex === 0 ? 0 : 100
-      const expectedBear = dialogueEnabled ? (stepIndex === 0 ? 0 : 100) : stepIndex < 2 ? 0 : 100
+      const expectedBear = graduationEnabled ? (stepIndex < 2 ? 0 : 200) : dialogueEnabled ? (stepIndex === 0 ? 0 : 100) : stepIndex < 2 ? 0 : 100
       if (fox !== expectedFox || bear !== expectedBear) {
         fail(`目标：小狐狸 ${expectedFox} 步、小熊 ${expectedBear} 步；实际：小狐狸 ${fox} 步、小熊 ${bear} 步。${bear === 0 && expectedBear > 0 ? '小熊还没动，看看操作权交给谁了。' : '检查移动次数和动作目标。'}`)
         return
@@ -135,9 +144,13 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
           return
         }
       }
+      if (graduationEnabled && stepIndex >= 2) {
+        setGiftFound(true)
+        setActionLog(prev => [...prev, '礼物已找到：狐狸 100 步，小熊 200 步，两个目标都到位'])
+      }
     }
     if (runIdRef.current === id) setExecutionState('success')
-  }, [blocks, duoEnabled, dialogueEnabled, stepIndex])
+  }, [blocks, duoEnabled, dialogueEnabled, graduationEnabled, stepIndex])
 
   const run = useCallback(async () => {
     reset()
@@ -184,10 +197,11 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
     setActorActions({ main: 'idle', partner: 'idle' })
     setActionLog([])
     setErrorMessage(null)
+    setGiftFound(false)
   }
 
   useEffect(() => { runIdRef.current += 1 }, [stepIndex, currentBlocksKey])
   useEffect(() => () => { runIdRef.current += 1 }, [])
 
-  return { executionState, characterPosition, characterMessage, partnerPosition, partnerMessage, activeActor, actorActions, actionLog, errorMessage, stageScene, run, reset, clickCharacter }
+  return { executionState, giftFound, characterPosition, characterMessage, partnerPosition, partnerMessage, activeActor, actorActions, actionLog, errorMessage, stageScene, run, reset, clickCharacter }
 }

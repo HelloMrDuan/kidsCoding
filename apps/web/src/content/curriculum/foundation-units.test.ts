@@ -119,13 +119,14 @@ describe('foundation curriculum seed', () => {
 
     expect(longestChain(lesson10)).toBe(4)
     expect(longestChain(lesson11)).toBe(5)
-    expect(longestChain(lesson12)).toBe(5)
+    expect(longestChain(lesson12)).toBe(6)
     expect(lesson12?.steps[4]?.requiredBlockTypes).toEqual([
       'when_start',
       'move_right',
       'switch_character',
-      'say_line',
+      'move_right',
       'repeat_twice',
+      'say_line',
     ])
   })
 
