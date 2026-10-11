@@ -279,18 +279,18 @@
       "title": "设计Tokens规范化",
       "priority": "P0",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
-      "scope": "docs/design/kidscoding-v2/ 已审批视觉基线；后续实现 apps/web/src/app/globals.css 与 features/ui/tokens.ts",
+      "scope": "apps/web/src/app/globals.css、features/ui/tokens.ts 与基础 Chrome 测试；AGENTS/VISUAL-LOCK/开发总纲/UI规范引用及 docs/roadmap/evidence/UX-001 三屏真实证据",
       "acceptance": [
-        "V2海军蓝导航/科技蓝动作色/中性背景形成可复用语义token；WCAG 2.2 AA 对比度检验",
+        "V2海军蓝导航/科技蓝动作色/中性背景形成可复用语义token；实测WCAG 2.2 AA对比度，按负责人明确裁定保留原型文字颜色并记录AA缺口，不宣称完整AA合规",
         "不破坏现有页面、交互与现有学习数据",
         "1440×900、768×1024、375×812 三断点实装前后截图与实际功能验收"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/34",
+        "mergeCommit": "ee1cddaa63f8baf3db57b873930a3f25461a83ec",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132983377",
         "tests": [
           "160 Vitest / 24 files passed, including frozen V2 token parity and explicit contrast exceptions.",
           "52 actual Google Chrome tests passed: 48 lesson 1-12 normal/error/isolation/rerun/reset/persistence/recovery/touch/reward regressions + 4 V2 production CSS/keyboard/touch/reduced-motion tests.",
@@ -299,9 +299,32 @@
           "AA NOT satisfied: owner explicitly retains approved text colors; exact contrast gaps documented in docs/roadmap/evidence/UX-001/contrast-report.json."
         ],
         "reviewer": null,
-        "visualEvidence": "docs/roadmap/evidence/UX-001/README.md"
+        "visualEvidence": "docs/roadmap/evidence/UX-001/README.md",
+        "prNumber": 34,
+        "featureHead": "ba480ef26d49a0c0d46f258b625a434d9471a8fb",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132219257",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132219165",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132982986",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132219257",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132219165",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132983377",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132982986",
+            "checks": "8/8 completed success"
+          }
+        },
+        "designDecision": {
+          "date": "2026-10-11",
+          "authority": "项目负责人，本会话明确回复",
+          "decision": "严格保持原型文字颜色，记录 AA 缺口",
+          "scope": "UX-001 冻结基础实现与对比度检验的验收取舍；不是全 AA 合规声明、不是生产页面发布批准"
+        }
       },
-      "notes": "2026-10-11 从已批准 PR #33 基线继续；实施冻结 V2 tokens、兼容基础样式与对比测试。负责人明确要求严格保留原型文字颜色并记录 AA 缺口，故全 AA 验收尚未满足，不标 completed。仅 UX-001，页面布局迁移仍按后续单任务。"
+      "notes": "V2 视觉基础工程完成；PR/main 各8项全绿，160单测、52真Chrome、33三屏对照图通过。负责人明确裁定严格保持原型文字颜色并记录AA缺口，按此取舍忠实实装；小字号及焦点环的完整AA未达标，未加深颜色或伪报合规。completed仅指UX-001基础代码/冻结规则/真实回归闭环，不代表十页布局迁移、素材生产许可、UX/教研百评分或生产发布完成。后续UX-002按钮状态与真实错误反馈，本轮未领取。"
     },
     {
       "id": "UX-002",
