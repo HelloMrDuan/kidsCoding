@@ -1095,88 +1095,88 @@
     },
     {
       "id": "lesson-12-graduation-show",
-      "title": "动物朋友毕业演出",
-      "story": "森林剧院开启毕业演出，孩子作为导演要把此前的故事、互动与角色串在一起。",
+      "title": "一起找到小礼物",
+      "story": "狐狸守住 100 步路标，小熊去 200 步寻找礼物；两位朋友都到位才找到礼物。",
       "concepts": [
-        "综合创作",
-        "交互",
-        "调试",
-        "展示"
+        "独立角色",
+        "重复归属",
+        "结果验证",
+        "调试"
       ],
-      "learningOutcome": "提交有开场、两位角色、互动和谢幕的可回放作品，并进行独立讲解。",
+      "learningOutcome": "实际运行 fox100/bear200，比较重复与两块移动方案，保存并重开可改的毕业作品。",
       "instructionSequence": [
         {
           "step": 1,
-          "teacherPrompt": "写下演出主题",
-          "childAction": "给毕业演出写一个名字并画故事路线图",
-          "check": "演出主题清楚",
-          "voiceover": "第1步：写下演出主题 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "观察两位朋友的起点",
+          "childAction": "指出两个0步起点和100/200步目标",
+          "check": "目标明确",
+          "voiceover": "观察两位朋友的起点",
           "interactionType": "observe"
         },
         {
           "step": 2,
-          "teacherPrompt": "安排至少两位角色",
-          "childAction": "确定两位主演和各自的动作任务",
-          "check": "两个主角有明确分工",
-          "voiceover": "第2步：安排至少两位角色 试一试，完成后说说你看到了什么。",
-          "interactionType": "build"
+          "teacherPrompt": "预测重复交给谁",
+          "childAction": "选择只有小熊或两个一起，不因猜错阻断实验",
+          "check": "记录预测再验证",
+          "voiceover": "预测重复交给谁",
+          "interactionType": "predict"
         },
         {
           "step": 3,
-          "teacherPrompt": "制作一段顺序剧情",
-          "childAction": "实现开场、移动与对白的核心片段",
-          "check": "开场剧情可运行",
-          "voiceover": "第3步：制作一段顺序剧情 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "狐狸独立移动",
+          "childAction": "拼开始和移动并运行",
+          "check": "fox100/bear0",
+          "voiceover": "狐狸独立移动",
           "interactionType": "build"
         },
         {
           "step": 4,
-          "teacherPrompt": "加入一次观众互动",
-          "childAction": "加入一次需要观众操作的触发事件",
-          "check": "至少一种互动可触发",
-          "voiceover": "第4步：加入一次观众互动 试一试，完成后说说你看到了什么。",
-          "interactionType": "predict"
+          "teacherPrompt": "小熊重复移动",
+          "childAction": "切换后移动再做一次，或接两块移动",
+          "check": "fox100/bear200产生礼物",
+          "voiceover": "小熊重复移动",
+          "interactionType": "build"
         },
         {
           "step": 5,
-          "teacherPrompt": "执行完整测试清单",
-          "childAction": "按清单从头测试所有场景和角色",
-          "check": "完整测试均有记录",
-          "voiceover": "第5步：执行完整测试清单 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "少走一次再修复",
+          "childAction": "实际运行fox100/bear100，观察无礼物后补一次移动",
+          "check": "错误已观察且修复成功",
+          "voiceover": "少走一次再修复",
           "interactionType": "test"
         },
         {
           "step": 6,
-          "teacherPrompt": "展示并讲解作品",
-          "childAction": "展示作品、解释最满意的设计并提出改进点",
-          "check": "作品可讲述并回放",
-          "voiceover": "第6步：展示并讲解作品 试一试，完成后说说你看到了什么。",
+          "teacherPrompt": "展示改造作品",
+          "childAction": "选择方案，复盘角色归属，完成后重开编辑保存",
+          "check": "可运行、可修改、可讲述",
+          "voiceover": "展示改造作品",
           "interactionType": "reflect"
         }
       ],
       "commonErrors": [
-        "只有堆积木没有连贯剧情",
-        "互动无法触发",
-        "缺少最后一次完整测试"
+        "漏切换让狐狸走过头",
+        "小熊只走100步",
+        "在切换后直接重复狐狸的动作"
       ],
       "tieredHints": [
-        "先画出完整故事路线。",
-        "列出每位角色该做的动作。",
-        "邀请家人按清单逐项试玩。"
+        "看看小熊实际距离，还差多少？",
+        "重复只给当前角色刚做的移动。",
+        "切换后先移动小熊，再做一次；或用两块小熊移动。"
       ],
-      "extension": "为毕业演出制作海报，并加一个可选择的故事结局。",
-      "parentConversation": "用作品回放请孩子自评：最喜欢的设计和下一次想改的点。",
+      "extension": "比较小熊移动加重复与两块移动，另加狐狸问候或小熊庆祝。",
+      "parentConversation": "请孩子重开作品演示，并解释为什么小熊重复时狐狸仍停在100步。",
       "assessment": {
         "pass": [
-          "作品可以按任务要求演示",
-          "学生能指出触发条件与实际结果",
-          "学生至少复查一次失败或边界情况"
+          "fox100/bear200真实运行",
+          "观察并修复少走一次错误",
+          "作品本机保存后可重开修改"
         ],
         "advanced": [
           "能够改变一个条件做出个性化作品",
           "能够讲清修改程序的原因"
         ],
-        "sampleFailureCase": "只有堆积木没有连贯剧情",
+        "sampleFailureCase": "狐狸100步、小熊100步，礼物尚未找到；补小熊移动后重新运行。",
         "instructorEvidence": [
           "能复述触发与执行顺序",
           "能独立演示当前课的核心动作",

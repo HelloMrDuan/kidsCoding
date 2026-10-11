@@ -34,8 +34,8 @@ export function DuoProject({ initialBlocks, lessonId = 'lesson-10-second-friend'
   if (initialBlocks.length === 0) return <p>本机没有这节课的作品。请先回课堂完成真实练习。</p>
   return <div className="space-y-4" data-testid="duo-saved-project">
     <p role="status" data-testid="duo-save-status" className="text-sm leading-7 text-slate-700">{message}</p>
-    <DuoStage dialogue={lessonId === 'lesson-11-duo-rehearsal'} blocks={blocks} requiredBlocks={required} stepIndex={4} onRunSuccess={onSuccess} onRunClear={onClear}/>
-    <BlocklyWorkspace allowedBlocks={allowed} blocks={blocks} onSnapshotChange={onChange} enableProgramTools/>
+    <DuoStage graduation={lessonId === 'lesson-12-graduation-show'} dialogue={lessonId === 'lesson-11-duo-rehearsal'} blocks={blocks} requiredBlocks={required} stepIndex={4} onRunSuccess={onSuccess} onRunClear={onClear}/>
+    <BlocklyWorkspace allowedBlocks={lessonId === 'lesson-12-graduation-show' ? [...allowed, 'repeat_twice'] : allowed} blocks={blocks} onSnapshotChange={onChange} enableProgramTools/>
     <button type="button" data-testid="duo-save-project" disabled={!passed} onClick={save}
       className="min-h-11 rounded-full bg-emerald-800 px-5 py-3 font-bold text-white disabled:opacity-50">保存改好的本机作品</button>
   </div>

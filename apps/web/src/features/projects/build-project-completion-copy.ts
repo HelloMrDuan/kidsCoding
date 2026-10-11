@@ -32,11 +32,11 @@ const PROJECT_COMPLETION_COPY: Record<string, ProjectCompletionCopy> = {
   },
   'lesson-12-graduation-show': {
     summary:
-      '这次，两个动物朋友一起完成了一个完整故事。先回看作品，再看看高阶创作阶段。',
+      '这次，小狐狸走了 100 步，小熊走了 200 步，两个目标到位找到礼物。先回看作品，再看看高阶创作阶段。',
     spotlightTag: '启蒙毕业作品',
     spotlightTitle: '你做出了一个完整作品',
     spotlightBody:
-      '这次，两个动物朋友一起完成了一个完整故事。你已经完成启蒙毕业作品，可以先回看作品，再看看高阶创作阶段。',
+      '这次，小狐狸走了 100 步，小熊走了 200 步，两个目标到位找到礼物。你已经完成启蒙毕业作品，可以先回看作品，再看看高阶创作阶段。',
   },
 }
 

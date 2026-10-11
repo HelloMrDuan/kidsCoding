@@ -35,3 +35,10 @@
 .hint { margin: 8px 0; font-size: 14px; line-height: 1.8; padding: 8px 12px; border-left: 3px solid #d79b45; }
 @media (max-width: 440px) { .landscape { padding: 10px; } .friend { width: 54px; } .friend svg { width: 50px; height: 50px; } .flag { transform: translateX(42px); } .track { margin-right: 58px; height: 98px; } }
 @media (prefers-reduced-motion: reduce) { .friend { transition: none; } }
+
+.gift { display:flex; align-items:center; gap:12px; margin-top:16px; border:1px dashed #bdac81; border-radius:18px; padding:14px; background:#fff9ec; font-size:14px; line-height:1.7; }
+.gift svg { width:52px; min-width:52px; opacity:.45; }
+.gift[data-found="true"] { background:#e6f1df; border-style:solid; border-color:#6b9261; }
+.gift[data-found="true"] svg { opacity:1; }
+.graduationStage .flag { transform: none; }
+.graduationStage .friend em { width: 80px; left: -16px; }
