@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-11",
+  "updatedAt": "2026-10-14",
   "policy": "11-TASK-EXECUTION-POLICY.md",
   "tasks": [
     {
@@ -331,7 +331,7 @@
       "title": "统一按钮状态与错误反馈组件",
       "priority": "P0",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-001"
       ],
@@ -347,7 +347,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "已领取。实现中：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；未提交 PR，未标完成。"
     },
     {
       "id": "UX-003",
