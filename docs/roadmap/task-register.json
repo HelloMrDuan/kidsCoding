@@ -331,7 +331,7 @@
       "title": "统一按钮状态与错误反馈组件",
       "priority": "P0",
       "category": "UX",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "UX-001"
       ],
@@ -341,13 +341,13 @@
         "失败绝不假报成功"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/36",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": "已领取。实现中：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；未提交 PR，未标完成。"
+      "notes": "功能 PR #36 已创建待 CI：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；20 单元测试、8 真实 Chrome 通过，生产构建/lint 通过；未合并，未标完成。"
     },
     {
       "id": "UX-003",

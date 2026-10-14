@@ -56,3 +56,4 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-14 | UX-002 | 已领取并开始实现：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；视觉严格取自原型 .button/.chip/.stage-feedback，未改布局与色板 | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务，UX-003 保持 todo；PR 创建后回填 in_review |
+| 2026-10-14 | UX-002 | 功能 PR 创建：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；20 单元测试、8 真实 Chrome（UX-002 4 条 + v2-tokens 4 条）、生产构建/lint 通过 | [#36](https://github.com/HelloMrDuan/kidsCoding/pull/36) | 待合并 | 待验收 | in_review；workflow 文件因 App 无 Workflows 权限由负责人网页编辑补齐，内容已验对；未合并，未标 completed |
