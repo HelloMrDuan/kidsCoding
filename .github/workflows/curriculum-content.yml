@@ -8,6 +8,7 @@ on:
       - 'apps/web/src/app/globals.css'
       - 'apps/web/src/features/ui/**'
       - 'apps/web/tests/e2e/v2-tokens.spec.ts'
+      - 'apps/web/tests/e2e/ux-002.spec.ts'
       - 'README.md'
       - 'apps/web/src/content/curriculum/**'
       - 'apps/web/src/features/curriculum/**'
@@ -77,6 +78,8 @@ jobs:
         run: npm run build
       - name: Frozen V2 tokens and recorded contrast limitations
         run: npx vitest run src/features/ui/tokens.test.ts
+      - name: UX-002 component unit tests
+        run: npx vitest run src/features/ui/button.test.tsx src/features/ui/status-tag.test.tsx src/features/ui/feedback-panel.test.tsx
 
   scratch-rls-postgres:
     runs-on: ubuntu-latest
@@ -180,7 +183,7 @@ jobs:
       - name: Lessons 10–12 actual Chrome touch browser
         run: npx playwright test tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts --project=mobile --workers=2 --output=test-results/duo-touch
       - name: Frozen V2 production CSS, three viewports and keyboard/touch
-        run: npx playwright test tests/e2e/v2-tokens.spec.ts --project=desktop --workers=2 --output=test-results/v2-tokens
+        run: npx playwright test tests/e2e/v2-tokens.spec.ts tests/e2e/ux-002.spec.ts --project=desktop --workers=2 --output=test-results/v2-tokens
       - uses: actions/upload-artifact@v4
         if: always()
         with:
