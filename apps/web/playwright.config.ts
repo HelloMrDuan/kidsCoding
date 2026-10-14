@@ -38,6 +38,10 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_URL: '',
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: '',
       SUPABASE_SERVICE_ROLE_KEY: '',
+      // UX-003 fixture route (/test-fixtures/ux-003) returns 404 unless
+      // explicitly enabled. Only the E2E server sets this; production
+      // builds leave it unset so the route stays 404.
+      UX003_FIXTURE_ENABLED: '1',
     },
   },
   projects: [
