@@ -50,3 +50,10 @@
 | 2026-10-11 | UX-001 | 冻结 V2 基础正式 PR；160 单测、52 真 Chrome、33 截图，功能分支一次推送 | [#34](https://github.com/HelloMrDuan/kidsCoding/pull/34) | 待合并 | 待验收 | in_review；完整 AA 未达，不标 completed |
 | 2026-10-11 | UX-001 | 功能 PR 8/8 全绿、无阻塞后合并，等待 main 复核 | [#34](https://github.com/HelloMrDuan/kidsCoding/pull/34) | `ee1cddaa63f8baf3db57b873930a3f25461a83ec` | 待 main | merged_waiting_ci；AA 验收缺口仍未关闭 |
 | 2026-10-11 | UX-001 | V2 真实 tokens/基础 CSS/永久冻结规则完成；160 单测、52 Chrome、33 截图；PR/main 各8/8成功 | [#34](https://github.com/HelloMrDuan/kidsCoding/pull/34) | `ee1cddaa63f8baf3db57b873930a3f25461a83ec` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132983377) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38132982986) | **completed（基础工程）**；按负责人裁定保留原型色并记录 AA 缺口，不宣称全 AA、十页迁移或生产发布；下一项 UX-002 未领取 |
+
+## UX-002 统一按钮状态与错误反馈组件
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-14 | UX-002 | 已领取并开始实现：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；视觉严格取自原型 .button/.chip/.stage-feedback，未改布局与色板 | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务，UX-003 保持 todo；PR 创建后回填 in_review |
+| 2026-10-14 | UX-002 | 功能 PR 创建：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；20 单元测试、8 真实 Chrome（UX-002 4 条 + v2-tokens 4 条）、生产构建/lint 通过 | [#36](https://github.com/HelloMrDuan/kidsCoding/pull/36) | 待合并 | 待验收 | in_review；workflow 文件因 App 无 Workflows 权限由负责人网页编辑补齐，内容已验对；未合并，未标 completed |

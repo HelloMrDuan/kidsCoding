@@ -132,3 +132,72 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
+/* UX-002 shared primitives: Button / StatusTag / FeedbackPanel.
+   Geometry and palette mirror the approved prototype
+   (docs/design/kidscoding-v2/prototype.html: .button, .button-outline,
+   .button-dark, .button-invert, .button-sm, .chip, .stage-feedback).
+   No new layout, palette, or type scale is introduced. External spacing
+   stays with the parent: these classes carry no outside margin. */
+.kc-btn-outline {
+  border: 1px solid #d5deed;
+  background: var(--kc-surface);
+  color: #27405e;
+}
+.kc-btn-outline:hover { background: #f3f7ff; }
+.kc-btn-dark { background: #142541; }
+.kc-btn-dark:hover { background: #142541; }
+.kc-btn-invert { background: var(--kc-surface); color: #193768; }
+.kc-btn-invert:hover { background: var(--kc-surface); }
+.kc-btn-sm { font-size: 12px; padding: 8px 11px; }
+.kc-btn-disabled { opacity: 0.55; cursor: not-allowed; }
+.kc-btn-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: kc-spin 0.7s linear infinite;
+  flex: none;
+}
+@keyframes kc-spin { to { transform: rotate(360deg); } }
+
+.kc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 750;
+  padding: 4px 9px;
+  border-radius: 5px;
+}
+.kc-chip-info { background: #eaf1ff; color: #2961ca; }
+.kc-chip-success { background: #e8f8f2; color: #168260; }
+.kc-chip-warning { background: #fff5e9; color: #ab711e; }
+.kc-chip-neutral { background: #eef2f6; color: #718097; }
+/* Error tone: the prototype defines no red chip. The tint follows the
+   prototype chip pattern (light tint background + darkened semantic text),
+   derived from the frozen danger token #d64c4c. */
+.kc-chip-error { background: #fdeeee; color: #b93a3a; }
+
+.kc-feedback {
+  min-height: 50px;
+  background: #f5f8fe;
+  padding: 11px 12px;
+  color: #526b91;
+  border-radius: 7px;
+  font-size: 12px;
+}
+.kc-feedback-success { background: #e8f8f2; }
+.kc-feedback-warning { background: #fff5e9; }
+.kc-feedback-error { background: #fdeeee; }
+.kc-feedback-title { color: var(--kc-text); font-weight: 700; }
+.kc-feedback-retry-error { color: var(--kc-danger); }
+.kc-feedback-dismiss {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  padding: 2px 4px;
+}
