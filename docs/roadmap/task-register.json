@@ -331,7 +331,7 @@
       "title": "统一按钮状态与错误反馈组件",
       "priority": "P0",
       "category": "UX",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "UX-001"
       ],
@@ -342,12 +342,35 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/36",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "132aa4f099905c719c88251e15b80a543fdf8909",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38533655342",
+        "tests": [
+          "20 Vitest component tests passed (button/status-tag/feedback-panel).",
+          "8 actual Google Chrome tests passed: 4 UX-002 (1440x900, 768x1024, 375x812 keyboard/states/frozen styles + existing-page regression) + 4 V2 tokens.",
+          "Production Next build and TypeScript passed; lint 0 errors with 5 existing warnings.",
+          "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
+          "Full local Vitest 357/362; 5 failures pre-existing in scripts/local-supabase-*.test.ts (Windows path assumption), reproduced on clean main, unrelated to UX-002."
+        ],
+        "reviewer": null,
+        "prNumber": 36,
+        "featureHead": "4da1fadccb5ce67b9350e5c97cd262b226a9c9d8",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38531809390",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38531809346",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38533659641",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38531809390",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38531809346",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38533655342",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38533659641",
+            "checks": "8/8 completed success"
+          }
+        }
       },
-      "notes": "功能 PR #36 已创建待 CI：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；20 单元测试、8 真实 Chrome 通过，生产构建/lint 通过；未合并，未标完成。"
+      "notes": "UX-002 工程交付完成：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；20 单测、8 真 Chrome、PR/main 各 8/8 通过。错误 chip 按 chip 浅色底 + 深色字模式从冻结 danger 色推导，PR 中已明示待负责人裁定，合并时未收到异议。业务页面未改接（不在本任务范围）；UX-001 的 AA 缺口仍未关闭，不宣称全 AA；下一项 UX-003 未领取。"
     },
     {
       "id": "UX-003",
