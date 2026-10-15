@@ -640,7 +640,7 @@
       "title": "学习地图真实浏览器视觉回归",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-104"
       ],
@@ -655,7 +655,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "已领取（UX-104 completed，前置满足）。先核查现有 spec 对验收项的覆盖：空/部分/完成、锁定、奖励幂等、键盘/触控三屏可能已被 ux-101/102/103/104、reward-idempotency、v2-tokens 等覆盖；确认新 spec 有真实缺口再写，不重复造 spec；截图口径须注明本地/CI 来源，不把本地字节一致当 CI 证据。"
     },
     {
       "id": "UX-201",
