@@ -39,7 +39,7 @@ for (const [name, width, height] of [
   ['tablet', 768, 1024],
   ['mobile', 375, 812],
 ] as const) {
-  test(`UX-101 four-unit map on ${name}`, async ({ browser }) => {
+  test(`UX-101 four-unit map on ${name}`, async ({ browser }, testInfo) => {
     const context = await browser.newContext({
       baseURL: 'http://127.0.0.1:3100',
       viewport: { width, height },
@@ -148,13 +148,17 @@ for (const [name, width, height] of [
     )
     expect(overflow).toBeLessThanOrEqual(0)
 
+    // Capture the REAL /learn/map route in Chrome for independent design review.
+    // Test artifact only; screenshot is never treated as proof of business publication.
+    await page.screenshot({ path: testInfo.outputPath(`ux-101-real-${name}.png`), fullPage: true })
+
     // Re-entering the page re-derives the default unit from real progress.
     await page.goto('/learn/map')
     await expect(map.getByRole('heading', { name: '第一单元 · 森林见面会' })).toBeVisible()
     await context.close()
   })
 
-  test(`UX-101 all-complete and not-started progress on ${name}`, async ({ browser }) => {
+  test(`UX-101 all-complete and not-started progress on ${name}`, async ({ browser }, testInfo) => {
     // All complete: every node completed, bottom action re-learns from unit 1's first lesson.
     const doneContext = await browser.newContext({
       baseURL: 'http://127.0.0.1:3100',
@@ -177,6 +181,9 @@ for (const [name, width, height] of [
       'href',
       '/learn/lesson/lesson-10-second-friend',
     )
+    if (name === 'desktop') {
+      await donePage.screenshot({ path: testInfo.outputPath('ux-101-real-all-complete-desktop.png'), fullPage: true })
+    }
     await doneContext.close()
 
     // Not started: first lesson is current, the rest available.
