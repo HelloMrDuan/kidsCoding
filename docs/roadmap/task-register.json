@@ -593,7 +593,7 @@
       "title": "地图桌面平板手机适配",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-103"
       ],
@@ -602,13 +602,38 @@
         "1440/768/375截图无溢出，手机单列地图，返回保持滚动状态"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/46",
+        "mergeCommit": "eeab8f99209da2b10f999d7bba7bfd489f34b50d",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38709033183",
+        "tests": [
+          "7 new E2E tests in tests/e2e/ux-104.spec.ts (3 viewports x no-overflow + scroll restore, plus mobile 3-column pin), all passing locally (Playwright bundled Chromium) and in CI real Chrome.",
+          "CI real-Chrome proof: the Frozen V2 step command explicitly lists ux-104.spec.ts; that step went from 30 passed (UX-103 CI) to 37 passed, 0 failed, with ux-104.spec.ts the only added spec (7 tests) — the delta confirms all 7 ran and passed in CI. No per-file breakdown exists in the CI log, so the 7/7 CI claim is stated as this arithmetic, not as a per-file log line.",
+          "Zero visual change: ux-104-real-desktop.png SHA-256 6303c7e558e93d397cdf3b5a6d3625473ff2a5cedae5654d653b8a4f0cdfde00, byte-identical to UX-101/102/103 real-desktop evidence.",
+          "Frozen mobile layout pinned: 3 columns at 375px (gridTemplateColumns has 3 tracks), not single-column.",
+          "No-overflow pinned: scrollWidth == innerWidth at 1440/768/375. Scroll restore pinned: scrollY after back-navigation equals scrollY before leaving, at all three viewports.",
+          "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
+          "ESLint clean on the new spec; no production code, CSS, or V2 layout changed."
+        ],
+        "reviewer": null,
+        "prNumber": 46,
+        "featureHead": "42261d39a8724fd57bfc8ac5ee70c9482388a4da",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707395899",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707841501",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38709033210",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707395899",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707841501",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38709033183",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38709033210",
+            "checks": "8/8 completed success"
+          }
+        }
       },
-      "notes": "负责人 2026-10-15 裁决：方案 A——按冻结 V2，手机保留 3 列 + 补三项回归证明。任务验收“手机单列地图”不实施：原型 ≤600px 的 .map-steps 仍为 3 列，改单列 = 改冻结设计，未获批准。实测另两项已满足（1440/768/375 均无溢出；返回滚动保持已生效），本轮零视觉改动、零 CSS、零业务代码：仅新增 E2E 回归证明（无溢出、滚动恢复、手机 3 列锁定）+ 三端截图。"
+      "notes": "负责人 2026-10-15 裁决方案 A 后实施：按冻结 V2，手机保留 3 列 + 补三项回归证明。任务验收“手机单列地图”不实施（原型 ≤600px 仍为 3 列，改单列 = 改冻结设计，未获批准）。另两项验收实测已满足（1440/768/375 均无溢出；返回滚动保持已生效）。本轮零视觉改动、零 CSS、零业务代码：仅新增 7 个 E2E 回归证明；Workflow 接线由负责人在网页编辑器补齐（提交 42261d3，差异仅路径触发 + E2E 列表 2 行）。桌面截图与 UX-101/102/103 证据图字节相同。"
     },
     {
       "id": "UX-105",
