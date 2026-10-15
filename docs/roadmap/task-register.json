@@ -545,7 +545,7 @@
       "title": "地图曲线连线与重点关卡",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-102"
       ],
@@ -561,7 +561,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "负责人 2026-10-15 裁决：方案 A——按冻结 V2，保留直线连线 + 补回归测试。任务标题“曲线连线”不实施：V2 原型 .map-steps:before 为直线（top:61px、左右 8%、2px、#d5dfed，≤600px 隐藏），当前实现已逐字抄入，不再改成曲线；“重点关卡”即原型已有的 .step.current 突出（蓝框 + 5px 外环），不新发明重点标记。本轮零视觉改动：回归测试证明直线连线几何、四单元 12 节点路径完整、重点突出存在且不遮挡触控目标、手机无连线。"
     },
     {
       "id": "UX-104",
