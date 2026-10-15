@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-14",
+  "updatedAt": "2026-10-15",
   "policy": "11-TASK-EXECUTION-POLICY.md",
   "tasks": [
     {
@@ -377,7 +377,7 @@
       "title": "统一任务卡进度与故事组件",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-002"
       ],
@@ -387,13 +387,37 @@
         "进度和真实课时一致"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/38",
+        "mergeCommit": "d6624b4de3f940fa57d44641661616aea0bb735a",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38659599006",
+        "tests": [
+          "29 Vitest component tests passed (story-dialog 6, lesson-card 12, progress-track 11).",
+          "11 actual Google Chrome E2E tests passed: tests/e2e/ux-003.spec.ts on 1440x900, 768x1024, 375x812 (frozen V2 production CSS + keyboard/touch).",
+          "Production Next build passed; lint 0 errors with 5 existing warnings; fixture route 404 without UX003_FIXTURE_ENABLED.",
+          "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
+          "Full local Vitest 386 passed; 5 failures pre-existing in scripts/local-supabase-*.test.ts (Windows path assumption), same as UX-002 baseline, unrelated to UX-003.",
+          "Evidence screenshots in repo: docs/roadmap/evidence/UX-003/ux-003-fixture-desktop.png, ux-003-fixture-tablet.png, ux-003-fixture-mobile.png (SHA-256 verified); CI artifact duo-chrome-evidence also holds ux-003 three-viewport screenshots."
+        ],
+        "reviewer": "https://github.com/HelloMrDuan/kidsCoding/pull/38#issuecomment-6181391608",
+        "prNumber": 38,
+        "featureHead": "8dccede670f1280a3b947faa603e59fe2709922a",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38553332171",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38553332646",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38659599021",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38553332171",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38553332646",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38659599006",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38659599021",
+            "checks": "8/8 completed success"
+          }
+        }
       },
-      "notes": "按用户 2026-10-14 裁定实现：StoryDialog 为内联故事引导（非弹窗）；LessonCard 以地图 .step 节点为唯一基准；ProgressTrack 用课堂 .lesson-progress + 步骤 X / Y，位置与完成数区分；locked/unreleased 仅展示不伪造；夹具路由生产默认 404。"
+      "notes": "按用户 2026-10-14 裁定实现：StoryDialog 为内联故事引导（非弹窗）；LessonCard 以地图 .step 节点为唯一基准；ProgressTrack 用课堂 .lesson-progress + 步骤 X / Y，位置与完成数区分；locked/unreleased 仅展示不伪造；夹具路由生产默认 404。工程交付完成：StoryDialog 内联故事引导、LessonCard 以地图 .step 节点为基准、ProgressTrack 课堂 .lesson-progress + 步骤 X / Y（位置与完成数区分）；29 单测、11 真 Chrome、PR/main 各 8/8 通过；三张三端截图已入库并 SHA-256 核对。解锁业务未改，留给 UX-102；5 项 supabase Windows 路径失败为既有遗留，不属本轮修复。"
     },
     {
       "id": "UX-004",

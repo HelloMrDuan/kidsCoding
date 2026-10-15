@@ -58,3 +58,11 @@
 | 2026-10-14 | UX-002 | 已领取并开始实现：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；视觉严格取自原型 .button/.chip/.stage-feedback，未改布局与色板 | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务，UX-003 保持 todo；PR 创建后回填 in_review |
 | 2026-10-14 | UX-002 | 功能 PR 创建：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；20 单元测试、8 真实 Chrome（UX-002 4 条 + v2-tokens 4 条）、生产构建/lint 通过 | [#36](https://github.com/HelloMrDuan/kidsCoding/pull/36) | 待合并 | 待验收 | in_review；workflow 文件因 App 无 Workflows 权限由负责人网页编辑补齐，内容已验对；未合并，未标 completed |
 | 2026-10-14 | UX-002 | **工程交付完成**：Button/StatusTag/FeedbackPanel 三组件 + 单元测试 + 真实 Chrome E2E；20 单测、8 真 Chrome、PR/main 各 8/8 通过；错误 chip 按 chip 模式从冻结 danger 色推导已在 PR 明示 | [#36](https://github.com/HelloMrDuan/kidsCoding/pull/36) | `132aa4f099905c719c88251e15b80a543fdf8909` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38533655342) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38533659641) | **completed**；业务页面未改接，AA 缺口仍未关闭，不宣称全 AA；下一项 UX-003 未领取 |
+
+## UX-003 统一任务卡、进度与故事组件
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-14 | UX-003 | 已领取并开始实现：StoryDialog 内联故事引导 + LessonCard 地图 .step 节点 + ProgressTrack 课堂进度 + 单元测试 + 真实 Chrome E2E；视觉严格取自 V2 课堂面板，未改布局与色板，未改解锁规则 | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务；PR 创建后回填 in_review |
+| 2026-10-14 | UX-003 | 功能 PR 创建：三个真实 React 组件 + 单元测试 + 真实 Chrome E2E；29 单元测试、11 真实 Chrome（三视口）、生产构建/lint 通过；三张三端截图已入库（提交 8dccede） | [#38](https://github.com/HelloMrDuan/kidsCoding/pull/38) | 待合并 | 待验收 | in_review；PR CI 8/8 全绿、无冲突；未合并，未标 completed |
+| 2026-10-15 | UX-003 | **工程交付完成**：StoryDialog 内联故事引导、LessonCard 地图 .step 节点、ProgressTrack 课堂进度（位置与完成数区分）；29 单测、11 真 Chrome、PR/main 各 8/8 通过；三张三端截图已入库并 SHA-256 核对 | [#38](https://github.com/HelloMrDuan/kidsCoding/pull/38) | `d6624b4de3f940fa57d44641661616aea0bb735a` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38659599006) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38659599021) | **completed**；解锁业务未改，留给 UX-102；5 项 supabase Windows 路径失败为既有遗留，不属本轮修复 |
