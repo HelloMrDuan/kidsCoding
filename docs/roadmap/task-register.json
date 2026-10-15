@@ -608,7 +608,7 @@
         "tests": [
           "7 new E2E tests in tests/e2e/ux-104.spec.ts (3 viewports x no-overflow + scroll restore, plus mobile 3-column pin), all passing locally (Playwright bundled Chromium) and in CI real Chrome.",
           "CI real-Chrome proof: the Frozen V2 step command explicitly lists ux-104.spec.ts; that step went from 30 passed (UX-103 CI) to 37 passed, 0 failed, with ux-104.spec.ts the only added spec (7 tests) — the delta confirms all 7 ran and passed in CI. No per-file breakdown exists in the CI log, so the 7/7 CI claim is stated as this arithmetic, not as a per-file log line.",
-          "Zero visual change: ux-104-real-desktop.png SHA-256 6303c7e558e93d397cdf3b5a6d3625473ff2a5cedae5654d653b8a4f0cdfde00, byte-identical to UX-101/102/103 real-desktop evidence.",
+          "No production CSS or business code was modified in PR #46. Independent review of main CI artifact duo-chrome-evidence (run 38709033183) inspected 1440/768/375 screenshots. In that CI artifact, ux-104-real-desktop.png SHA-256 is f75b20bfaa67aa728bc6d4bb8efc0fae4029be541d804227b41d3216c7ac10ec, NOT byte-identical to UX-101 real-desktop (9fe5a7e295483a044f1156e4e14a55d8e505fff734b307f14d140faca1e8345c), captured in a different page state; no claim of CI byte identity.",
           "Frozen mobile layout pinned: 3 columns at 375px (gridTemplateColumns has 3 tracks), not single-column.",
           "No-overflow pinned: scrollWidth == innerWidth at 1440/768/375. Scroll restore pinned: scrollY after back-navigation equals scrollY before leaving, at all three viewports.",
           "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
@@ -633,7 +633,7 @@
           }
         }
       },
-      "notes": "负责人 2026-10-15 裁决方案 A 后实施：按冻结 V2，手机保留 3 列 + 补三项回归证明。任务验收“手机单列地图”不实施（原型 ≤600px 仍为 3 列，改单列 = 改冻结设计，未获批准）。另两项验收实测已满足（1440/768/375 均无溢出；返回滚动保持已生效）。本轮零视觉改动、零 CSS、零业务代码：仅新增 7 个 E2E 回归证明；Workflow 接线由负责人在网页编辑器补齐（提交 42261d3，差异仅路径触发 + E2E 列表 2 行）。桌面截图与 UX-101/102/103 证据图字节相同。"
+      "notes": "负责人 2026-10-15 裁决方案 A 后实施：按冻结 V2，手机保留 3 列 + 补三项回归证明。任务验收“手机单列地图”不实施（原型 ≤600px 仍为 3 列，改单列 = 改冻结设计，未获批准）。另两项验收实测已满足（1440/768/375 均无溢出；返回滚动保持已生效）。本轮零视觉改动、零 CSS、零业务代码：仅新增 7 个 E2E 回归证明；Workflow 接线由负责人在网页编辑器补齐（提交 42261d3，差异仅路径触发 + E2E 列表 2 行）。本轮 main CI 的三端真实截图已独立查看；UX-104 与同次运行的 UX-101 桌面截图因页面捕获状态不同，字节并不相同，不将字节一致作为验收依据。"
     },
     {
       "id": "UX-105",
