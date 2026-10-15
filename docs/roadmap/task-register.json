@@ -640,7 +640,7 @@
       "title": "学习地图真实浏览器视觉回归",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-104"
       ],
@@ -649,13 +649,38 @@
         "空进度/部分进度/完成、锁定、奖励幂等、键盘/触控三屏E2E通过"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/48",
+        "mergeCommit": "aa6393ba1c92692bb93cf848f13341c1e402d9cb",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38718520283",
+        "tests": [
+          "5 new E2E tests in tests/e2e/ux-105.spec.ts (keyboard focus-visible + Enter on lesson node x desktop/tablet, keyboard Tab order, tablet touch, empty-progress screenshot), all passing locally (Playwright bundled Chromium) and in CI real Chrome.",
+          "CI real-Chrome proof: the Frozen V2 step command explicitly lists ux-105.spec.ts; that step went from 37 passed (UX-104 CI) to 42 passed, 0 failed, with ux-105.spec.ts the only added spec (5 tests) — the delta confirms all 5 ran and passed in CI. No per-file breakdown exists in the CI log, so the 5/5 CI claim is stated as this arithmetic, not as a per-file log line.",
+          "Screenshot provenance stated separately (UX-104 lesson applied): LOCAL Chromium ux-105-empty-desktop.png SHA-256 59da473f0b21f7104112d2cebec4e5600d4f6ba2c3ea7de143ff5eb0cd0b73cd. CI artifact (PR run 38716269384, duo-chrome-evidence) ux-105-empty-desktop.png SHA-256 f3aaf921b4d7ccf60166ab9417d74f942da19f54de4aa3ace5515b8e14db63c4 — downloaded and visually verified (empty progress: 0/12 completed, lesson 1 current, no completed nodes, no overflow). Local and CI hashes are NOT claimed identical.",
+          "Coverage audit: empty/partial/complete already covered by ux-101; locked by ux-102; reward idempotency by reward-idempotency; keyboard unit switching + CTA by ux-101/v2-tokens; mobile touch + three viewports by ux-103/ux-104. This spec only adds the genuine gaps (keyboard node activation, Tab order, tablet touch, empty screenshot). No snapshot-baseline comparison introduced: repo has no committed-baseline mechanism (binary PNGs cannot go through the text API).",
+          "Task scope named tests/e2e/learning-map-visual.spec.ts; actual file is tests/e2e/ux-105.spec.ts per repo ux-NNN naming convention (recorded in PR #48).",
+          "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
+          "ESLint clean on the new spec; no production code, CSS, or V2 layout changed."
+        ],
+        "reviewer": null,
+        "prNumber": 48,
+        "featureHead": "056ca165241c54e863e1eb158a0933b409f96cc7",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38716269384",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38716269371",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38718520176",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38716269384",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38716269371",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38718520283",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38718520176",
+            "checks": "8/8 completed success"
+          }
+        }
       },
-      "notes": "已领取（UX-104 completed，前置满足）。先核查现有 spec 对验收项的覆盖：空/部分/完成、锁定、奖励幂等、键盘/触控三屏可能已被 ux-101/102/103/104、reward-idempotency、v2-tokens 等覆盖；确认新 spec 有真实缺口再写，不重复造 spec；截图口径须注明本地/CI 来源，不把本地字节一致当 CI 证据。"
+      "notes": "按覆盖审计实施：验收项中已有真实覆盖的不重复（空/部分/完成→ux-101；锁定→ux-102；奖励幂等→reward-idempotency；键盘切单元/CTA→ux-101/v2-tokens；手机触控三端→ux-103/104）。本轮仅补真实缺口：键盘激活课时节点（focus-visible 3px #84afff + Enter）、Tab 穿过节点顺序、平板 768px 触控、空进度截图。零视觉改动、零 CSS、零业务代码：仅新增 5 个 E2E；Workflow 接线由 ChatGPT 用 GitHub 工具完成（提交 056ca16，差异仅路径触发 + E2E 列表 2 行），无需负责人手动编辑。截图口径分开记录：本地哈希与 CI 产物哈希不同，不混用。未引入快照基线比对（仓库无已提交基线机制）。"
     },
     {
       "id": "UX-201",
