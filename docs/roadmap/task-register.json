@@ -444,10 +444,10 @@
     },
     {
       "id": "UX-101",
-      "title": "学习地图四世界分区",
+      "title": "学习地图四单元分区",
       "priority": "P0",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-003"
       ],
@@ -458,13 +458,38 @@
         "原关卡入口保留"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/40",
+        "mergeCommit": "153b22453b20af368ffe2e22153c02395399bfc1",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38673730227",
+        "tests": [
+          "15 Vitest component tests passed (adventure-map 7, map-view 8).",
+          "6 actual Google Chrome E2E tests passed: tests/e2e/ux-101.spec.ts on 1440x900, 768x1024, 375x812 (four-unit switching, 12 real lesson links, partial/all-complete/not-started progress, keyboard/touch, no horizontal overflow, re-entry).",
+          "Production Next build passed; ESLint 0 errors 0 warnings; guest-story + v2-tokens E2E passed.",
+          "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
+          "Full local Vitest 398 passed; 5 failures pre-existing in scripts/local-supabase-*.test.ts (Windows path assumption), same as UX-003 baseline, unrelated to UX-101.",
+          "Evidence screenshots in repo: docs/roadmap/evidence/UX-101/ (6 PNGs: real desktop/tablet/mobile, real all-complete desktop, prototype desktop/mobile; each blob SHA verified); CI artifact duo-chrome-evidence also holds 4 real-Chrome screenshots, each independently reviewed.",
+          "E2E caught a real bug, fixed in-PR: useState(defaultUnitId) froze the first render's empty default and stuck the map on unit 1 when curriculum arrived late; now defaults follow current recommended unit until the user picks one, with a regression unit test."
+        ],
+        "reviewer": null,
+        "prNumber": 40,
+        "featureHead": "3724880674d6b589ea7685d23c6bd9e28c472200",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38670387022",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38670386964",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38673730285",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38670387022",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38670386964",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38673730227",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38673730285",
+            "checks": "8/8 completed success"
+          }
+        }
       },
-      "notes": "PR #40（ux-101-learning-map）已提交功能代码，正在等待 UX-101 单元测试、真 Chrome E2E、六张三端对照截图和负责人 V2 视觉验收。2026-10-15 先记录 in_progress（之前 PR CI 因仍为 todo 而失败），不代表已完成或授权合并。"
+      "notes": "按用户 2026-10-15 裁定实现：V2 为左侧四单元列表 + 右侧章节地形图 + 当前单元三个课时节点；旧路线图四世界同时铺开、大型连续岛屿地图的设想不覆盖 V2；“四区连续地形”按 V2 理解为右侧章节地形图；不做换色卡片墙。工程交付完成：AdventureMap 纯 UI 组件 + MapView 真实数据适配（12 节分四单元，状态只来自真实进度，不自动锁定）；kc-map-* 样式逐项抄原型；旧卡片路线/3D 轨道/售卖卡按 V2 删除。15 单测、6 真 Chrome、PR/main 各 8/8 通过；六张证据图已入库并逐个 blob SHA 核对；V2 视觉对比已按持续开发授权完成。解锁业务未改，留给 UX-102；5 项 supabase Windows 路径失败为既有遗留，不属本轮修复。"
     },
     {
       "id": "UX-102",
