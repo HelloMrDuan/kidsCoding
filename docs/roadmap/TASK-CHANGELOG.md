@@ -74,3 +74,11 @@
 | 2026-10-15 | UX-101 | 已领取并开始实现：左侧四单元列表 + 右侧章节地形图 + 当前单元三节课时节点；复用 map-terrain.svg 与 UX-003 LessonCard；真实课程数据驱动切换 | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务；PR 创建后回填 in_review |
 | 2026-10-15 | UX-101 | 功能 PR 创建：AdventureMap + MapView 真实数据适配 + kc-map-* 样式；15 单测、6 真实 Chrome E2E；workflow 接线与证据图提交由后续提交补齐 | [#40](https://github.com/HelloMrDuan/kidsCoding/pull/40) | 待合并 | 待验收 | in_review；PR CI 8/8 全绿、无冲突；未合并，未标 completed |
 | 2026-10-15 | UX-101 | **工程交付完成**：四单元切换、12 节真实链接、真实进度状态、不自动锁定；15 单测、6 真 Chrome、PR/main 各 8/8 通过；六张证据图已入库并逐个 blob SHA 核对；V2 视觉对比已按持续开发授权完成；E2E 抓出的 useState 默认值冻结 bug 已修 | [#40](https://github.com/HelloMrDuan/kidsCoding/pull/40) | `153b22453b20af368ffe2e22153c02395399bfc1` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38673730227) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38673730285) | **completed**；解锁业务未改，留给 UX-102；5 项 supabase Windows 路径失败为既有遗留，不属本轮修复 |
+
+## UX-102 地图节点与真实进度解锁
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-15 | UX-102 | 已领取并开始实现：真实访问规则 + 权益查询 + locked 优先状态 + 锁关拦截复用 + 权益变化重拉；先核实真实数据来源（12 节全 trial，无锁定节点；无未发布数据来源） | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务；PR 创建后回填 in_review |
+| 2026-10-15 | UX-102 | 功能 PR 创建：useCourseAccess + MapView locked 优先 + AdventureMap/页头 CTA 跳过 locked；7 新增单测、7 真实 Chrome E2E；workflow 接线由负责人在网页编辑器补齐（提交 e7b15fa） | [#42](https://github.com/HelloMrDuan/kidsCoding/pull/42) | 待合并 | 待验收 | in_review；PR CI 8/8 全绿、无冲突；未合并，未标 completed |
+| 2026-10-15 | UX-102 | **工程交付完成**：真实规则驱动的 locked/completed/current/available；7 新增单测、22 相关单测、7 真 Chrome、PR/main 各 8/8 通过；CI 产物三张截图已下载核对；真实数据截图与 UX-101 证据图字节相同，零视觉回归 | [#42](https://github.com/HelloMrDuan/kidsCoding/pull/42) | `61ea5c06cce6c60441c9be14b8379d2ad0f4e124` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38692383919) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38692384158) | **completed**；学员侧无未发布数据来源，地图不伪造未发布节点；锁屏既有文案未改；5 项 supabase Windows 路径失败为既有遗留，不属本轮修复 |
