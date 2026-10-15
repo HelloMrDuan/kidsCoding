@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
@@ -26,7 +26,6 @@ const startLevelLabels = {
 export default function LearnMapPage() {
   const curriculum = useLaunchCurriculum()
   const { allLessons, foundationUnits } = buildLaunchMap(curriculum.lessons)
-  const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const progress = useSyncExternalStore(
     subscribeGuestProgress,
     readGuestProgress,
@@ -45,29 +44,6 @@ export default function LearnMapPage() {
   const currentUnit =
     foundationUnits.find((unit) => unit.lessonIds.includes(nextLesson?.id ?? '')) ??
     foundationUnits[0]
-
-  useEffect(() => {
-    let isActive = true
-
-    fetch('/api/course-access')
-      .then(async (response) => {
-        if (!response.ok) {
-          return { hasLaunchPack: false }
-        }
-
-        return (await response.json()) as { hasLaunchPack?: boolean }
-      })
-      .then((payload) => {
-        if (isActive) {
-          setHasCourseEntitlement(Boolean(payload.hasLaunchPack))
-        }
-      })
-      .catch(() => {})
-
-    return () => {
-      isActive = false
-    }
-  }, [])
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef9ff_0%,#fffaf0_100%)] px-4 py-6 md:px-6 md:py-8">
@@ -134,11 +110,7 @@ export default function LearnMapPage() {
           浏览完整学习路线：Scratch、Python、C++、AI、机器人等18条路径（规划目录，未开放的课程不会直接闯关） →
         </Link>
 
-        <MapView
-          hasCourseEntitlement={hasCourseEntitlement}
-          lessons={allLessons}
-          progress={progress}
-        />
+        <MapView lessons={allLessons} progress={progress} />
       </section>
     </main>
   )
