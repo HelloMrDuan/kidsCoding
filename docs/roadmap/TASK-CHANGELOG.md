@@ -66,3 +66,11 @@
 | 2026-10-14 | UX-003 | 已领取并开始实现：StoryDialog 内联故事引导 + LessonCard 地图 .step 节点 + ProgressTrack 课堂进度 + 单元测试 + 真实 Chrome E2E；视觉严格取自 V2 课堂面板，未改布局与色板，未改解锁规则 | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务；PR 创建后回填 in_review |
 | 2026-10-14 | UX-003 | 功能 PR 创建：三个真实 React 组件 + 单元测试 + 真实 Chrome E2E；29 单元测试、11 真实 Chrome（三视口）、生产构建/lint 通过；三张三端截图已入库（提交 8dccede） | [#38](https://github.com/HelloMrDuan/kidsCoding/pull/38) | 待合并 | 待验收 | in_review；PR CI 8/8 全绿、无冲突；未合并，未标 completed |
 | 2026-10-15 | UX-003 | **工程交付完成**：StoryDialog 内联故事引导、LessonCard 地图 .step 节点、ProgressTrack 课堂进度（位置与完成数区分）；29 单测、11 真 Chrome、PR/main 各 8/8 通过；三张三端截图已入库并 SHA-256 核对 | [#38](https://github.com/HelloMrDuan/kidsCoding/pull/38) | `d6624b4de3f940fa57d44641661616aea0bb735a` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38659599006) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38659599021) | **completed**；解锁业务未改，留给 UX-102；5 项 supabase Windows 路径失败为既有遗留，不属本轮修复 |
+
+## UX-101 学习地图四单元分区
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-15 | UX-101 | 已领取并开始实现：左侧四单元列表 + 右侧章节地形图 + 当前单元三节课时节点；复用 map-terrain.svg 与 UX-003 LessonCard；真实课程数据驱动切换 | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务；PR 创建后回填 in_review |
+| 2026-10-15 | UX-101 | 功能 PR 创建：AdventureMap + MapView 真实数据适配 + kc-map-* 样式；15 单测、6 真实 Chrome E2E；workflow 接线与证据图提交由后续提交补齐 | [#40](https://github.com/HelloMrDuan/kidsCoding/pull/40) | 待合并 | 待验收 | in_review；PR CI 8/8 全绿、无冲突；未合并，未标 completed |
+| 2026-10-15 | UX-101 | **工程交付完成**：四单元切换、12 节真实链接、真实进度状态、不自动锁定；15 单测、6 真 Chrome、PR/main 各 8/8 通过；六张证据图已入库并逐个 blob SHA 核对；V2 视觉对比已按持续开发授权完成；E2E 抓出的 useState 默认值冻结 bug 已修 | [#40](https://github.com/HelloMrDuan/kidsCoding/pull/40) | `153b22453b20af368ffe2e22153c02395399bfc1` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38673730227) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38673730285) | **completed**；解锁业务未改，留给 UX-102；5 项 supabase Windows 路径失败为既有遗留，不属本轮修复 |
