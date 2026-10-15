@@ -100,3 +100,11 @@
 | 2026-10-15 | UX-104 | 负责人裁决：方案 A——按冻结 V2，手机保留 3 列 + 补三项回归证明；“手机单列地图”不实施 | 待正式 PR | 待定 | 待验收 | in_progress；零视觉改动 |
 | 2026-10-15 | UX-104 | 功能 PR 创建：新增 ux-104.spec.ts（7 E2E：三端无溢出、三端滚动恢复、手机 3 列锁定）；workflow 接线由负责人在网页编辑器补齐（提交 42261d3，差异仅 2 行） | [#46](https://github.com/HelloMrDuan/kidsCoding/pull/46) | 待合并 | 待验收 | in_review；等 PR CI |
 | 2026-10-15 | UX-104 | **工程交付完成**：PR CI 8/8，真实 Chrome Frozen V2 步骤 37 通过（含新增 7 项）；三端 main CI 截图已独立复核；CI 中 UX-104 与 UX-101 桌面截图字节不相同（抓取状态不同），不以字节一致作为证据；PR #46 零业务/CSS 改动 | [#46](https://github.com/HelloMrDuan/kidsCoding/pull/46) | `eeab8f99209da2b10f999d7bba7bfd489f34b50d` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38709033183) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38709033210) | **completed**；手机单列按裁决不实施，如未来要单列需另行 V2 设计变更裁决 |
+
+## UX-105 学习地图真实浏览器视觉回归
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-15 | UX-105 | 已领取并做覆盖审计：空/部分/完成、锁定、奖励幂等、键盘切单元/CTA、手机触控三端均已有真实 spec 覆盖；确认真实缺口为键盘节点激活、Tab 顺序、平板触控、空进度截图，不重复造 spec | 待正式 PR | 待定 | 待验收 | in_progress；零视觉改动 |
+| 2026-10-15 | UX-105 | 功能 PR 创建：新增 ux-105.spec.ts（5 E2E：键盘节点激活×2、Tab 顺序、平板触控、空进度截图）；workflow 接线由 ChatGPT 用 GitHub 工具完成（提交 056ca16，差异仅 2 行），无需负责人手动编辑 | [#48](https://github.com/HelloMrDuan/kidsCoding/pull/48) | 待合并 | 待验收 | in_review；等 PR CI |
+| 2026-10-15 | UX-105 | **工程交付完成**：PR CI 8/8，真实 Chrome Frozen V2 步骤 42 通过（含新增 5 项）；PR CI 产物空进度截图已下载逐项核对（CI 来源哈希 f3aaf921…，与本地哈希分开记录，不混用）；零业务/CSS 改动 | [#48](https://github.com/HelloMrDuan/kidsCoding/pull/48) | `aa6393ba1c92692bb93cf848f13341c1e402d9cb` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38718520283) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38718520176) | **completed**；未引入快照基线比对（仓库无已提交基线机制）；台账 scope 旧文件名 learning-map-visual.spec.ts 与实际 ux-105.spec.ts 的差异已在 PR 中说明 |
