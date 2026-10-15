@@ -496,7 +496,7 @@
       "title": "地图节点与真实进度解锁",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-101"
       ],
@@ -512,7 +512,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "已领取（UX-101 completed，前置满足）。已核实真实数据来源：访问规则为 features/billing/resolve-course-access（trial 直接放行；course 需 /api/course-access 返回的 launch-story-pack 权益 active；未知 phase  fail-closed 锁定）；12 节真实课程 phase 全为 trial，buildLaunchMap.paidLessons 为空，trialLessonCount:3 无任何代码消费（不是规则）；发布行 lesson_publications 只覆盖标题/目标/步骤文案，从不改变 phase、从不下线课程，因此学员侧不存在未发布（unreleased）数据来源，地图不伪造未发布节点。实现方向：地图页拉取 /api/course-access 并传给 MapView，locked 优先于 completed/current/available；页面 CTA 与地图底栏跳过 locked 选第一个可玩课程；锁关试玩由课时页 GuidedLessonShell 已有拦截（锁定不渲染工作台与完成按钮）。"
     },
     {
       "id": "UX-103",
