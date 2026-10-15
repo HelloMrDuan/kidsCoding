@@ -447,7 +447,7 @@
       "title": "学习地图四世界分区",
       "priority": "P0",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-003"
       ],
@@ -464,7 +464,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "PR #40（ux-101-learning-map）已提交功能代码，正在等待 UX-101 单元测试、真 Chrome E2E、六张三端对照截图和负责人 V2 视觉验收。2026-10-15 先记录 in_progress（之前 PR CI 因仍为 todo 而失败），不代表已完成或授权合并。"
     },
     {
       "id": "UX-102",

@@ -8,7 +8,7 @@ test('guest user can reach the first completed project', async ({ page }) => {
   await page.getByTestId('assessment-option-loop-repeat_until_done').click()
   await page.getByTestId('assessment-option-event-trigger_by_events').click()
   await page.getByTestId('assessment-option-logic-branch_story').click()
-  await page.getByTestId('lesson-link-lesson-01-forest-hello').click()
+  await page.getByTestId('lesson-card-lesson-01-forest-hello').click()
   await page.getByTestId('lesson-add-when_start').click()
   for(let step=0;step<5;step++){
     if(step===3)await page.getByTestId('lesson-add-move_right').click()
