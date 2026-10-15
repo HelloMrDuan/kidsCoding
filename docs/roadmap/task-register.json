@@ -377,7 +377,7 @@
       "title": "统一任务卡进度与故事组件",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-002"
       ],
@@ -393,7 +393,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "按用户 2026-10-14 裁定实现：StoryDialog 为内联故事引导（非弹窗）；LessonCard 以地图 .step 节点为唯一基准；ProgressTrack 用课堂 .lesson-progress + 步骤 X / Y，位置与完成数区分；locked/unreleased 仅展示不伪造；夹具路由生产默认 404。"
     },
     {
       "id": "UX-004",

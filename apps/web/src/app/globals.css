@@ -201,3 +201,106 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   text-decoration: underline;
   padding: 2px 4px;
 }
+
+/* UX-003: LessonCard (.step map node), StoryDialog (.pane-h / .task-content /
+   .task-mark / .objective / stage dialogue bubble), ProgressTrack
+   (.lesson-headright / .lesson-progress).
+   Geometry and palette are copied from the approved prototype
+   (docs/design/kidscoding-v2/prototype.html: .step, .step-node, .lesson-col,
+   .pane-h, .task-content, .task-mark, .objective, .lesson-progress,
+   .lesson-headright, .speech). Class names use the repo's kc- prefix
+   (UX-002 convention). No new palette, radius, or spacing.
+   Two documented adaptations, both forced by the inline (non-modal) ruling:
+   - .kc-lesson-progress i has no width in CSS: the fill comes only from the
+     component's computed inline width (real progress), never from the
+     prototype's 60% demo value.
+   - .kc-story-line reuses the .speech bubble visual (white, 9px radius,
+     12px, same shadow) in normal flow: the prototype .speech is
+     position:absolute + display:none for the stage, which cannot render
+     inline. The list resets (no bullets) and uses the .objective block's
+     18px top rhythm for spacing. */
+.kc-step {
+  min-width: 0;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  background: none;
+  border: 0;
+}
+.kc-step-node {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: white;
+  border: 2px solid #dce6f2;
+  border-radius: 11px;
+  color: #8d9aae;
+  font-weight: 850;
+  margin: 0 auto 12px;
+}
+.kc-step-done .kc-step-node { color: #fff; background: #2f6ae9; border-color: #2f6ae9; }
+.kc-step-current .kc-step-node { color: #1957cf; border-color: #2969ed; box-shadow: 0 0 0 5px #eaf1ff; }
+.kc-step small { display: block; font-size: 10px; color: #8a98aa; }
+.kc-step b {
+  font-size: 11px;
+  display: block;
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kc-step-locked { cursor: not-allowed; }
+
+.kc-lesson-col {
+  min-width: 0;
+  background: white;
+  border: 1px solid var(--kc-line);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.kc-pane-h {
+  padding: 14px 17px;
+  border-bottom: 1px solid var(--kc-line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+.kc-task-content { padding: 17px; }
+.kc-task-mark {
+  background: #edf3ff;
+  color: #2f63c5;
+  border-radius: 5px;
+  padding: 5px 7px;
+  font-size: 10px;
+  font-weight: 800;
+  display: inline-block;
+}
+.kc-task-content h3 { font-size: 19px; line-height: 1.43; margin: 17px 0 11px; }
+.kc-task-content p { color: #738197; font-size: 12px; line-height: 1.9; }
+.kc-objective {
+  background: #f3f6fc;
+  border: 1px solid #e8eef8;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 18px;
+}
+.kc-objective b { font-size: 12px; display: block; margin-bottom: 7px; }
+.kc-objective div { font-size: 12px; color: #526079; margin: 7px 0; }
+.kc-story-lines { list-style: none; margin: 18px 0 0; padding: 0; }
+.kc-story-line {
+  padding: 9px 12px;
+  background: white;
+  border-radius: 9px;
+  font-size: 12px;
+  box-shadow: 0 9px 20px #18442623;
+}
+.kc-story-line + .kc-story-line { margin-top: 10px; }
+
+.kc-lesson-headright { display: flex; align-items: center; gap: 14px; font-size: 12px; }
+.kc-lesson-progress { width: 130px; height: 5px; background: #e7eef9; border-radius: 8px; overflow: hidden; }
+.kc-lesson-progress i { display: block; height: 100%; background: var(--kc-action); }
