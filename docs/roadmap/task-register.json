@@ -545,7 +545,7 @@
       "title": "地图曲线连线与重点关卡",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-102"
       ],
@@ -555,13 +555,38 @@
         "推荐下一课突出且不会遮挡触控目标"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/44",
+        "mergeCommit": "86dede064902210a91c60d5e66dd5336e08d137c",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38700761845",
+        "tests": [
+          "6 new E2E tests in tests/e2e/ux-103.spec.ts (desktop/tablet/mobile x geometry + highlight/touch), all passing locally (Playwright bundled Chromium) and in CI real Chrome.",
+          "CI real-Chrome proof: the Frozen V2 step command explicitly lists ux-103.spec.ts; that step went from 24 passed (UX-102 CI) to 30 passed, 0 failed, with ux-103.spec.ts the only added spec (6 tests) — the delta confirms all 6 ran and passed in CI. No per-file breakdown exists in the CI log, so the 6/6 CI claim is stated as this arithmetic, not as a per-file log line.",
+          "Zero visual change: ux-103-real-desktop.png SHA-256 6303c7e558e93d397cdf3b5a6d3625473ff2a5cedae5654d653b8a4f0cdfde00, byte-identical to UX-101/UX-102 real-desktop evidence.",
+          "Frozen connector geometry pinned: 2px #d5dfed line, top 61px, left/right 8%, nodes z-index 1 above it; hidden at <=600px.",
+          "Key-level emphasis = the frozen .step.current highlight (border #2969ed + 5px #eaf1ff ring); E2E proves the current node stays a real link and desktop click / mobile tap reach the lesson page.",
+          "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
+          "ESLint clean on the new spec; no production code, CSS, or V2 layout changed."
+        ],
+        "reviewer": null,
+        "prNumber": 44,
+        "featureHead": "41a41f17925e8a6899ddadddaa1d9c075f410b5e",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38699005332",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38699005331",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38700761829",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38699005332",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38699005331",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38700761845",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38700761829",
+            "checks": "8/8 completed success"
+          }
+        }
       },
-      "notes": "负责人 2026-10-15 裁决：方案 A——按冻结 V2，保留直线连线 + 补回归测试。任务标题“曲线连线”不实施：V2 原型 .map-steps:before 为直线（top:61px、左右 8%、2px、#d5dfed，≤600px 隐藏），当前实现已逐字抄入，不再改成曲线；“重点关卡”即原型已有的 .step.current 突出（蓝框 + 5px 外环），不新发明重点标记。本轮零视觉改动：回归测试证明直线连线几何、四单元 12 节点路径完整、重点突出存在且不遮挡触控目标、手机无连线。"
+      "notes": "负责人 2026-10-15 裁决方案 A 后实施：按冻结 V2，保留直线连线 + 补回归测试。任务标题“曲线连线”不实施（V2 基线无曲线定义，原型 .map-steps:before 为直线）；“重点关卡”即原型已有的 .step.current 突出，不新发明重点标记。本轮零视觉改动、零 CSS、零业务代码：仅新增 6 个 E2E 回归证明；Workflow 接线由负责人在网页编辑器补齐（提交 41a41f1，差异仅路径触发 + E2E 列表 2 行）。桌面截图与 UX-101/102 证据图字节相同。"
     },
     {
       "id": "UX-104",

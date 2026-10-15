@@ -82,3 +82,12 @@
 | 2026-10-15 | UX-102 | 已领取并开始实现：真实访问规则 + 权益查询 + locked 优先状态 + 锁关拦截复用 + 权益变化重拉；先核实真实数据来源（12 节全 trial，无锁定节点；无未发布数据来源） | 待正式 PR | 待合并 | 待验收 | in_progress；仅此任务；PR 创建后回填 in_review |
 | 2026-10-15 | UX-102 | 功能 PR 创建：useCourseAccess + MapView locked 优先 + AdventureMap/页头 CTA 跳过 locked；7 新增单测、7 真实 Chrome E2E；workflow 接线由负责人在网页编辑器补齐（提交 e7b15fa） | [#42](https://github.com/HelloMrDuan/kidsCoding/pull/42) | 待合并 | 待验收 | in_review；PR CI 8/8 全绿、无冲突；未合并，未标 completed |
 | 2026-10-15 | UX-102 | **工程交付完成**：真实规则驱动的 locked/completed/current/available；7 新增单测、22 相关单测、7 真 Chrome、PR/main 各 8/8 通过；CI 产物三张截图已下载核对；真实数据截图与 UX-101 证据图字节相同，零视觉回归 | [#42](https://github.com/HelloMrDuan/kidsCoding/pull/42) | `61ea5c06cce6c60441c9be14b8379d2ad0f4e124` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38692383919) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38692384158) | **completed**；学员侧无未发布数据来源，地图不伪造未发布节点；锁屏既有文案未改；5 项 supabase Windows 路径失败为既有遗留，不属本轮修复 |
+
+## UX-103 地图曲线连线与重点关卡（方案 A）
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-15 | UX-103 | 已领取并核对 V2 基线：原型连线为直线（非曲线），当前实现已逐字抄入；冻结设计冲突（任务要曲线 vs 原型直线）已提交差异与两方案，等待负责人裁决，未擅自写实现代码 | 待裁决 | 待定 | 待验收 | blocked；等裁决 |
+| 2026-10-15 | UX-103 | 负责人裁决：方案 A——按冻结 V2，保留直线连线 + 补回归测试；“曲线连线”不实施，“重点关卡”即原型已有 current 突出，不新发明标记 | 待正式 PR | 待定 | 待验收 | in_progress；零视觉改动 |
+| 2026-10-15 | UX-103 | 功能 PR 创建：新增 ux-103.spec.ts（6 E2E：直线几何、12 节点路径、重点突出不遮挡触控）；workflow 接线由负责人在网页编辑器补齐（提交 41a41f1，差异仅 2 行） | [#44](https://github.com/HelloMrDuan/kidsCoding/pull/44) | 待合并 | 待验收 | in_review；等 PR CI |
+| 2026-10-15 | UX-103 | **工程交付完成**：PR CI 8/8，真实 Chrome Frozen V2 步骤 30 通过（含新增 6 项）；桌面截图与 UX-101/102 证据图字节相同，零视觉变化 | [#44](https://github.com/HelloMrDuan/kidsCoding/pull/44) | `86dede064902210a91c60d5e66dd5336e08d137c` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38700761845) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38700761829) | **completed**；曲线连线按裁决不实施，如未来要曲线需另行 V2 设计变更裁决 |
