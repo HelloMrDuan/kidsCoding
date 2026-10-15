@@ -304,3 +304,134 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-lesson-headright { display: flex; align-items: center; gap: 14px; font-size: 12px; }
 .kc-lesson-progress { width: 130px; height: 5px; background: #e7eef9; border-radius: 8px; overflow: hidden; }
 .kc-lesson-progress i { display: block; height: 100%; background: var(--kc-action); }
+
+/* UX-101: learning map (AdventureMap).
+   Geometry and palette are copied from the approved prototype
+   (docs/design/kidscoding-v2/prototype.html: .map-layout, .map-aside,
+   .module-item, .module-index, .map-main, .map-head, .map-cover,
+   .cover-label, .map-steps, .map-bottom, and the 860px / 600px
+   responsive rules). Class names use the repo's kc- prefix
+   (UX-002 convention). No new palette, radius, or spacing.
+   Reused V2 primitives, not redefined here: .kc-panel (prototype
+   .panel), .kc-chip / .kc-chip-info (prototype .chip),
+   .kc-action-surface + .kc-btn-sm (prototype .button / .button-sm),
+   .kc-text-muted (prototype .muted), .kc-step (UX-003, prototype .step).
+   Documented adaptations, all forced by real data:
+   - The steps are UX-003 LessonCards driven by real progress
+     (completed / current / available). The prototype's demo locked
+     node is NOT reproduced: locking is UX-102 business, explicitly
+     out of scope, so post-current lessons render available.
+   - The cover keeps the prototype's V2 label copy verbatim.
+   - The map-head eyebrow is CHAPTER + the real unit index
+     (prototype shows CHAPTER 01 / FUNDAMENTALS for every unit);
+     the aside range label is the real lesson sortOrder range
+     (prototype appends a demo level word with no real source). */
+.kc-eyebrow {
+  letter-spacing: 1.3px;
+  color: #6b82ad;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 800;
+}
+.kc-subtitle { color: var(--kc-text-muted); margin-top: 2px; font-size: 13px; }
+.kc-map-layout { display: grid; grid-template-columns: 246px minmax(0, 1fr); gap: 18px; }
+.kc-map-aside { padding: 20px; }
+.kc-map-aside h3 { font-size: 14px; }
+.kc-module-item {
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 12px;
+  display: flex;
+  gap: 11px;
+  margin-top: 9px;
+  cursor: pointer;
+  background: #fff;
+  color: #475870;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+}
+.kc-module-item:hover { background: #f7f9fd; }
+.kc-module-item.kc-module-selected { border-color: #aec7ff; background: #f0f5ff; }
+.kc-module-index {
+  background: #e9eff9;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  flex-shrink: 0;
+  font-weight: 850;
+  font-size: 12px;
+}
+.kc-module-item.kc-module-selected .kc-module-index { background: #2964e9; color: white; }
+.kc-module-item b { font-size: 12px; }
+.kc-module-item small { display: block; color: #8d9aae; }
+.kc-map-main { overflow: hidden; }
+.kc-map-head {
+  padding: 21px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 1px solid var(--kc-line);
+}
+.kc-map-head h2 { font-size: 21px; margin-top: 4px; }
+.kc-map-cover { height: 214px; background: #112c4f; position: relative; overflow: hidden; }
+.kc-map-cover img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+  filter: saturate(0.86);
+}
+.kc-map-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #12335fbb 0%, transparent 65%);
+}
+.kc-cover-label { position: absolute; z-index: 1; left: 29px; top: 30px; color: white; }
+.kc-cover-label b { display: block; font-size: 23px; margin-bottom: 7px; }
+.kc-cover-label p { font-size: 12px; color: #e2ebfc; }
+.kc-map-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 23px 24px;
+  position: relative;
+}
+.kc-map-steps::before {
+  content: '';
+  position: absolute;
+  top: 61px;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: #d5dfed;
+}
+.kc-map-bottom {
+  border-top: 1px solid var(--kc-line);
+  padding: 15px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+@media (max-width: 860px) {
+  .kc-map-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .kc-map-aside { display: flex; gap: 10px; overflow: auto; padding: 13px; }
+  .kc-map-aside h3 { display: none; }
+  .kc-module-item { min-width: 165px; margin: 0; }
+  .kc-map-cover { height: 167px; }
+  .kc-cover-label { left: 20px; top: 25px; }
+  .kc-cover-label b { font-size: 19px; }
+  .kc-map-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 22px; }
+  .kc-map-steps::before { display: none; }
+  .kc-map-head { padding: 16px; }
+  .kc-map-head h2 { font-size: 17px; }
+  .kc-map-bottom { padding: 13px; align-items: flex-start; }
+  .kc-map-bottom span { max-width: 180px; }
+}
