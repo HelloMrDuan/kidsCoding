@@ -1,21 +1,37 @@
-import Link from 'next/link'
+'use client'
+
+import { useState } from 'react'
 
 import { foundationUnits } from '@/content/curriculum/foundation-units'
 import type { LaunchLessonDefinition } from '@/features/domain/types'
 import type { GuestProgress } from '@/features/progress/local-progress'
+import type { LessonCardState } from '@/features/ui/lesson-card'
+
+import { AdventureMap } from './adventure-map'
+import type { AdventureMapUnit } from './adventure-map'
+
+/**
+ * UX-101 map view. Data adapter for AdventureMap: resolves the real
+ * 12 foundation lessons into their four real units and derives each
+ * lesson node's state from real guest progress.
+ *
+ * States come only from real progress: completed (in
+ * completedLessonIds), current (the recommended lesson), available
+ * (everything else, always linked). Nothing is locked by lesson order:
+ * locking is UX-102 business, explicitly out of scope for UX-101, so
+ * lessons after the current one are NOT forced locked, and no
+ * unreleased lesson is faked as open. Missing lessons resolve to
+ * fewer real nodes, never to invented lessons.
+ *
+ * The previous 3D/cartoon track (kc-surface-3d, high-tier upsell
+ * card) is gone: it was not V2. The upsell card is removed, not
+ * moved; the /learn/map header above this component is unchanged.
+ */
 
 type MapViewProps = {
   lessons: LaunchLessonDefinition[]
   progress: GuestProgress
-  hasCourseEntitlement: boolean
 }
-
-type LessonStationState =
-  | 'completed'
-  | 'current'
-  | 'next'
-  | 'available'
-  | 'upcoming'
 
 function getRecommendedLesson(
   lessons: LaunchLessonDefinition[],
@@ -29,240 +45,75 @@ function getRecommendedLesson(
   )
 }
 
-function getLessonStationState(args: {
+function getLessonState(args: {
   lesson: LaunchLessonDefinition
-  lessons: LaunchLessonDefinition[]
   progress: GuestProgress
   recommendedLessonId: string
-}) {
-  const { lesson, lessons, progress, recommendedLessonId } = args
-  const lessonIndex = lessons.findIndex((item) => item.id === lesson.id)
-  const recommendedIndex = lessons.findIndex(
-    (item) => item.id === recommendedLessonId,
-  )
-
+}): LessonCardState {
+  const { lesson, progress, recommendedLessonId } = args
   if (progress.completedLessonIds.includes(lesson.id)) return 'completed'
   if (lesson.id === recommendedLessonId) return 'current'
-  if (lessonIndex === recommendedIndex + 1) return 'next'
-  if (lessonIndex < recommendedIndex) return 'available'
-  return 'upcoming'
+  return 'available'
 }
 
-function getStationCopy(state: LessonStationState) {
-  switch (state) {
-    case 'completed':
-      return {
-        badge: '已完成',
-        cta: '重新做这一节',
-        badgeClass: 'bg-slate-100 text-slate-600',
-        nodeClass: 'border-slate-200 bg-white text-slate-500',
-        cardClass: 'border-white bg-white/90',
-      }
-    case 'current':
-      return {
-        badge: '现在就学',
-        cta: '开始这一节',
-        badgeClass: 'bg-sky-100 text-sky-700',
-        nodeClass: 'border-[#ffcf8a] bg-[#ffb458] text-slate-950',
-        cardClass:
-          'border-sky-200 bg-[linear-gradient(180deg,#ffffff_0%,#eef9ff_100%)]',
-      }
-    case 'next':
-      return {
-        badge: '下一节',
-        cta: '看看下一节',
-        badgeClass: 'bg-amber-100 text-amber-700',
-        nodeClass: 'border-[#ffd89c] bg-[#fff4de] text-amber-700',
-        cardClass:
-          'border-[#ffe3b6] bg-[linear-gradient(180deg,#fffdf8_0%,#fff7eb_100%)]',
-      }
-    case 'available':
-      return {
-        badge: '可以重学',
-        cta: '重新做这一节',
-        badgeClass: 'bg-sky-50 text-sky-700',
-        nodeClass: 'border-sky-200 bg-white text-sky-700',
-        cardClass: 'border-white bg-white/85',
-      }
-    default:
-      return {
-        badge: '后面会学',
-        cta: '看看这一节',
-        badgeClass: 'bg-slate-100 text-slate-500',
-        nodeClass: 'border-slate-200 bg-white/80 text-slate-400',
-        cardClass: 'border-white/80 bg-white/70',
-      }
-  }
-}
-
-export function MapView({
-  lessons,
-  progress,
-  hasCourseEntitlement,
-}: MapViewProps) {
+export function MapView({ lessons, progress }: MapViewProps) {
   const recommendedLesson = getRecommendedLesson(lessons, progress)
 
-  if (!recommendedLesson) return null
-
   const lessonsById = new Map(lessons.map((lesson) => [lesson.id, lesson]))
-  const completedCount = progress.completedLessonIds.length
-  const foundationComplete = completedCount >= lessons.length
+  const units: AdventureMapUnit[] = foundationUnits.map((unit) => ({
+    id: unit.id,
+    title: unit.title,
+    summary: unit.summary,
+    lessons: unit.lessonIds
+      .map((lessonId) => lessonsById.get(lessonId))
+      .filter((lesson): lesson is LaunchLessonDefinition => Boolean(lesson))
+      .map((lesson) => ({
+        id: lesson.id,
+        title: lesson.title,
+        sortOrder: lesson.sortOrder,
+        state: recommendedLesson
+          ? getLessonState({
+              lesson,
+              progress,
+              recommendedLessonId: recommendedLesson.id,
+            })
+          : 'available',
+        href: `/learn/lesson/${lesson.id}`,
+      })),
+  }))
+
+  const defaultUnitId =
+    (recommendedLesson
+      ? units.find((unit) =>
+          unit.lessons.some((lesson) => lesson.id === recommendedLesson.id),
+        )?.id
+      : undefined) ??
+    units[0]?.id ??
+    ''
+  // The user's explicit choice, when present. Null means "no choice yet":
+  // the selection follows the current recommended unit. This matters
+  // because the curriculum can arrive after the first render — a
+  // useState(defaultUnitId) initializer would freeze the first render's
+  // (possibly empty) default and stick on the first unit forever.
+  const [userSelectedUnitId, setUserSelectedUnitId] = useState<string | null>(null)
+  const selectedUnitId =
+    userSelectedUnitId && units.some((unit) => unit.id === userSelectedUnitId)
+      ? userSelectedUnitId
+      : defaultUnitId
+
+  if (lessons.length === 0) {
+    return (
+      <section data-testid="learning-map-empty">
+        <p>暂无课程数据，请稍后再来。</p>
+      </section>
+    )
+  }
 
   return (
-    <section
-      className="kc-surface-3d overflow-hidden rounded-[2.5rem] p-6"
-      data-testid="learning-map-track"
-    >
-      <div className="relative">
-        <div className="absolute bottom-8 left-[1.35rem] top-6 w-[4px] rounded-full bg-[linear-gradient(180deg,#ffd69f_0%,#bfe4ff_52%,#e3d7ff_100%)] shadow-[0_0_24px_rgba(191,228,255,0.5)]" />
-
-        <div className="space-y-8">
-          {foundationUnits.map((unit, unitIndex) => {
-            const unitLessons = unit.lessonIds
-              .map((lessonId) => lessonsById.get(lessonId))
-              .filter((lesson): lesson is LaunchLessonDefinition => Boolean(lesson))
-            const unitCurrent = unit.lessonIds.includes(recommendedLesson.id)
-            const unitCompleted = unit.lessonIds.every((lessonId) =>
-              progress.completedLessonIds.includes(lessonId),
-            )
-
-            return (
-              <section
-                key={unit.id}
-                className="relative pl-12"
-                data-testid={`map-unit-${unit.id}`}
-              >
-                <div className="kc-panel-3d mb-4 rounded-[1.9rem] p-5">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,#fff4cd_0%,#ffe5a5_100%)] text-sm font-black text-amber-700 shadow-[0_12px_20px_rgba(245,158,11,0.16)]">
-                      {unitIndex + 1}
-                    </span>
-                    <span
-                      className={`rounded-full px-3 py-2 text-xs font-bold ${
-                        unitCurrent
-                          ? 'bg-[#dff3ff] text-sky-700'
-                          : unitCompleted
-                            ? 'bg-[#eef3f8] text-slate-600'
-                            : 'bg-[#fff7e6] text-amber-700'
-                      }`}
-                    >
-                      {unitCurrent
-                        ? '现在正在这个单元'
-                        : unitCompleted
-                          ? '这个单元已经完成'
-                          : '后面会走到这里'}
-                    </span>
-                  </div>
-                  <h3 className="mt-4 text-2xl font-black text-slate-950">
-                    {unit.title}
-                  </h3>
-                  <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">
-                    {unit.summary}
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  {unitLessons.map((lesson) => {
-                    const state = getLessonStationState({
-                      lesson,
-                      lessons,
-                      progress,
-                      recommendedLessonId: recommendedLesson.id,
-                    })
-                    const copy = getStationCopy(state)
-
-                    return (
-                      <article
-                        key={lesson.id}
-                        className={`relative rounded-[1.75rem] border p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)] transition ${copy.cardClass}`}
-                        data-testid={`map-node-${lesson.id}`}
-                      >
-                        <div className="absolute -left-[2.45rem] top-7 flex flex-col items-center">
-                          <span
-                            className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-black shadow-sm ${copy.nodeClass}`}
-                          >
-                            {lesson.sortOrder}
-                          </span>
-                        </div>
-
-                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                          <div className="space-y-3">
-                            <div className="flex flex-wrap items-center gap-3">
-                              <span
-                                className={`rounded-full px-3 py-2 text-xs font-bold ${copy.badgeClass}`}
-                              >
-                                {copy.badge}
-                              </span>
-                              <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-500">
-                                第 {lesson.sortOrder} 节
-                              </span>
-                            </div>
-
-                            <div>
-                              <h4 className="text-xl font-black text-slate-950">
-                                {lesson.title}
-                              </h4>
-                              <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-                                {lesson.goal}
-                              </p>
-                            </div>
-                          </div>
-
-                          <Link
-                            className="kc-button-3d inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold text-slate-950"
-                            data-testid={`lesson-link-${lesson.id}`}
-                            href={`/learn/lesson/${lesson.id}`}
-                          >
-                            {copy.cta}
-                          </Link>
-                        </div>
-                      </article>
-                    )
-                  })}
-                </div>
-              </section>
-            )
-          })}
-
-          <aside className="relative pl-12" data-testid="learning-map-high-tier">
-            <div className="rounded-[1.95rem] border border-[#e5ddff] bg-[radial-gradient(circle_at_top,#fff8d6_0%,#f7f4ff_42%,#eef9ff_100%)] p-6 shadow-[0_18px_42px_rgba(107,70,255,0.12)]">
-              <p className="inline-flex rounded-full bg-white/90 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-[#6b46ff]">
-                高阶创作阶段
-              </p>
-              <h3 className="mt-4 text-2xl font-black text-slate-950">
-                启蒙走完后，后面还有更长的创作路线
-              </h3>
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">
-                完成 12 节启蒙课后，孩子会继续进入更复杂的互动故事创作。这里先告诉你方向，不打断现在的启蒙主线。
-              </p>
-
-              <div className="mt-5">
-                {foundationComplete ? (
-                  hasCourseEntitlement ? (
-                    <Link
-                      className="kc-button-3d inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold text-slate-950"
-                      href="/parent/overview"
-                    >
-                      查看高阶创作
-                    </Link>
-                  ) : (
-                    <Link
-                      className="inline-flex items-center justify-center rounded-full bg-[#6b46ff] px-5 py-3 text-sm font-bold text-white shadow-[0_16px_28px_rgba(107,70,255,0.25)] transition hover:bg-[#5935e6]"
-                      href="/parent/purchase"
-                    >
-                      解锁高阶创作
-                    </Link>
-                  )
-                ) : (
-                  <span className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-bold text-slate-500 shadow-sm">
-                    启蒙毕业后开启
-                  </span>
-                )}
-              </div>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
+    <AdventureMap
+      units={units}
+      selectedUnitId={selectedUnitId}
+      onSelectUnit={setUserSelectedUnitId}
+    />
   )
 }
