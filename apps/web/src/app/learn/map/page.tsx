@@ -5,6 +5,8 @@ import { useSyncExternalStore } from 'react'
 
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
+import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
+import { useCourseAccess } from '@/features/billing/use-course-access'
 import { MapView } from '@/features/lessons/map-view'
 import {
   defaultOnboardingSession,
@@ -26,6 +28,7 @@ const startLevelLabels = {
 export default function LearnMapPage() {
   const curriculum = useLaunchCurriculum()
   const { allLessons, foundationUnits } = buildLaunchMap(curriculum.lessons)
+  const { hasLaunchPack } = useCourseAccess()
   const progress = useSyncExternalStore(
     subscribeGuestProgress,
     readGuestProgress,
@@ -37,7 +40,20 @@ export default function LearnMapPage() {
     () => defaultOnboardingSession,
   )
   const recommendedLevel = onboarding.recommendedLevel ?? 'starter'
+  // UX-102: the "next lesson" CTA must point at a lesson the child can
+  // actually play. Prefer the first incomplete lesson the real access
+  // rule allows; only when every remaining lesson is locked does the
+  // CTA fall back to the first incomplete lesson, whose destination is
+  // the lesson page's lock screen (never the playable workspace).
+  // The all-complete fallback (recorded current lesson) is unchanged.
+  const isPlayable = (phase: 'trial' | 'course') =>
+    resolveCourseAccess({ lessonPhase: phase, hasLaunchPack }) === 'allowed'
   const nextLesson =
+    allLessons.find(
+      (lesson) =>
+        !progress.completedLessonIds.includes(lesson.id) &&
+        isPlayable(lesson.phase),
+    ) ??
     allLessons.find((lesson) => !progress.completedLessonIds.includes(lesson.id)) ??
     allLessons.find((lesson) => lesson.id === progress.currentLessonId) ??
     allLessons.at(-1)
@@ -110,7 +126,7 @@ export default function LearnMapPage() {
           浏览完整学习路线：Scratch、Python、C++、AI、机器人等18条路径（规划目录，未开放的课程不会直接闯关） →
         </Link>
 
-        <MapView lessons={allLessons} progress={progress} />
+        <MapView lessons={allLessons} progress={progress} hasLaunchPack={hasLaunchPack} />
       </section>
     </main>
   )
