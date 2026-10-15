@@ -16,7 +16,7 @@ describe('MapView', () => {
   it('selects the recommended lesson unit by default and derives real states', () => {
     const { allLessons } = buildLaunchMap()
     render(
-      <MapView lessons={allLessons} progress={partialProgress} />,
+      <MapView lessons={allLessons} progress={partialProgress} hasLaunchPack={false} />,
     )
 
     expect(screen.getByTestId('adventure-map')).toBeInTheDocument()
@@ -34,7 +34,7 @@ describe('MapView', () => {
 
   it('shows all 12 real lessons across the four units, none repeated, none invented', () => {
     const { allLessons } = buildLaunchMap()
-    render(<MapView lessons={allLessons} progress={partialProgress} />)
+    render(<MapView lessons={allLessons} progress={partialProgress} hasLaunchPack={false} />)
 
     const seen = new Set<string>()
     const unitIds = [
@@ -61,7 +61,7 @@ describe('MapView', () => {
 
   it('never locks lessons after the current one: they stay available and linked', () => {
     const { allLessons } = buildLaunchMap()
-    render(<MapView lessons={allLessons} progress={partialProgress} />)
+    render(<MapView lessons={allLessons} progress={partialProgress} hasLaunchPack={false} />)
 
     fireEvent.click(screen.getByTestId('adventure-map-unit-unit-2-meadow-journey'))
     const steps = screen.getByTestId('adventure-map-steps')
@@ -79,7 +79,7 @@ describe('MapView', () => {
   it('keeps the user-selected unit when progress changes, and re-derives on re-entry', () => {
     const { allLessons } = buildLaunchMap()
     const { rerender, unmount } = render(
-      <MapView lessons={allLessons} progress={partialProgress} />,
+      <MapView lessons={allLessons} progress={partialProgress} hasLaunchPack={false} />,
     )
 
     fireEvent.click(screen.getByTestId('adventure-map-unit-unit-3-garden-interaction'))
@@ -98,7 +98,8 @@ describe('MapView', () => {
           ],
           currentLessonId: 'lesson-04-meadow-scene',
         }}
-      />,
+             hasLaunchPack={false}
+/>,
     )
     expect(screen.getByRole('heading', { name: '第三单元 · 花园互动秀' })).toBeInTheDocument()
 
@@ -116,14 +117,15 @@ describe('MapView', () => {
           ],
           currentLessonId: 'lesson-04-meadow-scene',
         }}
-      />,
+             hasLaunchPack={false}
+/>,
     )
     expect(screen.getByRole('heading', { name: '第二单元 · 小动物去旅行' })).toBeInTheDocument()
   })
 
   it('follows the recommended unit when lessons arrive after the first render', () => {
     const { allLessons } = buildLaunchMap()
-    const { rerender } = render(<MapView lessons={[]} progress={defaultGuestProgress} />)
+    const { rerender } = render(<MapView lessons={[]} progress={defaultGuestProgress} hasLaunchPack={false} />)
     expect(screen.getByTestId('learning-map-empty')).toBeInTheDocument()
 
     rerender(
@@ -144,7 +146,8 @@ describe('MapView', () => {
           ],
           currentLessonId: 'lesson-10-second-friend',
         }}
-      />,
+             hasLaunchPack={false}
+/>,
     )
     expect(screen.getByRole('heading', { name: '第四单元 · 动物朋友合作演出' })).toBeInTheDocument()
   })
@@ -159,7 +162,8 @@ describe('MapView', () => {
           completedLessonIds: allLessons.map((lesson) => lesson.id),
           currentLessonId: 'lesson-12-graduation-show',
         }}
-      />,
+             hasLaunchPack={false}
+/>,
     )
 
     fireEvent.click(screen.getByTestId('adventure-map-unit-unit-4-graduation-show'))
@@ -172,7 +176,7 @@ describe('MapView', () => {
   })
 
   it('shows a real empty state when there is no lesson data at all', () => {
-    render(<MapView lessons={[]} progress={defaultGuestProgress} />)
+    render(<MapView lessons={[]} progress={defaultGuestProgress} hasLaunchPack={false} />)
     expect(screen.getByTestId('learning-map-empty')).toHaveTextContent('暂无课程数据')
     expect(screen.queryByTestId('adventure-map')).not.toBeInTheDocument()
   })
@@ -180,12 +184,87 @@ describe('MapView', () => {
   it('shows fewer real nodes and the real count when a lesson is missing', () => {
     const { allLessons } = buildLaunchMap()
     const withoutLesson6 = allLessons.filter((lesson) => lesson.id !== 'lesson-06-meadow-story')
-    render(<MapView lessons={withoutLesson6} progress={partialProgress} />)
+    render(<MapView lessons={withoutLesson6} progress={partialProgress} hasLaunchPack={false} />)
 
     fireEvent.click(screen.getByTestId('adventure-map-unit-unit-2-meadow-journey'))
     const steps = screen.getByTestId('adventure-map-steps')
     expect(steps.querySelectorAll('[data-testid^="lesson-card-"]')).toHaveLength(2)
     expect(screen.getByText('2 个学习任务')).toBeInTheDocument()
     expect(screen.getByText('第 04–05 课')).toBeInTheDocument()
+  })
+
+  it('locks course-phase lessons without entitlement, and never locks trial lessons for it', () => {
+    const { allLessons } = buildLaunchMap()
+    const withCourse = allLessons.map((lesson) =>
+      lesson.id === 'lesson-04-meadow-scene' ? { ...lesson, phase: 'course' as const } : lesson,
+    )
+    render(<MapView lessons={withCourse} progress={partialProgress} hasLaunchPack={false} />)
+
+    fireEvent.click(screen.getByTestId('adventure-map-unit-unit-2-meadow-journey'))
+    const steps = screen.getByTestId('adventure-map-steps')
+    const locked = within(steps).getByTestId('lesson-card-lesson-04-meadow-scene')
+    expect(locked).toHaveTextContent('已锁定')
+    expect(locked.tagName).toBe('SPAN')
+    expect(locked).not.toHaveAttribute('href')
+    // Trial lessons in the same unit stay playable: no order-based locking.
+    const next = within(steps).getByTestId('lesson-card-lesson-05-meadow-order')
+    expect(next).toHaveTextContent('可以开始')
+    expect(next).toHaveAttribute('href', '/learn/lesson/lesson-05-meadow-order')
+    // The unit bottom action skips the locked lesson for a playable one.
+    expect(screen.getByTestId('adventure-map-next-lesson')).toHaveAttribute(
+      'href',
+      '/learn/lesson/lesson-05-meadow-order',
+    )
+  })
+
+  it('unlocks course-phase lessons when the launch pack entitlement is present', () => {
+    const { allLessons } = buildLaunchMap()
+    const withCourse = allLessons.map((lesson) =>
+      lesson.id === 'lesson-04-meadow-scene' ? { ...lesson, phase: 'course' as const } : lesson,
+    )
+    const { rerender } = render(
+      <MapView lessons={withCourse} progress={partialProgress} hasLaunchPack={false} />,
+    )
+
+    fireEvent.click(screen.getByTestId('adventure-map-unit-unit-2-meadow-journey'))
+    expect(
+      screen.getByTestId('lesson-card-lesson-04-meadow-scene'),
+    ).toHaveTextContent('已锁定')
+
+    // Permission change (e.g. purchase in another tab) re-derives states.
+    rerender(
+      <MapView lessons={withCourse} progress={partialProgress} hasLaunchPack />,
+    )
+    const unlocked = screen.getByTestId('lesson-card-lesson-04-meadow-scene')
+    expect(unlocked).toHaveTextContent('可以开始')
+    expect(unlocked).toHaveAttribute('href', '/learn/lesson/lesson-04-meadow-scene')
+  })
+
+  it('locks a completed lesson whose access is gone, instead of promising re-study', () => {
+    const { allLessons } = buildLaunchMap()
+    const withCourse = allLessons.map((lesson) =>
+      lesson.id === 'lesson-01-forest-hello' ? { ...lesson, phase: 'course' as const } : lesson,
+    )
+    render(<MapView lessons={withCourse} progress={partialProgress} hasLaunchPack={false} />)
+
+    const locked = screen.getByTestId('lesson-card-lesson-01-forest-hello')
+    expect(locked).toHaveTextContent('已锁定')
+    expect(locked.tagName).toBe('SPAN')
+  })
+
+  it('fails closed: an unknown phase from abnormal data renders locked, never open', () => {
+    const { allLessons } = buildLaunchMap()
+    const abnormal = allLessons.map((lesson) =>
+      lesson.id === 'lesson-05-meadow-order'
+        ? { ...lesson, phase: 'mystery' as unknown as 'trial' }
+        : lesson,
+    )
+    render(<MapView lessons={abnormal} progress={partialProgress} hasLaunchPack={false} />)
+
+    fireEvent.click(screen.getByTestId('adventure-map-unit-unit-2-meadow-journey'))
+    const steps = screen.getByTestId('adventure-map-steps')
+    const locked = within(steps).getByTestId('lesson-card-lesson-05-meadow-order')
+    expect(locked).toHaveTextContent('已锁定')
+    expect(locked.tagName).toBe('SPAN')
   })
 })

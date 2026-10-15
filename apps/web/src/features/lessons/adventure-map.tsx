@@ -50,9 +50,16 @@ function getUnitRangeLabel(lessons: AdventureMapLesson[]) {
 }
 
 function getNextLesson(unit: AdventureMapUnit) {
+  // UX-102: prefer a lesson the child can actually play. Locked nodes
+  // are never a navigation target when any playable lesson exists in
+  // the unit. Only when every lesson in the unit is locked does the
+  // button fall back to the first lesson, whose destination is the
+  // lesson page's lock screen (which explains why and links to the
+  // upgrade) — never the playable workspace.
   return (
     unit.lessons.find((lesson) => lesson.state === 'current') ??
     unit.lessons.find((lesson) => lesson.state === 'available') ??
+    unit.lessons.find((lesson) => lesson.state === 'completed') ??
     unit.lessons[0] ??
     null
   )
