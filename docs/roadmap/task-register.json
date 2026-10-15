@@ -618,12 +618,12 @@
         "prNumber": 46,
         "featureHead": "42261d39a8724fd57bfc8ac5ee70c9482388a4da",
         "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707395899",
-        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707841501",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707395885",
         "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38709033210",
         "ciResults": {
           "pr": {
             "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707395899",
-            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707841501",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38707395885",
             "checks": "8/8 completed success"
           },
           "main": {
