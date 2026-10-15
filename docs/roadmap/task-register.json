@@ -496,7 +496,7 @@
       "title": "地图节点与真实进度解锁",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-101"
       ],
@@ -506,13 +506,39 @@
         "锁关不能进入试玩"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/42",
+        "mergeCommit": "61ea5c06cce6c60441c9be14b8379d2ad0f4e124",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38692383919",
+        "tests": [
+          "7 new tests: 4 in map-view.test.tsx (course lock, entitlement unlock, completed+locked, unknown phase) + 3 in use-course-access.test.ts (entitlement true, fail-closed, focus refetch).",
+          "22 tests pass across the three touched suites (map-view 12, use-course-access 3, adventure-map 7). Correction to PR #42 description: its 22/22 breakdown wrongly listed resolve-course-access 5 as well; the 5 resolve-course-access tests are pre-existing and pass separately, not part of the 22.",
+          "7 actual Google Chrome E2E tests passed in CI (tests/e2e/ux-102.spec.ts, within the Frozen V2 step: 24 passed, 0 failed): real data no fake locking + completed re-study, intercepted course-phase lock (map node + CTA skip + direct-URL lock screen), entitlement unlock, abnormal data fail-closed + permission-change refetch + refresh.",
+          "Production Next build passed; ESLint 0 errors 0 warnings; UX-101 + guest-story E2E regression passed.",
+          "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
+          "Full local Vitest 406 passed; 5 failures pre-existing in scripts/local-supabase-*.test.ts (Windows path assumption), same as UX-101 baseline, unrelated to UX-102.",
+          "CI artifact duo-chrome-evidence holds ux-102-real-desktop.png, ux-102-locked-map-desktop.png, ux-102-lock-screen-desktop.png (downloaded, verified present, visually reviewed). Local real-data screenshot is byte-identical to UX-101 evidence (zero visual regression).",
+          "Known gap, recorded honestly: no learner-facing unreleased data source exists (lesson_publications only overrides copy, never gates), so the map never emits unreleased; the lock-screen copy in GuidedLessonShell is pre-existing and was not changed."
+        ],
+        "reviewer": null,
+        "prNumber": 42,
+        "featureHead": "e7b15faa16366bf57e9b98068c0db5f179a76d02",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38690986470",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38690986499",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38692384158",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38690986470",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38690986499",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38692383919",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38692384158",
+            "checks": "8/8 completed success"
+          }
+        }
       },
-      "notes": "已领取（UX-101 completed，前置满足）。已核实真实数据来源：访问规则为 features/billing/resolve-course-access（trial 直接放行；course 需 /api/course-access 返回的 launch-story-pack 权益 active；未知 phase  fail-closed 锁定）；12 节真实课程 phase 全为 trial，buildLaunchMap.paidLessons 为空，trialLessonCount:3 无任何代码消费（不是规则）；发布行 lesson_publications 只覆盖标题/目标/步骤文案，从不改变 phase、从不下线课程，因此学员侧不存在未发布（unreleased）数据来源，地图不伪造未发布节点。实现方向：地图页拉取 /api/course-access 并传给 MapView，locked 优先于 completed/current/available；页面 CTA 与地图底栏跳过 locked 选第一个可玩课程；锁关试玩由课时页 GuidedLessonShell 已有拦截（锁定不渲染工作台与完成按钮）。"
+      "notes": "按用户 2026-10-15 明确指定领取并实现。真实数据来源已核实：访问规则 resolveCourseAccess（trial 放行；course 需权益；未知 phase 锁定）+ /api/course-access（Supabase entitlements，launch-story-pack，active）；12 节真实课程 phase 全为 trial，paidLessons 为空，trialLessonCount:3 无代码消费，因此真实数据下无任何节点被锁定，未为展示效果修改真实课程属性。工程交付完成：useCourseAccess（挂载 + 聚焦/可见重拉，失败闭合）；MapView locked > completed > current > available；AdventureMap 底栏与页头 CTA 跳过 locked；锁关试玩由课时页 GuidedLessonShell 已有拦截复用。7 单测新增、22 相关单测、7 真 Chrome、PR/main 各 8/8 通过；真实数据截图与 UX-101 证据图字节相同，零视觉回归。缺口如实记录：学员侧无未发布数据来源，地图不伪造未发布节点；锁屏既有文案未改。"
     },
     {
       "id": "UX-103",
