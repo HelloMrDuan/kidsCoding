@@ -687,7 +687,7 @@
       "title": "课堂顶部任务进度与保存状态",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-003"
       ],
@@ -697,13 +697,40 @@
         "无内容与失败反馈"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/50",
+        "mergeCommit": "3ed6fd084d7d27b1c0261c36584156e95c877da4",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38863681676",
+        "tests": [
+          "Classroom top progress strip + real local/cloud save status + resume last step: step X / Y, 130px x 5px real progress bar, local save states (unsaved / saved to this device / failed with real retry), cloud states (syncing / synced / local-only / failed with retry + continue-local-only), no cloud chip shown before any sync attempt (no faked state). saveLessonDraft returns boolean; a failed write never shows as success. Re-entry restores the real last step with a 'back to step X' note that clears on advance.",
+          "Unit tests: full vitest suite 423 passed / 5 failed. All 5 failures are in local Supabase CLI scripts tests (local-supabase-cli / install-cli-core / setup-core: .tools binary resolution, version marker, temp root). Verified pre-existing: the same 3 files fail with the same 5 failures on pristine code (page.tsx reverted to 4832343, without the fix); those test files only import their sibling scripts/*.mjs modules and have zero dependency on the lesson page. Unrelated to UX-201; left as a pre-existing environmental gap, not fixed in this task.",
+          "E2E: 5 tests in tests/e2e/ux-201.spec.ts (real steps + progress bar; re-entry resumes step 2; local save failure -> retry success; cloud 500 -> failure banner -> retry -> complete page; three-viewport strip screenshots), all passing locally (Playwright bundled Chromium) and in CI real Chrome.",
+          "CI real-Chrome proof: the Frozen V2 step command explicitly lists ux-201.spec.ts; that step went from 42 passed (UX-105 CI) to 47 passed, 0 failed, with ux-201.spec.ts the only added spec (5 tests) — the delta confirms all 5 ran and passed in CI. No per-file breakdown exists in the CI log, so the 5/5 CI claim is stated as this arithmetic, not as a per-file log line.",
+          "Screenshot provenance stated separately (UX-104 lesson applied): CI artifact duo-chrome-evidence from main run 38863681676, ZIP SHA-256 ed459b94a8d3cf74b0852ca2391aa57cc50a973cb1620ca2b7321d50f37d2f89 (verified locally, matches the Actions page claim). Three UX-201 strip screenshots downloaded and visually verified, each showing step 1/5, ~20% blue bar, green 'saved to this device' chip, no overflow: desktop (1280x60) SHA-256 747233d6fbd5f01f90ef19e0f5f8db57e46e1a4a67ffcb45d459f4df2574b7b6, tablet (720x60) SHA-256 499a65d621cabf852b41d8725ceccf60ac66d1d040b214baa024b7cd6c93cc05, mobile (343x60) SHA-256 ac3f8ecfc9974904fc4c94875f5c51acb56cf87c868c1cfe4778cf5196eef85. Local Chromium hashes are recorded separately and NOT claimed identical to CI.",
+          "React #418 hydration failure + fix: the first PR CI run (38845601930) failed 7/8 — scratch-real-vm-browser 28 passed / 6 failed in blockly-duo tests, with a React #418 hydration error. Root cause: a useState initializer read sessionStorage during render (restoring last step + save state) while SSR rendered step 1 / unsaved, so the client hydrated different text; duo tests trigger it because they reload() after saving. Fix (remote commit a088a4d, local commit e26d7f3, same content): first render reads no storage so it matches SSR; restore logic moved to a post-hydration microtask in useEffect; storage is only read in a safe client lifecycle. Local A/B: pristine code showed #418 + 'Failed to fetch'; fixed code showed no #418. After the fix, PR CI run 38861501737 is 8/8 success and a log search for 'hydration' / '418' returns 0 hits. No UX-201 functionality was rolled back to fix #418.",
+          "'Failed to fetch' final conclusion: traced with a production-server request log. The failing requests are GET https://blockly-demo.appspot.com/static/media/{delete,click,disconnect}.mp3 (Blockly UI sound assets), failing with net::ERR_TUNNEL_CONNECTION_FAILED in the Muse sandbox (proxy cannot reach the external host). It appears on pristine code too, is cosmetic (sounds only), and does not affect lesson operation, local save, or cloud sync. GitHub CI has full network, so it does not occur there; main CI duo tests pass. Pre-existing gap (Blockly loads sounds from an external demo host with uncaught fetch rejections in offline/sandboxed environments) is recorded, not fixed in this task.",
+          "PR CI 8/8 success; main CI 8/8 success (7 curriculum jobs + task-ledger).",
+          "ESLint + tsc clean on the fix; no V2 layout, palette, or component-position change. Draft storage remains sessionStorage; the UI only claims 'this device', never cross-tab or cross-device."
+        ],
+        "reviewer": null,
+        "prNumber": 50,
+        "featureHead": "a088a4dc8b65d6fdc4faa2c23dc0753a65d66c0d",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38861501737",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38861501576",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38863681655",
+        "ciResults": {
+          "pr": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38861501737",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38861501576",
+            "checks": "8/8 completed success"
+          },
+          "main": {
+            "curriculum": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38863681676",
+            "ledger": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/38863681655",
+            "checks": "8/8 completed success"
+          }
+        }
       },
-      "notes": "已领取（UX-105 completed；UX-201 仍为 todo，依赖 UX-003 已完成）。先核查当前课堂顶部（步骤/进度/保存状态）与本机/云端保存实现：步骤与真实进度是否一致、本机/云端状态是否区分、保存失败是否误报成功、加载/异常/重试/恢复是否真实；严格保持 V2 冻结课堂布局，不擅自改布局。"
+      "notes": "已领取并完成：课堂顶部真实状态条（步骤 X / Y + 真实进度条 + 本机/云端保存状态区分）+ 重进恢复上次步骤 + 保存失败真实重试 + 云端失败重试/仅用本机继续。首轮 PR CI 7/8：scratch-real-vm-browser duo 测试失败并含 React #418 水合错误；根因为渲染时读 sessionStorage 导致首渲染与 SSR 不一致，已修复（远程 a088a4d），修复后 PR CI 8/8、main CI 8/8。Workflow 接线（ux-201.spec.ts 路径触发 + Frozen V2 命令）由 ChatGPT 经 GitHub 工具完成（提交 4832343，差异仅 2 行），无需负责人手动编辑；此前 403 为 Muse GitHub App 无 Workflows 权限。严格保持 V2 冻结课堂布局；草稿仍为 sessionStorage，只声称“本机”。遗留缺口：5 项 Supabase CLI 单测失败为沙箱既存环境问题（与本任务无关）；Blockly 音效从外部 demo 域名加载，离线/沙箱环境下有未捕获 Failed to fetch（装饰性，不影响保存/同步）；onboarding/check 忽略同步返回值的旧行为未扩展修改（超出本任务范围）。"
     },
     {
       "id": "UX-202",
