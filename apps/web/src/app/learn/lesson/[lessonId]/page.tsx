@@ -46,28 +46,28 @@ export default function LessonPage() {
   const curriculum = useLaunchCurriculum()
   const { allLessons } = buildLaunchMap(curriculum.lessons)
   const lesson = allLessons.find((item) => item.id === lessonId)
-  // Resume at the furthest step that still has a saved draft, instead of
-  // always restarting at step 0. Computed once from session storage.
-  const [initialStep] = useState(() =>
-    lessonId ? (readLastLessonStep(lessonId) ?? 0) : 0,
-  )
-  const [resumedFromStep, setResumedFromStep] = useState<number | null>(() =>
-    initialStep > 0 ? initialStep : null,
-  )
-  const [stepIndex, setStepIndex] = useState(initialStep)
+  // Hydration-safe: the first render must not read browser storage. The
+  // server renders step 0 / unsaved, and the client must render the exact
+  // same HTML during hydration. Reading sessionStorage in a useState
+  // initializer made the client render a different step / save chip after
+  // a reload with a saved draft (React hydration error #418, caught by the
+  // blockly-duo E2E which reloads after saving). The real last step is
+  // restored in the mount effect below, which only runs on the client
+  // after hydration. (The blocks initializer below still reads the step-0
+  // draft during render, as before: blocks never reach the rendered HTML —
+  // they only feed the Blockly effect — so it cannot mismatch hydration.)
+  const [stepIndex, setStepIndex] = useState(0)
+  const [resumedFromStep, setResumedFromStep] = useState<number | null>(null)
   const [blocks, setBlocks] = useState<Array<{ type: string }>>(() => {
     if (!lessonId) {
       return []
     }
-    const draft = loadLessonDraft(lessonId, initialStep)
+    const draft = loadLessonDraft(lessonId, 0)
     return draft && draft.blocks.length > 0 ? draft.blocks : []
   })
   const [localSaveState, setLocalSaveState] =
-    useState<LessonLocalSaveState>(() =>
-      lessonId && loadLessonDraft(lessonId, initialStep)
-        ? 'saved'
-        : 'unsaved',
-    )
+    useState<LessonLocalSaveState>('unsaved')
+  const restoredForRef = useRef<string | null>(null)
   const [cloudSyncState, setCloudSyncState] =
     useState<LessonCloudSyncState>('idle')
   const [isCompleting, setIsCompleting] = useState(false)
@@ -81,6 +81,44 @@ export default function LessonPage() {
   const [failedAttempts, setFailedAttempts] = useState(0)
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const [hasRunSuccess,setHasRunSuccess] = useState(false)
+
+  // Restore the real last step after hydration (client-only). The restore
+  // is deferred to a microtask so it runs after the hydration commit:
+  // calling setState synchronously in the effect body would re-render
+  // against new state during hydration and trip the set-state-in-effect
+  // lint. Runs once per lesson.
+  useEffect(() => {
+    if (!lessonId || restoredForRef.current === lessonId) {
+      return
+    }
+    restoredForRef.current = lessonId
+
+    let cancelled = false
+    queueMicrotask(() => {
+      if (cancelled) {
+        return
+      }
+
+      const lastStep = readLastLessonStep(lessonId) ?? 0
+      if (lastStep > 0) {
+        setResumedFromStep(lastStep)
+        setStepIndex(lastStep)
+        const draft = loadLessonDraft(lessonId, lastStep)
+        if (draft && draft.blocks.length > 0) {
+          blocksRef.current = draft.blocks
+          setBlocks(draft.blocks)
+        }
+        setLocalSaveState(draft ? 'saved' : 'unsaved')
+        return
+      }
+
+      const draft = loadLessonDraft(lessonId, 0)
+      setLocalSaveState(draft ? 'saved' : 'unsaved')
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [lessonId])
 
   const handleSnapshotChange = useCallback(
     (nextBlocks: Array<{ type: string }>) => {
