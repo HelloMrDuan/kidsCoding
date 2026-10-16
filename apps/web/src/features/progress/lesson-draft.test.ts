@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildLessonDraftKey,
   clearLessonDraft,
   clearLessonDraftsForLesson,
   loadLessonDraft,
+  readLastLessonStep,
   saveLessonDraft,
 } from './lesson-draft'
 
@@ -129,5 +130,51 @@ describe('lessonDraft', () => {
 
   it('does not throw when clearing a lesson with no drafts', () => {
     expect(() => clearLessonDraftsForLesson('lesson-empty')).not.toThrow()
+  })
+
+  it('reports true when the draft write succeeds', () => {
+    expect(saveLessonDraft('lesson-01', 0, [{ type: 'when_start' }])).toBe(true)
+    expect(loadLessonDraft('lesson-01', 0)?.blocks).toEqual([
+      { type: 'when_start' },
+    ])
+  })
+
+  it('reports false when the draft write fails instead of pretending it saved', () => {
+    // Spy the shared Storage prototype: window.sessionStorage may resolve
+    // to a fresh object per access in the test DOM, so an instance spy
+    // would not intercept the call inside saveLessonDraft.
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(() => {
+      throw new Error('quota exceeded')
+    })
+
+    expect(saveLessonDraft('lesson-01', 0, [{ type: 'when_start' }])).toBe(
+      false,
+    )
+    expect(loadLessonDraft('lesson-01', 0)).toBeNull()
+  })
+
+  it('returns the furthest step with a valid draft for resume', () => {
+    saveLessonDraft('lesson-01', 0, [{ type: 'when_start' }])
+    saveLessonDraft('lesson-01', 1, [{ type: 'move_right' }])
+    saveLessonDraft('lesson-02', 0, [{ type: 'say_line' }])
+
+    expect(readLastLessonStep('lesson-01')).toBe(1)
+    expect(readLastLessonStep('lesson-02')).toBe(0)
+  })
+
+  it('returns null when no valid draft exists for the lesson', () => {
+    saveLessonDraft('lesson-02', 0, [{ type: 'say_line' }])
+
+    expect(readLastLessonStep('lesson-01')).toBeNull()
+  })
+
+  it('ignores corrupt entries when finding the last saved step', () => {
+    saveLessonDraft('lesson-01', 1, [{ type: 'move_right' }])
+    window.sessionStorage.setItem(
+      buildLessonDraftKey('lesson-01', 5),
+      'not-json',
+    )
+
+    expect(readLastLessonStep('lesson-01')).toBe(1)
   })
 })

@@ -17,12 +17,17 @@ import { buildHintState } from '@/features/lessons/build-hint-state'
 import { completeLaunchLesson } from '@/features/lessons/complete-launch-lesson'
 import { getFoundationLessonFeedback } from '@/features/lessons/foundation-lesson-feedback'
 import { GuidedLessonShell } from '@/features/lessons/guided-lesson-shell'
+import type {
+  LessonCloudSyncState,
+  LessonLocalSaveState,
+} from '@/features/lessons/guided-lesson-shell'
 import { TemplateStoryBuilder } from '@/features/lessons/template-story-builder'
 import { readOnboardingSession } from '@/features/onboarding/onboarding-session'
 import {
   clearLessonDraft,
   clearLessonDraftsForLesson,
   loadLessonDraft,
+  readLastLessonStep,
   saveLessonDraft,
 } from '@/features/progress/lesson-draft'
 import {
@@ -41,7 +46,18 @@ export default function LessonPage() {
   const curriculum = useLaunchCurriculum()
   const { allLessons } = buildLaunchMap(curriculum.lessons)
   const lesson = allLessons.find((item) => item.id === lessonId)
+  // Hydration-safe: the first render must not read browser storage. The
+  // server renders step 0 / unsaved, and the client must render the exact
+  // same HTML during hydration. Reading sessionStorage in a useState
+  // initializer made the client render a different step / save chip after
+  // a reload with a saved draft (React hydration error #418, caught by the
+  // blockly-duo E2E which reloads after saving). The real last step is
+  // restored in the mount effect below, which only runs on the client
+  // after hydration. (The blocks initializer below still reads the step-0
+  // draft during render, as before: blocks never reach the rendered HTML —
+  // they only feed the Blockly effect — so it cannot mismatch hydration.)
   const [stepIndex, setStepIndex] = useState(0)
+  const [resumedFromStep, setResumedFromStep] = useState<number | null>(null)
   const [blocks, setBlocks] = useState<Array<{ type: string }>>(() => {
     if (!lessonId) {
       return []
@@ -49,6 +65,15 @@ export default function LessonPage() {
     const draft = loadLessonDraft(lessonId, 0)
     return draft && draft.blocks.length > 0 ? draft.blocks : []
   })
+  const [localSaveState, setLocalSaveState] =
+    useState<LessonLocalSaveState>('unsaved')
+  const restoredForRef = useRef<string | null>(null)
+  const [cloudSyncState, setCloudSyncState] =
+    useState<LessonCloudSyncState>('idle')
+  const [isCompleting, setIsCompleting] = useState(false)
+  const pendingProgressRef = useRef<ReturnType<typeof readGuestProgress> | null>(
+    null,
+  )
   const blocksRef = useRef<Array<{ type: string }>>(blocks)
   const [feedback, setFeedback] = useState<string>(() =>
     getFoundationLessonFeedback(lessonId ?? '', 'initial'),
@@ -57,6 +82,44 @@ export default function LessonPage() {
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const [hasRunSuccess,setHasRunSuccess] = useState(false)
 
+  // Restore the real last step after hydration (client-only). The restore
+  // is deferred to a microtask so it runs after the hydration commit:
+  // calling setState synchronously in the effect body would re-render
+  // against new state during hydration and trip the set-state-in-effect
+  // lint. Runs once per lesson.
+  useEffect(() => {
+    if (!lessonId || restoredForRef.current === lessonId) {
+      return
+    }
+    restoredForRef.current = lessonId
+
+    let cancelled = false
+    queueMicrotask(() => {
+      if (cancelled) {
+        return
+      }
+
+      const lastStep = readLastLessonStep(lessonId) ?? 0
+      if (lastStep > 0) {
+        setResumedFromStep(lastStep)
+        setStepIndex(lastStep)
+        const draft = loadLessonDraft(lessonId, lastStep)
+        if (draft && draft.blocks.length > 0) {
+          blocksRef.current = draft.blocks
+          setBlocks(draft.blocks)
+        }
+        setLocalSaveState(draft ? 'saved' : 'unsaved')
+        return
+      }
+
+      const draft = loadLessonDraft(lessonId, 0)
+      setLocalSaveState(draft ? 'saved' : 'unsaved')
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [lessonId])
+
   const handleSnapshotChange = useCallback(
     (nextBlocks: Array<{ type: string }>) => {
       blocksRef.current = nextBlocks
@@ -64,11 +127,29 @@ export default function LessonPage() {
       setHasRunSuccess(false)
 
       if (lessonId) {
-        saveLessonDraft(lessonId, stepIndex, nextBlocks)
+        // The boolean result is the save truth: a failed write must show
+        // as failed, never as saved.
+        setLocalSaveState(
+          saveLessonDraft(lessonId, stepIndex, nextBlocks)
+            ? 'saved'
+            : 'failed',
+        )
       }
     },
     [lessonId, stepIndex, setHasRunSuccess],
   )
+
+  const handleRetryLocalSave = useCallback(() => {
+    if (!lessonId) {
+      return
+    }
+
+    setLocalSaveState(
+      saveLessonDraft(lessonId, stepIndex, blocksRef.current)
+        ? 'saved'
+        : 'failed',
+    )
+  }, [lessonId, stepIndex])
 
   const goToStep = useCallback(
     (nextStepIndex: number) => {
@@ -82,6 +163,12 @@ export default function LessonPage() {
       blocksRef.current = nextBlocks
       setBlocks(nextBlocks)
       setStepIndex(nextStepIndex)
+      setResumedFromStep(null)
+      setLocalSaveState(
+        lessonId && loadLessonDraft(lessonId, nextStepIndex)
+          ? 'saved'
+          : 'unsaved',
+      )
       setHasRunSuccess(false)
     },
     [lessonId, setHasRunSuccess],
@@ -128,7 +215,10 @@ export default function LessonPage() {
   }
 
   const currentLesson = lesson
-  const step = currentLesson.steps[stepIndex]
+  // Guard against a saved step index that no longer exists if the
+  // curriculum shrank: never render an out-of-range step.
+  const safeStepIndex = Math.min(stepIndex, currentLesson.steps.length - 1)
+  const step = currentLesson.steps[safeStepIndex]
   const hintState = buildHintState({
     failedAttempts,
     hintLayers: currentLesson.hintLayers,
@@ -207,17 +297,67 @@ export default function LessonPage() {
       updatedAt: new Date().toISOString(),
     })
 
+    if (isCompleting) {
+      return
+    }
+    setIsCompleting(true)
+
     try {
       writeGuestProgress(nextProgress)
     } catch {
       setHasRunSuccess(true)
       setFeedback('本机存储失败，作品和奖励尚未保存。请检查浏览器存储空间后重试完成。')
+      setIsCompleting(false)
       return
     }
-    await syncGuestSnapshot({
+
+    // Cloud sync is a separate truth from the local save: a failed sync
+    // must stay visible as failed with a retry, never as success.
+    setCloudSyncState('syncing')
+    const syncResult = await syncGuestSnapshot({
       onboarding: readOnboardingSession(),
       progress: nextProgress,
     })
+    if (!syncResult.ok) {
+      pendingProgressRef.current = nextProgress
+      setCloudSyncState('failed')
+      setIsCompleting(false)
+      return
+    }
+    setCloudSyncState(syncResult.synced ? 'synced' : 'local-only')
+    pendingProgressRef.current = null
+    clearLessonDraftsForLesson(currentLesson.id)
+    router.push(`/project/${currentLesson.id}/complete`)
+  }
+
+  async function handleRetryCloudSync() {
+    const pending = pendingProgressRef.current
+    if (!pending || isCompleting) {
+      return
+    }
+    setIsCompleting(true)
+    setCloudSyncState('syncing')
+
+    const syncResult = await syncGuestSnapshot({
+      onboarding: readOnboardingSession(),
+      progress: pending,
+    })
+    if (!syncResult.ok) {
+      setCloudSyncState('failed')
+      setIsCompleting(false)
+      return
+    }
+
+    setCloudSyncState(syncResult.synced ? 'synced' : 'local-only')
+    pendingProgressRef.current = null
+    clearLessonDraftsForLesson(currentLesson.id)
+    router.push(`/project/${currentLesson.id}/complete`)
+  }
+
+  function handleContinueLocalOnly() {
+    // Explicit choice: the local save is real, the cloud copy is missing,
+    // and the next lesson completion re-syncs the full snapshot.
+    pendingProgressRef.current = null
     clearLessonDraftsForLesson(currentLesson.id)
     router.push(`/project/${currentLesson.id}/complete`)
   }
@@ -239,9 +379,6 @@ export default function LessonPage() {
                   当前单元：{currentUnit.title}
                 </span>
               ) : null}
-              <span className="rounded-full bg-[#fff1d4] px-4 py-2 text-sm font-semibold text-amber-700">
-                第 {stepIndex + 1} 步 / 共 {currentLesson.steps.length} 步
-              </span>
             </div>
             <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-600 shadow-sm">
               {currentLesson.phase === 'trial' ? '启蒙主线' : '高阶创作'}
@@ -280,17 +417,26 @@ export default function LessonPage() {
         </header>
 
         <GuidedLessonShell
+          cloudSyncState={cloudSyncState}
           feedback={feedback}
           hintCopy={hintCopy}
           instruction={step.instruction}
+          isCompleting={isCompleting}
           isLocked={courseAccess === 'locked'}
           lessonGoal={currentLesson.goal}
           lessonTitle={currentLesson.title}
+          localSaveState={localSaveState}
           onCompleteStep={handleNext}
+          onContinueLocalOnly={handleContinueLocalOnly}
+          onRetryCloudSync={handleRetryCloudSync}
+          onRetryLocalSave={handleRetryLocalSave}
           onStartRemedial={handleStartRemedial}
           remedialLessonId={remedialLessonId}
           remedialMicroScript={remedialMicroScript}
-          stepTitle={`第 ${stepIndex + 1} 步：${step.title}`}
+          resumedFromStep={resumedFromStep}
+          stepCount={currentLesson.steps.length}
+          stepIndex={safeStepIndex}
+          stepTitle={`第 ${safeStepIndex + 1} 步：${step.title}`}
           voiceover={step.voiceover}
         >
           {currentLesson.mode === 'template' ? (

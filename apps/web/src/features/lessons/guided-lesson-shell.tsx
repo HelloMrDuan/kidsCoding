@@ -5,6 +5,26 @@ import type { FoundationRemedialMicroScript } from '@/features/domain/types'
 
 import { RemedialLinkCard } from './remedial-link-card'
 
+/**
+ * Local (this-device) draft save state. `unsaved` means no save attempt has
+ * succeeded yet for the current step — never display it as saved.
+ */
+export type LessonLocalSaveState = 'unsaved' | 'saved' | 'failed'
+
+/**
+ * Cloud snapshot sync state. `idle` hides the cloud chip entirely: no sync
+ * has been attempted, so there is nothing truthful to show. `local-only`
+ * means the server answered but has no cloud backend configured — the
+ * local save is real, but there is no cloud copy, so it must not read as
+ * "synced to cloud".
+ */
+export type LessonCloudSyncState =
+  | 'idle'
+  | 'syncing'
+  | 'synced'
+  | 'local-only'
+  | 'failed'
+
 type GuidedLessonShellProps = {
   lessonTitle: string
   lessonGoal: string
@@ -19,7 +39,32 @@ type GuidedLessonShellProps = {
   onCompleteStep?: () => void
   onStartRemedial: (remedialId: string) => void
   children?: ReactNode
+  /** 0-based current step, shown as "步骤 X / Y" with a real progress bar. */
+  stepIndex?: number
+  stepCount?: number
+  /** Step the child was actually on when this session restored a saved draft. */
+  resumedFromStep?: number | null
+  localSaveState?: LessonLocalSaveState
+  cloudSyncState?: LessonCloudSyncState
+  isCompleting?: boolean
+  onRetryLocalSave?: () => void
+  onRetryCloudSync?: () => void
+  onContinueLocalOnly?: () => void
 }
+
+const LOCAL_SAVE_COPY: Record<LessonLocalSaveState, string> = {
+  unsaved: '尚未保存',
+  saved: '已保存到本机',
+  failed: '本机保存失败',
+}
+
+const CLOUD_SYNC_COPY: Record<Exclude<LessonCloudSyncState, 'idle'>, string> =
+  {
+    syncing: '正在同步到云端…',
+    synced: '已同步到云端',
+    'local-only': '仅保存到本机',
+    failed: '云端同步失败',
+  }
 
 export function GuidedLessonShell({
   lessonTitle,
@@ -35,6 +80,15 @@ export function GuidedLessonShell({
   onCompleteStep,
   onStartRemedial,
   children,
+  stepIndex,
+  stepCount,
+  resumedFromStep,
+  localSaveState = 'unsaved',
+  cloudSyncState = 'idle',
+  isCompleting = false,
+  onRetryLocalSave,
+  onRetryCloudSync,
+  onContinueLocalOnly,
 }: GuidedLessonShellProps) {
   if (isLocked) {
     return (
@@ -63,7 +117,126 @@ export function GuidedLessonShell({
     )
   }
 
+  const showProgress =
+    typeof stepIndex === 'number' &&
+    typeof stepCount === 'number' &&
+    stepCount > 0
+  const progressPercent = showProgress
+    ? Math.min(100, Math.max(0, ((stepIndex + 1) / stepCount) * 100))
+    : 0
+  const showCloudChip = cloudSyncState !== 'idle'
+  const localChipClass =
+    localSaveState === 'failed'
+      ? 'bg-[#fff5e9] text-[#ab711e]'
+      : localSaveState === 'saved'
+        ? 'bg-[#e8f8f2] text-[#168260]'
+        : 'bg-[#eef2f6] text-[#718097]'
+  const cloudChipClass =
+    cloudSyncState === 'failed'
+      ? 'bg-[#fff5e9] text-[#ab711e]'
+      : cloudSyncState === 'synced'
+        ? 'bg-[#e8f8f2] text-[#168260]'
+        : 'bg-[#eef8ff] text-sky-700'
+
   return (
+    <section className="space-y-4">
+      <div
+        className="kc-surface-3d flex flex-wrap items-center justify-between gap-3 rounded-[1.75rem] px-5 py-4"
+        data-testid="lesson-progress-strip"
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          {showProgress ? (
+            <>
+              <span className="text-sm font-bold text-slate-900">
+                步骤 {stepIndex + 1} / {stepCount}
+              </span>
+              <div
+                aria-label={`课堂进度：第 ${stepIndex + 1} 步，共 ${stepCount} 步`}
+                aria-valuemax={100}
+                aria-valuemin={0}
+                aria-valuenow={Math.round(progressPercent)}
+                className="h-[5px] w-[130px] overflow-hidden rounded-[8px] bg-[#e7eef9]"
+                data-testid="lesson-progress-bar"
+                role="progressbar"
+              >
+                <i
+                  className="block h-full bg-[#2463eb]"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </>
+          ) : null}
+          {resumedFromStep !== null && resumedFromStep !== undefined ? (
+            <span
+              className="text-xs font-semibold text-slate-500"
+              data-testid="lesson-resume-note"
+            >
+              已回到上次进度：第 {resumedFromStep + 1} 步
+            </span>
+          ) : null}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={`rounded-[5px] px-[9px] py-1 text-[11px] font-bold ${localChipClass}`}
+            data-testid="lesson-save-local"
+          >
+            {LOCAL_SAVE_COPY[localSaveState]}
+          </span>
+          {showCloudChip ? (
+            <span
+              className={`rounded-[5px] px-[9px] py-1 text-[11px] font-bold ${cloudChipClass}`}
+              data-testid="lesson-save-cloud"
+            >
+              {CLOUD_SYNC_COPY[cloudSyncState]}
+            </span>
+          ) : null}
+          {localSaveState === 'failed' && onRetryLocalSave ? (
+            <button
+              className="rounded-full border border-[#f1e2b0] bg-white px-4 py-1.5 text-xs font-bold text-[#ab711e] transition hover:bg-[#fff9e8]"
+              data-testid="lesson-save-retry"
+              onClick={onRetryLocalSave}
+              type="button"
+            >
+              重试保存
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      {cloudSyncState === 'failed' ? (
+        <div
+          className="rounded-[1.5rem] border border-[#f1e2b0] bg-[#fff9e8] px-5 py-4 text-sm leading-7 text-[#6c5a20]"
+          data-testid="lesson-cloud-failure"
+        >
+          <p className="font-bold">云端同步失败，进度已保存到本机，还没同步到云端。</p>
+          <p className="mt-1">
+            可以重试同步；也可以先仅用本机继续，下次完成一节课时会重新同步全部进度。
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {onRetryCloudSync ? (
+              <button
+                className="rounded-full bg-[#2463eb] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#1d54cb]"
+                data-testid="lesson-cloud-retry"
+                onClick={onRetryCloudSync}
+                type="button"
+              >
+                重试同步
+              </button>
+            ) : null}
+            {onContinueLocalOnly ? (
+              <button
+                className="rounded-full border border-[#f1e2b0] bg-white px-4 py-2 text-xs font-bold text-[#6c5a20] transition hover:bg-white/70"
+                data-testid="lesson-cloud-continue-local"
+                onClick={onContinueLocalOnly}
+                type="button"
+              >
+                仅用本机继续
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
     <section className="grid items-start gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
       <aside
         className="kc-surface-3d space-y-5 rounded-[2.5rem] p-6"
@@ -145,12 +318,13 @@ export function GuidedLessonShell({
         ) : null}
 
         <button
-          className="w-full rounded-full bg-[#ff8b4e] px-5 py-3.5 font-bold text-white shadow-[0_18px_32px_rgba(255,139,78,0.3)] transition hover:bg-[#ff7b38]"
+          className="w-full rounded-full bg-[#ff8b4e] px-5 py-3.5 font-bold text-white shadow-[0_18px_32px_rgba(255,139,78,0.3)] transition hover:bg-[#ff7b38] disabled:cursor-not-allowed disabled:opacity-60"
           data-testid="lesson-complete-step"
+          disabled={isCompleting}
           onClick={onCompleteStep}
           type="button"
         >
-          完成这一步
+          {isCompleting ? '正在完成…' : '完成这一步'}
         </button>
       </aside>
 
@@ -173,6 +347,7 @@ export function GuidedLessonShell({
         </div>
         {children}
       </div>
+    </section>
     </section>
   )
 }
