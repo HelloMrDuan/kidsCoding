@@ -687,7 +687,7 @@
       "title": "课堂顶部任务进度与保存状态",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-003"
       ],
@@ -703,7 +703,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "已领取（UX-105 completed；UX-201 仍为 todo，依赖 UX-003 已完成）。先核查当前课堂顶部（步骤/进度/保存状态）与本机/云端保存实现：步骤与真实进度是否一致、本机/云端状态是否区分、保存失败是否误报成功、加载/异常/重试/恢复是否真实；严格保持 V2 冻结课堂布局，不擅自改布局。"
     },
     {
       "id": "UX-202",
