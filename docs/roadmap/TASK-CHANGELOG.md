@@ -129,3 +129,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-17 | UX-005 | **交付完成**：全站冻结 V2 外壳（222px 深蓝侧栏 + 76px 顶栏 + 1180/860/600 响应式 + 手机抽屉/底部导航），学习/创作/家长页面共用；首页不在范围；app-shell 单测 3/3、UI+lessons 182/182；三端截图经负责人确认 | [#55](https://github.com/HelloMrDuan/kidsCoding/pull/55) | `ac1d6b0103669fdaab3d8b1e4f87780647528ec7` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39036102104) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39036102073) | **completed**；首页属 UX-601；地图儿童卡通化由 UX-106 完成，课程体系/作品中心等内页样式后续任务 |
+
+## UX-106 学习地图儿童卡通化
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-17 | UX-106 | **交付完成**：学习地图儿童卡通化（卡通头图与小狐狸、单元吉祥物、按单元卡通世界封面、彩色圆形关卡节点+黄色小路）；状态与 testid 不回归；三端截图经负责人确认；儿童受众原则写入 VISUAL-LOCK.md | [#56](https://github.com/HelloMrDuan/kidsCoding/pull/56) | `77a52a649080d9859498de9e7237f9ed1cb4f014` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39037075751) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39037075778) | **completed**；课程体系、作品中心、卡册等内页的儿童卡通化后续逐页登记 |
