@@ -115,15 +115,16 @@ for (const [name, width, height] of [
       '/learn/lesson/lesson-10-second-friend',
     )
 
-    // Cover: real V2 terrain asset, not a gradient placeholder.
-    const cover = map.locator('.kc-map-cover img')
+    // Cover (UX-106): kid cartoon world with real illustrated characters, not a placeholder.
+    const cover = map.getByTestId('map-world-scene')
     await expect(cover).toBeVisible()
-    expect(await cover.getAttribute('src')).toBe('/assets/map-terrain.svg')
+    expect(await cover.locator('[data-character-art]').count()).toBeGreaterThan(0)
 
-    // Frozen .step geometry on the real cards.
+    // Kid-friendly round lesson nodes (UX-106): big, round, tappable.
     const firstNode = steps.getByTestId('lesson-card-lesson-10-second-friend').locator('.kc-step-node')
-    await expect(firstNode).toHaveCSS('width', '44px')
-    await expect(firstNode).toHaveCSS('height', '44px')
+    const nodeBox = await firstNode.boundingBox()
+    expect(nodeBox?.width ?? 0).toBeGreaterThanOrEqual(56)
+    await expect(firstNode).toHaveCSS('border-radius', '50%')
     await expect(
       steps.getByTestId('lesson-card-lesson-10-second-friend').locator('b'),
     ).toHaveCSS('text-overflow', 'ellipsis')

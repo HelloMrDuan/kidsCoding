@@ -708,6 +708,31 @@
       "notes": "按覆盖审计实施：验收项中已有真实覆盖的不重复（空/部分/完成→ux-101；锁定→ux-102；奖励幂等→reward-idempotency；键盘切单元/CTA→ux-101/v2-tokens；手机触控三端→ux-103/104）。本轮仅补真实缺口：键盘激活课时节点（focus-visible 3px #84afff + Enter）、Tab 穿过节点顺序、平板 768px 触控、空进度截图。零视觉改动、零 CSS、零业务代码：仅新增 5 个 E2E；Workflow 接线由 ChatGPT 用 GitHub 工具完成（提交 056ca16，差异仅路径触发 + E2E 列表 2 行），无需负责人手动编辑。截图口径分开记录：本地哈希与 CI 产物哈希不同，不混用。未引入快照基线比对（仓库无已提交基线机制）。"
     },
     {
+      "id": "UX-106",
+      "title": "学习地图儿童卡通化",
+      "priority": "P1",
+      "category": "UX",
+      "status": "in_progress",
+      "dependencies": [
+        "UX-005",
+        "UX-105"
+      ],
+      "scope": "app/learn/map/page.tsx,features/lessons/adventure-map.tsx,features/lessons/map-world-scene.tsx,globals.css",
+      "acceptance": [
+        "地图头图、单元、关卡节点为儿童卡通风：真实插画角色（无圆形占位）、彩色圆润节点、彩色小路",
+        "进度/锁定/当前关卡状态仍来自真实数据，testid 与可访问名称不回归",
+        "1440/768/375 无横向溢出，减少动效偏好下停止动画"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "负责人 2026-10-17：‘地图不够卡通，一定记住这是小孩用的’。外壳保持 V2，内容区儿童卡通化；替换深色数字地形封面为按单元主题的卡通世界（森林/草地/花园/舞台）。"
+    },
+    {
       "id": "UX-201",
       "title": "课堂顶部任务进度与保存状态",
       "priority": "P1",
