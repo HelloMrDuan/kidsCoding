@@ -5,7 +5,15 @@ import {
   getCatalogStatistics,
   getCatalogTrack,
   getLessonContentStage,
+  type CatalogTrack,
 } from '@/features/curriculum/full-catalog-access'
+
+/**
+ * UX-501 课程体系 = frozen V2 prototype #page-catalog: title row with the
+ * catalog chip, group filter bar, illustrated route cards, then the chosen
+ * route's units and lessons. Status chips are honest content stages: a route
+ * card never implies lessons are playable when they are only planned.
+ */
 
 const engineLabels: Record<string, string> = {
   blockly: '图形化积木', scratch: 'Scratch', python: 'Python',
@@ -13,86 +21,175 @@ const engineLabels: Record<string, string> = {
   hardware: '机器人与硬件', literacy: '数字安全', math: '数学编程', steam: 'STEAM',
 }
 
+type Group = 'starter' | 'coding' | 'other'
+const GROUPS: { id: 'all' | Group; label: string }[] = [
+  { id: 'all', label: '全部方向' },
+  { id: 'starter', label: '图形化启蒙' },
+  { id: 'coding', label: 'Scratch / Python' },
+  { id: 'other', label: '科学拓展' },
+]
+
+function groupOf(engine: string): Group {
+  if (engine === 'blockly') return 'starter'
+  if (engine === 'scratch' || engine === 'python') return 'coding'
+  return 'other'
+}
+
+/** V2 covers: the frozen track illustrations where one exists, V2 gradients + a big friendly emoji otherwise. */
+const COVERS: Record<string, { image?: string; tint: string; emoji?: string }> = {
+  blockly: { image: '/v2/track-blockly.webp', tint: 'linear-gradient(90deg,#0e549b99,#144c7c24)' },
+  scratch: { image: '/v2/track-scratch.webp', tint: 'linear-gradient(90deg,#27246d88,#2d1f6424)' },
+  python: { image: '/v2/track-python.webp', tint: 'linear-gradient(90deg,#14203488,#12284b33)' },
+  cpp: { tint: 'linear-gradient(130deg,#173d55,#287d8a)', emoji: '🧮' },
+  web: { tint: 'linear-gradient(130deg,#1f4f9a,#4c9be8)', emoji: '🌐' },
+  ai: { tint: 'linear-gradient(130deg,#1b5e76,#52afbd)', emoji: '🤖' },
+  'ai-python': { tint: 'linear-gradient(130deg,#24507a,#5aa7d6)', emoji: '🧠' },
+  hardware: { tint: 'linear-gradient(130deg,#382d76,#827ce1)', emoji: '🦾' },
+  literacy: { tint: 'linear-gradient(130deg,#1d6a5a,#4cb89a)', emoji: '🛡️' },
+  math: { tint: 'linear-gradient(130deg,#7a4a16,#e3a144)', emoji: '📐' },
+  steam: { tint: 'linear-gradient(130deg,#8a2f5b,#e2789f)', emoji: '🎨' },
+}
+
+const PYTHON_TRIAL = ['P0-U1-L01', 'P0-U1-L02', 'P0-U1-L03']
+
+function coverStyle(engine: string) {
+  const c = COVERS[engine] ?? COVERS.ai
+  return { backgroundImage: c.image ? `${c.tint},url(${c.image})` : c.tint }
+}
+
+function trackStatus(track: CatalogTrack): { label: string; tone: 'green' | 'amber' | 'gray' } {
+  if (track.id === 'G0') return { label: '启蒙 12 课可以玩', tone: 'green' }
+  if (track.id === 'P0') return { label: 'Python 实验可体验', tone: 'green' }
+  const detailed = track.units.some((u) => u.lessons.some((l) => getLessonContentStage(l.id) === 'detailed'))
+  return detailed ? { label: '教案已备 · 制作中', tone: 'amber' } : { label: '规划目录', tone: 'gray' }
+}
+
+function lessonStatus(id: string): { label: string; tone: 'green' | 'amber' | 'gray' } {
+  if (PYTHON_TRIAL.includes(id)) return { label: 'Python实验 · 可体验', tone: 'green' }
+  return getLessonContentStage(id) === 'detailed'
+    ? { label: '教案已备 · 待开发', tone: 'amber' }
+    : { label: '大纲规划 · 待开发', tone: 'gray' }
+}
+
 export default async function CatalogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ track?: string }>
+  searchParams: Promise<{ track?: string; group?: string }>
 }) {
   const query = await searchParams
   const current = getCatalogTrack(query.track ?? '') ?? curriculumTracks[0]
+  const group = (GROUPS.some((g) => g.id === query.group) ? query.group : 'all') as 'all' | Group
   const stats = getCatalogStatistics()
+  const visible = curriculumTracks.filter((t) => group === 'all' || groupOf(t.engine) === group)
+  const hrefFor = (params: { group?: string; track?: string }) => {
+    const sp = new URLSearchParams()
+    const g = params.group ?? group
+    if (g !== 'all') sp.set('group', g)
+    if (params.track) sp.set('track', params.track)
+    const s = sp.toString()
+    return `/learn/catalog${s ? `?${s}` : ''}`
+  }
+  const currentStatus = trackStatus(current)
+
   return (
-    <main className="min-h-screen bg-[linear-gradient(165deg,#ecf9f2_0%,#f3f8ff_45%,#fff9ec_100%)] px-4 py-8 text-slate-900 md:px-7">
-      <div className="mx-auto max-w-7xl space-y-7">
-        <header className="rounded-[2.5rem] border border-white bg-white/85 p-7 shadow-[0_18px_60px_rgba(43,83,93,0.08)] md:p-9">
-          <p className="text-sm font-black text-emerald-700">KidsCoding · 学习路线图</p>
-          <h1 className="mt-3 text-3xl font-black md:text-5xl">找到你的下一场编程冒险</h1>
-          <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
-            从图形化积木、Scratch、Python 到人工智能与机器人，先了解知识路线，再选择适合自己的挑战。下面的完整目录仍在逐步制作，未开放的课程不会让你进入空白关卡。
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-800">{stats.tracks} 条学习路径</span>
-            <span className="rounded-full bg-sky-100 px-4 py-2 text-sm font-bold text-sky-800">{stats.units} 个单元</span>
-            <span className="rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-800">{stats.lessons} 节规划课程</span>
-            <Link className="rounded-full bg-slate-900 px-5 py-2 text-sm font-bold text-white" href="/learn/map">进入现有12节启蒙地图 →</Link>
-          </div>
-        </header>
-        <div className="grid gap-6 lg:grid-cols-[310px_minmax(0,1fr)]">
-          <nav aria-label="课程路径" className="self-start rounded-[2rem] bg-white p-4 shadow-sm lg:sticky lg:top-5">
-            <h2 className="px-3 py-3 text-lg font-black">选择学习方向</h2>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-              {curriculumTracks.map((track) => (
+    <div className="kc-v2h kc-v2c">
+      <div className="kc-v2h-title-row">
+        <div>
+          <div className="kc-v2h-eyebrow">LEARNING PATHS</div>
+          <h1>课程体系</h1>
+          <p className="kc-v2h-subtitle">按年龄和兴趣挑一条编程冒险路线。还在制作的课程不会让你进入空白关卡。</p>
+        </div>
+        <span className="kc-v2c-chip kc-v2c-chip-gray" data-testid="catalog-stats">
+          {stats.tracks} 路线 / {stats.lessons} 课 · 规划总目录
+        </span>
+      </div>
+
+      <nav className="kc-v2c-filterbar" aria-label="课程方向">
+        {GROUPS.map((g) => (
+          <Link
+            key={g.id}
+            href={hrefFor({ group: g.id })}
+            className={`kc-v2c-filter${g.id === group ? ' kc-v2c-filter-active' : ''}`}
+            aria-current={g.id === group ? 'page' : undefined}
+          >
+            {g.label}
+          </Link>
+        ))}
+        <Link className="kc-v2h-btn kc-v2h-btn-sm kc-v2c-map-link" href="/learn/map">进入现有 12 节启蒙地图 →</Link>
+      </nav>
+
+      <div className="kc-v2c-course-grid" aria-label="课程路径">
+        {visible.map((track) => {
+          const status = trackStatus(track)
+          const cover = COVERS[track.engine] ?? COVERS.ai
+          const selected = track.id === current.id
+          return (
+            <div key={track.id} className={`kc-v2h-panel kc-v2c-course-card${selected ? ' kc-v2c-selected' : ''}`}>
+              <div className="kc-v2c-cover" style={coverStyle(track.engine)}>
+                {cover.emoji ? <span className="kc-v2c-cover-emoji" aria-hidden="true">{cover.emoji}</span> : null}
+                <b>{track.title}</b>
+              </div>
+              <div className="kc-v2c-body">
+                <span className={`kc-v2c-chip kc-v2c-chip-${status.tone}`}>{status.label}</span>
+                <p>
+                  {engineLabels[track.engine] ?? track.engine} · {track.ageRange} 岁 · {track.units.length} 单元
+                  <br />
+                  {track.units.map((u) => u.title).slice(0, 2).join('、')}……
+                </p>
                 <Link
-                  key={track.id}
-                  href={`/learn/catalog?track=${track.id}`}
-                  aria-current={track.id === current.id ? 'page' : undefined}
-                  className={`rounded-2xl px-4 py-3 transition ${current.id === track.id ? 'bg-emerald-600 text-white' : 'bg-slate-50 text-slate-700 hover:bg-emerald-50'}`}
+                  href={`${hrefFor({ track: track.id })}#track-detail`}
+                  aria-current={selected ? 'page' : undefined}
+                  className={`kc-v2h-btn kc-v2h-btn-sm${selected ? '' : ' kc-v2h-btn-outline'}`}
                   data-testid={`catalog-track-${track.id}`}
                 >
-                  <span className="text-sm font-bold">{track.title}</span>
-                  <span className={`mt-1 block text-xs ${track.id === current.id ? 'text-emerald-50' : 'text-slate-500'}`}>
-                    {engineLabels[track.engine] ?? track.engine} · {track.ageRange}岁 · 24课
-                  </span>
+                  {selected ? '正在查看 ↓' : '查看路线 →'}
                 </Link>
-              ))}
+              </div>
             </div>
-          </nav>
-          <div className="space-y-5">
-            <section className="rounded-[2rem] bg-white p-7 shadow-sm">
-              <p className="text-xs font-black tracking-widest text-emerald-600">{current.id} / 学习路线</p>
-              <h2 className="mt-2 text-3xl font-black">{current.title}</h2>
-              <p className="mt-2 text-sm text-slate-600">建议年龄 {current.ageRange} 岁 · 4 单元 · 24 课 · 当前以内容建设为主</p>
-              <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">课程目录不代表在线开放。显示「教案已备」的课程也需要素材、执行引擎和测试完成之后才能解锁。</p>
-            </section>
-            {current.units.map((unit, index) => (
-              <section key={unit.id} className="rounded-[2rem] bg-white p-6 shadow-sm" data-testid={`catalog-unit-${unit.id}`}>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-xl font-black">第 {index + 1} 单元 · {unit.title}</h3>
-                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">{unit.concepts.join(' · ')}</span>
-                </div>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {unit.lessons.map((lesson, lessonIndex) => (
+          )
+        })}
+      </div>
+
+      <section id="track-detail" className="kc-v2h-panel kc-v2c-detail" data-testid="catalog-track-detail">
+        <div className="kc-v2c-detail-head" style={coverStyle(current.engine)}>
+          <div>
+            <small>{current.id} · 学习路线</small>
+            <h2>{current.title}</h2>
+            <p>建议年龄 {current.ageRange} 岁 · {current.units.length} 单元 · {current.units.reduce((n, u) => n + u.lessons.length, 0)} 课</p>
+          </div>
+          <span className={`kc-v2c-chip kc-v2c-chip-${currentStatus.tone}`}>{currentStatus.label}</span>
+        </div>
+        <p className="kc-v2c-hint">课程目录不代表在线开放。「教案已备」的课也要等素材、运行引擎和测试都完成后才会解锁。</p>
+        <div className="kc-v2c-units">
+          {current.units.map((unit, index) => (
+            <section key={unit.id} className="kc-v2c-unit" data-testid={`catalog-unit-${unit.id}`}>
+              <div className="kc-v2c-unit-head">
+                <h3><span className="kc-v2c-unit-index">{index + 1}</span>第 {index + 1} 单元 · {unit.title}</h3>
+                <span className="kc-v2c-chip">{unit.concepts.join(' · ')}</span>
+              </div>
+              <div className="kc-v2c-lesson-grid">
+                {unit.lessons.map((lesson, lessonIndex) => {
+                  const ls = lessonStatus(lesson.id)
+                  return (
                     <Link
                       key={lesson.id}
                       href={`/learn/catalog/${lesson.id}`}
-                      className="rounded-2xl border border-slate-100 bg-slate-50 p-4 transition hover:border-emerald-300 hover:bg-emerald-50"
+                      className="kc-v2c-lesson"
                       data-testid={`catalog-lesson-${lesson.id}`}
                     >
-                      <span className="text-xs font-black text-slate-500">第 {index * 6 + lessonIndex + 1} 课 · {lesson.phase}</span>
-                      <h4 className="mt-2 text-base font-bold">{lesson.title}</h4>
-                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{lesson.learningOutcome}</p>
-                      <span className="mt-3 inline-block rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700">
-                        {['P0-U1-L01','P0-U1-L02','P0-U1-L03'].includes(lesson.id) ? 'Python实验 · 可体验' : getLessonContentStage(lesson.id) === 'detailed' ? '教案已备 · 待开发' : '大纲规划 · 待开发'}
-                      </span>
+                      <small>第 {index * 6 + lessonIndex + 1} 课 · {lesson.phase}</small>
+                      <h4>{lesson.title}</h4>
+                      <p>{lesson.learningOutcome}</p>
+                      <span className={`kc-v2c-chip kc-v2c-chip-${ls.tone}`}>{ls.label}</span>
                     </Link>
-                  ))}
-                </div>
-                <p className="mt-4 text-sm font-semibold text-emerald-800">🏆 单元作品：{unit.lessons.at(-1)?.title}</p>
-              </section>
-            ))}
-          </div>
+                  )
+                })}
+              </div>
+              <p className="kc-v2c-capstone">🏆 单元作品：{unit.lessons.at(-1)?.title}</p>
+            </section>
+          ))}
         </div>
-      </div>
-    </main>
+      </section>
+    </div>
   )
 }

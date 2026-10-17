@@ -1238,12 +1238,16 @@
       "title": "课程目录按年龄路线与成熟度分级",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
-      "dependencies": [],
-      "scope": "app/learn/catalog/*",
+      "status": "in_progress",
+      "dependencies": [
+        "UX-005",
+        "UX-601"
+      ],
+      "scope": "app/learn/catalog/page.tsx,globals.css",
       "acceptance": [
         "18路线显示课程和真实L0-L5状态",
-        "大纲课不显示可运行入口"
+        "大纲课不显示可运行入口",
+        "页面对齐冻结 V2 原型 #page-catalog：标题行+目录统计、方向筛选、带 V2 插画封面的路线卡、所选路线的单元与课程，纳入全站外壳，三端无横向溢出"
       ],
       "evidence": {
         "pr": null,
@@ -1252,7 +1256,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "2026-10-18 第一步：按 V2 原型完成课程体系视觉对齐，状态沿用现有内容阶段（可体验/教案已备/大纲规划）。L0-L5 统一成熟度数据源属 02-PHASED-DELIVERY P1.2，尚未建立，故本任务保持 in_progress。"
     },
     {
       "id": "UX-502",
