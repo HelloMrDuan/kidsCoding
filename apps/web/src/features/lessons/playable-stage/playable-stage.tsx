@@ -163,7 +163,7 @@ export function PlayableStage({
           <div className="relative overflow-hidden rounded-[1.5rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_100%)] px-4 pb-8 pt-6 min-h-[200px]">
             <div className="absolute left-1/2 top-0 h-24 w-24 -translate-x-1/2 rounded-full bg-white/35 blur-2xl" />
 
-            <div className="relative flex flex-wrap items-end gap-4 h-[120px]">
+            <div className="relative flex min-h-[120px] flex-wrap items-end gap-4">
               <button type="button" aria-label={clickLesson?'点击蝴蝶触发积木程序':mainLabel}
                 disabled={!clickLesson||executionState!=='armed'} onClick={()=>void clickCharacter()}
                 className="relative flex h-24 w-24 items-center justify-center rounded-full bg-orange-400 text-sm font-black text-white shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-500 ease-in-out"

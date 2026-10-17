@@ -179,6 +179,11 @@ test('UX-201 progress strip visual evidence on three viewports', async ({
     const page = await context.newPage()
     await page.goto(LESSON_URL)
     await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // UX-202: on phones only the task pane is visible by default; the
+    // Blockly workspace lives in the code pane behind the 积木 tab.
+    if (name === 'mobile') {
+      await page.getByTestId('lesson-mobile-tab-code').click()
+    }
     await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
     await page.getByTestId('lesson-add-when_start').click()
     await expect(page.getByTestId('lesson-save-local')).toContainText(

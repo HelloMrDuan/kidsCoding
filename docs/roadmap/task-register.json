@@ -737,7 +737,7 @@
       "title": "课堂任务舞台积木三域布局",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-201"
       ],
@@ -753,7 +753,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "已领取（UX-201 completed）。按冻结 V2 原型实施课堂三域布局：任务/积木/舞台三栏 + 1180/860/600 响应式 + 手机三标签切换；保留 UX-201 恢复/保存/同步功能；1-9 课真 Blockly 不回归。"
     },
     {
       "id": "UX-203",
