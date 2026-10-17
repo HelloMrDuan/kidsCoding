@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { GuidedLessonShell } from './guided-lesson-shell'
@@ -22,7 +22,7 @@ describe('GuidedLessonShell', () => {
     expect(screen.queryByRole('button', { name: '完成这一步' })).toBeNull()
   })
 
-  it('shows the task card, workbench shell, and result card on unlocked lessons', () => {
+  it('shows the task card, three zones, and result card on unlocked lessons', () => {
     render(
       <GuidedLessonShell
         feedback="太好了，角色已经准备好登场了。"
@@ -34,23 +34,84 @@ describe('GuidedLessonShell', () => {
         onStartRemedial={vi.fn()}
         stepTitle="第 1 步：连接动作"
         voiceover="先放开始积木。"
-      >
-        <div>工作台内容</div>
-      </GuidedLessonShell>,
+        codeSlot={<div>积木内容</div>}
+        stageSlot={<div>舞台内容</div>}
+      />,
     )
 
     expect(screen.getByText('今天的小任务')).toBeInTheDocument()
-    expect(screen.getByTestId('lesson-support-rail')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-shell')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-three-zone-grid')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-task-column')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-code-column')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-stage-column')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-task-pane-h')).toHaveTextContent('学习任务')
+    expect(screen.getByTestId('lesson-code-pane-h')).toHaveTextContent('编程工作区')
+    expect(screen.getByTestId('lesson-stage-pane-h')).toHaveTextContent('实时舞台')
     expect(screen.getByTestId('lesson-task-card')).toBeInTheDocument()
-    expect(screen.getByTestId('lesson-workbench-shell')).toBeInTheDocument()
-    expect(screen.getByText('把开始积木和向右移动积木接起来。')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-task-card')).toHaveTextContent(
+      '把开始积木和向右移动积木接起来。',
+    )
     expect(screen.getByText('主语音：先放开始积木。')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-feedback-card')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-feedback-preview')).toBeInTheDocument()
     expect(screen.getByText('刚完成的小结果')).toBeInTheDocument()
     expect(screen.getByText('太好了，角色已经准备好登场了。')).toBeInTheDocument()
-    expect(screen.getByText('工作台内容')).toBeInTheDocument()
+    expect(screen.getByText('积木内容')).toBeInTheDocument()
+    expect(screen.getByText('舞台内容')).toBeInTheDocument()
+    expect(screen.getByTestId('lesson-footer')).toBeInTheDocument()
     expect(screen.getByTestId('lesson-complete-step')).toBeInTheDocument()
+  })
+
+  it('switches the visible pane with the mobile tabs', () => {
+    render(
+      <GuidedLessonShell
+        isLocked={false}
+        lessonGoal="让主角从舞台左边走到右边。"
+        lessonTitle="让角色动起来"
+        onStartRemedial={vi.fn()}
+        codeSlot={<div>积木内容</div>}
+        stageSlot={<div>舞台内容</div>}
+      />,
+    )
+
+    const taskColumn = screen.getByTestId('lesson-task-column')
+    const codeColumn = screen.getByTestId('lesson-code-column')
+    const stageColumn = screen.getByTestId('lesson-stage-column')
+
+    expect(taskColumn.className).toContain('kc-mobile-visible')
+    expect(codeColumn.className).not.toContain('kc-mobile-visible')
+    expect(stageColumn.className).not.toContain('kc-mobile-visible')
+
+    fireEvent.click(screen.getByTestId('lesson-mobile-tab-code'))
+    expect(taskColumn.className).not.toContain('kc-mobile-visible')
+    expect(codeColumn.className).toContain('kc-mobile-visible')
+    expect(stageColumn.className).not.toContain('kc-mobile-visible')
+
+    fireEvent.click(screen.getByTestId('lesson-mobile-tab-stage'))
+    expect(taskColumn.className).not.toContain('kc-mobile-visible')
+    expect(codeColumn.className).not.toContain('kc-mobile-visible')
+    expect(stageColumn.className).toContain('kc-mobile-visible')
+
+    fireEvent.click(screen.getByTestId('lesson-mobile-tab-task'))
+    expect(taskColumn.className).toContain('kc-mobile-visible')
+  })
+
+  it('renders the code zone without a stage column when no stage slot is given', () => {
+    render(
+      <GuidedLessonShell
+        feedback="太好了，角色已经准备好登场了。"
+        isLocked={false}
+        lessonGoal="让主角从舞台左边走到右边。"
+        lessonTitle="让角色动起来"
+        onStartRemedial={vi.fn()}
+        codeSlot={<div>积木内容</div>}
+      />,
+    )
+
+    expect(screen.getByTestId('lesson-code-column')).toBeInTheDocument()
+    expect(screen.queryByTestId('lesson-stage-column')).not.toBeInTheDocument()
+    expect(screen.getByTestId('lesson-feedback-card')).toBeInTheDocument()
   })
 
   it('shows the in-lesson remedial micro script when the child gets stuck', () => {

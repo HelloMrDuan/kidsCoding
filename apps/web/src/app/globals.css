@@ -305,6 +305,83 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-lesson-progress { width: 130px; height: 5px; background: #e7eef9; border-radius: 8px; overflow: hidden; }
 .kc-lesson-progress i { display: block; height: 100%; background: var(--kc-action); }
 
+/* UX-202: classroom three-zone layout (task / code / stage).
+   Geometry and responsive rules are copied from the approved prototype
+   (docs/design/kidscoding-v2/prototype.html: .lesson-shell, .lesson-grid,
+   .lesson-col, .lesson-task, .mobile-tabs, .lesson-footer and the
+   1180px / 860px / 600px media queries). Class names use the repo's
+   kc- prefix (UX-002 convention). No new palette, radius, or spacing.
+   Documented adaptations:
+   - The grid is a plain CSS class (not Tailwind) because the prototype's
+     1180/860/600 breakpoints do not match Tailwind's default scale.
+   - At <=860px the prototype makes its single .task-content block
+     two-column; the real task column holds several cards (goal, task,
+     hint, remedial), so its cards stack vertically while the column
+     itself spans full width above the code/stage pair. The partition
+     rule (task on top, code + stage side by side) is preserved.
+   - The prototype's footer note is demo disclaimer copy; the real
+     footer carries only the real complete-step button.
+   - The prototype's progress bar lives in its lesson-header; the real
+     progress strip (UX-201) stays at page level above the shell. */
+.kc-lesson-shell {
+  background: #f8fafd;
+  border: 1px solid #e4eaf3;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.kc-lesson-grid {
+  display: grid;
+  grid-template-columns: 255px minmax(280px, 1fr) minmax(330px, 0.95fr);
+  gap: 12px;
+  padding: 12px;
+  min-height: 587px;
+}
+.kc-mobile-tabs { display: none; }
+.kc-lesson-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 17px;
+  background: white;
+  border-top: 1px solid var(--kc-line);
+}
+@media (max-width: 1180px) {
+  .kc-lesson-grid {
+    grid-template-columns: 210px minmax(250px, 1fr) minmax(290px, 0.9fr);
+  }
+}
+@media (max-width: 860px) {
+  .kc-lesson-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    min-height: unset;
+  }
+  .kc-lesson-grid .kc-lesson-task { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .kc-lesson-grid { display: block; padding: 8px; }
+  .kc-lesson-grid .kc-lesson-col { display: none; min-height: 500px; }
+  .kc-lesson-grid .kc-lesson-col.kc-mobile-visible { display: flex; }
+  .kc-mobile-tabs {
+    display: flex;
+    background: white;
+    padding: 9px;
+    gap: 5px;
+  }
+  .kc-mobile-tabs button {
+    border: 0;
+    background: #f2f5fa;
+    color: #6c7b91;
+    border-radius: 7px;
+    padding: 9px 16px;
+    flex: 1;
+  }
+  .kc-mobile-tabs button[aria-selected='true'] {
+    color: #fff;
+    background: var(--kc-action);
+  }
+}
+
 /* UX-101: learning map (AdventureMap).
    Geometry and palette are copied from the approved prototype
    (docs/design/kidscoding-v2/prototype.html: .map-layout, .map-aside,

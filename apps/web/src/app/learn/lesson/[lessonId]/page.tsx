@@ -418,6 +418,24 @@ export default function LessonPage() {
 
         <GuidedLessonShell
           cloudSyncState={cloudSyncState}
+          codeSlot={
+            currentLesson.mode === 'template' ? (
+              <TemplateStoryBuilder
+                allowedBlocks={step.allowedBlocks}
+                blocks={blocks}
+                onSnapshotChange={handleSnapshotChange}
+                template={currentTemplate}
+                templateName={templateName}
+              />
+            ) : (
+              <BlocklyWorkspace
+                enableProgramTools={['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)}
+                allowedBlocks={step.allowedBlocks}
+                blocks={blocks}
+                onSnapshotChange={handleSnapshotChange}
+              />
+            )
+          }
           feedback={feedback}
           hintCopy={hintCopy}
           instruction={step.instruction}
@@ -434,40 +452,27 @@ export default function LessonPage() {
           remedialLessonId={remedialLessonId}
           remedialMicroScript={remedialMicroScript}
           resumedFromStep={resumedFromStep}
+          stageSlot={
+            currentLesson.mode === 'template' ? null : (
+              <>
+                {['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id) ? (
+                  <DuoStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} requiredBlocks={step.requiredBlockTypes}
+                    graduation={currentLesson.id === 'lesson-12-graduation-show'} dialogue={currentLesson.id === 'lesson-11-duo-rehearsal'} stepIndex={stepIndex} onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
+                ) : ['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
+                  <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
+                    requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex}
+                    onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
+                ) : (
+                  <PreviewStage blocks={blocks} template={currentTemplate}/>
+                )}
+              </>
+            )
+          }
           stepCount={currentLesson.steps.length}
           stepIndex={safeStepIndex}
           stepTitle={`第 ${safeStepIndex + 1} 步：${step.title}`}
           voiceover={step.voiceover}
-        >
-          {currentLesson.mode === 'template' ? (
-            <TemplateStoryBuilder
-              allowedBlocks={step.allowedBlocks}
-              blocks={blocks}
-              onSnapshotChange={handleSnapshotChange}
-              template={currentTemplate}
-              templateName={templateName}
-            />
-          ) : (
-            <div className="space-y-6">
-              {['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id) ? (
-                <DuoStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} requiredBlocks={step.requiredBlockTypes}
-                  graduation={currentLesson.id === 'lesson-12-graduation-show'} dialogue={currentLesson.id === 'lesson-11-duo-rehearsal'} stepIndex={stepIndex} onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
-              ) : ['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
-                <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
-                  requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex}
-                  onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
-              ) : (
-                <PreviewStage blocks={blocks} template={currentTemplate}/>
-              )}
-              <BlocklyWorkspace
-                enableProgramTools={['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)}
-                allowedBlocks={step.allowedBlocks}
-                blocks={blocks}
-                onSnapshotChange={handleSnapshotChange}
-              />
-            </div>
-          )}
-        </GuidedLessonShell>
+        />
       </section>
     </main>
   )

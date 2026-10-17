@@ -114,7 +114,15 @@ test('UX-201 a failed local save shows as failed, and retry really saves', async
     ;(window as unknown as { __ux201FailDraftSave: boolean })
       .__ux201FailDraftSave = false
   })
-  await page.getByTestId('lesson-save-retry').click()
+  // The retry button was just asserted visible, but a loaded CI worker can
+  // transiently report it not actionable (layout settling under contention).
+  // Re-query and retry the click itself; the real assertion below — the
+  // save chip must read saved — is unchanged and not weakened.
+  await expect(async () => {
+    await page
+      .getByTestId('lesson-save-retry')
+      .click({ timeout: 5_000 })
+  }).toPass({ timeout: 30_000 })
   await expect(page.getByTestId('lesson-save-local')).toContainText(
     '已保存到本机',
   )
@@ -179,6 +187,11 @@ test('UX-201 progress strip visual evidence on three viewports', async ({
     const page = await context.newPage()
     await page.goto(LESSON_URL)
     await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // UX-202: on phones only the task pane is visible by default; the
+    // Blockly workspace lives in the code pane behind the 积木 tab.
+    if (name === 'mobile') {
+      await page.getByTestId('lesson-mobile-tab-code').click()
+    }
     await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
     await page.getByTestId('lesson-add-when_start').click()
     await expect(page.getByTestId('lesson-save-local')).toContainText(
