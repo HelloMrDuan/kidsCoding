@@ -5,8 +5,6 @@ import { useSyncExternalStore } from 'react'
 
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
-import { MapWorldScene, MAP_WORLD_THEMES } from '@/features/lessons/map-world-scene'
-import { CharacterArt } from '@/features/lessons/playable-stage/character-art'
 import {
   defaultGuestProgress,
   readGuestProgress,
@@ -14,44 +12,29 @@ import {
 } from '@/features/progress/local-progress'
 
 /**
- * UX-601 home = frozen V2 学习中心 (prototype #page-home) in the
- * kid-cartoon content style the owner requires (VISUAL-LOCK.md,
- * children audience). Every number shown comes from real guest
- * progress and the real launch curriculum; nothing is demo data.
+ * UX-601 home = frozen V2 学习中心 (docs/design/kidscoding-v2/prototype.html
+ * #page-home), section for section: title row, dark hero with the V2
+ * illustration + continue CTA, weekly progress ring with day dots, three
+ * illustrated learning tracks, and the example-works strip. Images are the
+ * frozen V2 assets (public/v2). Numbers come from real guest progress; the
+ * works strip is labelled as examples exactly like the prototype.
  */
 
 const TRACKS = [
-  {
-    id: 'blockly',
-    title: '图形化编程启蒙',
-    body: '事件、顺序、角色动作，从第一段积木程序开始',
-    status: '12 课全部开放',
-    href: '/learn/map',
-    cta: '进入课程',
-    mascot: 'fox',
-    tone: 'kc-home-track-sun',
-  },
-  {
-    id: 'scratch',
-    title: 'Scratch 创意编程',
-    body: '动画、交互与小游戏，把奇思妙想变成作品',
-    status: '部分课程试验',
-    href: '/learn/scratch-lab/G3-U1-L02',
-    cta: '去工作台',
-    mascot: 'bird',
-    tone: 'kc-home-track-sky',
-  },
-  {
-    id: 'python',
-    title: 'Python 项目编程',
-    body: '变量、逻辑与真实项目，慢慢走向文字代码',
-    status: '部分课程试验',
-    href: '/learn/python-lab/P0-U1-L01',
-    cta: '去实验室',
-    mascot: 'frog',
-    tone: 'kc-home-track-grape',
-  },
+  { id: 'blockly', cls: 'kc-v2h-t-block', title: '图形化编程启蒙', lines: ['事件、顺序、角色动作', '从第一段积木程序开始'], cta: '进入课程', href: '/learn/map' },
+  { id: 'scratch', cls: 'kc-v2h-t-scratch', title: 'Scratch 创意编程', lines: ['动画、交互与小游戏', '把奇思妙想变成作品'], cta: '查看工作台', href: '/learn/scratch-lab/G3-U1-L02' },
+  { id: 'python', cls: 'kc-v2h-t-python', title: 'Python 项目编程', lines: ['变量、逻辑与真实项目', '逐步迈向文字代码'], cta: '查看实验室', href: '/learn/python-lab/P0-U1-L01' },
 ] as const
+
+const WORKS = [
+  { img: '/v2/work-1.webp', title: '迷宫探险', tags: '移动控制 · 事件逻辑' },
+  { img: '/v2/work-2.webp', title: '海底世界', tags: '多角色 · 互动故事' },
+  { img: '/v2/work-3.webp', title: '太空探险', tags: '游戏设计 · 判断条件' },
+  { img: '/v2/work-4.webp', title: '几何图案', tags: '循环 · 绘制算法' },
+  { img: '/v2/work-5.webp', title: '冬日小镇', tags: '场景 · 角色交互' },
+] as const
+
+const DAY_NAMES = ['一', '二', '三', '四', '五', '六', '日']
 
 function greeting() {
   const h = new Date().getHours()
@@ -61,19 +44,17 @@ function greeting() {
   return '晚上好'
 }
 
+/** Monday-based index of today (0..6). */
+function todayIndex() {
+  return (new Date().getDay() + 6) % 7
+}
+
 export function HomeLearningCenter() {
   const curriculum = useLaunchCurriculum()
-  const { allLessons, foundationUnits } = buildLaunchMap(curriculum.lessons)
-  const progress = useSyncExternalStore(
-    subscribeGuestProgress,
-    readGuestProgress,
-    () => defaultGuestProgress,
-  )
-  const hello = useSyncExternalStore(
-    () => () => {},
-    greeting,
-    () => '你好',
-  )
+  const { allLessons } = buildLaunchMap(curriculum.lessons)
+  const progress = useSyncExternalStore(subscribeGuestProgress, readGuestProgress, () => defaultGuestProgress)
+  const hello = useSyncExternalStore(() => () => {}, greeting, () => '你好')
+  const today = useSyncExternalStore(() => () => {}, todayIndex, () => -1)
 
   const done = progress.completedLessonIds.length
   const total = allLessons.length
@@ -83,147 +64,125 @@ export function HomeLearningCenter() {
     allLessons.find((l) => l.id === progress.currentLessonId) ??
     allLessons[0]
   const percent = total > 0 ? Math.round((done / total) * 100) : 0
+  const works = progress.completedProjectIds.length
+  // Days of this week covered by the real streak (only counts once learning started).
+  const streak = started ? progress.streakDays : 0
+  const activeDay = (i: number) => today >= 0 && i <= today && i > today - streak
 
   return (
-    <div className="kc-home">
-      <section className="kc-home-hero-row" data-testid="story-stage-hero">
-        <div className="kc-home-hero">
-          <MapWorldScene theme="forest" label="森林冒险世界，小狐狸和小兔子在等你" />
-          <div className="kc-home-hero-card">
-            <span className="kc-home-kicker">✨ 当前学习 · 图形化编程启蒙</span>
-            <h1>{hello}，小小创作家！</h1>
-            <p className="kc-home-lead">
-              孩子可以自己做出动画故事：拖拖积木，让小动物走路、说话、表演。
-            </p>
+    <div className="kc-v2h">
+      <div className="kc-v2h-title-row" data-testid="home-title-row">
+        <div>
+          <div className="kc-v2h-eyebrow">YOUR LEARNING SPACE</div>
+          <h1>{hello}，今天继续创造点新东西。</h1>
+          <p className="kc-v2h-subtitle">孩子可以自己做出动画故事：从正在学的课开始，完成一节真正可运行的编程课。</p>
+        </div>
+        <Link className="kc-v2h-btn kc-v2h-btn-outline kc-v2h-btn-sm" href="/learn/catalog">查看全部课程 →</Link>
+      </div>
+
+      <div className="kc-v2h-two-col">
+        <section className="kc-v2h-hero" data-testid="story-stage-hero">
+          <div className="kc-v2h-hero-art" role="img" aria-label="孩子和机器人一起编程的插画" />
+          <div className="kc-v2h-hero-text">
+            <div className="kc-v2h-hero-kicker">⎯ {started ? '当前学习' : '第一课'} · 图形化编程启蒙</div>
             {nextLesson ? (
-              <p className="kc-home-next" data-testid="home-next-lesson">
-                下一关：第 {nextLesson.sortOrder} 课 · {nextLesson.title}
-              </p>
+              <h2 data-testid="home-next-lesson">
+                第 {nextLesson.sortOrder} 课
+                <br />
+                {nextLesson.title}
+              </h2>
             ) : null}
-            <div className="kc-home-buttons">
+            <p className="kc-v2h-hero-body">
+              拖动积木，让小动物走路、说话、表演，
+              <br />
+              把故事从想象变成能运行的作品。
+            </p>
+            <div className="kc-v2h-hero-progress">
+              <span>主线进度</span>
+              <div className="kc-v2h-line-progress"><i style={{ width: `${percent}%` }} /></div>
+              <b>{done} / {total} 课</b>
+            </div>
+            <div className="kc-v2h-hero-buttons">
               {started && nextLesson ? (
-                <Link
-                  className="kc-home-btn kc-home-btn-main"
-                  data-testid="home-continue"
-                  href={`/learn/lesson/${nextLesson.id}`}
-                >
-                  继续学习 ▶
-                </Link>
+                <Link className="kc-v2h-btn" data-testid="home-continue" href={`/learn/lesson/${nextLesson.id}`}>继续学习 ↗</Link>
               ) : (
-                <Link
-                  className="kc-home-btn kc-home-btn-main"
-                  data-testid="home-start"
-                  href="/onboarding/age"
-                >
-                  开始学第一节
-                </Link>
+                <Link className="kc-v2h-btn" data-testid="home-start" href="/onboarding/age">开始学第一节</Link>
               )}
-              <Link className="kc-home-btn kc-home-btn-soft" href="/learn/map">
-                🗺️ 学习地图
-              </Link>
+              <Link className="kc-v2h-btn kc-v2h-btn-invert" href="/learn/map">学习地图</Link>
             </div>
           </div>
-        </div>
+        </section>
 
-        <aside className="kc-home-progress" data-testid="home-progress">
-          <div className="kc-home-progress-head">
-            <b>我的闯关进度</b>
-            <Link href="/cards" className="kc-home-sub">我的卡册 →</Link>
+        <section className="kc-v2h-panel kc-v2h-progress-card" data-testid="home-progress">
+          <div className="kc-v2h-card-title">
+            学习进度
+            <Link className="kc-v2h-sub-action" href="/parent/overview">看看家长如何陪学 ↗</Link>
           </div>
-          <div className="kc-home-ring-row">
+          <div className="kc-v2h-progress-row">
             <div
-              className="kc-home-ring"
-              style={{ background: `conic-gradient(#ffab19 ${percent * 3.6}deg, #fff1cc 0deg)` }}
+              className="kc-v2h-ring"
+              style={{ background: `conic-gradient(#3169ea 0% ${percent}%, #e8effc ${percent}% 100%)` }}
               role="img"
               aria-label={`已完成 ${done} / ${total} 课`}
             >
-              <div className="kc-home-ring-hole">
-                <strong>{done}/{total}</strong>
-                <small>已完成</small>
-              </div>
+              <div className="kc-v2h-hole"><strong>{done}/{total}</strong><small>启蒙主线</small></div>
             </div>
-            <ul className="kc-home-stats">
-              <li><span className="kc-home-stat-ico">⭐</span><b>{progress.stars}</b> 颗星星</li>
-              <li><span className="kc-home-stat-ico">🃏</span><b>{progress.cardIds.length}</b> 张卡片</li>
-              <li><span className="kc-home-stat-ico">🔥</span>连续 <b>{progress.streakDays}</b> 天</li>
-            </ul>
+            <div className="kc-v2h-stats">
+              <div><b><i className="kc-v2h-dot" />{done} 节</b><small>完成课程</small></div>
+              <div><b><i className="kc-v2h-dot kc-v2h-dot-green" />{works} 件</b><small>完成作品</small></div>
+              <div><b><i className="kc-v2h-dot kc-v2h-dot-amber" />{progress.stars} 颗</b><small>获得星星</small></div>
+            </div>
           </div>
-          <div className="kc-home-progress-pet">
-            <CharacterArt id="rabbit" className="kc-home-pet" />
-            <span>{done === 0 ? '完成第一关，就能拿到第一颗星星哦！' : done >= total ? '太棒了！启蒙主线全部完成！' : `再闯 ${total - done} 关就毕业啦，加油！`}</span>
+          <div className="kc-v2h-days" aria-label={`连续学习 ${streak} 天`}>
+            {DAY_NAMES.map((d, i) => (
+              <span key={d} className={activeDay(i) ? 'kc-v2h-day-done' : undefined}>
+                {d}
+                <b>{activeDay(i) ? '✓' : '·'}</b>
+              </span>
+            ))}
           </div>
-        </aside>
-      </section>
+        </section>
+      </div>
 
       <section data-testid="growth-path">
-        <div className="kc-home-heading">
+        <div className="kc-v2h-section-heading">
           <div>
             <h2>我的学习路径</h2>
-            <p>从图形化思维到代码创作，每一步都做出能运行的作品</p>
+            <p className="kc-v2h-subtitle">从图形化思维到代码创作，每一步都落到可运行作品</p>
           </div>
-          <Link className="kc-home-sub" href="/learn/catalog">完整课程体系 →</Link>
+          <Link className="kc-v2h-sub-action" href="/learn/catalog">完整课程体系 ↗</Link>
         </div>
-        <div className="kc-home-tracks">
+        <div className="kc-v2h-track-grid">
           {TRACKS.map((t) => (
-            <Link key={t.id} href={t.href} className={`kc-home-track ${t.tone}`} data-testid={`home-track-${t.id}`}>
-              <CharacterArt id={t.mascot} className="kc-home-track-art" />
-              <span className="kc-home-track-status">{t.status}</span>
-              <h3>{t.title}</h3>
-              <p>{t.body}</p>
-              <span className="kc-home-track-cta">{t.cta} →</span>
-            </Link>
+            <div key={t.id} className={`kc-v2h-track ${t.cls}`} data-testid={`home-track-${t.id}`}>
+              <div>
+                <h3>{t.title}</h3>
+                <p>{t.lines[0]}<br />{t.lines[1]}</p>
+                <Link className="kc-v2h-mini-link" href={t.href}>{t.cta} ↗</Link>
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
-      <section data-testid="home-worlds">
-        <div className="kc-home-heading">
+      <section data-testid="home-works">
+        <div className="kc-v2h-section-heading">
           <div>
-            <h2>四个冒险世界</h2>
-            <p>启蒙 12 课分成四个单元，每个单元做出一个小作品</p>
+            <h2>作品展示 · 示例作品</h2>
+            <p className="kc-v2h-subtitle">学完这些课，你也能做出这样的作品</p>
           </div>
+          <Link className="kc-v2h-sub-action" href="/learn/portfolio">查看作品中心 ↗</Link>
         </div>
-        <div className="kc-home-worlds">
-          {foundationUnits.map((unit, i) => {
-            const unitDone = unit.lessonIds.filter((id) => progress.completedLessonIds.includes(id)).length
-            return (
-              <Link key={unit.id} href="/learn/map" className="kc-home-world" data-testid={`home-world-${unit.id}`}>
-                <div className="kc-home-world-art">
-                  <MapWorldScene theme={MAP_WORLD_THEMES[i % 4]} label={`${unit.title} 卡通世界`} />
-                </div>
-                <div className="kc-home-world-text">
-                  <b>{unit.title}</b>
-                  <span>{'⭐'.repeat(unitDone)}{'☆'.repeat(Math.max(unit.lessonIds.length - unitDone, 0))}</span>
-                </div>
-              </Link>
-            )
-          })}
+        <div className="kc-v2h-work-grid">
+          {WORKS.map((w) => (
+            <Link key={w.title} href="/learn/portfolio" className="kc-v2h-panel kc-v2h-work-card">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={w.img} alt={`${w.title}示例作品`} />
+              <div className="kc-v2h-work-text"><h4>{w.title}</h4><p>{w.tags}</p></div>
+            </Link>
+          ))}
         </div>
-      </section>
-
-      <section className="kc-home-parent" data-testid="parent-confidence">
-        <CharacterArt id="bear" className="kc-home-parent-art" />
-        <div>
-          <h2>家长也能看见孩子的进步</h2>
-          <p>学了哪几课、做出了哪些作品、下一步学什么，都记在家长中心里。</p>
-        </div>
-        <Link className="kc-home-btn kc-home-btn-soft" href="/parent/overview">
-          看看家长如何陪学
-        </Link>
-      </section>
-
-      <section className="kc-home-cta" data-testid="trial-cta">
-        <div className="kc-home-cta-cast" aria-hidden="true">
-          <CharacterArt id="butterfly" className="kc-home-cta-art" />
-          <CharacterArt id="fox" className="kc-home-cta-art" />
-        </div>
-        <div>
-          <h2>每天一小关，做出会动的小故事</h2>
-          <p>每 2–3 节就完成一个小作品，卡住时有提示和微补课帮忙。</p>
-        </div>
-        <Link className="kc-home-btn kc-home-btn-main" href="/learn/map">
-          去学习地图闯关
-        </Link>
+        <p className="kc-v2h-footnote">作品封面为示例，你的作品会保存在作品中心。</p>
       </section>
     </div>
   )
