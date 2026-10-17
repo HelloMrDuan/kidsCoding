@@ -116,6 +116,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await press(page, 'lesson-complete-step')
     await showLessonPane(page, 'task')
     await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
+    await showLessonPane(page, 'stage')
     await press(page, 'duo-reflect-own')
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     await page.screenshot({ path: testInfo.outputPath(`${viewport.name}-after.png`), fullPage: true })
