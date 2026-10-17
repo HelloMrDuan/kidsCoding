@@ -52,7 +52,8 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['tablet', 768, 102
 test('real pages consume V2 foundation and reduced motion without changing stored progress', async ({ page }) => {
   await page.goto('/learn/map')
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(243, 246, 251)')
-  await expect(page.locator('.kc-surface-3d').first()).toHaveCSS('border-radius', '14px')
+  // UX-106: the map hero is the kid-friendly rounded card (24px), still on the V2 canvas.
+  await expect(page.locator('.kc-surface-3d').first()).toHaveCSS('border-radius', '24px')
   await expect(page.getByTestId('learning-map-primary-cta')).toHaveCSS('background-color', 'rgb(36, 99, 235)')
   const before = await page.evaluate(() => JSON.stringify(localStorage))
   await page.reload()

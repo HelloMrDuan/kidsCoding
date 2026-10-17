@@ -177,16 +177,16 @@ for (const [name, width, height] of [
           boxShadow: style.boxShadow,
         }
       })
-    expect(nodeStyle.borderColor).toBe('rgb(41, 105, 237)')
-    expect(nodeStyle.boxShadow).toContain('rgb(234, 241, 255)')
-    expect(nodeStyle.boxShadow).toContain('5px')
+    // UX-106 kid map: current node is the warm orange node with a soft halo ring.
+    expect(nodeStyle.borderColor).toBe('rgb(255, 255, 255)')
+    expect(nodeStyle.boxShadow).toContain('rgb(224, 134, 0)')
 
     // Completed node keeps the frozen done highlight.
     const doneStyle = await map
       .getByTestId('lesson-card-lesson-01-forest-hello')
       .locator('.kc-step-node')
       .evaluate((el) => window.getComputedStyle(el).backgroundColor)
-    expect(doneStyle).toBe('rgb(47, 106, 233)')
+    expect(doneStyle).toBe('rgb(63, 191, 106)')
 
     // Tapping the highlighted node reaches the lesson (desktop click,
     // mobile tap): the highlight does not swallow the gesture.

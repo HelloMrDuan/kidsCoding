@@ -1,6 +1,9 @@
 'use client'
 
 import { LessonCard } from '@/features/ui/lesson-card'
+
+import { MapWorldScene, MAP_WORLD_THEMES } from './map-world-scene'
+import { CharacterArt } from './playable-stage/character-art'
 import type { LessonCardState } from '@/features/ui/lesson-card'
 
 /**
@@ -40,6 +43,8 @@ export interface AdventureMapProps {
 }
 
 const UNIT_NUMERALS = ['一', '二', '三', '四']
+const UNIT_MASCOTS = ['fox', 'rabbit', 'butterfly', 'bear']
+const UNIT_CHEERS = ['和小狐狸一起出发吧！', '背上小书包去旅行！', '花园里有好多惊喜！', '大家一起来表演！']
 
 function getUnitRangeLabel(lessons: AdventureMapLesson[]) {
   if (lessons.length === 0) return '暂无课程'
@@ -82,9 +87,10 @@ export function AdventureMap({
 
   const selectedIndex = units.indexOf(selectedUnit)
   const nextLesson = getNextLesson(selectedUnit)
+  const theme = MAP_WORLD_THEMES[selectedIndex % MAP_WORLD_THEMES.length]
 
   return (
-    <section className="kc-map-layout" data-testid="adventure-map">
+    <section className={`kc-map-layout kc-map-kids kc-map-theme-${theme}`} data-testid="adventure-map">
       <div className="kc-panel kc-map-aside">
         <h3>图形化启蒙 · 四个学习单元</h3>
         {units.map((unit, index) => (
@@ -96,7 +102,10 @@ export function AdventureMap({
             data-testid={`adventure-map-unit-${unit.id}`}
             onClick={() => onSelectUnit(unit.id)}
           >
-            <span className="kc-module-index">{String(index + 1).padStart(2, '0')}</span>
+            <span className={`kc-module-index kc-module-index-${index % 4}`}>
+              <CharacterArt id={UNIT_MASCOTS[index % 4]} className="kc-module-mascot" />
+              <i>{String(index + 1).padStart(2, '0')}</i>
+            </span>
             <span>
               <b>{unit.title}</b>
               <small>{getUnitRangeLabel(unit.lessons)}</small>
@@ -123,20 +132,10 @@ export function AdventureMap({
         </div>
 
         <div className="kc-map-cover">
-          {/*
-            Plain <img> on purpose: map-terrain.svg is a vector asset,
-            next/image provides no optimization for SVG. Matches the
-            prototype's plain <img> for the same cover.
-          */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/map-terrain.svg" alt="原创数字地形学习路径视觉" />
+          <MapWorldScene theme={theme} label={`${selectedUnit.title} 卡通冒险地图`} />
           <div className="kc-cover-label">
-            <b>
-              从一次点击开始
-              <br />
-              让想法发生
-            </b>
-            <p>课程地图 · 学习章节视觉演示</p>
+            <b>{selectedUnit.title}</b>
+            <p>{UNIT_CHEERS[selectedIndex % UNIT_CHEERS.length]}</p>
           </div>
         </div>
 
@@ -159,7 +158,7 @@ export function AdventureMap({
 
         <div className="kc-map-bottom">
           <span className="kc-text-muted" style={{ fontSize: 12 }}>
-            使用可追踪的章节进度，不以装饰性地图取代课程状态。
+            沿着小路一关一关闯过去，每完成一关都会点亮一颗星星 ⭐
           </span>
           {nextLesson ? (
             <a
@@ -167,7 +166,7 @@ export function AdventureMap({
               data-testid="adventure-map-next-lesson"
               href={nextLesson.href}
             >
-              进入选中课程 ↗
+              出发闯关 →
             </a>
           ) : null}
         </div>

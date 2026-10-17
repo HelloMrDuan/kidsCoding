@@ -49,8 +49,11 @@ describe('AdventureMap', () => {
     expect(screen.getByText('3 个学习任务')).toBeInTheDocument()
     expect(screen.getByText('CHAPTER 01')).toBeInTheDocument()
 
-    const cover = screen.getByAltText('原创数字地形学习路径视觉')
-    expect(cover).toHaveAttribute('src', '/assets/map-terrain.svg')
+    // UX-106: kid-friendly cartoon world with real illustrated characters.
+    const cover = screen.getByTestId('map-world-scene')
+    expect(cover).toHaveAttribute('role', 'img')
+    expect(cover).toHaveAttribute('aria-label', '第一单元标题 卡通冒险地图')
+    expect(cover.querySelectorAll('[data-character-art]').length).toBeGreaterThan(0)
 
     const steps = screen.getByTestId('adventure-map-steps')
     expect(within(steps).getByTestId('lesson-card-lesson-01')).toBeInTheDocument()
