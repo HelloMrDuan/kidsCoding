@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { showLessonPane } from './lesson-pane-helpers'
+
 const lessonId = 'lesson-12-graduation-show'
 const movement = ['when_start', 'move_right', 'switch_character', 'move_right']
 const repeat = [...movement, 'repeat_twice']
@@ -14,17 +16,21 @@ async function press(page: Page, id: string) {
   else await button.click()
 }
 async function add(page: Page, types: string[]) {
+  await showLessonPane(page, 'code')
   for (const type of types) await press(page, `lesson-add-${type}`)
 }
 async function program(page: Page, types: string[]) {
+  await showLessonPane(page, 'code')
   await press(page, 'lesson-clear-program')
   await add(page, types)
 }
 async function positions(page: Page, fox: number, bear: number) {
+  await showLessonPane(page, 'stage')
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-position', String(fox))
   await expect(page.getByTestId('stage-character-partner')).toHaveAttribute('data-position', String(bear))
 }
 async function run(page: Page, fox = 100, bear = 200) {
+  await showLessonPane(page, 'stage')
   await press(page, 'run-code-button')
   await expect(page.getByTestId('duo-result')).toContainText('运行成功', { timeout: 15000 })
   await positions(page, fox, bear)
@@ -32,11 +38,14 @@ async function run(page: Page, fox = 100, bear = 200) {
 }
 async function next(page: Page, step: number) {
   await press(page, 'lesson-complete-step')
+  await showLessonPane(page, 'task')
   await expect(page.getByTestId('lesson-task-card')).toContainText(`第 ${step} 步`)
 }
 async function opening(page: Page) {
   await page.goto(`/learn/lesson/${lessonId}`)
+  await showLessonPane(page, 'stage')
   await expect(page.getByTestId('lesson-playable-stage')).toBeVisible()
+  await showLessonPane(page, 'code')
   await expect(page.getByTestId('lesson-blockly-workspace').locator('.blocklySvg')).toBeVisible()
   await positions(page, 0, 0)
   await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', 'false')
@@ -51,6 +60,7 @@ async function opening(page: Page) {
 }
 async function debug(page: Page) {
   await program(page, movement)
+  await showLessonPane(page, 'stage')
   await press(page, 'run-code-button')
   await expect(page.getByTestId('duo-result')).toContainText('实际：小狐狸 100 步、小熊 100 步')
   await positions(page, 100, 100)
@@ -74,8 +84,10 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await opening(page)
     await debug(page)
     await press(page, 'lesson-complete-step')
+    await showLessonPane(page, 'task')
     await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 步')
     await add(page, ['repeat_twice'])
+    await showLessonPane(page, 'stage')
     await press(page, 'run-code-button')
     await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-position', '100')
     await press(page, 'reset-code-button')
@@ -87,6 +99,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await next(page, 4)
     await run(page)
     await press(page, 'lesson-complete-step')
+    await showLessonPane(page, 'task')
     await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 步')
     await debug(page)
     for (let i = 0; i < 3; i++) await press(page, 'duo-show-hint')
@@ -101,6 +114,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await expect(page.getByTestId('duo-bear-message')).toHaveText('找到礼物啦！')
     await press(page, 'duo-reflect-together')
     await press(page, 'lesson-complete-step')
+    await showLessonPane(page, 'task')
     await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
     await press(page, 'duo-reflect-own')
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
@@ -115,6 +129,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
       }
     })
     await press(page, 'lesson-complete-step')
+    await showLessonPane(page, 'stage')
     await expect(page.getByTestId('lesson-feedback-card')).toContainText('尚未保存')
     expect((await progress(page)).completedLessonIds ?? []).not.toContain(lessonId)
     await page.evaluate(() => { Storage.prototype.setItem = (window as unknown as { graduationSetItem: typeof Storage.prototype.setItem }).graduationSetItem })
@@ -127,6 +142,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await press(page, 'duo-reflect-own')
     await program(page, movement)
     await expect(page.getByTestId('duo-save-project')).toBeDisabled()
+    await showLessonPane(page, 'stage')
     await press(page, 'run-code-button')
     await expect(page.getByTestId('duo-result')).toContainText('小熊 100 步')
     await add(page, ['repeat_twice'])
@@ -162,11 +178,13 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
 test('repetition never borrows the other actor’s move, and invalid trailing code hides the gift', async ({ page }) => {
   await opening(page)
   await program(page, ['when_start', 'move_right', 'switch_character', 'repeat_twice'])
+  await showLessonPane(page, 'stage')
   await press(page, 'run-code-button')
   await expect(page.getByTestId('duo-result')).toContainText('当前角色的移动')
   await positions(page, 100, 0)
   await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', 'false')
   await program(page, [...repeat, 'switch_character'])
+  await showLessonPane(page, 'stage')
   await press(page, 'run-code-button')
   await expect(page.getByTestId('duo-result')).toContainText('重复切换')
   await positions(page, 100, 200)
