@@ -447,7 +447,7 @@
       "title": "全站冻结V2外壳（左侧导航+顶栏）",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-001",
         "UX-202"
@@ -459,13 +459,22 @@
         "不改动首页（UX-601 另行处理），既有 testid 与可访问名称不回归"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/55",
+        "prNumber": 55,
+        "mergeCommit": "ac1d6b0103669fdaab3d8b1e4f87780647528ec7",
+        "featureHead": "8405721ad63668ab080d25cb198fdc5b65132cd9",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39036102104",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39036102073",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39030994798",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39030994817",
+        "tests": [
+          "新增 features/ui/app-shell.tsx 与 learn/parent/cards/project 路由 layout：222px 深蓝侧栏 + 76px 顶栏，<=1180 图标栏，<=860 顶栏收窄，<=600 汉堡抽屉 + 底部导航；LEARNING/CREATE/FAMILY 分组，当前栏目高亮、面包屑、真实路由链接。首页未改动（UX-601）。",
+          "首轮 PR CI lint 失败（useEffect 内同步 setDrawerOpen）已修复为点击导航关闭抽屉。",
+          "vitest app-shell 3/3；UI + lessons 182/182；1440/768/375 三端截图无横向溢出，经负责人确认后合并。"
+        ],
+        "reviewer": "Owner (HelloMrDuan) approved screenshots and merge in chat, 2026-10-17"
       },
-      "notes": "负责人 2026-10-17 要求全站视觉统一为冻结 V2，单独登记外壳任务；首页属 UX-601，不混入本 PR。页面内部样式（地图、课程体系、作品中心等）后续按各自任务对齐。"
+      "notes": "负责人 2026-10-17 要求全站视觉统一为冻结 V2，单独登记外壳任务；首页属 UX-601，不混入本 PR。页面内部样式（地图、课程体系、作品中心等）后续按各自任务对齐。 完成：PR #55 负责人确认截图后合并（ac1d6b0），main CI 全绿。"
     },
     {
       "id": "UX-101",
