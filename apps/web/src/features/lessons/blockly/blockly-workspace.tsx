@@ -195,57 +195,29 @@ export function BlocklyWorkspace({
   }
 
   return (
-    <section className="space-y-4" data-testid="lesson-blockly-workspace">
-      <div className="rounded-[2rem] border border-white/80 bg-[linear-gradient(180deg,#fff9f2_0%,#ffffff_100%)] px-5 py-4 shadow-[0_18px_36px_rgba(15,23,42,0.06)]">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-[#ff8b4e]">创作积木桌</p>
-            <h3 className="mt-1 text-xl font-black text-slate-950">
-              把积木拼起来，让舞台里的故事发生
-            </h3>
-          </div>
-          <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
-            不会拖也可以点按钮
-          </span>
-        </div>
-        <p className="mt-3 text-sm leading-7 text-slate-600">
-          你可以直接拖动左侧积木，也可以点下面的按钮把当前这节课需要的积木补上。先把故事做出来，再慢慢理解为什么这样拼。
-        </p>
-      </div>
-
-      <div className="rounded-[2rem] border border-slate-200 bg-white px-3 py-3 shadow-[0_18px_36px_rgba(15,23,42,0.06)]">
+    <section className="flex flex-col gap-3" data-testid="lesson-blockly-workspace">
+      <div className="overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white">
         <div
           ref={mountRef}
-          className="relative h-[420px] overflow-hidden rounded-[1.5rem] border border-slate-100 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)]"
+          className="relative h-[420px] overflow-hidden bg-white"
         />
       </div>
 
-      <div className="rounded-[2rem] bg-slate-900 px-5 py-5 text-white shadow-[0_18px_36px_rgba(15,23,42,0.18)]">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-slate-200">本节可用积木</p>
-            <h4 className="mt-1 text-lg font-black text-white">
-              点一下就能把当前需要的积木加上去
-            </h4>
-          </div>
-          <span className="rounded-full bg-white/10 px-3 py-2 text-[11px] font-bold tracking-[0.18em] text-slate-200">
-            BLOCKS
-          </span>
+      <div className="rounded-[8px] border border-[#e8eef8] bg-[#f3f6fc] p-3">
+        <div className="flex items-center justify-between gap-3">
+          <b className="text-[12px]">本节可用积木</b>
+          <span className="kc-text-muted text-[11px]">不会拖也可以点按钮</span>
         </div>
-        <p className="mt-3 text-sm leading-7 text-slate-200">
-          这样能减少分心，让孩子先把当前动作做出来，再往下一步走。
-        </p>
-
-        <div className="mt-4 flex flex-wrap gap-3" data-testid="lesson-block-palette">
+        <div className="mt-2 flex flex-wrap gap-2" data-testid="lesson-block-palette">
           {enableProgramTools && <>
-            <button type="button" data-testid="lesson-remove-last" className="rounded-full bg-amber-100 px-4 py-3 text-sm font-bold text-slate-900" onClick={removeLastBlock}>撤回最后一块</button>
-            <button type="button" data-testid="lesson-clear-program" className="rounded-full bg-amber-100 px-4 py-3 text-sm font-bold text-slate-900"
+            <button type="button" data-testid="lesson-remove-last" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={removeLastBlock}>撤回最后一块</button>
+            <button type="button" data-testid="lesson-clear-program" className="kc-action-surface kc-btn-outline kc-btn-sm"
               onClick={() => { workspaceRef.current?.clear(); onSnapshotChange([]) }}>清空积木重拼</button>
           </>}
           {stableAllowedBlocks.map((type) => (
             <button
               key={type}
-              className="rounded-full bg-white px-4 py-3 text-sm font-bold text-slate-900 transition hover:-translate-y-0.5 hover:bg-[#fff1da]"
+              className="kc-action-surface kc-btn-outline kc-btn-sm"
               data-testid={`lesson-add-${type}`}
               onClick={() => addBlock(type)}
               type="button"
