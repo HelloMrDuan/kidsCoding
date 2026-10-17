@@ -721,7 +721,7 @@
       "title": "学习地图儿童卡通化",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-005",
         "UX-105"
@@ -733,13 +733,22 @@
         "1440/768/375 无横向溢出，减少动效偏好下停止动画"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/56",
+        "prNumber": 56,
+        "mergeCommit": "77a52a649080d9859498de9e7237f9ed1cb4f014",
+        "featureHead": "8e7fad6b8ec40b5df8a2374b5add0f484776bd0e",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39037075751",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39037075778",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39036116248",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39036116238",
+        "tests": [
+          "负责人 2026-10-17：‘地图不够卡通，一定记住这是小孩用的’。地图头图：挥手小狐狸+对话气泡、彩色胶囊标签、立体胶囊 CTA；单元列表吉祥物头像；封面改为按单元的卡通世界（森林/草地/花园/舞台：笑脸太阳、云朵、树、花、蜿蜒小路、终点旗、真实插画角色）；关卡节点 68px 彩色圆形（当前橙色跳动、完成绿色、锁定灰色）+ 黄色虚线小路。",
+          "真实进度/锁定状态、testid、href 不变；减少动效偏好下停止动画；globals.css 圆角走作用域变量以满足 V1 装饰守卫。",
+          "E2E 断言随负责人批准的视觉变更更新：ux-101 封面/节点、ux-103 节点颜色与连线、v2-tokens 头图圆角、adventure-map 单测；本地 ux-101~105 + v2-tokens 全部通过；1440/768/375 无横向溢出，截图经负责人确认后合并。"
+        ],
+        "reviewer": "Owner (HelloMrDuan) approved screenshots and merge in chat, 2026-10-17"
       },
-      "notes": "负责人 2026-10-17：‘地图不够卡通，一定记住这是小孩用的’。外壳保持 V2，内容区儿童卡通化；替换深色数字地形封面为按单元主题的卡通世界（森林/草地/花园/舞台）。"
+      "notes": "负责人 2026-10-17：‘地图不够卡通，一定记住这是小孩用的’。外壳保持 V2，内容区儿童卡通化；替换深色数字地形封面为按单元主题的卡通世界（森林/草地/花园/舞台）。 完成：PR #56 负责人确认截图后合并（77a52a6），main CI 全绿。"
     },
     {
       "id": "UX-201",
