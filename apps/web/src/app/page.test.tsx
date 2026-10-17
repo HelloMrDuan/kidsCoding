@@ -1,31 +1,29 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('next/navigation', () => ({ usePathname: () => '/' }))
 
 import HomePage from './page'
 
-describe('HomePage', () => {
-  it('renders the learning-first homepage narrative', () => {
+describe('HomePage (UX-601 学习中心)', () => {
+  it('renders the frozen V2 learning center inside the V2 shell with real entry points', () => {
     render(<HomePage />)
 
-    // 核心价值主张
-    expect(
-      screen.getByRole('heading', { name: '孩子可以自己做出动画故事' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /今天继续创造点新东西/ })).toBeInTheDocument()
+    expect(screen.getByText(/孩子可以自己做出动画故事/)).toBeInTheDocument()
 
-    // 入口层四大 3D 场景模块均存在
-    expect(screen.getByTestId('story-stage-hero')).toBeInTheDocument()
-    expect(screen.getByTestId('growth-path')).toBeInTheDocument()
-    expect(screen.getByTestId('parent-confidence')).toBeInTheDocument()
-    expect(screen.getByTestId('trial-cta')).toBeInTheDocument()
+    for (const id of ['home-title-row', 'story-stage-hero', 'home-progress', 'growth-path', 'home-works']) {
+      expect(screen.getByTestId(id)).toBeInTheDocument()
+    }
 
-    // 主操作：开始学第一节 → 启蒙入口
-    expect(
-      screen.getByRole('link', { name: '开始学第一节' }),
-    ).toHaveAttribute('href', '/onboarding/age')
+    // Fresh guest: first-screen CTA goes straight into the playable onboarding path.
+    expect(screen.getByRole('link', { name: '开始学第一节' })).toHaveAttribute('href', '/onboarding/age')
+    expect(screen.getByTestId('home-start')).toHaveAttribute('href', '/onboarding/age')
+    expect(screen.getByRole('link', { name: /看看家长如何陪学/ })).toHaveAttribute('href', '/parent/overview')
 
-    // 家长入口
-    expect(
-      screen.getByRole('link', { name: '看看家长如何陪学' }),
-    ).toHaveAttribute('href', '/parent/overview')
+    // Frozen V2 illustrations (hero, tracks, example works), never placeholder shapes.
+    expect(screen.getAllByRole('img', { name: /示例作品/ })).toHaveLength(5)
+    // Real progress numbers (fresh guest).
+    expect(screen.getByRole('img', { name: '已完成 0 / 12 课' })).toBeInTheDocument()
   })
 })

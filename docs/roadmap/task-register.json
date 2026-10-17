@@ -1325,14 +1325,18 @@
       "title": "首页成熟产品级真实体验入口",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
-        "UX-101"
+        "UX-005",
+        "UX-101",
+        "UX-106"
       ],
-      "scope": "app/page.tsx,features/marketing",
+      "scope": "app/page.tsx,features/marketing/home-learning-center.tsx,globals.css,public/v2",
       "acceptance": [
         "原创世界观和年龄分层、真实作品入口",
-        "首屏CTA直达可玩课程"
+        "首屏CTA直达可玩课程",
+        "首页为冻结 V2 学习中心结构并纳入全站外壳",
+        "逐区对齐 V2 原型 #page-home（标题行、深色主卡+插画、进度环+周打卡、三条插画路径卡、作品展示），使用冻结 V2 插画素材；数字来自真实学习数据"
       ],
       "evidence": {
         "pr": null,
@@ -1341,7 +1345,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "负责人 2026-10-17 要求首页与 V2 设计图一致：按 prototype #page-home 逐区实现，素材复制自 docs/design/kidscoding-v2/assets 到 public/v2；首屏 CTA：新用户“开始学第一节”→/onboarding/age，已开始“继续学习”→下一课；作品区标注为示例。"
     },
     {
       "id": "UX-602",
