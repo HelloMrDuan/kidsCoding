@@ -363,61 +363,29 @@ export default function LessonPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#fff7ed_100%)] px-4 py-6 md:px-6 md:py-8">
-      <section className="mx-auto max-w-7xl space-y-6">
-        <header className="kc-surface-3d rounded-[2.5rem] px-6 py-6 md:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800"
-                href="/learn/map"
-              >
-                回到学习地图
-              </Link>
-              {currentUnit ? (
-                <span className="rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
-                  当前单元：{currentUnit.title}
-                </span>
-              ) : null}
-            </div>
-            <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-600 shadow-sm">
+    <main className="min-h-screen bg-[var(--kc-canvas)]">
+      <section className="kc-page-main">
+        <header className="kc-title-row" data-testid="lesson-page-title-row">
+          <div className="min-w-0">
+            <div className="kc-eyebrow">INTERACTIVE CODING LESSON</div>
+            <h1>编程课堂 · {currentLesson.title}</h1>
+            <p className="kc-subtitle">
+              {currentUnit ? `当前单元：${currentUnit.title} · ` : ''}
               {currentLesson.phase === 'trial' ? '启蒙主线' : '高阶创作'}
-            </span>
+            </p>
           </div>
-
-          <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-end">
-            <div>
-              <h1 className="text-3xl font-black tracking-tight text-slate-950 md:text-[3.2rem]">
-                {currentLesson.title}
-              </h1>
-              <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600 md:text-lg md:leading-8">
-                先完成当前这一步，再看看舞台里的角色会发生什么变化。每一步都在把故事往前推进。
-              </p>
-            </div>
-            <div
-              className="kc-panel-3d grid gap-3 rounded-[1.75rem] px-5 py-4 text-sm leading-7 text-slate-600"
-              data-testid="lesson-entry-summary"
-            >
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
-                  当前任务
-                </p>
-                <p className="mt-2 text-base font-bold text-slate-900">{step.title}</p>
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
-                  做完这节会得到
-                </p>
-                <p className="mt-2 text-base font-bold text-slate-900">
-                  {completionPreview}
-                </p>
-              </div>
-            </div>
-          </div>
+          <Link
+            className="kc-action-surface kc-btn-outline kc-btn-sm shrink-0"
+            href="/learn/map"
+          >
+            <span aria-hidden="true">↖</span>
+            回到学习地图
+          </Link>
         </header>
 
         <GuidedLessonShell
           cloudSyncState={cloudSyncState}
+          completionPreview={completionPreview}
           codeSlot={
             currentLesson.mode === 'template' ? (
               <TemplateStoryBuilder

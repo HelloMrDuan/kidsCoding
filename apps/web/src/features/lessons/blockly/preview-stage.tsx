@@ -1,4 +1,5 @@
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
+import { CharacterArt } from '@/features/lessons/playable-stage/character-art'
 
 const CHARACTER_LABELS: Record<string, string> = {
   fox: '小狐狸',
@@ -162,10 +163,11 @@ export function PreviewStage({
 
             <div className="relative flex flex-wrap items-end gap-4">
               <div
-                className="flex h-24 w-24 items-center justify-center rounded-full bg-orange-400 text-sm font-black text-white shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-300"
+                className="kc-stage-actor"
                 style={{ transform: `translateX(${primaryOffset}px)` }}
               >
-                {mainLabel}
+                <CharacterArt id={template?.starterCharacters[0]} className="kc-stage-actor-art" />
+                <span className="kc-stage-nametag">{mainLabel}</span>
               </div>
 
               {secondLabel ? (
@@ -176,9 +178,8 @@ export function PreviewStage({
                       : 'opacity-70'
                   }`}
                 >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400 text-xs font-black text-white shadow-[0_16px_30px_rgba(52,211,153,0.22)]">
-                    {secondLabel}
-                  </div>
+                  <CharacterArt id={template?.starterCharacters[1]} className="kc-stage-actor-art kc-stage-actor-art-sm" />
+                  <span className="kc-stage-nametag">{secondLabel}</span>
                   <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] font-bold text-emerald-700">
                     {hasSecondStart ? '第二位朋友' : '舞台伙伴'}
                   </span>

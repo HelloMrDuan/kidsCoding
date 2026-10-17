@@ -33,6 +33,8 @@ export type LessonPane = 'task' | 'code' | 'stage'
 type GuidedLessonShellProps = {
   lessonTitle: string
   lessonGoal: string
+  /** Real "what this lesson builds" copy, shown in the task objective. */
+  completionPreview?: string
   isLocked: boolean
   stepTitle?: string
   instruction?: string
@@ -83,6 +85,7 @@ const PANE_TABS: Array<{ id: LessonPane; label: string }> = [
 export function GuidedLessonShell({
   lessonTitle,
   lessonGoal,
+  completionPreview,
   isLocked,
   stepTitle,
   instruction,
@@ -144,39 +147,26 @@ export function GuidedLessonShell({
   const showCloudChip = cloudSyncState !== 'idle'
   const localChipClass =
     localSaveState === 'failed'
-      ? 'bg-[#fff5e9] text-[#ab711e]'
+      ? 'kc-chip-warning'
       : localSaveState === 'saved'
-        ? 'bg-[#e8f8f2] text-[#168260]'
-        : 'bg-[#eef2f6] text-[#718097]'
+        ? 'kc-chip-success'
+        : 'kc-chip-neutral'
   const cloudChipClass =
     cloudSyncState === 'failed'
-      ? 'bg-[#fff5e9] text-[#ab711e]'
+      ? 'kc-chip-warning'
       : cloudSyncState === 'synced'
-        ? 'bg-[#e8f8f2] text-[#168260]'
-        : 'bg-[#eef8ff] text-sky-700'
+        ? 'kc-chip-success'
+        : 'kc-chip-info'
 
   const feedbackNode = feedback ? (
     <div
-      className="overflow-hidden rounded-[2rem] border border-[#dbeef8] bg-[linear-gradient(180deg,#f3fbff_0%,#ffffff_100%)] shadow-[0_18px_36px_rgba(56,189,248,0.12)]"
+      className="kc-feedback kc-feedback-success"
       data-testid="lesson-feedback-card"
     >
-      <div className="flex items-center justify-between gap-3 px-5 pt-5">
-        <p className="text-sm font-semibold text-sky-700">刚完成的小结果</p>
-        <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
-          马上看到变化
-        </span>
-      </div>
-      <div
-        className="mx-4 mb-4 mt-4 rounded-[1.75rem] bg-[linear-gradient(180deg,#d9f1ff_0%,#ffffff_100%)] px-4 py-4"
-        data-testid="lesson-feedback-preview"
-      >
-        <div className="flex items-end gap-3 rounded-[1.5rem] bg-white/75 px-4 py-4">
-          <div className="h-8 w-8 rounded-full bg-amber-300 shadow-[0_10px_20px_rgba(252,211,77,0.18)]" />
-          <div className="h-16 w-16 rounded-full bg-orange-400 shadow-[0_14px_28px_rgba(251,146,60,0.24)]" />
-          <div className="h-10 w-10 rounded-full bg-emerald-300/80 shadow-[0_10px_20px_rgba(16,185,129,0.14)]" />
-        </div>
-        <p className="mt-3 text-sm font-semibold leading-7 text-slate-700">{feedback}</p>
-      </div>
+      <p className="kc-feedback-title">刚完成的小结果</p>
+      <p className="mt-1" data-testid="lesson-feedback-preview">
+        {feedback}
+      </p>
     </div>
   ) : null
 
@@ -188,73 +178,11 @@ export function GuidedLessonShell({
     // (ux-102/103/104/105/201, trial-lock-purchase) for "classroom shell
     // is visible"; it stays on the shell root so those specs keep passing.
     <section className="space-y-4" data-testid="lesson-workbench-shell">
-      <div
-        className="kc-surface-3d flex flex-wrap items-center justify-between gap-3 rounded-[1.75rem] px-5 py-4"
-        data-testid="lesson-progress-strip"
-      >
-        <div className="flex flex-wrap items-center gap-3">
-          {showProgress ? (
-            <>
-              <span className="text-sm font-bold text-slate-900">
-                步骤 {stepIndex + 1} / {stepCount}
-              </span>
-              <div
-                aria-label={`课堂进度：第 ${stepIndex + 1} 步，共 ${stepCount} 步`}
-                aria-valuemax={100}
-                aria-valuemin={0}
-                aria-valuenow={Math.round(progressPercent)}
-                className="h-[5px] w-[130px] overflow-hidden rounded-[8px] bg-[#e7eef9]"
-                data-testid="lesson-progress-bar"
-                role="progressbar"
-              >
-                <i
-                  className="block h-full bg-[#2463eb]"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-            </>
-          ) : null}
-          {resumedFromStep !== null && resumedFromStep !== undefined ? (
-            <span
-              className="text-xs font-semibold text-slate-500"
-              data-testid="lesson-resume-note"
-            >
-              已回到上次进度：第 {resumedFromStep + 1} 步
-            </span>
-          ) : null}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={`rounded-[5px] px-[9px] py-1 text-[11px] font-bold ${localChipClass}`}
-            data-testid="lesson-save-local"
-          >
-            {LOCAL_SAVE_COPY[localSaveState]}
-          </span>
-          {showCloudChip ? (
-            <span
-              className={`rounded-[5px] px-[9px] py-1 text-[11px] font-bold ${cloudChipClass}`}
-              data-testid="lesson-save-cloud"
-            >
-              {CLOUD_SYNC_COPY[cloudSyncState]}
-            </span>
-          ) : null}
-          {localSaveState === 'failed' && onRetryLocalSave ? (
-            <button
-              className="rounded-full border border-[#f1e2b0] bg-white px-4 py-1.5 text-xs font-bold text-[#ab711e] transition hover:bg-[#fff9e8]"
-              data-testid="lesson-save-retry"
-              onClick={onRetryLocalSave}
-              type="button"
-            >
-              重试保存
-            </button>
-          ) : null}
-        </div>
-      </div>
-
       {cloudSyncState === 'failed' ? (
         <div
-          className="rounded-[1.5rem] border border-[#f1e2b0] bg-[#fff9e8] px-5 py-4 text-sm leading-7 text-[#6c5a20]"
+          className="kc-hint mt-0"
           data-testid="lesson-cloud-failure"
+          role="alert"
         >
           <p className="font-bold">云端同步失败，进度已保存到本机，还没同步到云端。</p>
           <p className="mt-1">
@@ -263,7 +191,7 @@ export function GuidedLessonShell({
           <div className="mt-3 flex flex-wrap gap-2">
             {onRetryCloudSync ? (
               <button
-                className="rounded-full bg-[#2463eb] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#1d54cb]"
+                className="kc-action-surface kc-btn-sm"
                 data-testid="lesson-cloud-retry"
                 onClick={onRetryCloudSync}
                 type="button"
@@ -273,7 +201,7 @@ export function GuidedLessonShell({
             ) : null}
             {onContinueLocalOnly ? (
               <button
-                className="rounded-full border border-[#f1e2b0] bg-white px-4 py-2 text-xs font-bold text-[#6c5a20] transition hover:bg-white/70"
+                className="kc-action-surface kc-btn-outline kc-btn-sm"
                 data-testid="lesson-cloud-continue-local"
                 onClick={onContinueLocalOnly}
                 type="button"
@@ -286,6 +214,67 @@ export function GuidedLessonShell({
       ) : null}
 
       <section className="kc-lesson-shell" data-testid="lesson-shell">
+        <div className="kc-lesson-header" data-testid="lesson-progress-strip">
+          <div className="min-w-0">
+            <h2>{lessonTitle}</h2>
+            {stepTitle ? (
+              <span className="kc-subtitle">当前任务：{stepTitle}</span>
+            ) : null}
+          </div>
+          <div className="kc-lesson-headright flex-wrap">
+            {showProgress ? (
+              <>
+                <span>
+                  步骤 {stepIndex + 1} / {stepCount}
+                </span>
+                <div
+                  aria-label={`课堂进度：第 ${stepIndex + 1} 步，共 ${stepCount} 步`}
+                  aria-valuemax={100}
+                  aria-valuemin={0}
+                  aria-valuenow={Math.round(progressPercent)}
+                  className="kc-lesson-progress"
+                  data-testid="lesson-progress-bar"
+                  role="progressbar"
+                >
+                  <i style={{ width: `${progressPercent}%` }} />
+                </div>
+              </>
+            ) : null}
+            {resumedFromStep !== null && resumedFromStep !== undefined ? (
+              <span
+                className="kc-text-muted"
+                data-testid="lesson-resume-note"
+              >
+                已回到上次进度：第 {resumedFromStep + 1} 步
+              </span>
+            ) : null}
+            <span
+              className={`kc-chip ${localChipClass}`}
+              data-testid="lesson-save-local"
+            >
+              {LOCAL_SAVE_COPY[localSaveState]}
+            </span>
+            {showCloudChip ? (
+              <span
+                className={`kc-chip ${cloudChipClass}`}
+                data-testid="lesson-save-cloud"
+              >
+                {CLOUD_SYNC_COPY[cloudSyncState]}
+              </span>
+            ) : null}
+            {localSaveState === 'failed' && onRetryLocalSave ? (
+              <button
+                className="kc-action-surface kc-btn-outline kc-btn-sm"
+                data-testid="lesson-save-retry"
+                onClick={onRetryLocalSave}
+                type="button"
+              >
+                重试保存
+              </button>
+            ) : null}
+          </div>
+        </div>
+
         <div
           aria-label="课堂分区"
           className="kc-mobile-tabs"
@@ -318,60 +307,43 @@ export function GuidedLessonShell({
             <div className="kc-pane-h" data-testid="lesson-task-pane-h" id="lesson-task-pane-h">
               <span>学习任务</span>
               {showProgress ? (
-                <span className="rounded-[5px] bg-[#eef8ff] px-2 py-1 text-[11px] font-bold text-sky-700">
+                <span className="kc-chip kc-chip-info">
                   STEP {String(stepIndex + 1).padStart(2, '0')}
                 </span>
               ) : null}
             </div>
-            <div className="kc-task-content space-y-5">
-              <div className="kc-panel-3d space-y-3 rounded-[2rem] px-5 py-5">
-                <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
-                  今天的小任务
-                </p>
-                <h1 className="text-[2rem] font-black tracking-tight text-slate-950">
-                  {lessonTitle}
-                </h1>
-                <p className="rounded-[1.5rem] bg-white/90 px-4 py-4 text-sm leading-7 text-slate-600">
-                  这节课要做到：{lessonGoal}
-                </p>
+            <div className="kc-task-content">
+              <div data-testid="lesson-task-card">
+                <span className="kc-task-mark">今天的小任务</span>
+                {stepTitle ? <h3>{stepTitle}</h3> : <h3>{lessonTitle}</h3>}
+                {instruction ? <p>{instruction}</p> : null}
+                {voiceover ? <p>主语音：{voiceover}</p> : null}
               </div>
 
-              {stepTitle ? (
-                <div
-                  className="rounded-[2rem] bg-[linear-gradient(180deg,#fff8eb_0%,#ffffff_100%)] p-5 shadow-[0_18px_36px_rgba(255,173,92,0.16)]"
-                  data-testid="lesson-task-card"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-amber-700">当前任务</p>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-amber-700 shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
-                      一步一步来
-                    </span>
-                  </div>
-                  <h2 className="mt-3 text-[1.75rem] font-black leading-tight text-slate-950">
-                    {stepTitle}
-                  </h2>
-                  <p className="mt-3 text-base leading-8 text-slate-700">{instruction}</p>
-                  {voiceover ? (
-                    <p className="mt-4 rounded-[1.5rem] bg-white px-4 py-3 text-sm font-semibold leading-7 text-slate-700 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
-                      主语音：{voiceover}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
+              <div className="kc-objective">
+                <b>完成目标</b>
+                <div>{lessonGoal}</div>
+                {completionPreview ? (
+                  <>
+                    <b className="mt-3">做完这节会得到</b>
+                    <div>{completionPreview}</div>
+                  </>
+                ) : null}
+              </div>
 
               {hintCopy ? (
-                <div className="rounded-[1.75rem] bg-[#f7f2ff] px-4 py-4 text-sm font-semibold leading-7 text-[#6b46ff] shadow-[0_14px_30px_rgba(107,70,255,0.08)]">
-                  卡住时提示：{hintCopy}
-                </div>
+                <div className="kc-hint">卡住时提示：{hintCopy}</div>
               ) : null}
 
               {hintCopy && (remedialLessonId || remedialMicroScript) ? (
-                <RemedialLinkCard
-                  copy={hintCopy}
-                  onStartRemedial={onStartRemedial}
-                  remedialLessonId={remedialLessonId}
-                  remedialMicroScript={remedialMicroScript}
-                />
+                <div className="mt-3">
+                  <RemedialLinkCard
+                    copy={hintCopy}
+                    onStartRemedial={onStartRemedial}
+                    remedialLessonId={remedialLessonId}
+                    remedialMicroScript={remedialMicroScript}
+                  />
+                </div>
               ) : null}
             </div>
           </section>
@@ -385,12 +357,10 @@ export function GuidedLessonShell({
           >
             <div className="kc-pane-h" data-testid="lesson-code-pane-h" id="lesson-code-pane-h">
               <span>编程工作区</span>
-              <span className="rounded-[5px] bg-[#eef8ff] px-2 py-1 text-[11px] font-bold text-sky-700">
-                BLOCKLY
-              </span>
+              <span className="kc-chip kc-chip-info">BLOCKLY</span>
             </div>
-            <div className="p-3">{codeSlot}</div>
-            {stageSlot ? null : feedbackNode}
+            <div className="flex-1 p-3">{codeSlot}</div>
+            {stageSlot ? null : <div className="kc-stage-panel">{feedbackNode}</div>}
           </section>
 
           {stageSlot ? (
@@ -403,27 +373,24 @@ export function GuidedLessonShell({
             >
               <div className="kc-pane-h" data-testid="lesson-stage-pane-h" id="lesson-stage-pane-h">
                 <span>实时舞台</span>
-                <span className="rounded-[5px] bg-[#e8f8f2] px-2 py-1 text-[11px] font-bold text-[#168260]">
-                  PREVIEW
-                </span>
+                <span className="kc-chip kc-chip-success">PREVIEW</span>
               </div>
-              <div className="space-y-4 p-3">
-                {stageSlot}
-                {feedbackNode}
-              </div>
+              {stageSlot}
+              {feedbackNode ? <div className="kc-stage-panel pt-0">{feedbackNode}</div> : null}
             </section>
           ) : null}
         </div>
 
         <div className="kc-lesson-footer" data-testid="lesson-footer">
           <button
-            className="rounded-full bg-[#ff8b4e] px-5 py-3.5 font-bold text-white shadow-[0_18px_32px_rgba(255,139,78,0.3)] transition hover:bg-[#ff7b38] disabled:cursor-not-allowed disabled:opacity-60"
+            className="kc-action-surface disabled:cursor-not-allowed disabled:opacity-60"
             data-testid="lesson-complete-step"
             disabled={isCompleting}
             onClick={onCompleteStep}
             type="button"
           >
             {isCompleting ? '正在完成…' : '完成这一步'}
+            {isCompleting ? null : <span aria-hidden="true">↗</span>}
           </button>
         </div>
       </section>

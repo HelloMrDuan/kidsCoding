@@ -10,6 +10,49 @@ export const kidsBlockLabels: Record<string, string> = {
   repeat_twice: '再做一次',
 }
 
+const ICONS: Record<string, string> = {
+  flag: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M6%203v18%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M7%204h11l-3%204%203%204H7z%22%20fill%3D%22%234cd964%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.6%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E',
+  hand: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M9%2012V5a1.6%201.6%200%200%201%203.2%200v5.5V4a1.6%201.6%200%200%201%203.2%200v7V6a1.6%201.6%200%200%201%203.2%200v8c0%204-2.6%207-6.6%207-2.6%200-4.2-1.3-5.6-3.4L4%2014.2a1.5%201.5%200%200%201%202.4-1.8z%22%20fill%3D%22%23fff%22/%3E%3C/svg%3E',
+  arrow: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%209.5h10V5l8%207-8%207v-4.5H3z%22%20fill%3D%22%23fff%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E',
+  bubble: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4%205h16a1%201%200%200%201%201%201v9a1%201%200%200%201-1%201h-9l-5%204v-4H4a1%201%200%200%201-1-1V6a1%201%200%200%201%201-1z%22%20fill%3D%22%23fff%22/%3E%3Ccircle%20cx%3D%228.5%22%20cy%3D%2210.5%22%20r%3D%221.4%22%20fill%3D%22%233fbf6a%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2210.5%22%20r%3D%221.4%22%20fill%3D%22%233fbf6a%22/%3E%3Ccircle%20cx%3D%2215.5%22%20cy%3D%2210.5%22%20r%3D%221.4%22%20fill%3D%22%233fbf6a%22/%3E%3C/svg%3E',
+  picture: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20x%3D%223%22%20y%3D%225%22%20width%3D%2218%22%20height%3D%2214%22%20rx%3D%222.5%22%20fill%3D%22%23fff%22/%3E%3Cpath%20d%3D%22M5%2017l5-6%204%204%202-2%203%204z%22%20fill%3D%22%238a63df%22/%3E%3Ccircle%20cx%3D%2216.5%22%20cy%3D%229%22%20r%3D%221.8%22%20fill%3D%22%23ffc94a%22/%3E%3C/svg%3E',
+  swap: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%208h12l-3-3M19%2016H7l3%203%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E',
+  repeat: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%2012a7%207%200%200%201%2012-5l2%202M19%2012a7%207%200%200%201-12%205l-2-2%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M19%204v5h-5M5%2020v-5h5%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E',
+}
+
+/**
+ * Cartoon, child-friendly block theme: Scratch-like chunky "zelos" shapes,
+ * one bright colour per category and a small white icon on every block.
+ * Colours follow the V2 prototype block palette (event amber, motion blue,
+ * looks purple, control orange) plus teal/pink for scene/friend switching.
+ */
+let cartoonTheme: Blockly.Theme | null = null
+
+export function getKidsBlockTheme() {
+  cartoonTheme ??= Blockly.Theme.defineTheme('kidscoding-cartoon', {
+  name: 'kidscoding-cartoon',
+  base: Blockly.Themes.Classic,
+  blockStyles: {
+    kc_event: { colourPrimary: '#ffab19', colourSecondary: '#ffc861', colourTertiary: '#cf8b17', hat: 'cap' },
+    kc_event_click: { colourPrimary: '#ff8c1a', colourSecondary: '#ffb366', colourTertiary: '#d9700f', hat: 'cap' },
+    kc_motion: { colourPrimary: '#4c97ff', colourSecondary: '#7db5ff', colourTertiary: '#3373cc' },
+    kc_looks: { colourPrimary: '#3fbf6a', colourSecondary: '#74d494', colourTertiary: '#2b9a51' },
+    kc_scene: { colourPrimary: '#9966ff', colourSecondary: '#b994ff', colourTertiary: '#774dcb' },
+    kc_friend: { colourPrimary: '#ff6680', colourSecondary: '#ff94a6', colourTertiary: '#d94a63' },
+    kc_control: { colourPrimary: '#0fbdbd', colourSecondary: '#5cd6d6', colourTertiary: '#0b9696' },
+  },
+  componentStyles: {
+    workspaceBackgroundColour: '#ffffff',
+    flyoutBackgroundColour: '#f4f8ff',
+    flyoutOpacity: 1,
+    scrollbarColour: '#c9d6ea',
+    scrollbarOpacity: 0.8,
+  },
+  fontStyle: { family: '"PingFang SC","Microsoft YaHei",sans-serif', weight: '700', size: 13 },
+  })
+  return cartoonTheme
+}
+
 let isRegistered = false
 
 export function registerKidsBlocks() {
@@ -20,50 +63,57 @@ export function registerKidsBlocks() {
   Blockly.defineBlocksWithJsonArray([
     {
       type: 'when_start',
-      message0: kidsBlockLabels.when_start,
+      message0: '%1 ' + kidsBlockLabels.when_start,
+      args0: [{ type: 'field_image', src: ICONS.flag, width: 22, height: 22, alt: '' }],
       nextStatement: null,
-      colour: 35,
+      style: 'kc_event',
     },
     {
       type: 'when_clicked',
-      message0: kidsBlockLabels.when_clicked,
+      message0: '%1 ' + kidsBlockLabels.when_clicked,
+      args0: [{ type: 'field_image', src: ICONS.hand, width: 22, height: 22, alt: '' }],
       nextStatement: null,
-      colour: 20,
+      style: 'kc_event_click',
     },
     {
       type: 'move_right',
-      message0: kidsBlockLabels.move_right,
+      message0: '%1 ' + kidsBlockLabels.move_right,
+      args0: [{ type: 'field_image', src: ICONS.arrow, width: 22, height: 22, alt: '' }],
       previousStatement: null,
       nextStatement: null,
-      colour: 210,
+      style: 'kc_motion',
     },
     {
       type: 'say_line',
-      message0: kidsBlockLabels.say_line,
+      message0: '%1 ' + kidsBlockLabels.say_line,
+      args0: [{ type: 'field_image', src: ICONS.bubble, width: 22, height: 22, alt: '' }],
       previousStatement: null,
       nextStatement: null,
-      colour: 120,
+      style: 'kc_looks',
     },
     {
       type: 'switch_scene',
-      message0: kidsBlockLabels.switch_scene,
+      message0: '%1 ' + kidsBlockLabels.switch_scene,
+      args0: [{ type: 'field_image', src: ICONS.picture, width: 22, height: 22, alt: '' }],
       previousStatement: null,
       nextStatement: null,
-      colour: 270,
+      style: 'kc_scene',
     },
     {
       type: 'switch_character',
-      message0: kidsBlockLabels.switch_character,
+      message0: '%1 ' + kidsBlockLabels.switch_character,
+      args0: [{ type: 'field_image', src: ICONS.swap, width: 22, height: 22, alt: '' }],
       previousStatement: null,
       nextStatement: null,
-      colour: 300,
+      style: 'kc_friend',
     },
     {
       type: 'repeat_twice',
-      message0: kidsBlockLabels.repeat_twice,
+      message0: '%1 ' + kidsBlockLabels.repeat_twice,
+      args0: [{ type: 'field_image', src: ICONS.repeat, width: 22, height: 22, alt: '' }],
       previousStatement: null,
       nextStatement: null,
-      colour: 160,
+      style: 'kc_control',
     },
   ])
 
