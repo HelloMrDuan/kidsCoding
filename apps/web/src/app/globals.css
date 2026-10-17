@@ -583,10 +583,23 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-stage-actors { position: absolute; z-index: 2; left: 8%; right: 6%; bottom: 30px; display: flex; align-items: flex-end; gap: 28px; }
 .kc-stage-actor { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; background: transparent; border: 0; padding: 0; color: inherit; transition: transform .5s ease-in-out; }
 .kc-stage-actor:disabled { cursor: default; }
-.kc-stage-actor-art { display: block; width: 82px; height: 82px; filter: drop-shadow(0 8px 4px #18442624); }
-.kc-stage-actor-friend .kc-stage-actor-art { width: 64px; height: 64px; }
+.kc-stage-actor-art { display: block; width: 92px; height: 101px; filter: drop-shadow(0 8px 4px #18442624); }
+.kc-stage-actor-friend .kc-stage-actor-art { width: 74px; height: 81px; }
 .kc-stage-actor-friend { margin-left: auto; }
 .kc-stage-nametag { font-size: 11px; font-weight: 750; color: #27405e; background: #ffffffd9; border-radius: 5px; padding: 2px 8px; white-space: nowrap; }
 .kc-stage-speech { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-30%); white-space: nowrap; background: #fff; color: #18243a; font-size: 12px; font-weight: 700; padding: 8px 11px; border-radius: 9px; box-shadow: 0 9px 20px #18442623; }
 @media (max-width: 600px) { .kc-stage-scene { height: 340px; } }
-.kc-stage-actor-art-sm { width: 64px; height: 64px; }
+.kc-stage-actor-art-sm { width: 74px; height: 81px; }
+
+/* Cartoon block chips (tap-to-add): same colours as the Blockly cartoon theme */
+.kc-block-chip { --c: #4c97ff; --d: #3373cc; border: 0; border-radius: 10px; padding: 9px 14px 11px; background: var(--c); color: #fff; font-weight: 800; font-size: 13px; box-shadow: 0 3px 0 var(--d); transition: transform .12s, box-shadow .12s; }
+.kc-block-chip:hover { transform: translateY(-1px); box-shadow: 0 4px 0 var(--d); }
+.kc-block-chip:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--d); }
+.kc-block-chip:disabled { opacity: .55; }
+.kc-block-chip[data-block="when_start"] { --c: #ffab19; --d: #cf8b17; }
+.kc-block-chip[data-block="when_clicked"] { --c: #ff8c1a; --d: #d9700f; }
+.kc-block-chip[data-block="move_right"] { --c: #4c97ff; --d: #3373cc; }
+.kc-block-chip[data-block="say_line"] { --c: #3fbf6a; --d: #2b9a51; }
+.kc-block-chip[data-block="switch_scene"] { --c: #9966ff; --d: #774dcb; }
+.kc-block-chip[data-block="switch_character"] { --c: #ff6680; --d: #d94a63; }
+.kc-block-chip[data-block="repeat_twice"] { --c: #0fbdbd; --d: #0b9696; }

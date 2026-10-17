@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import * as Blockly from 'blockly'
 
-import { getKidsBlockLabel, registerKidsBlocks } from './register-kids-blocks'
+import { getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
 import { restoreBlockSequence } from './restore-block-sequence'
 
 type BlockSnapshot = {
@@ -90,6 +90,9 @@ export function BlocklyWorkspace({
     }
 
     const workspace = Blockly.inject(mountRef.current, {
+      renderer: 'zelos',
+      theme: getKidsBlockTheme(),
+      grid: { spacing: 18, length: 2, colour: '#dbe4f1', snap: false },
       toolbox: {
         kind: 'flyoutToolbox',
         contents: stableAllowedBlocks.map((type) => ({ kind: 'block', type })),
@@ -217,7 +220,8 @@ export function BlocklyWorkspace({
           {stableAllowedBlocks.map((type) => (
             <button
               key={type}
-              className="kc-action-surface kc-btn-outline kc-btn-sm"
+              className="kc-block-chip"
+              data-block={type}
               data-testid={`lesson-add-${type}`}
               onClick={() => addBlock(type)}
               type="button"
