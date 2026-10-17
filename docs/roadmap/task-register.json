@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-15",
+  "updatedAt": "2026-10-17",
   "policy": "11-TASK-EXECUTION-POLICY.md",
   "tasks": [
     {
@@ -737,7 +737,7 @@
       "title": "课堂任务舞台积木三域布局",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-201"
       ],
@@ -747,13 +747,27 @@
         "原1至9课真执行不回归"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/53",
+        "prNumber": 53,
+        "earlierPr": "https://github.com/HelloMrDuan/kidsCoding/pull/52",
+        "mergeCommit": "698a3c8ea144f710b822697190f73fab140cb5f6",
+        "featureHead": "4ab45128689aec7c7bdd08ba43511ca9bcd917e1",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39027595967",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39027595976",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39026358203",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39026358201",
+        "tests": [
+          "PR #52 (merged 2026-10-17 at 9da5b99) shipped the first three-zone layout; PR #53 is the owner-requested frozen-V2 visual alignment follow-up under the same Task-ID.",
+          "V2 alignment: compact title row instead of hero card; step progress / current task / save state moved into the in-classroom lesson bar; flat task column using completionPreview; stage run (blue) / reset (outline) at the bottom; Blockly intro card removed. Existing testids, accessible names and <=600px save/retry controls preserved.",
+          "Owner principles (VISUAL-LOCK.md): whole-site V2 consistency; no placeholder characters. Stage now uses illustrated chibi SVG characters (fox, rabbit, bird, butterfly, frog, bear) on forest/meadow/garden SVG scenes in PlayableStage and PreviewStage; no plain-circle stand-ins remain.",
+          "Owner request (cartoon, child-friendly blocks): Blockly uses the zelos renderer with a kidscoding-cartoon theme (one bright colour per category + white SVG icon per block, dotted grid); tap-to-add buttons are matching coloured block chips. Accessible names unchanged.",
+          "Unit: vitest src/features/lessons 13 files, 124/124 passed. tsc clean on changed files.",
+          "Screenshots 1440x900, 768x1024, 375x812 (local Playwright Chromium) plus character and block sheets reviewed and approved by the owner on 2026-10-17 before merge.",
+          "PR CI and main CI: mandatory task accountability + curriculum content checks success."
+        ],
+        "reviewer": "Owner (HelloMrDuan) approved screenshots and merge in chat, 2026-10-17"
       },
-      "notes": "已领取（UX-201 completed）。按冻结 V2 原型实施课堂三域布局：任务/积木/舞台三栏 + 1180/860/600 响应式 + 手机三标签切换；保留 UX-201 恢复/保存/同步功能；1-9 课真 Blockly 不回归。 PR #52 已合并（三域布局首版）；跟进 PR 做冻结 V2 视觉对齐：紧凑标题行、课时条内进度/保存状态、扁平任务栏、舞台底部运行/重置、移除 Blockly 介绍卡。"
+      "notes": "已领取（UX-201 completed）。按冻结 V2 原型实施课堂三域布局：任务/积木/舞台三栏 + 1180/860/600 响应式 + 手机三标签切换；保留 UX-201 恢复/保存/同步功能；1-9 课真 Blockly 不回归。 PR #52 已合并（三域布局首版）；跟进 PR 做冻结 V2 视觉对齐：紧凑标题行、课时条内进度/保存状态、扁平任务栏、舞台底部运行/重置、移除 Blockly 介绍卡。 完成：PR #53 冻结 V2 对齐 + 真实卡通角色插画 + 卡通彩色积木，负责人确认截图后合并（698a3c8），main CI 全绿。遗留：首页/全站外壳不在本任务范围，另行登记。"
     },
     {
       "id": "UX-203",
