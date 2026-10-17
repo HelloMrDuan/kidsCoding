@@ -143,7 +143,7 @@ function ListView({ groupParam, pageParam }: { groupParam?: string; pageParam?: 
                 {cover.emoji ? <span className="kc-v2c-cover-emoji" aria-hidden="true">{cover.emoji}</span> : null}
                 <b>{t.title}</b>
               </div>
-              <div className="kc-v2c-body">
+              <div className="kc-v2c-body" data-title={t.title}>
                 <span className={`kc-v2c-chip kc-v2c-chip-${status.tone}`}>{status.label}</span>
                 <p>
                   {engineLabels[t.engine] ?? t.engine} · {t.ageRange} 岁 · {t.units.length} 单元
@@ -237,7 +237,7 @@ function RouteView({ track, unitParam }: { track: CatalogTrack; unitParam?: stri
                   <small>第 {unitIndex * 6 + lessonIndex + 1} 课 · {lesson.phase}</small>
                   <h3>{lesson.title}</h3>
                   <p>{lesson.learningOutcome}</p>
-                  <span className={`kc-v2c-chip kc-v2c-chip-${ls.tone}`}>{ls.label}</span>
+                  <span className={`kc-v2c-chip kc-v2c-chip-${ls.tone}`}>{ls.label.replace(' · ', '·')}</span>
                 </Link>
               )
             })}
