@@ -665,47 +665,48 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 /* ============ UX-106 kid-friendly cartoon learning map (owner request, 2026-10-17) ============ */
-.kc-map-hero { position: relative; display: grid; grid-template-columns: 150px minmax(0, 1fr) 300px; gap: 22px; align-items: center; padding: 24px 26px; border-radius: 24px; background: linear-gradient(120deg, #fff7e0 0%, #e9f6ff 55%, #f1ecff 100%); border: 2px solid #ffffff; box-shadow: 0 10px 0 #dbe8fb, 0 18px 40px rgba(60, 110, 190, .12); overflow: hidden; }
+.kc-map-page, .kc-map-kids { --kc-kid-r8: 8px; --kc-kid-r14: 14px; --kc-kid-r16: 16px; --kc-kid-r18: 18px; --kc-kid-r20: 20px; --kc-kid-r22: 22px; --kc-kid-r24: 24px; --kc-kid-r999: 999px; }
+.kc-map-hero { position: relative; display: grid; grid-template-columns: 150px minmax(0, 1fr) 300px; gap: 22px; align-items: center; padding: 24px 26px; border-radius: var(--kc-kid-r24); background: linear-gradient(120deg, #fff7e0 0%, #e9f6ff 55%, #f1ecff 100%); border: 2px solid #ffffff; box-shadow: 0 10px 0 #dbe8fb, 0 18px 40px rgba(60, 110, 190, .12); overflow: hidden; }
 .kc-map-hero::before { content: ''; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: #ffe58a55; }
 .kc-map-hero-art { position: relative; display: grid; justify-items: center; padding-top: 34px; }
 .kc-map-hero-fox { width: 130px; height: 143px; animation: kc-bob 2.6s ease-in-out infinite; filter: drop-shadow(0 8px 6px #b4733a30); }
-.kc-map-hero-bubble { position: absolute; top: 0; left: 50%; transform: translateX(-50%); white-space: nowrap; background: #fff; border-radius: 14px; padding: 6px 11px; font-size: 13px; font-weight: 800; color: #ff7a3d; box-shadow: 0 4px 0 #ffd9c2; }
+.kc-map-hero-bubble { position: absolute; top: 0; left: 50%; transform: translateX(-50%); white-space: nowrap; background: #fff; border-radius: var(--kc-kid-r14); padding: 6px 11px; font-size: 13px; font-weight: 800; color: #ff7a3d; box-shadow: 0 4px 0 #ffd9c2; }
 .kc-map-hero-text { position: relative; min-width: 0; }
 .kc-map-hero-text h1 { font-size: 34px; font-weight: 900; letter-spacing: -0.5px; color: #24324d; margin: 12px 0 6px; }
 .kc-map-hero-text > p { font-size: 15px; line-height: 1.75; color: #56658a; max-width: 520px; }
 .kc-map-hero-chips, .kc-map-hero-meta { display: flex; flex-wrap: wrap; gap: 9px; }
 .kc-map-hero-meta { margin-top: 14px; }
-.kc-kid-chip { border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 800; }
+.kc-kid-chip { border-radius: var(--kc-kid-r999); padding: 6px 13px; font-size: 13px; font-weight: 800; }
 .kc-kid-chip-sky { background: #d9efff; color: #1d6fc9; }
 .kc-kid-chip-sun { background: #fff0c2; color: #b26a00; }
-.kc-kid-stars { border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 800; background: #fff; color: #3a4a6b; box-shadow: 0 3px 0 #e4ebf6; }
-.kc-kid-link { border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 800; background: #ffe3ef; color: #d6336c; box-shadow: 0 3px 0 #ffc2d8; text-decoration: none; transition: transform .15s; }
+.kc-kid-stars { border-radius: var(--kc-kid-r999); padding: 8px 14px; font-size: 13px; font-weight: 800; background: #fff; color: #3a4a6b; box-shadow: 0 3px 0 #e4ebf6; }
+.kc-kid-link { border-radius: var(--kc-kid-r999); padding: 8px 14px; font-size: 13px; font-weight: 800; background: #ffe3ef; color: #d6336c; box-shadow: 0 3px 0 #ffc2d8; text-decoration: none; transition: transform .15s; }
 .kc-kid-link:hover { transform: translateY(-2px); }
-.kc-map-next { position: relative; background: #fff; border-radius: 20px; padding: 18px; border: 2px dashed #ffcf6b; }
+.kc-map-next { position: relative; background: #fff; border-radius: var(--kc-kid-r20); padding: 18px; border: 2px dashed #ffcf6b; }
 .kc-map-next-kicker { font-size: 12px; font-weight: 800; color: #ff8c1a; letter-spacing: 1px; }
 .kc-map-next h2 { font-size: 22px; font-weight: 900; color: #24324d; margin: 6px 0 4px; }
 .kc-map-next-goal { font-size: 13px; color: #6a7896; line-height: 1.7; }
-.kc-map-next-cta { margin-top: 14px; display: flex; width: 100%; align-items: center; justify-content: center; border-radius: 999px !important; padding: 13px 18px; font-size: 15px; font-weight: 900; box-shadow: 0 5px 0 #1748b2 !important; text-decoration: none; transition: transform .12s, box-shadow .12s; }
+.kc-map-next-cta { margin-top: 14px; display: flex; width: 100%; align-items: center; justify-content: center; border-radius: var(--kc-kid-r999) !important; padding: 13px 18px; font-size: 15px; font-weight: 900; box-shadow: 0 5px 0 #1748b2 !important; text-decoration: none; transition: transform .12s, box-shadow .12s; }
 .kc-map-next-cta:hover { transform: translateY(-2px); }
 .kc-map-next-cta:active { transform: translateY(3px); box-shadow: 0 2px 0 #1748b2 !important; }
-.kc-map-catalog-link { display: block; border-radius: 18px; padding: 14px 20px; background: #fff; color: #1d5fb8; font-weight: 800; font-size: 14px; border: 2px solid #d9ebff; box-shadow: 0 4px 0 #d9ebff; text-decoration: none; }
+.kc-map-catalog-link { display: block; border-radius: var(--kc-kid-r18); padding: 14px 20px; background: #fff; color: #1d5fb8; font-weight: 800; font-size: 14px; border: 2px solid #d9ebff; box-shadow: 0 4px 0 #d9ebff; text-decoration: none; }
 .kc-map-catalog-link:hover { background: #f2f9ff; }
 
-.kc-map-kids .kc-panel { border-radius: 22px; border: 2px solid #eef3fb; box-shadow: 0 6px 0 #e3ebf7, 0 14px 30px rgba(60, 110, 190, .08); }
+.kc-map-kids .kc-panel { border-radius: var(--kc-kid-r22); border: 2px solid #eef3fb; box-shadow: 0 6px 0 #e3ebf7, 0 14px 30px rgba(60, 110, 190, .08); }
 .kc-map-kids .kc-map-aside h3 { font-size: 15px; font-weight: 900; color: #2b3a5a; }
-.kc-map-kids .kc-module-item { border-radius: 16px; border: 2px solid transparent; align-items: center; padding: 10px; }
+.kc-map-kids .kc-module-item { border-radius: var(--kc-kid-r16); border: 2px solid transparent; align-items: center; padding: 10px; }
 .kc-map-kids .kc-module-item:hover { background: #f6faff; }
 .kc-map-kids .kc-module-item.kc-module-selected { border-color: #ffcf6b; background: #fff8e3; box-shadow: 0 4px 0 #ffe3a3; }
-.kc-map-kids .kc-module-index { position: relative; width: 48px; height: 48px; border-radius: 16px; overflow: visible; background: #e6f3ff; }
+.kc-map-kids .kc-module-index { position: relative; width: 48px; height: 48px; border-radius: var(--kc-kid-r16); overflow: visible; background: #e6f3ff; }
 .kc-map-kids .kc-module-index-1 { background: #e8f8e4; }
 .kc-map-kids .kc-module-index-2 { background: #fbe8ff; }
 .kc-map-kids .kc-module-index-3 { background: #fff0dc; }
 .kc-map-kids .kc-module-item.kc-module-selected .kc-module-index { background: #ffe08a; }
 .kc-module-mascot { width: 40px; height: 44px; }
-.kc-map-kids .kc-module-index i { position: absolute; right: -5px; bottom: -5px; font-style: normal; font-size: 10px; font-weight: 900; color: #fff; background: #4c97ff; border-radius: 999px; padding: 1px 5px; border: 2px solid #fff; }
+.kc-map-kids .kc-module-index i { position: absolute; right: -5px; bottom: -5px; font-style: normal; font-size: 10px; font-weight: 900; color: #fff; background: #4c97ff; border-radius: var(--kc-kid-r999); padding: 1px 5px; border: 2px solid #fff; }
 .kc-map-kids .kc-module-item b { font-size: 14px; color: #2b3a5a; }
 .kc-map-kids .kc-map-head h2 { font-weight: 900; color: #24324d; }
-.kc-map-kids .kc-map-head .kc-chip { border-radius: 999px; padding: 6px 12px; font-size: 12px; background: #fff0c2; color: #b26a00; }
+.kc-map-kids .kc-map-head .kc-chip { border-radius: var(--kc-kid-r999); padding: 6px 12px; font-size: 12px; background: #fff0c2; color: #b26a00; }
 .kc-map-kids .kc-map-cover { height: 240px; background: #bfe6ff; }
 .kc-map-kids .kc-map-cover::after { display: none; }
 .kc-map-world, .kc-map-world-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -714,12 +715,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-map-world-char-1 { animation-delay: .4s; width: 70px; height: 77px; }
 .kc-map-world-char-2 { animation-delay: .8s; width: 66px; height: 73px; }
 .kc-map-world-char-3 { animation-delay: 1.2s; width: 62px; height: 68px; }
-.kc-map-kids .kc-cover-label { left: 24px; top: 22px; background: #ffffffe6; color: #24324d; border-radius: 18px; padding: 12px 16px; box-shadow: 0 5px 0 #ffffff80; }
+.kc-map-kids .kc-cover-label { left: 24px; top: 22px; background: #ffffffe6; color: #24324d; border-radius: var(--kc-kid-r18); padding: 12px 16px; box-shadow: 0 5px 0 #ffffff80; }
 .kc-map-kids .kc-cover-label b { font-size: 22px; font-weight: 900; margin-bottom: 2px; }
 .kc-map-kids .kc-cover-label p { font-size: 13px; font-weight: 700; color: #ff7a3d; }
 
 .kc-map-kids .kc-map-steps { padding: 28px 24px 22px; gap: 14px; }
-.kc-map-kids .kc-map-steps::before { top: 62px; height: 8px; border-radius: 8px; background: repeating-linear-gradient(90deg, #ffd66b 0 18px, #ffffff 18px 26px); box-shadow: 0 2px 0 #f2c24f; }
+.kc-map-kids .kc-map-steps::before { top: 62px; height: 8px; border-radius: var(--kc-kid-r8); background: repeating-linear-gradient(90deg, #ffd66b 0 18px, #ffffff 18px 26px); box-shadow: 0 2px 0 #f2c24f; }
 .kc-map-kids .kc-step { text-decoration: none; transition: transform .15s; }
 .kc-map-kids a.kc-step:hover { transform: translateY(-3px); }
 .kc-map-kids .kc-step-node { width: 68px; height: 68px; border-radius: 50%; border: 4px solid #fff; background: #4c97ff; color: #fff; font-size: 20px; font-weight: 900; box-shadow: 0 6px 0 #2f6fd0, 0 10px 18px rgba(47, 111, 208, .25); margin-bottom: 14px; }
@@ -732,7 +733,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-map-kids .kc-step b { font-size: 14px; font-weight: 800; color: #2b3a5a; }
 .kc-map-kids .kc-map-bottom { border-top: 2px dashed #eef3fb; }
 .kc-map-kids .kc-map-bottom .kc-text-muted { font-size: 13px !important; color: #6a7896; font-weight: 700; }
-.kc-map-kids [data-testid='adventure-map-next-lesson'] { border-radius: 999px; padding: 10px 18px; font-weight: 900; box-shadow: 0 4px 0 #1748b2; }
+.kc-map-kids [data-testid='adventure-map-next-lesson'] { border-radius: var(--kc-kid-r999); padding: 10px 18px; font-weight: 900; box-shadow: 0 4px 0 #1748b2; }
 
 @keyframes kc-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes kc-pulse { 0%, 100% { box-shadow: 0 6px 0 #e08600, 0 0 0 6px #ffe9a8; } 50% { box-shadow: 0 6px 0 #e08600, 0 0 0 11px #ffe9a866; } }

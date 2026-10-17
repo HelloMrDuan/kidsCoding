@@ -93,12 +93,11 @@ for (const [name, width, height] of [
       const style = await connectorStyle(page)
       expect(style?.display).toBe('none')
     } else {
-      // Frozen V2 geometry: 2px #d5dfed line at top 61px, inset 8%.
+      // UX-106 kid road: 8px dashed yellow road through the node centres, inset 8%.
       const style = await connectorStyle(page)
       expect(style?.display).not.toBe('none')
-      expect(style?.height).toBe('2px')
-      expect(style?.top).toBe('61px')
-      expect(style?.backgroundColor).toBe('rgb(213, 223, 237)')
+      expect(style?.height).toBe('8px')
+      expect(style?.top).toBe('62px')
       // left/right are 8% of the steps container width.
       const expected = (style?.widthPx ?? 0) * 0.08
       expect(Math.abs((style?.leftPx ?? -1) - expected)).toBeLessThanOrEqual(2)
@@ -137,7 +136,7 @@ for (const [name, width, height] of [
       }
       if (name !== 'mobile') {
         const style = await connectorStyle(page)
-        expect(style?.height).toBe('2px')
+        expect(style?.height).toBe('8px')
       }
     }
     expect([...seen].sort()).toEqual([...ALL_LESSONS].sort())
