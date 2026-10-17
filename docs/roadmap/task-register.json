@@ -1325,7 +1325,7 @@
       "title": "首页成熟产品级真实体验入口",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-005",
         "UX-101",
@@ -1339,13 +1339,22 @@
         "逐区对齐 V2 原型 #page-home（标题行、深色主卡+插画、进度环+周打卡、三条插画路径卡、作品展示），使用冻结 V2 插画素材；数字来自真实学习数据"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/59",
+        "prNumber": 59,
+        "mergeCommit": "fbc8b681450ba477511611aacc61210ff2c5dd03",
+        "featureHead": "4fd4adc8a5b8f2b1012e694e7bdd0447f0ed940f",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39049278801",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39049278748",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39043424989",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39043424984",
+        "tests": [
+          "首页按冻结 V2 原型 #page-home 逐区实现：标题行、深色主卡+V2 插画+主线进度、进度环+周打卡、三条插画路径卡、5 个示例作品；素材 public/v2 复制自 docs/design/kidscoding-v2/assets；数字来自真实学习进度。",
+          "首版粉彩卡片方案经负责人比对设计图判定不符，已重做。",
+          "vitest page.test 1/1；ESLint 0 errors；1440/768/375 三端截图横向溢出 0，与原型对照截图经负责人确认后合并。"
+        ],
+        "reviewer": "Owner (HelloMrDuan) approved screenshots and merge in chat, 2026-10-18"
       },
-      "notes": "负责人 2026-10-17 要求首页与 V2 设计图一致：按 prototype #page-home 逐区实现，素材复制自 docs/design/kidscoding-v2/assets 到 public/v2；首屏 CTA：新用户“开始学第一节”→/onboarding/age，已开始“继续学习”→下一课；作品区标注为示例。"
+      "notes": "负责人 2026-10-17 要求首页与 V2 设计图一致：按 prototype #page-home 逐区实现，素材复制自 docs/design/kidscoding-v2/assets 到 public/v2；首屏 CTA：新用户“开始学第一节”→/onboarding/age，已开始“继续学习”→下一课；作品区标注为示例。 完成：PR #59 负责人确认后合并（fbc8b68），main CI 全绿。"
     },
     {
       "id": "UX-602",
