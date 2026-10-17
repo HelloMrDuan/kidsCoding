@@ -1,5 +1,7 @@
+'use client'
+
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import type { FoundationRemedialMicroScript } from '@/features/domain/types'
 
@@ -25,6 +27,9 @@ export type LessonCloudSyncState =
   | 'local-only'
   | 'failed'
 
+/** The three classroom zones from the frozen V2 prototype (task / code / stage). */
+export type LessonPane = 'task' | 'code' | 'stage'
+
 type GuidedLessonShellProps = {
   lessonTitle: string
   lessonGoal: string
@@ -38,7 +43,10 @@ type GuidedLessonShellProps = {
   remedialMicroScript?: FoundationRemedialMicroScript
   onCompleteStep?: () => void
   onStartRemedial: (remedialId: string) => void
-  children?: ReactNode
+  /** Real Blockly workspace — the code (blocks) zone. */
+  codeSlot?: ReactNode
+  /** Real stage (playable / duo / preview) — the stage zone. */
+  stageSlot?: ReactNode
   /** 0-based current step, shown as "步骤 X / Y" with a real progress bar. */
   stepIndex?: number
   stepCount?: number
@@ -66,6 +74,12 @@ const CLOUD_SYNC_COPY: Record<Exclude<LessonCloudSyncState, 'idle'>, string> =
     failed: '云端同步失败',
   }
 
+const PANE_TABS: Array<{ id: LessonPane; label: string }> = [
+  { id: 'task', label: '任务' },
+  { id: 'code', label: '积木' },
+  { id: 'stage', label: '舞台' },
+]
+
 export function GuidedLessonShell({
   lessonTitle,
   lessonGoal,
@@ -79,7 +93,8 @@ export function GuidedLessonShell({
   remedialMicroScript,
   onCompleteStep,
   onStartRemedial,
-  children,
+  codeSlot,
+  stageSlot,
   stepIndex,
   stepCount,
   resumedFromStep,
@@ -90,6 +105,8 @@ export function GuidedLessonShell({
   onRetryCloudSync,
   onContinueLocalOnly,
 }: GuidedLessonShellProps) {
+  const [activePane, setActivePane] = useState<LessonPane>('task')
+
   if (isLocked) {
     return (
       <section className="kc-surface-3d rounded-[2.5rem] p-8">
@@ -138,8 +155,39 @@ export function GuidedLessonShell({
         ? 'bg-[#e8f8f2] text-[#168260]'
         : 'bg-[#eef8ff] text-sky-700'
 
+  const feedbackNode = feedback ? (
+    <div
+      className="overflow-hidden rounded-[2rem] border border-[#dbeef8] bg-[linear-gradient(180deg,#f3fbff_0%,#ffffff_100%)] shadow-[0_18px_36px_rgba(56,189,248,0.12)]"
+      data-testid="lesson-feedback-card"
+    >
+      <div className="flex items-center justify-between gap-3 px-5 pt-5">
+        <p className="text-sm font-semibold text-sky-700">刚完成的小结果</p>
+        <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
+          马上看到变化
+        </span>
+      </div>
+      <div
+        className="mx-4 mb-4 mt-4 rounded-[1.75rem] bg-[linear-gradient(180deg,#d9f1ff_0%,#ffffff_100%)] px-4 py-4"
+        data-testid="lesson-feedback-preview"
+      >
+        <div className="flex items-end gap-3 rounded-[1.5rem] bg-white/75 px-4 py-4">
+          <div className="h-8 w-8 rounded-full bg-amber-300 shadow-[0_10px_20px_rgba(252,211,77,0.18)]" />
+          <div className="h-16 w-16 rounded-full bg-orange-400 shadow-[0_14px_28px_rgba(251,146,60,0.24)]" />
+          <div className="h-10 w-10 rounded-full bg-emerald-300/80 shadow-[0_10px_20px_rgba(16,185,129,0.14)]" />
+        </div>
+        <p className="mt-3 text-sm font-semibold leading-7 text-slate-700">{feedback}</p>
+      </div>
+    </div>
+  ) : null
+
+  const paneVisible = (pane: LessonPane) =>
+    activePane === pane ? 'kc-mobile-visible' : ''
+
   return (
-    <section className="space-y-4">
+    // lesson-workbench-shell is the legacy testid used by the E2E suite
+    // (ux-102/103/104/105/201, trial-lock-purchase) for "classroom shell
+    // is visible"; it stays on the shell root so those specs keep passing.
+    <section className="space-y-4" data-testid="lesson-workbench-shell">
       <div
         className="kc-surface-3d flex flex-wrap items-center justify-between gap-3 rounded-[1.75rem] px-5 py-4"
         data-testid="lesson-progress-strip"
@@ -237,117 +285,148 @@ export function GuidedLessonShell({
         </div>
       ) : null}
 
-    <section className="grid items-start gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-      <aside
-        className="kc-surface-3d space-y-5 rounded-[2.5rem] p-6"
-        data-testid="lesson-support-rail"
-      >
-        <div className="kc-panel-3d space-y-3 rounded-[2rem] px-5 py-5">
-          <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
-            今天的小任务
-          </p>
-          <h1 className="text-[2rem] font-black tracking-tight text-slate-950">
-            {lessonTitle}
-          </h1>
-          <p className="rounded-[1.5rem] bg-white/90 px-4 py-4 text-sm leading-7 text-slate-600">
-            这节课要做到：{lessonGoal}
-          </p>
-        </div>
-
-        {stepTitle ? (
-          <div
-            className="rounded-[2rem] bg-[linear-gradient(180deg,#fff8eb_0%,#ffffff_100%)] p-5 shadow-[0_18px_36px_rgba(255,173,92,0.16)]"
-            data-testid="lesson-task-card"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-semibold text-amber-700">当前任务</p>
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-amber-700 shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
-                一步一步来
-              </span>
-            </div>
-            <h2 className="mt-3 text-[1.75rem] font-black leading-tight text-slate-950">
-              {stepTitle}
-            </h2>
-            <p className="mt-3 text-base leading-8 text-slate-700">{instruction}</p>
-            {voiceover ? (
-              <p className="mt-4 rounded-[1.5rem] bg-white px-4 py-3 text-sm font-semibold leading-7 text-slate-700 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
-                主语音：{voiceover}
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
-        {feedback ? (
-          <div
-            className="overflow-hidden rounded-[2rem] border border-[#dbeef8] bg-[linear-gradient(180deg,#f3fbff_0%,#ffffff_100%)] shadow-[0_18px_36px_rgba(56,189,248,0.12)]"
-            data-testid="lesson-feedback-card"
-          >
-            <div className="flex items-center justify-between gap-3 px-5 pt-5">
-              <p className="text-sm font-semibold text-sky-700">刚完成的小结果</p>
-              <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
-                马上看到变化
-              </span>
-            </div>
-            <div
-              className="mx-4 mb-4 mt-4 rounded-[1.75rem] bg-[linear-gradient(180deg,#d9f1ff_0%,#ffffff_100%)] px-4 py-4"
-              data-testid="lesson-feedback-preview"
-            >
-              <div className="flex items-end gap-3 rounded-[1.5rem] bg-white/75 px-4 py-4">
-                <div className="h-8 w-8 rounded-full bg-amber-300 shadow-[0_10px_20px_rgba(252,211,77,0.18)]" />
-                <div className="h-16 w-16 rounded-full bg-orange-400 shadow-[0_14px_28px_rgba(251,146,60,0.24)]" />
-                <div className="h-10 w-10 rounded-full bg-emerald-300/80 shadow-[0_10px_20px_rgba(16,185,129,0.14)]" />
-              </div>
-              <p className="mt-3 text-sm font-semibold leading-7 text-slate-700">{feedback}</p>
-            </div>
-          </div>
-        ) : null}
-
-        {hintCopy ? (
-          <div className="rounded-[1.75rem] bg-[#f7f2ff] px-4 py-4 text-sm font-semibold leading-7 text-[#6b46ff] shadow-[0_14px_30px_rgba(107,70,255,0.08)]">
-            卡住时提示：{hintCopy}
-          </div>
-        ) : null}
-
-        {hintCopy && (remedialLessonId || remedialMicroScript) ? (
-          <RemedialLinkCard
-            copy={hintCopy}
-            onStartRemedial={onStartRemedial}
-            remedialLessonId={remedialLessonId}
-            remedialMicroScript={remedialMicroScript}
-          />
-        ) : null}
-
-        <button
-          className="w-full rounded-full bg-[#ff8b4e] px-5 py-3.5 font-bold text-white shadow-[0_18px_32px_rgba(255,139,78,0.3)] transition hover:bg-[#ff7b38] disabled:cursor-not-allowed disabled:opacity-60"
-          data-testid="lesson-complete-step"
-          disabled={isCompleting}
-          onClick={onCompleteStep}
-          type="button"
+      <section className="kc-lesson-shell" data-testid="lesson-shell">
+        <div
+          aria-label="课堂分区"
+          className="kc-mobile-tabs"
+          data-testid="lesson-mobile-tabs"
+          role="tablist"
         >
-          {isCompleting ? '正在完成…' : '完成这一步'}
-        </button>
-      </aside>
-
-      <div
-        className="kc-scene-shell space-y-4 rounded-[2.75rem] p-3 md:p-4"
-        data-testid="lesson-workbench-shell"
-      >
-        <div className="kc-panel-3d rounded-[2rem] px-5 py-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-sky-700">儿童创作工作台</p>
-              <h3 className="mt-1 text-xl font-black text-slate-950">
-                先看舞台，再用积木让故事往前走
-              </h3>
-            </div>
-            <span className="rounded-full bg-[#eef8ff] px-3 py-2 text-xs font-bold text-sky-700">
-              做一步，看一步
-            </span>
-          </div>
+          {PANE_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              aria-controls={`lesson-pane-${tab.id}`}
+              aria-selected={activePane === tab.id}
+              data-testid={`lesson-mobile-tab-${tab.id}`}
+              onClick={() => setActivePane(tab.id)}
+              role="tab"
+              type="button"
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-        {children}
-      </div>
-    </section>
+
+        <div className="kc-lesson-grid" data-testid="lesson-three-zone-grid">
+          <section
+            aria-labelledby="lesson-task-pane-h"
+            className={`kc-lesson-col kc-lesson-task ${paneVisible('task')}`}
+            data-testid="lesson-task-column"
+            id="lesson-pane-task"
+            role="tabpanel"
+          >
+            <div className="kc-pane-h" data-testid="lesson-task-pane-h" id="lesson-task-pane-h">
+              <span>学习任务</span>
+              {showProgress ? (
+                <span className="rounded-[5px] bg-[#eef8ff] px-2 py-1 text-[11px] font-bold text-sky-700">
+                  STEP {String(stepIndex + 1).padStart(2, '0')}
+                </span>
+              ) : null}
+            </div>
+            <div className="kc-task-content space-y-5">
+              <div className="kc-panel-3d space-y-3 rounded-[2rem] px-5 py-5">
+                <p className="inline-flex rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-sky-700">
+                  今天的小任务
+                </p>
+                <h1 className="text-[2rem] font-black tracking-tight text-slate-950">
+                  {lessonTitle}
+                </h1>
+                <p className="rounded-[1.5rem] bg-white/90 px-4 py-4 text-sm leading-7 text-slate-600">
+                  这节课要做到：{lessonGoal}
+                </p>
+              </div>
+
+              {stepTitle ? (
+                <div
+                  className="rounded-[2rem] bg-[linear-gradient(180deg,#fff8eb_0%,#ffffff_100%)] p-5 shadow-[0_18px_36px_rgba(255,173,92,0.16)]"
+                  data-testid="lesson-task-card"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-amber-700">当前任务</p>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-amber-700 shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
+                      一步一步来
+                    </span>
+                  </div>
+                  <h2 className="mt-3 text-[1.75rem] font-black leading-tight text-slate-950">
+                    {stepTitle}
+                  </h2>
+                  <p className="mt-3 text-base leading-8 text-slate-700">{instruction}</p>
+                  {voiceover ? (
+                    <p className="mt-4 rounded-[1.5rem] bg-white px-4 py-3 text-sm font-semibold leading-7 text-slate-700 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+                      主语音：{voiceover}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {hintCopy ? (
+                <div className="rounded-[1.75rem] bg-[#f7f2ff] px-4 py-4 text-sm font-semibold leading-7 text-[#6b46ff] shadow-[0_14px_30px_rgba(107,70,255,0.08)]">
+                  卡住时提示：{hintCopy}
+                </div>
+              ) : null}
+
+              {hintCopy && (remedialLessonId || remedialMicroScript) ? (
+                <RemedialLinkCard
+                  copy={hintCopy}
+                  onStartRemedial={onStartRemedial}
+                  remedialLessonId={remedialLessonId}
+                  remedialMicroScript={remedialMicroScript}
+                />
+              ) : null}
+            </div>
+          </section>
+
+          <section
+            aria-labelledby="lesson-code-pane-h"
+            className={`kc-lesson-col ${paneVisible('code')}`}
+            data-testid="lesson-code-column"
+            id="lesson-pane-code"
+            role="tabpanel"
+          >
+            <div className="kc-pane-h" data-testid="lesson-code-pane-h" id="lesson-code-pane-h">
+              <span>编程工作区</span>
+              <span className="rounded-[5px] bg-[#eef8ff] px-2 py-1 text-[11px] font-bold text-sky-700">
+                BLOCKLY
+              </span>
+            </div>
+            <div className="p-3">{codeSlot}</div>
+            {stageSlot ? null : feedbackNode}
+          </section>
+
+          {stageSlot ? (
+            <section
+              aria-labelledby="lesson-stage-pane-h"
+              className={`kc-lesson-col ${paneVisible('stage')}`}
+              data-testid="lesson-stage-column"
+              id="lesson-pane-stage"
+              role="tabpanel"
+            >
+              <div className="kc-pane-h" data-testid="lesson-stage-pane-h" id="lesson-stage-pane-h">
+                <span>实时舞台</span>
+                <span className="rounded-[5px] bg-[#e8f8f2] px-2 py-1 text-[11px] font-bold text-[#168260]">
+                  PREVIEW
+                </span>
+              </div>
+              <div className="space-y-4 p-3">
+                {stageSlot}
+                {feedbackNode}
+              </div>
+            </section>
+          ) : null}
+        </div>
+
+        <div className="kc-lesson-footer" data-testid="lesson-footer">
+          <button
+            className="rounded-full bg-[#ff8b4e] px-5 py-3.5 font-bold text-white shadow-[0_18px_32px_rgba(255,139,78,0.3)] transition hover:bg-[#ff7b38] disabled:cursor-not-allowed disabled:opacity-60"
+            data-testid="lesson-complete-step"
+            disabled={isCompleting}
+            onClick={onCompleteStep}
+            type="button"
+          >
+            {isCompleting ? '正在完成…' : '完成这一步'}
+          </button>
+        </div>
+      </section>
     </section>
   )
 }
