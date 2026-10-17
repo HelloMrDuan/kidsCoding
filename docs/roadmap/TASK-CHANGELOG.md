@@ -117,3 +117,9 @@
 | 2026-10-16 | UX-201 | 功能 PR 创建：状态条 + 保存状态 + 恢复逻辑 + ux-201.spec.ts（5 E2E）；Workflow 接线由 ChatGPT 用 GitHub 工具完成（提交 4832343，差异仅路径触发 + Frozen V2 命令 2 行），此前 403 为 Muse GitHub App 无 Workflows 权限 | [#50](https://github.com/HelloMrDuan/kidsCoding/pull/50) | 待合并 | 待验收 | in_review；首轮 PR CI 7/8，scratch-real-vm-browser duo 失败并含 React #418，未合并，未标 completed |
 | 2026-10-16 | UX-201 | **React #418 修复**：根因为 useState 初始化器渲染时读 sessionStorage（恢复步骤 + 保存状态），SSR 渲染第 1 步/未保存，客户端水合渲染不同文本；duo 测试保存后 reload() 触发。修复（远程 a088a4d）：首渲染不读存储，水合后 microtask 恢复，功能未回退；本地 A/B：原始代码有 #418，修复后无 #418；修复后 PR CI 8/8 | [#50](https://github.com/HelloMrDuan/kidsCoding/pull/50) | 待合并 | 待验收 | in_review；PR CI 8/8 全绿、无冲突 |
 | 2026-10-16 | UX-201 | **工程交付完成**：PR CI 8/8，真实 Chrome Frozen V2 步骤 47 通过（含新增 5 项）；duo 桌面 34 通过 + 手机端 13 通过；main CI 产物三张 UX-201 三端截图已下载逐张核对（步骤 1/5、20% 蓝条、绿色“已保存到本机”，无溢出；CI 哈希桌面 747233d6…、平板 499a65d6…、手机 ac3f8ecf…，与本地哈希分开记录，不混用） | [#50](https://github.com/HelloMrDuan/kidsCoding/pull/50) | `3ed6fd084d7d27b1c0261c36584156e95c877da4` | [课程 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38863681676) / [台账 main](https://github.com/HelloMrDuan/kidsCoding/actions/runs/38863681655) | **completed**；`Failed to fetch` 已定位为 Blockly 音效 mp3 外部请求在沙箱代理失败（装饰性，不影响保存/同步，CI 无此问题）；5 项 Supabase CLI 单测失败为沙箱既存环境问题，与本任务无关；草稿仍为 sessionStorage，只声称“本机” |
+
+## UX-202 课堂任务舞台积木三域布局
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-17 | UX-202 | **交付完成**：三域布局首版（PR #52）+ 冻结 V2 视觉对齐（紧凑标题行、课时条内进度/保存、扁平任务栏、舞台底部运行/重置）；舞台改用真实卡通插画角色与 SVG 场景（无圆形占位）；Blockly 改为 zelos 圆润卡通积木、分类亮色+图标；vitest 124/124；三尺寸截图经负责人确认 | [#53](https://github.com/HelloMrDuan/kidsCoding/pull/53) | `698a3c8ea144f710b822697190f73fab140cb5f6` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39027595967) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39027595976) | **completed**；首页与全站 V2 外壳另行登记新任务 |
