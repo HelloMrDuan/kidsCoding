@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 
+import { CharacterArt, SceneBackdrop, type SceneId } from './character-art'
 import { useBlockExecutor } from './use-block-executor'
 
 const CHARACTER_LABELS: Record<string, string> = {
@@ -80,6 +81,9 @@ export function PlayableStage({
   const clickLesson=requiredBlocks[0]==='when_clicked'
   const [prediction,setPrediction]=useState<'automatic'|'needs-click'|null>(null)
   const visualScene=stageScene==='meadow'?'草地':template?.starterScene==='garden'?'花园':'森林'
+  const sceneId: SceneId = stageScene==='meadow'?'meadow':template?.starterScene==='garden'?'garden':'forest'
+  const mainId = template?.starterCharacters[0] ?? 'fox'
+  const secondId = template?.starterCharacters[1]
 
   useEffect(() => {
     if (executionState === 'success') {
@@ -99,55 +103,36 @@ export function PlayableStage({
       className="flex flex-1 flex-col"
       data-testid="lesson-playable-stage"
     >
-      <div className="bg-[radial-gradient(circle_at_top,#ffffff_0%,#d8f0ff_42%,#f7ebd6_100%)] p-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex gap-2">
-            <span className="h-3 w-3 rounded-full bg-white/80" />
-            <span className="h-3 w-3 rounded-full bg-white/60" />
-            <span className="h-3 w-3 rounded-full bg-white/40" />
-          </div>
-          <span className="rounded-full bg-white/80 px-3 py-1 text-[11px] font-bold tracking-[0.2em] text-slate-500">
-            {sceneCopy.badge}
-          </span>
-          <span data-testid="stage-current-scene" className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-900">当前实际场景：{visualScene}</span>
+      <div className="kc-stage-scene" data-scene={sceneId}>
+        <SceneBackdrop scene={sceneId} />
+        <div className="kc-stage-topline">
+          <span className="kc-stage-badge">{sceneCopy.badge}</span>
+          <span data-testid="stage-current-scene" className="kc-stage-scene-chip">当前实际场景：{visualScene}</span>
         </div>
 
-        <div className={`mt-4 rounded-[10px] px-5 pb-6 pt-8 shadow-[0_20px_36px_rgba(125,211,252,0.18)] ${stageScene === "meadow" ? "bg-[linear-gradient(180deg,#8ed6ae_0%,#d5f5b4_60%,#fff4bc_100%)]" : template?.starterScene === 'garden' ? "bg-[linear-gradient(180deg,#ffe9fa_0%,#def8de_58%,#fff5c9_100%)]" : "bg-[linear-gradient(180deg,#84d2ff_0%,#daf4ff_58%,#f8f2e7_100%)]"}`}>
-          <div className="relative overflow-hidden rounded-[1.5rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_100%)] px-4 pb-8 pt-6 min-h-[200px]">
-            <div className="absolute left-1/2 top-0 h-24 w-24 -translate-x-1/2 rounded-full bg-white/35 blur-2xl" />
+        <div className="kc-stage-actors">
+          <button type="button" aria-label={clickLesson?'点击蝴蝶触发积木程序':mainLabel}
+            disabled={!clickLesson||executionState!=='armed'} onClick={()=>void clickCharacter()}
+            className="kc-stage-actor kc-stage-actor-main"
+            style={{ transform: `translateX(${characterPosition}px)` }}
+            data-testid="stage-character-main"
+          >
+            <CharacterArt id={mainId} className="kc-stage-actor-art" />
+            <span className="kc-stage-nametag">{mainLabel}</span>
 
-            <div className="relative flex min-h-[120px] flex-wrap items-end gap-4">
-              <button type="button" aria-label={clickLesson?'点击蝴蝶触发积木程序':mainLabel}
-                disabled={!clickLesson||executionState!=='armed'} onClick={()=>void clickCharacter()}
-                className="relative flex h-24 w-24 items-center justify-center rounded-full bg-orange-400 text-sm font-black text-white shadow-[0_16px_30px_rgba(251,146,60,0.3)] transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(${characterPosition}px)` }}
-                data-testid="stage-character-main"
-              >
-                {mainLabel}
+            {characterMessage && (
+              <span className="kc-stage-speech">
+                {characterMessage}
+              </span>
+            )}
+          </button>
 
-                {characterMessage && (
-                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 rounded-[1rem] bg-white px-3 py-2 text-xs font-bold text-slate-800 shadow-lg whitespace-nowrap">
-                    {characterMessage}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white" />
-                  </div>
-                )}
-              </button>
-
-              {secondLabel ? (
-                <div className="flex flex-col items-center gap-2 transition-opacity duration-300 opacity-70">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400 text-xs font-black text-white shadow-[0_16px_30px_rgba(52,211,153,0.22)]">
-                    {secondLabel}
-                  </div>
-                  <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] font-bold text-emerald-700">
-                    舞台伙伴
-                  </span>
-                </div>
-              ) : null}
+          {secondLabel ? (
+            <div className="kc-stage-actor kc-stage-actor-friend">
+              <CharacterArt id={secondId} className="kc-stage-actor-art" />
+              <span className="kc-stage-nametag">{secondLabel}</span>
             </div>
-
-            <div className="mt-5 h-6 rounded-full bg-[linear-gradient(90deg,#ffdd94_0%,#ffeec1_100%)] opacity-80" />
-
-          </div>
+          ) : null}
         </div>
       </div>
 
