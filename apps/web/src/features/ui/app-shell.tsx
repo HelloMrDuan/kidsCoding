@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 /**
  * Frozen V2 global shell: 222px navy sidebar + 76px white top bar.
@@ -74,10 +74,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const current = ALL_ITEMS.find((i) => i.match(pathname))
 
-  useEffect(() => {
-    setDrawerOpen(false)
-  }, [pathname])
-
   return (
     <div className="kc-app" data-testid="kc-app-shell">
       <aside className={`kc-sidebar${drawerOpen ? ' is-open' : ''}`} aria-label="主导航" id="kc-sidebar">
@@ -99,6 +95,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     aria-current={active ? 'page' : undefined}
                     title={item.label}
                     data-testid={`kc-nav-${item.id}`}
+                    onClick={() => setDrawerOpen(false)}
                   >
                     <span className="kc-nav-ico"><NavIcon name={item.icon} /></span>
                     <span className="kc-nav-name">{item.label}</span>
