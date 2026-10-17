@@ -443,6 +443,31 @@
       "notes": ""
     },
     {
+      "id": "UX-005",
+      "title": "全站冻结V2外壳（左侧导航+顶栏）",
+      "priority": "P1",
+      "category": "UX",
+      "status": "in_progress",
+      "dependencies": [
+        "UX-001",
+        "UX-202"
+      ],
+      "scope": "features/ui/app-shell.tsx,app/learn|parent|cards|project/layout.tsx,globals.css",
+      "acceptance": [
+        "学习/创作/家长页面共用 V2 外壳：222px 深蓝侧栏 + 76px 顶栏，1180 收为图标栏、860 顶栏收窄、600 抽屉+底部导航",
+        "当前栏目高亮与面包屑真实、无横向溢出",
+        "不改动首页（UX-601 另行处理），既有 testid 与可访问名称不回归"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "负责人 2026-10-17 要求全站视觉统一为冻结 V2，单独登记外壳任务；首页属 UX-601，不混入本 PR。页面内部样式（地图、课程体系、作品中心等）后续按各自任务对齐。"
+    },
+    {
       "id": "UX-101",
       "title": "学习地图四单元分区",
       "priority": "P0",
