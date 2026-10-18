@@ -1259,16 +1259,15 @@
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/61",
         "mergeCommit": "67fb94042de1354858cb565b5db9fe0b20101f93",
-        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344835",
+        "mainCI": [
+          "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344835",
+          "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344848"
+        ],
         "tests": [
           "PR CI 39057393180/39057393173 success",
           "Playwright 1440x900/768x1024/375x812 截图（列表页+路线详情页）横向溢出 0"
         ],
-        "reviewer": "owner 2026-10-18 确认合并",
-        "prNumber": 61,
-        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344848",
-        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39057393173",
-        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39057393180"
+        "reviewer": "owner 2026-10-18 确认合并"
       },
       "notes": "2026-10-18 第一步：按 V2 原型完成课程体系视觉对齐，状态沿用现有内容阶段（可体验/教案已备/大纲规划）。L0-L5 统一成熟度数据源属 02-PHASED-DELIVERY P1.2，尚未建立，故本任务保持 in_progress。 | 2026-10-18：V2 #page-catalog 分页分层版已合并（PR #61）；保持 in_progress，待统一 L0–L5 成熟度数据源（02-PHASED-DELIVERY P1.2）。"
     },
