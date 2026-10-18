@@ -1493,7 +1493,7 @@
       "title": "Blockly关卡改为可观察结果评测",
       "priority": "P1",
       "category": "SYS",
-      "status": "todo",
+      "status": "in_review",
       "dependencies": [
         "EDU-103"
       ],
@@ -1502,13 +1502,13 @@
         "允许合理等价积木实现，反例失败，无法执行不授予完成"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/72",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "第1～9课按可观察结果（触发/步数/场景及切换位置/对白及时机）评测；参考程序结果即目标；等价解通过、反例失败、不可执行不授予完成。"
     },
     {
       "id": "SYS-104",
