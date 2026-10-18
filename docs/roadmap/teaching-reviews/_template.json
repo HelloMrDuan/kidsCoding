@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "填写课程ID",
+  "reviewedCommit": "",
+  "reviewedAt": "",
+  "reviewer": "",
+  "reviewerKind": "human",
+  "independent": false,
+  "ageBand": "",
+  "prerequisites": [],
+  "newConcepts": [],
+  "references": [],
+  "scores": {
+    "knowledge": {
+      "score": 0,
+      "evidence": [],
+      "defects": []
+    },
+    "story": {
+      "score": 0,
+      "evidence": [],
+      "defects": []
+    },
+    "practice": {
+      "score": 0,
+      "evidence": [],
+      "defects": []
+    },
+    "feedback": {
+      "score": 0,
+      "evidence": [],
+      "defects": []
+    },
+    "creation": {
+      "score": 0,
+      "evidence": [],
+      "defects": []
+    },
+    "assessment": {
+      "score": 0,
+      "evidence": [],
+      "defects": []
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "unchecked",
+      "note": ""
+    },
+    "no-hands-on": {
+      "status": "unchecked",
+      "note": ""
+    },
+    "no-failure-test": {
+      "status": "unchecked",
+      "note": ""
+    },
+    "rigid-answer": {
+      "status": "unchecked",
+      "note": ""
+    },
+    "fake-project": {
+      "status": "unchecked",
+      "note": ""
+    },
+    "unlicensed-assets": {
+      "status": "unchecked",
+      "note": ""
+    },
+    "minor-privacy-risk": {
+      "status": "unchecked",
+      "note": ""
+    },
+    "broken-or-false-success": {
+      "status": "unchecked",
+      "note": ""
+    },
+    "id-status-mismatch": {
+      "status": "unchecked",
+      "note": ""
+    }
+  },
+  "runEvidence": {
+    "normalRun": null,
+    "failureCase": null,
+    "hintLayers": [],
+    "practiceA": null,
+    "practiceB": null,
+    "equivalentSolutions": [],
+    "saveReopen": null,
+    "e2eSpecs": [],
+    "screenshots": []
+  },
+  "maturityLevel": 0,
+  "childTrial": "none",
+  "blockers": []
+}
