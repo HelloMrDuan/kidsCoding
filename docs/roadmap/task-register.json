@@ -1584,6 +1584,32 @@
       "notes": ""
     },
     {
+      "id": "SYS-106",
+      "title": "G0网格寻路引擎（方向/障碍/钥匙门）",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "in_review",
+      "dependencies": [
+        "SYS-103",
+        "TQ-004"
+      ],
+      "scope": "features/lessons/grid、register-kids-blocks、features/curriculum/engine-capabilities",
+      "acceptance": [
+        "网格移动、四方向与左右转、石头/小河/地图边界碰撞、捡钥匙后才能开门，均由真实程序运行判定",
+        "等价路线通过，撞石头、落水、出界、先开门、未到目标各有本课专属提示",
+        "卡通森林网格舞台按真实运行帧显示小狐狸位置与朝向",
+        "引擎能力登记：G0-U1 所需能力齐全，但课程保持不可玩，待教案重写与复核"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/80",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "为解除 TQ-004 阻塞登记。只做引擎与舞台，不解锁 G0-U1。"
+    },
+    {
       "id": "CLOUD-101",
       "title": "真实Supabase迁移与回滚确认",
       "priority": "P1",

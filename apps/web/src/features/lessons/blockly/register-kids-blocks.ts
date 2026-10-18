@@ -8,6 +8,15 @@ export const kidsBlockLabels: Record<string, string> = {
   switch_scene: '切换场景',
   switch_character: '切换到另一位朋友',
   repeat_twice: '再做一次',
+  move_up: '向上走一格',
+  move_down: '向下走一格',
+  move_left: '向左走一格',
+  move_right_cell: '向右走一格',
+  move_forward: '向前走一格',
+  turn_left: '向左转',
+  turn_right: '向右转',
+  pick_key: '捡起钥匙',
+  open_door: '打开树洞门',
 }
 
 const ICONS: Record<string, string> = {
@@ -18,6 +27,14 @@ const ICONS: Record<string, string> = {
   picture: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20x%3D%223%22%20y%3D%225%22%20width%3D%2218%22%20height%3D%2214%22%20rx%3D%222.5%22%20fill%3D%22%23fff%22/%3E%3Cpath%20d%3D%22M5%2017l5-6%204%204%202-2%203%204z%22%20fill%3D%22%238a63df%22/%3E%3Ccircle%20cx%3D%2216.5%22%20cy%3D%229%22%20r%3D%221.8%22%20fill%3D%22%23ffc94a%22/%3E%3C/svg%3E',
   swap: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%208h12l-3-3M19%2016H7l3%203%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E',
   repeat: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%2012a7%207%200%200%201%2012-5l2%202M19%2012a7%207%200%200%201-12%205l-2-2%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M19%204v5h-5M5%2020v-5h5%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E',
+  arrowUp: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cg%20transform%3D%22rotate%28-90%2012%2012%29%22%3E%3Cpath%20d%3D%22M3%209.5h10V5l8%207-8%207v-4.5H3z%22%20fill%3D%22%23fff%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E',
+  arrowDown: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cg%20transform%3D%22rotate%2890%2012%2012%29%22%3E%3Cpath%20d%3D%22M3%209.5h10V5l8%207-8%207v-4.5H3z%22%20fill%3D%22%23fff%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E',
+  arrowLeft: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cg%20transform%3D%22rotate%28180%2012%2012%29%22%3E%3Cpath%20d%3D%22M3%209.5h10V5l8%207-8%207v-4.5H3z%22%20fill%3D%22%23fff%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E',
+  forward: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%2020V9a3%203%200%200%201%203-3h7V2l6%206-6%206v-4H9v10z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E',
+  turnLeft: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M19%2020v-7a5%205%200%200%200-5-5H8%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M10%203%204%208l6%205z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E',
+  turnRight: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%2020v-7a5%205%200%200%201%205-5h6%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M14%203l6%205-6%205z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E',
+  key: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%228%22%20cy%3D%2212%22%20r%3D%224.6%22%20fill%3D%22none%22%20stroke%3D%22%23ffe066%22%20stroke-width%3D%222.8%22%2F%3E%3Cpath%20d%3D%22M12.4%2012H21M18%2012v3.5M15.4%2012v2.6%22%20stroke%3D%22%23ffe066%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E',
+  door: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%2021V10a7%207%200%200%201%2014%200v11z%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2215%22%20cy%3D%2215%22%20r%3D%221.6%22%20fill%3D%22%23b06a2b%22%2F%3E%3C%2Fsvg%3E',
 }
 
 /**
@@ -39,6 +56,7 @@ export function getKidsBlockTheme() {
     kc_looks: { colourPrimary: '#3fbf6a', colourSecondary: '#74d494', colourTertiary: '#2b9a51' },
     kc_scene: { colourPrimary: '#9966ff', colourSecondary: '#b994ff', colourTertiary: '#774dcb' },
     kc_friend: { colourPrimary: '#ff6680', colourSecondary: '#ff94a6', colourTertiary: '#d94a63' },
+    kc_item: { colourPrimary: '#cf63cf', colourSecondary: '#e08fe0', colourTertiary: '#a63fa6' },
     kc_control: { colourPrimary: '#0fbdbd', colourSecondary: '#5cd6d6', colourTertiary: '#0b9696' },
   },
   componentStyles: {
@@ -114,6 +132,79 @@ export function registerKidsBlocks() {
       previousStatement: null,
       nextStatement: null,
       style: 'kc_control',
+    },
+  // SYS-106 grid path-finding blocks (G0 direction / path_obstacles)
+    {
+      type: 'move_up',
+      message0: '%1 ' + kidsBlockLabels.move_up,
+      args0: [{ type: 'field_image', src: ICONS.arrowUp, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_motion',
+    },
+    {
+      type: 'move_down',
+      message0: '%1 ' + kidsBlockLabels.move_down,
+      args0: [{ type: 'field_image', src: ICONS.arrowDown, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_motion',
+    },
+    {
+      type: 'move_left',
+      message0: '%1 ' + kidsBlockLabels.move_left,
+      args0: [{ type: 'field_image', src: ICONS.arrowLeft, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_motion',
+    },
+    {
+      type: 'move_right_cell',
+      message0: '%1 ' + kidsBlockLabels.move_right_cell,
+      args0: [{ type: 'field_image', src: ICONS.arrow, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_motion',
+    },
+    {
+      type: 'move_forward',
+      message0: '%1 ' + kidsBlockLabels.move_forward,
+      args0: [{ type: 'field_image', src: ICONS.forward, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_motion',
+    },
+    {
+      type: 'turn_left',
+      message0: '%1 ' + kidsBlockLabels.turn_left,
+      args0: [{ type: 'field_image', src: ICONS.turnLeft, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_motion',
+    },
+    {
+      type: 'turn_right',
+      message0: '%1 ' + kidsBlockLabels.turn_right,
+      args0: [{ type: 'field_image', src: ICONS.turnRight, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_motion',
+    },
+    {
+      type: 'pick_key',
+      message0: '%1 ' + kidsBlockLabels.pick_key,
+      args0: [{ type: 'field_image', src: ICONS.key, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_item',
+    },
+    {
+      type: 'open_door',
+      message0: '%1 ' + kidsBlockLabels.open_door,
+      args0: [{ type: 'field_image', src: ICONS.door, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_item',
     },
   ])
 
