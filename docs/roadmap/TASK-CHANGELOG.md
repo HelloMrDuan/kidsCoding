@@ -165,3 +165,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-18 | SYS-102 | **交付完成**：`lesson-maturity.ts` 为唯一 L0–L5 成熟度来源（大纲/详案/引擎/实验可试玩/验收/正式发布，逐级 fail-closed）；目录、详情、后台、`/api/curriculum/catalog` 统一读取，`playable` 仅 L5；L3=7 门目录实验课+12 节启蒙课，L4/L5=0；修正目录与详情试玩入口不一致；6 项新测试；三端截图 owner 确认 | [#67](https://github.com/HelloMrDuan/kidsCoding/pull/67) | `05ff515cee53281f1ca465cf90bf9c042f80401c` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39107647945) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39107647931) | **completed**；UX-501 的 L0–L5 依赖已满足 |
+
+## UX-501 完成记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-18 | UX-501 | **交付完成**：V2 #page-catalog 分页分层（#61）+ 真实 L0–L5 状态（SYS-102 #67）：18 路线和每课显示统一成熟度，大纲课无可运行入口，三端无横向溢出 | [#61](https://github.com/HelloMrDuan/kidsCoding/pull/61) / [#67](https://github.com/HelloMrDuan/kidsCoding/pull/67) | `67fb94042de1354858cb565b5db9fe0b20101f93` / `05ff515cee53281f1ca465cf90bf9c042f80401c` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344848) / [L0–L5 main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39107647945) | **completed**；课程详情页 V2 改版另排期 |
