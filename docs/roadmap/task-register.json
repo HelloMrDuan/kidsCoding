@@ -59,7 +59,7 @@
       "title": "收口冲突的遗留PR1",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "旧PR1/Blockly首关",
       "acceptance": [
@@ -68,10 +68,16 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/63",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "0847cde2598c31ced1366939be95b7b03899822e",
+        "mainCI": [
+          "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39090066911",
+          "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39090066873"
+        ],
+        "tests": [
+          "PR CI 39088019047/39088019006 success",
+          "PR #1 已关闭并留言说明，分支保留"
+        ],
+        "reviewer": "owner 2026-10-18 确认"
       },
       "notes": "对照见 docs/roadmap/evidence/OPS-003/pr1-closure.md：PR #1 能力已由 #16 及后续任务在 main 交付，决定关闭不移植。"
     },
