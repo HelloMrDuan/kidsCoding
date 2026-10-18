@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "lesson-11-duo-rehearsal",
+  "reviewedCommit": "e8552299ae37586c7895c9f04cd8c3fe3c58370c",
+  "reviewedAt": "2026-10-18",
+  "reviewer": "Hark（AI 参考评分）",
+  "reviewerKind": "ai",
+  "independent": true,
+  "ageBand": "G0 启蒙（约 5～7 岁）",
+  "prerequisites": [
+    "lesson-10-second-friend"
+  ],
+  "newConcepts": [
+    "对白归属当前角色"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11，保留预测/迁移）",
+    "西瓜创客 PBL https://www.xiguacity.cn/curriculum（2026-10-11，保留项目作品与反思）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 16,
+      "evidence": [
+        "从“移动归属”迁移到“对白归属”",
+        "本 PR 修正课堂提示中“不能共用一条开始线”的错误概念（duo-lesson-hints.test.ts）"
+      ],
+      "defects": [
+        "与第 10 课结构几乎相同，新知识只有一处",
+        "修正前课堂反馈提示曾教错概念"
+      ]
+    },
+    "story": {
+      "score": 12,
+      "evidence": [
+        "出发排练情境；预测“说话会让谁开口”"
+      ],
+      "defects": [
+        "孩子不决定对白内容"
+      ]
+    },
+    "practice": {
+      "score": 20,
+      "evidence": [
+        "练习A：回顾两角色各走 100",
+        "练习B：切换后让小熊说“我们一起出发吧！”",
+        "duo-dialogue-executor.test.ts"
+      ],
+      "defects": [
+        "练习A 是第 10 课的重复，不是新目标"
+      ]
+    },
+    "feedback": {
+      "score": 13,
+      "evidence": [
+        "对白交错实验：狐狸开口、小熊沉默，舞台说明",
+        "重复切换是真实错误（e2e duplicate switching）",
+        "三层提示已统一为对白版本"
+      ],
+      "defects": [
+        "第三层的补救跳转仍是点击事件补救"
+      ]
+    },
+    "creation": {
+      "score": 10,
+      "evidence": [
+        "作品：保留小熊对白，或切换前加狐狸问候；本机保存重开修改（e2e editable saved work）"
+      ],
+      "defects": [
+        "对白文字固定，孩子不能写自己的台词"
+      ]
+    },
+    "assessment": {
+      "score": 7,
+      "evidence": [
+        "duo-reflect-own 对白版反思"
+      ],
+      "defects": [
+        "反思是二选一按钮（duo-reflect-own/together），不能记录孩子自己的解释",
+        "练习记录只在客户端，家长端没有基于本课真实数据的报告"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "真实 Blockly 连接顺序进入双角色教学解释器（use-block-executor.ts duo 分支），按坐标/对白判定；不是完整 Scratch VM，课堂已标实验"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "每步孩子自己拼积木并运行"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "step-4 必须先观察真实错误再修复（duo-stage observedMistake 门槛）"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "按实际位置/对白判定，作品步骤允许两种方案"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "完成页是可运行作品，直接打开完成 URL 不伪造（EDU-103 证据）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色/礼物为代码自绘原创 SVG"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "作品仅存本机，无云端/公开发布入口"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "存储写失败不发奖励、不跳完成页（local-progress-storage.test.ts + Chrome 注入 QuotaExceededError）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 登记 L3 实验可试玩，目录不显示为正式发布（SYS-102）"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "开始→狐狸移动→切换→小熊移动→说话：两位各 100，小熊说“我们一起出发吧！”，狐狸无对白",
+    "failureCase": "说话放在切换前：狐狸说“你好！”，小熊沉默，舞台报“对白没有交给正确角色”",
+    "hintLayers": [
+      "launch-lessons.ts duoLessonHints['lesson-11-duo-rehearsal'] 第1层",
+      "launch-lessons.ts duoLessonHints['lesson-11-duo-rehearsal'] 第2层",
+      "launch-lessons.ts duoLessonHints['lesson-11-duo-rehearsal'] 第3层"
+    ],
+    "practiceA": "两位朋友按顺序各走 100（无对白）",
+    "practiceB": "切换后只让小熊说出发对白",
+    "equivalentSolutions": [
+      "开始→狐狸移动→切换→小熊移动→说话",
+      "开始→狐狸移动→说话(狐狸问候)→切换→小熊移动→说话"
+    ],
+    "saveReopen": "完成页本机保存→重开→修改→再运行→重存（blockly-duo-dialogue.spec.ts）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/blockly-duo-dialogue.spec.ts"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/EDU-102/desktop-after.png",
+      "docs/roadmap/evidence/EDU-102/phone-error.png"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "对白内容固定，需支持孩子输入台词",
+    "需要本课专属补救内容"
+  ],
+  "notes": "单元测试 apps/web/src/features/lessons/playable-stage/duo-dialogue-executor.test.ts；EDU 证据 docs/roadmap/evidence/EDU-102/README.md。AI 参考分，需负责人作为独立人工审核人确认后才算正式复核。"
+}

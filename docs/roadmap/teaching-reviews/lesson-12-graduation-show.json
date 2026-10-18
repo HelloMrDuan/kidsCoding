@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "lesson-12-graduation-show",
+  "reviewedCommit": "e8552299ae37586c7895c9f04cd8c3fe3c58370c",
+  "reviewedAt": "2026-10-18",
+  "reviewer": "Hark（AI 参考评分）",
+  "reviewerKind": "ai",
+  "independent": true,
+  "ageBand": "G0 启蒙（约 5～7 岁）",
+  "prerequisites": [
+    "lesson-10-second-friend",
+    "lesson-11-duo-rehearsal"
+  ],
+  "newConcepts": [
+    "“再做一次”只重复当前角色的动作",
+    "两个目标都到位才算完成"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11，保留预测/迁移）",
+    "西瓜创客 PBL https://www.xiguacity.cn/curriculum（2026-10-11，保留项目作品与反思）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 18,
+      "evidence": [
+        "重复归属 + 双目标判定，是 10/11 课的综合与延伸"
+      ],
+      "defects": [
+        "“再做一次”不是真正的循环容器，后续课需说明"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "寻宝情境，100/200 两个路标，预测“再做一次让谁再走”"
+      ],
+      "defects": [
+        "剧情仍较短"
+      ]
+    },
+    "practice": {
+      "score": 22,
+      "evidence": [
+        "练习A：狐狸守住 100",
+        "练习B：小熊走到 200（再做一次或两块移动）",
+        "duo-graduation-executor.test.ts 两种方案"
+      ],
+      "defects": [
+        "没有改距离/改目标的练习"
+      ]
+    },
+    "feedback": {
+      "score": 13,
+      "evidence": [
+        "少走一次：实际 100/100，礼物不出现；补一次移动修复",
+        "重复不能借用另一角色的动作（e2e）"
+      ],
+      "defects": [
+        "第三层补救跳转仍是点击事件补救"
+      ]
+    },
+    "creation": {
+      "score": 12,
+      "evidence": [
+        "两种方案 + 可加狐狸问候/小熊庆祝",
+        "保存→重开→运行→修改→再验证（e2e graduation reopen）",
+        "重做不重复领奖"
+      ],
+      "defects": [
+        "作品元素都是预设选项"
+      ]
+    },
+    "assessment": {
+      "score": 7,
+      "evidence": [
+        "反思“为什么狐狸仍停在 100 步”",
+        "奖励去重、直接打开完成 URL 不伪造毕业"
+      ],
+      "defects": [
+        "反思是二选一按钮（duo-reflect-own/together），不能记录孩子自己的解释",
+        "练习记录只在客户端，家长端没有基于本课真实数据的报告"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "真实 Blockly 连接顺序进入双角色教学解释器（use-block-executor.ts duo 分支），按坐标/对白判定；不是完整 Scratch VM，课堂已标实验"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "每步孩子自己拼积木并运行"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "step-4 必须先观察真实错误再修复（duo-stage observedMistake 门槛）"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "按实际位置/对白判定，作品步骤允许两种方案"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "完成页是可运行作品，直接打开完成 URL 不伪造（EDU-103 证据）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色/礼物为代码自绘原创 SVG"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "作品仅存本机，无云端/公开发布入口"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "存储写失败不发奖励、不跳完成页（local-progress-storage.test.ts + Chrome 注入 QuotaExceededError）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 登记 L3 实验可试玩，目录不显示为正式发布（SYS-102）"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "开始→狐狸移动→切换→小熊移动→再做一次：狐狸 100、小熊 200，程序结束后礼物出现",
+    "failureCase": "小熊少走一次：实际 100/100，礼物不出现；给狐狸重复、切换后直接重复均失败",
+    "hintLayers": [
+      "launch-lessons.ts duoLessonHints['lesson-12-graduation-show'] 第1层",
+      "launch-lessons.ts duoLessonHints['lesson-12-graduation-show'] 第2层",
+      "launch-lessons.ts duoLessonHints['lesson-12-graduation-show'] 第3层"
+    ],
+    "practiceA": "狐狸走 100 守住路标，小熊留在 0",
+    "practiceB": "切换后小熊用“再做一次”或两块移动走到 200",
+    "equivalentSolutions": [
+      "开始→狐狸移动→切换→小熊移动→再做一次",
+      "开始→狐狸移动→切换→小熊移动→小熊移动"
+    ],
+    "saveReopen": "完成页可运行作品：保存→重开→运行→修改→再验证→重存；第二次通关不叠星/卡/徽章（blockly-duo-graduation.spec.ts）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/blockly-duo-graduation.spec.ts"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/EDU-103/desktop-after.png",
+      "docs/roadmap/evidence/EDU-103/phone-error.png"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "需要本课专属补救内容",
+    "开放创作受引擎限制（距离、台词不可自定义）"
+  ],
+  "notes": "单元测试 apps/web/src/features/lessons/playable-stage/duo-graduation-executor.test.ts；EDU 证据 docs/roadmap/evidence/EDU-103/README.md。AI 参考分，需负责人作为独立人工审核人确认后才算正式复核。"
+}

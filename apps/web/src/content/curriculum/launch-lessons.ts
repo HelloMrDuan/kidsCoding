@@ -5,6 +5,25 @@ import type {
 
 import { applyFoundationVoiceovers } from './foundation-voiceovers'
 
+/** TQ-003: one source for the duo lessons' three hint layers (classroom feedback + duo stage). */
+export const duoLessonHints = {
+  'lesson-10-second-friend': [
+  '看看两条轨道：谁走过了头？谁还在起点？',
+  '每个角色有自己的位置。移动积木只交给当前操作的朋友，不会让大家一起走。',
+  '先开始 → 小狐狸移动 → 切换到另一位朋友 → 小熊移动。删掉多余移动，在两次移动中间插入切换。',
+],
+  'lesson-11-duo-rehearsal': [
+  '看看谁头上出现了对白：小熊说出目标的话了吗？',
+  '每个角色有自己的对白。说话和移动一样，只作用于当前操作的朋友。',
+  '先让狐狸移动，再切换并移动小熊，把“说一句话”接在切换之后。作品步骤可以给狐狸另加问候。',
+],
+  'lesson-12-graduation-show': [
+  '看看小熊的距离：只走 100 步，离 200 步的礼物还差多远？',
+  '再做一次只重复当前角色刚做的移动；狐狸的位置不会跟着改变。',
+  '开始 → 狐狸移动 → 切换 → 小熊移动 → 再做一次。也可以用第二块小熊移动到达 200 步。',
+],
+} as const satisfies Record<string, readonly [string, string, string]>
+
 function buildHintLayers(
   repeatGoal: string,
   showBlock: string,
@@ -290,11 +309,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
     phase: 'trial',
     mode: 'guided',
     sortOrder: 10,
-    hintLayers: buildHintLayers(
-      '看两条轨道：小熊是不是还留在起点？小狐狸是不是走过了头？',
-      '移动只作用于当前角色；切换改变后续动作的目标，不改变之前的位置。',
-      '先开始、狐狸移动，再切换、小熊移动；需要时清空重拼。',
-    ),
+    hintLayers: buildHintLayers(...duoLessonHints['lesson-10-second-friend']),
     templateId: 'forest-graduation-show',
     parentAdvice: '请孩子演示漏切换时狐狸走 200 步、小熊不动，再修好为各走 100 步，并解释动作为什么只给当前角色。这里记录客户端练习，不代表认证掌握度。',
   },
@@ -314,11 +329,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
     phase: 'trial',
     mode: 'guided',
     sortOrder: 11,
-    hintLayers: buildHintLayers(
-      '先让第一位朋友行动，再让第二位朋友跟上。',
-      '两位朋友不能共用一条开始线，每个人都要接好自己的动作。',
-      '先看一下两位朋友按顺序合作的小示意。',
-    ),
+    hintLayers: buildHintLayers(...duoLessonHints['lesson-11-duo-rehearsal']),
     templateId: 'forest-graduation-show',
     parentAdvice: '请孩子演示对白放在切换前后的区别，再解释小熊的对白为什么不会让狐狸开口。完成作品可以在本机重开、修改和保存；这是练习，不是认证成绩。',
   },
@@ -338,11 +349,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
     phase: 'trial',
     mode: 'guided',
     sortOrder: 12,
-    hintLayers: buildHintLayers(
-      '看看小熊实际走了多少步，离 200 步还差多少。',
-      '再做一次只重复当前角色刚做的移动，狐狸不会跟着走。',
-      '开始 → 狐狸移动 → 切换 → 小熊移动 → 再做一次，也可以接第二块小熊移动。',
-    ),
+    hintLayers: buildHintLayers(...duoLessonHints['lesson-12-graduation-show']),
     templateId: 'forest-graduation-show',
     parentAdvice: '请孩子演示重开作品，解释狐狸为什么停在 100 步、小熊怎样走到 200 步，并比较两种方案。',
   },
