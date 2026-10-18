@@ -182,7 +182,7 @@
       "title": "双角色毕业课教学质量复核",
       "priority": "P1",
       "category": "TQ",
-      "status": "todo",
+      "status": "in_review",
       "dependencies": [
         "EDU-103"
       ],
@@ -192,13 +192,13 @@
         "不同正确作品可演示且保存重开"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/76",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "AI 参考分：L10 79、L11 78、L12 85，均未达 90；修正第11课错误提示并统一提示来源。待负责人人工确认。"
     },
     {
       "id": "TQ-004",

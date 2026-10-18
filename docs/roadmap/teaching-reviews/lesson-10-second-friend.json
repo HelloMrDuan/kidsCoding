@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "lesson-10-second-friend",
+  "reviewedCommit": "e8552299ae37586c7895c9f04cd8c3fe3c58370c",
+  "reviewedAt": "2026-10-18",
+  "reviewer": "Hark（AI 参考评分）",
+  "reviewerKind": "ai",
+  "independent": true,
+  "ageBand": "G0 启蒙（约 5～7 岁）",
+  "prerequisites": [
+    "lesson-01～09：开始事件、移动、说话、再做一次"
+  ],
+  "newConcepts": [
+    "角色切换",
+    "移动只作用于当前角色"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11，保留预测/迁移）",
+    "西瓜创客 PBL https://www.xiguacity.cn/curriculum（2026-10-11，保留项目作品与反思）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "launch-lessons.ts lesson-10 五步：观察→狐狸独立→切换→漏切换→作品",
+        "从单角色移动迁移到“操作权”"
+      ],
+      "defects": [
+        "距离固定为 100 步，没有参数变化"
+      ]
+    },
+    "story": {
+      "score": 12,
+      "evidence": [
+        "野餐旗情境；step-1 预测“切换后移动给谁”（duo-predict-bear/both）"
+      ],
+      "defects": [
+        "情境只有一句，孩子不决定下一步目标"
+      ]
+    },
+    "practice": {
+      "score": 21,
+      "evidence": [
+        "练习A：只让狐狸走 100，小熊留 0",
+        "练习B：切换后小熊走 100，狐狸保持",
+        "duo-executor.test.ts"
+      ],
+      "defects": [
+        "两项练习之外没有改参数/改角色的变化练习"
+      ]
+    },
+    "feedback": {
+      "score": 12,
+      "evidence": [
+        "漏切换错误：实际狐狸 200、小熊 0，舞台说明差异",
+        "三层提示具体（duoLessonHints）"
+      ],
+      "defects": [
+        "第三层同时触发的补救跳转是 remedial-click-trigger（点击事件补救），与本课不匹配"
+      ]
+    },
+    "creation": {
+      "score": 10,
+      "evidence": [
+        "作品步骤：保持各走 100 或切换前加狐狸问候，两种都通过",
+        "duo-save-project 本机保存、重开后可改"
+      ],
+      "defects": [
+        "创作空间只有“加不加问候”两种，孩子没有自己的选择"
+      ]
+    },
+    "assessment": {
+      "score": 7,
+      "evidence": [
+        "duo-reflect-own 反思题",
+        "parentAdvice 写明客户端练习不代表认证"
+      ],
+      "defects": [
+        "反思是二选一按钮（duo-reflect-own/together），不能记录孩子自己的解释",
+        "练习记录只在客户端，家长端没有基于本课真实数据的报告"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "真实 Blockly 连接顺序进入双角色教学解释器（use-block-executor.ts duo 分支），按坐标/对白判定；不是完整 Scratch VM，课堂已标实验"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "每步孩子自己拼积木并运行"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "step-4 必须先观察真实错误再修复（duo-stage observedMistake 门槛）"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "按实际位置/对白判定，作品步骤允许两种方案"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "完成页是可运行作品，直接打开完成 URL 不伪造（EDU-103 证据）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色/礼物为代码自绘原创 SVG"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "作品仅存本机，无云端/公开发布入口"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "存储写失败不发奖励、不跳完成页（local-progress-storage.test.ts + Chrome 注入 QuotaExceededError）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 登记 L3 实验可试玩，目录不显示为正式发布（SYS-102）"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "开始→狐狸移动→切换→小熊移动：狐狸 100、小熊 100，成功（blockly-duo.spec.ts 三尺寸）",
+    "failureCase": "漏切换：开始→移动→移动，实际狐狸 200、小熊 0，舞台报“目标/实际”差异，不能进入下一步",
+    "hintLayers": [
+      "launch-lessons.ts duoLessonHints['lesson-10-second-friend'] 第1层",
+      "launch-lessons.ts duoLessonHints['lesson-10-second-friend'] 第2层",
+      "launch-lessons.ts duoLessonHints['lesson-10-second-friend'] 第3层"
+    ],
+    "practiceA": "只让狐狸走 100，小熊停在 0",
+    "practiceB": "切换后让小熊独立走 100，狐狸位置不变",
+    "equivalentSolutions": [
+      "开始→狐狸移动→切换→小熊移动",
+      "开始→狐狸移动→说话(狐狸问候)→切换→小熊移动"
+    ],
+    "saveReopen": "完成页 duo-save-project → “作品已保存到本机”；改动后显示“作品尚未保存”，重存（blockly-duo.spec.ts）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/blockly-duo.spec.ts"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/EDU-101/desktop-after.png",
+      "docs/roadmap/evidence/EDU-101/phone-error.png"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "孩子只能在两种作品中选择，开放创作需引擎支持参数/对白内容编辑",
+    "需要本课专属补救内容，替换点击事件补救跳转"
+  ],
+  "notes": "单元测试 apps/web/src/features/lessons/playable-stage/duo-executor.test.ts；EDU 证据 docs/roadmap/evidence/EDU-101/README.md。AI 参考分，需负责人作为独立人工审核人确认后才算正式复核。"
+}
