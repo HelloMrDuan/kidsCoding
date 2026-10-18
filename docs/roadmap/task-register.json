@@ -1588,7 +1588,7 @@
       "title": "G0网格寻路引擎（方向/障碍/钥匙门）",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "SYS-103",
         "TQ-004"
@@ -1602,10 +1602,19 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/80",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "928aaba4d90fcd6a1d9d7acc1bd067515b13f7e2",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39176017943",
+        "tests": [
+          "grid-engine.test.ts 8 项（等价路线、撞石头、落水、出界、钥匙门错序）",
+          "grid-stage.test.tsx 3 项",
+          "engine-capabilities.test.ts 3 项；均加入 CI",
+          "截图 evidence/SYS-106/grid-1440/768/375.png"
+        ],
+        "reviewer": "owner 2026-10-19 确认合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39176018058",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39174207463",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39174207450",
+        "prNumber": 80
       },
       "notes": "为解除 TQ-004 阻塞登记。只做引擎与舞台，不解锁 G0-U1。"
     },
