@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useBlockExecutor } from './use-block-executor'
 import styles from './duo-stage.module.css'
+import { duoLessonHints } from '@/content/curriculum/launch-lessons'
 
 function Friend({ bear = false }: { bear?: boolean }) {
   return <svg viewBox="0 0 80 80" aria-hidden="true">
@@ -15,16 +16,6 @@ function Friend({ bear = false }: { bear?: boolean }) {
   </svg>
 }
 
-const hints = [
-  '看看两条轨道：谁走过了头？谁还在起点？',
-  '每个角色有自己的位置。移动积木只交给当前操作的朋友，不会让大家一起走。',
-  '先开始 → 小狐狸移动 → 切换到另一位朋友 → 小熊移动。删掉多余移动，在两次移动中间插入切换。',
-]
-const dialogueHints = [
-  '看看谁头上出现了对白：小熊说出目标的话了吗？',
-  '每个角色有自己的对白。说话和移动一样，只作用于当前操作的朋友。',
-  '先让狐狸移动，再切换并移动小熊，把“说一句话”接在切换之后。作品步骤可以给狐狸另加问候。',
-]
 
 export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRunClear, dialogue = false, graduation = false }: {
   blocks: Array<{ type: string }>
@@ -36,11 +27,7 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
   graduation?: boolean
 }) {
   const executor = useBlockExecutor(blocks, requiredBlocks, stepIndex, graduation ? 'graduation' : dialogue ? 'dialogue' : true)
-  const activeHints = graduation ? [
-    '看看小熊的距离：只走 100 步，离 200 步的礼物还差多远？',
-    '再做一次只重复当前角色刚做的移动；狐狸的位置不会跟着改变。',
-    '开始 → 狐狸移动 → 切换 → 小熊移动 → 再做一次。也可以用第二块小熊移动到达 200 步。',
-  ] : dialogue ? dialogueHints : hints
+  const activeHints = duoLessonHints[graduation ? 'lesson-12-graduation-show' : dialogue ? 'lesson-11-duo-rehearsal' : 'lesson-10-second-friend']
   const [prediction, setPrediction] = useState<'bear' | 'both' | null>(null)
   const [observedMistake, setObservedMistake] = useState(false)
   const [reflection, setReflection] = useState<'own' | 'together' | null>(null)
