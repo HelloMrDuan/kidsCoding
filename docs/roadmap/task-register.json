@@ -213,7 +213,7 @@
       "title": "G0第一单元教学质量复核",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_review",
+      "status": "blocked",
       "dependencies": [
         "TQ-001"
       ],
@@ -223,12 +223,18 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/78",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "f94809318b921d709cb7cba881c40deb52d8f403",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39130429176",
+        "tests": [
+          "teaching-review.test.ts 逐份复查 6 份 G0-U1 记录"
+        ],
+        "reviewer": "owner 2026-10-18 确认合并；AI 参考分",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39130429095",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39128997988",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39128997956",
+        "prNumber": 78
       },
-      "notes": "AI 参考分 33～35，六节均为 L1 详案不可玩，验收不通过；合并后改 blocked，待引擎方向/障碍能力与教案重写。"
+      "notes": "复核已做（#78），验收不通过：G0-U1 六节都是 L1 详案不可玩，AI 参考分 33～35，触发无亲手操作/无真实错误测试硬否决。恢复：引擎补网格、方向、障碍、拾取开门 → 按 TQ-001 重写教案 → 做成可玩课堂与单元作品 + E2E → 重新复核。"
     },
     {
       "id": "TQ-005",
