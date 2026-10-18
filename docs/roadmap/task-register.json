@@ -1042,7 +1042,7 @@
       "title": "作品夹真实作品卡与空状态",
       "priority": "P1",
       "category": "UX",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "UX-003"
       ],
@@ -1053,10 +1053,18 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/70",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "7fb164cb4248c1fbccedea913d7215dd48e49ebd",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39113860472",
+        "tests": [
+          "portfolio-works.test.ts 5 tests；progress+app vitest 65 passed",
+          "PR CI 39112990436/39112990428 success",
+          "Playwright 1440x900/768x1024/375x812（有作品/空状态）横向溢出 0，owner 确认"
+        ],
+        "reviewer": "owner 2026-10-18 确认合并",
+        "prNumber": 70,
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39113860452",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39112990436",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39112990428"
       },
       "notes": "V2 #page-portfolio：真实作品卡（积木快照/Python 本机+云端草稿）、场景/代码封面、小狐狸空状态、8 件分页、手机紧凑行。"
     },

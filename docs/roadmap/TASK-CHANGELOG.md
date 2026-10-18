@@ -171,3 +171,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-18 | UX-501 | **交付完成**：V2 #page-catalog 分页分层（#61）+ 真实 L0–L5 状态（SYS-102 #67）：18 路线和每课显示统一成熟度，大纲课无可运行入口，三端无横向溢出 | [#61](https://github.com/HelloMrDuan/kidsCoding/pull/61) / [#67](https://github.com/HelloMrDuan/kidsCoding/pull/67) | `67fb94042de1354858cb565b5db9fe0b20101f93` / `05ff515cee53281f1ca465cf90bf9c042f80401c` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344848) / [L0–L5 main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39107647945) | **completed**；课程详情页 V2 改版另排期 |
+
+## UX-301 完成记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-18 | UX-301 | **交付完成**：作品中心按冻结 V2 #page-portfolio 重做；`portfolio-works.ts` 只从真实存档生成作品卡（积木快照 + Python 本机/云端草稿），显示真实课程名、更新时间、积木数、来源（本机/本机+云端/仅云端）；封面为本课场景角色插画或孩子自己的代码，无示例图；无作品显示小狐狸空状态；每页 8 件分页、手机紧凑行；三端截图 owner 确认 | [#70](https://github.com/HelloMrDuan/kidsCoding/pull/70) | `7fb164cb4248c1fbccedea913d7215dd48e49ebd` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39113860472) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39113860452) | **completed**；账号云端暂只覆盖 Python 草稿，积木作品云端同步随账号绑定流程另行处理 |
