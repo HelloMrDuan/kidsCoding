@@ -1424,7 +1424,7 @@
       "title": "12启蒙ID与G0目录关联映射",
       "priority": "P1",
       "category": "SYS",
-      "status": "todo",
+      "status": "in_review",
       "dependencies": [
         "EDU-103"
       ],
@@ -1433,13 +1433,13 @@
         "不增加432总数，保留老进度和URL，映射语义经测试"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/65",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "映射表 content/curriculum/launch-catalog-mapping.ts + evidence/SYS-101/launch-g0-mapping.md；全部为衔接，无替代，不增 432、不自动完成目录课。"
     },
     {
       "id": "SYS-102",
