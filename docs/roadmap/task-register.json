@@ -132,20 +132,20 @@
       "title": "逐课教学审核表与评分工具",
       "priority": "P0",
       "category": "TQ",
-      "status": "todo",
+      "status": "in_review",
       "dependencies": [],
       "scope": "docs/roadmap/09,10、教研评审数据结构",
       "acceptance": [
         "每课独立100分、人工复核、硬否决、实际运行证据模板可填写且可复查"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/74",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "评分工具 teaching-review.ts（6维度100分、9条硬否决、运行证据模板、AI/非独立不能认定优质）；记录目录 docs/roadmap/teaching-reviews/；CI 复查。"
     },
     {
       "id": "TQ-002",
