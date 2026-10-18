@@ -1424,7 +1424,7 @@
       "title": "12启蒙ID与G0目录关联映射",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "EDU-103"
       ],
@@ -1434,10 +1434,17 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/65",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "3fc426881e7818be5af22b9d13ad62563d21345d",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39095422817",
+        "tests": [
+          "vitest launch-catalog-mapping + features/curriculum 5 files/22 tests passed",
+          "12 课各一条、原 ID 保留；432 总数不变；只链真实 G0/G1；衔接不自动完成目录课"
+        ],
+        "reviewer": "Owner (HelloMrDuan) approved merge in chat, 2026-10-18",
+        "prNumber": 65,
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39095422805",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39093302901",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39093302893"
       },
       "notes": "映射表 content/curriculum/launch-catalog-mapping.ts + evidence/SYS-101/launch-g0-mapping.md；全部为衔接，无替代，不增 432、不自动完成目录课。"
     },
