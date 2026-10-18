@@ -67,7 +67,7 @@
         "保留证据并决定关闭或移植，避免重复合并"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/63",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
