@@ -159,3 +159,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-18 | SYS-101 | **交付完成**：12 节启蒙课 ↔ G0/G1 目录映射（launch-catalog-mapping.ts + evidence/SYS-101 映射表），逐课标注关系/目录课/共同概念/理由；评审全部为衔接、无替代；保留原 ID 与进度，432 不变，启蒙进度不自动完成目录课；22 项单测通过；owner 确认 | [#65](https://github.com/HelloMrDuan/kidsCoding/pull/65) | `3fc426881e7818be5af22b9d13ad62563d21345d` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39095422817) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39095422805) | **completed**；下一项 SYS-102（L0–L5 统一状态） |
+
+## SYS-102 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-18 | SYS-102 | **交付完成**：`lesson-maturity.ts` 为唯一 L0–L5 成熟度来源（大纲/详案/引擎/实验可试玩/验收/正式发布，逐级 fail-closed）；目录、详情、后台、`/api/curriculum/catalog` 统一读取，`playable` 仅 L5；L3=7 门目录实验课+12 节启蒙课，L4/L5=0；修正目录与详情试玩入口不一致；6 项新测试；三端截图 owner 确认 | [#67](https://github.com/HelloMrDuan/kidsCoding/pull/67) | `05ff515cee53281f1ca465cf90bf9c042f80401c` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39107647945) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39107647931) | **completed**；UX-501 的 L0–L5 依赖已满足 |
