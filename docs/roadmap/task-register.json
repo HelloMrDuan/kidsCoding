@@ -1453,7 +1453,7 @@
       "title": "课程L0-L5状态统一数据模型",
       "priority": "P1",
       "category": "SYS",
-      "status": "todo",
+      "status": "in_review",
       "dependencies": [
         "SYS-101"
       ],
@@ -1463,13 +1463,16 @@
         "未发布不会误显示可玩"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/67",
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "vitest curriculum 8 files/45 tests passed (lesson-maturity 6)",
+          "Playwright 1440/768/375 目录/路线/详情 横向溢出 0"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "2026-10-18：lesson-maturity.ts 为唯一 L0–L5 来源；目录/详情/后台/API 统一读取；L4/L5=0。"
     },
     {
       "id": "SYS-103",

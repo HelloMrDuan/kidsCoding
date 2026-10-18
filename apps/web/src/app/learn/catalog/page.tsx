@@ -4,16 +4,17 @@ import {
   curriculumTracks,
   getCatalogStatistics,
   getCatalogTrack,
-  getLessonContentStage,
   type CatalogTrack,
 } from '@/features/curriculum/full-catalog-access'
+import { getLessonMaturity, summarizeMaturity, maturityLevels } from '@/features/curriculum/lesson-maturity'
+import { getLaunchLessonsForCatalogLesson } from '@/content/curriculum/launch-catalog-mapping'
 
 /**
  * UX-501 课程体系 = frozen V2 prototype #page-catalog, split into pages so a
  * child never scrolls through 432 lessons at once:
  *  - list view: title row, direction filter, 6 illustrated route cards per page + pager
  *  - route view (?track=ID): route header, unit tabs (?unit=N), that unit's 6 lessons
- * Status chips are honest content stages; nothing implies planned lessons are playable.
+ * Status chips read the single L0–L5 maturity source (SYS-102); nothing below L3 looks playable.
  */
 
 const PAGE_SIZE = 6
@@ -53,8 +54,6 @@ const COVERS: Record<string, { image?: string; tint: string; emoji?: string }> =
   steam: { tint: 'linear-gradient(130deg,#8a2f5b,#e2789f)', emoji: '🎨' },
 }
 
-const PYTHON_TRIAL = ['P0-U1-L01', 'P0-U1-L02', 'P0-U1-L03']
-
 function coverStyle(engine: string) {
   const c = COVERS[engine] ?? COVERS.ai
   return { backgroundImage: c.image ? `${c.tint},url(${c.image})` : c.tint }
@@ -62,18 +61,23 @@ function coverStyle(engine: string) {
 
 type Tone = 'green' | 'amber' | 'gray'
 
+function toneFor(level: number): Tone {
+  return level >= 3 ? 'green' : level >= 1 ? 'amber' : 'gray'
+}
+
 function trackStatus(track: CatalogTrack): { label: string; tone: Tone } {
-  if (track.id === 'G0') return { label: '启蒙 12 课可以玩', tone: 'green' }
-  if (track.id === 'P0') return { label: 'Python 实验可体验', tone: 'green' }
-  const detailed = track.units.some((u) => u.lessons.some((l) => getLessonContentStage(l.id) === 'detailed'))
-  return detailed ? { label: '教案已备 · 制作中', tone: 'amber' } : { label: '规划目录', tone: 'gray' }
+  const ids = track.units.flatMap((u) => u.lessons.map((l) => l.id))
+  const own = summarizeMaturity(ids)
+  if (own.trialCount > 0) return { label: `${own.trialCount} 课实验可试玩`, tone: 'green' }
+  const bridged = new Set(ids.flatMap((id) => getLaunchLessonsForCatalogLesson(id).map((link) => link.launchLessonId)))
+  if (bridged.size > 0) return { label: `启蒙衔接 ${bridged.size} 课可试玩`, tone: 'green' }
+  return { label: `L${own.max} ${maturityLevels[own.max].label}`, tone: toneFor(own.max) }
 }
 
 function lessonStatus(id: string): { label: string; tone: Tone } {
-  if (PYTHON_TRIAL.includes(id)) return { label: 'Python实验 · 可体验', tone: 'green' }
-  return getLessonContentStage(id) === 'detailed'
-    ? { label: '教案已备 · 待开发', tone: 'amber' }
-    : { label: '大纲规划 · 待开发', tone: 'gray' }
+  const m = getLessonMaturity(id)
+  const level = m?.level ?? 0
+  return { label: `L${level} ${maturityLevels[level].label}`, tone: toneFor(level) }
 }
 
 function toInt(value: string | undefined, fallback: number) {
@@ -237,7 +241,7 @@ function RouteView({ track, unitParam }: { track: CatalogTrack; unitParam?: stri
                   <small>第 {unitIndex * 6 + lessonIndex + 1} 课 · {lesson.phase}</small>
                   <h3>{lesson.title}</h3>
                   <p>{lesson.learningOutcome}</p>
-                  <span className={`kc-v2c-chip kc-v2c-chip-${ls.tone}`}>{ls.label.replace(' · ', '·')}</span>
+                  <span className={`kc-v2c-chip kc-v2c-chip-${ls.tone}`}>{ls.label}</span>
                 </Link>
               )
             })}
@@ -251,7 +255,7 @@ function RouteView({ track, unitParam }: { track: CatalogTrack; unitParam?: stri
             ) : null}
           </div>
         </section>
-        <p className="kc-v2c-hint">课程目录不代表在线开放。「教案已备」的课也要等素材、运行引擎和测试都完成后才会解锁。</p>
+        <p className="kc-v2c-hint">课程成熟度 L0 大纲 → L1 详案 → L2 引擎 → L3 实验可试玩 → L4 验收 → L5 正式发布；到 L5 才是正式课程。</p>
       </section>
     </div>
   )

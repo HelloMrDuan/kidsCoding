@@ -1,0 +1,132 @@
+import { launchLessons } from '@/content/curriculum/launch-lessons'
+import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
+import { evaluateReleaseReadiness, releasePilotEvidence, releaseRequirements, type ReleaseEvidence } from './release-readiness'
+
+/**
+ * SYS-101/SYS-102 — the ONE course maturity source (L0–L5).
+ * Catalog list, lesson detail, admin catalog and /api/curriculum/catalog must all read
+ * `getLessonMaturity`; never re-derive "playable" from track names or ad-hoc ID lists.
+ *
+ * L0 大纲规划   catalog outline only
+ * L1 详案已备   detailed lesson plan / foundation guide exists (content != engine)
+ * L2 引擎原型   a real runner executes this lesson's task (Blockly / Scratch VM / Pyodide)
+ * L3 实验可试玩 runner is wired into a routed, E2E-covered trial entry — still NOT published
+ * L4 验收通过   every release requirement except owner approval has positive evidence
+ * L5 正式发布   all release requirements true, owner approved
+ *
+ * A level counts only when every lower level also holds (fail closed).
+ */
+export const maturityLevels = [
+  { level: 0, key: 'outline', label: '大纲规划', short: 'L0 大纲' },
+  { level: 1, key: 'detailed', label: '详案已备', short: 'L1 详案' },
+  { level: 2, key: 'engine', label: '引擎原型', short: 'L2 引擎' },
+  { level: 3, key: 'trial', label: '实验可试玩', short: 'L3 试玩' },
+  { level: 4, key: 'verified', label: '验收通过', short: 'L4 验收' },
+  { level: 5, key: 'published', label: '正式发布', short: 'L5 发布' },
+] as const
+
+export type MaturityLevel = (typeof maturityLevels)[number]['level']
+
+export type TrialIntegration = {
+  engine: 'blockly' | 'scratch-vm' | 'pyodide'
+  /** Route a learner opens; must exist in app/ and be covered by the e2e spec below. */
+  route: string
+  e2eSpec: string
+}
+
+/** Auditable engine evidence: only lessons with a real runner + routed trial + e2e spec. */
+export const trialIntegrations: Record<string, TrialIntegration> = {
+  'G3-U1-L02': { engine: 'scratch-vm', route: '/learn/scratch-lab/G3-U1-L02', e2eSpec: 'tests/e2e/scratch-vm.spec.ts' },
+  'P0-U1-L01': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L01', e2eSpec: 'tests/e2e/python-lab.spec.ts' },
+  'P0-U1-L02': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L02', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
+  'P0-U1-L03': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L03', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
+  'P0-U1-L04': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L04', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
+  'P0-U1-L05': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L05', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
+  'P0-U1-L06': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L06', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
+  // 12 standalone launch lessons: Blockly stage at /learn/lesson/<id>, covered by tests/e2e/blockly-*.spec.ts.
+  ...Object.fromEntries(
+    launchLessons.map((lesson) => [
+      lesson.id,
+      { engine: 'blockly', route: `/learn/lesson/${lesson.id}`, e2eSpec: 'tests/e2e/blockly-*.spec.ts' } satisfies TrialIntegration,
+    ]),
+  ),
+}
+
+/** Release evidence per lesson; absent = every requirement false. Launch lessons have none yet. */
+export function getReleaseEvidence(id: string): ReleaseEvidence {
+  return releasePilotEvidence[id] ?? {}
+}
+
+export type LessonMaturity = {
+  id: string
+  level: MaturityLevel
+  key: (typeof maturityLevels)[number]['key']
+  label: string
+  short: string
+  /** L3+: an experimental trial entry may be shown (labelled as 实验, never 正式). */
+  trialAvailable: boolean
+  trialRoute: string | null
+  engine: TrialIntegration['engine'] | null
+  /** L5 only. Anything below must never be shown as a published, playable course. */
+  published: boolean
+  /** Next missing gate, for admin "未发布原因". */
+  blockers: string[]
+}
+
+function isKnownLesson(id: string) {
+  return getCatalogLesson(id) !== null || launchLessons.some((lesson) => lesson.id === id)
+}
+
+function hasDetailedPlan(id: string) {
+  if (launchLessons.some((lesson) => lesson.id === id)) return true // foundation guide + seeded steps
+  return getLessonContentStage(id) !== 'outline'
+}
+
+export function getLessonMaturity(id: string): LessonMaturity | null {
+  if (!isKnownLesson(id)) return null
+  const trial = trialIntegrations[id] ?? null
+  const release = evaluateReleaseReadiness(getReleaseEvidence(id))
+  const verifiedOnly = release.missing.length === 1 && release.missing[0].key === 'humanApproved'
+
+  const gates: { ok: boolean; blocker: string }[] = [
+    { ok: hasDetailedPlan(id), blocker: '缺详细教案' },
+    { ok: trial !== null, blocker: '缺真实运行引擎' },
+    { ok: trial !== null && trial.route.length > 0 && trial.e2eSpec.length > 0, blocker: '缺可路由的试玩入口和 E2E' },
+    { ok: release.ready || verifiedOnly, blocker: '发布验收未完成' },
+    { ok: release.ready, blocker: '负责人尚未批准正式发布' },
+  ]
+  let level = 0
+  for (const gate of gates) {
+    if (!gate.ok) break
+    level += 1
+  }
+  const meta = maturityLevels[level]
+  const blockers = level < 5 ? [gates[level].blocker, ...(level >= 3 ? release.missing.map((m) => m.label) : [])] : []
+  return {
+    id,
+    level: meta.level,
+    key: meta.key,
+    label: meta.label,
+    short: meta.short,
+    trialAvailable: level >= 3,
+    trialRoute: level >= 3 && trial ? trial.route : null,
+    engine: level >= 2 && trial ? trial.engine : null,
+    published: level === 5,
+    blockers: [...new Set(blockers)],
+  }
+}
+
+/** Highest level reached by any lesson in a set, plus per-level counts (for track/unit chips). */
+export function summarizeMaturity(ids: string[]) {
+  const counts = [0, 0, 0, 0, 0, 0]
+  let max = 0
+  for (const id of ids) {
+    const m = getLessonMaturity(id)
+    if (!m) continue
+    counts[m.level] += 1
+    max = Math.max(max, m.level)
+  }
+  return { max: max as MaturityLevel, counts, trialCount: counts[3] + counts[4] + counts[5], publishedCount: counts[5] }
+}
+
+export const releaseRequirementCount = releaseRequirements.length

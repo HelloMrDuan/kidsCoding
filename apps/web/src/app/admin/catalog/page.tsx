@@ -5,10 +5,10 @@ import {
   curriculumTracks,
   getCatalogStatistics,
   getCatalogTrack,
-  getLessonContentStage,
 } from '@/features/curriculum/full-catalog-access'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import {evaluateReleaseReadiness,releasePilotEvidence} from '@/features/curriculum/release-readiness'
+import { getLessonMaturity } from '@/features/curriculum/lesson-maturity'
 
 export default async function AdminCatalogPage({ searchParams }: { searchParams: Promise<{ track?: string }> }) {
   await requireCurriculumAdmin()
@@ -75,7 +75,7 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
                   {unit.lessons.map((lesson) => (
                     <Link key={lesson.id} href={`/admin/catalog/${lesson.id}`} className="flex flex-wrap justify-between gap-2 rounded-xl bg-slate-50 px-4 py-3 text-sm hover:bg-emerald-50" data-testid={`admin-catalog-lesson-${lesson.id}`}>
                       <span className="font-bold text-slate-900">{lesson.title}</span>
-                      <span className="text-slate-600">{getLessonContentStage(lesson.id) === 'detailed' ? '详细教案待审' : '仅大纲'}</span>
+                      {(() => { const m = getLessonMaturity(lesson.id)!; return <span className="text-slate-600" data-testid={`admin-lesson-maturity-${lesson.id}`}>L{m.level} {m.label}{m.blockers[0] ? ` · 未发布：${m.blockers[0]}` : ''}</span> })()}
                     </Link>
                   ))}
                 </div>
@@ -86,7 +86,7 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
               <p className="mt-2 text-sm text-slate-600">与现有线上课程条目 ID 对应，内容详案与线上发布状态分离。</p>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {launchLessons.map((lesson) => (
-                  <Link key={lesson.id} href={`/admin/catalog/${lesson.id}`} className="rounded-xl border border-slate-100 p-3 text-sm font-bold hover:border-emerald-300">{lesson.title} →</Link>
+                  <Link key={lesson.id} href={`/admin/catalog/${lesson.id}`} className="rounded-xl border border-slate-100 p-3 text-sm font-bold hover:border-emerald-300">{lesson.title} · L{getLessonMaturity(lesson.id)!.level} →</Link>
                 ))}
               </div>
             </section>

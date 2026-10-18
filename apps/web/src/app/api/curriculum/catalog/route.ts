@@ -8,6 +8,18 @@ import {
   getPublicCatalogTracks,
   getPublicCatalogUnit,
 } from '@/features/curriculum/full-catalog-access'
+import { getLessonMaturity } from '@/features/curriculum/lesson-maturity'
+
+function maturityFields(id: string) {
+  const m = getLessonMaturity(id)
+  return {
+    maturity: m ? { level: m.level, key: m.key, label: m.label } : null,
+    // Formal play only at L5; L3/L4 are experimental trials.
+    playable: m?.published ?? false,
+    trialAvailable: m?.trialAvailable ?? false,
+    trialRoute: m?.trialRoute ?? null,
+  }
+}
 
 // Public metadata only. Unpublished teacher scripts and draft answers stay in admin views.
 export function GET(request: Request) {
@@ -24,8 +36,7 @@ export function GET(request: Request) {
       concepts: found.lesson.concepts,
       learningOutcome: found.lesson.learningOutcome,
       contentStage: getLessonContentStage(found.lesson.id),
-      playable: false,
-      trialAvailable: found.lesson.id === 'P0-U1-L01',
+      ...maturityFields(found.lesson.id),
     })
   }
 
@@ -35,7 +46,10 @@ export function GET(request: Request) {
     if (!track) return NextResponse.json({ error: 'track-not-found' }, { status: 404 })
     return NextResponse.json({
       track: { id: track.id, title: track.title, ageRange: track.ageRange, engine: track.engine },
-      units: track.units.map(getPublicCatalogUnit),
+      units: track.units.map((unit) => {
+        const pub = getPublicCatalogUnit(unit)
+        return { ...pub, lessons: pub.lessons.map((lesson) => ({ ...lesson, ...maturityFields(lesson.id) })) }
+      }),
       notice: '内容目录不是已发布的在线课程；未完成引擎验收的关卡不可游玩。',
     })
   }
