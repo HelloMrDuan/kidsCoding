@@ -182,7 +182,7 @@
       "title": "双角色毕业课教学质量复核",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "EDU-103"
       ],
@@ -193,12 +193,20 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/76",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "95af5b8cdc311d2ccf2b1f8f457efc96650833ee",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39126276497",
+        "tests": [
+          "duo-lesson-hints.test.ts 2 tests（已加入 CI）",
+          "teaching-review.test.ts 逐份复查 3 份复核记录",
+          "PR CI 39124733298/39124733295 success"
+        ],
+        "reviewer": "owner 2026-10-18 确认合并；分数为 AI 参考分，未经人工认证",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39126276515",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39124733298",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39124733295",
+        "prNumber": 76
       },
-      "notes": "AI 参考分：L10 79、L11 78、L12 85，均未达 90；修正第11课错误提示并统一提示来源。待负责人人工确认。"
+      "notes": "AI 参考分 L10 79、L11 78、L12 85，均未达 90，不认定优质；修正第11课错误提示并统一提示来源。遗留：双角色专属补救、记录孩子自己的反思、开放创作、第11课练习A去重。"
     },
     {
       "id": "TQ-004",

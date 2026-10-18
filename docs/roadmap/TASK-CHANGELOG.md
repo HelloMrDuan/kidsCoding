@@ -189,3 +189,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-18 | TQ-001 | 逐课教学审核表与评分工具：6维度100分（给分必附证据）、9条硬否决（fail/未核即不可候选）、运行证据模板、AI/非独立审核不能认定优质、最多支持 L4；空白模板与填写说明在 docs/roadmap/teaching-reviews/，CI 逐份复查 | [#74](https://github.com/HelloMrDuan/kidsCoding/pull/74) | `e2468f910e8441568f9edcc21f765e8cd8204b8e` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39121854087) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39121854090) | **completed**；未给任何真实课程打分；下一项 TQ-003 |
+
+## TQ-003 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-18 | TQ-003 | 用 TQ-001 审核表复核第10～12课：AI 参考分 79/78/85，九条硬否决均通过；修正第11课错误提示，10～12课提示合并为单一来源并加测试入 CI | [#76](https://github.com/HelloMrDuan/kidsCoding/pull/76) | `95af5b8cdc311d2ccf2b1f8f457efc96650833ee` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39126276497) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39126276515) | **completed**；分数仅 AI 参考，未经人工认证、无儿童试学；三课仍 L3。遗留：双角色补救、自述反思、开放创作、第11课练习A去重 |
