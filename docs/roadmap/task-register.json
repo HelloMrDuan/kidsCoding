@@ -132,7 +132,7 @@
       "title": "逐课教学审核表与评分工具",
       "priority": "P0",
       "category": "TQ",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "docs/roadmap/09,10、教研评审数据结构",
       "acceptance": [
@@ -140,10 +140,17 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/74",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "e2468f910e8441568f9edcc21f765e8cd8204b8e",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39121854087",
+        "tests": [
+          "teaching-review.test.ts 10 tests（评分规则 + 逐份复查 docs/roadmap/teaching-reviews），已加入 CI Curriculum contract tests",
+          "PR CI 39119823268/39119823266 success"
+        ],
+        "reviewer": "owner 2026-10-18 确认合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39121854090",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39119823268",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39119823266",
+        "prNumber": 74
       },
       "notes": "评分工具 teaching-review.ts（6维度100分、9条硬否决、运行证据模板、AI/非独立不能认定优质）；记录目录 docs/roadmap/teaching-reviews/；CI 复查。"
     },

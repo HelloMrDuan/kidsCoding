@@ -183,3 +183,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-18 | SYS-103 | 第1～9课 Blockly 关卡按可观察结果评测（触发、步数、场景及切换位置、对白及时机）；参考程序结果即目标，等价解通过、反例失败并给出原因、无法执行不授予完成；130 vitest 通过 | [#72](https://github.com/HelloMrDuan/kidsCoding/pull/72) | `1586e277a56c4523ac52335e2f7a0af7978e7a84` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39117380477) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39117380520) | **completed**；第10～12课沿用双角色坐标判定；下一项 TQ-001 |
+
+## TQ-001 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-18 | TQ-001 | 逐课教学审核表与评分工具：6维度100分（给分必附证据）、9条硬否决（fail/未核即不可候选）、运行证据模板、AI/非独立审核不能认定优质、最多支持 L4；空白模板与填写说明在 docs/roadmap/teaching-reviews/，CI 逐份复查 | [#74](https://github.com/HelloMrDuan/kidsCoding/pull/74) | `e2468f910e8441568f9edcc21f765e8cd8204b8e` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39121854087) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39121854090) | **completed**；未给任何真实课程打分；下一项 TQ-003 |
