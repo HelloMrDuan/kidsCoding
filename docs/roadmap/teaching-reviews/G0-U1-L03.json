@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G0-U1-L03",
+  "reviewedCommit": "ac9a4bab5ccda461de85503928b3c727766f4435",
+  "reviewedAt": "2026-10-18",
+  "reviewer": "Hark（AI 参考评分）",
+  "reviewerKind": "ai",
+  "independent": true,
+  "ageBand": "G0 启蒙（5～7 岁）",
+  "prerequisites": [
+    "G0-U1-L02"
+  ],
+  "newConcepts": [
+    "步数与顺序计数"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11 公开介绍）",
+    "西瓜创客 PBL https://www.xiguacity.cn/curriculum（2026-10-11 公开介绍）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 13,
+      "evidence": [
+        "apps/web/src/content/curriculum/track-g0-detailed-lessons-v1.json G0-U1-L03",
+        "步数计数，两格/四格都是错误路线（边界清楚）"
+      ],
+      "defects": [
+        "extension 用“次数参数”提前引入循环，超出本单元"
+      ]
+    },
+    "story": {
+      "score": 9,
+      "evidence": [
+        "三格到蘑菇屋，多一步撞石头"
+      ],
+      "defects": [
+        "情境只有一句"
+      ]
+    },
+    "practice": {
+      "score": 5,
+      "evidence": [
+        "teachingSteps 五步有观察/操作/运行/比较的设计"
+      ],
+      "defects": [
+        "产品内不可操作；步骤含“地面/网格纸”等线下动作，未转成线上舞台操作"
+      ]
+    },
+    "feedback": {
+      "score": 3,
+      "evidence": [
+        "有 3 条 commonMistakes + 3 条 hints"
+      ],
+      "defects": [
+        "commonMistakes.diagnosis 是模板句（“检查「X」的输入条件与对象”），没有针对本课的现象描述",
+        "三条 hints 不是“现象→概念→具体做法”三层"
+      ]
+    },
+    "creation": {
+      "score": 2,
+      "evidence": [
+        "extension：次数参数替代三块指令"
+      ],
+      "defects": [
+        "没有可保存作品"
+      ]
+    },
+    "assessment": {
+      "score": 3,
+      "evidence": [
+        "有 rubric、mustPass、negativeCases、parentConversation"
+      ],
+      "defects": [
+        "observableCheck 五步都是同一句模板“学生能展示第N步操作结果…”",
+        "rubric 证据句由模板生成，automatedAssessmentReady=false"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "教案标 blockly_conceptual_not_executable、playable=false，没有假执行；但也没有任何真实执行"
+    },
+    "no-hands-on": {
+      "status": "fail",
+      "note": "产品里没有本课可操作的课堂：playable=false、codeReady=false，孩子无法亲手拼块运行"
+    },
+    "no-failure-test": {
+      "status": "fail",
+      "note": "没有正常执行，也没有真实错误/边界运行；negativeCases 只是文字"
+    },
+    "rigid-answer": {
+      "status": "unchecked",
+      "note": "没有判定器，无法核查合理程序是否能通过"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "目录未展示“项目已完成”，artifact 只是教案要求"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "无美术/音频素材（assetsReady=false），文字为自写教案"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "无作品保存或上传入口"
+    },
+    "broken-or-false-success": {
+      "status": "unchecked",
+      "note": "没有课堂可运行，无法核查"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 记为 L1 详案，目录不显示可玩（SYS-102）"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "",
+    "failureCase": "",
+    "hintLayers": [],
+    "practiceA": "",
+    "practiceB": "",
+    "equivalentSolutions": [],
+    "saveReopen": "",
+    "e2eSpecs": [],
+    "screenshots": []
+  },
+  "maturityLevel": 1,
+  "childTrial": "none",
+  "blockers": [
+    "引擎缺少本课所需能力（方向/网格移动/障碍碰撞），requiredEngineCapabilities 未满足",
+    "需要按 TQ-001 重写：本课专属现象诊断、三层提示、可判定的两项练习和两种正确方案",
+    "需要可保存重开的作品与 E2E"
+  ],
+  "notes": "教案级（detailed_script，playable=false）。与启蒙可玩课的对应：lesson-01-forest-hello 只部分对应（启蒙课一次移动 100 步，不是三格计数）。AI 参考分，不能认定优质。"
+}

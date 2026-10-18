@@ -213,7 +213,7 @@
       "title": "G0第一单元教学质量复核",
       "priority": "P1",
       "category": "TQ",
-      "status": "todo",
+      "status": "in_review",
       "dependencies": [
         "TQ-001"
       ],
@@ -222,13 +222,13 @@
         "六节知识递进且有两种有效练习、反例/分层提示、单元可演示作品"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/78",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "AI 参考分 33～35，六节均为 L1 详案不可玩，验收不通过；合并后改 blocked，待引擎方向/障碍能力与教案重写。"
     },
     {
       "id": "TQ-005",
