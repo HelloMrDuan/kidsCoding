@@ -1042,7 +1042,7 @@
       "title": "作品夹真实作品卡与空状态",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_review",
       "dependencies": [
         "UX-003"
       ],
@@ -1052,13 +1052,13 @@
         "无作品不展示假图"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/70",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "V2 #page-portfolio：真实作品卡（积木快照/Python 本机+云端草稿）、场景/代码封面、小狐狸空状态、8 件分页、手机紧凑行。"
     },
     {
       "id": "UX-302",

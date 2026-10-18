@@ -1,7 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { CharacterArt, SceneBackdrop } from '@/features/lessons/playable-stage/character-art'
+import { defaultGuestProgress, readGuestProgress, subscribeGuestProgress } from './local-progress'
+import { buildPortfolioWorks, sourceLabels, type PortfolioWork, type WorkKind } from './portfolio-works'
 import { parseCloudPythonDraft, type CloudPythonDraft } from './cloud-python-drafts'
 import { collectLocalPractices, PRACTICE_STORAGE_PREFIX, type LocalPractice } from './local-practice'
 
@@ -11,6 +14,10 @@ export function LocalPracticePortfolio() {
   const [cloudBusy, setCloudBusy] = useState(false)
   const [cloudMessage, setCloudMessage] = useState('需要登录账号并完成数据库迁移后才能使用。同步仅保存源码，不保存正式成绩。')
   const [needsLogin, setNeedsLogin] = useState(false)
+  const [cloudDrafts, setCloudDrafts] = useState<CloudPythonDraft[] | null>(null)
+  const [filter, setFilter] = useState<'all' | WorkKind>('all')
+  const [page, setPage] = useState(1)
+  const progress = useSyncExternalStore(subscribeGuestProgress, readGuestProgress, () => defaultGuestProgress)
 
   function refresh() {
     try {
@@ -20,6 +27,21 @@ export function LocalPracticePortfolio() {
     }
     setLoaded(true)
   }
+
+  useEffect(() => {
+    // Read-only peek at the child's own account drafts to label cloud copies; 401/missing table = local only.
+    let alive = true
+    fetch('/api/practice/drafts', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) return null
+        const payload: unknown = await response.json()
+        const rows = payload && typeof payload === 'object' && 'drafts' in payload ? (payload as { drafts: unknown }).drafts : null
+        return Array.isArray(rows) ? rows.map(parseCloudPythonDraft).filter((item): item is CloudPythonDraft => Boolean(item)) : null
+      })
+      .catch(() => null)
+      .then((drafts) => { if (alive) setCloudDrafts(drafts) })
+    return () => { alive = false }
+  }, [])
 
   useEffect(() => {
     refresh()
@@ -49,6 +71,7 @@ export function LocalPracticePortfolio() {
         }
         if (!response.ok) throw new Error('云端暂不可用，请确认数据库迁移已执行；本机草稿仍然保留。')
       }
+      setCloudDrafts(drafts.map(d => ({ lessonId: d.lessonId, source: d.source, updatedAt: new Date().toISOString() })))
       setCloudMessage('已把 '+drafts.length+' 份代码草稿保存到当前账号。成绩与星星没有上传。')
     } catch (error) {
       setCloudMessage(error instanceof Error ? error.message : '同步失败，请稍后再试。')
@@ -73,6 +96,7 @@ export function LocalPracticePortfolio() {
         ? (payload as {drafts:unknown}).drafts : null
       if (!Array.isArray(rows)) throw new Error('云端返回的数据格式不正确。')
       const drafts: CloudPythonDraft[] = rows.map(parseCloudPythonDraft).filter((item): item is CloudPythonDraft => Boolean(item))
+      setCloudDrafts(drafts)
       if (drafts.length === 0) {
         setCloudMessage('账号中还没有保存过 Python 作品。')
         return
@@ -99,44 +123,101 @@ export function LocalPracticePortfolio() {
     }
   }
 
-  return <main className="min-h-screen bg-[linear-gradient(140deg,#eaf7f2,#eff4ff_60%,#fff5e4)] px-4 py-8 text-slate-900">
-    <div className="mx-auto max-w-5xl space-y-6">
-      <Link href="/learn/catalog?track=P0" className="font-bold text-emerald-800">← 返回 Python 课程路线</Link>
-      <header className="rounded-[2rem] bg-white p-8 shadow-sm">
-        <p className="text-sm font-extrabold text-emerald-700">KidsCoding · 代码作品夹</p>
-        <h1 className="mt-2 text-3xl font-black">我的 Python 练习作品</h1>
-        <p className="mt-4 leading-7 text-slate-600">本机代码会自动保存。登录后可自主选择上传到自己账号，换设备后再恢复。上传和恢复不会改变正式课程成绩。</p>
-        <p className="mt-3 rounded-xl bg-amber-50 p-4 text-sm font-semibold text-amber-900">达标标记来自本机存储，能够被修改，<strong>不是正式课程成绩</strong>。云端只保存代码草稿，尚不支持正式教师评测与认证进度。</p>
-      </header>
-      <section className="rounded-[2rem] bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-black">我的账号 · 作品草稿同步</h2>
-        <p className="mt-2 text-sm leading-7 text-slate-600">上传为手动操作，不会在后台自动收集代码。使用前需要先完成账号登录和 Supabase 数据库迁移。</p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <button type="button" data-testid="cloud-upload-drafts" disabled={!loaded||cloudBusy} onClick={sendLocalToCloud} className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">上传本机草稿到账号</button>
-          <button type="button" data-testid="cloud-restore-drafts" disabled={!loaded||cloudBusy} onClick={restoreCloudToLocal} className="rounded-full border border-sky-300 bg-sky-50 px-5 py-3 text-sm font-bold text-sky-900 disabled:opacity-50">从账号恢复较新草稿</button>
-        </div>
-        <p data-testid="cloud-drafts-status" role="status" className="mt-3 text-sm text-slate-600">{cloudMessage}</p>
-        {needsLogin ? <Link href="/auth/bind" className="mt-3 inline-flex text-sm font-bold text-emerald-800">去登录 / 绑定账号 →</Link> : null}
-      </section>
-      <section data-testid="practice-portfolio" className="space-y-4">
-        {!loaded ? <p className="rounded-2xl bg-white p-6">正在读取本机作品……</p> : null}
-        {loaded && items.length === 0 ? <div className="rounded-[2rem] bg-white p-8 shadow-sm">
-          <h2 className="text-xl font-black">还没有保存的练习</h2>
-          <p className="mt-3 text-slate-600">先去第2～6课中的任意一节写一段 Python，编辑器会自动保存到当前浏览器。</p>
-          <Link href="/learn/python-lab/P0-U1-L02" className="mt-5 inline-flex rounded-full bg-emerald-700 px-5 py-3 font-bold text-white">开始第2课 →</Link>
-        </div> : null}
-        {items.map(item=><article key={item.lessonId} data-testid={`practice-item-${item.lessonId}`} className="rounded-[2rem] bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div><p className="text-xs font-bold text-emerald-700">{item.lessonId}</p><h2 className="mt-1 text-xl font-black">{item.title}</h2></div>
-            <span className="rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700">{item.passed?'本机记录：曾显示达标':'本机记录：继续练习'}</span>
-          </div>
-          <pre className="mt-4 max-h-44 overflow-auto whitespace-pre-wrap break-all rounded-xl bg-slate-950 p-4 font-mono text-sm text-emerald-200">{item.source}</pre>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-xs text-slate-500">本机更新时间：{new Date(item.savedAt).toLocaleString('zh-CN')}</p>
-            <Link href={`/learn/python-lab/${item.lessonId}`} className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-bold text-white">继续编辑作品 →</Link>
-          </div>
-        </article>)}
-      </section>
+  const works = useMemo(() => buildPortfolioWorks({ progress, practices: items, cloudDrafts }), [progress, items, cloudDrafts])
+  const shown = filter === 'all' ? works : works.filter((work) => work.kind === filter)
+  const pages = Math.max(1, Math.ceil(shown.length / PAGE_SIZE))
+  const current = Math.min(page, pages)
+  const visible = shown.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE)
+  const counts = { all: works.length, blockly: works.filter((w) => w.kind === 'blockly').length, python: works.filter((w) => w.kind === 'python').length }
+
+  return <div className="kc-v2h kc-v2p">
+    <div className="kc-v2h-title-row">
+      <div>
+        <div className="kc-v2h-eyebrow">MY PROJECTS</div>
+        <h1>作品中心</h1>
+        <p className="kc-v2h-subtitle">这里只放你真的做出来、能打开、能再次修改的作品。</p>
+      </div>
+      <Link href="/learn/map" className="kc-v2h-btn">＋ 新建作品</Link>
     </div>
-  </main>
+
+    <div className="kc-v2p-banner">作品自动保存在这台设备；Python 草稿登录后可手动存到自己账号。「完成」标记来自本机存储，<strong>不是正式课程成绩</strong>。</div>
+
+    <nav className="kc-v2c-filterbar" aria-label="作品类型">
+      {([['all', '全部作品'], ['blockly', '积木故事'], ['python', 'Python 练习']] as const).map(([key, label]) => (
+        <button key={key} type="button" onClick={() => { setFilter(key); setPage(1) }}
+          className={`kc-v2c-filter${filter === key ? ' kc-v2c-filter-active' : ''}`} aria-pressed={filter === key}>
+          {label} · {counts[key]}
+        </button>
+      ))}
+    </nav>
+
+    <section data-testid="practice-portfolio" aria-label="我的作品">
+      {!loaded ? <p className="kc-v2h-panel kc-v2p-loading">正在读取本机作品……</p> : null}
+      {loaded && shown.length === 0 ? <EmptyPortfolio kind={filter} /> : null}
+      {visible.length > 0 ? <div className="kc-v2p-grid">{visible.map((work) => <WorkCard key={work.id} work={work} />)}</div> : null}
+      {pages > 1 ? <nav className="kc-v2c-pager" aria-label="作品分页">
+        {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+          <button key={n} type="button" onClick={() => setPage(n)} aria-current={n === current ? 'page' : undefined}
+            className={`kc-v2c-page${n === current ? ' kc-v2c-page-active' : ''}`}>{n}</button>
+        ))}
+        <span className="kc-v2c-pager-note">共 {shown.length} 件</span>
+      </nav> : null}
+    </section>
+
+    <section className="kc-v2h-panel kc-v2p-sync" aria-label="账号云端">
+      <div className="kc-v2p-sync-text">
+        <b>Python 草稿 · 账号云端</b>
+        <p data-testid="cloud-drafts-status" role="status">{cloudMessage}</p>
+        {needsLogin ? <Link href="/auth/bind" className="kc-v2p-login">去登录 / 绑定账号 →</Link> : null}
+      </div>
+      <div className="kc-v2p-sync-actions">
+        <button type="button" data-testid="cloud-upload-drafts" disabled={!loaded||cloudBusy} onClick={sendLocalToCloud} className="kc-v2h-btn kc-v2h-btn-sm">上传本机草稿到账号</button>
+        <button type="button" data-testid="cloud-restore-drafts" disabled={!loaded||cloudBusy} onClick={restoreCloudToLocal} className="kc-v2h-btn kc-v2h-btn-sm kc-v2h-btn-outline">从账号恢复较新草稿</button>
+      </div>
+    </section>
+  </div>
+}
+
+const PAGE_SIZE = 8
+
+function WorkCover({ work }: { work: PortfolioWork }) {
+  if (work.cover.type === 'scene') {
+    return <div className="kc-v2p-cover kc-v2p-cover-scene" aria-hidden="true">
+      <SceneBackdrop scene={work.cover.scene} />
+      <div className="kc-v2p-cast">{work.cover.characters.slice(0, 2).map((id) => <CharacterArt key={id} id={id} className="kc-v2p-char" />)}</div>
+    </div>
+  }
+  return <div className="kc-v2p-cover kc-v2p-cover-code" aria-hidden="true">
+    <span className="kc-v2p-dots"><i /><i /><i /></span>
+    <pre>{work.cover.lines.join('\n') || '# 还没有代码'}</pre>
+  </div>
+}
+
+function WorkCard({ work }: { work: PortfolioWork }) {
+  const testId = work.kind === 'python' ? `practice-item-${work.lessonId}` : `portfolio-work-${work.lessonId}`
+  return <article className="kc-v2h-panel kc-v2p-card" data-testid={testId}>
+    <WorkCover work={work} />
+    <div className="kc-v2p-meta">
+      <h3>{work.title}</h3>
+      <p>{work.meta}</p>
+      <div className="kc-v2p-chips">
+        <span className={`kc-v2c-chip ${work.source === 'local' ? 'kc-v2c-chip-gray' : 'kc-v2c-chip-green'}`}>{sourceLabels[work.source]}</span>
+        <span className="kc-v2c-chip kc-v2c-chip-amber">{work.localPassed ? '本机：已完成' : '本机：继续练习'}</span>
+      </div>
+      <p className="kc-v2p-time">更新于 {new Date(work.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+      <Link href={work.href} className="kc-v2h-btn kc-v2h-btn-sm kc-v2h-btn-outline kc-v2p-open">继续编辑作品 →</Link>
+    </div>
+  </article>
+}
+
+function EmptyPortfolio({ kind }: { kind: 'all' | WorkKind }) {
+  const python = kind === 'python'
+  return <div className="kc-v2h-panel kc-v2p-empty">
+    <div className="kc-v2p-empty-art" aria-hidden="true"><SceneBackdrop scene="forest" /><CharacterArt id="fox" className="kc-v2p-empty-fox" /></div>
+    <div>
+      <h2>{python ? '还没有 Python 练习作品' : kind === 'blockly' ? '还没有积木故事作品' : '这里还空空的'}</h2>
+      <p>{python ? '去第 2～6 课写一段 Python，编辑器会自动保存到这台设备。' : '完成一节启蒙课，小狐狸的故事就会出现在这里，可以随时打开再改。'}</p>
+      <Link href={python ? '/learn/python-lab/P0-U1-L02' : '/learn/map'} className="kc-v2h-btn">{python ? '开始第 2 课 →' : '去完成第一课 →'}</Link>
+    </div>
+  </div>
 }
