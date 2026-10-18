@@ -147,3 +147,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-18 | UX-501 | 课程体系页对齐冻结 V2 #page-catalog 并分页分层：路线列表每页 6 张插画路线卡+分页+方向筛选；路线详情页单元标签切换、每次只显示一个单元；手机端一行一条紧凑列表；如实标注 可体验/教案已备/规划中；三端截图无横向溢出，owner 确认 | [#61](https://github.com/HelloMrDuan/kidsCoding/pull/61) | `67fb94042de1354858cb565b5db9fe0b20101f93` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344835) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344848) | **in_progress**（页面部分已交付）；统一 L0–L5 成熟度数据源未建立（02-PHASED-DELIVERY P1.2） |
+
+## OPS-003 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-18 | OPS-003 | **交付完成**：比对遗留 PR #1 与 main，其舞台/执行器/运行门禁已由 #16 及 EDU-101~103、UX-202 更完整交付；旧分叉直接合并会删约 5.6 万行；决定关闭不移植，证据 evidence/OPS-003/pr1-closure.md；PR #1 已关闭留言，分支保留；owner 确认 | [#63](https://github.com/HelloMrDuan/kidsCoding/pull/63) | `0847cde2598c31ced1366939be95b7b03899822e` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39090066911) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39090066873) | **completed**；下一项 SYS-101 |
