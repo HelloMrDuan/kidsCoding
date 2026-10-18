@@ -153,3 +153,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-18 | OPS-003 | **交付完成**：比对遗留 PR #1 与 main，其舞台/执行器/运行门禁已由 #16 及 EDU-101~103、UX-202 更完整交付；旧分叉直接合并会删约 5.6 万行；决定关闭不移植，证据 evidence/OPS-003/pr1-closure.md；PR #1 已关闭留言，分支保留；owner 确认 | [#63](https://github.com/HelloMrDuan/kidsCoding/pull/63) | `0847cde2598c31ced1366939be95b7b03899822e` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39090066911) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39090066873) | **completed**；下一项 SYS-101 |
+
+## SYS-101 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-18 | SYS-101 | **交付完成**：12 节启蒙课 ↔ G0/G1 目录映射（launch-catalog-mapping.ts + evidence/SYS-101 映射表），逐课标注关系/目录课/共同概念/理由；评审全部为衔接、无替代；保留原 ID 与进度，432 不变，启蒙进度不自动完成目录课；22 项单测通过；owner 确认 | [#65](https://github.com/HelloMrDuan/kidsCoding/pull/65) | `3fc426881e7818be5af22b9d13ad62563d21345d` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39095422817) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39095422805) | **completed**；下一项 SYS-102（L0–L5 统一状态） |
