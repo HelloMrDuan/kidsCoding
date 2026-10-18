@@ -1493,7 +1493,7 @@
       "title": "Blockly关卡改为可观察结果评测",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "EDU-103"
       ],
@@ -1503,10 +1503,18 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/72",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "1586e277a56c4523ac52335e2f7a0af7978e7a84",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39117380477",
+        "tests": [
+          "observable-run.test.ts（第1～9课全部步骤参考目标自洽、等价解、反例、不可执行）",
+          "use-block-executor 新增 2 项；lessons+learn vitest 130 passed",
+          "PR CI 39116382470/39116382435 success"
+        ],
+        "reviewer": "owner 2026-10-18 确认合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39117380520",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39116382470",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39116382435",
+        "prNumber": 72
       },
       "notes": "第1～9课按可观察结果（触发/步数/场景及切换位置/对白及时机）评测；参考程序结果即目标；等价解通过、反例失败、不可执行不授予完成。"
     },
