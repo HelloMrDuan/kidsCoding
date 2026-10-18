@@ -141,3 +141,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-18 | UX-601 | **交付完成**：首页按冻结 V2 学习中心原型逐区实现（标题行、深色主卡+V2 插画、进度环+周打卡、三条插画路径卡、示例作品），纳入全站外壳；CTA 新用户→/onboarding/age、已开始→下一课；数字来自真实进度；三端截图经负责人确认 | [#59](https://github.com/HelloMrDuan/kidsCoding/pull/59) | `fbc8b681450ba477511611aacc61210ff2c5dd03` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39049278801) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39049278748) | **completed**；课程体系、作品中心、卡册等内页后续逐页对齐 V2 |
+
+## UX-501 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-18 | UX-501 | 课程体系页对齐冻结 V2 #page-catalog 并分页分层：路线列表每页 6 张插画路线卡+分页+方向筛选；路线详情页单元标签切换、每次只显示一个单元；手机端一行一条紧凑列表；如实标注 可体验/教案已备/规划中；三端截图无横向溢出，owner 确认 | [#61](https://github.com/HelloMrDuan/kidsCoding/pull/61) | `67fb94042de1354858cb565b5db9fe0b20101f93` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344835) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39084344848) | **in_progress**（页面部分已交付）；统一 L0–L5 成熟度数据源未建立（02-PHASED-DELIVERY P1.2） |
