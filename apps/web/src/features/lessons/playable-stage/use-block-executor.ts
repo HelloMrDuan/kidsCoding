@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { evaluateObservable, MAX_PROGRAM_BLOCKS, simulateProgram } from '../blockly/observable-run'
 
 export type ExecutionState = 'idle' | 'armed' | 'running' | 'success' | 'error'
 
@@ -123,6 +124,14 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
       await new Promise(resolve => setTimeout(resolve, 180))
       if (runIdRef.current !== id) return
     }
+    if (!duoEnabled) {
+      // SYS-103: judge the observed result, so equivalent programs pass and counter-examples fail.
+      const verdict = evaluateObservable(requiredBlocks, blocks)
+      if (!verdict.passed) {
+        fail(verdict.reason)
+        return
+      }
+    }
     if (duoEnabled) {
       const expectedFox = stepIndex === 0 ? 0 : 100
       const expectedBear = graduationEnabled ? (stepIndex < 2 ? 0 : 200) : dialogueEnabled ? (stepIndex === 0 ? 0 : 100) : stepIndex < 2 ? 0 : 100
@@ -150,16 +159,25 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
       }
     }
     if (runIdRef.current === id) setExecutionState('success')
-  }, [blocks, duoEnabled, dialogueEnabled, graduationEnabled, stepIndex])
+  }, [blocks, requiredBlocks, duoEnabled, dialogueEnabled, graduationEnabled, stepIndex])
 
   const run = useCallback(async () => {
     reset()
     const id = ++runIdRef.current
     setExecutionState('running')
-    if ((!duoEnabled && (blocks.length !== requiredBlocks.length || !requiredBlocks.every((type, i) => type === blocks[i]?.type))) || blocks.length > 24) {
-      setErrorMessage('积木数量或顺序不符合任务；一次最多运行 24 块。')
+    if (blocks.length > MAX_PROGRAM_BLOCKS) {
+      setErrorMessage(`一次最多运行 ${MAX_PROGRAM_BLOCKS} 块积木。`)
       setExecutionState('error')
       return
+    }
+    if (!duoEnabled) {
+      // A program that cannot actually run never starts (and never earns completion).
+      const simulation = simulateProgram(blocks)
+      if (!simulation.ok) {
+        setErrorMessage(simulation.reason)
+        setExecutionState('error')
+        return
+      }
     }
     if (duoEnabled ? blocks[0]?.type !== 'when_start' : blocks[0]?.type !== 'when_start' && blocks[0]?.type !== 'when_clicked') {
       setErrorMessage('请把“开始时”放在最前面，告诉朋友什么时候行动。')

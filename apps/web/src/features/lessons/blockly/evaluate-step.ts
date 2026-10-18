@@ -1,10 +1,9 @@
-export function evaluateStep(
-  requiredBlockTypes: string[],
-  blocks: Array<{ type: string }>,
-) {
-  if (blocks.length < requiredBlockTypes.length) {
-    return false
-  }
+import { evaluateObservable, type ProgramBlock } from './observable-run'
 
-  return requiredBlockTypes.every((type, index) => blocks[index]?.type === type)
+/**
+ * SYS-103: a step is complete when the program's observable result matches the step goal
+ * (see observable-run.ts). Equivalent programs pass; programs that cannot run never pass.
+ */
+export function evaluateStep(requiredBlockTypes: string[], blocks: ProgramBlock[]) {
+  return evaluateObservable(requiredBlockTypes, blocks).passed
 }

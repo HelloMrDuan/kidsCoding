@@ -98,6 +98,24 @@ describe('useBlockExecutor', () => {
     expect(result.current.characterMessage).toBe('我到草地啦！')
   },12000)
 
+  it('SYS-103: an equivalent program reaches the same observed goal and succeeds',async()=>{
+    const goal=['when_start','move_right','switch_scene','repeat_twice','say_line']
+    const blocks=[{type:'when_start'},{type:'move_right'},{type:'switch_scene'},{type:'move_right'},{type:'say_line'}]
+    const {result}=renderHook(()=>useBlockExecutor(blocks,goal))
+    await act(async()=>{await result.current.run()})
+    expect(result.current.executionState).toBe('success')
+    expect(result.current.characterPosition).toBe(200)
+  },12000)
+
+  it('SYS-103: a runnable counter-example plays out but ends in an explained error',async()=>{
+    const goal=['when_start','move_right','switch_scene']
+    const blocks=[{type:'when_start'},{type:'switch_scene'},{type:'move_right'}]
+    const {result}=renderHook(()=>useBlockExecutor(blocks,goal))
+    await act(async()=>{await result.current.run()})
+    expect(result.current.executionState).toBe('error')
+    expect(result.current.errorMessage).toContain('先在森林走 100 步')
+  },12000)
+
   it('refuses to repeat a movement that does not exist',async()=>{
     const sequence=['when_start','repeat_twice']
     const {result}=renderHook(()=>useBlockExecutor(sequence.map(type=>({type})),sequence))
