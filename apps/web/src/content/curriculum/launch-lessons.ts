@@ -178,6 +178,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
       '先看一下故事怎么从森林走到草地，再回来试一次。',
       'remedial-scene-switch',
     ),
+    templateId: 'meadow-journey-stage',
     parentAdvice: '请孩子指给你看，故事是在第几步从森林走到了草地。',
   },
   {
@@ -202,6 +203,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
       '先看一下顺序示意，再回来把旅行接完整。',
       'remedial-scene-switch',
     ),
+    templateId: 'meadow-journey-stage',
     parentAdvice: '让孩子按顺序说一遍，先从森林出发，再到草地，最后又往前走了一步。',
   },
   {

@@ -15,6 +15,47 @@ type BlockSnapshot = {
 }
 
 const LINE_FIELD = 'LINE'
+const BASE_SCALE = 0.9
+/** Lowest scale the fit may shrink to: still readable for kids on a 375px phone. */
+const MIN_FIT_SCALE = 0.6
+const FIT_MARGIN = 12
+/** Blockly's scrollbars sit inside the view; keep blocks clear of them. */
+const SCROLLBAR_ALLOWANCE = 16
+
+/**
+ * TQ-008: on narrow canvases (375/768) the flyout leaves little room, so a stack with the
+ * say-line dropdown ran past the right edge. When the program does not fully show, shrink
+ * (never below MIN_FIT_SCALE, never above BASE_SCALE) and scroll it back to the top-left so
+ * the whole block, dropdown text included, stays visible. A program that already fits is
+ * left exactly where it is.
+ */
+function fitBlocksToView(workspace: Blockly.WorkspaceSvg) {
+  if (workspace.isDragging() || workspace.getTopBlocks(false).length === 0) return
+  const box = workspace.getBlocksBoundingBox()
+  const contentWidth = box.right - box.left
+  const contentHeight = box.bottom - box.top
+  if (contentWidth <= 0 || contentHeight <= 0) return
+  const metrics = workspace.getMetricsManager()
+  const view = metrics.getViewMetrics(true)
+  const allowance = SCROLLBAR_ALLOWANCE / workspace.scale
+  const fullyVisible =
+    box.left >= view.left &&
+    box.top >= view.top &&
+    box.right <= view.left + view.width - allowance &&
+    box.bottom <= view.top + view.height - allowance
+  const pixelView = metrics.getViewMetrics(false)
+  const fitScale = Math.min(
+    BASE_SCALE,
+    (pixelView.width - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) / contentWidth,
+    (pixelView.height - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) / contentHeight,
+  )
+  const targetScale = Math.max(MIN_FIT_SCALE, fitScale)
+  const canGrowBack = workspace.scale < BASE_SCALE - 0.01 && targetScale > workspace.scale + 0.01
+  if (fullyVisible && !canGrowBack) return
+  if (Math.abs(workspace.scale - targetScale) > 0.01) workspace.setScale(targetScale)
+  const scale = workspace.scale
+  workspace.scroll(FIT_MARGIN - box.left * scale, FIT_MARGIN - box.top * scale)
+}
 
 function collectSequence(block: Blockly.Block | null, result: BlockSnapshot[]) {
   let current = block
@@ -147,8 +188,8 @@ export function BlocklyWorkspace({
       zoom: {
         controls: false,
         wheel: true,
-        startScale: 0.9,
-        minScale: 0.8,
+        startScale: BASE_SCALE,
+        minScale: MIN_FIT_SCALE,
         maxScale: 1.2,
       },
     })
@@ -170,18 +211,28 @@ export function BlocklyWorkspace({
       else positionOrConnectBlock(workspace, block)
     })
 
+    let fitFrame = 0
+    const scheduleFit = () => {
+      cancelAnimationFrame(fitFrame)
+      fitFrame = requestAnimationFrame(() => fitBlocksToView(workspace))
+    }
+
     const handleResize = () => {
       Blockly.svgResize(workspace)
+      scheduleFit()
     }
 
     let previousSnapshot = JSON.stringify(latestBlocksRef.current)
-    const handleChange = () => {
+    const handleChange = (event?: Blockly.Events.Abstract) => {
       const next = snapshotOf(workspace)
       const key = JSON.stringify(next)
       // Focus, selection and viewport changes do not edit the program.
       if (key !== previousSnapshot) {
         previousSnapshot = key
         onSnapshotChange(next)
+        scheduleFit()
+      } else if (event?.type === Blockly.Events.BLOCK_DRAG && !(event as Blockly.Events.BlockDrag).isStart) {
+        scheduleFit()
       }
     }
 
@@ -198,6 +249,7 @@ export function BlocklyWorkspace({
     handleChange()
 
     return () => {
+      cancelAnimationFrame(fitFrame)
       resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
       workspace.removeChangeListener(handleChange)
