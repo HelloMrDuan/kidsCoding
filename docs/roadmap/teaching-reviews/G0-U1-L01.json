@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "lessonId": "G0-U1-L01",
-  "reviewedCommit": "ac9a4bab5ccda461de85503928b3c727766f4435",
-  "reviewedAt": "2026-10-18",
-  "reviewer": "Hark（AI 参考评分）",
+  "reviewedCommit": "32c86eafaf283db95961c168965ae4922c3c18a5",
+  "reviewedAt": "2026-10-19",
+  "reviewer": "Hark（AI 参考评分，亦为本课实现者）",
   "reviewerKind": "ai",
-  "independent": true,
+  "independent": false,
   "ageBand": "G0 启蒙（5～7 岁）",
   "prerequisites": [],
   "newConcepts": [
-    "事件入口与一条动作顺序"
+    "事件入口“开始时”与一条顺序动作"
   ],
   "references": [
     "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11 公开介绍）",
@@ -17,119 +17,130 @@
   ],
   "scores": {
     "knowledge": {
-      "score": 12,
+      "score": 17,
       "evidence": [
-        "apps/web/src/content/curriculum/track-g0-detailed-lessons-v1.json G0-U1-L01",
-        "教案 focusConcept 事件入口与一条动作顺序；第5步删掉开始牌再运行比较"
+        "apps/web/src/content/curriculum/g0-u1-grid-lessons.ts G0-U1-L01",
+        "标题「开始时，向前走」与内容一致；新概念：事件入口“开始时”与一条顺序动作",
+        "六课递进：开始事件 → 四方向 → 数步数 → 转向 → 钥匙门前提 → 综合作品"
       ],
       "defects": [
-        "标题“认识按钮”与内容（开始事件+移动）不符",
-        "学习目标是模板句"
+        "L01 只有一个新概念，分量偏轻"
       ]
     },
     "story": {
-      "score": 9,
+      "score": 11,
       "evidence": [
-        "树屋情境：“先启动再前进才能走出树屋”"
+        "小狐狸森林情境贯穿；每关有“先猜一猜”预测问题"
       ],
       "defects": [
-        "缺少让孩子先预测的问题"
+        "没有语音朗读：5～7 岁识字有限，说明、提示、预测问题全靠文字"
       ]
     },
     "practice": {
-      "score": 4,
+      "score": 21,
       "evidence": [
-        "teachingSteps 五步有观察/操作/运行/比较的设计"
+        "4 关：两关带着做 + 练习 A 自己搭 + 练习 B 修别人的程序，均在网格舞台上亲手拼块运行",
+        "apps/web/src/content/curriculum/g0-u1-grid-lessons.test.ts 每关正解真跑通"
       ],
       "defects": [
-        "产品内不可操作；步骤含“地面/网格纸”等线下动作，未转成线上舞台操作"
+        "练习 B 修错主要靠清空重拼，单块插入/替换对这个年龄偏难"
       ]
     },
     "feedback": {
-      "score": 3,
+      "score": 13,
       "evidence": [
-        "有 3 条 commonMistakes + 3 条 hints"
+        "每种失败有本课专属诊断（diagnoses）",
+        "三层提示：现象 → 概念 → 具体做法；舞台显示撞到/落水的位置"
       ],
       "defects": [
-        "commonMistakes.diagnosis 是模板句（“检查「X」的输入条件与对象”），没有针对本课的现象描述",
-        "三条 hints 不是“现象→概念→具体做法”三层"
+        "提示按次数展开，不会根据孩子的具体程序指出是哪一块错"
       ]
     },
     "creation": {
-      "score": 2,
+      "score": 8,
       "evidence": [
-        "extension：给动作换一个方向，解释不同结局"
+        "练习 A 允许多种路线，引擎按真实运行判定"
       ],
       "defects": [
-        "没有可保存作品"
+        "没有开放创作，练习 A 是“多解路线”，不是自己出题或改地图"
       ]
     },
     "assessment": {
-      "score": 3,
+      "score": 8,
       "evidence": [
-        "有 rubric、mustPass、negativeCases、parentConversation"
+        "通过由真实引擎判定，反例在单元测试里给出指定错误",
+        "apps/web/tests/e2e/grid-lab.spec.ts：G0-U1-L01 grid lesson: real failure, layered hint, four real passes, saved and reopened"
       ],
       "defects": [
-        "observableCheck 五步都是同一句模板“学生能展示第N步操作结果…”",
-        "rubric 证据句由模板生成，automatedAssessmentReady=false"
+        "反思与家长问题只显示，不收集回答；没有儿童试学"
       ]
     }
   },
   "vetoes": {
     "fake-execution": {
       "status": "pass",
-      "note": "教案标 blockly_conceptual_not_executable、playable=false，没有假执行；但也没有任何真实执行"
+      "note": "运行结果来自 grid-engine 真实执行，舞台按运行帧播放"
     },
     "no-hands-on": {
-      "status": "fail",
-      "note": "产品里没有本课可操作的课堂：playable=false、codeReady=false，孩子无法亲手拼块运行"
+      "status": "pass",
+      "note": "/learn/grid-lab/G0-U1-L01 可亲手拼块运行（L3 实验可试玩）"
     },
     "no-failure-test": {
-      "status": "fail",
-      "note": "没有正常执行，也没有真实错误/边界运行；negativeCases 只是文字"
+      "status": "pass",
+      "note": "单元测试反例 + E2E 真实失败再修正"
     },
     "rigid-answer": {
-      "status": "unchecked",
-      "note": "没有判定器，无法核查合理程序是否能通过"
+      "status": "pass",
+      "note": "每课至少一关两种不同正解，均由引擎判定通过（单元测试）"
     },
     "fake-project": {
       "status": "pass",
-      "note": "目录未展示“项目已完成”，artifact 只是教案要求"
+      "note": "本课不声称项目完成"
     },
     "unlicensed-assets": {
       "status": "pass",
-      "note": "无美术/音频素材（assetsReady=false），文字为自写教案"
+      "note": "小狐狸与森林网格为自绘 SVG，文字为自写"
     },
     "minor-privacy-risk": {
       "status": "pass",
-      "note": "无作品保存或上传入口"
+      "note": "只存本机 localStorage（kids-grid-lesson-v1:），不上传"
     },
     "broken-or-false-success": {
-      "status": "unchecked",
-      "note": "没有课堂可运行，无法核查"
+      "status": "pass",
+      "note": "练习 B 起始程序必失败；未到目标不判通过（单元测试 + E2E）"
     },
     "id-status-mismatch": {
       "status": "pass",
-      "note": "lesson-maturity.ts 记为 L1 详案，目录不显示可玩（SYS-102）"
+      "note": "lesson-maturity.ts 记为 L3 实验可试玩，目录不标正式发布"
     }
   },
   "runEvidence": {
-    "normalRun": "",
-    "failureCase": "",
-    "hintLayers": [],
-    "practiceA": "",
-    "practiceB": "",
-    "equivalentSolutions": [],
-    "saveReopen": "",
-    "e2eSpecs": [],
-    "screenshots": []
+    "normalRun": "L01 第1关：开始时 + 向右走 3 格，真实运行到达蘑菇屋（E2E）",
+    "failureCase": "缺少“开始时”→ no_start；多走一步 → out_of_bounds（E2E 先失败再修正）",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清这一课的规则（概念）",
+      "第三层：给出具体积木顺序（做法）"
+    ],
+    "practiceA": "练习 A 自己搭：从起点走到目标，两种正解",
+    "practiceB": "练习 B 修小兔子的程序（起始程序必失败）",
+    "equivalentSolutions": [
+      "正解 1（单元测试真跑通）",
+      "正解 2（单元测试真跑通）"
+    ],
+    "saveReopen": "程序与关卡进度存 kids-grid-lesson-v1:G0-U1-L01，刷新后回到原关卡（E2E 验证）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L01 grid lesson: real failure, layered hint, four real passes, saved and reopened"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/EDU-104/"
+    ]
   },
-  "maturityLevel": 1,
+  "maturityLevel": 3,
   "childTrial": "none",
   "blockers": [
-    "引擎缺少本课所需能力（方向/网格移动/障碍碰撞），requiredEngineCapabilities 未满足",
-    "需要按 TQ-001 重写：本课专属现象诊断、三层提示、可判定的两项练习和两种正确方案",
-    "需要可保存重开的作品与 E2E"
+    "AI 评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学"
   ],
-  "notes": "教案级（detailed_script，playable=false）。与启蒙可玩课的对应：lesson-02-forest-greeting 只部分对应（启蒙课是出场说话）。AI 参考分，不能认定优质。"
+  "notes": "2026-10-19 在 EDU-104 合并后（PR #82）重新复核。AI 参考分，只用于找缺陷，不能认定优质。"
 }
