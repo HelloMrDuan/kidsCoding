@@ -39,6 +39,8 @@ export type GridLesson = {
   diagnoses: Partial<Record<GridFailure, string>>
   steps: GridLessonStep[]
   reflection: string
+  /** EDU-105: one-tap check of the lesson's idea; the child's choice is saved with the lesson. */
+  reflectionCheck: { question: string; options: Array<{ text: string; correct: boolean }>; why: string }
   parentQuestion: string
   /** Unit project: the child's own program from this step becomes a saved, replayable card. */
   project?: { stepId: string; title: string }
@@ -147,6 +149,11 @@ const L01: GridLesson = {
     },
   ],
   reflection: '说一说：为什么没有“开始时”，小狐狸就不动？',
+  reflectionCheck: {
+    question: '没有“开始时”，小狐狸会怎样？',
+    options: [{ text: '一动不动，等着出发', correct: true }, { text: '自己随便乱走', correct: false }, { text: '走得更快', correct: false }],
+    why: '“开始时”就像发令枪，没有它，下面的积木都不会运行。',
+  },
   parentQuestion: '请孩子演示：先拿掉“开始时”运行一次，再放回去运行一次，说说两次有什么不同。',
 }
 
@@ -246,6 +253,11 @@ const L02: GridLesson = {
     },
   ],
   reflection: '说一说：你选了哪条路？为什么不能直接穿过小河？',
+  reflectionCheck: {
+    question: '为什么不能直接穿过小河？',
+    options: [{ text: '小狐狸会掉进河里', correct: true }, { text: '小河会自己变没', correct: false }, { text: '走河里更快', correct: false }],
+    why: '小河是走不过去的格子，要换一排没有河的路绕过去。',
+  },
   parentQuestion: '请孩子指着屏幕，说出自己的路线：“先往哪边走几格，再往哪边走几格”。',
 }
 
@@ -339,6 +351,11 @@ const L03: GridLesson = {
     },
   ],
   reflection: '说一说：少一步和多一步，小狐狸分别停在哪里？',
+  reflectionCheck: {
+    question: '蘑菇屋在右边 3 格，要放几块“向右走一格”？',
+    options: [{ text: '3 块', correct: true }, { text: '2 块', correct: false }, { text: '4 块', correct: false }],
+    why: '一块积木走一格：少一块停在前面，多一块就走出地图。',
+  },
   parentQuestion: '请孩子先说出要走几步，再拼积木运行，看看猜得对不对。',
 }
 
@@ -434,6 +451,11 @@ const L04: GridLesson = {
     },
   ],
   reflection: '说一说：“向左转”和“向左走一格”有什么不一样？',
+  reflectionCheck: {
+    question: '小狐狸脸朝右，“向左转”以后脸朝哪边？',
+    options: [{ text: '朝上', correct: true }, { text: '朝左', correct: false }, { text: '朝下', correct: false }],
+    why: '转弯是站在小狐狸自己的位置转身：脸朝右时，它的左手在上面。',
+  },
   parentQuestion: '请孩子站起来当小狐狸，跟着自己的程序转身、走路，看看会不会撞到“石头”。',
 }
 
@@ -532,6 +554,11 @@ const L05: GridLesson = {
     },
   ],
   reflection: '说一说：为什么“捡起钥匙”一定要在“打开树洞门”前面？',
+  reflectionCheck: {
+    question: '哪个顺序能打开树洞门？',
+    options: [{ text: '捡钥匙 → 开门 → 走过去', correct: true }, { text: '开门 → 捡钥匙 → 走过去', correct: false }, { text: '直接走过去', correct: false }],
+    why: '开门要先有钥匙，所以“捡起钥匙”必须排在“打开树洞门”前面。',
+  },
   parentQuestion: '请孩子把“捡钥匙”和“开门”两块积木对调后运行，说说门为什么打不开。',
 }
 
@@ -639,6 +666,11 @@ const L06: GridLesson = {
     },
   ],
   reflection: '说一说：你的寻路卡是怎么走的？修小伙伴的卡时，你改了哪一块？',
+  reflectionCheck: {
+    question: '小伙伴的寻路卡少了哪一块？',
+    options: [{ text: '捡起钥匙', correct: true }, { text: '打开树洞门', correct: false }, { text: '开始时', correct: false }],
+    why: '路过金钥匙时没有捡，门就打不开，所以要加上“捡起钥匙”。',
+  },
   parentQuestion: '请孩子播放自己的寻路卡，一边播放一边讲：哪里转弯、哪里捡钥匙、哪里开门。',
   project: { stepId: 'my-route-card', title: '我的森林寻路卡' },
 }

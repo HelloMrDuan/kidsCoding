@@ -10,6 +10,8 @@ export type GridDraft = {
   /** Steps that really ran to the goal on this device. Editable in storage: not a trusted grade. */
   passed: string[]
   savedAt: string | null
+  /** EDU-105: index of the reflection option the child tapped. */
+  reflection?: number
 }
 
 const KNOWN = new Set<string>(['when_start', ...GRID_BLOCK_TYPES])
@@ -32,7 +34,9 @@ export function parseGridDraft(lesson: GridLesson, raw: string | null): GridDraf
     }
     const passed = Array.isArray(value.passed) ? (value.passed as unknown[]).filter((id): id is string => typeof id === 'string' && stepIds.includes(id)) : []
     const savedAt = typeof value.savedAt === 'string' && Number.isFinite(Date.parse(value.savedAt)) ? value.savedAt : null
-    return { stepIndex, programs, passed: [...new Set(passed)], savedAt }
+    const options = lesson.reflectionCheck?.options.length ?? 0
+    const reflection = Number.isInteger(value.reflection) && (value.reflection as number) >= 0 && (value.reflection as number) < options ? (value.reflection as number) : undefined
+    return { stepIndex, programs, passed: [...new Set(passed)], savedAt, ...(reflection === undefined ? {} : { reflection }) }
   } catch {
     return null
   }

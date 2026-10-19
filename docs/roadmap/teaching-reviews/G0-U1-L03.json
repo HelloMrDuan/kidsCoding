@@ -31,12 +31,13 @@
       ]
     },
     "story": {
-      "score": 11,
+      "score": 13,
       "evidence": [
-        "小狐狸森林情境贯穿；每关有“先猜一猜”预测问题"
+        "小狐狸森林情境贯穿；每关有“先猜一猜”预测问题",
+        "EDU-105：说明、预测、诊断、提示都可中文语音朗读（read-aloud.tsx，E2E 验证）"
       ],
       "defects": [
-        "没有语音朗读：5～7 岁识字有限，说明、提示、预测问题全靠文字"
+        "朗读用浏览器自带声音，音色因设备而异；没有角色配音"
       ]
     },
     "practice": {
@@ -50,13 +51,14 @@
       ]
     },
     "feedback": {
-      "score": 13,
+      "score": 14,
       "evidence": [
         "每种失败有本课专属诊断（diagnoses）",
-        "三层提示：现象 → 概念 → 具体做法；舞台显示撞到/落水的位置"
+        "三层提示：现象 → 概念 → 具体做法；舞台显示撞到/落水的位置",
+        "EDU-105：失败时指出第几块积木出错（grid-lab-pointer.test.ts）"
       ],
       "defects": [
-        "提示按次数展开，不会根据孩子的具体程序指出是哪一块错"
+        "没到目标（停早了）时只给差几格，不指具体积木"
       ]
     },
     "creation": {
@@ -69,13 +71,14 @@
       ]
     },
     "assessment": {
-      "score": 7,
+      "score": 8,
       "evidence": [
         "通过由真实引擎判定，反例在单元测试里给出指定错误",
-        "apps/web/tests/e2e/grid-lab.spec.ts：G0-U1-L02 and L03: river crash and one-step-too-far are diagnosed, then fixed"
+        "apps/web/tests/e2e/grid-lab.spec.ts：G0-U1-L02 and L03: river crash and one-step-too-far are diagnosed, then fixed",
+        "EDU-105：点选式反思判对错并保存，重开仍在（E2E）"
       ],
       "defects": [
-        "反思与家长问题只显示，不收集回答；没有儿童试学"
+        "反思是点选题，开放表达仍靠家长；没有儿童试学"
       ]
     }
   },
@@ -145,5 +148,5 @@
     "AI 评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
     "没有儿童试学"
   ],
-  "notes": "2026-10-19 在 EDU-104 合并后（PR #82）重新复核。AI 参考分，只用于找缺陷，不能认定优质。"
+  "notes": "2026-10-19 EDU-105 打磨后再评（AI 参考分，评分者也是实现者）。"
 }
