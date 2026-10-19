@@ -6,8 +6,10 @@ const toBlocks = (program: string[]) => program.map(type => ({ type }))
 const lessons = Object.values(g0u1GridLessons)
 
 describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
-  it('covers L01–L03 with four steps each', () => {
-    expect(lessons.map(l => l.id)).toEqual(['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03'])
+  it('covers L01–L06 with four steps each and L06 is the unit project', () => {
+    expect(lessons.map(l => l.id)).toEqual(['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05', 'G0-U1-L06'])
+    const project = g0u1GridLessons['G0-U1-L06'].project!
+    expect(g0u1GridLessons['G0-U1-L06'].steps.find(s => s.id === project.stepId)?.kind).toBe('practice-a')
     for (const lesson of lessons) expect(lesson.steps).toHaveLength(4)
   })
 

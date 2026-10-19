@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { GridLesson } from '@/content/curriculum/g0-u1-grid-lessons'
 import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
+import { getKidsBlockLabel } from '@/features/lessons/blockly/register-kids-blocks'
 import { GuidedLessonShell, type LessonLocalSaveState } from '@/features/lessons/guided-lesson-shell'
 import { runGridProgram, type GridRun } from './grid-engine'
 import { GridStage, useGridPlayback } from './grid-stage'
@@ -130,6 +131,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
           <p className="mt-2 kc-text-muted">给家长：{lesson.parentQuestion}</p>
           <p className="mt-2 kc-text-muted">这是实验课，成绩只保存在本机，不是正式课程成绩。</p>
         </div>
+        {lesson.project ? <ProjectCard lesson={lesson} blocks={draft.programs[lesson.project.stepId] ?? []} /> : null}
         <div className="mt-4 flex flex-wrap gap-2">
           {lesson.steps.map((s, i) => (
             <button key={s.id} type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" data-testid={`grid-replay-${s.id}`}
@@ -191,5 +193,37 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
       stepTitle={`第 ${draft.stepIndex + 1} 关：${step.title}`}
       voiceover={undefined}
     />
+  )
+}
+
+/** Unit project: the child's own passing route, saved locally, replayed by the real engine. */
+function ProjectCard({ lesson, blocks }: { lesson: GridLesson; blocks: Block[] }) {
+  const project = lesson.project!
+  const step = lesson.steps.find(s => s.id === project.stepId)!
+  const [run, setRun] = useState<GridRun | null>(null)
+  const { state, trail, done } = useGridPlayback(step.level, run)
+  const verdict = useMemo(() => runGridProgram(step.level, blocks), [step.level, blocks])
+  return (
+    <section className="kc-surface-3d mt-4 rounded-[18px] p-5" data-testid="grid-project-card">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-lg font-black">🗺️ {project.title}</h3>
+        <span className={`kc-chip ${verdict.passed ? 'kc-chip-success' : 'kc-chip-warning'}`} data-testid="grid-project-status">
+          {verdict.passed ? '真实运行能走到蘑菇屋' : '这张卡还走不到，回去改一改'}
+        </span>
+      </div>
+      <ol className="mt-3 flex flex-wrap gap-2" data-testid="grid-project-steps">
+        {blocks.map((b, i) => (
+          <li key={i} className="kc-block-chip" data-block={b.type}>{i === 0 ? '' : `${i}. `}{getKidsBlockLabel(b.type)}</li>
+        ))}
+      </ol>
+      <div className="mt-4 max-w-[420px]">
+        <GridStage level={step.level} state={state} trail={run ? trail : []} />
+      </div>
+      <button type="button" className="kc-action-surface mt-3" data-testid="grid-project-play" disabled={!!run && !done}
+        onClick={() => setRun(runGridProgram(step.level, blocks))}>
+        {run && !done ? '播放中…' : '▶ 播放我的寻路卡'}
+      </button>
+      <p className="kc-text-muted mt-2 text-sm">作品保存在这台设备上，下次打开这节课还在。</p>
+    </section>
   )
 }
