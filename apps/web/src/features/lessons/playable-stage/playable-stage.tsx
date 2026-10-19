@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 import { evaluateObservable, type JudgeOptions, type ProgramBlock, type RunFailureCode } from '../blockly/observable-run'
@@ -7,6 +7,18 @@ import { explainRunFailure } from '../blockly/run-feedback'
 
 import { CharacterArt, SceneBackdrop, type SceneId } from './character-art'
 import { useBlockExecutor } from './use-block-executor'
+
+/**
+ * TQ-009: steps are story distance, not pixels. 200 steps (the longest walk in lessons 01–09)
+ * is “arrived”: the walker stops right BESIDE the friend at every viewport, never on top of it.
+ * Longer (wrong) programs still report their real step count but stay beside the friend.
+ */
+export const STAGE_ARRIVAL_STEPS = 200
+
+export function stageWalkProgress(steps: number) {
+  if (!Number.isFinite(steps) || steps <= 0) return 0
+  return Math.min(steps, STAGE_ARRIVAL_STEPS) / STAGE_ARRIVAL_STEPS
+}
 
 const CHARACTER_LABELS: Record<string, string> = {
   fox: '小狐狸',
@@ -155,7 +167,8 @@ export function PlayableStage({
           <button type="button" aria-label={clickLesson?'点击蝴蝶触发积木程序':mainLabel}
             disabled={!clickLesson||executionState!=='armed'} onClick={()=>void clickCharacter()}
             className="kc-stage-actor kc-stage-actor-main"
-            style={{ transform: `translateX(${characterPosition}px)` }}
+            style={{ '--kc-walk': stageWalkProgress(characterPosition) } as CSSProperties}
+            data-steps={characterPosition}
             data-testid="stage-character-main"
           >
             <CharacterArt id={mainId} className="kc-stage-actor-art" />
@@ -169,7 +182,7 @@ export function PlayableStage({
           </button>
 
           {secondLabel ? (
-            <div className="kc-stage-actor kc-stage-actor-friend">
+            <div className="kc-stage-actor kc-stage-actor-friend" data-testid="stage-character-friend">
               <CharacterArt id={secondId} className="kc-stage-actor-art" />
               <span className="kc-stage-nametag">{secondLabel}</span>
             </div>

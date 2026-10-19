@@ -1,4 +1,5 @@
 import {expect,test,type Page} from '@playwright/test'
+import {expectStageWalk} from './lesson-pane-helpers'
 
 async function play(page:Page,id:string,adds:Record<number,string[]>,sceneStep:number,repeatStep:number){
   await page.goto('/learn/lesson/'+id)
@@ -8,7 +9,7 @@ async function play(page:Page,id:string,adds:Record<number,string[]>,sceneStep:n
     await page.getByTestId('run-code-button').click()
     await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:25_000})
     await expect(page.getByTestId('stage-current-scene')).toContainText(step>=sceneStep?'草地':'森林')
-    if(step>=repeatStep)await expect(page.getByTestId('stage-character-main')).toHaveCSS('transform','matrix(1, 0, 0, 1, 200, 0)')
+    if(step>=repeatStep)await expectStageWalk(page,200)
     await page.getByTestId('lesson-complete-step').click()
   }
   await page.waitForURL('**/project/'+id+'/complete')
@@ -32,7 +33,7 @@ test('lesson 6 executes movement, scene change, repetition and speech in order',
     await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:25_000})
     if(step>=3){
       await expect(page.getByTestId('stage-current-scene')).toContainText('草地')
-      await expect(page.getByTestId('stage-character-main')).toHaveCSS('transform','matrix(1, 0, 0, 1, 200, 0)')
+      await expectStageWalk(page,200)
       await expect(page.getByTestId('lesson-playable-stage')).toContainText('我到草地啦！')
     }
     await page.getByTestId('lesson-complete-step').click()
@@ -66,5 +67,7 @@ test('TQ-009: lesson 5 blocks and stage say exactly what happens (向右走 100 
   // Step 3 stops on arrival (100 步); the repeat walks again, so the run fails and says so in steps.
   await expect(page.getByTestId('stage-run-reason')).toContainText('要走 100 步，现在走了 200 步',{timeout:20_000})
   await expect(page.getByTestId('stage-walked-distance')).toContainText('已走 200 步')
+  // The fox ends beside the bird, never on top of it.
+  await expectStageWalk(page,200)
   await expect(page.getByTestId('stage-current-scene')).toContainText('草地')
 })

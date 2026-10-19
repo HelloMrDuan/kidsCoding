@@ -1,4 +1,5 @@
 import {expect,test} from '@playwright/test'
+import {expectStageWalk} from './lesson-pane-helpers'
 
 test('first forest Blockly lesson requires actual execution before each step and awards completion once',async({page})=>{
   test.setTimeout(180_000)
@@ -12,7 +13,7 @@ test('first forest Blockly lesson requires actual execution before each step and
     if(step===3)await page.getByTestId('lesson-add-move_right').click()
     await page.getByTestId('run-code-button').click()
     await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:15_000})
-    if(step>=3)await expect(page.getByTestId('stage-character-main')).toHaveCSS('transform','matrix(1, 0, 0, 1, 100, 0)')
+    if(step>=3)await expectStageWalk(page,100)
     await page.getByTestId('lesson-complete-step').click()
   }
   await page.waitForURL('**/project/lesson-01-forest-hello/complete')

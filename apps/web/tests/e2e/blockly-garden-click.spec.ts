@@ -1,4 +1,5 @@
 import {expect,test,type Page} from '@playwright/test'
+import {expectStageWalk} from './lesson-pane-helpers'
 
 async function performClickStep(page:Page,expectedMovement:number,expectSpeech:boolean){
   // Code.org-inspired prediction: select a hypothesis before testing it.
@@ -6,14 +7,14 @@ async function performClickStep(page:Page,expectedMovement:number,expectSpeech:b
   await expect(page.getByTestId('run-code-button')).toBeEnabled()
   await page.getByTestId('run-code-button').click()
   await expect(page.getByTestId('garden-await-click')).toBeVisible()
-  await expect(page.getByTestId('stage-character-main')).toHaveCSS('transform','matrix(1, 0, 0, 1, 0, 0)')
+  await expectStageWalk(page,0)
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('运行成功')
   // No click means no execution and no credit, even though the blocks are correct.
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('点击蝴蝶')
   await page.getByTestId('stage-character-main').click()
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
-  if(expectedMovement>0) await expect(page.getByTestId('stage-character-main')).toHaveCSS('transform',`matrix(1, 0, 0, 1, ${expectedMovement}, 0)`)
+  if(expectedMovement>0) await expectStageWalk(page,expectedMovement)
   if(expectSpeech) await expect(page.getByTestId('stage-character-main')).toContainText('蝴蝶收到你的点击啦！')
   await expect(page.getByTestId('garden-reflection')).toContainText('点击事件发生后')
   await page.getByTestId('lesson-complete-step').click()
