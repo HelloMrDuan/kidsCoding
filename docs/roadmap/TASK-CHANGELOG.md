@@ -237,3 +237,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-19 | RELEASE-102 | 发布七门禁可追溯：每门须证据（仓库文件/本仓库 CI/PR）+审阅人+日期；仓库事实（运行器、E2E、正反例欠账、素材授权）不可被台账覆盖；拒绝 AI/实现者审阅；人审仅负责人且排最后；release-evidence-v1.json 覆盖 25 节试玩课，全部 0/7，L4/L5=0；后台逐课分页门禁卡，三端截图 owner 确认 | [#90](https://github.com/HelloMrDuan/kidsCoding/pull/90) | `15565b8c69c1d0eba118009e014e63ed11b3a9fa` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39210798648) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39210798588) | completed；解除 RELEASE-103 阻塞 |
+
+## TQ-002 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-19 | TQ-002 | 前 9 节 Blockly 课逐课审计（只审计不修复）：9 份审核记录 + 汇总/报告；AI 参考分 27～43 全部退回重做、保持 L3；均无两次不同动手、课内纠错、开放创作，作品仅 3/6/9 课弱；L02、L09 硬否决 rigid-answer；7 组修复建议 | [#93](https://github.com/HelloMrDuan/kidsCoding/pull/93) | `dd7521a777f7626b67335764c220b5796ae5f169` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39221458292) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39221458283) | completed |
