@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "lesson-05-meadow-order",
+  "reviewedCommit": "632c3a4dabd3eab258063ef663f2b88402c2a343",
+  "reviewedAt": "2026-10-19",
+  "reviewer": "Hark（AI 参考评分）",
+  "reviewerKind": "ai",
+  "independent": true,
+  "ageBand": "G0 启蒙（约 5～7 岁）",
+  "prerequisites": [
+    "lesson-04：切换场景"
+  ],
+  "newConcepts": [
+    "再做一次（重复移动）",
+    "事件顺序"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11，保留情境/预测/迁移）",
+    "核桃编程 一学九练 https://official.hetao101.com/curriculum（2026-10-11，保留“至少两个不同目标的动手”，舍弃凑次数）",
+    "西瓜创客 PBL https://www.xiguacity.cn/curriculum（2026-10-11，保留项目作品与反思）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 9,
+      "evidence": [
+        "apps/web/src/content/curriculum/launch-lessons.ts lesson-05 新概念“再做一次”",
+        "apps/web/tests/e2e/blockly-meadow-journey.spec.ts “lesson 5 visibly repeats the prior movement”：断言 200 步"
+      ],
+      "defects": [
+        "“再做一次”接在“切换场景”后面，实际重复的是更早的移动（apps/web/src/features/lessons/blockly/observable-run.ts repeat_twice 只检查之前有没有移动），与积木名“再做一次（上一个动作）”的字面意思不一致，容易形成错误心智模型",
+        "课名“旅行要按顺序发生”，但顺序在第 4 课已经教过，本课没有让孩子比较不同顺序",
+        "step-4/5 目标相同；allowedBlocks 放出 say_line，但本课任何一步都不能用（加了会被判“还不用说话”）"
+      ]
+    },
+    "story": {
+      "score": 6,
+      "evidence": [
+        "apps/web/src/content/curriculum/launch-lessons.ts goal“先出发、再到达”"
+      ],
+      "defects": [
+        "没有预测、没有孩子的决定"
+      ]
+    },
+    "practice": {
+      "score": 10,
+      "evidence": [
+        "apps/web/tests/e2e/blockly-meadow-journey.spec.ts 第 5 课用例",
+        "apps/web/src/features/lessons/playable-stage/use-block-executor.test.ts “runs real meadow transition, repeat move and travel speech”"
+      ],
+      "defects": [
+        "新搭建只有一次（加再做一次），其余为重复运行",
+        "没有第二项不同目标的练习"
+      ]
+    },
+    "feedback": {
+      "score": 4,
+      "evidence": [
+        "apps/web/src/content/curriculum/launch-lessons.ts lesson-05 hintLayers",
+        "apps/web/src/features/lessons/playable-stage/use-block-executor.test.ts “refuses to repeat a movement that does not exist”"
+      ],
+      "defects": [
+        "运行出错时舞台只显示通用文案“积木好像不太对，再检查一下吧！需要和任务要求的积木一样哦。”：apps/web/src/features/lessons/playable-stage/playable-stage.tsx 没有取用 useBlockExecutor 返回的 errorMessage，observable-run 已算出的具体差异原因（如“说话的时机不对”）孩子看不到；“和任务要求的积木一样”还与 SYS-103 等价方案判定相矛盾",
+        "apps/web/src/features/lessons/build-hint-state.ts 以 failedAttempts 作下标（min(failedAttempts, 2)），第一次失败直接显示第 2 层，第 1 层 repeat_goal 在失败后永远不会出现；失败次数只在点“完成这一步”时增加，运行出错本身不计",
+        "第 3 层补救统一跳到 remedial-click-trigger（“先学会点击触发”，apps/web/src/content/curriculum/remedial-lessons.ts 中 steps 为空，/learn/remedial 页面是三张静态卡），与本课的开始事件/场景知识点不对应；已存在的 remedial-scene-switch 没有被使用"
+      ]
+    },
+    "creation": {
+      "score": 2,
+      "evidence": [
+        "apps/web/src/features/lessons/blockly/observable-run.test.ts “accepts a reasonable equivalent: two moves == move + repeat”：用第二块移动代替再做一次也能通过"
+      ],
+      "defects": [
+        "等价方案孩子并不知道，没有被设计成选择",
+        "作品不能重开运行"
+      ]
+    },
+    "assessment": {
+      "score": 3,
+      "evidence": [
+        "apps/web/src/content/curriculum/launch-lessons.ts lesson-05-meadow-order.parentAdvice 请孩子向家长演示/讲述",
+        "apps/web/src/app/project/[projectId]/complete/page.tsx 完成页显示保存的积木快照（apps/web/src/features/lessons/blockly/preview-stage.tsx 静态预览）"
+      ],
+      "defects": [
+        "家长端 apps/web/src/features/parent/build-parent-overview.ts describeProjectResult 按课程 ID 返回固定文案，不基于孩子真实的运行、错误或用时数据",
+        "课堂没有记录孩子自己的解释或反思，只有完成与否"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "PlayableStage 读取 Blockly 实际连接顺序逐块解释执行（apps/web/src/features/lessons/playable-stage/use-block-executor.ts 非双角色分支 + apps/web/src/features/lessons/blockly/observable-run.ts simulateProgram），按位置/场景/对白判定（SYS-103），不是预制动画；属于教学解释器而非完整 Scratch VM。对白内容由引擎写死（say_line 积木无文本字段，apps/web/src/features/lessons/blockly/register-kids-blocks.ts）。"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "孩子亲手点积木面板添加积木并运行；但多步只是重新运行同一程序（见“实际操作”维度）。"
+    },
+    "no-failure-test": {
+      "status": "fail",
+      "note": "课程五步都只有“搭对→运行成功”的路径，没有任何一步要求孩子先遇到真实错误、看到预期与实际的差异再修好（对照 lesson-10 step-4 的 observedMistake 门槛）。引擎层的反例只存在于单元测试/工程 E2E，不构成本课的纠错教学。（“再做一次放在移动前”只在 apps/web/src/features/lessons/playable-stage/use-block-executor.test.ts 单测中出现。）"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "没有宣称自由创作；判定按可观察结果（evaluateObservable），等价程序可以通过（observable-run.test.ts “accepts a reasonable equivalent”）。"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "完成页标题是“你完成了《课名》”，展示的是本课真实运行通过后保存的积木快照（apps/web/src/app/project/[projectId]/complete/page.tsx），没有虚构作品；但预览是 apps/web/src/features/lessons/blockly/preview-stage.tsx 按积木种类拼出的静态文案，不能重新运行或修改。"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色与场景是 apps/web/src/features/lessons/playable-stage/character-art.tsx 中代码绘制的内联 SVG；配音为文本稿（foundation-voiceovers.ts），未发现外部商用素材。"
+    },
+    "minor-privacy-risk": {
+      "status": "unchecked",
+      "note": "完成课时会调用 syncGuestSnapshot 向 /api/guest 上传进度与作品快照（apps/web/src/app/learn/lesson/[lessonId]/page.tsx handleNext）；本次审计没有审查云端隔离与儿童隐私，lesson-maturity 也把“儿童隐私、输入和沙箱安全完成审核”列为未完成。"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "完成时 writeGuestProgress 失败会提示“本机存储失败”，不跳转、不发奖励；云同步失败显示失败并可重试（apps/web/src/app/learn/lesson/[lessonId]/page.tsx handleNext；local-progress-storage.test.ts、sync-guest-snapshot.test.ts）。草稿保存按返回值显示已保存/失败。"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 计算为 L3 实验可试玩（审计时用 vitest 探针调用 getLessonMaturity 确认 9 课均为 L3，blockers 首条“发布验收未完成”），没有标成正式发布。"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "开始时→向右移动→切换场景→再做一次：草地上共 200 步（apps/web/tests/e2e/blockly-meadow-journey.spec.ts）",
+    "failureCase": "单测：再做一次前没有移动→执行报错（apps/web/src/features/lessons/playable-stage/use-block-executor.test.ts “refuses to repeat a movement that does not exist”）；课堂未安排。",
+    "hintLayers": [
+      "apps/web/src/content/curriculum/launch-lessons.ts lesson-05-meadow-order.hintLayers[0] repeat_goal（失败后实际不会显示，见 build-hint-state.ts）",
+      "apps/web/src/content/curriculum/launch-lessons.ts lesson-05-meadow-order.hintLayers[1] show_block",
+      "apps/web/src/content/curriculum/launch-lessons.ts lesson-05-meadow-order.hintLayers[2] offer_remedial → remedial-click-trigger"
+    ],
+    "practiceA": "在草地后接“再做一次”，再往前走 100",
+    "practiceB": null,
+    "equivalentSolutions": [
+      "开始时→向右移动→切换场景→再做一次",
+      "开始时→向右移动→切换场景→向右移动（evaluateObservable 通过，AI 探针复现；同类等价见 apps/web/src/features/lessons/blockly/observable-run.test.ts）"
+    ],
+    "saveReopen": null,
+    "e2eSpecs": [
+      "apps/web/tests/e2e/blockly-meadow-journey.spec.ts"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "“再做一次”语义需重新定义或改名（重复的是移动，不是上一块）",
+    "补第二项不同练习和纠错步骤"
+  ],
+  "notes": "TQ-002 审计（只审不修）。课时中途草稿按步保存在本机并可刷新恢复（apps/web/tests/e2e/lesson-draft-persistence.spec.ts），但完成后的作品只有静态预览，不能保存→重开→运行→修改，因此 saveReopen 记为缺失。没有截图或录屏证据，没有儿童试学。AI 参考分，需负责人作为独立人工审核人确认后才算正式复核。"
+}
