@@ -1658,7 +1658,7 @@
       "title": "G0第一单元打磨：语音朗读、反思作答、错块定位",
       "priority": "P1",
       "category": "EDU",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "EDU-104",
         "TQ-004"
@@ -1677,9 +1677,17 @@
           "grid-draft.test.ts 3 项",
           "g0-u1-grid-lessons.test.ts 44 项",
           "grid-lab.spec.ts 5 个真实浏览器用例（本地通过）"
-        ]
+        ],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/86",
+        "mergeCommit": "26e4fcd56a0dfbc8ccf97eda4a7f57221bd90135",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39193424664",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39193424454",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39191953927",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39191953941",
+        "prNumber": 86,
+        "reviewer": "owner 2026-10-19 确认合并"
       },
-      "notes": "来自 TQ-004 重新复核的打磨清单。仍为 L3 实验可试玩。"
+      "notes": "来自 TQ-004 重新复核的打磨清单。仍为 L3 实验可试玩。 儿童试学计划未在本任务完成，另行处理。"
     },
     {
       "id": "CLOUD-101",
