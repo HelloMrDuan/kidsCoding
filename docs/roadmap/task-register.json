@@ -1619,6 +1619,32 @@
       "notes": "为解除 TQ-004 阻塞登记。只做引擎与舞台，不解锁 G0-U1。"
     },
     {
+      "id": "EDU-104",
+      "title": "G0第一单元按TQ-001重写并接入网格引擎可玩课堂",
+      "priority": "P1",
+      "category": "EDU",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-001",
+        "SYS-106"
+      ],
+      "scope": "content/curriculum/g0-u1-grid-lessons.ts、features/lessons/grid（grid-lab、grid-draft）、app/learn/grid-lab、lesson-maturity 试玩登记、tests/e2e/grid-lab.spec.ts",
+      "acceptance": [
+        "G0-U1-L01～L06 每课：本课专属错误诊断、三层提示、两种不同练习（自己搭 + 修别人的程序）、至少两种正确方案，均由真实引擎运行判定",
+        "接入 V2 三区课堂，程序与关卡进度保存在本机，刷新后可重开",
+        "单元作品可保存重开；真实 E2E 覆盖失败→提示→修正→通过→重开",
+        "课程只到 L3 实验可试玩，不标正式发布；完成后重新执行 TQ-004"
+      ],
+      "evidence": {
+        "tests": [
+          "g0-u1-grid-lessons.test.ts 22 项：每关正解真跑通、反例给出指定错误、两种以上正解、练习 B 起始程序必失败、三层提示",
+          "grid-draft.test.ts 2 项",
+          "grid-lab.spec.ts 2 个真实浏览器用例（本地通过）"
+        ]
+      },
+      "notes": "第一批（本 PR）L01～L03；L04～L06 与单元作品在后续 PR 完成后再标 completed。"
+    },
+    {
       "id": "CLOUD-101",
       "title": "真实Supabase迁移与回滚确认",
       "priority": "P1",
