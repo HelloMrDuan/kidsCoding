@@ -603,6 +603,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-block-chip[data-block="switch_scene"] { --c: #9966ff; --d: #774dcb; }
 .kc-block-chip[data-block="switch_character"] { --c: #ff6680; --d: #d94a63; }
 .kc-block-chip[data-block="repeat_twice"] { --c: #0fbdbd; --d: #0b9696; }
+/* TQ-008: preset dialogue choice for the say block (lesson-02); same cartoon chip family. */
+.kc-say-choice { border: 2px solid #74d494; border-radius: 999px; padding: 7px 14px; background: #fff; color: #2b9a51; font-weight: 800; font-size: 13px; box-shadow: 0 2px 0 #c9ecd5; transition: transform .12s, box-shadow .12s; }
+.kc-say-choice:hover { transform: translateY(-1px); }
+.kc-say-choice-on { background: #3fbf6a; border-color: #2b9a51; color: #fff; box-shadow: 0 3px 0 #2b9a51; }
 
 /* ============ Frozen V2 global shell: sidebar + top bar ============ */
 .kc-app { display: grid; grid-template-columns: 222px minmax(0, 1fr); min-height: 100vh; background: var(--kc-canvas, #f3f6fb); }

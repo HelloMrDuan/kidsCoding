@@ -41,6 +41,8 @@ type GuidedLessonShellProps = {
   voiceover?: string
   feedback?: string
   hintCopy?: string
+  /** TQ-008: 1-based hint tier currently shown (for tests and styling hooks). */
+  hintTier?: number
   remedialLessonId?: string
   remedialMicroScript?: FoundationRemedialMicroScript
   onCompleteStep?: () => void
@@ -92,6 +94,7 @@ export function GuidedLessonShell({
   voiceover,
   feedback,
   hintCopy,
+  hintTier,
   remedialLessonId,
   remedialMicroScript,
   onCompleteStep,
@@ -332,7 +335,7 @@ export function GuidedLessonShell({
               </div>
 
               {hintCopy ? (
-                <div className="kc-hint">卡住时提示：{hintCopy}</div>
+                <div className="kc-hint" data-hint-tier={hintTier} data-testid="lesson-hint">卡住时提示：{hintCopy}</div>
               ) : null}
 
               {hintCopy && (remedialLessonId || remedialMicroScript) ? (

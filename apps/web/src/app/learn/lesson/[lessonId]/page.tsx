@@ -10,10 +10,15 @@ import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
 import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { evaluateStep } from '@/features/lessons/blockly/evaluate-step'
+import { evaluateObservable } from '@/features/lessons/blockly/observable-run'
+import { explainRunFailure } from '@/features/lessons/blockly/run-feedback'
+import { getSayLineChoices, getStepJudgeOptions } from '@/features/lessons/blockly/step-judge-options'
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
 import { PlayableStage } from '@/features/lessons/playable-stage'
+import { getMainCharacterLabel } from '@/features/lessons/playable-stage/playable-stage'
 import { DuoStage } from '@/features/lessons/playable-stage/duo-stage'
 import { buildHintState } from '@/features/lessons/build-hint-state'
+import { getRemedialIdForLesson } from '@/features/lessons/remedial-routing'
 import { completeLaunchLesson } from '@/features/lessons/complete-launch-lesson'
 import { getFoundationLessonFeedback } from '@/features/lessons/foundation-lesson-feedback'
 import { GuidedLessonShell } from '@/features/lessons/guided-lesson-shell'
@@ -81,6 +86,11 @@ export default function LessonPage() {
   const [failedAttempts, setFailedAttempts] = useState(0)
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const [hasRunSuccess,setHasRunSuccess] = useState(false)
+  // TQ-008: the program whose failed run was already counted, so pressing
+  // “完成这一步” right after that failed run does not skip a hint tier.
+  const countedRunFailureRef = useRef<string | null>(null)
+  const currentStepId = lesson?.steps[Math.min(stepIndex, Math.max(0, (lesson?.steps.length ?? 1) - 1))]?.id ?? ''
+  const judgeOptions = getStepJudgeOptions(lessonId ?? '', currentStepId)
 
   // Restore the real last step after hydration (client-only). The restore
   // is deferred to a microtask so it runs after the hydration commit:
@@ -178,6 +188,11 @@ export default function LessonPage() {
     setHasRunSuccess(true)
     if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('本步角色结果与学习活动已验证。看看两条轨道，再完成这一步。')
   }, [lessonId, setHasRunSuccess, setFeedback])
+  const handleRunFailure = useCallback(() => {
+    // Every failed real run is one failed attempt: hints escalate 1 → 2 → 3.
+    countedRunFailureRef.current = `${stepIndex}|${JSON.stringify(blocksRef.current)}`
+    setFailedAttempts((count) => count + 1)
+  }, [stepIndex])
   const handleRunClear=useCallback(() => {
     setHasRunSuccess(false)
     if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('先运行积木，观察两个朋友的实际位置，再完成本步学习活动。')
@@ -223,11 +238,11 @@ export default function LessonPage() {
     failedAttempts,
     hintLayers: currentLesson.hintLayers,
   })
-  const hintCopy = failedAttempts > 0 ? hintState.activeHint?.copy : undefined
-  const remedialLessonId =
-    failedAttempts > 0 && hintState.showRemedialJump
-      ? hintState.activeHint?.remedialLessonId
-      : undefined
+  const hintCopy = hintState.activeHint?.copy
+  // TQ-008: tier-3 remedial follows the lesson's unit concept, not one fixed page.
+  const remedialLessonId = hintState.showRemedialJump
+    ? getRemedialIdForLesson(currentLesson.id, hintState.activeHint?.remedialLessonId)
+    : undefined
   const remedialMicroScript =
     failedAttempts > 0 && hintState.showRemedialJump
       ? getFoundationUnitByLessonId(currentLesson.id)?.remedialMicroScript
@@ -254,22 +269,30 @@ export default function LessonPage() {
   async function handleNext() {
     const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id)
     const duoLesson = ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)
-    const correct=duoLesson ? hasRunSuccess : evaluateStep(step.requiredBlockTypes,blocksRef.current)
-    if (!correct || (needsRun && !hasRunSuccess)) {
-      const nextFailedAttempts = failedAttempts + 1
-      const nextHintState = buildHintState({
-        failedAttempts: nextFailedAttempts,
-        hintLayers: currentLesson.hintLayers,
-      })
-
-      setFailedAttempts(nextFailedAttempts)
-      setFeedback(
-        needsRun && correct && !hasRunSuccess
-          ? (currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一步。')
-          : duoLesson ? '请先运行并观察角色结果，完成本步的预测、错误实验或复盘。舞台会告诉你还缺什么。' : nextHintState.activeHint?.copy ?? getFoundationLessonFeedback(currentLesson.id, 'retry'),
-      )
+    const correct=duoLesson ? hasRunSuccess : evaluateStep(step.requiredBlockTypes,blocksRef.current,judgeOptions)
+    if (needsRun && correct && !hasRunSuccess) {
+      // Not a mistake: the program is right but has not been run yet.
+      setFeedback(currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一步。')
       return
     }
+    if (!correct) {
+      const programKey = `${stepIndex}|${JSON.stringify(blocksRef.current)}`
+      if (countedRunFailureRef.current === programKey) {
+        // This exact failed run already raised the hint tier.
+        countedRunFailureRef.current = null
+      } else {
+        setFailedAttempts((count) => count + 1)
+      }
+      if (duoLesson) {
+        setFeedback('请先运行并观察角色结果，完成本步的预测、错误实验或复盘。舞台会告诉你还缺什么。')
+      } else {
+        const verdict = evaluateObservable(step.requiredBlockTypes, blocksRef.current, judgeOptions)
+        setFeedback(explainRunFailure(verdict, getMainCharacterLabel(currentTemplate)) || getFoundationLessonFeedback(currentLesson.id, 'retry'))
+      }
+      return
+    }
+
+    countedRunFailureRef.current = null
 
     setFailedAttempts(0)
     setHasRunSuccess(false)
@@ -401,11 +424,13 @@ export default function LessonPage() {
                 allowedBlocks={step.allowedBlocks}
                 blocks={blocks}
                 onSnapshotChange={handleSnapshotChange}
+                sayLineChoices={getSayLineChoices(currentLesson.id)}
               />
             )
           }
           feedback={feedback}
           hintCopy={hintCopy}
+          hintTier={hintState.tier || undefined}
           instruction={step.instruction}
           isCompleting={isCompleting}
           isLocked={courseAccess === 'locked'}
@@ -428,8 +453,8 @@ export default function LessonPage() {
                     graduation={currentLesson.id === 'lesson-12-graduation-show'} dialogue={currentLesson.id === 'lesson-11-duo-rehearsal'} stepIndex={stepIndex} onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
                 ) : ['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
                   <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
-                    requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex}
-                    onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
+                    requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex} judgeOptions={judgeOptions}
+                    onRunSuccess={handleRunSuccess} onRunClear={handleRunClear} onRunFailure={handleRunFailure}/>
                 ) : (
                   <PreviewStage blocks={blocks} template={currentTemplate}/>
                 )}

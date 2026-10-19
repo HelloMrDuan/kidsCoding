@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
+import { evaluateObservable, type JudgeOptions, type ProgramBlock, type RunFailureCode } from '../blockly/observable-run'
+import { explainRunFailure } from '../blockly/run-feedback'
 
 import { CharacterArt, SceneBackdrop, type SceneId } from './character-art'
 import { useBlockExecutor } from './use-block-executor'
@@ -33,6 +35,12 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
   },
 }
 
+/** TQ-008: name used in kid-facing failure reasons (“小狐狸还没开口呢！”). */
+export function getMainCharacterLabel(template?: ProjectTemplateDefinition) {
+  const first = template?.starterCharacters[0]
+  return first ? CHARACTER_LABELS[first] ?? '小狐狸' : '小狐狸'
+}
+
 function getTemplateCharacterLabels(template?: ProjectTemplateDefinition) {
   const first = template?.starterCharacters[0]
   const second = template?.starterCharacters[1]
@@ -59,25 +67,39 @@ export function PlayableStage({
   stepIndex,
   onRunSuccess,
   onRunClear,
+  onRunFailure,
+  judgeOptions,
 }: {
-  blocks: Array<{ type: string }>
+  blocks: ProgramBlock[]
   template?: ProjectTemplateDefinition
   requiredBlocks: string[]
   stepIndex: number
   onRunSuccess: () => void
   onRunClear?: () => void
+  /** TQ-008: a real run failed; the kid-friendly reason comes from the judge result. */
+  onRunFailure?: (failure: { code: RunFailureCode | null; message: string }) => void
+  judgeOptions?: JudgeOptions
 }) {
   const {
     executionState,
     characterPosition,
     characterMessage,
     stageScene,
+    errorMessage,
     run,
     reset,
     clickCharacter,
-  } = useBlockExecutor(blocks, requiredBlocks, stepIndex)
+  } = useBlockExecutor(blocks, requiredBlocks, stepIndex, false, judgeOptions)
 
   const { mainLabel, secondLabel, sceneCopy } = getTemplateCharacterLabels(template)
+  // TQ-008: the same judge the executor used, explained for a 5–7 year old.
+  const verdict = useMemo(() => evaluateObservable(requiredBlocks, blocks, judgeOptions), [requiredBlocks, blocks, judgeOptions])
+  const failureCode = verdict.passed ? null : verdict.code
+  const kidReason = (verdict.passed ? '' : explainRunFailure(verdict, getMainCharacterLabel(template))) || errorMessage || '再看看积木的顺序吧！'
+  // Each press of “运行” is one attempt; a failed attempt is reported exactly once,
+  // even when two failures in a row leave executionState at 'error'.
+  const [attemptId, setAttemptId] = useState(0)
+  const reportedAttemptRef = useRef(-1)
   const clickLesson=requiredBlocks[0]==='when_clicked'
   const [prediction,setPrediction]=useState<'automatic'|'needs-click'|null>(null)
   const visualScene=stageScene==='meadow'?'草地':template?.starterScene==='garden'?'花园':'森林'
@@ -90,6 +112,17 @@ export function PlayableStage({
       onRunSuccess()
     }
   }, [executionState, onRunSuccess])
+
+  useEffect(() => {
+    if (executionState !== 'error' || reportedAttemptRef.current === attemptId) return
+    reportedAttemptRef.current = attemptId
+    onRunFailure?.({ code: failureCode, message: kidReason })
+  }, [executionState, attemptId, onRunFailure, failureCode, kidReason])
+
+  function handleRun() {
+    setAttemptId((id) => id + 1)
+    void run()
+  }
 
   function handleReset() {
     reset()
@@ -162,8 +195,9 @@ export function PlayableStage({
               </div>
             ):null}
             {executionState === 'error' && (
-              <div className="kc-feedback kc-feedback-error">
-                ⚠️ 积木好像不太对，再检查一下吧！需要和任务要求的积木一样哦。
+              <div className="kc-feedback kc-feedback-error" data-failure-code={failureCode ?? undefined} data-testid="stage-run-error">
+                <p className="kc-feedback-title">🤔 哎呀，差一点点！</p>
+                <p className="mt-1" data-testid="stage-run-reason">{kidReason}</p>
               </div>
             )}
 
@@ -180,7 +214,7 @@ export function PlayableStage({
           <button
             type="button"
             className="kc-action-surface disabled:opacity-50"
-            onClick={run}
+            onClick={handleRun}
             disabled={executionState === 'running' || executionState === 'armed' || (clickLesson && prediction===null)}
             data-testid="run-code-button"
           >

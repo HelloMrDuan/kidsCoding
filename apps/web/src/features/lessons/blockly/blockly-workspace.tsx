@@ -1,23 +1,83 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import * as Blockly from 'blockly'
 
 import { getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
 import { restoreBlockSequence } from './restore-block-sequence'
+import type { SayLinePreset } from './say-line-presets'
 
 type BlockSnapshot = {
   type: string
   disconnected?: boolean
+  /** TQ-008: preset line id chosen on a say block (only when the lesson offers choices). */
+  line?: string
+}
+
+const LINE_FIELD = 'LINE'
+const BASE_SCALE = 0.9
+/** Lowest scale the fit may shrink to: still readable for kids on a 375px phone. */
+const MIN_FIT_SCALE = 0.6
+const FIT_MARGIN = 12
+/** Blockly's scrollbars sit inside the view; keep blocks clear of them. */
+const SCROLLBAR_ALLOWANCE = 16
+
+/**
+ * TQ-008: on narrow canvases (375/768) the flyout leaves little room, so a stack with the
+ * say-line dropdown ran past the right edge. When the program does not fully show, shrink
+ * (never below MIN_FIT_SCALE, never above BASE_SCALE) and scroll it back to the top-left so
+ * the whole block, dropdown text included, stays visible. A program that already fits is
+ * left exactly where it is.
+ */
+function fitBlocksToView(workspace: Blockly.WorkspaceSvg) {
+  if (workspace.isDragging() || workspace.getTopBlocks(false).length === 0) return
+  const box = workspace.getBlocksBoundingBox()
+  const contentWidth = box.right - box.left
+  const contentHeight = box.bottom - box.top
+  if (contentWidth <= 0 || contentHeight <= 0) return
+  const metrics = workspace.getMetricsManager()
+  const view = metrics.getViewMetrics(true)
+  const allowance = SCROLLBAR_ALLOWANCE / workspace.scale
+  const fullyVisible =
+    box.left >= view.left &&
+    box.top >= view.top &&
+    box.right <= view.left + view.width - allowance &&
+    box.bottom <= view.top + view.height - allowance
+  const pixelView = metrics.getViewMetrics(false)
+  const fitScale = Math.min(
+    BASE_SCALE,
+    (pixelView.width - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) / contentWidth,
+    (pixelView.height - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) / contentHeight,
+  )
+  const targetScale = Math.max(MIN_FIT_SCALE, fitScale)
+  const canGrowBack = workspace.scale < BASE_SCALE - 0.01 && targetScale > workspace.scale + 0.01
+  if (fullyVisible && !canGrowBack) return
+  if (Math.abs(workspace.scale - targetScale) > 0.01) workspace.setScale(targetScale)
+  const scale = workspace.scale
+  workspace.scroll(FIT_MARGIN - box.left * scale, FIT_MARGIN - box.top * scale)
 }
 
 function collectSequence(block: Blockly.Block | null, result: BlockSnapshot[]) {
   let current = block
 
   while (current) {
-    result.push({ type: current.type })
+    const line = current.getField(LINE_FIELD)?.getValue()
+    result.push(typeof line === 'string' && line ? { type: current.type, line } : { type: current.type })
     current = current.getNextBlock()
   }
+}
+
+/**
+ * TQ-008: in a lesson with preset dialogue, every say block on the workspace carries a
+ * dropdown of the preset lines (no free text). Appending a field fires no Blockly event.
+ */
+function ensureLineField(block: Blockly.Block, choices: readonly SayLinePreset[], lineId: string) {
+  if (block.type !== 'say_line' || block.getField(LINE_FIELD)) return
+  const dropdown = new Blockly.FieldDropdown(choices.map((choice) => [choice.text, choice.id] as [string, string]))
+  dropdown.setValue(choices.some((choice) => choice.id === lineId) ? lineId : choices[0].id)
+  // Own row under “说一句话”, so the block stays narrow enough for the phone workspace.
+  block.appendDummyInput('LINE_ROW').appendField(dropdown, LINE_FIELD)
+  block.setInputsInline(false)
 }
 
 function buildSnapshot(workspace: Blockly.WorkspaceSvg) {
@@ -64,17 +124,26 @@ export function BlocklyWorkspace({
   onSnapshotChange,
   enableProgramTools = false,
   snapStartOnTop = false,
+  sayLineChoices,
 }: {
   allowedBlocks: string[]
-  blocks: Array<{ type: string }>
-  onSnapshotChange: (blocks: Array<{ type: string }>) => void
+  blocks: BlockSnapshot[]
+  onSnapshotChange: (blocks: BlockSnapshot[]) => void
   enableProgramTools?: boolean
   /** Grid lessons: a start hat added by button snaps onto a headless stack. */
   snapStartOnTop?: boolean
+  /** TQ-008: preset lines the say block may speak in this lesson (dropdown + buttons). */
+  sayLineChoices?: readonly SayLinePreset[]
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
   const latestBlocksRef = useRef(blocks)
+  const choicesKey = sayLineChoices?.map((choice) => `${choice.id}:${choice.text}`).join('|') ?? ''
+  const choicesRef = useRef(sayLineChoices)
+  const lastChosenLineRef = useRef<string | undefined>(sayLineChoices?.[0]?.id)
+  const [pickedLine, setPickedLine] = useState<string | undefined>(undefined)
+  const sayBlockLine = blocks.find((block) => block.type === 'say_line' && block.line)?.line
+  const chosenLine = sayBlockLine ?? pickedLine ?? sayLineChoices?.[0]?.id
   const allowedBlockKey = useMemo(() => allowedBlocks.join('|'), [allowedBlocks])
   const stableAllowedBlocks = useMemo(
     () => (allowedBlockKey ? allowedBlockKey.split('|') : []),
@@ -83,7 +152,17 @@ export function BlocklyWorkspace({
 
   useEffect(() => {
     latestBlocksRef.current = blocks
-  }, [blocks])
+    choicesRef.current = sayLineChoices
+    if (chosenLine) lastChosenLineRef.current = chosenLine
+  }, [blocks, sayLineChoices, chosenLine])
+
+  function snapshotOf(workspace: Blockly.WorkspaceSvg) {
+    const choices = choicesRef.current
+    if (choices && choices.length > 0) {
+      workspace.getAllBlocks(false).forEach((block) => ensureLineField(block, choices, lastChosenLineRef.current ?? choices[0].id))
+    }
+    return buildSnapshot(workspace)
+  }
 
   useEffect(() => {
     registerKidsBlocks()
@@ -109,8 +188,8 @@ export function BlocklyWorkspace({
       zoom: {
         controls: false,
         wheel: true,
-        startScale: 0.9,
-        minScale: 0.8,
+        startScale: BASE_SCALE,
+        minScale: MIN_FIT_SCALE,
         maxScale: 1.2,
       },
     })
@@ -123,24 +202,37 @@ export function BlocklyWorkspace({
 
     restoredBlocks.forEach((snapshot) => {
       const block = workspace.newBlock(snapshot.type)
+      if (choicesRef.current && choicesRef.current.length > 0) {
+        ensureLineField(block, choicesRef.current, snapshot.line ?? lastChosenLineRef.current ?? choicesRef.current[0].id)
+      }
       block.initSvg()
       block.render()
       if ((snapshot as BlockSnapshot).disconnected) block.moveBy(28, 230)
       else positionOrConnectBlock(workspace, block)
     })
 
+    let fitFrame = 0
+    const scheduleFit = () => {
+      cancelAnimationFrame(fitFrame)
+      fitFrame = requestAnimationFrame(() => fitBlocksToView(workspace))
+    }
+
     const handleResize = () => {
       Blockly.svgResize(workspace)
+      scheduleFit()
     }
 
     let previousSnapshot = JSON.stringify(latestBlocksRef.current)
-    const handleChange = () => {
-      const next = buildSnapshot(workspace)
+    const handleChange = (event?: Blockly.Events.Abstract) => {
+      const next = snapshotOf(workspace)
       const key = JSON.stringify(next)
       // Focus, selection and viewport changes do not edit the program.
       if (key !== previousSnapshot) {
         previousSnapshot = key
         onSnapshotChange(next)
+        scheduleFit()
+      } else if (event?.type === Blockly.Events.BLOCK_DRAG && !(event as Blockly.Events.BlockDrag).isStart) {
+        scheduleFit()
       }
     }
 
@@ -157,13 +249,15 @@ export function BlocklyWorkspace({
     handleChange()
 
     return () => {
+      cancelAnimationFrame(fitFrame)
       resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
       workspace.removeChangeListener(handleChange)
       workspace.dispose()
       workspaceRef.current = null
     }
-  }, [allowedBlockKey, onSnapshotChange, stableAllowedBlocks])
+    // choicesKey re-injects when the lesson's preset lines change (snapshotOf only reads refs).
+  }, [allowedBlockKey, onSnapshotChange, stableAllowedBlocks, choicesKey])
 
   function addBlock(type: string) {
     const workspace = workspaceRef.current
@@ -172,7 +266,7 @@ export function BlocklyWorkspace({
       return
     }
 
-    const currentBlocks = buildSnapshot(workspace)
+    const currentBlocks = snapshotOf(workspace)
     if (
       (type === 'when_start' || type === 'when_clicked') &&
       currentBlocks.some((block) => block.type === type)
@@ -201,7 +295,16 @@ export function BlocklyWorkspace({
       positionOrConnectBlock(workspace, block)
     }
 
-    onSnapshotChange(buildSnapshot(workspace))
+    onSnapshotChange(snapshotOf(workspace))
+  }
+
+  function chooseLine(lineId: string) {
+    lastChosenLineRef.current = lineId
+    setPickedLine(lineId)
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    workspace.getAllBlocks(false).forEach((block) => block.getField(LINE_FIELD)?.setValue(lineId))
+    onSnapshotChange(snapshotOf(workspace))
   }
 
   function removeLastBlock() {
@@ -212,12 +315,13 @@ export function BlocklyWorkspace({
     if (!tail) return
     while (tail.getNextBlock()) tail = tail.getNextBlock() as Blockly.BlockSvg
     tail.dispose(false)
-    onSnapshotChange(buildSnapshot(workspace))
+    onSnapshotChange(snapshotOf(workspace))
   }
 
   return (
     <section className="flex flex-col gap-3" data-testid="lesson-blockly-workspace">
-      <div className="overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white">
+      {/* isolate: Blockly's flyout (z-index 20) must not paint over the sticky top bar when scrolled. */}
+      <div className="isolate overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white">
         <div
           ref={mountRef}
           className="relative h-[420px] overflow-hidden bg-white"
@@ -248,6 +352,25 @@ export function BlocklyWorkspace({
             </button>
           ))}
         </div>
+        {sayLineChoices && sayLineChoices.length > 0 && stableAllowedBlocks.includes('say_line') ? (
+          <div className="mt-3" data-testid="lesson-say-line-choices">
+            <b className="text-[12px]" id="lesson-say-line-choices-label">💬 选一句对白（“说一句话”会说这句）</b>
+            <div aria-labelledby="lesson-say-line-choices-label" className="mt-2 flex flex-wrap gap-2" role="group">
+              {sayLineChoices.map((choice) => (
+                <button
+                  aria-pressed={chosenLine === choice.id}
+                  className={`kc-say-choice ${chosenLine === choice.id ? 'kc-say-choice-on' : ''}`}
+                  data-testid={`lesson-say-line-${choice.id}`}
+                  key={choice.id}
+                  onClick={() => chooseLine(choice.id)}
+                  type="button"
+                >
+                  {choice.text}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
     </section>
   )

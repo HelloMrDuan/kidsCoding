@@ -66,6 +66,23 @@ export type FoundationRemedialMicroScript = {
   demo: string
 }
 
+/** TQ-008: one tiny hands-on check on a remedial page (no free text, no grading stored). */
+export type RemedialPractice =
+  | {
+      kind: 'order'
+      prompt: string
+      /** Blocks in the correct order; `type` picks the block colour. */
+      cards: Array<{ type: string; label: string }>
+      /** Display order as indexes into `cards` (fixed, so server and client render the same). */
+      displayOrder: number[]
+      success: string
+    }
+  | {
+      kind: 'click'
+      prompt: string
+      success: string
+    }
+
 export type RemedialLessonDefinition = {
   id: string
   title: string
@@ -73,6 +90,9 @@ export type RemedialLessonDefinition = {
   returnToLessonId: string
   returnToStepId: string
   steps: LessonStep[]
+  /** TQ-008: 2–3 short points this remedial reviews (shown instead of generic copy). */
+  keyPoints?: string[]
+  practice?: RemedialPractice
 }
 
 export type LaunchLessonDefinition = LessonDefinition & {

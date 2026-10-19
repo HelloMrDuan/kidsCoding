@@ -68,8 +68,40 @@ test('an incorrect first event cannot be used to bypass the click lesson',async(
   await expect(page.getByTestId('run-code-button')).toBeDisabled()
   await page.getByTestId('garden-predict-auto').click()
   await page.getByTestId('run-code-button').click()
-  await expect(page.getByTestId('lesson-playable-stage')).toContainText('积木好像不太对',{timeout:10_000})
+  await expect(page.getByTestId('stage-run-reason')).toContainText('先放一块“被点击时”',{timeout:10_000})
   await expect(page.getByTestId('stage-character-main')).toBeDisabled()
   await page.getByTestId('lesson-complete-step').click()
   await expect(page).toHaveURL(/lesson-07-garden-click/)
+})
+
+async function seedStepDraft(page:Page,lessonId:string,stepIndex:number,blocks:Array<{type:string;line?:string}>){
+  await page.addInitScript(({lessonId,stepIndex,blocks})=>{
+    if(sessionStorage.getItem('tq008-seeded'))return
+    sessionStorage.setItem('tq008-seeded','1')
+    sessionStorage.setItem(`kc-lesson-draft:${lessonId}:${stepIndex}`,JSON.stringify({schemaVersion:1,lessonId,stepIndex,blocks,updatedAt:new Date().toISOString()}))
+  },{lessonId,stepIndex,blocks})
+}
+
+test('TQ-008: lesson 9 step 5 accepts following the instruction literally (fly twice, then reply)',async({page})=>{
+  test.setTimeout(120_000)
+  await seedStepDraft(page,'lesson-09-garden-story',4,[{type:'when_clicked'},{type:'move_right'},{type:'repeat_twice'},{type:'say_line'}])
+  await page.goto('/learn/lesson/lesson-09-garden-story')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('一共飞两次')
+  await performClickStep(page,200,true)
+  await page.waitForURL('**/project/lesson-09-garden-story/complete')
+})
+
+test('TQ-008: lesson 9 step 5 still rejects replying before flying, with a specific reason',async({page})=>{
+  test.setTimeout(120_000)
+  await seedStepDraft(page,'lesson-09-garden-story',4,[{type:'when_clicked'},{type:'say_line'},{type:'move_right'},{type:'repeat_twice'}])
+  await page.goto('/learn/lesson/lesson-09-garden-story')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
+  await page.getByTestId('garden-predict-click').click()
+  await page.getByTestId('run-code-button').click()
+  await page.getByTestId('stage-character-main').click()
+  await expect(page.getByTestId('stage-run-reason')).toContainText('说话说早啦',{timeout:20_000})
+  await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier','1')
+  await page.getByTestId('lesson-complete-step').click()
+  await expect(page).toHaveURL(/lesson-09-garden-story/)
 })
