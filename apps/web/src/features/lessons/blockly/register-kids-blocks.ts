@@ -1,23 +1,8 @@
 import * as Blockly from 'blockly'
 
-export const kidsBlockLabels: Record<string, string> = {
-  when_start: '开始时',
-  when_clicked: '被点击时',
-  move_right: '向右移动',
-  say_line: '说一句话',
-  switch_scene: '切换场景',
-  switch_character: '切换到另一位朋友',
-  repeat_twice: '再做一次',
-  move_up: '向上走一格',
-  move_down: '向下走一格',
-  move_left: '向左走一格',
-  move_right_cell: '向右走一格',
-  move_forward: '向前走一格',
-  turn_left: '向左转',
-  turn_right: '向右转',
-  pick_key: '捡起钥匙',
-  open_door: '打开树洞门',
-}
+import { getKidsBlockLabel, kidsBlockLabels } from './block-labels'
+
+export { getKidsBlockLabel, kidsBlockLabels }
 
 const ICONS: Record<string, string> = {
   flag: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M6%203v18%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M7%204h11l-3%204%203%204H7z%22%20fill%3D%22%234cd964%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.6%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E',
@@ -211,6 +196,3 @@ export function registerKidsBlocks() {
   isRegistered = true
 }
 
-export function getKidsBlockLabel(type: string) {
-  return kidsBlockLabels[type] ?? type
-}

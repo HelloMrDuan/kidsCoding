@@ -1,4 +1,8 @@
+import { quoteBlock } from './block-labels'
 import { MAX_PROGRAM_BLOCKS, type ObservableVerdict } from './observable-run'
+
+const MOVE = quoteBlock('move_right')
+const REPEAT = quoteBlock('repeat_twice')
 
 /**
  * TQ-008: turn the real judge result (observable-run.ts) into one short, cute sentence
@@ -21,7 +25,7 @@ export function explainRunFailure(verdict: Pick<ObservableVerdict, 'code' | 'goa
     case 'extra-start':
       return '开始积木一块就够啦，把多出来的那块拿走吧。'
     case 'repeat-without-move':
-      return '“再做一次”要跟在移动后面，它才知道要重复什么哦。'
+      return `${REPEAT}前面要先有${MOVE}哦。`
     case 'double-scene-switch':
       return '已经在草地啦，不用再切换一次～'
     case 'unsupported-block':
@@ -39,9 +43,9 @@ export function explainRunFailure(verdict: Pick<ObservableVerdict, 'code' | 'goa
     case 'scene-switch-late':
       return `换场景换晚啦！在森林走 ${goal?.sceneSwitchAt ?? 0} 步就该去草地了。`
     case 'too-few-moves':
-      return `${actor}只走了 ${actual?.position ?? 0} 步，要走 ${goal?.position ?? 0} 步哦，再多走一次吧！`
+      return `${actor}只走了 ${actual?.position ?? 0} 步，要走 ${goal?.position ?? 0} 步哦，再多走 100 步吧！`
     case 'too-many-moves':
-      return `${actor}走过头啦！要走 ${goal?.position ?? 0} 步，现在走了 ${actual?.position ?? 0} 步，拿掉一块移动吧。`
+      return `${actor}走过头啦！要走 ${goal?.position ?? 0} 步，现在走了 ${actual?.position ?? 0} 步，少走 100 步吧。`
     case 'missing-say':
       return `${actor}还没开口呢！接一块“说一句话”吧。`
     case 'extra-say':

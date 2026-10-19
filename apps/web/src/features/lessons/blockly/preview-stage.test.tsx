@@ -66,7 +66,7 @@ describe('PreviewStage', () => {
 
     expect(
       screen.getByText(
-        '太好了，角色已经会在点击后一共飞两次，还会用一句话回应你。',
+        '太好了，角色已经会在点击后一共动两次、移动 200 步，还会用一句话回应你。',
       ),
     ).toBeInTheDocument()
   })
@@ -111,6 +111,6 @@ describe('PreviewStage', () => {
       />,
     )
 
-    expect(screen.getByText('角色已经学会把刚才的动作再做一次')).toBeInTheDocument()
+    expect(screen.getByText('角色会把移动再做一次，多走 100 步')).toBeInTheDocument()
   })
 })

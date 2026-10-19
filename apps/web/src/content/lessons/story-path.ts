@@ -17,8 +17,8 @@ export const storyPathLessons: LessonDefinition[] = [
       },
       {
         id: 'step-2',
-        title: '让角色向右移动',
-        instruction: '把“向右移动”接在“开始时”后面。',
+        title: '让角色向右走 100 步',
+        instruction: '把“向右走 100 步”接在“开始时”后面。',
         allowedBlocks: ['when_start', 'move_right'],
         requiredBlockTypes: ['when_start', 'move_right'],
       },

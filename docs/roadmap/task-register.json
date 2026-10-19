@@ -347,6 +347,37 @@
       "notes": "TQ-002 修复第 1 步（建议 a + b 中的 L02/L09）。不含：每课纠错步骤、第二项练习、“再做一次”语义、单元作品、lesson-08 parentAdvice“不同点法”、lesson-10～12 补救（TQ-002c～g 另行登记）。课程成熟度仍为 L3，不因本修复升级；未经儿童试学。"
     },
     {
+      "id": "TQ-009",
+      "title": "前9课积木语义与文案对齐",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-008"
+      ],
+      "scope": "features/lessons/blockly 积木标签（block-labels 单一来源）、launch-lessons 第1～12课文案、run-feedback/observable-run 错因、补救页、舞台距离显示、语音/家长/完成文案",
+      "acceptance": [
+        "积木说出自己做什么：move_right 显示“向右走 100 步”，repeat_twice 显示“重复：再走 100 步”（它总是重复移动，在“切换场景”或“说一句话”之后也一样）；积木类型 id 与 testid 不变，面板按钮与 Blockly 积木读同一标签",
+        "第1～12课任务、目标、提示、家长建议、语音、反馈、补救页、完成文案中引用的积木名都是真实标签；不再出现“向右移动”“再做一次”旧名，也不再用“走一步”描述 100 步的移动",
+        "角色名与舞台一致：第4～6课称“小狐狸”（不再泛称“小动物”），第7～9课称“蝴蝶”；第5课目标不再承诺并不存在的说话步骤",
+        "单角色舞台显示实际已走步数（如“小狐狸已走 200 步”），与文案“走 100 步”对应；草地课程舞台徽标不再在森林画面上写“草地舞台”",
+        "单测：标签、第5/9课重复语义、文案引用积木名全部合法、步数与参考程序一致、补救卡片标签、错因文案；E2E 覆盖第5课新标签、失败原因与距离显示"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "apps/web/src/content/curriculum/tq009-copy-alignment.test.ts（11 例：标签、重复语义、引用积木名、步数、角色名、补救卡片、错因文案）",
+          "apps/web/src/features/lessons/blockly/run-feedback.test.ts、preview-stage.test.tsx（更新为新标签/步数文案）",
+          "apps/web/src/features/lessons/foundation-lesson-feedback.test.ts、src/content/curriculum/foundation-units.test.ts、src/features/parent/build-parent-overview.test.ts、src/features/projects/build-project-completion-copy.test.ts（文案更新）",
+          "apps/web/tests/e2e/blockly-meadow-journey.spec.ts（新增 TQ-009 用例：第5课第3步标签、失败原因、已走步数）"
+        ],
+        "reviewer": null
+      },
+      "notes": "由负责人发现：“向右移动”每块走 100 步但积木不显示数字，文案却说“走 100 步”。本任务主动排查第1～12课同类不一致并修复（清单见 PR 描述）。不含：课程步骤“第 N 步”与距离“N 步”共用“步”字的命名、foundation-guides-v1.json 脚本课的其余内容差异、第5课面板仍提供用不到的“说一句话”积木。课程成熟度仍为 L3，未经儿童试学。"
+    },
+    {
       "id": "UX-001",
       "title": "设计Tokens规范化",
       "priority": "P0",

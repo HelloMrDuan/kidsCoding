@@ -7,6 +7,7 @@
  * so equivalent programs pass (e.g. "move, move" == "move, repeat"), counter-examples fail,
  * and a program that cannot run never earns completion.
  */
+import { quoteBlock } from './block-labels'
 import { resolveSayLine } from './say-line-presets'
 
 /** `line` is the preset id chosen in a say block's dropdown (lesson-02 only; TQ-008). */
@@ -85,7 +86,7 @@ export function simulateProgram(blocks: ProgramBlock[]): SimulationResult {
         moved = true
         break
       case 'repeat_twice':
-        if (!moved) return { ok: false, code: 'repeat-without-move', reason: '“再做一次”前面还没有动作可以重复，先接一个移动积木。' }
+        if (!moved) return { ok: false, code: 'repeat-without-move', reason: `${quoteBlock('repeat_twice')}前面还没有移动可以重复，先接${quoteBlock('move_right')}。` }
         observed.position += STEP_DISTANCE
         break
       case 'switch_scene':
@@ -149,7 +150,7 @@ function describeDifference(goal: ObservedRun, actual: ObservedRun, options: Jud
   if (goal.position !== actual.position) {
     return {
       code: actual.position < goal.position ? 'too-few-moves' : 'too-many-moves',
-      reason: `目标：一共走 ${goal.position} 步；实际：走了 ${actual.position} 步。检查移动和“再做一次”的数量。`,
+      reason: `目标：一共走 ${goal.position} 步；实际：走了 ${actual.position} 步。检查${quoteBlock('move_right')}和${quoteBlock('repeat_twice')}的数量。`,
     }
   }
   if (goal.message !== actual.message) {

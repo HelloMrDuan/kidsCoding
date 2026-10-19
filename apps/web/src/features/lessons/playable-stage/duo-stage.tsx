@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useBlockExecutor } from './use-block-executor'
 import styles from './duo-stage.module.css'
 import { duoLessonHints } from '@/content/curriculum/launch-lessons'
+import { getKidsBlockLabel, quoteBlock } from '@/features/lessons/blockly/block-labels'
 
 function Friend({ bear = false }: { bear?: boolean }) {
   return <svg viewBox="0 0 80 80" aria-hidden="true">
@@ -54,7 +55,7 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
     </div>
     {stepIndex === 0 && <div className={styles.activity}>
       <p>小狐狸和小熊都在各自的 <strong>0 步起点</strong>。{graduation ? '狐狸在 100 步守住路标，小熊要走到 200 步寻找礼物。两个目标都到位才找到礼物。' : dialogue ? '今天排练出发：各走 100 步后，只有小熊说“我们一起出发吧！”。' : '它们要分别走到 100 步的野餐旗。'}</p>
-      <p>先猜一猜：切换到小熊后，下一块{graduation ? '移动后的“再做一次”会让谁再走 100 步？' : dialogue ? '“说一句话”会让谁说话？' : '“向右移动”会让谁走？'}</p>
+      <p>先猜一猜：切换到小熊后，下一块{graduation ? `移动后的${quoteBlock('repeat_twice')}会让谁再走 100 步？` : dialogue ? '“说一句话”会让谁说话？' : `${quoteBlock('move_right')}会让谁走？`}</p>
       <div className={styles.buttons}>
         <button data-testid="duo-predict-bear" aria-pressed={prediction === 'bear'} onClick={() => setPrediction('bear')}>只有小熊</button>
         <button data-testid="duo-predict-both" aria-pressed={prediction === 'both'} onClick={() => setPrediction('both')}>两个一起</button>
@@ -63,7 +64,7 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
     </div>}
     {stepIndex === 3 && <div className={styles.activity} data-testid="duo-debug-task">
       <strong>{graduation ? '实验：小熊少走一次' : dialogue ? '实验：故意把对白交错朋友' : '实验：故意漏掉切换'}</strong>
-      <p>{graduation ? '清空重拼：开始 → 狐狸移动 → 切换 → 小熊移动。亲自运行，观察礼物为什么没有出现。再给小熊补一次移动。' : dialogue ? '清空重拼：开始 → 移动 → 说话 → 切换 → 移动。亲自运行，观察是谁开口。再把说话移到切换之后。' : '清空积木，亲自拼“开始时 → 向右移动 → 向右移动”并运行。观察小熊，再修好程序。'}</p>
+      <p>{graduation ? '清空重拼：开始 → 狐狸移动 → 切换 → 小熊移动。亲自运行，观察礼物为什么没有出现。再给小熊补一次移动。' : dialogue ? '清空重拼：开始 → 移动 → 说话 → 切换 → 移动。亲自运行，观察是谁开口。再把说话移到切换之后。' : `清空积木，亲自拼“开始时 → ${getKidsBlockLabel('move_right')} → ${getKidsBlockLabel('move_right')}”并运行。观察小熊，再修好程序。`}</p>
       <p>{observedMistake ? graduation ? '已观察：狐狸 100 步，小熊只有 100 步，礼物尚未找到。给小熊补上 100 步，再试一次。' : dialogue ? '已观察：两位朋友各走了 100 步，但狐狸开口，小熊没有目标对白。现在把说话交给小熊。' : '已观察：小狐狸走了 200 步，小熊仍在 0 步。现在把切换补在两次移动中间。' : '这一步需要先观察真实错误结果，再修复。'}</p>
     </div>}
     <div className={styles.toolbar}>
@@ -114,7 +115,7 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
     <div className={styles.buttons}><button data-testid="duo-show-hint" disabled={hintCount === activeHints.length} onClick={() => setHintCount(count => count + 1)}>看看提示（{hintCount}/3）</button></div>
     {activeHints.slice(0, hintCount).map((hint, i) => <p className={styles.hint} key={hint}>{i + 1}. {hint}</p>)}
     {stepIndex === 4 && <div className={styles.activity}>
-      <strong>{graduation ? '我的毕业寻宝作品' : dialogue ? '我的出发排练作品' : '我的野餐作品'}</strong><p>{graduation ? '选一种方案：小熊移动后接“再做一次”，或给小熊接两块移动。还可以给狐狸加问候、给小熊加庆祝话。保持狐狸 100 步、小熊 200 步，再运行验证。' : dialogue ? '保留小熊的出发对白，也可以在切换前给狐狸另加“你好！”。两位朋友各走 100 步，目标对白仍由小熊说。' : '你可以保留两位朋友各走 100 步，也可以在切换前给小狐狸加一句问候。两种作品都能过关。'}</p>
+      <strong>{graduation ? '我的毕业寻宝作品' : dialogue ? '我的出发排练作品' : '我的野餐作品'}</strong><p>{graduation ? `选一种方案：小熊移动后接${quoteBlock('repeat_twice')}，或给小熊接两块移动。还可以给狐狸加问候、给小熊加庆祝话。保持狐狸 100 步、小熊 200 步，再运行验证。` : dialogue ? '保留小熊的出发对白，也可以在切换前给狐狸另加“你好！”。两位朋友各走 100 步，目标对白仍由小熊说。' : '你可以保留两位朋友各走 100 步，也可以在切换前给小狐狸加一句问候。两种作品都能过关。'}</p>
       <p>想一想：为什么{graduation ? '小熊再做一次时，狐狸仍停在 100 步？' : dialogue ? '小熊说话时，狐狸不会跟着说？' : '两位朋友不会一起移动？'}</p>
       <div className={styles.buttons}>
         <button data-testid="duo-reflect-own" aria-pressed={reflection === 'own'} onClick={() => setReflection('own')}>动作只给当前角色</button>

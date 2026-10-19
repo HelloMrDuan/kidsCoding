@@ -15,8 +15,9 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
     badge: '森林舞台',
     note: '先让角色上场，再看看故事会不会往前走。',
   },
+  // TQ-009: this stage starts in the forest; a “草地舞台” badge over a forest scene confused kids.
   meadow: {
-    badge: '草地舞台',
+    badge: '旅行舞台',
     note: '先在森林出发，再把故事带到草地。',
   },
   garden: {
@@ -29,7 +30,7 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
   },
 }
 
-function getStageCopy(blocks: Array<{ type: string }>) {
+function getStageCopy(blocks: Array<{ type: string }>, actor = '角色') {
   const moved = blocks.some((block) => block.type === 'move_right')
   const spoke = blocks.some((block) => block.type === 'say_line')
   const repeated = blocks.some((block) => block.type === 'repeat_twice')
@@ -38,25 +39,26 @@ function getStageCopy(blocks: Array<{ type: string }>) {
   const hasSecondStart = startCount > 1
   const hasClickTrigger = blocks.some((block) => block.type === 'when_clicked')
   const switchedScene = blocks.some((block) => block.type === 'switch_scene')
+  const walked = blocks.filter((block) => block.type === 'move_right' || block.type === 'repeat_twice').length * 100
 
   if (repeated && spoke && hasSecondStart) {
-    return '太好了，两个朋友已经会合了，还会一起再向礼物靠近一步，毕业故事更完整了。'
+    return '太好了，两个朋友已经会合了，还会再向礼物走 100 步，毕业故事更完整了。'
   }
 
   if (repeated && spoke && switchedScene) {
-    return '太好了，故事已经从森林走到草地了，还会在草地上再往前走一步，再说出旅行感受。'
+    return '太好了，故事已经从森林走到草地了，还会在草地上再走 100 步，再说出旅行感受。'
   }
 
   if (repeated && spoke && hasClickTrigger) {
-    return '太好了，角色已经会在点击后一共飞两次，还会用一句话回应你。'
+    return `太好了，${actor}已经会在点击后一共动两次、移动 200 步，还会用一句话回应你。`
   }
 
   if (spoke && switchedScene) {
-    return '太好了，故事已经从森林走到草地了。再接一句收尾的话，小旅行就更完整了。'
+    return '太好了，故事已经从森林走到草地了，还说了一句话，小旅行更完整了。'
   }
 
   if (spoke && hasClickTrigger) {
-    return '太好了，角色已经会在点击后先动起来，再用一句话回应你。'
+    return `太好了，${actor}已经会在点击后先动起来，再用一句话回应你。`
   }
 
   if (spoke) {
@@ -80,7 +82,7 @@ function getStageCopy(blocks: Array<{ type: string }>) {
   }
 
   if (moved) {
-    return '太好了，角色已经走上舞台了。再接一句话，故事就会更完整。'
+    return `太好了，${actor}已经向右走了 ${walked} 步，走上舞台了。再接一句话，故事就会更完整。`
   }
 
   if (hasClickTrigger) {
@@ -191,7 +193,7 @@ export function PreviewStage({
 
             {repeated ? (
               <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
-                角色已经学会把刚才的动作再做一次
+                角色会把移动再做一次，多走 100 步
               </div>
             ) : switchedScene ? (
               <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
@@ -206,7 +208,7 @@ export function PreviewStage({
         </div>
 
         <div className="mt-5 rounded-[1.75rem] bg-white/85 px-4 py-4 shadow-[0_14px_28px_rgba(15,23,42,0.06)]">
-          <p className="text-sm font-semibold leading-7 text-slate-700">{getStageCopy(blocks)}</p>
+          <p className="text-sm font-semibold leading-7 text-slate-700">{getStageCopy(blocks, template ? mainLabel : undefined)}</p>
         </div>
       </div>
     </section>

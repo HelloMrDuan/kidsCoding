@@ -6,13 +6,13 @@ describe('getFoundationLessonFeedback', () => {
   it('uses a result-first progress line for lesson 01', () => {
     expect(
       getFoundationLessonFeedback('lesson-01-forest-hello', 'progress'),
-    ).toBe('现在，角色已经会走上舞台了。')
+    ).toBe('现在，小狐狸已经会向右走 100 步、走上舞台了。')
   })
 
   it('uses a result-first progress line for lesson 02', () => {
     expect(
       getFoundationLessonFeedback('lesson-02-forest-greeting', 'progress'),
-    ).toBe('现在，角色已经会边出场边打招呼了。')
+    ).toBe('现在，小狐狸已经会先出场、再打招呼了。')
   })
 
   it('keeps lesson 03 focused on the upcoming full project', () => {
@@ -30,7 +30,7 @@ describe('getFoundationLessonFeedback', () => {
   it('uses a result-first progress line for lesson 05', () => {
     expect(
       getFoundationLessonFeedback('lesson-05-meadow-order', 'progress'),
-    ).toBe('现在，故事不只会转场，还会在新场景里继续往前走了。')
+    ).toBe('现在，故事不只会转场，小狐狸还会在草地上再走 100 步了。')
   })
 
   it('keeps lesson 06 focused on the upcoming full project', () => {
@@ -42,13 +42,13 @@ describe('getFoundationLessonFeedback', () => {
   it('uses a result-first progress line for lesson 07', () => {
     expect(
       getFoundationLessonFeedback('lesson-07-garden-click', 'progress'),
-    ).toBe('现在，角色已经会回应点击了。')
+    ).toBe('现在，蝴蝶已经会回应点击了。')
   })
 
   it('uses a result-first progress line for lesson 08', () => {
     expect(
       getFoundationLessonFeedback('lesson-08-garden-dialogue', 'progress'),
-    ).toBe('现在，角色已经会先动再说了。')
+    ).toBe('现在，蝴蝶已经会先飞再说了。')
   })
 
   it('keeps lesson 09 focused on the upcoming full project', () => {

@@ -21,8 +21,9 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
     badge: '森林舞台',
     note: '先让角色上场，再看看故事会不会往前走。',
   },
+  // TQ-009: this stage starts in the forest; a “草地舞台” badge over a forest scene confused kids.
   meadow: {
-    badge: '草地舞台',
+    badge: '旅行舞台',
     note: '先在森林出发，再把故事带到草地。',
   },
   garden: {
@@ -140,7 +141,11 @@ export function PlayableStage({
         <SceneBackdrop scene={sceneId} />
         <div className="kc-stage-topline">
           <span className="kc-stage-badge">{sceneCopy.badge}</span>
-          <span data-testid="stage-current-scene" className="kc-stage-scene-chip">当前实际场景：{visualScene}</span>
+          <span className="flex flex-wrap justify-end gap-1.5">
+            <span data-testid="stage-current-scene" className="kc-stage-scene-chip">当前实际场景：{visualScene}</span>
+            {/* TQ-009: copy says “走 100 步”, so the stage shows the distance actually walked. */}
+            <span data-testid="stage-walked-distance" className="kc-stage-scene-chip">{mainLabel}已走 {characterPosition} 步</span>
+          </span>
         </div>
 
         <div className="kc-stage-actors">

@@ -76,7 +76,7 @@ describe('foundation curriculum seed', () => {
     expect(lessons[1]?.steps).toHaveLength(5)
     expect(lessons[2]?.steps).toHaveLength(5)
     expect(lessons[0]?.goal).toContain('点击')
-    expect(lessons[1]?.goal).toContain('先动')
+    expect(lessons[1]?.goal).toContain('先飞')
     expect(lessons[2]?.goal).toContain('互动故事')
   })
 

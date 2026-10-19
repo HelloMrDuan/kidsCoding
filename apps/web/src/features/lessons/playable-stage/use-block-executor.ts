@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { quoteBlock } from '../blockly/block-labels'
 import { evaluateObservable, MAX_PROGRAM_BLOCKS, sayMessageFor, simulateProgram, type JudgeOptions, type ProgramBlock } from '../blockly/observable-run'
 
 const NO_JUDGE_OPTIONS: JudgeOptions = {}
@@ -70,7 +71,7 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
             bear += 100
             setPartnerPosition(bear)
           }
-          setActionLog(prev => [...prev, `${actor === 'main' ? '小狐狸' : '小熊'}向右移动 100 步`])
+          setActionLog(prev => [...prev, `${actor === 'main' ? '小狐狸' : '小熊'}向右走 100 步`])
         } else if (type === 'switch_character') {
           if (actor === 'partner') { fail('已经在操作小熊了。本课只切换一次，重复切换没有新目标。'); return }
           if (fox !== 100) { fail('先让小狐狸走 100 步，再把操作权交给小熊。'); return }
@@ -78,11 +79,11 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
           setActiveActor(actor)
           setActionLog(prev => [...prev, '切换到小熊：后面的动作只给小熊'])
         } else if (type === 'repeat_twice' && graduationEnabled) {
-          if (blocks[i - 1]?.type !== 'move_right') { fail('“再做一次”要接在当前角色的移动后面，切换不会把狐狸的移动交给小熊重复。'); return }
+          if (blocks[i - 1]?.type !== 'move_right') { fail(`${quoteBlock('repeat_twice')}要接在当前角色的移动后面，切换不会把狐狸的移动交给小熊重复。`); return }
           setActorActions({ main: actor === 'main' ? 'moving' : 'idle', partner: actor === 'partner' ? 'moving' : 'idle' })
           if (actor === 'main') { fox += 100; setCharacterPosition(fox) }
           else { bear += 100; setPartnerPosition(bear) }
-          setActionLog(prev => [...prev, `${actor === 'main' ? '小狐狸' : '小熊'}再移动 100 步（再做一次）`])
+          setActionLog(prev => [...prev, `${actor === 'main' ? '小狐狸' : '小熊'}再走 100 步（重复）`])
         } else if (type === 'say_line' && (dialogueEnabled || graduationEnabled && stepIndex === 4)) {
           setActorActions({ main: actor === 'main' ? 'speaking' : 'idle', partner: actor === 'partner' ? 'speaking' : 'idle' })
           if (actor === 'main') {

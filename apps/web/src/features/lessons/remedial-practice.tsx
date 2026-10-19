@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import type { RemedialPractice as RemedialPracticeData } from '@/features/domain/types'
+import { getKidsBlockLabel } from '@/features/lessons/blockly/block-labels'
 import { CharacterArt } from '@/features/lessons/playable-stage/character-art'
 
 /** TQ-008: tiny hands-on practice on a remedial page. Nothing is graded or stored. */
@@ -76,9 +77,9 @@ function ClickPractice({ practice }: { practice: Extract<RemedialPracticeData, {
     <div className="rounded-[1.5rem] bg-emerald-50 p-5" data-testid="remedial-practice">
       <p className="text-base font-bold text-slate-900">{practice.prompt}</p>
       <div className="mt-3 flex items-center gap-3 overflow-hidden rounded-[1.25rem] bg-white px-4 py-3">
-        <span className="kc-block-chip shrink-0" data-block="when_clicked">被点击时</span>
+        <span className="kc-block-chip shrink-0" data-block="when_clicked">{getKidsBlockLabel('when_clicked')}</span>
         <span aria-hidden="true" className="font-black text-slate-400">→</span>
-        <span className="kc-block-chip shrink-0" data-block="move_right">向右移动</span>
+        <span className="kc-block-chip shrink-0" data-block="move_right">{getKidsBlockLabel('move_right')}</span>
       </div>
       <div className="mt-3 h-[120px] overflow-hidden rounded-[1.25rem] bg-gradient-to-b from-sky-100 to-emerald-100 p-2">
         <button
