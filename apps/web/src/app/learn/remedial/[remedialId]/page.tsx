@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
+import { RemedialPractice } from '@/features/lessons/remedial-practice'
 
 export default function RemedialLessonPage() {
   const params = useParams<{ remedialId: string }>()
@@ -31,28 +32,19 @@ export default function RemedialLessonPage() {
           <p className="text-base leading-7 text-slate-600">{lesson.focus}</p>
         </header>
         <div className="rounded-[1.5rem] bg-amber-50 p-5 text-base leading-7 text-amber-900">
-          先用 1 分钟复习这一点，再回到刚才的课程继续挑战。补课完成后，系统会带你回到原来的学习路径。
+          先花 1 分钟复习这一点，再回到刚才卡住的那一步继续，不用从头开始。
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          <article className="rounded-[1.5rem] bg-slate-50 p-5">
-            <p className="text-sm font-semibold text-slate-500">先看目标</p>
-            <p className="mt-2 text-base font-semibold text-slate-900">
-              先听一遍语音提示，确认这一小步到底要做什么。
-            </p>
-          </article>
-          <article className="rounded-[1.5rem] bg-slate-50 p-5">
-            <p className="text-sm font-semibold text-slate-500">再看顺序</p>
-            <p className="mt-2 text-base font-semibold text-slate-900">
-              把开始积木放在最前面，再接上动作或对白积木。
-            </p>
-          </article>
-          <article className="rounded-[1.5rem] bg-slate-50 p-5">
-            <p className="text-sm font-semibold text-slate-500">最后回主课</p>
-            <p className="mt-2 text-base font-semibold text-slate-900">
-              回到刚才卡住的那一步，重新试一次，不用从头开始。
-            </p>
-          </article>
-        </div>
+        {lesson.keyPoints && lesson.keyPoints.length > 0 ? (
+          <ol className={`grid gap-4 ${lesson.keyPoints.length >= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'}`} data-testid="remedial-key-points">
+            {lesson.keyPoints.map((point, index) => (
+              <li className="rounded-[1.5rem] bg-slate-50 p-5" key={point}>
+                <p className="text-sm font-semibold text-slate-500">第 {index + 1} 点</p>
+                <p className="mt-2 text-base font-semibold text-slate-900">{point}</p>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+        {lesson.practice ? <RemedialPractice practice={lesson.practice} /> : null}
         <div className="flex flex-col gap-4 sm:flex-row">
           <Link
             className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-4 text-lg font-bold text-white"

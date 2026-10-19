@@ -1,9 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { evaluateObservable, MAX_PROGRAM_BLOCKS, simulateProgram } from '../blockly/observable-run'
+import { evaluateObservable, MAX_PROGRAM_BLOCKS, sayMessageFor, simulateProgram, type JudgeOptions, type ProgramBlock } from '../blockly/observable-run'
+
+const NO_JUDGE_OPTIONS: JudgeOptions = {}
 
 export type ExecutionState = 'idle' | 'armed' | 'running' | 'success' | 'error'
 
-export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: boolean }>, requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' | 'graduation' = false) {
+export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' | 'graduation' = false, judgeOptions: JudgeOptions = NO_JUDGE_OPTIONS) {
   const dialogueEnabled = duoEnabled === 'dialogue'
   const graduationEnabled = duoEnabled === 'graduation'
   const [giftFound, setGiftFound] = useState(false)
@@ -114,9 +116,11 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
         }
         setCharacterPosition(prev => prev + 100)
       } else if (type === 'say_line') {
-        setCharacterMessage(blocks.slice(0, i).some(b => b.type === 'switch_scene')
-          ? '我到草地啦！'
-          : blocks[0].type === 'when_clicked' ? '蝴蝶收到你的点击啦！' : '你好！')
+        setCharacterMessage(sayMessageFor(
+          blocks[i],
+          blocks.slice(0, i).some(b => b.type === 'switch_scene') ? 'meadow' : 'forest',
+          blocks[0].type === 'when_clicked' ? 'click' : 'start',
+        ))
       } else {
         setExecutionState('error')
         return
@@ -126,7 +130,7 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
     }
     if (!duoEnabled) {
       // SYS-103: judge the observed result, so equivalent programs pass and counter-examples fail.
-      const verdict = evaluateObservable(requiredBlocks, blocks)
+      const verdict = evaluateObservable(requiredBlocks, blocks, judgeOptions)
       if (!verdict.passed) {
         fail(verdict.reason)
         return
@@ -159,7 +163,7 @@ export function useBlockExecutor(blocks: Array<{ type: string; disconnected?: bo
       }
     }
     if (runIdRef.current === id) setExecutionState('success')
-  }, [blocks, requiredBlocks, duoEnabled, dialogueEnabled, graduationEnabled, stepIndex])
+  }, [blocks, requiredBlocks, duoEnabled, dialogueEnabled, graduationEnabled, stepIndex, judgeOptions])
 
   const run = useCallback(async () => {
     reset()

@@ -66,7 +66,7 @@ describe('PreviewStage', () => {
 
     expect(
       screen.getByText(
-        '太好了，角色已经会在点击后连着动两次，再用一句话回应你。',
+        '太好了，角色已经会在点击后一共飞两次，还会用一句话回应你。',
       ),
     ).toBeInTheDocument()
   })

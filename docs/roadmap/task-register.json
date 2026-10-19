@@ -309,6 +309,40 @@
       "notes": ""
     },
     {
+      "id": "TQ-008",
+      "title": "前9节Blockly课堂反馈与硬否决修复",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-002"
+      ],
+      "scope": "features/lessons 课堂反馈/提示/补救、lesson-02/09",
+      "acceptance": [
+        "运行失败时舞台显示由真实执行/判定结果得出的具体错因（缺开始积木、顺序不对、说话太早、少某块积木等），儿童化短句，不再出现“需要和任务要求的积木一样”",
+        "提示按失败次数 1→2→3 逐层出现，第一次失败显示第 1 层；同一错误程序运行失败后再点“完成这一步”不重复跳层",
+        "第 3 层补救按单元对应：森林第1～3课→开始与顺序补救，草地第4～6课→按顺序换场景补救，花园第7～9课→点击触发补救；补救页有可操作的小练习",
+        "L02 step-5 自选对白真实可选：说一句话积木有 4 句预设对白下拉与按钮（无自由文本），任选一句都判定通过并在舞台说出",
+        "L09 step-5 指令与判定一致：一共飞两次、飞完第一次或第二次后回话都通过，先说话再飞等真正错误仍被拒绝",
+        "正反例测试：错因映射、提示层级、补救路由、L02 每句预设、L09 正例与反例；E2E 覆盖"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "apps/web/src/features/lessons/blockly/run-feedback.test.ts（19 例：错因码→儿童化文案）",
+          "apps/web/src/features/lessons/build-hint-state.test.ts（提示 1→2→3 顺序）",
+          "apps/web/src/features/lessons/remedial-routing.test.ts（按单元补救路由与补救内容）",
+          "apps/web/src/features/lessons/blockly/tq008-lesson-judging.test.ts（L02 四句预设、L09 正反例）",
+          "apps/web/src/features/lessons/playable-stage/playable-stage-feedback.test.tsx（舞台显示具体错因、每次失败上报）",
+          "apps/web/tests/e2e/blockly-first-run.spec.ts、blockly-forest-sequence.spec.ts、blockly-garden-click.spec.ts（新增 TQ-008 用例）"
+        ],
+        "reviewer": null
+      },
+      "notes": "TQ-002 修复第 1 步（建议 a + b 中的 L02/L09）。不含：每课纠错步骤、第二项练习、“再做一次”语义、单元作品、lesson-08 parentAdvice“不同点法”、lesson-10～12 补救（TQ-002c～g 另行登记）。课程成熟度仍为 L3，不因本修复升级；未经儿童试学。"
+    },
+    {
       "id": "UX-001",
       "title": "设计Tokens规范化",
       "priority": "P0",

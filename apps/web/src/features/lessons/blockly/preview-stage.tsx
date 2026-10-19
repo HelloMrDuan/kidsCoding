@@ -48,7 +48,7 @@ function getStageCopy(blocks: Array<{ type: string }>) {
   }
 
   if (repeated && spoke && hasClickTrigger) {
-    return '太好了，角色已经会在点击后连着动两次，再用一句话回应你。'
+    return '太好了，角色已经会在点击后一共飞两次，还会用一句话回应你。'
   }
 
   if (spoke && switchedScene) {

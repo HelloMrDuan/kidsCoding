@@ -31,9 +31,11 @@ export function RemedialLinkCard({
         </div>
       ) : null}
 
-      {remedialLessonId && !remedialMicroScript ? (
+      {remedialLessonId ? (
         <button
           className="mt-3 rounded-full bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-400"
+          data-remedial-id={remedialLessonId}
+          data-testid="lesson-remedial-link"
           onClick={() => onStartRemedial(remedialLessonId)}
           type="button"
         >
