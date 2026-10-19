@@ -65,7 +65,7 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
     {stepIndex === 3 && <div className={styles.activity} data-testid="duo-debug-task">
       <strong>{graduation ? '实验：小熊少走一次' : dialogue ? '实验：故意把对白交错朋友' : '实验：故意漏掉切换'}</strong>
       <p>{graduation ? '清空重拼：开始 → 狐狸移动 → 切换 → 小熊移动。亲自运行，观察礼物为什么没有出现。再给小熊补一次移动。' : dialogue ? '清空重拼：开始 → 移动 → 说话 → 切换 → 移动。亲自运行，观察是谁开口。再把说话移到切换之后。' : `清空积木，亲自拼“开始时 → ${getKidsBlockLabel('move_right')} → ${getKidsBlockLabel('move_right')}”并运行。观察小熊，再修好程序。`}</p>
-      <p>{observedMistake ? graduation ? '已观察：狐狸 100 步，小熊只有 100 步，礼物尚未找到。给小熊补上 100 步，再试一次。' : dialogue ? '已观察：两位朋友各走了 100 步，但狐狸开口，小熊没有目标对白。现在把说话交给小熊。' : '已观察：小狐狸走了 200 步，小熊仍在 0 步。现在把切换补在两次移动中间。' : '这一步需要先观察真实错误结果，再修复。'}</p>
+      <p>{observedMistake ? graduation ? '已观察：狐狸 100 步，小熊只有 100 步，礼物尚未找到。给小熊补上 100 步，再试一次。' : dialogue ? '已观察：两位朋友各走了 100 步，但狐狸开口，小熊没有目标对白。现在把说话交给小熊。' : '已观察：小狐狸走了 200 步，小熊仍在 0 步。现在把切换补在两次移动中间。' : '这一关需要先观察真实错误结果，再修复。'}</p>
     </div>}
     <div className={styles.toolbar}>
       <p data-testid="duo-active-actor">当前操作：<strong>{activeActor === 'main' ? '小狐狸' : '小熊'}</strong></p>
@@ -100,16 +100,16 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
     {dialogue && <div className={styles.dialogueBoard} data-testid="duo-dialogue-board" aria-label="角色对白记录">
       <p><strong>小狐狸说：</strong><span data-testid="duo-fox-speech-record">{characterMessage ?? '还没有说话'}</span></p>
       <p><strong>小熊说：</strong><span data-testid="duo-bear-speech-record">{executor.partnerMessage ?? '还没有说话'}</span></p>
-      <small>{stepIndex >= 2 ? '本步目标：小熊说“我们一起出发吧！”；作品步骤可另加狐狸问候。' : '本步先观察或移动，两个对白都留空。'}</small>
+      <small>{stepIndex >= 2 ? '本关目标：小熊说“我们一起出发吧！”；作品关卡可另加狐狸问候。' : '本关先观察或移动，两个对白都留空。'}</small>
     </div>}
     <div className={styles.result} role="status" aria-live="polite" data-testid="duo-result">
       {executionState === 'idle' && '先拼好积木，再运行。重置只恢复舞台，保留你的代码。'}
       {executionState === 'running' && '按顺序执行中，注意当前操作的朋友。'}
       {executionState === 'error' && <strong className={styles.error}>{executor.errorMessage}</strong>}
-      {executionState === 'success' && <><strong>运行成功！两个角色的{dialogue ? '位置和对白' : '位置'}符合本步目标。</strong>
+      {executionState === 'success' && <><strong>运行成功！两个角色的{dialogue ? '位置和对白' : '位置'}符合本关目标。</strong>
         {stepIndex === 3 && !observedMistake && <p>还需要先完成上面的错误实验。</p>}
         {stepIndex === 2 && <p>{graduation ? '小熊再走一次，到达 200 步；狐狸仍停在 100 步。重复动作也只给当前角色。' : dialogue ? '小熊说出了出发对白，小狐狸没有跟着说。对白也有自己的角色归属。' : '小狐狸停在 100 步，小熊接着走。切换的是操作权，已经走过的位置不会变。'}</p>}
-        {ready && <p>可以点击“完成这一步”继续。</p>}</>}
+        {ready && <p>可以点击“完成这一关”继续。</p>}</>}
     </div>
     {executor.actionLog.length > 0 && <ol className={styles.log} data-testid="duo-action-log">{executor.actionLog.map((line, i) => <li key={i}>{line}</li>)}</ol>}
     <div className={styles.buttons}><button data-testid="duo-show-hint" disabled={hintCount === activeHints.length} onClick={() => setHintCount(count => count + 1)}>看看提示（{hintCount}/3）</button></div>

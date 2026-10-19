@@ -12,6 +12,11 @@ const MOVE = quoteBlock('move_right')
 const REPEAT = quoteBlock('repeat_twice')
 const MOVE_NAME = getKidsBlockLabel('move_right')
 const REPEAT_NAME = getKidsBlockLabel('repeat_twice')
+/** Lessons 07–09: the butterfly flies, so its blocks say “向右飞 100 步” / “重复：再飞 100 步”. */
+const FLY = quoteBlock('move_right', 'fly')
+const FLY_REPEAT = quoteBlock('repeat_twice', 'fly')
+const FLY_NAME = getKidsBlockLabel('move_right', 'fly')
+const FLY_REPEAT_NAME = getKidsBlockLabel('repeat_twice', 'fly')
 
 /** TQ-003: one source for the duo lessons' three hint layers (classroom feedback + duo stage). */
 export const duoLessonHints = {
@@ -23,7 +28,7 @@ export const duoLessonHints = {
   'lesson-11-duo-rehearsal': [
   '看看谁头上出现了对白：小熊说出目标的话了吗？',
   '每个角色有自己的对白。说话和移动一样，只作用于当前操作的朋友。',
-  '先让狐狸移动，再切换并移动小熊，把“说一句话”接在切换之后。作品步骤可以给狐狸另加问候。',
+  '先让狐狸移动，再切换并移动小熊，把“说一句话”接在切换之后。最后的作品关可以给狐狸另加问候。',
 ],
   'lesson-12-graduation-show': [
   '看看小熊的距离：只走 100 步，离 200 步的礼物还差多远？',
@@ -196,10 +201,10 @@ export const launchLessons: LaunchLessonDefinition[] = [
     recommendedLevel: 'starter',
     steps: [
       step('step-1', '回顾上节的转场', '先看一眼故事怎么从森林走到草地，今天我们要让它更有先后顺序。', ['when_start'], ['when_start']),
-      step('step-2', '先安排出发', `先让小狐狸从森林里出发：接好“开始时”和${MOVE}。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right']),
-      step('step-3', '再安排到达', '接上“切换场景”，让小狐狸来到草地。', ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene']),
-      step('step-4', '到草地后再走 100 步', `在“切换场景”后面接${REPEAT}，它会把移动再做一次，让小狐狸到草地后再走 100 步。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
-      step('step-5', '顺序排完整', '再运行一次，看看是不是先出发、再到草地、再走 100 步，一共走了 200 步。', ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
+      step('step-2', '先安排出发', `先让小狐狸从森林里出发：接好“开始时”和${MOVE}。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right']),
+      step('step-3', '再安排到达', '接上“切换场景”，让小狐狸来到草地。', ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene']),
+      step('step-4', '到草地后再走 100 步', `在“切换场景”后面接${REPEAT}，它会把移动再做一次，让小狐狸到草地后再走 100 步。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
+      step('step-5', '顺序排完整', '再运行一次，看看是不是先出发、再到草地、再走 100 步，一共走了 200 步。', ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
     ],
     rewardCardId: 'growth-meadow-order',
     phase: 'trial',
@@ -247,9 +252,9 @@ export const launchLessons: LaunchLessonDefinition[] = [
     recommendedLevel: 'foundation',
     steps: [
       step('step-1', '认识今天的新规则', '今天蝴蝶不会一开始就自己动，要等你点到它，它才会回应你。', ['when_clicked'], ['when_clicked']),
-      step('step-2', '先让蝴蝶回应一次点击', `先把“被点击时”放在最前面，再接上${MOVE}，让蝴蝶被点到后向右飞 100 步。`, ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
+      step('step-2', '先让蝴蝶回应一次点击', `先把“被点击时”放在最前面，再接上${FLY}，让蝴蝶被点到后向右飞 100 步。`, ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
       step('step-3', '再确认只有点到时才会动', '点一下蝴蝶，再看看它是不是只有被点到后才开始飞。', ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
-      step('step-4', '把点击和飞起来接完整', `确认顺序是“被点击时”在前面，${MOVE}在后面。`, ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
+      step('step-4', '把点击和飞起来接完整', `确认顺序是“被点击时”在前面，${FLY}在后面。`, ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
       step('step-5', '试试点一下会发生什么', '点一下蝴蝶，看看它是不是已经会立刻飞起来了。', ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
     ],
     rewardCardId: 'theme-garden-butterfly',
@@ -258,7 +263,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
     sortOrder: 7,
     hintLayers: buildHintLayers(
       '先放好“被点击时”，再让蝴蝶做动作。',
-      `把“被点击时”放在最前面，再把${MOVE}接在后面。`,
+      `把“被点击时”放在最前面，再把${FLY}接在后面。`,
       '先看一下点到蝴蝶后才会开始动作的小示意。',
       'remedial-click-trigger',
     ),
@@ -273,7 +278,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
     steps: [
       step('step-1', '回顾上节的互动动作', '先想一想：点一下蝴蝶后，它是不是先飞起来了？今天我们要让它再说一句话。', ['when_clicked'], ['when_clicked']),
       step('step-2', '先准备点击开关', '先把“被点击时”放在最前面，让蝴蝶准备好回应点击。', ['when_clicked'], ['when_clicked']),
-      step('step-3', '点一下先动起来', `把${MOVE}接在后面，让蝴蝶被点到后先向右飞 100 步。`, ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right']),
+      step('step-3', '点一下先动起来', `把${FLY}接在后面，让蝴蝶被点到后先向右飞 100 步。`, ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right']),
       step('step-4', '再接一句回应的话', '在移动后面接一块“说一句话”，让蝴蝶先飞再说。', ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right', 'say_line']),
       step('step-5', '回看完整互动', '点一下蝴蝶，看看它是不是已经会先飞起来，再说一句话了。', ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right', 'say_line']),
     ],
@@ -283,7 +288,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
     sortOrder: 8,
     hintLayers: buildHintLayers(
       '先让蝴蝶在点击后飞起来，再接一句回应的话。',
-      `顺序要是“被点击时 → ${MOVE_NAME} → 说一句话”。`,
+      `顺序要是“被点击时 → ${FLY_NAME} → 说一句话”。`,
       '先看一下“点一下，先飞再说”的小示意。',
       'remedial-click-trigger',
     ),
@@ -297,9 +302,9 @@ export const launchLessons: LaunchLessonDefinition[] = [
     steps: [
       step('step-1', '看看今天要完成什么', '今天我们要做一段完整的互动表演，让蝴蝶在花园里回应你的点击。', ['when_clicked'], ['when_clicked']),
       step('step-2', '先搭好互动开关', '先把“被点击时”放在最前面，告诉蝴蝶什么时候开始表演。', ['when_clicked'], ['when_clicked']),
-      step('step-3', '点一下，蝴蝶先飞起来', `接上${MOVE}，让蝴蝶被点到后先向右飞 100 步。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right']),
+      step('step-3', '点一下，蝴蝶先飞起来', `接上${FLY}，让蝴蝶被点到后先向右飞 100 步。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right']),
       step('step-4', '再加上一句回应的话', '在移动后面接一块“说一句话”，让互动故事更完整。', ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right', 'say_line']),
-      step('step-5', '再飞一次，让互动更明显', `接上${REPEAT}，让蝴蝶被点一下后一共飞两次、飞 200 步。回应的话可以在飞完第一次后说，也可以飞完两次再说。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right', 'say_line', 'repeat_twice']),
+      step('step-5', '再飞一次，让互动更明显', `接上${FLY_REPEAT}，让蝴蝶被点一下后一共飞两次、飞 200 步。回应的话可以在飞完第一次后说，也可以飞完两次再说。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right', 'say_line', 'repeat_twice']),
     ],
     rewardCardId: 'theme-garden-story',
     phase: 'trial',
@@ -307,7 +312,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
     sortOrder: 9,
     hintLayers: buildHintLayers(
       '先把点击开关放好，再接动作、回应的话，最后让它再飞 100 步。',
-      `可以是“被点击时 → ${MOVE_NAME} → 说一句话 → ${REPEAT_NAME}”，也可以是“被点击时 → ${MOVE_NAME} → ${REPEAT_NAME} → 说一句话”。`,
+      `可以是“被点击时 → ${FLY_NAME} → 说一句话 → ${FLY_REPEAT_NAME}”，也可以是“被点击时 → ${FLY_NAME} → ${FLY_REPEAT_NAME} → 说一句话”。`,
       '先看一下完整互动故事的顺序，再回来把自己的表演接完。',
       'remedial-click-trigger',
     ),
@@ -340,8 +345,8 @@ export const launchLessons: LaunchLessonDefinition[] = [
     goal: '让两个角色按顺序各走 100 步，再让小熊独立说“我们一起出发吧！”，做出可修改的出发排练作品。',
     recommendedLevel: 'foundation',
     steps: [
-      step('step-1', '观察与预测：谁会开口', '两位朋友从各自 0 步起点准备出发。猜一猜切换到小熊后，说话积木让谁开口；添加开始并运行观察起点。', ['when_start'], ['when_start']),
-      step('step-2', '回顾独立移动', '让小狐狸走 100 步，再切换并让小熊走 100 步。这一步先不说话，观察两条轨道各自的位置。', ['when_start', 'move_right', 'switch_character'], ['when_start', 'move_right', 'switch_character', 'move_right']),
+      step('step-1', '观察与预测：谁会开口', '两位朋友从各自 0 步起点准备出发。猜一猜切换到小熊后，说话积木让谁开口；添加“开始时”并运行，观察起点。', ['when_start'], ['when_start']),
+      step('step-2', '回顾独立移动', '让小狐狸走 100 步，再切换并让小熊走 100 步。这一关先不说话，观察两条轨道各自的位置。', ['when_start', 'move_right', 'switch_character'], ['when_start', 'move_right', 'switch_character', 'move_right']),
       step('step-3', '只让小熊说出发对白', '在切换之后加入一块“说一句话”。运行观察：小熊说“我们一起出发吧！”，小狐狸的对白留空。两位朋友仍各走 100 步。', ['when_start', 'move_right', 'switch_character', 'say_line'], ['when_start', 'move_right', 'switch_character', 'move_right', 'say_line']),
       step('step-4', '把对白交错朋友，再修好', '先清空重拼，故意把说话放在切换前，再切换并移动小熊。运行观察狐狸开口而小熊沉默；再把说话移到切换之后并验证。', ['when_start', 'move_right', 'switch_character', 'say_line'], ['when_start', 'move_right', 'switch_character', 'move_right', 'say_line']),
       step('step-5', '改造排练，解释对白归属', '保留小熊出发对白，或者在切换前另加狐狸问候。运行你的版本，解释为什么小熊说话时狐狸不会跟着说，完成后重开修改作品。', ['when_start', 'move_right', 'switch_character', 'say_line'], ['when_start', 'move_right', 'switch_character', 'move_right', 'say_line']),

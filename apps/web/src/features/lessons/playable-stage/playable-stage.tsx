@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 import { evaluateObservable, type JudgeOptions, type ProgramBlock, type RunFailureCode } from '../blockly/observable-run'
+import { motionVerbForTemplate, motionWord } from '../blockly/block-labels'
 import { explainRunFailure } from '../blockly/run-feedback'
 
 import { CharacterArt, SceneBackdrop, type SceneId } from './character-art'
@@ -28,7 +29,7 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
   },
   garden: {
     badge: '花园舞台',
-    note: '点一下角色，看看它会不会立刻回应你。',
+    note: '点一下蝴蝶，看看它会不会立刻回应你。',
   },
   'forest-stage': {
     badge: '毕业舞台',
@@ -52,11 +53,11 @@ function getTemplateCharacterLabels(template?: ProjectTemplateDefinition) {
     sceneCopy: template
       ? SCENE_LABELS[template.starterScene] ?? {
           badge: '故事舞台',
-          note: '先把这一步做出来，再看舞台会发生什么变化。',
+          note: '先把这一关做出来，再看舞台会发生什么变化。',
         }
       : {
           badge: '故事舞台',
-          note: '先把这一步做出来，再看舞台会发生什么变化。',
+          note: '先把这一关做出来，再看舞台会发生什么变化。',
         },
   }
 }
@@ -96,7 +97,9 @@ export function PlayableStage({
   // TQ-008: the same judge the executor used, explained for a 5–7 year old.
   const verdict = useMemo(() => evaluateObservable(requiredBlocks, blocks, judgeOptions), [requiredBlocks, blocks, judgeOptions])
   const failureCode = verdict.passed ? null : verdict.code
-  const kidReason = (verdict.passed ? '' : explainRunFailure(verdict, getMainCharacterLabel(template))) || errorMessage || '再看看积木的顺序吧！'
+  // TQ-009: the butterfly flies (“飞”), the fox walks (“走”) — feedback and the distance chip follow the stage.
+  const motionVerb = motionVerbForTemplate(template?.id)
+  const kidReason = (verdict.passed ? '' : explainRunFailure(verdict, getMainCharacterLabel(template), motionVerb)) || errorMessage || '再看看积木的顺序吧！'
   // Each press of “运行” is one attempt; a failed attempt is reported exactly once,
   // even when two failures in a row leave executionState at 'error'.
   const [attemptId, setAttemptId] = useState(0)
@@ -143,8 +146,8 @@ export function PlayableStage({
           <span className="kc-stage-badge">{sceneCopy.badge}</span>
           <span className="flex flex-wrap justify-end gap-1.5">
             <span data-testid="stage-current-scene" className="kc-stage-scene-chip">当前实际场景：{visualScene}</span>
-            {/* TQ-009: copy says “走 100 步”, so the stage shows the distance actually walked. */}
-            <span data-testid="stage-walked-distance" className="kc-stage-scene-chip">{mainLabel}已走 {characterPosition} 步</span>
+            {/* TQ-009: copy says “走/飞 100 步”, so the stage shows the distance actually moved. */}
+            <span data-testid="stage-walked-distance" className="kc-stage-scene-chip">{mainLabel}已{motionWord(motionVerb)} {characterPosition} 步</span>
           </span>
         </div>
 
@@ -177,7 +180,7 @@ export function PlayableStage({
       <div className="kc-stage-panel space-y-3">
       {clickLesson ? (
         <div data-testid="garden-prediction" className="rounded-[8px] border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-bold text-amber-950">先猜一猜：只点“运行”，没有点蝴蝶，它会自己飞起来吗？</p>
+          <p className="text-sm font-bold text-amber-950">先猜一猜：只按“启动点击程序”，没有点蝴蝶，它会自己飞起来吗？</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" data-testid="garden-predict-auto" aria-pressed={prediction==='automatic'}
               className={`rounded-full border px-4 py-2 text-sm font-bold ${prediction==='automatic'?'bg-amber-600 text-white':'bg-white text-amber-950'}`}
@@ -208,11 +211,11 @@ export function PlayableStage({
 
             {executionState === 'success' && (
               <div className="kc-feedback kc-feedback-success">
-                🎉 太棒了！运行成功！点击&quot;完成这一步&quot;继续。
+                🎉 太棒了！运行成功！点击“完成这一关”继续。
               </div>
             )}
           {executionState !== 'error' && executionState !== 'success' && !(clickLesson && executionState==='armed') ? (
-            <div className="kc-feedback">准备就绪。点击「运行」观察角色动作与对白。</div>
+            <div className="kc-feedback">{clickLesson ? '准备就绪。先按「启动点击程序」，再点一下蝴蝶。' : '准备就绪。点击「运行」观察角色动作与对白。'}</div>
           ) : null}
         </div>
         <div className="kc-run-actions">

@@ -48,7 +48,7 @@ test('TQ-008: lesson 2 step 5 accepts every preset line (no free text) and the f
     sessionStorage.setItem(`kc-lesson-draft:${lessonId}:4`,JSON.stringify({schemaVersion:1,lessonId,stepIndex:4,blocks:[{type:'when_start'},{type:'move_right'},{type:'say_line'}],updatedAt:new Date().toISOString()}))
   })
   await page.goto('/learn/lesson/lesson-02-forest-greeting')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
   const choices=page.getByTestId('lesson-say-line-choices')
   await expect(choices.getByRole('button')).toHaveCount(4)
   await expect(choices.locator('input,textarea')).toHaveCount(0)

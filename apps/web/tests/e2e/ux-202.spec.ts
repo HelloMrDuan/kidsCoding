@@ -169,7 +169,7 @@ test('UX-202 real edit, run, save and reload-restore still work', async ({
 
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-progress-strip')).toContainText(
-    '步骤 2 / 5',
+    '关卡 2 / 5',
   )
 
   // On step 2, change the blocks once so a draft exists for THIS step;
@@ -182,10 +182,10 @@ test('UX-202 real edit, run, save and reload-restore still work', async ({
   await page.reload()
   await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
   await expect(page.getByTestId('lesson-progress-strip')).toContainText(
-    '步骤 2 / 5',
+    '关卡 2 / 5',
   )
   await expect(page.getByTestId('lesson-resume-note')).toContainText(
-    '已回到上次进度：第 2 步',
+    '已回到上次进度：第 2 关',
   )
 })
 

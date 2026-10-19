@@ -78,6 +78,6 @@ describe('getFoundationLessonFeedback', () => {
   it('falls back to a result-first generic line for unknown lessons', () => {
     expect(
       getFoundationLessonFeedback('lesson-99-fallback', 'progress'),
-    ).toBe('很好，这一步已经完成了。继续往下，你的作品会更完整。')
+    ).toBe('很好，这一关已经完成了。继续往下，你的作品会更完整。')
   })
 })

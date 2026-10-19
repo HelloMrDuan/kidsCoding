@@ -50,9 +50,12 @@ test('TQ-009: lesson 5 blocks and stage say exactly what happens (向右走 100 
     sessionStorage.setItem(`kc-lesson-draft:${lessonId}:2`,JSON.stringify({schemaVersion:1,lessonId,stepIndex:2,blocks:[],updatedAt:new Date().toISOString()}))
   })
   await page.goto('/learn/lesson/lesson-05-meadow-order')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 步')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 关')
   await expect(page.getByTestId('lesson-add-move_right')).toHaveText('添加积木：向右走 100 步')
   await expect(page.getByTestId('lesson-add-repeat_twice')).toHaveText('添加积木：重复：再走 100 步')
+  // Lesson 5 never speaks, so it does not offer the say block.
+  await expect(page.getByTestId('lesson-add-say_line')).toHaveCount(0)
+  await expect(page.getByTestId('lesson-progress-strip')).toContainText('关卡 3 / 5')
   await expect(page.getByTestId('stage-walked-distance')).toContainText('已走 0 步')
   for(const type of ['when_start','move_right','switch_scene','repeat_twice'])await page.getByTestId('lesson-add-'+type).click()
   // The real Blockly blocks carry the same labels as the palette buttons.

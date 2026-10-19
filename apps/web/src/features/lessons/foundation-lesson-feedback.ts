@@ -2,6 +2,8 @@ import { quoteBlock } from './blockly/block-labels'
 
 /** TQ-009: quoted block names come from the labels the blocks show. */
 const REPEAT = quoteBlock('repeat_twice')
+/** Lessons 07–09: the butterfly flies, so its blocks say “飞”. */
+const REPEAT_FLY = quoteBlock('repeat_twice', 'fly')
 
 const FOUNDATION_LESSON_FEEDBACK = {
   'lesson-01-forest-hello': {
@@ -47,7 +49,7 @@ const FOUNDATION_LESSON_FEEDBACK = {
   'lesson-09-garden-story': {
     initial: '先把点击开关放好，再接上动作、回应的话，最后让它再飞 100 步。',
     progress: '很好，你马上就要做出一个完整作品了。',
-    retry: `先确认“被点击时”在最前面，再把动作、回应和${REPEAT}按顺序接好。`,
+    retry: `先确认“被点击时”在最前面，再把动作、回应和${REPEAT_FLY}按顺序接好。`,
   },
   'lesson-10-second-friend': {
     initial: '小狐狸和小熊各有自己的起点。先观察、预测，再用积木分别指挥它们去野餐。',
@@ -68,7 +70,7 @@ const FOUNDATION_LESSON_FEEDBACK = {
 
 const DEFAULT_FEEDBACK = {
   initial: '先把第一块积木放上去，角色就会开始准备登场。',
-  progress: '很好，这一步已经完成了。继续往下，你的作品会更完整。',
+  progress: '很好，这一关已经完成了。继续往下，你的作品会更完整。',
   retry: '还差一点点。先看看角色是不是已经有开始积木，再把需要的动作接上去。',
 }
 

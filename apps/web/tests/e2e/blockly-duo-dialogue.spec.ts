@@ -27,7 +27,7 @@ async function run(page: Page, fox = 100, bear = 100) {
 async function next(page: Page, step: number) {
   await page.getByTestId('lesson-complete-step').click()
   await showLessonPane(page, 'task')
-  await expect(page.getByTestId('lesson-task-card')).toContainText(`第 ${step} 步`)
+  await expect(page.getByTestId('lesson-task-card')).toContainText(`第 ${step} 关`)
 }
 async function start(page: Page) {
   await page.goto(`/learn/lesson/${lessonId}`)
@@ -46,7 +46,7 @@ async function start(page: Page) {
   await page.getByTestId('duo-predict-both').click()
   await page.getByTestId('lesson-complete-step').click()
   await showLessonPane(page, 'task')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 1 步')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 1 关')
   await run(page, 0, 0)
   await next(page, 2)
   await add(page, 'move_right', 'switch_character', 'move_right')
@@ -69,7 +69,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await positions(page, 100, 100)
     await page.getByTestId('lesson-complete-step').click()
     await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 步')
+    await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 关')
     await add(page, 'say_line')
     // Speech is cancelled if the child resets while movement is in progress.
     await showLessonPane(page, 'stage')
@@ -90,7 +90,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await run(page)
     await page.getByTestId('lesson-complete-step').click()
     await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 步')
+    await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
     await program(page, ['when_start', 'move_right', 'say_line', 'switch_character', 'move_right'])
     await showLessonPane(page, 'stage')
     await page.getByTestId('run-code-button').click()
@@ -120,7 +120,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await page.getByTestId('duo-reflect-together').click()
     await page.getByTestId('lesson-complete-step').click()
     await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
+    await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
     await showLessonPane(page, 'stage')
     await page.getByTestId('duo-reflect-own').click()
     await expect(page.getByTestId('duo-reflection')).toContainText('各有自己的对白')

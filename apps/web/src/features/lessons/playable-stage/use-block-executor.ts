@@ -154,7 +154,7 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
           return
         }
         if (stepIndex < 2 && (foxMessage !== null || bearMessage !== null)) {
-          fail('这一步先观察起点或独立移动，暂时不用说话积木。')
+          fail('这一关先观察起点或独立移动，暂时不用说话积木。')
           return
         }
       }

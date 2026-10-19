@@ -1,6 +1,8 @@
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 import { CharacterArt } from '@/features/lessons/playable-stage/character-art'
 
+import { motionVerbForTemplate, motionWord, type MotionVerb } from './block-labels'
+
 const CHARACTER_LABELS: Record<string, string> = {
   fox: '小狐狸',
   rabbit: '小兔子',
@@ -22,7 +24,7 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
   },
   garden: {
     badge: '花园舞台',
-    note: '点一下角色，看看它会不会立刻回应你。',
+    note: '点一下蝴蝶，看看它会不会立刻回应你。',
   },
   'forest-stage': {
     badge: '毕业舞台',
@@ -30,7 +32,8 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
   },
 }
 
-function getStageCopy(blocks: Array<{ type: string }>, actor = '角色') {
+function getStageCopy(blocks: Array<{ type: string }>, actor = '角色', verb: MotionVerb = 'walk') {
+  const go = motionWord(verb)
   const moved = blocks.some((block) => block.type === 'move_right')
   const spoke = blocks.some((block) => block.type === 'say_line')
   const repeated = blocks.some((block) => block.type === 'repeat_twice')
@@ -82,7 +85,7 @@ function getStageCopy(blocks: Array<{ type: string }>, actor = '角色') {
   }
 
   if (moved) {
-    return `太好了，${actor}已经向右走了 ${walked} 步，走上舞台了。再接一句话，故事就会更完整。`
+    return `太好了，${actor}已经向右${go}了 ${walked} 步，${go}上舞台了。再接一句话，故事就会更完整。`
   }
 
   if (hasClickTrigger) {
@@ -106,11 +109,11 @@ function getTemplateCharacterLabels(template?: ProjectTemplateDefinition) {
     sceneCopy: template
       ? SCENE_LABELS[template.starterScene] ?? {
           badge: '故事舞台',
-          note: '先把这一步做出来，再看舞台会发生什么变化。',
+          note: '先把这一关做出来，再看舞台会发生什么变化。',
         }
       : {
           badge: '故事舞台',
-          note: '先把这一步做出来，再看舞台会发生什么变化。',
+          note: '先把这一关做出来，再看舞台会发生什么变化。',
         },
   }
 }
@@ -128,6 +131,8 @@ export function PreviewStage({
   const hasSecondStart = startCount > 1
   const switchedScene = blocks.some((block) => block.type === 'switch_scene')
   const { mainLabel, secondLabel, sceneCopy } = getTemplateCharacterLabels(template)
+  // TQ-009: the butterfly flies, so its stage copy says “飞”.
+  const motionVerb = motionVerbForTemplate(template?.id)
   const primaryOffset = repeated ? 136 : moved ? 88 : 0
 
   return (
@@ -193,7 +198,7 @@ export function PreviewStage({
 
             {repeated ? (
               <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
-                角色会把移动再做一次，多走 100 步
+                角色会把移动再做一次，多{motionWord(motionVerb)} 100 步
               </div>
             ) : switchedScene ? (
               <div className="mt-4 rounded-[1.25rem] bg-white/75 px-3 py-2 text-xs font-bold text-sky-700">
@@ -208,7 +213,7 @@ export function PreviewStage({
         </div>
 
         <div className="mt-5 rounded-[1.75rem] bg-white/85 px-4 py-4 shadow-[0_14px_28px_rgba(15,23,42,0.06)]">
-          <p className="text-sm font-semibold leading-7 text-slate-700">{getStageCopy(blocks, template ? mainLabel : undefined)}</p>
+          <p className="text-sm font-semibold leading-7 text-slate-700">{getStageCopy(blocks, template ? mainLabel : undefined, motionVerb)}</p>
         </div>
       </div>
     </section>

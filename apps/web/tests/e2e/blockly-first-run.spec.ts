@@ -30,7 +30,7 @@ test('bad Blockly program cannot be passed off as actual execution',async({page}
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('需要和任务要求的积木一样')
   await page.getByTestId('lesson-complete-step').click()
   await expect(page).toHaveURL(/lesson-01-forest-hello/)
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 1 步')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 1 关')
 })
 
 test('TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matching start/sequence remedial',async({page})=>{
@@ -42,7 +42,7 @@ test('TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matc
   await expect(page.getByTestId('stage-run-reason')).toBeVisible({timeout:12_000})
   await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier','1')
   await expect(page.getByTestId('lesson-hint')).toContainText('先让小狐狸准备好出场')
-  // Pressing “完成这一步” on the same failed program does not skip a tier.
+  // Pressing “完成这一关” on the same failed program does not skip a tier.
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier','1')
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('先放一块“开始时”')

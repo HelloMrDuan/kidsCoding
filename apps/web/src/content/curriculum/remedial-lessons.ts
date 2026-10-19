@@ -57,7 +57,7 @@ export const remedialLessons: RemedialLessonDefinition[] = [
   {
     id: 'remedial-click-trigger',
     title: '先学会点击触发',
-    focus: '用“被点击时”开头的程序，要等你点到角色才开始。',
+    focus: '用“被点击时”开头的程序，要等你点到蝴蝶才开始。',
     returnToLessonId: 'lesson-07-garden-click',
     returnToStepId: 'step-1',
     steps: [],

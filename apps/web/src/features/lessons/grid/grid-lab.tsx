@@ -113,7 +113,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   function handleComplete() {
     if (!passedHere) {
-      setNotice('先按“运行”，让小狐狸真的到达目标，才能完成这一步。')
+      setNotice('先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
       return
     }
     if (draft.stepIndex < lesson.steps.length - 1) goToStep(draft.stepIndex + 1)
@@ -122,7 +122,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   const feedback = useMemo(() => {
     if (notice) return { tone: 'warning', text: notice }
-    if (!run) return { tone: 'idle', text: passedHere ? '这一步已经通过。可以再试一种不同的程序，或者点“完成这一步”。' : '想好了就按“运行”，看看小狐狸会不会按你猜的走。' }
+    if (!run) return { tone: 'idle', text: passedHere ? '这一关已经通过。可以再试一种不同的程序，或者点“完成这一关”。' : '想好了就按“运行”，看看小狐狸会不会按你猜的走。' }
     if (!done) return { tone: 'idle', text: '小狐狸正在按积木一块一块走……' }
     if (run.passed) return { tone: 'success', text: `🎉 ${run.message}` }
     const diagnosis = lesson.diagnoses[run.failure!] ?? run.message

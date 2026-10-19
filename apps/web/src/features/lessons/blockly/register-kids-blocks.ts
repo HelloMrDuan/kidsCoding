@@ -4,6 +4,12 @@ import { getKidsBlockLabel, kidsBlockLabels } from './block-labels'
 
 export { getKidsBlockLabel, kidsBlockLabels }
 
+/**
+ * TQ-009: move/repeat blocks carry their text in a named, serializable label field so the
+ * workspace can show “向右飞 100 步” for the butterfly while the block type stays move_right.
+ */
+export const BLOCK_LABEL_FIELD = 'LABEL'
+
 const ICONS: Record<string, string> = {
   flag: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M6%203v18%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M7%204h11l-3%204%203%204H7z%22%20fill%3D%22%234cd964%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.6%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E',
   hand: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M9%2012V5a1.6%201.6%200%200%201%203.2%200v5.5V4a1.6%201.6%200%200%201%203.2%200v7V6a1.6%201.6%200%200%201%203.2%200v8c0%204-2.6%207-6.6%207-2.6%200-4.2-1.3-5.6-3.4L4%2014.2a1.5%201.5%200%200%201%202.4-1.8z%22%20fill%3D%22%23fff%22/%3E%3C/svg%3E',
@@ -80,8 +86,11 @@ export function registerKidsBlocks() {
     },
     {
       type: 'move_right',
-      message0: '%1 ' + kidsBlockLabels.move_right,
-      args0: [{ type: 'field_image', src: ICONS.arrow, width: 22, height: 22, alt: '' }],
+      message0: '%1 %2',
+      args0: [
+        { type: 'field_image', src: ICONS.arrow, width: 22, height: 22, alt: '' },
+        { type: 'field_label_serializable', name: BLOCK_LABEL_FIELD, text: kidsBlockLabels.move_right },
+      ],
       previousStatement: null,
       nextStatement: null,
       style: 'kc_motion',
@@ -112,8 +121,11 @@ export function registerKidsBlocks() {
     },
     {
       type: 'repeat_twice',
-      message0: '%1 ' + kidsBlockLabels.repeat_twice,
-      args0: [{ type: 'field_image', src: ICONS.repeat, width: 22, height: 22, alt: '' }],
+      message0: '%1 %2',
+      args0: [
+        { type: 'field_image', src: ICONS.repeat, width: 22, height: 22, alt: '' },
+        { type: 'field_label_serializable', name: BLOCK_LABEL_FIELD, text: kidsBlockLabels.repeat_twice },
+      ],
       previousStatement: null,
       nextStatement: null,
       style: 'kc_control',

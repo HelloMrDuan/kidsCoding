@@ -38,7 +38,7 @@ describe('SYS-103 observable Blockly evaluation', () => {
     expect(trigger.reason).toContain('被点击时')
 
     const extra = evaluateObservable(['when_start', 'move_right'], b('when_start', 'move_right', 'move_right'))
-    expect(extra.reason).toContain('目标：一共走 100 步')
+    expect(extra.reason).toContain('目标：一共移动 100 步')
 
     const noTalk = evaluateObservable(['when_start'], b('when_start', 'say_line'))
     expect(noTalk.reason).toContain('还不用说话')

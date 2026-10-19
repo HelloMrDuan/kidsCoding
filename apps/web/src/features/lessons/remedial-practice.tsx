@@ -79,7 +79,7 @@ function ClickPractice({ practice }: { practice: Extract<RemedialPracticeData, {
       <div className="mt-3 flex items-center gap-3 overflow-hidden rounded-[1.25rem] bg-white px-4 py-3">
         <span className="kc-block-chip shrink-0" data-block="when_clicked">{getKidsBlockLabel('when_clicked')}</span>
         <span aria-hidden="true" className="font-black text-slate-400">→</span>
-        <span className="kc-block-chip shrink-0" data-block="move_right">{getKidsBlockLabel('move_right')}</span>
+        <span className="kc-block-chip shrink-0" data-block="move_right">{getKidsBlockLabel('move_right', 'fly')}</span>
       </div>
       <div className="mt-3 h-[120px] overflow-hidden rounded-[1.25rem] bg-gradient-to-b from-sky-100 to-emerald-100 p-2">
         <button
