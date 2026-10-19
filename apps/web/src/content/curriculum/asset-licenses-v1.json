@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0",
+  "policy": "public/ 下每个素材文件都必须登记来源和授权；只允许 original（本项目原创）或 authorized（有书面授权）。",
+  "assets": [
+    { "path": "assets/map-terrain.svg", "license": "original", "source": "本项目手绘 SVG，UX-101（commit 1d82165）" },
+    { "path": "scratch-samples/meteor-clones.sb3", "license": "original", "source": "本项目原创 Scratch 示例作品（commit bf72b97）" },
+    { "path": "v2/hero-studio.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601，commit fbc8b68）" },
+    { "path": "v2/track-blockly.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
+    { "path": "v2/track-python.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
+    { "path": "v2/track-scratch.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
+    { "path": "v2/work-1.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
+    { "path": "v2/work-2.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
+    { "path": "v2/work-3.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
+    { "path": "v2/work-4.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
+    { "path": "v2/work-5.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" }
+  ]
+}

@@ -1566,22 +1566,23 @@
       "title": "课程内容schema引擎需求和版权校验",
       "priority": "P1",
       "category": "SYS",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "SYS-102"
       ],
-      "scope": "scripts/lesson schema与CI",
+      "scope": "features/curriculum/lesson-schema.ts（+snapshot、test）、content/curriculum/asset-licenses-v1.json、curriculum-content CI",
       "acceptance": [
-        "重复ID、无运行器、无素材授权、缺正反例变更必须失败"
+        "重复ID、无运行器、无素材授权、缺正反例变更必须失败",
+        "真实仓库通过校验：432 课目录、192 节详案、25 个试玩登记、public 下 11 个素材全部登记原创来源",
+        "可试玩课程必须有真实路由、E2E 文件和所需引擎能力；缺任何一项失败",
+        "历史上没有结构化正反例的 19 节试玩课列为欠账名单，只能减少，补齐前不能正式发布"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "tests": [
+          "lesson-schema.test.ts 8 项：真实仓库通过 + 每类违规的破坏副本都失败"
+        ]
       },
-      "notes": ""
+      "notes": "解除 RELEASE-102、RELEASE-105 阻塞。校验跑在 curriculum-content CI 的 vitest 步骤里。"
     },
     {
       "id": "SYS-106",
