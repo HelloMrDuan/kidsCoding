@@ -1654,6 +1654,34 @@
       "notes": "L01～L06 + 单元作品寻路卡经 PR #82 合并；成熟度 L3 实验可试玩，不是正式发布。下一步重新执行 TQ-004 教学质量复核。"
     },
     {
+      "id": "EDU-105",
+      "title": "G0第一单元打磨：语音朗读、反思作答、错块定位",
+      "priority": "P1",
+      "category": "EDU",
+      "status": "in_progress",
+      "dependencies": [
+        "EDU-104",
+        "TQ-004"
+      ],
+      "scope": "features/lessons/voice、features/lessons/grid（grid-lab、grid-draft）、content/curriculum/g0-u1-grid-lessons.ts、tests/e2e/grid-lab.spec.ts",
+      "acceptance": [
+        "每关说明、预测问题、错误诊断和提示都能用中文语音读出（浏览器自带朗读，不录音不上传；不支持时隐藏按钮）",
+        "每课完成后有一题点选式反思，判对错并保存在本机，重开仍在",
+        "失败时指出是第几块积木出错",
+        "真实 E2E 覆盖朗读、错块定位、反思保存；TQ-004 记录按新证据重新打分，L01～L03 不低于 80"
+      ],
+      "evidence": {
+        "tests": [
+          "read-aloud.test.tsx 3 项",
+          "grid-lab-pointer.test.ts 2 项",
+          "grid-draft.test.ts 3 项",
+          "g0-u1-grid-lessons.test.ts 44 项",
+          "grid-lab.spec.ts 5 个真实浏览器用例（本地通过）"
+        ]
+      },
+      "notes": "来自 TQ-004 重新复核的打磨清单。仍为 L3 实验可试玩。"
+    },
+    {
       "id": "CLOUD-101",
       "title": "真实Supabase迁移与回滚确认",
       "priority": "P1",

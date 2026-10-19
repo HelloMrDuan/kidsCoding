@@ -67,4 +67,13 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
       })
     })
   }
+
+  it('every lesson has a one-tap reflection check with exactly one right answer', () => {
+    for (const lesson of lessons) {
+      const check = lesson.reflectionCheck
+      expect(check.options.length, lesson.id).toBeGreaterThanOrEqual(2)
+      expect(check.options.filter(o => o.correct), lesson.id).toHaveLength(1)
+      expect(check.why.length, lesson.id).toBeGreaterThan(8)
+    }
+  })
 })

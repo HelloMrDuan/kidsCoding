@@ -1025,3 +1025,11 @@ a.kc-v2c-filter:hover { border-color: #b9cdf2; color: #2a63d6; }
   .kc-v2p-sync-actions { width: 100%; }
   .kc-v2p-sync-actions button { flex: 1; }
 }
+
+/* EDU-105 read-aloud pill for young readers */
+.kc-read-aloud { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 6px 14px; border-radius: 999px; border: 2px solid #ffd27a; background: #fff8e6; color: #8a5a00; font-weight: 800; font-size: 14px; cursor: pointer; }
+.kc-read-aloud:hover { background: #ffefc2; }
+.kc-read-aloud[data-speaking='true'] { background: #ffe1a3; border-color: #f5a623; }
+.kc-reflect-option { display: block; width: 100%; text-align: left; min-height: 48px; padding: 10px 16px; border-radius: 16px; border: 2px solid #dbe4f3; background: #fff; font-weight: 800; color: #1e2a44; cursor: pointer; }
+.kc-reflect-option[data-chosen='true'][data-correct='true'] { border-color: #2fbf8a; background: #e8f8f2; }
+.kc-reflect-option[data-chosen='true'][data-correct='false'] { border-color: #f5a623; background: #fff5e9; }

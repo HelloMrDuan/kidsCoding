@@ -15,4 +15,8 @@ describe('EDU-104 grid lesson local draft', () => {
     expect(parseGridDraft(lesson, '{oops')).toBeNull()
     expect(parseGridDraft(lesson, null)).toBeNull()
   })
+  it('keeps a valid reflection choice and drops an out-of-range one', () => {
+    expect(parseGridDraft(lesson, JSON.stringify({ stepIndex: 0, reflection: 1 }))?.reflection).toBe(1)
+    expect(parseGridDraft(lesson, JSON.stringify({ stepIndex: 0, reflection: 9 }))?.reflection).toBeUndefined()
+  })
 })

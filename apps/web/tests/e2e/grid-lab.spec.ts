@@ -56,8 +56,15 @@ test('G0-U1-L01 grid lesson: real failure, layered hint, four real passes, saved
   await next(page)
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
 
+  // EDU-105: one-tap reflection is judged and saved with the lesson.
+  await page.getByTestId('grid-reflection-option-1').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'false')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
   await page.reload()
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await expect(page.getByTestId('grid-reflection-option-0')).toHaveAttribute('data-chosen', 'true')
   await page.getByTestId('grid-replay-mushroom-house').click()
   await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
   await runAndExpect(page, 'success') // the saved forward×3 program is restored, not a fixed answer
@@ -141,4 +148,24 @@ test('G0-U1-L06 unit project: own route card is saved, reopened and replayed', a
   await expect(page.getByTestId('grid-project-steps').locator('li')).toHaveCount(11)
   await page.getByTestId('grid-project-play').click()
   await expect(page.getByTestId('grid-project-play')).toHaveText('▶ 播放我的寻路卡', { timeout: 15_000 })
+})
+
+test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at the failing block', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.addInitScript(() => {
+    const spoken: string[] = []
+    ;(window as unknown as { __spoken: string[] }).__spoken = spoken
+    class Utterance { lang = ''; rate = 1; pitch = 1; voice = null; onend: (() => void) | null = null; onerror = null; constructor(public text: string) {} }
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: Utterance, configurable: true })
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { cancel() {}, getVoices: () => [], speak(u: Utterance) { spoken.push(u.lang + '|' + u.text); setTimeout(() => u.onend?.(), 50) } } })
+  })
+  await page.goto('/learn/grid-lab/G0-U1-L04')
+  await page.getByTestId('grid-read-instruction').click()
+  await add(page, 'when_start')
+  await add(page, 'move_forward', 3)
+  await runAndExpect(page, 'error', '问题出在第 3 块')
+  await page.getByTestId('grid-read-feedback').click()
+  const spoken = await page.evaluate(() => (window as unknown as { __spoken: string[] }).__spoken)
+  expect(spoken[0]).toMatch(/^zh-CN\|第 1 关，第一次转弯/)
+  expect(spoken[1]).toMatch(/^zh-CN\|.*问题出在第 3 块/)
 })
