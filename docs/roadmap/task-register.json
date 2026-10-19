@@ -1566,7 +1566,7 @@
       "title": "课程内容schema引擎需求和版权校验",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "SYS-102"
       ],
@@ -1580,7 +1580,15 @@
       "evidence": {
         "tests": [
           "lesson-schema.test.ts 8 项：真实仓库通过 + 每类违规的破坏副本都失败"
-        ]
+        ],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/88",
+        "mergeCommit": "c6c092a195d7d4c1b26c28df23cc0eefe452fda0",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39197933515",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39197933462",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39196481974",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39196481936",
+        "prNumber": 88,
+        "reviewer": "owner 2026-10-19 确认合并"
       },
       "notes": "解除 RELEASE-102、RELEASE-105 阻塞。校验跑在 curriculum-content CI 的 vitest 步骤里。"
     },
