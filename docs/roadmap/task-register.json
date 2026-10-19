@@ -213,7 +213,7 @@
       "title": "G0第一单元教学质量复核",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "TQ-001"
       ],
@@ -223,18 +223,18 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/84",
-        "mergeCommit": "f94809318b921d709cb7cba881c40deb52d8f403",
-        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39130429176",
+        "mergeCommit": "4c17c2fe8b2a9dc30f31a9127dc83f566c4ec391",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39188727805",
         "tests": [
           "teaching-review.test.ts 逐份复查 6 份 G0-U1 记录（2026-10-19 重新复核）"
         ],
-        "reviewer": "owner 2026-10-18 确认合并；AI 参考分",
-        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39130429095",
-        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39128997988",
-        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39128997956",
-        "prNumber": 78
+        "reviewer": "owner 2026-10-19 确认复核结论并合并；AI 参考分",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39188727586",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39187610667",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39187610708",
+        "prNumber": 84
       },
-      "notes": "2026-10-19 在 EDU-104 合并后重新复核：硬否决全部解除，验收项具备；AI 参考分 L01 78 / L02 78 / L03 76 / L04 81 / L05 82 / L06 86（评分者也是实现者）。待负责人确认结论；共同缺陷：无语音朗读、反思不收集、L01～L05 无开放创作。首次复核 #78 结论 blocked。"
+      "notes": "2026-10-19 重新复核（#84）：硬否决全部解除，验收项具备；AI 参考分 L01 78 / L02 78 / L03 76 / L04 81 / L05 82 / L06 86。负责人确认完成；打磨（语音朗读、反思收集、L01～L03 提到 80 以上）另行登记任务。首次复核 #78 结论 blocked。"
     },
     {
       "id": "TQ-005",

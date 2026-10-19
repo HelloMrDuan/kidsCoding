@@ -213,3 +213,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-19 | EDU-104 | G0-U1-L01～L06 按 TQ-001 重写并接入网格引擎：每课 4 关（两关带着做、自己搭、修别人程序），专属诊断、三层提示、正反例；V2 三区课堂、本机保存与刷新重开；L06 单元作品“森林寻路卡”可保存、重开、真实回放；43 项教案测试 + 4 个真实浏览器 E2E | [#82](https://github.com/HelloMrDuan/kidsCoding/pull/82) | `32c86eafaf283db95961c168965ae4922c3c18a5` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39185196960) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39185196982) | completed；成熟度 L3 实验可试玩，不是正式发布；下一步重新执行 TQ-004 |
+
+## TQ-004 重新复核记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-19 | TQ-004 | EDU-104 合并后重新复核 G0-U1-L01～L06：九条硬否决全部 pass；知识递进、两种练习、反例/分层提示、单元作品均有证据；AI 参考分 76～86 | [#84](https://github.com/HelloMrDuan/kidsCoding/pull/84) | `4c17c2fe8b2a9dc30f31a9127dc83f566c4ec391` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39188727805) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39188727586) | completed；仍是 L3 实验可试玩；打磨另立任务：语音朗读、反思收集、L01～L03 提到 80 分以上、儿童试学 |
