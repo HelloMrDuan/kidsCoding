@@ -215,8 +215,7 @@
       "category": "TQ",
       "status": "in_review",
       "dependencies": [
-        "TQ-001",
-        "EDU-104"
+        "TQ-001"
       ],
       "scope": "G0-U1六节",
       "acceptance": [
