@@ -17,7 +17,7 @@ import {
 const REPO = join(__dirname, '..', '..', '..', '..', '..')
 const fileExists = (p: string) => existsSync(join(REPO, p))
 
-const repoCtx: ReleaseContext = { hasTrial: true, hasE2E: true, inExampleDebt: false, hasUnlicensedRequiredAsset: false, fileExists }
+const repoCtx: ReleaseContext = { hasTrial: true, hasE2E: true, inExampleDebt: false, hasUnlicensedRequiredAsset: false, validChildTrials: 1, fileExists }
 const ok = (extra: Partial<GateRecord> = {}): GateRecord => ({
   status: 'pass', reviewer: '审阅人A', reviewerRole: 'independent', date: '2026-10-19',
   evidence: [{ kind: 'file', ref: 'docs/roadmap/teaching-reviews/G0-U1-L01.json' }], ...extra,
@@ -79,6 +79,12 @@ describe('RELEASE-102 seven traceable release gates', () => {
     const notOwner = evaluateLessonRelease({ ...fullRecord(), humanApproved: ok({ reviewerRole: 'independent' }) }, repoCtx)
     expect(notOwner.ready).toBe(false)
     expect(notOwner.verified).toBe(true)
+  })
+
+  it('owner approval needs at least one valid child trial (RELEASE-103)', () => {
+    const r = evaluateLessonRelease(fullRecord(), { ...repoCtx, validChildTrials: 0 })
+    expect(r.ready).toBe(false)
+    expect(r.gates.find(g => g.key === 'humanApproved')!.reasons).toContain('缺经同意的适龄儿童试学记录')
   })
 
   it('owner approval cannot jump ahead of the six earlier gates', () => {

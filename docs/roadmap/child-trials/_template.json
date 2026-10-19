@@ -1,0 +1,20 @@
+{
+  "trialId": "T2026-001",
+  "date": "YYYY-MM-DD",
+  "childCode": "C01",
+  "age": 6,
+  "setting": "home",
+  "device": "平板 Chrome",
+  "consent": {
+    "guardianConsent": true,
+    "consentDate": "YYYY-MM-DD",
+    "form": "docs/roadmap/child-trials/consent-v1.md",
+    "recordingAllowed": false
+  },
+  "observer": { "name": "观察人姓名（成人）", "role": "parent" },
+  "lessons": [
+    { "lessonId": "G0-U1-L01", "completed": true, "minutes": 18, "hintsUsed": 1, "stuckPoints": ["第 2 关：转向积木"], "childFeedback": "转述孩子的话" }
+  ],
+  "issues": ["界面问题或教学问题"],
+  "reviewer": { "name": "审阅人", "role": "owner", "date": "YYYY-MM-DD" }
+}

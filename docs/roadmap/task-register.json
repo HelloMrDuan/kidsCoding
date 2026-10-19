@@ -1862,7 +1862,7 @@
       "title": "真实用户端试学与发布审核",
       "priority": "P1",
       "category": "RELEASE",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "RELEASE-102"
       ],
@@ -1875,10 +1875,12 @@
         "pr": null,
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "apps/web/src/features/curriculum/child-trial.test.ts"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "阶段1：试学计划/同意书/观察表/记录校验/人审门禁已建；待真实试点A（≥3名5～7岁儿童）"
     },
     {
       "id": "RELEASE-104",

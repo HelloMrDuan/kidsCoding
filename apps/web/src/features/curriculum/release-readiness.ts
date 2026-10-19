@@ -37,6 +37,8 @@ export type ReleaseContext = {
   hasE2E?: boolean
   inExampleDebt?: boolean
   hasUnlicensedRequiredAsset?: boolean
+  /** RELEASE-103: valid consented, age-appropriate child trials covering this lesson. */
+  validChildTrials?: number
   /** When given, file evidence must be one of these existing repo paths. */
   fileExists?: (path: string) => boolean
 }
@@ -99,6 +101,7 @@ function judgeGate(meta: ReleaseRequirementMeta, record: GateRecord | undefined,
     case 'humanApproved':
       if (status === 'pass' && record?.reviewerRole !== 'owner') reasons.push('只有负责人可以批准正式发布')
       if (!earlierPassed) reasons.push('前六道门禁未全部通过，不能批准')
+      if (!ctx.validChildTrials) reasons.push('缺经同意的适龄儿童试学记录')
       break
   }
   return {
