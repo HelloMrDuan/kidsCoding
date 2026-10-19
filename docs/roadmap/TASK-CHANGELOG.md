@@ -243,3 +243,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-19 | TQ-002 | 前 9 节 Blockly 课逐课审计（只审计不修复）：9 份审核记录 + 汇总/报告；AI 参考分 27～43 全部退回重做、保持 L3；均无两次不同动手、课内纠错、开放创作，作品仅 3/6/9 课弱；L02、L09 硬否决 rigid-answer；7 组修复建议 | [#93](https://github.com/HelloMrDuan/kidsCoding/pull/93) | `dd7521a777f7626b67335764c220b5796ae5f169` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39221458292) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39221458283) | completed |
+
+## TQ-008 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-19 | TQ-008 | 前 9 课课堂反馈：具体错因、提示 1→2→3、第三层补救按单元路由（含可操作练习）；L02 四句预设对白真实可选、L09 指令与判定一致；窄屏积木自适应缩放、第 4/5 课舞台角色名；正反例单测与 E2E。课程仍 L3 | [#95](https://github.com/HelloMrDuan/kidsCoding/pull/95) | `4f68b1b36936d5a39db70461d6c05aadd64e58cf` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39238711505) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39238711513) | completed |

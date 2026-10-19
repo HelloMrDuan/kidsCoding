@@ -313,7 +313,7 @@
       "title": "前9节Blockly课堂反馈与硬否决修复",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-002"
       ],
@@ -327,9 +327,9 @@
         "正反例测试：错因映射、提示层级、补救路由、L02 每句预设、L09 正例与反例；E2E 覆盖"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/95",
+        "mergeCommit": "4f68b1b36936d5a39db70461d6c05aadd64e58cf",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39238711505",
         "tests": [
           "apps/web/src/features/lessons/blockly/run-feedback.test.ts（19 例：错因码→儿童化文案）",
           "apps/web/src/features/lessons/build-hint-state.test.ts（提示 1→2→3 顺序）",
@@ -338,7 +338,11 @@
           "apps/web/src/features/lessons/playable-stage/playable-stage-feedback.test.tsx（舞台显示具体错因、每次失败上报）",
           "apps/web/tests/e2e/blockly-first-run.spec.ts、blockly-forest-sequence.spec.ts、blockly-garden-click.spec.ts（新增 TQ-008 用例）"
         ],
-        "reviewer": null
+        "reviewer": "owner 2026-10-19 确认截图并要求修小问题后合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39238711513",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39237080042",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39237080084",
+        "prNumber": 95
       },
       "notes": "TQ-002 修复第 1 步（建议 a + b 中的 L02/L09）。不含：每课纠错步骤、第二项练习、“再做一次”语义、单元作品、lesson-08 parentAdvice“不同点法”、lesson-10～12 补救（TQ-002c～g 另行登记）。课程成熟度仍为 L3，不因本修复升级；未经儿童试学。"
     },
