@@ -1,7 +1,8 @@
 import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
-import { evaluateReleaseReadiness, releasePilotEvidence, releaseRequirements, type ReleaseEvidence } from './release-readiness'
+import { EXAMPLE_DEBT_BASELINE } from './lesson-schema'
+import { evaluateLessonRelease, getLessonReleaseRecord, releaseRequirements, type ReleaseContext } from './release-readiness'
 
 /**
  * SYS-101/SYS-102 — the ONE course maturity source (L0–L5).
@@ -60,9 +61,19 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
   ),
 }
 
-/** Release evidence per lesson; absent = every requirement false. Launch lessons have none yet. */
-export function getReleaseEvidence(id: string): ReleaseEvidence {
-  return releasePilotEvidence[id] ?? {}
+/** Repository facts a release record cannot override (RELEASE-102). */
+export function getReleaseContext(id: string): ReleaseContext {
+  const trial = trialIntegrations[id]
+  return {
+    hasTrial: !!trial,
+    hasE2E: !!trial && trial.e2eSpec.length > 0,
+    inExampleDebt: EXAMPLE_DEBT_BASELINE.includes(id),
+  }
+}
+
+/** RELEASE-102: seven traceable gates for one lesson (records + repository facts). */
+export function getLessonRelease(id: string) {
+  return evaluateLessonRelease(getLessonReleaseRecord(id), getReleaseContext(id))
 }
 
 export type LessonMaturity = {
@@ -93,14 +104,13 @@ function hasDetailedPlan(id: string) {
 export function getLessonMaturity(id: string): LessonMaturity | null {
   if (!isKnownLesson(id)) return null
   const trial = trialIntegrations[id] ?? null
-  const release = evaluateReleaseReadiness(getReleaseEvidence(id))
-  const verifiedOnly = release.missing.length === 1 && release.missing[0].key === 'humanApproved'
+  const release = getLessonRelease(id)
 
   const gates: { ok: boolean; blocker: string }[] = [
     { ok: hasDetailedPlan(id), blocker: '缺详细教案' },
     { ok: trial !== null, blocker: '缺真实运行引擎' },
     { ok: trial !== null && trial.route.length > 0 && trial.e2eSpec.length > 0, blocker: '缺可路由的试玩入口和 E2E' },
-    { ok: release.ready || verifiedOnly, blocker: '发布验收未完成' },
+    { ok: release.ready || release.verified, blocker: '发布验收未完成' },
     { ok: release.ready, blocker: '负责人尚未批准正式发布' },
   ]
   let level = 0

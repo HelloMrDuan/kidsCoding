@@ -1834,7 +1834,7 @@
       "title": "课程发布七门禁可追溯",
       "priority": "P1",
       "category": "RELEASE",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "SYS-105"
       ],
@@ -1846,7 +1846,9 @@
         "pr": null,
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "apps/web/src/features/curriculum/release-readiness.test.ts"
+        ],
         "reviewer": null
       },
       "notes": ""

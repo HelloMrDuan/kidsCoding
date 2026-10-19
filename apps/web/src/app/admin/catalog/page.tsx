@@ -7,14 +7,21 @@ import {
   getCatalogTrack,
 } from '@/features/curriculum/full-catalog-access'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
-import {evaluateReleaseReadiness,releasePilotEvidence} from '@/features/curriculum/release-readiness'
-import { getLessonMaturity } from '@/features/curriculum/lesson-maturity'
+import { releaseEvidence, releaseRequirements } from '@/features/curriculum/release-readiness'
+import { getLessonMaturity, getLessonRelease } from '@/features/curriculum/lesson-maturity'
 
-export default async function AdminCatalogPage({ searchParams }: { searchParams: Promise<{ track?: string }> }) {
+const RELEASE_PAGE_SIZE = 6
+
+export default async function AdminCatalogPage({ searchParams }: { searchParams: Promise<{ track?: string; rp?: string }> }) {
   await requireCurriculumAdmin()
   const query = await searchParams
   const current = getCatalogTrack(query.track ?? '') ?? curriculumTracks[0]
   const stats = getCatalogStatistics()
+  const releaseIds = Object.keys(releaseEvidence)
+  const releasePages = Math.max(1, Math.ceil(releaseIds.length / RELEASE_PAGE_SIZE))
+  const releasePage = Math.min(releasePages, Math.max(1, Number(query.rp) || 1))
+  const releaseSlice = releaseIds.slice((releasePage - 1) * RELEASE_PAGE_SIZE, releasePage * RELEASE_PAGE_SIZE)
+  const trackParam = query.track ? `track=${query.track}&` : ''
   return (
     <main className="min-h-screen bg-[#f3f8f4] px-4 py-7 text-slate-900 md:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -33,18 +40,34 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
           </div>
         </header>
         <section className="rounded-[1.5rem] border border-amber-200 bg-white p-6" data-testid="admin-release-readiness">
-          <h2 className="text-xl font-black">实验关卡发布验收 · 全部仍未获正式发布授权</h2>
-          <p className="mt-2 text-sm leading-7 text-slate-600">内容完整、能运行一次、测试通过，不等于已经可以向儿童正式发布。下表逐课列出独立阻塞条件，不会触发任何发布 API。</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {Object.entries(releasePilotEvidence).map(([id,evidence])=>{
-              const result=evaluateReleaseReadiness(evidence)
-              return <div key={id} className="rounded-xl bg-amber-50 p-4 text-sm" data-testid={`release-readiness-${id}`}>
-                <p className="font-black text-slate-900">{id} · {result.ready?'允许进入正式发布审核':'禁止正式发布'}</p>
-                <p className="mt-2 text-amber-900">剩余 {result.missing.length} 项：</p>
-                <p className="mt-1 leading-7 text-slate-700">{result.missing.map(item=>item.label).join('、')}</p>
+          <h2 className="text-xl font-black">发布七门禁 · {releaseIds.length} 节试玩课全部未获正式发布授权</h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">每道门禁必须附证据（仓库文件、本仓库 CI 或 PR 链接）、审阅人和日期才算通过；AI 评分和实现者自评不算，人审只认负责人且必须排在最后。本页只读，不会触发任何发布 API。</p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-slate-600" aria-label="门禁说明">
+            {releaseRequirements.map((r, i) => <span key={r.key} className="rounded-lg bg-slate-50 px-2 py-1">{i + 1} {r.short}：{r.label}</span>)}
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {releaseSlice.map((id) => {
+              const result = getLessonRelease(id)
+              return <div key={id} className="min-w-0 rounded-xl bg-amber-50 p-4 text-sm" data-testid={`release-readiness-${id}`}>
+                <p className="break-words font-black text-slate-900">{id} · {result.ready ? '允许正式发布' : '禁止正式发布'}</p>
+                <p className="mt-1 text-amber-900">已通过 {result.passedCount}/7 · 剩余 {result.missing.length} 项</p>
+                <ul className="mt-2 space-y-1.5">
+                  {result.gates.map((g) => (
+                    <li key={g.key} className="flex min-w-0 gap-2" data-testid={`release-gate-${id}-${g.key}`} data-passed={g.passed ? 'true' : 'false'}>
+                      <span className={`shrink-0 self-start rounded-md px-1.5 text-xs font-black ${g.passed ? 'bg-emerald-600 text-white' : g.status === 'fail' ? 'bg-rose-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{g.short}</span>
+                      <span className="min-w-0 break-words text-xs leading-5 text-slate-700">{g.passed ? `${g.reviewer} · ${g.date}` : g.reasons[0]}{g.evidence.length ? ` · 已附证据 ${g.evidence.length}` : ''}{!g.passed && g.note ? <span className="hidden sm:inline">（{g.note}）</span> : null}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             })}
           </div>
+          <nav className="mt-4 flex flex-wrap items-center gap-2 text-sm font-bold" aria-label="发布门禁分页" data-testid="release-readiness-pager">
+            {Array.from({ length: releasePages }, (_, i) => i + 1).map((n) => (
+              <Link key={n} href={`/admin/catalog?${trackParam}rp=${n}`} aria-current={n === releasePage ? 'page' : undefined} className={`rounded-lg px-3 py-1.5 ${n === releasePage ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-700'}`}>{n}</Link>
+            ))}
+            <span className="text-xs text-slate-500">第 {releasePage}/{releasePages} 页，每页 {RELEASE_PAGE_SIZE} 节</span>
+          </nav>
         </section>
         <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
           <nav className="self-start rounded-[1.5rem] bg-white p-4 lg:sticky lg:top-5" aria-label="后台课程路径">
