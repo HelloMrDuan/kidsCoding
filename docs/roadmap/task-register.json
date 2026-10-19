@@ -159,7 +159,7 @@
       "title": "前9节Blockly教学质量审计",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-001"
       ],
@@ -169,15 +169,19 @@
         "九份差距与阻塞证据"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/93",
+        "mergeCommit": "dd7521a777f7626b67335764c220b5796ae5f169",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39221458292",
         "tests": [
           "apps/web/src/features/curriculum/teaching-review.test.ts（逐份复查 9 份新审核记录）"
         ],
-        "reviewer": null
+        "reviewer": "owner 2026-10-19 确认合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39221458283",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39217655430",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39217655647",
+        "prNumber": 93
       },
-      "notes": ""
+      "notes": "审计不等于修复：9 份 teaching-reviews（AI 参考 27～43，全部退回重做，保持 L3）；9 课均无两次不同动手/课内纠错/开放创作，作品仅 3/6/9 课弱；L02、L09 硬否决 rigid-answer；修复建议 a～g 见 docs/roadmap/evidence/TQ-002/README.md。"
     },
     {
       "id": "TQ-003",
