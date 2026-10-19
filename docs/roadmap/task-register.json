@@ -1834,7 +1834,7 @@
       "title": "课程发布七门禁可追溯",
       "priority": "P1",
       "category": "RELEASE",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "SYS-105"
       ],
@@ -1843,13 +1843,17 @@
         "内容、引擎、E2E、授权、进度、隐私、人审均具证据才允许L5"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/90",
+        "mergeCommit": "15565b8c69c1d0eba118009e014e63ed11b3a9fa",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39210798648",
         "tests": [
           "apps/web/src/features/curriculum/release-readiness.test.ts"
         ],
-        "reviewer": null
+        "reviewer": "owner 2026-10-19 确认三端截图并合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39210798588",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39208561104",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39208561063",
+        "prNumber": 90
       },
       "notes": ""
     },

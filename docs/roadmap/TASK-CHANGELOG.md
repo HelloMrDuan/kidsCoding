@@ -231,3 +231,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-19 | SYS-105 | 课程内容 schema 门禁：重复 ID、可玩课无运行器/路由/E2E/引擎能力、public 素材无原创或授权登记、关卡缺正反例均让 CI 失败；新增 asset-licenses-v1.json；19 节历史试玩课列为只减不增的正反例欠账 | [#88](https://github.com/HelloMrDuan/kidsCoding/pull/88) | `c6c092a195d7d4c1b26c28df23cc0eefe452fda0` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39197933515) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39197933462) | completed；解除 RELEASE-102、RELEASE-105 阻塞 |
+
+## RELEASE-102 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-19 | RELEASE-102 | 发布七门禁可追溯：每门须证据（仓库文件/本仓库 CI/PR）+审阅人+日期；仓库事实（运行器、E2E、正反例欠账、素材授权）不可被台账覆盖；拒绝 AI/实现者审阅；人审仅负责人且排最后；release-evidence-v1.json 覆盖 25 节试玩课，全部 0/7，L4/L5=0；后台逐课分页门禁卡，三端截图 owner 确认 | [#90](https://github.com/HelloMrDuan/kidsCoding/pull/90) | `15565b8c69c1d0eba118009e014e63ed11b3a9fa` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39210798648) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39210798588) | completed；解除 RELEASE-103 阻塞 |
