@@ -225,3 +225,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-19 | EDU-105 | G0-U1 打磨：说明/预测/诊断/提示/反思可中文语音朗读；失败时指出第几块积木；每课点选式反思判对错并保存；AI 参考再评 L01 82 / L02 82 / L03 80 / L04 85 / L05 85 / L06 89 | [#86](https://github.com/HelloMrDuan/kidsCoding/pull/86) | `26e4fcd56a0dfbc8ccf97eda4a7f57221bd90135` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39193424664) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39193424454) | completed；仍是 L3 实验可试玩；儿童试学计划待另立任务 |
+
+## SYS-105 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-19 | SYS-105 | 课程内容 schema 门禁：重复 ID、可玩课无运行器/路由/E2E/引擎能力、public 素材无原创或授权登记、关卡缺正反例均让 CI 失败；新增 asset-licenses-v1.json；19 节历史试玩课列为只减不增的正反例欠账 | [#88](https://github.com/HelloMrDuan/kidsCoding/pull/88) | `c6c092a195d7d4c1b26c28df23cc0eefe452fda0` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39197933515) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39197933462) | completed；解除 RELEASE-102、RELEASE-105 阻塞 |
