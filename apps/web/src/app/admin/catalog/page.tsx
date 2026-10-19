@@ -8,7 +8,8 @@ import {
 } from '@/features/curriculum/full-catalog-access'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { releaseEvidence, releaseRequirements } from '@/features/curriculum/release-readiness'
-import { getLessonMaturity, getLessonRelease } from '@/features/curriculum/lesson-maturity'
+import { getLessonMaturity, getLessonRelease, getReleaseContext } from '@/features/curriculum/lesson-maturity'
+import { childTrials } from '@/features/curriculum/child-trial'
 
 const RELEASE_PAGE_SIZE = 6
 
@@ -42,6 +43,7 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
         <section className="rounded-[1.5rem] border border-amber-200 bg-white p-6" data-testid="admin-release-readiness">
           <h2 className="text-xl font-black">发布七门禁 · {releaseIds.length} 节试玩课全部未获正式发布授权</h2>
           <p className="mt-2 text-sm leading-7 text-slate-600">每道门禁必须附证据（仓库文件、本仓库 CI 或 PR 链接）、审阅人和日期才算通过；AI 评分和实现者自评不算，人审只认负责人且必须排在最后。本页只读，不会触发任何发布 API。</p>
+          <p className="mt-2 rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-900" data-testid="child-trial-summary">儿童试学记录：{childTrials.length} 条 · 人审前每课至少需要 1 条经监护人同意的适龄试学；没有记录时不得对外宣称课程经过儿童检验。</p>
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-slate-600" aria-label="门禁说明">
             {releaseRequirements.map((r, i) => <span key={r.key} className="rounded-lg bg-slate-50 px-2 py-1">{i + 1} {r.short}：{r.label}</span>)}
           </div>
@@ -50,7 +52,7 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
               const result = getLessonRelease(id)
               return <div key={id} className="min-w-0 rounded-xl bg-amber-50 p-4 text-sm" data-testid={`release-readiness-${id}`}>
                 <p className="break-words font-black text-slate-900">{id} · {result.ready ? '允许正式发布' : '禁止正式发布'}</p>
-                <p className="mt-1 text-amber-900">已通过 {result.passedCount}/7 · 剩余 {result.missing.length} 项</p>
+                <p className="mt-1 text-amber-900">已通过 {result.passedCount}/7 · 剩余 {result.missing.length} 项 · <span data-testid={`child-trials-${id}`}>有效试学 {getReleaseContext(id).validChildTrials ?? 0} 次</span></p>
                 <ul className="mt-2 space-y-1.5">
                   {result.gates.map((g) => (
                     <li key={g.key} className="flex min-w-0 gap-2" data-testid={`release-gate-${id}-${g.key}`} data-passed={g.passed ? 'true' : 'false'}>

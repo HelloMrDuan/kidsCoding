@@ -1,6 +1,7 @@
 import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
+import { validTrialsFor } from './child-trial'
 import { EXAMPLE_DEBT_BASELINE } from './lesson-schema'
 import { evaluateLessonRelease, getLessonReleaseRecord, releaseRequirements, type ReleaseContext } from './release-readiness'
 
@@ -68,6 +69,7 @@ export function getReleaseContext(id: string): ReleaseContext {
     hasTrial: !!trial,
     hasE2E: !!trial && trial.e2eSpec.length > 0,
     inExampleDebt: EXAMPLE_DEBT_BASELINE.includes(id),
+    validChildTrials: validTrialsFor(id, Object.keys(trialIntegrations)).length,
   }
 }
 
