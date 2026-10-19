@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "lesson-09-garden-story",
+  "reviewedCommit": "632c3a4dabd3eab258063ef663f2b88402c2a343",
+  "reviewedAt": "2026-10-19",
+  "reviewer": "Hark（AI 参考评分）",
+  "reviewerKind": "ai",
+  "independent": true,
+  "ageBand": "G0 启蒙（约 5～7 岁）",
+  "prerequisites": [
+    "lesson-07、08：被点击时、说一句话；lesson-05：再做一次"
+  ],
+  "newConcepts": [
+    "（无新概念）点击+移动+对白+再做一次"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11，保留情境/预测/迁移）",
+    "核桃编程 一学九练 https://official.hetao101.com/curriculum（2026-10-11，保留“至少两个不同目标的动手”，舍弃凑次数）",
+    "西瓜创客 PBL https://www.xiguacity.cn/curriculum（2026-10-11，保留项目作品与反思）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 7,
+      "evidence": [
+        "apps/web/src/content/curriculum/launch-lessons.ts lesson-09 目标 [when_clicked, move_right, say_line, repeat_twice]",
+        "apps/web/src/features/lessons/playable-stage/use-block-executor.test.ts “runs the original four-block garden story…only after a click”"
+      ],
+      "defects": [
+        "“再做一次”接在“说一句话”后面，却重复移动而不是说话（apps/web/src/features/lessons/blockly/observable-run.ts），与积木名矛盾",
+        "step-5 文字“连着动两次，再回一句话”与参考程序“动→说→再动”相反（见硬否决 rigid-answer）",
+        "最终程序 = lesson-08 + 再做一次，没有新能力"
+      ]
+    },
+    "story": {
+      "score": 7,
+      "evidence": [
+        "apps/web/src/content/curriculum/launch-lessons.ts goal“完成一个点一下就会有反应的互动故事”",
+        "apps/web/src/features/lessons/playable-stage/playable-stage.tsx 点击预测"
+      ],
+      "defects": [
+        "“互动表演”只有一种固定反应",
+        "孩子不做任何故事决定"
+      ]
+    },
+    "practice": {
+      "score": 9,
+      "evidence": [
+        "apps/web/tests/e2e/blockly-garden-click.spec.ts “lesson 9 has a distinct garden ending…”：断言 step-5 移动 200"
+      ],
+      "defects": [
+        "操作是 lesson-08 加一块",
+        "没有第二项不同练习"
+      ]
+    },
+    "feedback": {
+      "score": 3,
+      "evidence": [
+        "apps/web/src/content/curriculum/launch-lessons.ts lesson-09 hintLayers（第 2 层写明顺序“被点击时 → 向右移动 → 说一句话 → 再做一次”）"
+      ],
+      "defects": [
+        "运行出错时舞台只显示通用文案“积木好像不太对，再检查一下吧！需要和任务要求的积木一样哦。”：apps/web/src/features/lessons/playable-stage/playable-stage.tsx 没有取用 useBlockExecutor 返回的 errorMessage，observable-run 已算出的具体差异原因（如“说话的时机不对”）孩子看不到；“和任务要求的积木一样”还与 SYS-103 等价方案判定相矛盾",
+        "apps/web/src/features/lessons/build-hint-state.ts 以 failedAttempts 作下标（min(failedAttempts, 2)），第一次失败直接显示第 2 层，第 1 层 repeat_goal 在失败后永远不会出现；失败次数只在点“完成这一步”时增加，运行出错本身不计",
+        "第 3 层补救 remedial-click-trigger 主题对应点击事件，但补救页只有三张静态说明卡（apps/web/src/content/curriculum/remedial-lessons.ts steps 为空），没有可操作的补救练习",
+        "按 step-5 文字搭出“移动→再做一次→说话”会失败，而舞台只显示通用错误，孩子不知道错在“说话时机”，提示第 2 层又和指令文字矛盾"
+      ]
+    },
+    "creation": {
+      "score": 3,
+      "evidence": [
+        "build-project-completion-copy.ts lesson-09“第三个完整作品”",
+        "等价方案：被点击时→移动→说话→移动 也能通过（AI 探针调用 evaluateObservable 复现）"
+      ],
+      "defects": [
+        "单元作品没有孩子的选择",
+        "作品不能重开、运行、修改"
+      ]
+    },
+    "assessment": {
+      "score": 4,
+      "evidence": [
+        "apps/web/src/content/curriculum/launch-lessons.ts lesson-09-garden-story.parentAdvice 请孩子向家长演示/讲述",
+        "apps/web/src/app/project/[projectId]/complete/page.tsx 完成页显示保存的积木快照（apps/web/src/features/lessons/blockly/preview-stage.tsx 静态预览）",
+        "apps/web/src/features/lessons/playable-stage/playable-stage.tsx garden-reflection"
+      ],
+      "defects": [
+        "家长端 apps/web/src/features/parent/build-parent-overview.ts describeProjectResult 按课程 ID 返回固定文案，不基于孩子真实的运行、错误或用时数据",
+        "课堂没有记录孩子自己的解释或反思，只有完成与否",
+        "apps/web/src/features/lessons/blockly/preview-stage.tsx 完成预览文案写“连着动两次，再用一句话回应你”，与实际程序顺序（动→说→再动）不符"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "PlayableStage 读取 Blockly 实际连接顺序逐块解释执行（apps/web/src/features/lessons/playable-stage/use-block-executor.ts 非双角色分支 + apps/web/src/features/lessons/blockly/observable-run.ts simulateProgram），按位置/场景/对白判定（SYS-103），不是预制动画；属于教学解释器而非完整 Scratch VM。对白内容由引擎写死（say_line 积木无文本字段，apps/web/src/features/lessons/blockly/register-kids-blocks.ts）。"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "孩子亲手点积木面板添加积木并运行；但多步只是重新运行同一程序（见“实际操作”维度）。"
+    },
+    "no-failure-test": {
+      "status": "fail",
+      "note": "课程五步都只有“搭对→运行成功”的路径，没有任何一步要求孩子先遇到真实错误、看到预期与实际的差异再修好（对照 lesson-10 step-4 的 observedMistake 门槛）。引擎层的反例只存在于单元测试/工程 E2E，不构成本课的纠错教学。"
+    },
+    "rigid-answer": {
+      "status": "fail",
+      "note": "step-5 指令“在最后接上再做一次，让角色点一下后会连着动两次，再回一句话”。按这句话搭出 被点击时→向右移动→再做一次→说一句话，evaluateObservable 判失败：“说话的时机不对：要在走完 100 步时说，实际是在 200 步时说”（审计时 vitest 探针复现）；唯一能过的顺序是 移动→说话→再做一次（参考答案与 apps/web/tests/e2e/blockly-garden-click.spec.ts）。任务文字描述的合理程序不能通过，且舞台只显示通用错误。"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "完成页写“你做出了一个完整作品”（build-project-completion-copy.ts），背后有本课真实运行通过后保存的积木快照，所以不算伪造；但作品只能看静态预览（apps/web/src/features/lessons/blockly/preview-stage.tsx），不能重开、运行、修改，作品质量很弱（见“创造”维度）。"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色与场景是 apps/web/src/features/lessons/playable-stage/character-art.tsx 中代码绘制的内联 SVG；配音为文本稿（foundation-voiceovers.ts），未发现外部商用素材。"
+    },
+    "minor-privacy-risk": {
+      "status": "unchecked",
+      "note": "完成课时会调用 syncGuestSnapshot 向 /api/guest 上传进度与作品快照（apps/web/src/app/learn/lesson/[lessonId]/page.tsx handleNext）；本次审计没有审查云端隔离与儿童隐私，lesson-maturity 也把“儿童隐私、输入和沙箱安全完成审核”列为未完成。"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "完成时 writeGuestProgress 失败会提示“本机存储失败”，不跳转、不发奖励；云同步失败显示失败并可重试（apps/web/src/app/learn/lesson/[lessonId]/page.tsx handleNext；local-progress-storage.test.ts、sync-guest-snapshot.test.ts）。草稿保存按返回值显示已保存/失败。"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 计算为 L3 实验可试玩（审计时用 vitest 探针调用 getLessonMaturity 确认 9 课均为 L3，blockers 首条“发布验收未完成”），没有标成正式发布。"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "被点击时→移动→说一句话→再做一次→点击蝴蝶：200 步 + “蝴蝶收到你的点击啦！”（apps/web/tests/e2e/blockly-garden-click.spec.ts）",
+    "failureCase": "按 step-5 文字搭“移动→再做一次→说话”→判“说话的时机不对”（AI 探针复现）；这是指令与判定矛盾造成的错误，不是设计好的纠错环节。",
+    "hintLayers": [
+      "apps/web/src/content/curriculum/launch-lessons.ts lesson-09-garden-story.hintLayers[0] repeat_goal（失败后实际不会显示，见 build-hint-state.ts）",
+      "apps/web/src/content/curriculum/launch-lessons.ts lesson-09-garden-story.hintLayers[1] show_block",
+      "apps/web/src/content/curriculum/launch-lessons.ts lesson-09-garden-story.hintLayers[2] offer_remedial → remedial-click-trigger"
+    ],
+    "practiceA": "在第 8 课程序后接“再做一次”",
+    "practiceB": null,
+    "equivalentSolutions": [
+      "被点击时→向右移动→说一句话→再做一次",
+      "被点击时→向右移动→说一句话→向右移动（AI 探针：evaluateObservable 通过；尚无提交的测试）"
+    ],
+    "saveReopen": null,
+    "e2eSpecs": [
+      "apps/web/tests/e2e/blockly-garden-click.spec.ts"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "修正 step-5 指令/parentAdvice/预览文案与判定顺序的矛盾（或改判定）",
+    "“再做一次”语义需重新定义",
+    "单元作品需孩子选择并可重开修改；缺纠错步骤"
+  ],
+  "notes": "TQ-002 审计（只审不修）。课时中途草稿按步保存在本机并可刷新恢复（apps/web/tests/e2e/lesson-draft-persistence.spec.ts），但完成后的作品只有静态预览，不能保存→重开→运行→修改，因此 saveReopen 记为缺失。没有截图或录屏证据，没有儿童试学。AI 参考分，需负责人作为独立人工审核人确认后才算正式复核。"
+}

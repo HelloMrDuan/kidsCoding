@@ -159,7 +159,7 @@
       "title": "前9节Blockly教学质量审计",
       "priority": "P1",
       "category": "TQ",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "TQ-001"
       ],
@@ -172,7 +172,9 @@
         "pr": null,
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "apps/web/src/features/curriculum/teaching-review.test.ts（逐份复查 9 份新审核记录）"
+        ],
         "reviewer": null
       },
       "notes": ""
