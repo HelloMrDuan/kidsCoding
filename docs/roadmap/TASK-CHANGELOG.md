@@ -207,3 +207,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-19 | SYS-106 | G0 网格寻路引擎：网格移动、四方向与转向、石头/小河/边界碰撞、捡钥匙开门；卡通森林网格舞台；引擎能力登记（direction、path_obstacles 已实现） | [#80](https://github.com/HelloMrDuan/kidsCoding/pull/80) | `928aaba4d90fcd6a1d9d7acc1bd067515b13f7e2` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39176017943) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39176018058) | completed；G0-U1 仍不可玩，下一步按 TQ-001 重写六节教案并接入课堂，再重新复核 TQ-004 |
+
+## EDU-104 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-19 | EDU-104 | G0-U1-L01～L06 按 TQ-001 重写并接入网格引擎：每课 4 关（两关带着做、自己搭、修别人程序），专属诊断、三层提示、正反例；V2 三区课堂、本机保存与刷新重开；L06 单元作品“森林寻路卡”可保存、重开、真实回放；43 项教案测试 + 4 个真实浏览器 E2E | [#82](https://github.com/HelloMrDuan/kidsCoding/pull/82) | `32c86eafaf283db95961c168965ae4922c3c18a5` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39185196960) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39185196982) | completed；成熟度 L3 实验可试玩，不是正式发布；下一步重新执行 TQ-004 |

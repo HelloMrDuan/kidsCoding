@@ -1623,7 +1623,7 @@
       "title": "G0第一单元按TQ-001重写并接入网格引擎可玩课堂",
       "priority": "P1",
       "category": "EDU",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-001",
         "SYS-106"
@@ -1639,10 +1639,19 @@
         "tests": [
           "g0-u1-grid-lessons.test.ts 43 项：6 课每关正解真跑通、反例给出指定错误、两种以上正解、练习 B 起始程序必失败、三层提示、L06 单元作品",
           "grid-draft.test.ts 2 项",
-          "grid-lab.spec.ts 4 个真实浏览器用例（本地通过）：失败→提示→修正→通过→刷新重开，L06 寻路卡保存重开播放"
-        ]
+          "grid-lab.spec.ts 4 个真实浏览器用例（本地通过）：失败→提示→修正→通过→刷新重开，L06 寻路卡保存重开播放",
+          "截图 evidence/EDU-104（课堂与单元作品，1440/768/375）"
+        ],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/82",
+        "mergeCommit": "32c86eafaf283db95961c168965ae4922c3c18a5",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39185196960",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39185196982",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39181500442",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39181500444",
+        "prNumber": 82,
+        "reviewer": "owner 2026-10-19 确认合并"
       },
-      "notes": "第一批 L01～L03（PR #82），第二批 L04～L06 + 单元作品寻路卡。完成后重新执行 TQ-004。"
+      "notes": "L01～L06 + 单元作品寻路卡经 PR #82 合并；成熟度 L3 实验可试玩，不是正式发布。下一步重新执行 TQ-004 教学质量复核。"
     },
     {
       "id": "CLOUD-101",
