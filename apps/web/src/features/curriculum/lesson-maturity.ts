@@ -1,3 +1,4 @@
+import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
 import { evaluateReleaseReadiness, releasePilotEvidence, releaseRequirements, type ReleaseEvidence } from './release-readiness'
@@ -43,6 +44,13 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
   'P0-U1-L04': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L04', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
   'P0-U1-L05': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L05', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
   'P0-U1-L06': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L06', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
+  // EDU-104: G0-U1 rewritten lessons on the SYS-106 grid engine.
+  ...Object.fromEntries(
+    Object.keys(g0u1GridLessons).map((id) => [
+      id,
+      { engine: 'blockly', route: `/learn/grid-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
+    ]),
+  ),
   // 12 standalone launch lessons: Blockly stage at /learn/lesson/<id>, covered by tests/e2e/blockly-*.spec.ts.
   ...Object.fromEntries(
     launchLessons.map((lesson) => [

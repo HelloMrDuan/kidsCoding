@@ -63,11 +63,14 @@ export function BlocklyWorkspace({
   blocks,
   onSnapshotChange,
   enableProgramTools = false,
+  snapStartOnTop = false,
 }: {
   allowedBlocks: string[]
   blocks: Array<{ type: string }>
   onSnapshotChange: (blocks: Array<{ type: string }>) => void
   enableProgramTools?: boolean
+  /** Grid lessons: a start hat added by button snaps onto a headless stack. */
+  snapStartOnTop?: boolean
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
@@ -181,7 +184,22 @@ export function BlocklyWorkspace({
     const block = workspace.newBlock(type)
     block.initSvg()
     block.render()
-    positionOrConnectBlock(workspace, block)
+    // A start hat added by button snaps on top of a headless stack (e.g. a
+    // starter program missing its start), so tapping alone can fix it.
+    const headless = snapStartOnTop && !block.previousConnection && block.nextConnection
+      ? workspace.getTopBlocks(true).find((item) => item.id !== block.id && item.previousConnection && !item.previousConnection.isConnected())
+      : undefined
+    if (headless?.previousConnection && block.nextConnection) {
+      const { x, y } = headless.getRelativeToSurfaceXY()
+      block.moveTo(new Blockly.utils.Coordinate(x, Math.max(0, y - 48)))
+      try {
+        block.nextConnection.connect(headless.previousConnection)
+      } catch {
+        positionOrConnectBlock(workspace, block)
+      }
+    } else {
+      positionOrConnectBlock(workspace, block)
+    }
 
     onSnapshotChange(buildSnapshot(workspace))
   }
