@@ -67,6 +67,11 @@ test('TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matc
   await page.getByTestId('remedial-card-move_right').click()
   await page.getByTestId('remedial-card-say_line').click()
   await expect(page.getByTestId('remedial-success')).toContainText('开始 → 移动 → 说话')
+  // TQ-010: the reset button uses the decorative SVG icon, not the “↺” glyph; its name is the plain text.
+  const again=page.getByRole('button',{name:'再排一次',exact:true})
+  await expect(again).toBeVisible()
+  await expect(again.locator('svg[data-testid="reset-icon"]')).toHaveAttribute('aria-hidden','true')
+  await expect(again).not.toContainText('↺')
   await page.getByRole('link',{name:'回到刚才的课程'}).click()
   await page.waitForURL('**/learn/lesson/lesson-01-forest-hello')
 })

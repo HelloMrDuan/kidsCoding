@@ -19,6 +19,11 @@ test('G0-U1-L01 grid lesson: real failure, layered hint, four real passes, saved
   await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
   await page.getByTestId('grid-trial-entry').click()
   await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  // TQ-010: “回到起点” uses the decorative SVG icon, not the “↺” glyph; its name is the plain text.
+  const reset = page.getByTestId('grid-reset')
+  await expect(reset.locator('svg[data-testid="reset-icon"]')).toHaveAttribute('aria-hidden', 'true')
+  await expect(reset).not.toContainText('↺')
+  await expect(page.getByRole('button', { name: '回到起点', exact: true })).toHaveAttribute('data-testid', 'grid-reset')
 
   // Step 1: the starter arrow has no start → the fox must not move.
   await next(page)

@@ -8,6 +8,7 @@ import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { getKidsBlockLabel } from '@/features/lessons/blockly/register-kids-blocks'
 import { GuidedLessonShell, type LessonLocalSaveState } from '@/features/lessons/guided-lesson-shell'
 import { ReadAloudButton } from '@/features/lessons/voice/read-aloud'
+import { ResetIcon } from '@/features/ui/reset-icon'
 import { runGridProgram, type GridFailure, type GridRun } from './grid-engine'
 import { GridStage, useGridPlayback } from './grid-stage'
 import { parseGridDraft, gridDraftKey, type GridDraft } from './grid-draft'
@@ -199,7 +200,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
               <button type="button" className="kc-action-surface disabled:opacity-50" data-testid="grid-run" disabled={!!run && !done} onClick={handleRun}>
                 {run && !done ? '运行中…' : '▶ 运行'}
               </button>
-              <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-reset" disabled={!!run && !done} onClick={handleReset}>↺ 回到起点</button>
+              <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-reset" disabled={!!run && !done} onClick={handleReset}><ResetIcon />回到起点</button>
               {failures > 0 && hintLayer < 2 ? (
                 <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-more-hint" onClick={() => setFailures(n => n + 1)}>再给点提示</button>
               ) : null}
