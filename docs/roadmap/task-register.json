@@ -387,7 +387,7 @@
       "title": "前9课每课纠错关卡",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-009"
       ],
@@ -401,15 +401,19 @@
         "单测：每课恰好一个纠错关且位置正确、错误程序以预期具体错因失败、舞台可观察差异、修复程序通过、积木均在本关面板内、问题只有一个正确答案、文案标签/角色/关步/距离检查；组件测试覆盖纠错面板；E2E 覆盖 L01、L05、L07 纠错关，并更新第1～9课通关流程"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/99",
+        "mergeCommit": "3b2dee21a032b69199e1156b31e729d410b7a632",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39429034193",
         "tests": [
           "apps/web/src/content/curriculum/tq010-mistake-steps.test.ts（16 例：只有首次设计内错误运行算实验、每课一个纠错关、错误程序具体错因、舞台可观察、修复通过、面板积木、问题答案、文案标签/蝴蝶不说“走”/小狐狸/关步/距离）",
           "apps/web/src/features/lessons/playable-stage/playable-stage-mistake.test.tsx（10 例：L01 漏开始不动且无“哎呀”框、提问与答错提示、修复成功确认、未观察错误不提示完成、L07 开始时不点也飞、答对后仍无“哎呀”框、观察后再运行错误程序为真实失败、真实失败显示正常反馈、两按钮同一 SVG 图标且无障碍名称不变、L07 猜测不被误判）",
           "apps/web/tests/e2e/blockly-first-run.spec.ts（L01 纠错关）、blockly-meadow-journey.spec.ts（L05 纠错关）、blockly-garden-click.spec.ts（L07 纠错关）；其余第1～9课通关 E2E 更新为先完成纠错关；blockly-first-run（补救页“再排一次”）与 grid-lab（“回到起点”）断言 SVG 图标且无“↺”"
         ],
-        "reviewer": null
+        "reviewer": "owner（HelloMrDuan）2026-10-20 确认截图后同意合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39429034297",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39426980443",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39426980203",
+        "prNumber": 99
       },
       "notes": "TQ-002 建议修复第 4 项（TQ-002d）。不含：第二项不同练习与去重（TQ-002e）、单元作品（TQ-002f）、评价与证据（TQ-002g）。课程成熟度仍为 L3，不因本任务升级；未经儿童试学。"
     },
