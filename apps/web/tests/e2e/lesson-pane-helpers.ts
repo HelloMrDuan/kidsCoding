@@ -53,3 +53,49 @@ export async function expectStageWalk(page: Page, steps: number) {
   expect(mainArt!.x + mainArt!.width).toBeLessThan(friendArt!.x)
   if (progress === 1) expect(friendArt!.x - (mainArt!.x + mainArt!.width)).toBeLessThanOrEqual(30)
 }
+
+/**
+ * TQ-010: lessons 01–09 each have one designed mistake → observe → fix step. The step opens
+ * with a pre-built wrong program: run it (and click the butterfly when it waits for a click),
+ * see the designed failure, answer “what did you see?”, rebuild the fix and run it again.
+ * Leaves the page on the passing run; the caller presses “完成这一关”.
+ */
+export async function solveMistakeStep(
+  page: Page,
+  options: {
+    expectCode: string
+    answer: string
+    fix: string[]
+    /** Garden lessons: a prediction is required before the run button works. */
+    garden?: boolean
+    /** The wrong program starts with “被点击时”, so it waits for a click. */
+    wrongWaitsForClick?: boolean
+  },
+) {
+  await expect(page.getByTestId('mistake-task')).toBeVisible()
+  await expect(page.getByTestId('mistake-setup')).toBeVisible()
+  if (options.garden) await page.getByTestId('garden-predict-click').click()
+  await page.getByTestId('run-code-button').click()
+  if (options.wrongWaitsForClick) {
+    await expect(page.getByTestId('garden-await-click')).toBeVisible()
+    await page.getByTestId('stage-character-main').click()
+  }
+  await expect(page.getByTestId('stage-run-error')).toHaveAttribute('data-failure-code', options.expectCode, { timeout: 20_000 })
+  await expect(page.getByTestId('mistake-observed')).toBeVisible()
+  // The designed mistake is the experiment, not a failed attempt: no hint tier is raised.
+  await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
+  // Observed but not answered: the step does not pass yet.
+  await page.getByTestId('lesson-complete-step').click()
+  await expect(page.getByTestId('lesson-feedback-card')).toContainText('先回答舞台上的问题')
+  await page.getByTestId(`mistake-answer-${options.answer}`).click()
+  await expect(page.getByTestId('mistake-fix')).toBeVisible()
+  await page.getByTestId('lesson-clear-program').click()
+  for (const type of options.fix) await page.getByTestId(`lesson-add-${type}`).click()
+  await page.getByTestId('run-code-button').click()
+  if (options.garden) {
+    await expect(page.getByTestId('garden-await-click')).toBeVisible()
+    await page.getByTestId('stage-character-main').click()
+  }
+  await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 20_000 })
+  await expect(page.getByTestId('mistake-fixed')).toBeVisible()
+}

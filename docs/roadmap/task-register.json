@@ -383,6 +383,37 @@
       "notes": "由负责人发现：“向右移动”每块走 100 步但积木不显示数字，文案却说“走 100 步”。本任务主动排查第1～12课同类不一致并修复（清单见 PR 描述）；按负责人要求一并修复：蝴蝶课积木用“飞”、第5课去掉用不到的“说一句话”、课堂进度改称“关”以免与距离“步”混淆（格子课本已用“关”）。不含：foundation-guides-v1.json 脚本课（非第1～12课课堂页）的内容差异。课程成熟度仍为 L3，未经儿童试学。"
     },
     {
+      "id": "TQ-010",
+      "title": "前9课每课纠错关卡",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-009"
+      ],
+      "scope": "TQ-002d：content/curriculum/mistake-steps.ts（9 课纠错设计单一来源）、launch-lessons 第1～9课各替换一个重复关为纠错关（语音同步）、课堂页 learn/lesson/[lessonId] 纠错门槛（观察→回答→修复）、playable-stage 纠错面板，复用 observable-run 判定、run-feedback 具体错因、block-labels 标签、remedial-routing 分层补救",
+      "acceptance": [
+        "第1～9课每课恰好一个纠错关（课程仍为 5 关，替换与前一关目标重复的关）：L01 第5关漏“开始时”、L02 第4关与 L03 第4关先说后走、L04 第5关先切换后移动、L05 第5关“重复：再走 100 步”放在移动前、L06 第5关场景切换太晚（森林走 200 步才切换）、L07 第3关误用“开始时”导致不点也飞、L08 第5关与 L09 第5关说话时机（先说后飞）",
+        "进入纠错关时积木区自动摆好设计的错误程序（已有本关草稿时保留草稿，可点“再摆一次错误程序”重新摆出）；孩子运行后舞台真实呈现错误（不动 / 先说话 / 一出发就到草地 / 森林里走过头 / 没点就飞），并显示 run-feedback 的具体错因",
+        "观察到预期错误后出现适合 5～7 岁的问题“你看到了什么”，选错有提示可重选，选对后显示修复方法；只有“已观察错误 + 答对 + 修复后程序真实运行成功”才能完成这一关；设计内的错误运行不计入提示升级的失败次数",
+        "纠错关提供“撤回最后一块”“清空积木重拼”，“开始时”按钮可吸附到无头程序顶部；原有 testid 与无障碍名称不变，新增 mistake-task / mistake-setup / mistake-observed / mistake-question / mistake-answer-<id> / mistake-answer-reply / mistake-fix / mistake-fixed / mistake-need-observe / mistake-reload",
+        "文案只引用真实积木标签（block-labels），角色名与舞台一致（第4～6课小狐狸、第7～9课蝴蝶且不说“走”），课程进度称“关”、“步”只用于距离",
+        "单测：每课恰好一个纠错关且位置正确、错误程序以预期具体错因失败、舞台可观察差异、修复程序通过、积木均在本关面板内、问题只有一个正确答案、文案标签/角色/关步/距离检查；组件测试覆盖纠错面板；E2E 覆盖 L01、L05、L07 纠错关，并更新第1～9课通关流程"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "apps/web/src/content/curriculum/tq010-mistake-steps.test.ts（15 例：每课一个纠错关、错误程序具体错因、舞台可观察、修复通过、面板积木、问题答案、文案标签/蝴蝶不说“走”/小狐狸/关步/距离）",
+          "apps/web/src/features/lessons/playable-stage/playable-stage-mistake.test.tsx（5 例：L01 漏开始不动、提问与答错提示、修复成功确认、未观察错误不提示完成、L07 开始时不点也飞）",
+          "apps/web/tests/e2e/blockly-first-run.spec.ts（L01 纠错关）、blockly-meadow-journey.spec.ts（L05 纠错关）、blockly-garden-click.spec.ts（L07 纠错关）；其余第1～9课通关 E2E 更新为先完成纠错关"
+        ],
+        "reviewer": null
+      },
+      "notes": "TQ-002 建议修复第 4 项（TQ-002d）。不含：第二项不同练习与去重（TQ-002e）、单元作品（TQ-002f）、评价与证据（TQ-002g）。课程成熟度仍为 L3，不因本任务升级；未经儿童试学。"
+    },
+    {
       "id": "UX-001",
       "title": "设计Tokens规范化",
       "priority": "P0",

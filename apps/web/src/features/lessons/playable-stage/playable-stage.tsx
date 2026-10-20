@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
+import type { MistakeStepDesign } from '@/content/curriculum/mistake-steps'
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 import { evaluateObservable, type JudgeOptions, type ProgramBlock, type RunFailureCode } from '../blockly/observable-run'
 import { motionVerbForTemplate, motionWord } from '../blockly/block-labels'
@@ -83,6 +84,11 @@ export function PlayableStage({
   onRunClear,
   onRunFailure,
   judgeOptions,
+  mistake,
+  mistakeObserved = false,
+  mistakeAnswer = null,
+  onMistakeAnswer,
+  onReloadMistake,
 }: {
   blocks: ProgramBlock[]
   template?: ProjectTemplateDefinition
@@ -93,6 +99,15 @@ export function PlayableStage({
   /** TQ-008: a real run failed; the kid-friendly reason comes from the judge result. */
   onRunFailure?: (failure: { code: RunFailureCode | null; message: string }) => void
   judgeOptions?: JudgeOptions
+  /** TQ-010: this step is the lesson's designed mistake → observe → fix step. */
+  mistake?: MistakeStepDesign
+  /** TQ-010: the designed wrong program was run and its failure seen on stage. */
+  mistakeObserved?: boolean
+  /** TQ-010: the child's answer to “what did you see?”. */
+  mistakeAnswer?: string | null
+  onMistakeAnswer?: (choiceId: string) => void
+  /** TQ-010: put the designed wrong program back on the workspace. */
+  onReloadMistake?: () => void
 }) {
   const {
     executionState,
@@ -121,6 +136,9 @@ export function PlayableStage({
   const visualScene=stageScene==='meadow'?'草地':template?.starterScene==='garden'?'花园':'森林'
   const sceneId: SceneId = stageScene==='meadow'?'meadow':template?.starterScene==='garden'?'garden':'forest'
   const mainId = template?.starterCharacters[0] ?? 'fox'
+  const pickedChoice = mistake?.choices.find((choice) => choice.id === mistakeAnswer)
+  const mistakeAnswered = Boolean(pickedChoice?.correct)
+  const designedFailure = Boolean(mistake && failureCode === mistake.expectedCode)
   const secondId = template?.starterCharacters[1]
 
   useEffect(() => {
@@ -209,6 +227,35 @@ export function PlayableStage({
           ) : null}
         </div>
       ) : null}
+      {mistake ? (
+        <div data-testid="mistake-task" data-observed={String(mistakeObserved)} className="kc-mistake-task">
+          <p className="kc-mistake-title">🔍 {mistake.title}</p>
+          {!mistakeObserved ? (
+            <p data-testid="mistake-setup" className="mt-1">{mistake.setup}</p>
+          ) : (
+            <div data-testid="mistake-observed" className="mt-2">
+              <p className="font-bold" id="mistake-question-label" data-testid="mistake-question">你看到了：{mistake.question}</p>
+              <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="mistake-question-label">
+                {mistake.choices.map((choice) => (
+                  <button key={choice.id} type="button" data-testid={`mistake-answer-${choice.id}`}
+                    aria-pressed={mistakeAnswer === choice.id}
+                    className={`kc-mistake-choice ${mistakeAnswer === choice.id ? 'kc-mistake-choice-on' : ''}`}
+                    onClick={() => onMistakeAnswer?.(choice.id)}>{choice.label}</button>
+                ))}
+              </div>
+              {pickedChoice ? <p data-testid="mistake-answer-reply" className="mt-2 font-semibold">{pickedChoice.reply}</p> : null}
+              {mistakeAnswered ? <p data-testid="mistake-fix" className="mt-2">🛠 {mistake.fix}</p> : null}
+            </div>
+          )}
+          {mistakeObserved && mistakeAnswered && executionState === 'success' ? (
+            <p data-testid="mistake-fixed" className="mt-2 font-bold text-emerald-800">✅ {mistake.done}</p>
+          ) : null}
+          {onReloadMistake ? (
+            <button type="button" data-testid="mistake-reload" className="kc-action-surface kc-btn-outline kc-btn-sm mt-2"
+              disabled={executionState === 'running'} onClick={onReloadMistake}>↺ 再摆一次错误程序</button>
+          ) : null}
+        </div>
+      ) : null}
         <div aria-live="polite">
             {clickLesson && executionState==='armed' ? (
               <div data-testid="garden-await-click" className="kc-feedback">
@@ -217,16 +264,20 @@ export function PlayableStage({
             ):null}
             {executionState === 'error' && (
               <div className="kc-feedback kc-feedback-error" data-failure-code={failureCode ?? undefined} data-testid="stage-run-error">
-                <p className="kc-feedback-title">🤔 哎呀，差一点点！</p>
+                <p className="kc-feedback-title">{designedFailure && !mistakeAnswered ? '🔍 出错啦！看看舞台上发生了什么。' : '🤔 哎呀，差一点点！'}</p>
                 <p className="mt-1" data-testid="stage-run-reason">{kidReason}</p>
               </div>
             )}
 
-            {executionState === 'success' && (
+            {executionState === 'success' && (mistake && !(mistakeObserved && mistakeAnswered) ? (
+              <div className="kc-feedback" data-testid="mistake-need-observe">
+                {mistakeObserved ? '运行成功了！先回答上面的问题：你看到了什么？' : '运行成功了！不过这一关要先看看错误程序会怎样。点“再摆一次错误程序”，运行看看。'}
+              </div>
+            ) : (
               <div className="kc-feedback kc-feedback-success">
                 🎉 太棒了！运行成功！点击“完成这一关”继续。
               </div>
-            )}
+            ))}
           {executionState !== 'error' && executionState !== 'success' && !(clickLesson && executionState==='armed') ? (
             <div className="kc-feedback">{clickLesson ? '准备就绪。先按「启动点击程序」，再点一下蝴蝶。' : '准备就绪。点击「运行」观察角色动作与对白。'}</div>
           ) : null}
