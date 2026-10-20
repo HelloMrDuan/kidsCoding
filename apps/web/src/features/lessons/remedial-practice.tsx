@@ -5,6 +5,7 @@ import { useState } from 'react'
 import type { RemedialPractice as RemedialPracticeData } from '@/features/domain/types'
 import { getKidsBlockLabel } from '@/features/lessons/blockly/block-labels'
 import { CharacterArt } from '@/features/lessons/playable-stage/character-art'
+import { ResetIcon } from '@/features/ui/reset-icon'
 
 /** TQ-008: tiny hands-on practice on a remedial page. Nothing is graded or stored. */
 export function RemedialPractice({ practice }: { practice: RemedialPracticeData }) {
@@ -59,11 +60,12 @@ function OrderPractice({ practice }: { practice: Extract<RemedialPracticeData, {
       </div>
       {placed.length > 0 ? (
         <button
-          className="mt-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700"
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700"
           onClick={() => { setPlaced([]); setNudge(null) }}
           type="button"
         >
-          ↺ 再排一次
+          <ResetIcon size={14} />
+          再排一次
         </button>
       ) : null}
     </div>
@@ -114,11 +116,12 @@ function ClickPractice({ practice }: { practice: Extract<RemedialPracticeData, {
         </button>
         {state === 'flown' ? (
           <button
-            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700"
+            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700"
             onClick={() => setState('idle')}
             type="button"
           >
-            ↺ 再试一次
+            <ResetIcon size={14} />
+            再试一次
           </button>
         ) : null}
       </div>

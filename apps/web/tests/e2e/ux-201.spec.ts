@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { solveMistakeStep } from './lesson-pane-helpers'
 
 // UX-201: classroom top task progress + save status must be real.
 //
@@ -153,6 +154,12 @@ test('UX-201 a failed cloud sync never reports success; retry really syncs', asy
   await page.getByTestId('lesson-add-move_right').click()
   for (let step = 0; step < 5; step += 1) {
     if (step === 2) await page.getByTestId('lesson-add-say_line').click()
+    if (step === 3) {
+      // TQ-010: 第 4 关 is the designed mistake step (speaks before walking).
+      await solveMistakeStep(page, { expectCode: 'say-too-early', answer: 'before-walk', fix: ['when_start', 'move_right', 'say_line'] })
+      await page.getByTestId('lesson-complete-step').click()
+      continue
+    }
     await runAndCompleteStep(page)
   }
 

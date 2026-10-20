@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
 import { getFoundationUnitByLessonId } from '@/content/curriculum/foundation-units'
+import { getMistakeStep, getMistakeStepAt } from '@/content/curriculum/mistake-steps'
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
@@ -92,6 +93,13 @@ export default function LessonPage() {
   const countedRunFailureRef = useRef<string | null>(null)
   const currentStepId = lesson?.steps[Math.min(stepIndex, Math.max(0, (lesson?.steps.length ?? 1) - 1))]?.id ?? ''
   const judgeOptions = getStepJudgeOptions(lessonId ?? '', currentStepId)
+  // TQ-010: lessons 01–09 each have one designed mistake → observe → fix step.
+  const mistakeStep = getMistakeStep(lessonId ?? '', currentStepId)
+  const [mistakeObserved, setMistakeObserved] = useState(false)
+  const [mistakeAnswer, setMistakeAnswer] = useState<string | null>(null)
+  const mistakeObservedRef = useRef(false)
+  // Bumped to rebuild the Blockly workspace from `blocks` (e.g. “再摆一次错误程序”).
+  const [workspaceVersion, setWorkspaceVersion] = useState(0)
 
   // Restore the real last step after hydration (client-only). The restore
   // is deferred to a microtask so it runs after the hydration commit:
@@ -115,9 +123,13 @@ export default function LessonPage() {
         setResumedFromStep(lastStep)
         setStepIndex(lastStep)
         const draft = loadLessonDraft(lessonId, lastStep)
+        const resumedMistake = getMistakeStepAt(lessonId, lastStep)
         if (draft && draft.blocks.length > 0) {
           blocksRef.current = draft.blocks
           setBlocks(draft.blocks)
+        } else if (resumedMistake) {
+          blocksRef.current = resumedMistake.wrongProgram
+          setBlocks(resumedMistake.wrongProgram)
         }
         setLocalSaveState(draft ? 'saved' : 'unsaved')
         return
@@ -169,8 +181,13 @@ export default function LessonPage() {
         : null
       // Carry the current blocks forward when there is no saved draft for the
       // next step. Only a saved draft should override the in-progress blocks.
+      // TQ-010: a designed mistake step opens on its pre-built wrong program.
+      const nextMistake = lessonId ? getMistakeStepAt(lessonId, nextStepIndex) : undefined
+      const openMistake = Boolean(nextMistake && !(draft && draft.blocks.length > 0))
       const nextBlocks =
-        draft && draft.blocks.length > 0 ? draft.blocks : blocksRef.current
+        draft && draft.blocks.length > 0 ? draft.blocks : nextMistake ? nextMistake.wrongProgram : blocksRef.current
+      // Save the pre-built program as this step's draft, so a reload resumes at the experiment.
+      if (openMistake && lessonId) saveLessonDraft(lessonId, nextStepIndex, nextBlocks)
       blocksRef.current = nextBlocks
       setBlocks(nextBlocks)
       setStepIndex(nextStepIndex)
@@ -181,19 +198,40 @@ export default function LessonPage() {
           : 'unsaved',
       )
       setHasRunSuccess(false)
+      mistakeObservedRef.current = false
+      setMistakeObserved(false)
+      setMistakeAnswer(null)
     },
-    [lessonId, setHasRunSuccess],
+    [lessonId, setHasRunSuccess, setMistakeObserved, setMistakeAnswer],
   )
 
   const handleRunSuccess=useCallback(() => {
     setHasRunSuccess(true)
     if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('本关角色结果与学习活动已验证。看看两条轨道，再完成这一关。')
   }, [lessonId, setHasRunSuccess, setFeedback])
-  const handleRunFailure = useCallback(() => {
+  const handleRunFailure = useCallback((failure?: { code: string | null; designedMistake?: boolean }) => {
+    // TQ-010: running the designed wrong program is the experiment, not a failed attempt
+    // (also when it is run again after “再摆一次错误程序”). The stage decides which run that is.
+    const design = getMistakeStepAt(lessonId ?? '', stepIndex)
+    if (design && failure?.designedMistake) {
+      mistakeObservedRef.current = true
+      setMistakeObserved(true)
+      return
+    }
     // Every failed real run is one failed attempt: hints escalate 1 → 2 → 3.
     countedRunFailureRef.current = `${stepIndex}|${JSON.stringify(blocksRef.current)}`
     setFailedAttempts((count) => count + 1)
-  }, [stepIndex])
+  }, [stepIndex, lessonId, setMistakeObserved])
+  const handleReloadMistake = useCallback(() => {
+    const design = getMistakeStepAt(lessonId ?? '', stepIndex)
+    if (!design) return
+    const wrong = design.wrongProgram
+    blocksRef.current = wrong
+    setBlocks(wrong)
+    setHasRunSuccess(false)
+    if (lessonId) setLocalSaveState(saveLessonDraft(lessonId, stepIndex, wrong) ? 'saved' : 'failed')
+    setWorkspaceVersion((version) => version + 1)
+  }, [lessonId, stepIndex, setHasRunSuccess, setWorkspaceVersion])
   const handleRunClear=useCallback(() => {
     setHasRunSuccess(false)
     if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('先运行积木，观察两个朋友的实际位置，再完成本关学习活动。')
@@ -271,6 +309,17 @@ export default function LessonPage() {
     const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id)
     const duoLesson = ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)
     const correct=duoLesson ? hasRunSuccess : evaluateStep(step.requiredBlockTypes,blocksRef.current,judgeOptions)
+    if (mistakeStep && !mistakeObserved) {
+      // TQ-010: the designed mistake has to be seen on stage before it can be fixed.
+      // Garden steps name their real stage button (「启动点击程序」), not a generic “运行”.
+      const runButton = step.requiredBlockTypes[0] === 'when_clicked' ? '「启动点击程序」' : '运行按钮'
+      setFeedback(`先按舞台上的${runButton}，看看摆好的这段程序会让${getMainCharacterLabel(currentTemplate)}怎样，再来修好它。`)
+      return
+    }
+    if (mistakeStep && !mistakeStep.choices.some((choice) => choice.id === mistakeAnswer && choice.correct)) {
+      setFeedback(`先回答舞台上的问题：${mistakeStep.question}`)
+      return
+    }
     if (needsRun && correct && !hasRunSuccess) {
       // Not a mistake: the program is right but has not been run yet.
       setFeedback(currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一关。')
@@ -421,7 +470,9 @@ export default function LessonPage() {
               />
             ) : (
               <BlocklyWorkspace
-                enableProgramTools={['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)}
+                key={`workspace-${workspaceVersion}`}
+                enableProgramTools={Boolean(mistakeStep) || ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)}
+                snapStartOnTop={Boolean(mistakeStep)}
                 allowedBlocks={step.allowedBlocks}
                 blocks={blocks}
                 onSnapshotChange={handleSnapshotChange}
@@ -456,7 +507,9 @@ export default function LessonPage() {
                 ) : ['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
                   <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
                     requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex} judgeOptions={judgeOptions}
-                    onRunSuccess={handleRunSuccess} onRunClear={handleRunClear} onRunFailure={handleRunFailure}/>
+                    onRunSuccess={handleRunSuccess} onRunClear={handleRunClear} onRunFailure={handleRunFailure}
+                    mistake={mistakeStep} mistakeObserved={mistakeObserved} mistakeAnswer={mistakeAnswer}
+                    onMistakeAnswer={setMistakeAnswer} onReloadMistake={mistakeStep ? handleReloadMistake : undefined}/>
                 ) : (
                   <PreviewStage blocks={blocks} template={currentTemplate}/>
                 )}

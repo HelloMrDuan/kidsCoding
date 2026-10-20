@@ -1,5 +1,5 @@
 import {expect,test} from '@playwright/test'
-import {expectStageWalk} from './lesson-pane-helpers'
+import {expectStageWalk,solveMistakeStep} from './lesson-pane-helpers'
 
 test('forest greeting lesson really moves then speaks before completion',async({page})=>{
   test.setTimeout(180_000)
@@ -11,8 +11,12 @@ test('forest greeting lesson really moves then speaks before completion',async({
     if(step===2)await page.getByTestId('lesson-add-say_line').click()
     // TQ-008 step-5 “从预设对白里选一句”: the choice is real and the fox says it.
     if(step===4)await page.getByTestId('lesson-say-line-lets-play').click()
-    await page.getByTestId('run-code-button').click()
-    await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
+    // TQ-010: 第 4 关 is the designed mistake step — the fox speaks before walking.
+    if(step===3)await solveMistakeStep(page,{expectCode:'say-too-early',answer:'before-walk',fix:['when_start','move_right','say_line']})
+    else{
+      await page.getByTestId('run-code-button').click()
+      await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
+    }
     await expectStageWalk(page,100)
     if(step>=2&&step<4)await expect(page.getByTestId('lesson-playable-stage')).toContainText('你好！')
     if(step===4)await expect(page.getByTestId('stage-character-main')).toContainText('一起来玩吧！')
@@ -31,8 +35,12 @@ test('forest first story progresses from start to move to speech through real Bl
   for(let step=0;step<5;step++){
     if(step===1)await page.getByTestId('lesson-add-move_right').click()
     if(step===2)await page.getByTestId('lesson-add-say_line').click()
-    await page.getByTestId('run-code-button').click()
-    await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
+    // TQ-010: 第 4 关 is the designed mistake step — the story greets before the fox walks on.
+    if(step===3)await solveMistakeStep(page,{expectCode:'say-too-early',answer:'said-first',fix:['when_start','move_right','say_line']})
+    else{
+      await page.getByTestId('run-code-button').click()
+      await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
+    }
     if(step>=2)await expect(page.getByTestId('lesson-playable-stage')).toContainText('你好！')
     await page.getByTestId('lesson-complete-step').click()
   }
