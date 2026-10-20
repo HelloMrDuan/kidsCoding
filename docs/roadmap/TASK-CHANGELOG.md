@@ -249,3 +249,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-19 | TQ-008 | 前 9 课课堂反馈：具体错因、提示 1→2→3、第三层补救按单元路由（含可操作练习）；L02 四句预设对白真实可选、L09 指令与判定一致；窄屏积木自适应缩放、第 4/5 课舞台角色名；正反例单测与 E2E。课程仍 L3 | [#95](https://github.com/HelloMrDuan/kidsCoding/pull/95) | `4f68b1b36936d5a39db70461d6c05aadd64e58cf` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39238711505) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39238711513) | completed |
+
+## TQ-009 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-20 | TQ-009 | 前 9 课积木语义与文案对齐：block-labels 单一来源（“向右走/飞 100 步”“重复：再走/飞 100 步”），第 1～12 课文案引用真实积木名、角色名一致，第 5 课去掉无用“说一句话”，课堂进度改称“关”，舞台显示已走步数、终点角色不重叠；地图返回滚动恢复（ux-104）。课程仍 L3 | [#97](https://github.com/HelloMrDuan/kidsCoding/pull/97) | `96bf91cb93881bfaa6261ebf6f658908e98815fb` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39405396354) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39405396336) | completed |
