@@ -14,7 +14,7 @@ function describeProjectResult(lessonId: string) {
   }
 
   if (lessonId === 'lesson-06-meadow-story') {
-    return '这次，小动物从森林走到草地，完成了一次小旅行。'
+    return '这次，小狐狸从森林走到草地，完成了一次小旅行。'
   }
 
   if (lessonId === 'lesson-09-garden-story') {
@@ -26,11 +26,11 @@ function describeProjectResult(lessonId: string) {
   }
 
   if (lessonId === 'lesson-02-forest-greeting') {
-    return '现在，角色已经会边出场边打招呼了。'
+    return '现在，小狐狸已经会先出场、再打招呼了。'
   }
 
   if (lessonId === 'lesson-01-forest-hello') {
-    return '现在，角色已经会走上舞台了。'
+    return '现在，小狐狸已经会向右走 100 步、走上舞台了。'
   }
 
   if (lessonId === 'lesson-04-meadow-scene') {
@@ -38,15 +38,15 @@ function describeProjectResult(lessonId: string) {
   }
 
   if (lessonId === 'lesson-05-meadow-order') {
-    return '现在，故事已经有先后顺序了。'
+    return '现在，故事已经有先后顺序了：先出发、再到草地、再走 100 步。'
   }
 
   if (lessonId === 'lesson-07-garden-click') {
-    return '现在，角色已经会回应点击了。'
+    return '现在，蝴蝶已经会回应点击了。'
   }
 
   if (lessonId === 'lesson-08-garden-dialogue') {
-    return '现在，角色已经会先动再说了。'
+    return '现在，蝴蝶已经会先飞再说了。'
   }
 
   if (lessonId === 'lesson-10-second-friend') {

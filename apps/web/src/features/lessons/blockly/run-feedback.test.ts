@@ -20,7 +20,7 @@ describe('kid-friendly failure reasons from the real judge (TQ-008)', () => {
     ['missing click hat in a click lesson', CLICK, b('move_right'), 'missing-start', '把“被点击时”放在最上面'],
     ['disconnected block', GREETING, [{ type: 'when_start' }, { type: 'move_right', disconnected: true }], 'disconnected', '掉队'],
     ['two start blocks', GREETING, b('when_start', 'when_start', 'move_right'), 'extra-start', '一块就够'],
-    ['repeat before any move', ['when_start', 'move_right', 'move_right'], b('when_start', 'repeat_twice'), 'repeat-without-move', '要跟在移动后面'],
+    ['repeat before any move', ['when_start', 'move_right', 'move_right'], b('when_start', 'repeat_twice'), 'repeat-without-move', '前面要先有“向右走 100 步”'],
     ['wrong trigger (needs click)', CLICK, b('when_start', 'move_right'), 'needs-click-trigger', '换成“被点击时”'],
     ['wrong trigger (needs start)', GREETING, b('when_clicked', 'move_right', 'say_line'), 'needs-start-trigger', '换成“开始时”'],
     ['no scene switch', MEADOW, b('when_start', 'move_right'), 'missing-scene-switch', '还在森林里'],

@@ -1,4 +1,5 @@
 import {expect,test,type Page} from '@playwright/test'
+import {expectStageWalk} from './lesson-pane-helpers'
 
 async function performClickStep(page:Page,expectedMovement:number,expectSpeech:boolean){
   // Code.org-inspired prediction: select a hypothesis before testing it.
@@ -6,14 +7,14 @@ async function performClickStep(page:Page,expectedMovement:number,expectSpeech:b
   await expect(page.getByTestId('run-code-button')).toBeEnabled()
   await page.getByTestId('run-code-button').click()
   await expect(page.getByTestId('garden-await-click')).toBeVisible()
-  await expect(page.getByTestId('stage-character-main')).toHaveCSS('transform','matrix(1, 0, 0, 1, 0, 0)')
+  await expectStageWalk(page,0)
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('运行成功')
   // No click means no execution and no credit, even though the blocks are correct.
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('点击蝴蝶')
   await page.getByTestId('stage-character-main').click()
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
-  if(expectedMovement>0) await expect(page.getByTestId('stage-character-main')).toHaveCSS('transform',`matrix(1, 0, 0, 1, ${expectedMovement}, 0)`)
+  if(expectedMovement>0) await expectStageWalk(page,expectedMovement)
   if(expectSpeech) await expect(page.getByTestId('stage-character-main')).toContainText('蝴蝶收到你的点击啦！')
   await expect(page.getByTestId('garden-reflection')).toContainText('点击事件发生后')
   await page.getByTestId('lesson-complete-step').click()
@@ -86,7 +87,7 @@ test('TQ-008: lesson 9 step 5 accepts following the instruction literally (fly t
   test.setTimeout(120_000)
   await seedStepDraft(page,'lesson-09-garden-story',4,[{type:'when_clicked'},{type:'move_right'},{type:'repeat_twice'},{type:'say_line'}])
   await page.goto('/learn/lesson/lesson-09-garden-story')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
   await expect(page.getByTestId('lesson-task-card')).toContainText('一共飞两次')
   await performClickStep(page,200,true)
   await page.waitForURL('**/project/lesson-09-garden-story/complete')
@@ -96,7 +97,7 @@ test('TQ-008: lesson 9 step 5 still rejects replying before flying, with a speci
   test.setTimeout(120_000)
   await seedStepDraft(page,'lesson-09-garden-story',4,[{type:'when_clicked'},{type:'say_line'},{type:'move_right'},{type:'repeat_twice'}])
   await page.goto('/learn/lesson/lesson-09-garden-story')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
   await page.getByTestId('garden-predict-click').click()
   await page.getByTestId('run-code-button').click()
   await page.getByTestId('stage-character-main').click()
@@ -104,4 +105,29 @@ test('TQ-008: lesson 9 step 5 still rejects replying before flying, with a speci
   await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier','1')
   await page.getByTestId('lesson-complete-step').click()
   await expect(page).toHaveURL(/lesson-09-garden-story/)
+})
+
+test('TQ-009: the butterfly flies — lesson 9 blocks, palette, stage and feedback say “飞”, never “走”',async({page})=>{
+  test.setTimeout(120_000)
+  await seedStepDraft(page,'lesson-09-garden-story',4,[{type:'when_clicked'},{type:'move_right'},{type:'say_line'}])
+  await page.goto('/learn/lesson/lesson-09-garden-story')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
+  await expect(page.getByTestId('lesson-add-move_right')).toHaveText('添加积木：向右飞 100 步')
+  await expect(page.getByTestId('lesson-add-repeat_twice')).toHaveText('添加积木：重复：再飞 100 步')
+  await expect(page.getByTestId('stage-walked-distance')).toContainText('小蝴蝶已飞 0 步')
+  // The restored program and the flyout are real Blockly blocks with the same “飞” labels.
+  const workspace=page.getByTestId('lesson-blockly-workspace')
+  await expect(workspace.locator('.blocklyBlockCanvas').first()).toContainText('向右飞 100 步')
+  await expect(workspace.locator('.blocklyFlyout').first()).toContainText('重复：再飞 100 步')
+  await expect(workspace).not.toContainText('向右走')
+  await expect(workspace).not.toContainText('再走')
+  // Missing the repeat: the reason says how far it flew, in “飞”.
+  await page.getByTestId('garden-predict-click').click()
+  await page.getByTestId('run-code-button').click()
+  await page.getByTestId('stage-character-main').click()
+  await expect(page.getByTestId('stage-run-reason')).toContainText('只飞了 100 步，要飞 200 步',{timeout:20_000})
+  await expect(page.getByTestId('stage-walked-distance')).toContainText('小蝴蝶已飞 100 步')
+  // A dragged-in copy keeps the label too: adding the repeat by button shows “再飞”.
+  await page.getByTestId('lesson-add-repeat_twice').click()
+  await expect(workspace.locator('.blocklyBlockCanvas').first()).toContainText('重复：再飞 100 步')
 })

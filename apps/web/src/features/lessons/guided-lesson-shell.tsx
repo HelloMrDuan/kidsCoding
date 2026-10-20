@@ -51,7 +51,7 @@ type GuidedLessonShellProps = {
   codeSlot?: ReactNode
   /** Real stage (playable / duo / preview) — the stage zone. */
   stageSlot?: ReactNode
-  /** 0-based current step, shown as "步骤 X / Y" with a real progress bar. */
+  /** 0-based current step, shown as "关卡 X / Y" (TQ-009: “步” is reserved for distance) with a real progress bar. */
   stepIndex?: number
   stepCount?: number
   /** Step the child was actually on when this session restored a saved draft. */
@@ -228,10 +228,10 @@ export function GuidedLessonShell({
             {showProgress ? (
               <>
                 <span>
-                  步骤 {stepIndex + 1} / {stepCount}
+                  关卡 {stepIndex + 1} / {stepCount}
                 </span>
                 <div
-                  aria-label={`课堂进度：第 ${stepIndex + 1} 步，共 ${stepCount} 步`}
+                  aria-label={`课堂进度：第 ${stepIndex + 1} 关，共 ${stepCount} 关`}
                   aria-valuemax={100}
                   aria-valuemin={0}
                   aria-valuenow={Math.round(progressPercent)}
@@ -248,7 +248,7 @@ export function GuidedLessonShell({
                 className="kc-text-muted"
                 data-testid="lesson-resume-note"
               >
-                已回到上次进度：第 {resumedFromStep + 1} 步
+                已回到上次进度：第 {resumedFromStep + 1} 关
               </span>
             ) : null}
             <span
@@ -311,7 +311,7 @@ export function GuidedLessonShell({
               <span>学习任务</span>
               {showProgress ? (
                 <span className="kc-chip kc-chip-info">
-                  STEP {String(stepIndex + 1).padStart(2, '0')}
+                  LEVEL {String(stepIndex + 1).padStart(2, '0')}
                 </span>
               ) : null}
             </div>
@@ -392,7 +392,7 @@ export function GuidedLessonShell({
             onClick={onCompleteStep}
             type="button"
           >
-            {isCompleting ? '正在完成…' : '完成这一步'}
+            {isCompleting ? '正在完成…' : '完成这一关'}
             {isCompleting ? null : <span aria-hidden="true">↗</span>}
           </button>
         </div>

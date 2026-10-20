@@ -347,6 +347,38 @@
       "notes": "TQ-002 修复第 1 步（建议 a + b 中的 L02/L09）。不含：每课纠错步骤、第二项练习、“再做一次”语义、单元作品、lesson-08 parentAdvice“不同点法”、lesson-10～12 补救（TQ-002c～g 另行登记）。课程成熟度仍为 L3，不因本修复升级；未经儿童试学。"
     },
     {
+      "id": "TQ-009",
+      "title": "前9课积木语义与文案对齐",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-008"
+      ],
+      "scope": "features/lessons/blockly 积木标签（block-labels 单一来源）、launch-lessons 第1～12课文案、run-feedback/observable-run 错因、补救页、舞台距离显示、语音/家长/完成文案",
+      "acceptance": [
+        "积木说出自己做什么：move_right 显示“向右走 100 步”，repeat_twice 显示“重复：再走 100 步”（它总是重复移动，在“切换场景”或“说一句话”之后也一样）；第7～9课蝴蝶在飞，积木按课显示“向右飞 100 步”“重复：再飞 100 步”（block-labels 的动作动词变体，Blockly 积木、面板按钮、反馈、提示、补救点击页、舞台距离一致）；积木类型 id 与 testid 不变",
+        "第1～12课任务、目标、提示、家长建议、语音、反馈、补救页、完成文案中引用的积木名都是真实标签；不再出现“向右移动”“再做一次”旧名，也不再用“走一步”描述 100 步的移动",
+        "角色名与舞台一致：第4～6课称“小狐狸”（不再泛称“小动物”），第7～9课称“蝴蝶”；第5课目标不再承诺并不存在的说话步骤",
+        "单角色舞台显示实际已走/已飞步数（如“小狐狸已走 200 步”“小蝴蝶已飞 100 步”），与文案对应；草地课程舞台徽标不再在森林画面上写“草地舞台”",
+        "第5课各步面板只提供本课用得到的积木（去掉从不使用的“说一句话”）；课堂页的课程进度改称“关”（“第 N 关”“关卡 X / Y”“完成这一关”），“步”只用于距离，testid 不变",
+        "单测：标签（含“飞”变体）、第5/9课重复语义、文案引用积木名必须是本课积木的真实标签、蝴蝶文案不出现“走”、课程文案不用“第 N 步/这一步”、第5课面板无多余积木、步数与参考程序一致、补救卡片标签、错因文案（走/飞）；E2E 覆盖第5课标签/无说话积木/关卡进度、第9课蝴蝶“飞”标签（面板、Blockly 积木与工具箱、距离、失败原因）"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "apps/web/src/content/curriculum/tq009-copy-alignment.test.ts（16 例：标签与“飞”变体、重复语义、按课校验引用积木名、蝴蝶不说“走”、关/步区分、第5课面板、步数、角色名、补救卡片、错因文案）",
+          "apps/web/src/features/lessons/blockly/run-feedback.test.ts、observable-run.test.ts、preview-stage.test.tsx（更新为新标签/步数文案）",
+          "apps/web/src/features/lessons/foundation-lesson-feedback.test.ts、guided-lesson-shell.test.tsx、src/content/curriculum/foundation-units.test.ts、src/features/parent/build-parent-overview.test.ts、src/features/projects/build-project-completion-copy.test.ts（文案更新）",
+          "apps/web/tests/e2e/blockly-meadow-journey.spec.ts（第5课第3关标签、无说话积木、失败原因、已走步数）、blockly-garden-click.spec.ts（第9课蝴蝶“飞”标签与失败原因）；其余 Blockly/UX E2E 改为“第 N 关”“关卡 X / 5”"
+        ],
+        "reviewer": null
+      },
+      "notes": "由负责人发现：“向右移动”每块走 100 步但积木不显示数字，文案却说“走 100 步”。本任务主动排查第1～12课同类不一致并修复（清单见 PR 描述）；按负责人要求一并修复：蝴蝶课积木用“飞”、第5课去掉用不到的“说一句话”、课堂进度改称“关”以免与距离“步”混淆（格子课本已用“关”）。不含：foundation-guides-v1.json 脚本课（非第1～12课课堂页）的内容差异。课程成熟度仍为 L3，未经儿童试学。"
+    },
+    {
       "id": "UX-001",
       "title": "设计Tokens规范化",
       "priority": "P0",

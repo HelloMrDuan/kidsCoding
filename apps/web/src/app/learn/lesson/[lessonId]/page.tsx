@@ -11,6 +11,7 @@ import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum
 import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { evaluateStep } from '@/features/lessons/blockly/evaluate-step'
 import { evaluateObservable } from '@/features/lessons/blockly/observable-run'
+import { motionVerbForTemplate } from '@/features/lessons/blockly/block-labels'
 import { explainRunFailure } from '@/features/lessons/blockly/run-feedback'
 import { getSayLineChoices, getStepJudgeOptions } from '@/features/lessons/blockly/step-judge-options'
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
@@ -87,7 +88,7 @@ export default function LessonPage() {
   const [hasCourseEntitlement, setHasCourseEntitlement] = useState(false)
   const [hasRunSuccess,setHasRunSuccess] = useState(false)
   // TQ-008: the program whose failed run was already counted, so pressing
-  // “完成这一步” right after that failed run does not skip a hint tier.
+  // “完成这一关” right after that failed run does not skip a hint tier.
   const countedRunFailureRef = useRef<string | null>(null)
   const currentStepId = lesson?.steps[Math.min(stepIndex, Math.max(0, (lesson?.steps.length ?? 1) - 1))]?.id ?? ''
   const judgeOptions = getStepJudgeOptions(lessonId ?? '', currentStepId)
@@ -186,7 +187,7 @@ export default function LessonPage() {
 
   const handleRunSuccess=useCallback(() => {
     setHasRunSuccess(true)
-    if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('本步角色结果与学习活动已验证。看看两条轨道，再完成这一步。')
+    if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('本关角色结果与学习活动已验证。看看两条轨道，再完成这一关。')
   }, [lessonId, setHasRunSuccess, setFeedback])
   const handleRunFailure = useCallback(() => {
     // Every failed real run is one failed attempt: hints escalate 1 → 2 → 3.
@@ -195,7 +196,7 @@ export default function LessonPage() {
   }, [stepIndex])
   const handleRunClear=useCallback(() => {
     setHasRunSuccess(false)
-    if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('先运行积木，观察两个朋友的实际位置，再完成本步学习活动。')
+    if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('先运行积木，观察两个朋友的实际位置，再完成本关学习活动。')
   }, [lessonId, setHasRunSuccess, setFeedback])
 
   useEffect(() => {
@@ -272,7 +273,7 @@ export default function LessonPage() {
     const correct=duoLesson ? hasRunSuccess : evaluateStep(step.requiredBlockTypes,blocksRef.current,judgeOptions)
     if (needsRun && correct && !hasRunSuccess) {
       // Not a mistake: the program is right but has not been run yet.
-      setFeedback(currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一步。')
+      setFeedback(currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一关。')
       return
     }
     if (!correct) {
@@ -284,10 +285,10 @@ export default function LessonPage() {
         setFailedAttempts((count) => count + 1)
       }
       if (duoLesson) {
-        setFeedback('请先运行并观察角色结果，完成本步的预测、错误实验或复盘。舞台会告诉你还缺什么。')
+        setFeedback('请先运行并观察角色结果，完成本关的预测、错误实验或复盘。舞台会告诉你还缺什么。')
       } else {
         const verdict = evaluateObservable(step.requiredBlockTypes, blocksRef.current, judgeOptions)
-        setFeedback(explainRunFailure(verdict, getMainCharacterLabel(currentTemplate)) || getFoundationLessonFeedback(currentLesson.id, 'retry'))
+        setFeedback(explainRunFailure(verdict, getMainCharacterLabel(currentTemplate), motionVerbForTemplate(currentLesson.templateId)) || getFoundationLessonFeedback(currentLesson.id, 'retry'))
       }
       return
     }
@@ -425,6 +426,7 @@ export default function LessonPage() {
                 blocks={blocks}
                 onSnapshotChange={handleSnapshotChange}
                 sayLineChoices={getSayLineChoices(currentLesson.id)}
+                motionVerb={motionVerbForTemplate(currentLesson.templateId)}
               />
             )
           }
@@ -463,7 +465,7 @@ export default function LessonPage() {
           }
           stepCount={currentLesson.steps.length}
           stepIndex={safeStepIndex}
-          stepTitle={`第 ${safeStepIndex + 1} 步：${step.title}`}
+          stepTitle={`第 ${safeStepIndex + 1} 关：${step.title}`}
           voiceover={step.voiceover}
         />
       </section>

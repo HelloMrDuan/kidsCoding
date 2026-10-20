@@ -32,10 +32,10 @@
         },
         {
           "step": 3,
-          "teacherPrompt": "连接向右移动积木",
-          "childAction": "把向右移动积木接在开始时的后面",
+          "teacherPrompt": "连接“向右走 100 步”积木",
+          "childAction": "把“向右走 100 步”积木接在“开始时”的后面",
           "check": "动作积木正确连接",
-          "voiceover": "第3步：连接向右移动积木 试一试，完成后说说你看到了什么。",
+          "voiceover": "第3步：连接“向右走 100 步”积木 试一试，完成后说说你看到了什么。",
           "interactionType": "build"
         },
         {

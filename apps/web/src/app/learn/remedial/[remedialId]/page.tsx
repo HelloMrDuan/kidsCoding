@@ -32,7 +32,7 @@ export default function RemedialLessonPage() {
           <p className="text-base leading-7 text-slate-600">{lesson.focus}</p>
         </header>
         <div className="rounded-[1.5rem] bg-amber-50 p-5 text-base leading-7 text-amber-900">
-          先花 1 分钟复习这一点，再回到刚才卡住的那一步继续，不用从头开始。
+          先花 1 分钟复习这一点，再回到刚才卡住的那一关继续，不用从头开始。
         </div>
         {lesson.keyPoints && lesson.keyPoints.length > 0 ? (
           <ol className={`grid gap-4 ${lesson.keyPoints.length >= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'}`} data-testid="remedial-key-points">

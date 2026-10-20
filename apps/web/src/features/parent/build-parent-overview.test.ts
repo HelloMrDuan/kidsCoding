@@ -75,7 +75,7 @@ describe('buildParentOverview', () => {
       {
         lessonId: 'lesson-02-forest-greeting',
         lessonTitle: '小狐狸打招呼',
-        lessonSummary: '现在，角色已经会边出场边打招呼了。',
+        lessonSummary: '现在，小狐狸已经会先出场、再打招呼了。',
         href: '/parent/projects/lesson-02-forest-greeting',
         updatedAt: '2026-03-31T09:00:00.000Z',
       },

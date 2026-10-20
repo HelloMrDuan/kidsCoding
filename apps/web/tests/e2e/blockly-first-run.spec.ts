@@ -1,4 +1,5 @@
 import {expect,test} from '@playwright/test'
+import {expectStageWalk} from './lesson-pane-helpers'
 
 test('first forest Blockly lesson requires actual execution before each step and awards completion once',async({page})=>{
   test.setTimeout(180_000)
@@ -12,7 +13,7 @@ test('first forest Blockly lesson requires actual execution before each step and
     if(step===3)await page.getByTestId('lesson-add-move_right').click()
     await page.getByTestId('run-code-button').click()
     await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:15_000})
-    if(step>=3)await expect(page.getByTestId('stage-character-main')).toHaveCSS('transform','matrix(1, 0, 0, 1, 100, 0)')
+    if(step>=3)await expectStageWalk(page,100)
     await page.getByTestId('lesson-complete-step').click()
   }
   await page.waitForURL('**/project/lesson-01-forest-hello/complete')
@@ -30,7 +31,7 @@ test('bad Blockly program cannot be passed off as actual execution',async({page}
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('需要和任务要求的积木一样')
   await page.getByTestId('lesson-complete-step').click()
   await expect(page).toHaveURL(/lesson-01-forest-hello/)
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 1 步')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 1 关')
 })
 
 test('TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matching start/sequence remedial',async({page})=>{
@@ -42,7 +43,7 @@ test('TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matc
   await expect(page.getByTestId('stage-run-reason')).toBeVisible({timeout:12_000})
   await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier','1')
   await expect(page.getByTestId('lesson-hint')).toContainText('先让小狐狸准备好出场')
-  // Pressing “完成这一步” on the same failed program does not skip a tier.
+  // Pressing “完成这一关” on the same failed program does not skip a tier.
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier','1')
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('先放一块“开始时”')

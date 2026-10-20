@@ -36,7 +36,7 @@ test('UX-201 progress strip shows the real step and saved chip', async ({
   await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
 
   const strip = page.getByTestId('lesson-progress-strip')
-  await expect(strip).toContainText('步骤 1 / 5')
+  await expect(strip).toContainText('关卡 1 / 5')
   await expect(page.getByTestId('lesson-progress-bar')).toHaveAttribute(
     'aria-valuenow',
     '20',
@@ -70,10 +70,10 @@ test('UX-201 re-entering a lesson resumes at the real last step', async ({
   await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
 
   await expect(page.getByTestId('lesson-progress-strip')).toContainText(
-    '步骤 2 / 5',
+    '关卡 2 / 5',
   )
   await expect(page.getByTestId('lesson-resume-note')).toContainText(
-    '已回到上次进度：第 2 步',
+    '已回到上次进度：第 2 关',
   )
 })
 

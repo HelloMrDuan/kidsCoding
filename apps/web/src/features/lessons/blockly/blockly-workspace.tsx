@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as Blockly from 'blockly'
 
-import { getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
+import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
+import { BLOCK_LABEL_FIELD, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
 import { restoreBlockSequence } from './restore-block-sequence'
 import type { SayLinePreset } from './say-line-presets'
 
@@ -55,6 +56,14 @@ function fitBlocksToView(workspace: Blockly.WorkspaceSvg) {
   if (Math.abs(workspace.scale - targetScale) > 0.01) workspace.setScale(targetScale)
   const scale = workspace.scale
   workspace.scroll(FIT_MARGIN - box.left * scale, FIT_MARGIN - box.top * scale)
+}
+
+/** TQ-009: show this lesson's wording (“走” or “飞”) on a move/repeat block. */
+function applyMotionLabel(block: Blockly.Block, verb: MotionVerb) {
+  if (!VERB_LABELLED_BLOCKS.includes(block.type)) return
+  const label = getKidsBlockLabel(block.type, verb)
+  const field = block.getField(BLOCK_LABEL_FIELD)
+  if (field && field.getValue() !== label) field.setValue(label)
 }
 
 function collectSequence(block: Blockly.Block | null, result: BlockSnapshot[]) {
@@ -125,6 +134,7 @@ export function BlocklyWorkspace({
   enableProgramTools = false,
   snapStartOnTop = false,
   sayLineChoices,
+  motionVerb = 'walk',
 }: {
   allowedBlocks: string[]
   blocks: BlockSnapshot[]
@@ -134,6 +144,8 @@ export function BlocklyWorkspace({
   snapStartOnTop?: boolean
   /** TQ-008: preset lines the say block may speak in this lesson (dropdown + buttons). */
   sayLineChoices?: readonly SayLinePreset[]
+  /** TQ-009: the butterfly flies, so its move/repeat blocks say “飞”. */
+  motionVerb?: MotionVerb
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
@@ -177,7 +189,11 @@ export function BlocklyWorkspace({
       grid: { spacing: 18, length: 2, colour: '#dbe4f1', snap: false },
       toolbox: {
         kind: 'flyoutToolbox',
-        contents: stableAllowedBlocks.map((type) => ({ kind: 'block', type })),
+        contents: stableAllowedBlocks.map((type) =>
+          VERB_LABELLED_BLOCKS.includes(type)
+            ? { kind: 'block', type, fields: { [BLOCK_LABEL_FIELD]: getKidsBlockLabel(type, motionVerb) } }
+            : { kind: 'block', type },
+        ),
       },
       trashcan: false,
       move: {
@@ -202,6 +218,7 @@ export function BlocklyWorkspace({
 
     restoredBlocks.forEach((snapshot) => {
       const block = workspace.newBlock(snapshot.type)
+      applyMotionLabel(block, motionVerb)
       if (choicesRef.current && choicesRef.current.length > 0) {
         ensureLineField(block, choicesRef.current, snapshot.line ?? lastChosenLineRef.current ?? choicesRef.current[0].id)
       }
@@ -257,7 +274,7 @@ export function BlocklyWorkspace({
       workspaceRef.current = null
     }
     // choicesKey re-injects when the lesson's preset lines change (snapshotOf only reads refs).
-  }, [allowedBlockKey, onSnapshotChange, stableAllowedBlocks, choicesKey])
+  }, [allowedBlockKey, onSnapshotChange, stableAllowedBlocks, choicesKey, motionVerb])
 
   function addBlock(type: string) {
     const workspace = workspaceRef.current
@@ -276,6 +293,7 @@ export function BlocklyWorkspace({
     }
 
     const block = workspace.newBlock(type)
+    applyMotionLabel(block, motionVerb)
     block.initSvg()
     block.render()
     // A start hat added by button snaps on top of a headless stack (e.g. a
@@ -348,7 +366,7 @@ export function BlocklyWorkspace({
               onClick={() => addBlock(type)}
               type="button"
             >
-              添加积木：{getKidsBlockLabel(type)}
+              添加积木：{getKidsBlockLabel(type, motionVerb)}
             </button>
           ))}
         </div>

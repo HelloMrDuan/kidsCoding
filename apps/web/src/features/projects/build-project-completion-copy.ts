@@ -16,11 +16,11 @@ const PROJECT_COMPLETION_COPY: Record<string, ProjectCompletionCopy> = {
   },
   'lesson-06-meadow-story': {
     summary:
-      '这次，小动物从森林走到草地，完成了一次小旅行。先回看作品，再进入下一单元。',
+      '这次，小狐狸从森林走到草地，完成了一次小旅行。先回看作品，再进入下一单元。',
     spotlightTag: '第二个完整作品',
     spotlightTitle: '你做出了一个完整作品',
     spotlightBody:
-      '这次，小动物从森林走到草地，完成了一次小旅行。现在可以继续第三单元，让故事开始回应点击。',
+      '这次，小狐狸从森林走到草地，完成了一次小旅行。现在可以继续第三单元，让故事开始回应点击。',
   },
   'lesson-09-garden-story': {
     summary:

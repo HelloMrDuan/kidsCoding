@@ -19,7 +19,7 @@ describe('GuidedLessonShell', () => {
         '这节高阶内容会在启蒙毕业后开启。先学完 12 节启蒙课，再决定要不要继续升级更复杂的互动故事。',
       ),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: '完成这一步' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '完成这一关' })).toBeNull()
   })
 
   it('shows the task card, three zones, and result card on unlocked lessons', () => {
@@ -32,7 +32,7 @@ describe('GuidedLessonShell', () => {
         lessonTitle="让角色动起来"
         onCompleteStep={vi.fn()}
         onStartRemedial={vi.fn()}
-        stepTitle="第 1 步：连接动作"
+        stepTitle="第 1 关：连接动作"
         voiceover="先放开始积木。"
         codeSlot={<div>积木内容</div>}
         stageSlot={<div>舞台内容</div>}
@@ -128,7 +128,7 @@ describe('GuidedLessonShell', () => {
           demo: '先高亮开始积木，再高亮后面的动作积木。',
         }}
         onStartRemedial={vi.fn()}
-        stepTitle="第 1 步：连接动作"
+        stepTitle="第 1 关：连接动作"
       />,
     )
 
@@ -156,7 +156,7 @@ describe('GuidedLessonShell', () => {
     )
 
     expect(screen.getByTestId('lesson-progress-strip')).toBeInTheDocument()
-    expect(screen.getByText('步骤 2 / 3')).toBeInTheDocument()
+    expect(screen.getByText('关卡 2 / 3')).toBeInTheDocument()
     expect(screen.getByRole('progressbar')).toHaveAttribute(
       'aria-valuenow',
       '67',
@@ -204,7 +204,7 @@ describe('GuidedLessonShell', () => {
     )
 
     expect(screen.getByTestId('lesson-resume-note')).toHaveTextContent(
-      '已回到上次进度：第 2 步',
+      '已回到上次进度：第 2 关',
     )
   })
 

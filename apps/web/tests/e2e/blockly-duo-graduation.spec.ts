@@ -39,7 +39,7 @@ async function run(page: Page, fox = 100, bear = 200) {
 async function next(page: Page, step: number) {
   await press(page, 'lesson-complete-step')
   await showLessonPane(page, 'task')
-  await expect(page.getByTestId('lesson-task-card')).toContainText(`第 ${step} 步`)
+  await expect(page.getByTestId('lesson-task-card')).toContainText(`第 ${step} 关`)
 }
 async function opening(page: Page) {
   await page.goto(`/learn/lesson/${lessonId}`)
@@ -85,7 +85,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await debug(page)
     await press(page, 'lesson-complete-step')
     await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 步')
+    await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 关')
     await add(page, ['repeat_twice'])
     await showLessonPane(page, 'stage')
     await press(page, 'run-code-button')
@@ -100,7 +100,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await run(page)
     await press(page, 'lesson-complete-step')
     await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 步')
+    await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
     await debug(page)
     for (let i = 0; i < 3; i++) await press(page, 'duo-show-hint')
     await expect(page.getByTestId('duo-debug-task')).toContainText('已观察')
@@ -115,7 +115,7 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await press(page, 'duo-reflect-together')
     await press(page, 'lesson-complete-step')
     await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 步')
+    await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
     await showLessonPane(page, 'stage')
     await press(page, 'duo-reflect-own')
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)

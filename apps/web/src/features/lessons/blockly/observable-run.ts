@@ -85,7 +85,7 @@ export function simulateProgram(blocks: ProgramBlock[]): SimulationResult {
         moved = true
         break
       case 'repeat_twice':
-        if (!moved) return { ok: false, code: 'repeat-without-move', reason: '“再做一次”前面还没有动作可以重复，先接一个移动积木。' }
+        if (!moved) return { ok: false, code: 'repeat-without-move', reason: '重复积木前面还没有移动可以重复，先接一块移动积木。' }
         observed.position += STEP_DISTANCE
         break
       case 'switch_scene':
@@ -132,13 +132,13 @@ type Difference = { code: DifferenceCode; reason: string } | null
 function describeDifference(goal: ObservedRun, actual: ObservedRun, options: JudgeOptions): Difference {
   if (goal.trigger !== actual.trigger) {
     return goal.trigger === 'click'
-      ? { code: 'needs-click-trigger', reason: '这一步要等你点到角色才开始，用“被点击时”开头。' }
-      : { code: 'needs-start-trigger', reason: '这一步按“运行”就要开始，用“开始时”开头。' }
+      ? { code: 'needs-click-trigger', reason: '这一关要等你点到角色才开始，用“被点击时”开头。' }
+      : { code: 'needs-start-trigger', reason: '这一关按“运行”就要开始，用“开始时”开头。' }
   }
   if (goal.scene !== actual.scene) {
     return goal.scene === 'meadow'
       ? { code: 'missing-scene-switch', reason: '目标是来到草地，故事还停在森林里。' }
-      : { code: 'extra-scene-switch', reason: '这一步还不用换场景，先留在森林。' }
+      : { code: 'extra-scene-switch', reason: '这一关还不用换场景，先留在森林。' }
   }
   if (goal.sceneSwitchAt !== actual.sceneSwitchAt) {
     return {
@@ -149,11 +149,11 @@ function describeDifference(goal: ObservedRun, actual: ObservedRun, options: Jud
   if (goal.position !== actual.position) {
     return {
       code: actual.position < goal.position ? 'too-few-moves' : 'too-many-moves',
-      reason: `目标：一共走 ${goal.position} 步；实际：走了 ${actual.position} 步。检查移动和“再做一次”的数量。`,
+      reason: `目标：一共移动 ${goal.position} 步；实际：移动了 ${actual.position} 步。检查移动积木和重复积木的数量。`,
     }
   }
   if (goal.message !== actual.message) {
-    if (goal.message === null) return { code: 'extra-say', reason: '这一步还不用说话，先把说话积木拿走。' }
+    if (goal.message === null) return { code: 'extra-say', reason: '这一关还不用说话，先把说话积木拿走。' }
     if (actual.message === null) return { code: 'missing-say', reason: `角色要说出“${goal.message}”，现在还没有说话。` }
     const accepted = options.acceptedLines?.includes(goal.message) && options.acceptedLines.includes(actual.message)
     if (!accepted) return { code: 'wrong-line', reason: `角色要说出“${goal.message}”，现在说的是“${actual.message}”。` }
@@ -166,7 +166,7 @@ function describeDifference(goal: ObservedRun, actual: ObservedRun, options: Jud
         : actual.messageAt < goal.messageAt ? 'say-too-early' : 'say-too-late',
       reason: options.sayAnyTimeAfterMove
         ? '说话的时机不对：要先动起来，再说话。'
-        : `说话的时机不对：要在走完 ${goal.messageAt} 步时说，实际是在 ${actual.messageAt} 步时说。`,
+        : `说话的时机不对：要在移动 ${goal.messageAt} 步时说，实际是在 ${actual.messageAt} 步时说。`,
     }
   }
   return null
@@ -178,7 +178,7 @@ export function evaluateObservable(
   options: JudgeOptions = {},
 ): ObservableVerdict {
   const reference = simulateProgram(referenceBlockTypes.map((type) => ({ type })))
-  if (!reference.ok) return { passed: false, goal: null, actual: null, reason: '这一步的目标还没有配置好。', code: 'goal-misconfigured' }
+  if (!reference.ok) return { passed: false, goal: null, actual: null, reason: '这一关的目标还没有配置好。', code: 'goal-misconfigured' }
   const actual = simulateProgram(blocks)
   if (!actual.ok) return { passed: false, goal: reference.observed, actual: null, reason: actual.reason, code: actual.code }
   const difference = describeDifference(reference.observed, actual.observed, options)

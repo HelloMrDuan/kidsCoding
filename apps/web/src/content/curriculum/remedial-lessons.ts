@@ -1,4 +1,5 @@
 import type { RemedialLessonDefinition } from '@/features/domain/types'
+import { getKidsBlockLabel, quoteBlock } from '@/features/lessons/blockly/block-labels'
 
 /**
  * Tier-3 remedials (TQ-008). Each one reviews exactly the concept of the unit that routes to it
@@ -15,15 +16,15 @@ export const remedialLessons: RemedialLessonDefinition[] = [
     keyPoints: [
       '“开始时”放在最上面，按“运行”后程序才出发。',
       '下面的积木从上往下，一块做完再做下一块。',
-      '想让小狐狸先出场再说话，就把“向右移动”放在“说一句话”上面。',
+      `想让小狐狸先出场再说话，就把${quoteBlock('move_right')}放在“说一句话”上面。`,
     ],
     practice: {
       kind: 'order',
-      prompt: '按顺序点一点：让小狐狸先出发，再走上舞台，最后打招呼。',
+      prompt: '按顺序点一点：小狐狸先听到开始口令，再向右走 100 步走上舞台，最后打招呼。',
       cards: [
-        { type: 'when_start', label: '开始时' },
-        { type: 'move_right', label: '向右移动' },
-        { type: 'say_line', label: '说一句话' },
+        { type: 'when_start', label: getKidsBlockLabel('when_start') },
+        { type: 'move_right', label: getKidsBlockLabel('move_right') },
+        { type: 'say_line', label: getKidsBlockLabel('say_line') },
       ],
       displayOrder: [2, 0, 1],
       success: '排好啦！开始 → 移动 → 说话，小狐狸会先出场再打招呼。',
@@ -38,25 +39,25 @@ export const remedialLessons: RemedialLessonDefinition[] = [
     steps: [],
     keyPoints: [
       '“切换场景”放在哪里，故事就在哪里换到草地。',
-      '先在森林走一走，再切换，小动物才是“从森林出发”。',
-      '“再做一次”会重复刚才的移动，要放在移动后面。',
+      '先在森林走 100 步，再切换，小狐狸才是“从森林出发”。',
+      `${quoteBlock('repeat_twice')}会把移动再做一次，要放在移动后面。`,
     ],
     practice: {
       kind: 'order',
-      prompt: '按顺序点一点：先出发，在森林走一段，再换到草地。',
+      prompt: '按顺序点一点：先听到开始口令，在森林走 100 步，再换到草地。',
       cards: [
-        { type: 'when_start', label: '开始时' },
-        { type: 'move_right', label: '向右移动' },
-        { type: 'switch_scene', label: '切换场景' },
+        { type: 'when_start', label: getKidsBlockLabel('when_start') },
+        { type: 'move_right', label: getKidsBlockLabel('move_right') },
+        { type: 'switch_scene', label: getKidsBlockLabel('switch_scene') },
       ],
       displayOrder: [1, 2, 0],
-      success: '排好啦！先在森林走，再切换场景，故事就来到草地了。',
+      success: '排好啦！先在森林走 100 步，再切换场景，故事就来到草地了。',
     },
   },
   {
     id: 'remedial-click-trigger',
     title: '先学会点击触发',
-    focus: '用“被点击时”开头的程序，要等你点到角色才开始。',
+    focus: '用“被点击时”开头的程序，要等你点到蝴蝶才开始。',
     returnToLessonId: 'lesson-07-garden-click',
     returnToStepId: 'step-1',
     steps: [],

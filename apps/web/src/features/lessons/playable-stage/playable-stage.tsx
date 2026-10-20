@@ -1,11 +1,24 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 import { evaluateObservable, type JudgeOptions, type ProgramBlock, type RunFailureCode } from '../blockly/observable-run'
+import { motionVerbForTemplate, motionWord } from '../blockly/block-labels'
 import { explainRunFailure } from '../blockly/run-feedback'
 
 import { CharacterArt, SceneBackdrop, type SceneId } from './character-art'
 import { useBlockExecutor } from './use-block-executor'
+
+/**
+ * TQ-009: steps are story distance, not pixels. 200 steps (the longest walk in lessons 01–09)
+ * is “arrived”: the walker stops right BESIDE the friend at every viewport, never on top of it.
+ * Longer (wrong) programs still report their real step count but stay beside the friend.
+ */
+export const STAGE_ARRIVAL_STEPS = 200
+
+export function stageWalkProgress(steps: number) {
+  if (!Number.isFinite(steps) || steps <= 0) return 0
+  return Math.min(steps, STAGE_ARRIVAL_STEPS) / STAGE_ARRIVAL_STEPS
+}
 
 const CHARACTER_LABELS: Record<string, string> = {
   fox: '小狐狸',
@@ -21,13 +34,14 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
     badge: '森林舞台',
     note: '先让角色上场，再看看故事会不会往前走。',
   },
+  // TQ-009: this stage starts in the forest; a “草地舞台” badge over a forest scene confused kids.
   meadow: {
-    badge: '草地舞台',
+    badge: '旅行舞台',
     note: '先在森林出发，再把故事带到草地。',
   },
   garden: {
     badge: '花园舞台',
-    note: '点一下角色，看看它会不会立刻回应你。',
+    note: '点一下蝴蝶，看看它会不会立刻回应你。',
   },
   'forest-stage': {
     badge: '毕业舞台',
@@ -51,11 +65,11 @@ function getTemplateCharacterLabels(template?: ProjectTemplateDefinition) {
     sceneCopy: template
       ? SCENE_LABELS[template.starterScene] ?? {
           badge: '故事舞台',
-          note: '先把这一步做出来，再看舞台会发生什么变化。',
+          note: '先把这一关做出来，再看舞台会发生什么变化。',
         }
       : {
           badge: '故事舞台',
-          note: '先把这一步做出来，再看舞台会发生什么变化。',
+          note: '先把这一关做出来，再看舞台会发生什么变化。',
         },
   }
 }
@@ -95,7 +109,9 @@ export function PlayableStage({
   // TQ-008: the same judge the executor used, explained for a 5–7 year old.
   const verdict = useMemo(() => evaluateObservable(requiredBlocks, blocks, judgeOptions), [requiredBlocks, blocks, judgeOptions])
   const failureCode = verdict.passed ? null : verdict.code
-  const kidReason = (verdict.passed ? '' : explainRunFailure(verdict, getMainCharacterLabel(template))) || errorMessage || '再看看积木的顺序吧！'
+  // TQ-009: the butterfly flies (“飞”), the fox walks (“走”) — feedback and the distance chip follow the stage.
+  const motionVerb = motionVerbForTemplate(template?.id)
+  const kidReason = (verdict.passed ? '' : explainRunFailure(verdict, getMainCharacterLabel(template), motionVerb)) || errorMessage || '再看看积木的顺序吧！'
   // Each press of “运行” is one attempt; a failed attempt is reported exactly once,
   // even when two failures in a row leave executionState at 'error'.
   const [attemptId, setAttemptId] = useState(0)
@@ -140,14 +156,19 @@ export function PlayableStage({
         <SceneBackdrop scene={sceneId} />
         <div className="kc-stage-topline">
           <span className="kc-stage-badge">{sceneCopy.badge}</span>
-          <span data-testid="stage-current-scene" className="kc-stage-scene-chip">当前实际场景：{visualScene}</span>
+          <span className="flex flex-wrap justify-end gap-1.5">
+            <span data-testid="stage-current-scene" className="kc-stage-scene-chip">当前实际场景：{visualScene}</span>
+            {/* TQ-009: copy says “走/飞 100 步”, so the stage shows the distance actually moved. */}
+            <span data-testid="stage-walked-distance" className="kc-stage-scene-chip">{mainLabel}已{motionWord(motionVerb)} {characterPosition} 步</span>
+          </span>
         </div>
 
         <div className="kc-stage-actors">
           <button type="button" aria-label={clickLesson?'点击蝴蝶触发积木程序':mainLabel}
             disabled={!clickLesson||executionState!=='armed'} onClick={()=>void clickCharacter()}
             className="kc-stage-actor kc-stage-actor-main"
-            style={{ transform: `translateX(${characterPosition}px)` }}
+            style={{ '--kc-walk': stageWalkProgress(characterPosition) } as CSSProperties}
+            data-steps={characterPosition}
             data-testid="stage-character-main"
           >
             <CharacterArt id={mainId} className="kc-stage-actor-art" />
@@ -161,7 +182,7 @@ export function PlayableStage({
           </button>
 
           {secondLabel ? (
-            <div className="kc-stage-actor kc-stage-actor-friend">
+            <div className="kc-stage-actor kc-stage-actor-friend" data-testid="stage-character-friend">
               <CharacterArt id={secondId} className="kc-stage-actor-art" />
               <span className="kc-stage-nametag">{secondLabel}</span>
             </div>
@@ -172,7 +193,7 @@ export function PlayableStage({
       <div className="kc-stage-panel space-y-3">
       {clickLesson ? (
         <div data-testid="garden-prediction" className="rounded-[8px] border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-bold text-amber-950">先猜一猜：只点“运行”，没有点蝴蝶，它会自己飞起来吗？</p>
+          <p className="text-sm font-bold text-amber-950">先猜一猜：只按“启动点击程序”，没有点蝴蝶，它会自己飞起来吗？</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" data-testid="garden-predict-auto" aria-pressed={prediction==='automatic'}
               className={`rounded-full border px-4 py-2 text-sm font-bold ${prediction==='automatic'?'bg-amber-600 text-white':'bg-white text-amber-950'}`}
@@ -203,11 +224,11 @@ export function PlayableStage({
 
             {executionState === 'success' && (
               <div className="kc-feedback kc-feedback-success">
-                🎉 太棒了！运行成功！点击&quot;完成这一步&quot;继续。
+                🎉 太棒了！运行成功！点击“完成这一关”继续。
               </div>
             )}
           {executionState !== 'error' && executionState !== 'success' && !(clickLesson && executionState==='armed') ? (
-            <div className="kc-feedback">准备就绪。点击「运行」观察角色动作与对白。</div>
+            <div className="kc-feedback">{clickLesson ? '准备就绪。先按「启动点击程序」，再点一下蝴蝶。' : '准备就绪。点击「运行」观察角色动作与对白。'}</div>
           ) : null}
         </div>
         <div className="kc-run-actions">
