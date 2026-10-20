@@ -351,7 +351,7 @@
       "title": "前9课积木语义与文案对齐",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-008"
       ],
@@ -365,16 +365,20 @@
         "单测：标签（含“飞”变体）、第5/9课重复语义、文案引用积木名必须是本课积木的真实标签、蝴蝶文案不出现“走”、课程文案不用“第 N 步/这一步”、第5课面板无多余积木、步数与参考程序一致、补救卡片标签、错因文案（走/飞）；E2E 覆盖第5课标签/无说话积木/关卡进度、第9课蝴蝶“飞”标签（面板、Blockly 积木与工具箱、距离、失败原因）"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/97",
+        "mergeCommit": "96bf91cb93881bfaa6261ebf6f658908e98815fb",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39405396354",
         "tests": [
           "apps/web/src/content/curriculum/tq009-copy-alignment.test.ts（16 例：标签与“飞”变体、重复语义、按课校验引用积木名、蝴蝶不说“走”、关/步区分、第5课面板、步数、角色名、补救卡片、错因文案）",
           "apps/web/src/features/lessons/blockly/run-feedback.test.ts、observable-run.test.ts、preview-stage.test.tsx（更新为新标签/步数文案）",
           "apps/web/src/features/lessons/foundation-lesson-feedback.test.ts、guided-lesson-shell.test.tsx、src/content/curriculum/foundation-units.test.ts、src/features/parent/build-parent-overview.test.ts、src/features/projects/build-project-completion-copy.test.ts（文案更新）",
           "apps/web/tests/e2e/blockly-meadow-journey.spec.ts（第5课第3关标签、无说话积木、失败原因、已走步数）、blockly-garden-click.spec.ts（第9课蝴蝶“飞”标签与失败原因）；其余 Blockly/UX E2E 改为“第 N 关”“关卡 X / 5”"
         ],
-        "reviewer": null
+        "reviewer": "owner 2026-10-19 确认截图后回复“好”同意合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39405396336",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39403675774",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39403675759",
+        "prNumber": 97
       },
       "notes": "由负责人发现：“向右移动”每块走 100 步但积木不显示数字，文案却说“走 100 步”。本任务主动排查第1～12课同类不一致并修复（清单见 PR 描述）；按负责人要求一并修复：蝴蝶课积木用“飞”、第5课去掉用不到的“说一句话”、课堂进度改称“关”以免与距离“步”混淆（格子课本已用“关”）。不含：foundation-guides-v1.json 脚本课（非第1～12课课堂页）的内容差异。课程成熟度仍为 L3，未经儿童试学。"
     },
