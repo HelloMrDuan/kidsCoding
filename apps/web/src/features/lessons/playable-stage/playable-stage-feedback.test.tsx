@@ -87,7 +87,7 @@ describe('PlayableStage failure feedback (TQ-008)', () => {
     render(
       <PlayableStage
         blocks={[{ type: 'when_start' }, { type: 'move_right' }, { type: 'say_line', line: 'lets-play' }]}
-        judgeOptions={getStepJudgeOptions('lesson-02-forest-greeting', 'step-5')}
+        judgeOptions={getStepJudgeOptions('lesson-02-forest-greeting', 'step-2')}
         onRunSuccess={onRunSuccess}
         requiredBlocks={['when_start', 'move_right', 'say_line']}
         stepIndex={4}

@@ -17,7 +17,7 @@ const FOUNDATION_LESSON_FEEDBACK = {
     retry: '先确认是先出场，再把说话积木接在后面。',
   },
   'lesson-03-forest-story': {
-    initial: '先让小狐狸出场，再把欢迎的话按顺序接上去。',
+    initial: '先让小狐狸走到小兔子身边，再把欢迎的话接上去。',
     progress: '很好，你马上就要做出一个完整作品了。',
     retry: '先看看动作和对白的顺序对不对，再把缺少的积木接完整。',
   },

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { solveMistakeStep } from './lesson-pane-helpers'
+import { solveMistakeStep, solvePracticeStep } from './lesson-pane-helpers'
 
 // UX-201: classroom top task progress + save status must be real.
 //
@@ -37,10 +37,10 @@ test('UX-201 progress strip shows the real step and saved chip', async ({
   await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
 
   const strip = page.getByTestId('lesson-progress-strip')
-  await expect(strip).toContainText('关卡 1 / 5')
+  await expect(strip).toContainText('关卡 1 / 4')
   await expect(page.getByTestId('lesson-progress-bar')).toHaveAttribute(
     'aria-valuenow',
-    '20',
+    '25',
   )
 
   await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
@@ -71,7 +71,7 @@ test('UX-201 re-entering a lesson resumes at the real last step', async ({
   await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
 
   await expect(page.getByTestId('lesson-progress-strip')).toContainText(
-    '关卡 2 / 5',
+    '关卡 2 / 4',
   )
   await expect(page.getByTestId('lesson-resume-note')).toContainText(
     '已回到上次进度：第 2 关',
@@ -152,8 +152,14 @@ test('UX-201 a failed cloud sync never reports success; retry really syncs', asy
   await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
   await page.getByTestId('lesson-add-when_start').click()
   await page.getByTestId('lesson-add-move_right').click()
-  for (let step = 0; step < 5; step += 1) {
-    if (step === 2) await page.getByTestId('lesson-add-say_line').click()
+  for (let step = 0; step < 4; step += 1) {
+    if (step === 1) await page.getByTestId('lesson-add-say_line').click()
+    if (step === 2) {
+      // TQ-011: 第 3 关 is the second practice (greet without walking).
+      await solvePracticeStep(page, { goalType: 'change-distance', guess: 'stay', clear: true, build: ['when_start', 'say_line'] })
+      await page.getByTestId('lesson-complete-step').click()
+      continue
+    }
     if (step === 3) {
       // TQ-010: 第 4 关 is the designed mistake step (speaks before walking).
       await solveMistakeStep(page, { expectCode: 'say-too-early', answer: 'before-walk', fix: ['when_start', 'move_right', 'say_line'] })

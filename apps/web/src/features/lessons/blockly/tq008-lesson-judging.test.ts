@@ -11,9 +11,10 @@ const b = (...types: string[]): ProgramBlock[] => types.map((type) => ({ type })
 const lesson = (id: string) => launchLessons.find((item) => item.id === id)!
 const stepOf = (lessonId: string, stepId: string) => lesson(lessonId).steps.find((step) => step.id === stepId)!
 
-describe('lesson-02 step-5: the preset dialogue choice is real (TQ-008)', () => {
-  const step = stepOf('lesson-02-forest-greeting', 'step-5')
-  const options = getStepJudgeOptions('lesson-02-forest-greeting', 'step-5')
+// TQ-011: the preset line choice moved from 第 5 关 into the main build (第 2 关).
+describe('lesson-02 step-2: the preset dialogue choice is real (TQ-008)', () => {
+  const step = stepOf('lesson-02-forest-greeting', 'step-2')
+  const options = getStepJudgeOptions('lesson-02-forest-greeting', 'step-2')
 
   it('offers 3–4 fixed kid-safe preset lines and no free text', () => {
     const choices = getSayLineChoices('lesson-02-forest-greeting')!
@@ -44,7 +45,7 @@ describe('lesson-02 step-5: the preset dialogue choice is real (TQ-008)', () => 
 
   it('the choice is scoped: lessons without presets keep their fixed line', () => {
     expect(getSayLineChoices('lesson-03-forest-story')).toBeUndefined()
-    const verdict = evaluateObservable(['when_start', 'move_right', 'say_line'], [{ type: 'when_start' }, { type: 'move_right' }, { type: 'say_line', line: 'hi-all' }], getStepJudgeOptions('lesson-03-forest-story', 'step-5'))
+    const verdict = evaluateObservable(['when_start', 'move_right', 'say_line'], [{ type: 'when_start' }, { type: 'move_right' }, { type: 'say_line', line: 'hi-all' }], getStepJudgeOptions('lesson-03-forest-story', 'step-2'))
     expect(verdict.code).toBe('wrong-line')
   })
 
@@ -53,9 +54,10 @@ describe('lesson-02 step-5: the preset dialogue choice is real (TQ-008)', () => 
   })
 })
 
-describe('lesson-09 step-5: instruction and judge agree (TQ-008)', () => {
-  const step = stepOf('lesson-09-garden-story', 'step-5')
-  const options = getStepJudgeOptions('lesson-09-garden-story', 'step-5')
+// TQ-011: the flexible-timing step is the mistake step, now 第 4 关.
+describe('lesson-09 step-4: instruction and judge agree (TQ-008)', () => {
+  const step = stepOf('lesson-09-garden-story', 'step-4')
+  const options = getStepJudgeOptions('lesson-09-garden-story', 'step-4')
 
   it('the instruction describes flying twice with the line after either flight', () => {
     expect(step.instruction).toContain('一共飞两次')
@@ -83,11 +85,12 @@ describe('lesson-09 step-5: instruction and judge agree (TQ-008)', () => {
     expect(verdict.code).toBe(code)
   })
 
-  it('the say-timing flexibility is limited to lesson-09 step-5', () => {
-    expect(getStepJudgeOptions('lesson-09-garden-story', 'step-4').sayAnyTimeAfterMove).toBeUndefined()
-    expect(getStepJudgeOptions('lesson-06-meadow-story', 'step-5').sayAnyTimeAfterMove).toBeUndefined()
+  it('the say-timing flexibility is limited to lesson-09 step-4', () => {
+    expect(getStepJudgeOptions('lesson-09-garden-story', 'step-2').sayAnyTimeAfterMove).toBeUndefined()
+    expect(getStepJudgeOptions('lesson-09-garden-story', 'step-3').sayAnyTimeAfterMove).toBeUndefined()
+    expect(getStepJudgeOptions('lesson-06-meadow-story', 'step-4').sayAnyTimeAfterMove).toBeUndefined()
     // lesson-06 still insists on speaking after the full journey
-    const l06 = stepOf('lesson-06-meadow-story', 'step-5')
-    expect(evaluateStep(l06.requiredBlockTypes, b('when_start', 'move_right', 'switch_scene', 'say_line', 'repeat_twice'), getStepJudgeOptions('lesson-06-meadow-story', 'step-5'))).toBe(false)
+    const l06 = stepOf('lesson-06-meadow-story', 'step-4')
+    expect(evaluateStep(l06.requiredBlockTypes, b('when_start', 'move_right', 'switch_scene', 'say_line', 'repeat_twice'), getStepJudgeOptions('lesson-06-meadow-story', 'step-4'))).toBe(false)
   })
 })

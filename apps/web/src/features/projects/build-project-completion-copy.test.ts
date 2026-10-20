@@ -7,11 +7,11 @@ describe('buildProjectCompletionCopy', () => {
     const copy = buildProjectCompletionCopy('lesson-03-forest-story')
 
     expect(copy.summary).toBe(
-      '小狐狸已经会走上舞台，还会打招呼了。先回看作品，再进入下一单元。',
+      '小狐狸已经会走到小兔子身边，再打招呼了。先回看作品，再进入下一单元。',
     )
     expect(copy.spotlightTag).toBe('第一个完整作品')
     expect(copy.spotlightTitle).toBe('你做出了一个完整作品')
-    expect(copy.spotlightBody).toContain('小狐狸走上舞台')
+    expect(copy.spotlightBody).toContain('小狐狸走到小兔子身边')
     expect(copy.spotlightBody).toContain('第二单元')
   })
 

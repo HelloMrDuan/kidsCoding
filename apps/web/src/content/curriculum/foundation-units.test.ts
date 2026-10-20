@@ -11,12 +11,14 @@ describe('foundation curriculum seed', () => {
     expect(launchLessons[11]?.id).toBe('lesson-12-graduation-show')
   })
 
-  it('expands the first three lessons into polished five-step scripts', () => {
+  // TQ-011: steps that only re-ran the same program were merged; each lesson is
+  // warm-up → main build → second practice → designed mistake (4 关).
+  it('expands the first three lessons into short four-step scripts', () => {
     const lessons = launchLessons.slice(0, 3)
 
-    expect(lessons[0]?.steps).toHaveLength(5)
-    expect(lessons[1]?.steps).toHaveLength(5)
-    expect(lessons[2]?.steps).toHaveLength(5)
+    expect(lessons[0]?.steps).toHaveLength(4)
+    expect(lessons[1]?.steps).toHaveLength(4)
+    expect(lessons[2]?.steps).toHaveLength(4)
     expect(lessons[2]?.goal).toContain('完整小故事')
   })
 
@@ -25,9 +27,9 @@ describe('foundation curriculum seed', () => {
     const longestChain = (lesson = lesson1) =>
       Math.max(...lesson.steps.map((step) => step.requiredBlockTypes.length))
 
-    expect(longestChain(lesson1)).toBe(2)
+    expect(longestChain(lesson1)).toBe(3)
     expect(longestChain(lesson2)).toBe(3)
-    expect(longestChain(lesson3)).toBe(3)
+    expect(longestChain(lesson3)).toBe(4)
     expect(lesson2?.goal).toContain('出场后说一句欢迎的话')
     expect(lesson2?.steps[0]?.requiredBlockTypes).toEqual([
       'when_start',
@@ -35,12 +37,12 @@ describe('foundation curriculum seed', () => {
     ])
   })
 
-  it('expands lessons 4 to 6 into the second unit five-step scripts', () => {
+  it('expands lessons 4 to 6 into the second unit four-step scripts', () => {
     const lessons = launchLessons.slice(3, 6)
 
-    expect(lessons[0]?.steps).toHaveLength(5)
-    expect(lessons[1]?.steps).toHaveLength(5)
-    expect(lessons[2]?.steps).toHaveLength(5)
+    expect(lessons[0]?.steps).toHaveLength(4)
+    expect(lessons[1]?.steps).toHaveLength(4)
+    expect(lessons[2]?.steps).toHaveLength(4)
     expect(lessons[0]?.goal).toContain('场景')
     expect(lessons[1]?.goal).toContain('顺序')
     expect(lessons[2]?.goal).toContain('完整小故事')
@@ -51,16 +53,16 @@ describe('foundation curriculum seed', () => {
     const longestChain = (lesson = lesson4) =>
       Math.max(...lesson.steps.map((step) => step.requiredBlockTypes.length))
 
-    expect(longestChain(lesson4)).toBe(3)
+    expect(longestChain(lesson4)).toBe(4)
     expect(longestChain(lesson5)).toBe(4)
     expect(longestChain(lesson6)).toBe(5)
-    expect(lesson5?.steps[3]?.requiredBlockTypes).toEqual([
+    expect(lesson5?.steps[1]?.requiredBlockTypes).toEqual([
       'when_start',
       'move_right',
       'switch_scene',
       'repeat_twice',
     ])
-    expect(lesson6?.steps[3]?.requiredBlockTypes).toEqual([
+    expect(lesson6?.steps[1]?.requiredBlockTypes).toEqual([
       'when_start',
       'move_right',
       'switch_scene',
@@ -69,12 +71,12 @@ describe('foundation curriculum seed', () => {
     ])
   })
 
-  it('expands lessons 7 to 9 into the third unit five-step scripts', () => {
+  it('expands lessons 7 to 9 into the third unit four-step scripts', () => {
     const lessons = launchLessons.slice(6, 9)
 
-    expect(lessons[0]?.steps).toHaveLength(5)
-    expect(lessons[1]?.steps).toHaveLength(5)
-    expect(lessons[2]?.steps).toHaveLength(5)
+    expect(lessons[0]?.steps).toHaveLength(4)
+    expect(lessons[1]?.steps).toHaveLength(4)
+    expect(lessons[2]?.steps).toHaveLength(4)
     expect(lessons[0]?.goal).toContain('点击')
     expect(lessons[1]?.goal).toContain('先飞')
     expect(lessons[2]?.goal).toContain('互动故事')
@@ -85,15 +87,15 @@ describe('foundation curriculum seed', () => {
     const longestChain = (lesson = lesson7) =>
       Math.max(...lesson.steps.map((step) => step.requiredBlockTypes.length))
 
-    expect(longestChain(lesson7)).toBe(2)
+    expect(longestChain(lesson7)).toBe(3)
     expect(longestChain(lesson8)).toBe(3)
     expect(longestChain(lesson9)).toBe(4)
-    expect(lesson8?.steps[4]?.requiredBlockTypes).toEqual([
+    expect(lesson8?.steps[3]?.requiredBlockTypes).toEqual([
       'when_clicked',
       'move_right',
       'say_line',
     ])
-    expect(lesson9?.steps[4]?.requiredBlockTypes).toEqual([
+    expect(lesson9?.steps[3]?.requiredBlockTypes).toEqual([
       'when_clicked',
       'move_right',
       'say_line',
@@ -166,7 +168,7 @@ describe('foundation curriculum seed', () => {
     const projectLessons = [launchLessons[5], launchLessons[8], launchLessons[11]]
 
     for (const lesson of projectLessons) {
-      expect(lesson.steps[4]?.requiredBlockTypes).toContain('repeat_twice')
+      expect(lesson.steps.at(-1)?.requiredBlockTypes).toContain('repeat_twice')
       expect(
         lesson.steps
           .slice(3)

@@ -418,6 +418,27 @@
       "notes": "TQ-002 建议修复第 4 项（TQ-002d）。不含：第二项不同练习与去重（TQ-002e）、单元作品（TQ-002f）、评价与证据（TQ-002g）。课程成熟度仍为 L3，不因本任务升级；未经儿童试学。"
     },
     {
+      "id": "TQ-011",
+      "title": "前9课第二项不同练习与去重",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-010"
+      ],
+      "scope": "TQ-002e：content/curriculum/practice-steps.ts（9 课第二项练习设计单一来源）、launch-lessons 第1～9课压缩只重复运行同一程序的关卡、每课加一关目标不同的练习（改距离并预测停在哪里 / 比一比两种顺序或两种事件哪里不一样）、重新定位第3/6/8课与前一课逐块重复的内容；课堂页 learn/lesson/[lessonId] 练习门槛、playable-stage 练习面板，复用 observable-run 判定、run-feedback 具体错因、block-labels 标签、foundation-voiceovers 配音；保留 TQ-010 每课一个纠错关",
+      "acceptance": [
+        "第1～9课每课恰好一个“第二项练习”关，其目标类型（change-distance / compare-orders / compare-events）与本课主搭建不同，可观察结果（停下的步数、换场景的位置、开口的位置/对白、开始方式）与主搭建关不同",
+        "任何一课都没有两个相邻关卡的目标程序（可观察结果）完全相同；只重复运行同一程序的关卡被删除或合并；每课保留 TQ-010 的纠错关",
+        "第3课改为“走到小兔子身边再打招呼”，第6课的练习比较在森林和草地说话的不同，第8课的练习比较“开始时”与“被点击时”，不再与前一课逐块相同",
+        "练习面板：预测类先选猜测再运行，运行成功后显示猜对/实际结果；比较类运行成功后回答“哪里不一样”，答错可重选；只有满足条件且真实运行成功才能完成本关；新增 testid practice-task / practice-setup / practice-question / practice-answer-<id> / practice-answer-reply / practice-need-guess / practice-need-answer / practice-done，原有 testid 与无障碍名称不变；花园“先猜一猜”只在第7课主搭建与纠错关出现，不再在第8～9课重复",
+        "文案只引用真实积木标签（block-labels），角色名与舞台一致（第1～6课小狐狸、第7～9课蝴蝶且不说“走”），课程进度称“关”、“步”只用于距离",
+        "单测：每课恰好一个练习关且目标类型与主搭建不同、相邻关目标程序不相同、练习参考程序通过而主搭建程序不通过、问题只有一个正确答案、文案标签/角色/关步检查；组件测试覆盖练习面板；E2E 覆盖至少两个新练习并更新第1～9课通关流程"
+      ],
+      "evidence": {},
+      "notes": "TQ-002 建议修复第 5 项（TQ-002e）。课程成熟度仍为 L3，不因本任务升级；未经儿童试学。不含：单元作品（TQ-002f）、评价与证据（TQ-002g）。"
+    },
+    {
       "id": "UX-001",
       "title": "设计Tokens规范化",
       "priority": "P0",
