@@ -8,6 +8,7 @@ import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { useCourseAccess } from '@/features/billing/use-course-access'
 import { MapView } from '@/features/lessons/map-view'
+import { useBackScrollRestore } from '@/features/lessons/use-back-scroll-restore'
 import { CharacterArt } from '@/features/lessons/playable-stage/character-art'
 import {
   defaultOnboardingSession,
@@ -41,6 +42,11 @@ export default function LearnMapPage() {
     () => defaultOnboardingSession,
   )
   const recommendedLevel = onboarding.recommendedLevel ?? 'starter'
+  // UX-104: lesson cards are plain <a> links (UX-003), so Back re-loads
+  // this document. Its pre-hydration markup (default guest progress) can
+  // be shorter than the hydrated map, which makes the browser clamp the
+  // restored scroll. Re-apply the offset once the real map has rendered.
+  useBackScrollRestore('learn-map')
   // UX-102: the "next lesson" CTA must point at a lesson the child can
   // actually play. Prefer the first incomplete lesson the real access
   // rule allows; only when every remaining lesson is locked does the
