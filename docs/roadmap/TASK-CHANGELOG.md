@@ -255,3 +255,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-20 | TQ-009 | 前 9 课积木语义与文案对齐：block-labels 单一来源（“向右走/飞 100 步”“重复：再走/飞 100 步”），第 1～12 课文案引用真实积木名、角色名一致，第 5 课去掉无用“说一句话”，课堂进度改称“关”，舞台显示已走步数、终点角色不重叠；地图返回滚动恢复（ux-104）。课程仍 L3 | [#97](https://github.com/HelloMrDuan/kidsCoding/pull/97) | `96bf91cb93881bfaa6261ebf6f658908e98815fb` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39405396354) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39405396336) | completed |
+
+## TQ-010 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-20 | TQ-010 | 前 9 课每课一个纠错关（TQ-002d）：mistake-steps 单一来源，第 1～9 课各替换一个重复关为“真实错误 → 观察 → 回答 → 修复”关（课程仍 5 关），积木区自动摆好错误程序、可“再摆一次错误程序”；设计内错误运行不显示“哎呀”框、不计入提示升级；重置类按钮（重置、再摆一次错误程序、补救页再排一次/再试一次、格子课回到起点）改用 aria-hidden SVG 图标替换“↺”；正反例单测、组件测试与 L01/L05/L07 纠错关 E2E。课程仍 L3 | [#99](https://github.com/HelloMrDuan/kidsCoding/pull/99) | `3b2dee21a032b69199e1156b31e729d410b7a632` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39429034193) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39429034297) | completed |
