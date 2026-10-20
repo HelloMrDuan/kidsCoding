@@ -80,7 +80,9 @@ export async function solveMistakeStep(
     await expect(page.getByTestId('garden-await-click')).toBeVisible()
     await page.getByTestId('stage-character-main').click()
   }
-  await expect(page.getByTestId('stage-run-error')).toHaveAttribute('data-failure-code', options.expectCode, { timeout: 20_000 })
+  // The designed wrong run is the experiment: a neutral note, never the failure-style “哎呀” box.
+  await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code', options.expectCode, { timeout: 20_000 })
+  await expect(page.getByTestId('stage-run-error')).toHaveCount(0)
   await expect(page.getByTestId('mistake-observed')).toBeVisible()
   // The designed mistake is the experiment, not a failed attempt: no hint tier is raised.
   await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
@@ -89,6 +91,9 @@ export async function solveMistakeStep(
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('先回答舞台上的问题')
   await page.getByTestId(`mistake-answer-${options.answer}`).click()
   await expect(page.getByTestId('mistake-fix')).toBeVisible()
+  // Answered right: still no “哎呀” box under the panel.
+  await expect(page.getByTestId('mistake-run-result')).toContainText('你看懂啦')
+  await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('哎呀')
   await page.getByTestId('lesson-clear-program').click()
   for (const type of options.fix) await page.getByTestId(`lesson-add-${type}`).click()
   await page.getByTestId('run-code-button').click()

@@ -223,6 +223,20 @@ export function getMistakeStepAt(lessonId: string, stepIndex: number): MistakeSt
   return BY_INDEX.get(`${lessonId}|${stepIndex}`)
 }
 
+/**
+ * TQ-010: is this failed run the designed experiment rather than a real failed attempt?
+ * Only the run that first shows the designed failure is the experiment (it is what “observes”
+ * the mistake). Every later failed run — including running the wrong program again — is a real
+ * attempt and gets the normal failure feedback and hint escalation.
+ */
+export function isDesignedMistakeRun(
+  design: MistakeStepDesign | undefined,
+  code: RunFailureCode | null | undefined,
+  observed: boolean,
+): boolean {
+  return Boolean(design && !observed && code === design.expectedCode)
+}
+
 /** Every piece of child-facing copy of a design (for copy checks). */
 export function mistakeStepCopy(design: MistakeStepDesign) {
   return [

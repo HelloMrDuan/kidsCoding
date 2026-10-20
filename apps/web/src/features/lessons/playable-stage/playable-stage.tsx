@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
-import type { MistakeStepDesign } from '@/content/curriculum/mistake-steps'
+import { isDesignedMistakeRun, type MistakeStepDesign } from '@/content/curriculum/mistake-steps'
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
+import { ResetIcon } from '@/features/ui/reset-icon'
 import { evaluateObservable, type JudgeOptions, type ProgramBlock, type RunFailureCode } from '../blockly/observable-run'
 import { motionVerbForTemplate, motionWord } from '../blockly/block-labels'
 import { explainRunFailure } from '../blockly/run-feedback'
@@ -96,8 +97,12 @@ export function PlayableStage({
   stepIndex: number
   onRunSuccess: () => void
   onRunClear?: () => void
-  /** TQ-008: a real run failed; the kid-friendly reason comes from the judge result. */
-  onRunFailure?: (failure: { code: RunFailureCode | null; message: string }) => void
+  /**
+   * TQ-008: a run failed; the kid-friendly reason comes from the judge result.
+   * TQ-010: `designedMistake` marks the designed wrong run of a mistake step (the experiment,
+   * not a failed attempt).
+   */
+  onRunFailure?: (failure: { code: RunFailureCode | null; message: string; designedMistake?: boolean }) => void
   judgeOptions?: JudgeOptions
   /** TQ-010: this step is the lesson's designed mistake → observe → fix step. */
   mistake?: MistakeStepDesign
@@ -138,7 +143,9 @@ export function PlayableStage({
   const mainId = template?.starterCharacters[0] ?? 'fox'
   const pickedChoice = mistake?.choices.find((choice) => choice.id === mistakeAnswer)
   const mistakeAnswered = Boolean(pickedChoice?.correct)
-  const designedFailure = Boolean(mistake && failureCode === mistake.expectedCode)
+  // TQ-010: decided when “运行” is pressed (the verdict depends only on the blocks), so the
+  // designed wrong run never shows the failure-style “哎呀” box — the mistake panel explains it.
+  const [designedRun, setDesignedRun] = useState(false)
   const secondId = template?.starterCharacters[1]
 
   useEffect(() => {
@@ -150,11 +157,12 @@ export function PlayableStage({
   useEffect(() => {
     if (executionState !== 'error' || reportedAttemptRef.current === attemptId) return
     reportedAttemptRef.current = attemptId
-    onRunFailure?.({ code: failureCode, message: kidReason })
-  }, [executionState, attemptId, onRunFailure, failureCode, kidReason])
+    onRunFailure?.(mistake ? { code: failureCode, message: kidReason, designedMistake: designedRun } : { code: failureCode, message: kidReason })
+  }, [executionState, attemptId, onRunFailure, failureCode, kidReason, mistake, designedRun])
 
   function handleRun() {
     setAttemptId((id) => id + 1)
+    setDesignedRun(isDesignedMistakeRun(mistake, failureCode, mistakeObserved))
     void run()
   }
 
@@ -222,7 +230,10 @@ export function PlayableStage({
           </div>
           {executionState==='success' && prediction ? (
             <p data-testid="garden-reflection" className="mt-3 text-sm font-semibold text-amber-900">
-              {prediction==='needs-click'?'你预测对了：点击事件发生后，积木才开始执行。':'观察到了吗？只有点击蝴蝶后程序才执行，再想想“被点击时”的意义。'}
+              {/* TQ-010: in the mistake step the guess was about the wrong “开始时” program, so it is not graded here. */}
+              {mistake && mistake.wrongProgram[0]?.type === 'when_start'
+                ? '你亲眼看到了：用“开始时”，蝴蝶自己就飞；换成“被点击时”，它会等你点。'
+                : prediction==='needs-click'?'你预测对了：点击事件发生后，积木才开始执行。':'观察到了吗？只有点击蝴蝶后程序才执行，再想想“被点击时”的意义。'}
             </p>
           ) : null}
         </div>
@@ -252,7 +263,7 @@ export function PlayableStage({
           ) : null}
           {onReloadMistake ? (
             <button type="button" data-testid="mistake-reload" className="kc-action-surface kc-btn-outline kc-btn-sm mt-2"
-              disabled={executionState === 'running'} onClick={onReloadMistake}>↺ 再摆一次错误程序</button>
+              disabled={executionState === 'running'} onClick={onReloadMistake}><ResetIcon size={13} />再摆一次错误程序</button>
           ) : null}
         </div>
       ) : null}
@@ -262,12 +273,16 @@ export function PlayableStage({
                 程序已准备，但蝴蝶还没动。现在请亲自点击舞台上的蝴蝶！
               </div>
             ):null}
-            {executionState === 'error' && (
+            {executionState === 'error' && mistake && designedRun ? (
+              <div className="kc-feedback" data-failure-code={failureCode ?? undefined} data-testid="mistake-run-result">
+                {mistakeAnswered ? '👍 你看懂啦！照上面 🛠 的办法修好程序，再运行一次。' : '🔍 这就是错误程序运行的样子。看看舞台，回答上面的问题吧！'}
+              </div>
+            ) : executionState === 'error' ? (
               <div className="kc-feedback kc-feedback-error" data-failure-code={failureCode ?? undefined} data-testid="stage-run-error">
-                <p className="kc-feedback-title">{designedFailure && !mistakeAnswered ? '🔍 出错啦！看看舞台上发生了什么。' : '🤔 哎呀，差一点点！'}</p>
+                <p className="kc-feedback-title">🤔 哎呀，差一点点！</p>
                 <p className="mt-1" data-testid="stage-run-reason">{kidReason}</p>
               </div>
-            )}
+            ) : null}
 
             {executionState === 'success' && (mistake && !(mistakeObserved && mistakeAnswered) ? (
               <div className="kc-feedback" data-testid="mistake-need-observe">
@@ -299,7 +314,8 @@ export function PlayableStage({
             disabled={executionState === 'running'}
             data-testid="reset-code-button"
           >
-            ↺ 重置
+            <ResetIcon />
+            重置
           </button>
         </div>
       </div>

@@ -209,10 +209,11 @@ export default function LessonPage() {
     setHasRunSuccess(true)
     if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('本关角色结果与学习活动已验证。看看两条轨道，再完成这一关。')
   }, [lessonId, setHasRunSuccess, setFeedback])
-  const handleRunFailure = useCallback((failure?: { code: string | null }) => {
-    // TQ-010: running the designed wrong program is the experiment, not a failed attempt.
+  const handleRunFailure = useCallback((failure?: { code: string | null; designedMistake?: boolean }) => {
+    // TQ-010: running the designed wrong program is the experiment, not a failed attempt
+    // (also when it is run again after “再摆一次错误程序”). The stage decides which run that is.
     const design = getMistakeStepAt(lessonId ?? '', stepIndex)
-    if (design && !mistakeObservedRef.current && failure?.code === design.expectedCode) {
+    if (design && failure?.designedMistake) {
       mistakeObservedRef.current = true
       setMistakeObserved(true)
       return
@@ -310,7 +311,9 @@ export default function LessonPage() {
     const correct=duoLesson ? hasRunSuccess : evaluateStep(step.requiredBlockTypes,blocksRef.current,judgeOptions)
     if (mistakeStep && !mistakeObserved) {
       // TQ-010: the designed mistake has to be seen on stage before it can be fixed.
-      setFeedback(`先按舞台上的运行按钮，看看摆好的这段程序会让${getMainCharacterLabel(currentTemplate)}怎样，再来修好它。`)
+      // Garden steps name their real stage button (「启动点击程序」), not a generic “运行”.
+      const runButton = step.requiredBlockTypes[0] === 'when_clicked' ? '「启动点击程序」' : '运行按钮'
+      setFeedback(`先按舞台上的${runButton}，看看摆好的这段程序会让${getMainCharacterLabel(currentTemplate)}怎样，再来修好它。`)
       return
     }
     if (mistakeStep && !mistakeStep.choices.some((choice) => choice.id === mistakeAnswer && choice.correct)) {

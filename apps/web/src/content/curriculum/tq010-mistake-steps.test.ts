@@ -11,7 +11,7 @@ import { getStepJudgeOptions } from '@/features/lessons/blockly/step-judge-optio
 import { restoreBlockSequence } from '@/features/lessons/blockly/restore-block-sequence'
 
 import { launchLessons, launchTemplates } from './launch-lessons'
-import { getMistakeStep, getMistakeStepAt, mistakeStepCopy, mistakeSteps } from './mistake-steps'
+import { getMistakeStep, getMistakeStepAt, isDesignedMistakeRun, mistakeStepCopy, mistakeSteps } from './mistake-steps'
 
 /**
  * TQ-010 (= TQ-002d): each Blockly lesson 01–09 has exactly one designed
@@ -137,6 +137,19 @@ describe('TQ-010 one designed mistake step per lesson 01–09', () => {
       const { step } = stepOf(design.lessonId, design.stepId)
       expect(restoreBlockSequence(design.wrongProgram, step.allowedBlocks), design.lessonId).toEqual(design.wrongProgram)
       expect(restoreBlockSequence(design.fixedProgram, step.allowedBlocks), design.lessonId).toEqual(design.fixedProgram)
+    }
+  })
+
+  it('only the first designed wrong run is the experiment; every later failed run is a real attempt', () => {
+    for (const design of mistakeSteps) {
+      // First run showing the designed failure = the experiment (observes the mistake).
+      expect(isDesignedMistakeRun(design, design.expectedCode, false)).toBe(true)
+      // After observing, any failed run (even the same wrong program again) is a real attempt.
+      expect(isDesignedMistakeRun(design, design.expectedCode, true)).toBe(false)
+      // A different failure is never the experiment.
+      expect(isDesignedMistakeRun(design, design.expectedCode === 'missing-start' ? 'say-too-early' : 'missing-start', false)).toBe(false)
+      expect(isDesignedMistakeRun(design, null, false)).toBe(false)
+      expect(isDesignedMistakeRun(undefined, design.expectedCode, false)).toBe(false)
     }
   })
 

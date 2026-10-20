@@ -100,8 +100,8 @@ test('TQ-010: lesson 1 第 5 关 — the pre-built program without “开始时�
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
   // Run it: the fox does not move, and the stage says why.
   await page.getByTestId('run-code-button').click()
-  await expect(page.getByTestId('stage-run-error')).toHaveAttribute('data-failure-code','missing-start',{timeout:12_000})
-  await expect(page.getByTestId('stage-run-reason')).toContainText('小狐狸还没听到出发口令')
+  await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code','missing-start',{timeout:12_000})
+  await expect(page.getByTestId('stage-run-error')).toHaveCount(0)
   await expect(page.getByTestId('stage-walked-distance')).toContainText('小狐狸已走 0 步')
   await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
   await expect(page.getByTestId('mistake-question')).toContainText('按了运行，小狐狸怎么了？')
@@ -111,6 +111,9 @@ test('TQ-010: lesson 1 第 5 关 — the pre-built program without “开始时�
   await expect(page.getByTestId('mistake-fix')).toHaveCount(0)
   await page.getByTestId('mistake-answer-stayed').click()
   await expect(page.getByTestId('mistake-fix')).toContainText('把“开始时”放到“向右走 100 步”上面')
+  // The child answered right: nothing under the panel may read as “you were wrong”.
+  await expect(page.getByTestId('mistake-run-result')).toContainText('你看懂啦')
+  await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('哎呀')
   // Fix by tapping “开始时”: it snaps on top of the headless move block.
   await page.getByTestId('lesson-add-when_start').click()
   await page.getByTestId('run-code-button').click()

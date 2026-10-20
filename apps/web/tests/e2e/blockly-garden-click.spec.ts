@@ -125,7 +125,9 @@ test('TQ-008/TQ-010: lesson 9 第 5 关 rejects replying before flying with a sp
   await page.getByTestId('garden-predict-click').click()
   await page.getByTestId('run-code-button').click()
   await page.getByTestId('stage-character-main').click()
-  await expect(page.getByTestId('stage-run-reason')).toContainText('说话说早啦',{timeout:20_000})
+  // The designed run is the experiment: no failure-style “哎呀” box, the panel asks what happened.
+  await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code','say-too-early',{timeout:20_000})
+  await expect(page.getByTestId('stage-run-error')).toHaveCount(0)
   await expect(page.getByTestId('mistake-observed')).toBeVisible()
   await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
   await page.getByTestId('lesson-complete-step').click()
@@ -135,6 +137,8 @@ test('TQ-008/TQ-010: lesson 9 第 5 关 rejects replying before flying with a sp
   await page.getByTestId('run-code-button').click()
   await page.getByTestId('stage-character-main').click()
   await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier','1',{timeout:20_000})
+  await expect(page.getByTestId('stage-run-reason')).toContainText('说话说早啦')
+  await expect(page.getByTestId('stage-run-error')).toContainText('哎呀')
 })
 
 test('TQ-009: the butterfly flies — lesson 9 blocks, palette, stage and feedback say “飞”, never “走”',async({page})=>{
@@ -178,15 +182,16 @@ test('TQ-010: lesson 7 第 3 关 — “开始时” makes the butterfly fly wit
   await page.getByTestId('run-code-button').click()
   // No click: it never waits — the butterfly flies by itself.
   await expect(page.getByTestId('garden-await-click')).toHaveCount(0)
-  await expect(page.getByTestId('stage-run-error')).toHaveAttribute('data-failure-code','needs-click-trigger',{timeout:20_000})
+  await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code','needs-click-trigger',{timeout:20_000})
+  await expect(page.getByTestId('stage-run-error')).toHaveCount(0)
   await expect(page.getByTestId('stage-walked-distance')).toContainText('小蝴蝶已飞 100 步')
-  await expect(page.getByTestId('stage-run-reason')).toContainText('换成“被点击时”开头')
   await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
   await expect(page.getByTestId('mistake-question')).toContainText('你还没点蝴蝶，它怎么了？')
   await page.getByTestId('mistake-answer-waited').click()
   await expect(page.getByTestId('mistake-answer-reply')).toContainText('蝴蝶已经飞了 100 步')
   await page.getByTestId('mistake-answer-flew-alone').click()
   await expect(page.getByTestId('mistake-fix')).toContainText('把“开始时”换成“被点击时”')
+  await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('哎呀')
   await page.getByTestId('lesson-clear-program').click()
   await page.getByTestId('lesson-add-when_clicked').click()
   await page.getByTestId('lesson-add-move_right').click()
