@@ -273,3 +273,4 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-21 | OPS-006 | 本地 Supabase CLI 路径助手改按目标平台拼路径（win32/posix），三个脚本测试的跨平台期望修正（精确相等断言未放宽）；Linux 受影响文件 13/13、全量 Vitest 661/661（修复前 656/661） | [#102](https://github.com/HelloMrDuan/kidsCoding/pull/102) | `2f26130b0a4b32d6b650fdabb756df3b07a847e1` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489646) / [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489645) | **completed**；Windows 主机行为不变（宿主恒等于目标）；无遗留 |
+| TQ-012 | Blockly E2E 移动端与三标签页布局对齐：助手与三规格插入 showLessonPane 切换，移动端 15/15、桌面 15/15（本地真实 Chromium），PR #106 CI 8/8 后合并入 tq-011 并经部署代理上线复测；状态 merged_waiting_ci，随 tq-011 入 main 并通过 main CI 后转 completed |
