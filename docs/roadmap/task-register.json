@@ -484,7 +484,7 @@
       "title": "前9课单元作品可运行、可保存、可重开修改",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "TQ-011"
       ],
@@ -496,7 +496,16 @@
         "未完成课堂不能打开完成页作品",
         "单测+E2E 覆盖保存→重开→修改，手机无横向滚动"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/108",
+        "prNumber": 108,
+        "tests": [
+          "apps/web/src/content/curriculum/tq012-unit-projects.test.ts（15 例：第1～9课配置、第3/6/9课两种可观察不同方案都通过、错误顺序/对白放错场景的具体错因、拒绝外课对白与本课未提供的积木、文案只引用真实积木标签）",
+          "apps/web/src/features/lessons/playable-stage/unit-project.test.tsx（7 例：打开已存快照、选择课提示、运行通过才可保存、改动后须重跑、失败运行不可保存、保存后重开恢复对白与顺序、存储写满如实报错）",
+          "apps/web/src/features/progress/project-snapshot.test.ts（4 例：对白字段、旧快照兼容、合并形状）",
+          "apps/web/tests/e2e/unit-project.spec.ts（9 例：未完成锁定、L03 保存→刷新→重开→另一方案、L06 场景对白、L09 两种顺序、存储写满、1440 保存区首屏、375 保存按钮可见、375 无横向滚动、课堂完成带入程序）"
+        ]
+      },
       "notes": "TQ-002 建议修复第 6 项（TQ-002f）。课程成熟度仍为 L3，不因本任务升级；未经儿童试学。"
     },
     {
