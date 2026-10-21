@@ -484,7 +484,7 @@
       "title": "前9课单元作品可运行、可保存、可重开修改",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "TQ-011"
       ],
@@ -499,6 +499,12 @@
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/108",
         "prNumber": 108,
+        "mergeCommit": "768f29720cef4ae5bf4ac9f01f27dc1e4c53e37a",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39608931445",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39608931176",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39606598232",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39606598159",
+        "reviewer": "owner（HelloMrDuan）2026-10-21 确认截图后同意合并",
         "tests": [
           "apps/web/src/content/curriculum/tq012-unit-projects.test.ts（15 例：第1～9课配置、第3/6/9课两种可观察不同方案都通过、错误顺序/对白放错场景的具体错因、拒绝外课对白与本课未提供的积木、文案只引用真实积木标签）",
           "apps/web/src/features/lessons/playable-stage/unit-project.test.tsx（7 例：打开已存快照、选择课提示、运行通过才可保存、改动后须重跑、失败运行不可保存、保存后重开恢复对白与顺序、存储写满如实报错）",

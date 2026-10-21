@@ -273,3 +273,9 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-21 | OPS-006 | 本地 Supabase CLI 路径助手改按目标平台拼路径（win32/posix），三个脚本测试的跨平台期望修正（精确相等断言未放宽）；Linux 受影响文件 13/13、全量 Vitest 661/661（修复前 656/661） | [#102](https://github.com/HelloMrDuan/kidsCoding/pull/102) | `2f26130b0a4b32d6b650fdabb756df3b07a847e1` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489646) / [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489645) | **completed**；Windows 主机行为不变（宿主恒等于目标）；无遗留 |
+
+## TQ-012 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-21 | TQ-012 | 前 9 课单元作品（TQ-002f）：unit-projects 单一来源，第 1～9 课完成页作品可运行、可本机保存、可重开修改，替换静态预览；第 3/6/9 课孩子可选对白/在哪里说/先后顺序，两种不同方案都判为正确；改动后须重新运行通过才能保存，存储写满如实报错，未完成课堂不能打开作品；快照带所选对白并兼容旧快照；1440 保存区首屏、375 分页且无横向滚动；完成页/完成卡 V2 视觉；单测、组件测试与 unit-project E2E。课程仍 L3，未经儿童试学 | [#108](https://github.com/HelloMrDuan/kidsCoding/pull/108) | `768f29720cef4ae5bf4ac9f01f27dc1e4c53e37a` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39608931445) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39608931176) | completed |
