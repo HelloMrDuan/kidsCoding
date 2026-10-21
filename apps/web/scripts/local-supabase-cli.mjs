@@ -1,6 +1,6 @@
 import { constants } from 'node:fs'
 import { access } from 'node:fs/promises'
-import { join } from 'node:path'
+import { posix, win32 } from 'node:path'
 
 export const SUPABASE_CLI_VERSION = '2.84.6'
 
@@ -53,12 +53,23 @@ export function getSupabaseCliTarget(
   return target
 }
 
+// The binary/version paths describe where a *target* platform CLI lives,
+// so they must be joined with the target platform separator rules, not the
+// host rules. On a real machine host and target always match, so behaviour
+// there is unchanged; the helpers are now deterministic on every host,
+// which keeps the tests platform-independent.
+function joinForTarget(target, ...segments) {
+  return target.directoryName.startsWith('windows')
+    ? win32.join(...segments)
+    : posix.join(...segments)
+}
+
 export function getSupabaseCliBinaryPath(repoRoot, target) {
-  return join(repoRoot, '.tools', 'supabase', target.directoryName, target.binaryName)
+  return joinForTarget(target, repoRoot, '.tools', 'supabase', target.directoryName, target.binaryName)
 }
 
 export function getSupabaseCliVersionFile(repoRoot, target) {
-  return join(repoRoot, '.tools', 'supabase', target.directoryName, '.version')
+  return joinForTarget(target, repoRoot, '.tools', 'supabase', target.directoryName, '.version')
 }
 
 export async function resolveSupabaseCliExecutable({
