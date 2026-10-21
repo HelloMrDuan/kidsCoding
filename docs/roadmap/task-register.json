@@ -154,6 +154,32 @@
       "notes": "InstaBox 预发布部署验收中发现；源码改为按目标平台拼路径，测试期望按平台形式修正。"
     },
     {
+      "id": "OPS-007",
+      "title": "多分支自动部署流水线（push 触发构建→GHCR→InstaBox 部署代理）",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-001"
+      ],
+      "scope": ".github/workflows/deploy.yml 与 deploy/Dockerfile.web；认领分支 feat/deploy-pipeline；任意分支 push 触发测试与 GHCR 镜像构建，PR 仅运行测试不构建镜像",
+      "acceptance": [
+        "push 到任意分支自动运行测试并构建锁定完整 SHA 的 GHCR 镜像（标签含 slug 化分支 channel），PR 事件不构建镜像、不引用部署密钥",
+        "镜像构建沿用已验证的 deploy/Dockerfile.web（上下文 apps/web）；流水线与本 PR CI 全绿后方可合并"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/OPS007PR",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "Local: deploy.yml YAML parse OK; Dockerfile.web matches the deployment-proven Dockerfile stages",
+          "Local: ops007_register.py dry-run against a register copy OK (OPS-007 inserted once, JSON valid)"
+        ],
+        "reviewer": null
+      },
+      "notes": ""
+    },
+    {
       "id": "TQ-001",
       "title": "逐课教学审核表与评分工具",
       "priority": "P0",
