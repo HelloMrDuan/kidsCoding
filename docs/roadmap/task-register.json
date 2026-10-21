@@ -2108,7 +2108,7 @@
       "title": "Blockly E2E 移动端与三标签页布局对齐",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "dependencies": [
         "TQ-011"
       ],
@@ -2119,7 +2119,9 @@
         "diff 只包含 tests/e2e 下的测试文件与本台账条目；未删除、跳过或放宽任何断言，未修改应用源码"
       ],
       "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/106"
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/106",
+        "mergeCommit": "6a637259d02dc4469e61b643fad847af790b1f42",
+        "tests": "本地真实 Chromium（修复工作树 webServer 构建）：移动端三规格 15/15、桌面端 15/15（修复前移动端 13 failed/2 passed）；PR #106 CI 8/8 全绿后合并入 tq-011（6a637259），部署代理自动上线，线上移动端复测 15/15"
       }
     }
   ]
