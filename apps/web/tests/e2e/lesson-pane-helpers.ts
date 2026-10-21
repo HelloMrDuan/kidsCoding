@@ -26,6 +26,7 @@ const overlaps = (a: Box, b: Box) =>
  * name tags never overlap — so a child always sees the friend they travelled to.
  */
 export async function expectStageWalk(page: Page, steps: number) {
+  await showLessonPane(page, 'stage')
   const main = page.getByTestId('stage-character-main')
   const friend = page.getByTestId('stage-character-friend')
   await expect(main).toHaveAttribute('data-steps', String(steps))
@@ -77,6 +78,7 @@ export async function solveMistakeStep(
     wrongWaitsForClick?: boolean
   },
 ) {
+  await showLessonPane(page, 'stage')
   await expect(page.getByTestId('mistake-task')).toBeVisible()
   await expect(page.getByTestId('mistake-setup')).toBeVisible()
   if (options.predict ?? options.garden) await page.getByTestId('garden-predict-click').click()
@@ -100,8 +102,10 @@ export async function solveMistakeStep(
   // Answered right: still no “哎呀” box under the panel.
   await expect(page.getByTestId('mistake-run-result')).toContainText('你看懂啦')
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('哎呀')
+  await showLessonPane(page, 'code')
   await page.getByTestId('lesson-clear-program').click()
   for (const type of options.fix) await page.getByTestId(`lesson-add-${type}`).click()
+  await showLessonPane(page, 'stage')
   await page.getByTestId('run-code-button').click()
   if (options.garden) {
     await expect(page.getByTestId('garden-await-click')).toBeVisible()
@@ -135,6 +139,7 @@ export async function solvePracticeStep(
     click?: boolean
   },
 ) {
+  await showLessonPane(page, 'stage')
   const task = page.getByTestId('practice-task')
   await expect(task).toBeVisible()
   await expect(task).toHaveAttribute('data-goal-type', options.goalType)
@@ -152,8 +157,10 @@ export async function solvePracticeStep(
   } else {
     await expect(page.getByTestId('practice-question')).toHaveCount(0)
   }
+  await showLessonPane(page, 'code')
   if (options.clear) await page.getByTestId('lesson-clear-program').click()
   for (const type of options.build) await page.getByTestId(`lesson-add-${type}`).click()
+  await showLessonPane(page, 'stage')
   await page.getByTestId('run-code-button').click()
   if (options.click) {
     await expect(page.getByTestId('garden-await-click')).toBeVisible()
