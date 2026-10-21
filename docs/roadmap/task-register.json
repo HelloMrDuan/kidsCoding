@@ -132,7 +132,7 @@
       "title": "本地 Supabase CLI 脚本测试跨平台修复",
       "priority": "P1",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-001"
       ],
@@ -143,15 +143,16 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/102",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "2f26130b0a4b32d6b650fdabb756df3b07a847e1",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489646",
         "tests": [
-          "Linux: affected 3 files 13/13 passed",
-          "Linux: full Vitest 661/661 on main baseline (was 656/661 with the 5 platform failures)"
+          "PR #102 CI 8/8 green (curriculum + task-ledger)",
+          "main CI task-ledger: https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489645",
+          "Linux: affected 3 files 13/13; full Vitest 661/661 on main baseline (was 656/661)"
         ],
         "reviewer": null
       },
-      "notes": "InstaBox 预发布部署验收中发现；源码改为按目标平台拼路径，测试期望按平台形式修正。"
+      "notes": "InstaBox 预发布部署验收中发现并修复；已合并且 main CI 通过。Windows 主机行为不变（真实使用时宿主恒等于目标）。"
     },
     {
       "id": "OPS-007",
