@@ -1,3 +1,5 @@
+import { join } from 'node:path'
+
 import { describe, expect, it, vi } from 'vitest'
 
 import {
@@ -47,7 +49,7 @@ SERVICE_ROLE_KEY=service-local-key
     })
 
     expect(resolveCli).toHaveBeenCalledWith({
-      repoRoot: 'D:\\pyprograms\\kidsCoding',
+      repoRoot: join('D:/pyprograms/kidsCoding/apps/web', '..', '..'),
     })
 
     expect(exec.mock.calls).toEqual([
@@ -84,7 +86,7 @@ SERVICE_ROLE_KEY=service-local-key
     ])
 
     expect(writeEnv).toHaveBeenCalledWith(
-      'D:\\pyprograms\\kidsCoding\\apps\\web\\.env.local',
+      join('D:/pyprograms/kidsCoding/apps/web', '.env.local'),
       expect.objectContaining({
         NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
         NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'anon-local-key',
