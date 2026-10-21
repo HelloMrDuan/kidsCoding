@@ -52,9 +52,11 @@ export default function ProjectCompletePage() {
   // really completed on this device (same gate as the graduation show).
   const unitProject = getUnitProject(lesson.id)
   if (unitProject && (!progress.completedLessonIds.includes(lesson.id) || snapshotBlocks.length === 0)) {
-    return <main className="min-h-screen bg-amber-50 p-6"><section className="mx-auto max-w-xl rounded-3xl bg-white p-6" data-testid="unit-project-locked">
-      <h1 className="text-2xl font-bold">这个作品还没有完成</h1><p className="my-4 leading-7">本机还没有这节课的作品。请先回课堂完成练习，作品会自动保存在这里。</p>
-      <Link className="inline-flex min-h-11 items-center rounded-full bg-emerald-800 px-5 text-white" href={`/learn/lesson/${lesson.id}`}>回课堂完成这节课</Link>
+    // V2 surface: kc-panel card + kc-action-surface button (same as the unit project itself).
+    return <main className="min-h-screen p-6"><section className="kc-panel mx-auto max-w-xl p-6" data-testid="unit-project-locked">
+      <span className="kc-task-mark">我的单元作品</span>
+      <h1 className="mt-3 text-2xl font-bold">《{unitProject.title}》还没有做好</h1><p className="kc-text-muted my-4 leading-7">这台电脑上还没有这节课的作品。先回课堂学完这节课，作品就会出现在这里。</p>
+      <Link className="kc-action-surface inline-flex min-h-11 items-center" href={`/learn/lesson/${lesson.id}`}>回课堂完成这节课</Link>
     </section></main>
   }
   const completionCopy = buildProjectCompletionCopy(lesson.id)

@@ -73,7 +73,7 @@ export function UnitProject({ lessonId, initialBlocks }: { lessonId: string; ini
   }, [])
   const onSuccess = useCallback(() => {
     setPassed(true)
-    setMessage('运行成功！现在可以保存这个作品啦。')
+    setMessage('点“保存我的作品”，下次打开还能接着玩。')
   }, [])
   const onClear = useCallback(() => setPassed(false), [])
 
