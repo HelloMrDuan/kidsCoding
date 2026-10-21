@@ -2102,6 +2102,25 @@
         "reviewer": null
       },
       "notes": ""
+    },
+    {
+      "id": "TQ-012",
+      "title": "Blockly E2E 移动端与三标签页布局对齐",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_review",
+      "dependencies": [
+        "TQ-011"
+      ],
+      "scope": "移动视口下课堂为任务/积木/舞台三标签页布局（V2 冻结设计），仅活动页可见；Blockly E2E 族（blockly-first-run、blockly-second-practice、blockly-meadow-journey 及共享助手 lesson-pane-helpers）按桌面布局书写、从未做标签页切换，导致移动端 13/15 失败且仓库 CI 不跑移动端项目而长期未被发现。本任务只改测试代码：在助手函数（expectStageWalk、solveMistakeStep、solvePracticeStep）与各规格的跨页交互点插入既有 showLessonPane 切换（桌面下为无操作），不改任何断言、不改应用代码与视觉设计。",
+      "acceptance": [
+        "真实 Chromium 移动端项目下 blockly-first-run 4/4、blockly-second-practice 与 blockly-meadow-journey 全部通过（修复前合计 13 失败/2 通过）",
+        "桌面项目下同一组规格保持全绿，无回归",
+        "diff 只包含 tests/e2e 下的测试文件与本台账条目；未删除、跳过或放宽任何断言，未修改应用源码"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/106"
+      }
     }
   ]
 }
