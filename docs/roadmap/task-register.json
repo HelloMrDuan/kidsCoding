@@ -448,7 +448,7 @@
       "title": "前9课第二项不同练习与去重",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-010"
       ],
@@ -461,7 +461,21 @@
         "文案只引用真实积木标签（block-labels），角色名与舞台一致（第1～6课小狐狸、第7～9课蝴蝶且不说“走”），课程进度称“关”、“步”只用于距离",
         "单测：每课恰好一个练习关且目标类型与主搭建不同、相邻关目标程序不相同、练习参考程序通过而主搭建程序不通过、问题只有一个正确答案、文案标签/角色/关步检查；组件测试覆盖练习面板；E2E 覆盖至少两个新练习并更新第1～9课通关流程"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/101",
+        "mergeCommit": "0e76f5456dca0cb4861cb4a0290e168395a0af62",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571407684",
+        "tests": [
+          "apps/web/src/content/curriculum/tq011-practice-steps.test.ts（21 例：每课恰好一个练习关且目标类型与主搭建不同、保留 TQ-010 纠错关、参考程序通过且与主搭建可观察结果不同、相邻关目标程序不相同、每课 4 关、第3/6/8课不再逐块重复、问题只有一个正确答案、预测/比较答案与舞台一致、文案标签/角色/关步检查、花园“先猜一猜”只在第7课）",
+          "apps/web/src/features/lessons/playable-stage/playable-stage-practice.test.tsx（6 例：L01 先猜后运行停在 200 步、停早为真实失败及具体错因、L06 比较题答对才完成、L08 开始时与被点击时对比、第8～9课点击关不再先猜）",
+          "apps/web/tests/e2e/blockly-second-practice.spec.ts（L04 预测换场景位置、L08 比较开始时与被点击时、L06 森林说话对比、各视口积木区从顶部完整显示）；其余第1～9课通关 E2E 更新为 4 关流程"
+        ],
+        "reviewer": "owner（HelloMrDuan）2026-10-21 确认截图后同意合并",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571407732",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39569417115",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39569416976",
+        "prNumber": 101
+      },
       "notes": "TQ-002 建议修复第 5 项（TQ-002e）。课程成熟度仍为 L3，不因本任务升级；未经儿童试学。不含：单元作品（TQ-002f）、评价与证据（TQ-002g）。"
     },
     {

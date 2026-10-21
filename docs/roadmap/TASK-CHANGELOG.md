@@ -261,3 +261,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-20 | TQ-010 | 前 9 课每课一个纠错关（TQ-002d）：mistake-steps 单一来源，第 1～9 课各替换一个重复关为“真实错误 → 观察 → 回答 → 修复”关（课程仍 5 关），积木区自动摆好错误程序、可“再摆一次错误程序”；设计内错误运行不显示“哎呀”框、不计入提示升级；重置类按钮（重置、再摆一次错误程序、补救页再排一次/再试一次、格子课回到起点）改用 aria-hidden SVG 图标替换“↺”；正反例单测、组件测试与 L01/L05/L07 纠错关 E2E。课程仍 L3 | [#99](https://github.com/HelloMrDuan/kidsCoding/pull/99) | `3b2dee21a032b69199e1156b31e729d410b7a632` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39429034193) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39429034297) | completed |
+
+## TQ-011 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-21 | TQ-011 | 前 9 课第二项不同练习与去重（TQ-002e）：practice-steps 单一来源，前 9 课每课 4 关：热身、主任务、不同目标的新练习（预测距离/比较顺序/比较开始时与被点击时）、纠错；删除重复关；积木区从顶部完整显示与手机宽度适配；L06 切换场景清气泡、草地独立背景；花园小花可见；正反例单测、组件测试与第二项练习 E2E。课程仍 L3，未经儿童试学 | [#101](https://github.com/HelloMrDuan/kidsCoding/pull/101) | `0e76f5456dca0cb4861cb4a0290e168395a0af62` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571407684) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571407732) | completed |
