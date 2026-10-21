@@ -1,3 +1,5 @@
+import { join } from 'node:path'
+
 import { describe, expect, it, vi } from 'vitest'
 
 import {
@@ -90,7 +92,7 @@ describe('downloadSupabaseCliArchive', () => {
 describe('getSupabaseCliTempRoot', () => {
   it('keeps temporary downloads inside the repository tools directory', () => {
     expect(getSupabaseCliTempRoot('D:/pyprograms/kidsCoding')).toBe(
-      'D:\\pyprograms\\kidsCoding\\.tools\\.tmp',
+      join('D:/pyprograms/kidsCoding', '.tools', '.tmp'),
     )
   })
 })

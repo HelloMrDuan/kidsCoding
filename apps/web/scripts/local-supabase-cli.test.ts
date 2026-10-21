@@ -39,7 +39,7 @@ describe('resolveSupabaseCliExecutable', () => {
         exists,
       }),
     ).resolves.toEqual({
-      file: 'D:\\pyprograms\\kidsCoding\\.tools\\supabase\\linux-x64\\supabase',
+      file: 'D:/pyprograms/kidsCoding/.tools/supabase/linux-x64/supabase',
       source: 'repo-tools',
       version: SUPABASE_CLI_VERSION,
     })
