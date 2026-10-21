@@ -170,7 +170,7 @@ export const practiceSteps: readonly PracticeStepDesign[] = [
     setup: `这次不去草地：要拼成“开始时 → ${MOVE_NAME} → ${REPEAT_NAME}”。先猜一猜小狐狸停在哪里，再点「清空积木重拼」拼好、按“运行”。`,
     question: `${MOVE}后面接${REPEAT}，小狐狸停在哪里？`,
     choices: [
-      { id: 'beside-bird', label: '走 200 步，停在草地小鸟身边', correct: true, reply: '猜对啦！重复积木让小狐狸再走 100 步，一共 200 步，还在森林里。' },
+      { id: 'beside-bird', label: '走 200 步，停在小鸟身边', correct: true, reply: '猜对啦！重复积木让小狐狸再走 100 步，一共 200 步，还在森林里。' },
       { id: 'stay-100', label: '只走 100 步', correct: false, reply: '看看舞台：重复积木又走了 100 步，小狐狸已走 200 步。' },
     ],
     hint: `这一关不用“切换场景”：${MOVE}后面直接接${REPEAT}。`,
@@ -190,7 +190,7 @@ export const practiceSteps: readonly PracticeStepDesign[] = [
     question: '和上一关比，小狐狸说的话一样吗？',
     choices: [
       { id: 'different-line', label: '不一样：在森林说“你好！”，在草地说“我到草地啦！”', correct: true, reply: '对！“说一句话”放在森林里，小狐狸说“你好！”；放到草地，它就说“我到草地啦！”。' },
-      { id: 'same-line', label: '一样，都说“我到草地啦！”', correct: false, reply: '再看看舞台：这次小狐狸在森林里开口，说的是“你好！”。' },
+      { id: 'same-line', label: '一样，都说“我到草地啦！”', correct: false, reply: '再看看舞台：这次小狐狸还在森林时就开口了，说的是“你好！”；到了草地，它没有再说话。' },
     ],
     hint: `把“说一句话”放在${MOVE}和“切换场景”中间，${REPEAT}放在最后。`,
     done: '你发现啦：同一块“说一句话”，放在不同的地方，故事就不一样。',

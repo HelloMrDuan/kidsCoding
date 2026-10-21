@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 
 import { getFoundationUnitByLessonId } from '@/content/curriculum/foundation-units'
 import { getMistakeStep, getMistakeStepAt } from '@/content/curriculum/mistake-steps'
-import { asksClickPrediction, getPracticeStepFor, isPracticeAnswered } from '@/content/curriculum/practice-steps'
+import { asksClickPrediction, getPracticeStepAt, getPracticeStepFor, isPracticeAnswered } from '@/content/curriculum/practice-steps'
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
@@ -136,6 +136,11 @@ export default function LessonPage() {
           setBlocks(resumedMistake.wrongProgram)
         }
         setLocalSaveState(draft ? 'saved' : 'unsaved')
+        // TQ-011: resuming at the practice or mistake step, the main build is already done —
+        // “刚完成的小结果” shows that result, not the lesson's opening instruction.
+        if (getPracticeStepAt(lessonId, lastStep) || resumedMistake) {
+          setFeedback(getFoundationLessonFeedback(lessonId, 'progress'))
+        }
         return
       }
 
@@ -237,6 +242,16 @@ export default function LessonPage() {
     if (lessonId) setLocalSaveState(saveLessonDraft(lessonId, stepIndex, wrong) ? 'saved' : 'failed')
     setWorkspaceVersion((version) => version + 1)
   }, [lessonId, stepIndex, setHasRunSuccess, setWorkspaceVersion])
+  // TQ-011: once the child answers, the “先回答/先猜一猜” nudge is no longer true; show the
+  // last real result again instead of a stale instruction.
+  const handlePracticeAnswer = useCallback((answerId: string) => {
+    setPracticeAnswer(answerId)
+    setFeedback((current) =>
+      current.startsWith('先回答舞台上的问题') || current.startsWith('先在舞台上猜一猜')
+        ? getFoundationLessonFeedback(lessonId ?? '', 'progress')
+        : current,
+    )
+  }, [lessonId, setPracticeAnswer, setFeedback])
   const handleRunClear=useCallback(() => {
     setHasRunSuccess(false)
     if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('先运行积木，观察两个朋友的实际位置，再完成本关学习活动。')
@@ -368,7 +383,8 @@ export default function LessonPage() {
     if (stepIndex < currentLesson.steps.length - 1) {
       clearLessonDraft(currentLesson.id, stepIndex)
       goToStep(stepIndex + 1)
-      setFeedback(getFoundationLessonFeedback(currentLesson.id, 'progress'))
+      // TQ-011: after the practice the result is the practice's own (not the main build's again).
+      setFeedback(practiceStep ? practiceStep.done : getFoundationLessonFeedback(currentLesson.id, 'progress'))
       return
     }
 
@@ -528,7 +544,7 @@ export default function LessonPage() {
                     onRunSuccess={handleRunSuccess} onRunClear={handleRunClear} onRunFailure={handleRunFailure}
                     mistake={mistakeStep} mistakeObserved={mistakeObserved} mistakeAnswer={mistakeAnswer}
                     onMistakeAnswer={setMistakeAnswer} onReloadMistake={mistakeStep ? handleReloadMistake : undefined}
-                    practice={practiceStep} practiceAnswer={practiceAnswer} onPracticeAnswer={setPracticeAnswer}
+                    practice={practiceStep} practiceAnswer={practiceAnswer} onPracticeAnswer={handlePracticeAnswer}
                     askClickPrediction={asksClickPrediction(currentLesson.id, step.id)}/>
                 ) : (
                   <PreviewStage blocks={blocks} template={currentTemplate}/>

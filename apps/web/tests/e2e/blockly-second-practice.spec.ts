@@ -1,5 +1,5 @@
 import {expect,test,type Page} from '@playwright/test'
-import {expectStageWalk} from './lesson-pane-helpers'
+import {expectProgramFromTop,expectStageWalk,showLessonPane} from './lesson-pane-helpers'
 
 /**
  * TQ-011 (= TQ-002e): each Blockly lesson 01–09 has one second practice whose goal differs
@@ -65,6 +65,8 @@ test('TQ-011: lesson 8 第 3 关 — compare “开始时” with “被点击�
   await expect(task).toHaveAttribute('data-goal-type','compare-events')
   await expect(task).toContainText('新练习：换成“开始时”比一比')
   await expect(page.getByTestId('lesson-task-card')).toContainText('把开头换成“开始时”')
+  // “刚完成的小结果” is the main build's result, not the lesson's opening instruction.
+  await expect(page.getByTestId('lesson-feedback-preview')).toHaveText('现在，蝴蝶已经会先飞再说了。')
   // Lesson 8 does not repeat lesson 7's click prediction; the comparison question waits for a run.
   await expect(page.getByTestId('garden-prediction')).toHaveCount(0)
   await expect(page.getByTestId('practice-question')).toHaveCount(0)
@@ -90,6 +92,8 @@ test('TQ-011: lesson 8 第 3 关 — compare “开始时” with “被点击�
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('先回答舞台上的问题：和上一关比，蝴蝶有什么不一样？')
   await page.getByTestId('practice-answer-still-waits').click()
   await expect(page.getByTestId('practice-answer-reply')).toContainText('你没点蝴蝶，它一运行就飞了 100 步')
+  // Answered: the “先回答” nudge is gone.
+  await expect(page.getByTestId('lesson-feedback-preview')).not.toContainText('先回答舞台上的问题')
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 关')
   await page.getByTestId('practice-answer-no-wait').click()
@@ -99,6 +103,8 @@ test('TQ-011: lesson 8 第 3 关 — compare “开始时” with “被点击�
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
   await expect(page.getByTestId('mistake-task')).toBeVisible()
+  // The result just finished is this practice's own finding.
+  await expect(page.getByTestId('lesson-feedback-preview')).toHaveText('你发现啦：开头的积木决定蝴蝶什么时候开始表演。')
 })
 
 test('TQ-011: lesson 6 第 3 关 — speaking in the forest changes what the fox says; the journey stays the same',async({page})=>{
@@ -111,13 +117,55 @@ test('TQ-011: lesson 6 第 3 关 — speaking in the forest changes what the fox
   await expect(page.getByTestId('practice-question')).toHaveCount(0)
   await page.getByTestId('lesson-clear-program').click()
   for(const type of ['when_start','move_right','say_line','switch_scene','repeat_twice'])await page.getByTestId('lesson-add-'+type).click()
+  // The forest line is seen while the stage is still the forest (polled every frame: the bubble lasts ~0.5 s) …
+  const saidInForest=page.waitForFunction(()=>document.querySelector('[data-testid=stage-character-main] .kc-stage-speech')?.textContent?.includes('你好！')&&document.querySelector('[data-testid=stage-current-scene]')?.textContent?.includes('森林'),null,{timeout:20_000})
   await page.getByTestId('run-code-button').click()
+  await saidInForest
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:25_000})
   await expect(page.getByTestId('stage-current-scene')).toContainText('草地')
   await expectStageWalk(page,200)
-  await expect(page.getByTestId('stage-character-main')).toContainText('你好！')
+  // … and “切换场景” leaves it behind: the meadow shows no old forest bubble (TQ-011).
+  await expect(page.getByTestId('stage-character-main').locator('.kc-stage-speech')).toHaveCount(0)
   await page.getByTestId('practice-answer-different-line').click()
   await expect(page.getByTestId('practice-done')).toBeVisible()
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
 })
+
+/**
+ * TQ-011 fix: when a step loads its program (carried over into 第 3 关, the pre-built wrong
+ * program of 第 4 关) or the child rebuilds it with the buttons after “清空积木重拼”, the whole
+ * program is visible from the top of the workspace — the first block is never cut off.
+ */
+const VIEWPORTS=[{name:'desktop',width:1440,height:900},{name:'tablet',width:768,height:1024},{name:'phone',width:375,height:812}] as const
+const LOADED_PROGRAMS=[
+  {lessonId:'lesson-08-garden-dialogue',stepIndex:2,blocks:['when_clicked','move_right','say_line'],rebuild:['when_start','move_right','say_line']},
+  {lessonId:'lesson-04-meadow-scene',stepIndex:2,blocks:['when_start','move_right','switch_scene'],rebuild:['when_start','move_right','move_right','switch_scene']},
+  {lessonId:'lesson-06-meadow-story',stepIndex:2,blocks:['when_start','move_right','switch_scene','repeat_twice','say_line'],rebuild:['when_start','move_right','say_line','switch_scene','repeat_twice']},
+  {lessonId:'lesson-01-forest-hello',stepIndex:3,blocks:['move_right'],rebuild:null},
+  {lessonId:'lesson-07-garden-click',stepIndex:3,blocks:['when_start','move_right'],rebuild:null},
+] as const
+for(const viewport of VIEWPORTS){
+  test.describe(`on ${viewport.name}`,()=>{
+    test.use({viewport:{width:viewport.width,height:viewport.height},hasTouch:viewport.width<500})
+    test(`TQ-011: loaded and rebuilt programs show from the top of the workspace on ${viewport.name}`,async({page})=>{
+      test.setTimeout(180_000)
+      for(const item of LOADED_PROGRAMS){
+        await page.goto('/learn/catalog')
+        await page.evaluate(({lessonId,stepIndex,blocks})=>{
+          sessionStorage.clear()
+          sessionStorage.setItem(`kc-lesson-draft:${lessonId}:${stepIndex}`,JSON.stringify({schemaVersion:1,lessonId,stepIndex,blocks:blocks.map((type)=>({type})),updatedAt:new Date().toISOString()}))
+        },{lessonId:item.lessonId,stepIndex:item.stepIndex,blocks:[...item.blocks]})
+        await page.goto('/learn/lesson/'+item.lessonId)
+        await expect(page.getByTestId('lesson-task-card')).toContainText(`第 ${item.stepIndex+1} 关`)
+        await expectProgramFromTop(page)
+        if(item.rebuild){
+          await page.getByTestId('lesson-clear-program').click()
+          for(const type of item.rebuild)await page.getByTestId('lesson-add-'+type).click()
+          await expectProgramFromTop(page)
+        }
+        await showLessonPane(page,'task')
+      }
+    })
+  })
+}

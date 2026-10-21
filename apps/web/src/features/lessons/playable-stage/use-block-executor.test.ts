@@ -98,6 +98,16 @@ describe('useBlockExecutor', () => {
     expect(result.current.characterMessage).toBe('我到草地啦！')
   },12000)
 
+  it('TQ-011: switching scene clears a line said before the switch (no forest bubble in the meadow)',async()=>{
+    const sequence=['when_start','move_right','say_line','switch_scene','repeat_twice']
+    const {result}=renderHook(()=>useBlockExecutor(sequence.map(type=>({type})),sequence))
+    await act(async()=>{await result.current.run()})
+    expect(result.current.executionState).toBe('success')
+    expect(result.current.stageScene).toBe('meadow')
+    expect(result.current.characterPosition).toBe(200)
+    expect(result.current.characterMessage).toBeNull()
+  },12000)
+
   it('SYS-103: an equivalent program reaches the same observed goal and succeeds',async()=>{
     const goal=['when_start','move_right','switch_scene','repeat_twice','say_line']
     const blocks=[{type:'when_start'},{type:'move_right'},{type:'switch_scene'},{type:'move_right'},{type:'say_line'}]

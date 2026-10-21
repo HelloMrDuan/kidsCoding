@@ -3,7 +3,7 @@ import {expectStageWalk,solveMistakeStep,solvePracticeStep} from './lesson-pane-
 
 type Mistake={expectCode:string;answer:string;fix:string[]}
 type Practice=Parameters<typeof solvePracticeStep>[1]
-type Expect={scene:'森林'|'草地';walk:number;say?:string}
+type Expect={scene:'森林'|'草地';walk:number;say?:string;noBubble?:boolean}
 /** TQ-011: warm-up → main build → second practice (第 3 关) → designed mistake (第 4 关). */
 async function play(page:Page,id:string,adds:Record<number,string[]>,practice:Practice,mistake:Mistake,expects:Expect[]){
   await page.goto('/learn/lesson/'+id)
@@ -20,6 +20,8 @@ async function play(page:Page,id:string,adds:Record<number,string[]>,practice:Pr
     await expect(page.getByTestId('stage-current-scene')).toContainText(expects[step].scene)
     await expectStageWalk(page,expects[step].walk)
     if(expects[step].say)await expect(page.getByTestId('stage-character-main')).toContainText(expects[step].say!)
+    // TQ-011: a line said before “切换场景” does not follow the fox into the meadow.
+    if(expects[step].noBubble)await expect(page.getByTestId('stage-character-main').locator('.kc-stage-speech')).toHaveCount(0)
     await page.getByTestId('lesson-complete-step').click()
   }
   await page.waitForURL('**/project/'+id+'/complete')
@@ -47,7 +49,7 @@ test('lesson 6 executes movement, scene change, repetition and speech in order',
     // TQ-011: speak in the forest instead and compare what the fox says.
     {goalType:'compare-orders',clear:true,build:['when_start','move_right','say_line','switch_scene','repeat_twice'],wrongAnswer:'same-line',answer:'different-line'},
     {expectCode:'scene-switch-late',answer:'too-far',fix:['when_start','move_right','switch_scene','repeat_twice','say_line']},
-    [{scene:'草地',walk:200},{scene:'草地',walk:200,say:'我到草地啦！'},{scene:'草地',walk:200,say:'你好！'},{scene:'草地',walk:200,say:'我到草地啦！'}])
+    [{scene:'草地',walk:200},{scene:'草地',walk:200,say:'我到草地啦！'},{scene:'草地',walk:200,noBubble:true},{scene:'草地',walk:200,say:'我到草地啦！'}])
 })
 
 test('TQ-009: lesson 5 blocks and stage say exactly what happens (向右走 100 步, repeat walks again after the scene switch)',async({page})=>{

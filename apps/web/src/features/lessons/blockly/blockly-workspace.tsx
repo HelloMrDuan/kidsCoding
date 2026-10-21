@@ -29,14 +29,24 @@ const SCROLLBAR_ALLOWANCE = 16
  * (never below MIN_FIT_SCALE, never above BASE_SCALE) and scroll it back to the top-left so
  * the whole block, dropdown text included, stays visible. A program that already fits is
  * left exactly where it is.
+ *
+ * TQ-011: when the program itself is set (a step loads its program — prebuilt or carried
+ * over — or a button adds/removes a block, e.g. after “清空积木重拼”), `fromTop` always
+ * scrolls the stack back to the top-left with a small margin, so the first block
+ * (“开始时”/“被点击时”) is never cut off at the top edge. Dragging keeps the child's view.
  */
-function fitBlocksToView(workspace: Blockly.WorkspaceSvg) {
-  if (workspace.isDragging() || workspace.getTopBlocks(false).length === 0) return
+/** Returns false only when the fit must wait (mid-drag or hidden pane). */
+function fitBlocksToView(workspace: Blockly.WorkspaceSvg, fromTop = false): boolean {
+  if (workspace.isDragging()) return false
+  if (workspace.getTopBlocks(false).length === 0) return true
   const box = workspace.getBlocksBoundingBox()
   const contentWidth = box.right - box.left
   const contentHeight = box.bottom - box.top
-  if (contentWidth <= 0 || contentHeight <= 0) return
+  if (contentWidth <= 0 || contentHeight <= 0) return true
   const metrics = workspace.getMetricsManager()
+  const pixelView = metrics.getViewMetrics(false)
+  // Hidden pane (phone tabs): nothing to fit yet; try again when it is shown.
+  if (pixelView.width <= 0 || pixelView.height <= 0) return false
   const view = metrics.getViewMetrics(true)
   const allowance = SCROLLBAR_ALLOWANCE / workspace.scale
   const fullyVisible =
@@ -44,18 +54,30 @@ function fitBlocksToView(workspace: Blockly.WorkspaceSvg) {
     box.top >= view.top &&
     box.right <= view.left + view.width - allowance &&
     box.bottom <= view.top + view.height - allowance
-  const pixelView = metrics.getViewMetrics(false)
+  // The flyout zooms with the workspace, so the view narrows as the scale grows: solve the
+  // width fit with the flyout's width at the target scale, not at the current one.
+  const flyoutWidth = workspace.getFlyout()?.getWidth() ?? 0
   const fitScale = Math.min(
     BASE_SCALE,
-    (pixelView.width - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) / contentWidth,
+    (pixelView.width + flyoutWidth - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) /
+      (contentWidth + flyoutWidth / workspace.scale),
     (pixelView.height - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) / contentHeight,
   )
   const targetScale = Math.max(MIN_FIT_SCALE, fitScale)
   const canGrowBack = workspace.scale < BASE_SCALE - 0.01 && targetScale > workspace.scale + 0.01
-  if (fullyVisible && !canGrowBack) return
+  if (fullyVisible && !canGrowBack && !fromTop) return true
   if (Math.abs(workspace.scale - targetScale) > 0.01) workspace.setScale(targetScale)
   const scale = workspace.scale
-  workspace.scroll(FIT_MARGIN - box.left * scale, FIT_MARGIN - box.top * scale)
+  // Still too wide (clamped at MIN_FIT_SCALE, or the flyout grew with the new scale, which
+  // narrows the view): trim the left margin (not below 0) so the right edge stays clear of
+  // the scrollbar; the top keeps its margin. Re-read the view, since setScale changes it.
+  const viewWidth = metrics.getViewMetrics(false).width
+  const leftMargin = Math.min(
+    FIT_MARGIN,
+    Math.max(0, viewWidth - SCROLLBAR_ALLOWANCE - contentWidth * scale),
+  )
+  workspace.scroll(leftMargin - box.left * scale, FIT_MARGIN - box.top * scale)
+  return true
 }
 
 /** TQ-009: show this lesson's wording (“走” or “飞”) on a move/repeat block. */
@@ -149,6 +171,7 @@ export function BlocklyWorkspace({
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
+  const showFromTopRef = useRef<(() => void) | null>(null)
   const latestBlocksRef = useRef(blocks)
   const choicesKey = sayLineChoices?.map((choice) => `${choice.id}:${choice.text}`).join('|') ?? ''
   const choicesRef = useRef(sayLineChoices)
@@ -229,10 +252,16 @@ export function BlocklyWorkspace({
     })
 
     let fitFrame = 0
-    const scheduleFit = () => {
+    // The program loaded with the step is shown from the top until the child moves it.
+    let pendingFromTop = true
+    const scheduleFit = (fromTop = false) => {
+      if (fromTop) pendingFromTop = true
       cancelAnimationFrame(fitFrame)
-      fitFrame = requestAnimationFrame(() => fitBlocksToView(workspace))
+      fitFrame = requestAnimationFrame(() => {
+        if (fitBlocksToView(workspace, pendingFromTop)) pendingFromTop = false
+      })
     }
+    showFromTopRef.current = () => scheduleFit(true)
 
     const handleResize = () => {
       Blockly.svgResize(workspace)
@@ -267,6 +296,7 @@ export function BlocklyWorkspace({
 
     return () => {
       cancelAnimationFrame(fitFrame)
+      showFromTopRef.current = null
       resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
       workspace.removeChangeListener(handleChange)
@@ -314,6 +344,7 @@ export function BlocklyWorkspace({
     }
 
     onSnapshotChange(snapshotOf(workspace))
+    showFromTopRef.current?.()
   }
 
   function chooseLine(lineId: string) {
@@ -334,6 +365,7 @@ export function BlocklyWorkspace({
     while (tail.getNextBlock()) tail = tail.getNextBlock() as Blockly.BlockSvg
     tail.dispose(false)
     onSnapshotChange(snapshotOf(workspace))
+    showFromTopRef.current?.()
   }
 
   return (

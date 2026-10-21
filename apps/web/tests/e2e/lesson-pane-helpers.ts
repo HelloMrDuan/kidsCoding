@@ -174,3 +174,38 @@ export async function solvePracticeStep(
   }
   await expect(page.getByTestId('practice-done')).toBeVisible()
 }
+
+/**
+ * TQ-011: a step that loads or sets its program (carried over, pre-built, or rebuilt with the
+ * buttons after “清空积木重拼”) shows the whole program from the top-left of the Blockly
+ * workspace: every block sits inside the visible workspace (right of the flyout, above the
+ * bottom edge) and the first block (“开始时”/“被点击时”) starts near the top — never cut off.
+ */
+export async function expectProgramFromTop(page: Page) {
+  await showLessonPane(page, 'code')
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const root = document.querySelector('[data-testid="lesson-blockly-workspace"]')
+          const svg = root?.querySelector('svg.blocklySvg')
+          const view = svg?.querySelector('.blocklyMainBackground')?.getBoundingClientRect()
+          const flyout = root?.querySelector('svg.blocklyFlyout')?.getBoundingClientRect()
+          const canvas = svg?.querySelector('.blocklyBlockCanvas')
+          const tops = canvas ? Array.from(canvas.children).filter((node) => node.classList.contains('blocklyDraggable')) : []
+          if (!view || view.width === 0 || tops.length === 0) return 'missing'
+          const left = flyout && flyout.width > 0 ? Math.max(view.left, flyout.right) : view.left
+          let highest = Infinity
+          for (const node of tops) {
+            const box = node.getBoundingClientRect()
+            highest = Math.min(highest, box.top)
+            if (box.top < view.top || box.left < left - 1 || box.bottom > view.bottom || box.right > view.right) {
+              return `cut: block ${Math.round(box.left)},${Math.round(box.top)}–${Math.round(box.right)},${Math.round(box.bottom)} view ${Math.round(left)},${Math.round(view.top)}–${Math.round(view.right)},${Math.round(view.bottom)}`
+            }
+          }
+          return highest - view.top <= 48 ? 'ok' : `not from top: ${Math.round(highest - view.top)}px down`
+        }),
+      { timeout: 10_000 },
+    )
+    .toBe('ok')
+}

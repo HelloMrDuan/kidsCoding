@@ -74,10 +74,13 @@ describe('PlayableStage second practice (TQ-011)', () => {
     expect(screen.queryByTestId('practice-question')).toBeNull()
     expect(screen.getByTestId('run-code-button')).toBeEnabled()
     fireEvent.click(screen.getByTestId('run-code-button'))
+    // Spoken in the forest: the fox says the forest line while the stage is still the forest …
+    await waitFor(() => expect(screen.getByTestId('stage-character-main')).toHaveTextContent('你好！'), { timeout: 4000, interval: 20 })
+    expect(screen.getByTestId('stage-current-scene')).toHaveTextContent('森林')
     await waitFor(() => expect(onRunSuccess).toHaveBeenCalled(), { timeout: 6000 })
-    // Spoken in the forest: the fox says the forest line, and the story still ends in the meadow.
-    expect(screen.getByTestId('stage-character-main')).toHaveTextContent('你好！')
+    // … and the story ends in the meadow without the old forest bubble (TQ-011).
     expect(screen.getByTestId('stage-current-scene')).toHaveTextContent('草地')
+    expect(screen.getByTestId('stage-character-main')).not.toHaveTextContent('你好！')
     expect(screen.getByTestId('practice-question')).toHaveTextContent('比一比：和上一关比，小狐狸说的话一样吗？')
     expect(screen.getByTestId('practice-need-answer')).toHaveTextContent('运行成功了！先回答上面的问题')
     fireEvent.click(screen.getByTestId('practice-answer-same-line'))
