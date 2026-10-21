@@ -1,6 +1,6 @@
 import { LESSON_COMPLETION_STARS } from '@/features/rewards/award-lesson-completion'
 
-import { normalizeProjectSnapshots } from './project-snapshot'
+import { normalizeProjectSnapshots, type SnapshotBlock } from './project-snapshot'
 
 export function mergeGuestSnapshot({
   snapshot,
@@ -16,7 +16,7 @@ export function mergeGuestSnapshot({
       projectSnapshots?: Array<{
         lessonId: string
         updatedAt: string
-        blocks: Array<{ type: string }>
+        blocks: SnapshotBlock[]
       }>
     }
   }

@@ -1,6 +1,6 @@
 import type { LaunchLessonDefinition } from '@/features/domain/types'
 import type { GuestProgress } from '@/features/progress/local-progress'
-import { normalizeProjectSnapshots } from '@/features/progress/project-snapshot'
+import { normalizeProjectSnapshots, type SnapshotBlock } from '@/features/progress/project-snapshot'
 
 type CompleteLaunchLessonInput = {
   lesson: LaunchLessonDefinition
@@ -11,7 +11,7 @@ type CompleteLaunchLessonInput = {
     badgeIds: string[]
     cardIds: string[]
   }
-  blocks: Array<{ type: string }>
+  blocks: SnapshotBlock[]
   updatedAt: string
 }
 

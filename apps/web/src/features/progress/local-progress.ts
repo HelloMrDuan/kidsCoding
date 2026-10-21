@@ -1,3 +1,5 @@
+import type { SnapshotBlock } from './project-snapshot'
+
 export const GUEST_PROGRESS_STORAGE_KEY = 'kc-progress'
 const CHANGE_EVENT = 'kc-progress-change'
 
@@ -12,7 +14,8 @@ export type GuestProgress = {
   projectSnapshots: Array<{
     lessonId: string
     updatedAt: string
-    blocks: Array<{ type: string }>
+    /** TQ-012: say blocks may carry the chosen preset `line`; older entries have `type` only. */
+    blocks: SnapshotBlock[]
   }>
 }
 

@@ -6,7 +6,7 @@ import { MAX_PROGRAM_BLOCKS, type ObservableVerdict } from './observable-run'
  * a 5–7 year old can act on. Every message names what to change, never “和要求一样”.
  */
 export function explainRunFailure(
-  verdict: Pick<ObservableVerdict, 'code' | 'goal' | 'actual'>,
+  verdict: Pick<ObservableVerdict, 'code' | 'goal' | 'actual'> & { reason?: string },
   actor = '小狐狸',
   /** TQ-009: the butterfly flies, so its feedback says “飞” and quotes the “飞” blocks. */
   verb: MotionVerb = 'walk',
@@ -57,6 +57,11 @@ export function explainRunFailure(
       return '这一关先不用说话，把“说一句话”拿走吧～'
     case 'wrong-line':
       return `${actor}这次要说“${goal?.message ?? ''}”哦。`
+    case 'unknown-line':
+      return '这句对白找不到啦，在“选一句对白”里重新挑一句吧。'
+    case 'line-wrong-place':
+      // TQ-012: the judge names the line and a line that fits the scene.
+      return verdict.reason || '这句话和现在的地方不搭哦，换一句，或者换个地方说吧。'
     case 'say-too-early':
       return `${actor}说话说早啦！先${go}到位，再开口。`
     case 'say-too-late':
