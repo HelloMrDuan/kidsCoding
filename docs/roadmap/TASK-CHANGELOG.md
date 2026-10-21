@@ -267,3 +267,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-21 | TQ-011 | 前 9 课第二项不同练习与去重（TQ-002e）：practice-steps 单一来源，前 9 课每课 4 关：热身、主任务、不同目标的新练习（预测距离/比较顺序/比较开始时与被点击时）、纠错；删除重复关；积木区从顶部完整显示与手机宽度适配；L06 切换场景清气泡、草地独立背景；花园小花可见；正反例单测、组件测试与第二项练习 E2E。课程仍 L3，未经儿童试学 | [#101](https://github.com/HelloMrDuan/kidsCoding/pull/101) | `0e76f5456dca0cb4861cb4a0290e168395a0af62` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571407684) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571407732) | completed |
+
+## OPS-006 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-21 | OPS-006 | 本地 Supabase CLI 路径助手改按目标平台拼路径（win32/posix），三个脚本测试的跨平台期望修正（精确相等断言未放宽）；Linux 受影响文件 13/13、全量 Vitest 661/661（修复前 656/661） | [#102](https://github.com/HelloMrDuan/kidsCoding/pull/102) | `2f26130b0a4b32d6b650fdabb756df3b07a847e1` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489646) / [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489645) | **completed**；Windows 主机行为不变（宿主恒等于目标）；无遗留 |
