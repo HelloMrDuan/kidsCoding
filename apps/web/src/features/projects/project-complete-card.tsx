@@ -88,7 +88,7 @@ export function ProjectCompleteCard({
           className="kc-panel-3d p-5"
           data-testid="project-complete-lite-card"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-orange-500">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--kc-action)]">
             完成这一课
           </p>
           <h1
@@ -117,14 +117,14 @@ export function ProjectCompleteCard({
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button
-              className="kc-button-3d inline-flex items-center justify-center rounded-full bg-[#ff8b4e] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_28px_rgba(255,139,78,0.28)] transition hover:bg-[#ff7b38]"
+              className="kc-action-surface min-h-12 text-lg"
               onClick={onReplay}
               type="button"
             >
               回看我的作品
             </button>
             <Link
-              className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800 transition hover:bg-slate-50"
+              className="kc-action-surface kc-btn-outline min-h-12 text-lg"
               href={primaryHref}
             >
               {primaryLabel}
@@ -189,14 +189,14 @@ export function ProjectCompleteCard({
 
           <div className="flex flex-col gap-3">
             <button
-              className="kc-button-3d inline-flex items-center justify-center rounded-full bg-[#ff8b4e] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_28px_rgba(255,139,78,0.28)] transition hover:bg-[#ff7b38]"
+              className="kc-action-surface min-h-12 text-lg"
               onClick={onReplay}
               type="button"
             >
               回看我的作品
             </button>
             <Link
-              className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-4 text-lg font-bold text-slate-800 transition hover:bg-slate-50"
+              className="kc-action-surface kc-btn-outline min-h-12 text-lg"
               href={primaryHref}
             >
               {primaryLabel}
