@@ -101,7 +101,7 @@ export function UnitProject({ lessonId, initialBlocks }: { lessonId: string; ini
   const visible = (id: Pane) => (pane === id ? 'kc-mobile-visible' : '')
 
   return (
-    <div className="kc-unit-project" data-testid="unit-project" data-lesson-id={lessonId} data-passed={String(passed)}>
+    <div className="kc-unit-project" data-pane={pane} data-testid="unit-project" data-lesson-id={lessonId} data-passed={String(passed)}>
       <div className="kc-unit-brief">
         <span className="kc-task-mark">我的单元作品</span>
         <h2>{project.title}</h2>
@@ -131,7 +131,7 @@ export function UnitProject({ lessonId, initialBlocks }: { lessonId: string; ini
       </div>
 
       <div className="kc-unit-grid">
-        <section className={`kc-lesson-col kc-unit-pane ${visible('stage')}`} id="unit-pane-stage" role="tabpanel" aria-label="舞台">
+        <section className={`kc-lesson-col kc-unit-pane kc-unit-pane-stage ${visible('stage')}`} id="unit-pane-stage" role="tabpanel" aria-label="舞台">
           <PlayableStage
             askClickPrediction={false}
             blocks={blocks}
@@ -144,7 +144,7 @@ export function UnitProject({ lessonId, initialBlocks }: { lessonId: string; ini
             template={template}
           />
         </section>
-        <section className={`kc-lesson-col kc-unit-pane ${visible('code')}`} id="unit-pane-code" role="tabpanel" aria-label="积木">
+        <section className={`kc-lesson-col kc-unit-pane kc-unit-pane-code ${visible('code')}`} id="unit-pane-code" role="tabpanel" aria-label="积木">
           <div className="p-3">
             <BlocklyWorkspace
               allowedBlocks={[...project.allowedBlocks]}
@@ -156,26 +156,28 @@ export function UnitProject({ lessonId, initialBlocks }: { lessonId: string; ini
             />
           </div>
         </section>
-      </div>
-
-      <div className="kc-unit-save">
-        <p
-          className={saveState === 'error' ? 'kc-unit-status kc-unit-status-error' : 'kc-unit-status'}
-          data-save-state={saveState}
-          data-testid="unit-save-status"
-          role="status"
-        >
-          {message}
-        </p>
-        <button
-          className="kc-action-surface disabled:cursor-not-allowed disabled:opacity-60"
-          data-testid="unit-save-project"
-          disabled={!passed}
-          onClick={save}
-          type="button"
-        >
-          保存我的作品
-        </button>
+        {/* One save area for every layout: in the grid it sits in the stage column right under
+            运行/重置 (≥769px); on phones/tablets it follows the open pane (舞台 or 积木) and
+            sticks to the bottom while the child edits blocks. */}
+        <div className="kc-unit-save" data-testid="unit-save-area">
+          <p
+            className={saveState === 'error' ? 'kc-unit-status kc-unit-status-error' : 'kc-unit-status'}
+            data-save-state={saveState}
+            data-testid="unit-save-status"
+            role="status"
+          >
+            {message}
+          </p>
+          <button
+            className="kc-action-surface disabled:cursor-not-allowed disabled:opacity-60"
+            data-testid="unit-save-project"
+            disabled={!passed}
+            onClick={save}
+            type="button"
+          >
+            保存我的作品
+          </button>
+        </div>
       </div>
     </div>
   )

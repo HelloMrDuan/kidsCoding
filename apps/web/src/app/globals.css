@@ -390,13 +390,31 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-unit-brief h2 { font-size: 19px; font-weight: 800; line-height: 1.43; margin: 10px 0 6px; color: var(--kc-text); }
 .kc-unit-brief p { color: #526079; font-size: 13px; line-height: 1.8; }
 .kc-unit-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+/* Stage + save stack in the left column, blocks span both rows on the right, so the
+   save button sits right under 运行/重置 instead of below the (taller) Blockly column. */
 .kc-unit-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: 'stage code' 'save code';
   gap: 12px;
 }
+.kc-unit-pane-stage { grid-area: stage; }
+.kc-unit-pane-code { grid-area: code; }
 .kc-unit-tabs { display: none; }
-.kc-unit-save { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.kc-unit-save {
+  grid-area: save;
+  align-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--kc-surface);
+  border: 1px solid var(--kc-line);
+  border-radius: var(--kc-radius-pane);
+}
 .kc-unit-status { flex: 1 1 220px; font-size: 13px; line-height: 1.7; color: #526079; }
 .kc-unit-status-error { color: var(--kc-danger); font-weight: 700; }
 @media (max-width: 768px) {
@@ -420,7 +438,19 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     flex: 1;
   }
   .kc-unit-tabs button[aria-selected='true'] { color: #fff; background: var(--kc-action); }
+  .kc-unit-save { margin-top: 12px; }
   .kc-unit-save .kc-action-surface { width: 100%; }
+  /* While editing in 积木 the save area stays in reach at the bottom of the screen. */
+  .kc-unit-project[data-pane='code'] .kc-unit-save {
+    position: sticky;
+    bottom: 8px;
+    z-index: 5;
+    box-shadow: var(--kc-shadow-panel);
+  }
+}
+/* ≤600px the shell's fixed bottom nav (.kc-mobile-bottom) covers the last 62px. */
+@media (max-width: 600px) {
+  .kc-unit-project[data-pane='code'] .kc-unit-save { bottom: calc(var(--kc-mobile-nav-height) + 8px); }
 }
 
 /* UX-101: learning map (AdventureMap).

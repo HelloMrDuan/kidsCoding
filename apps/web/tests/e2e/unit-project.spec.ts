@@ -218,6 +218,38 @@ test('storage full: saving says honestly that the project is not saved', async (
   expect(saved.blocks).toEqual(start)
 })
 
+test('1440 wide: the save area sits right under 运行/重置 in the stage column, above the fold', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'desktop layout only')
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await seed(page, L03, [{ type: 'when_start' }, { type: 'move_right' }, { type: 'move_right' }, { type: 'say_line', line: 'hello' }])
+  await page.getByTestId('unit-project').evaluate((el) => el.scrollIntoView({ block: 'start' }))
+  const run = (await page.getByTestId('run-code-button').boundingBox())!
+  const save = (await page.getByTestId('unit-save-project').boundingBox())!
+  const code = (await page.locator('#unit-pane-code').boundingBox())!
+  expect(save.x + save.width).toBeLessThan(code.x)
+  expect(save.y).toBeGreaterThan(run.y + run.height)
+  expect(save.y - (run.y + run.height)).toBeLessThan(140)
+  expect(save.y + save.height).toBeLessThanOrEqual(900)
+  await expect(page.getByTestId('unit-save-project')).toHaveCount(1)
+})
+
+test('375 wide: while editing in 积木 the save button stays on screen', async ({ page }) => {
+  test.setTimeout(90_000)
+  await page.setViewportSize({ width: 375, height: 812 })
+  await seed(page, L03, [{ type: 'when_start' }, { type: 'move_right' }, { type: 'move_right' }, { type: 'say_line', line: 'hello' }])
+  await page.getByTestId('unit-mobile-tab-code').click()
+  await page.getByTestId('lesson-blockly-workspace').evaluate((el) => el.scrollIntoView({ block: 'start' }))
+  await expect(page.getByTestId('unit-save-project')).toBeInViewport()
+  // Not hidden under the shell's fixed bottom nav (62px at ≤600px).
+  const sticky = (await page.getByTestId('unit-save-project').boundingBox())!
+  expect(sticky.y + sticky.height).toBeLessThanOrEqual(812 - 62)
+  await page.getByTestId('unit-mobile-tab-stage').click()
+  await page.getByTestId('run-code-button').evaluate((el) => el.scrollIntoView({ block: 'center' }))
+  const run = (await page.getByTestId('run-code-button').boundingBox())!
+  const save = (await page.getByTestId('unit-save-project').boundingBox())!
+  expect(save.y).toBeGreaterThan(run.y + run.height)
+})
+
 test('375 wide: 舞台 / 积木 tabs work and the page never scrolls sideways', async ({ page }) => {
   test.setTimeout(120_000)
   await page.setViewportSize({ width: 375, height: 812 })

@@ -43,7 +43,7 @@ export default function ProjectCompletePage() {
 
   const isFoundationGraduate = lesson.id === 'lesson-12-graduation-show'
   if (isFoundationGraduate && (!progress.completedLessonIds.includes(lesson.id) || snapshotBlocks.length === 0)) {
-    return <main className="min-h-screen bg-amber-50 p-6"><section className="mx-auto max-w-xl rounded-3xl bg-white p-6">
+    return <main className="min-h-screen bg-[var(--kc-canvas)] p-6"><section className="kc-panel mx-auto max-w-xl p-6">
       <h1 className="text-2xl font-bold">毕业作品还未完成</h1><p className="my-4 leading-7">请回课堂实际运行、完成错误实验并保存作品，再领取毕业奖励。</p>
       <Link className="inline-flex min-h-11 items-center rounded-full bg-emerald-800 px-5 text-white" href={`/learn/lesson/${lesson.id}`}>回课堂继续寻宝</Link>
     </section></main>
@@ -75,7 +75,7 @@ export default function ProjectCompletePage() {
   const continueAction = resolveProjectContinueAction(allLessons, lesson.id)
 
   return (
-    <main className={`min-h-screen bg-[radial-gradient(circle_at_top,#fffdf8_0%,#fff4e2_38%,#eef8ff_100%)] ${isFoundationGraduate ? 'px-3 py-6 md:px-6 md:py-10' : 'px-6 py-10'}`}>
+    <main className={`min-h-screen bg-[var(--kc-canvas)] ${isFoundationGraduate ? 'px-3 py-6 md:px-6 md:py-10' : 'px-6 py-10'}`}>
       <ProjectCompleteCard
         key={`${lesson.id}-${replayCount}`}
         blocks={snapshotBlocks}
