@@ -1,16 +1,19 @@
 import {expect,test} from '@playwright/test'
-import {expectStageWalk,solveMistakeStep,solvePracticeStep} from './lesson-pane-helpers'
+import {expectStageWalk,showLessonPane,solveMistakeStep,solvePracticeStep} from './lesson-pane-helpers'
 
 test('first forest Blockly lesson requires actual execution before each step and awards completion once',async({page})=>{
   test.setTimeout(180_000)
   await page.goto('/learn/lesson/lesson-01-forest-hello')
+  await showLessonPane(page,'stage')
   await expect(page.getByTestId('lesson-playable-stage')).toBeVisible()
   await expect(page.getByTestId('stage-character-main')).toContainText('小狐狸')
+  await showLessonPane(page,'code')
   await page.getByTestId('lesson-add-when_start').click()
   await page.getByTestId('lesson-complete-step').click()
+  await showLessonPane(page,'stage')
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('请先点击舞台')
   for(let step=0;step<2;step++){
-    if(step===1)await page.getByTestId('lesson-add-move_right').click()
+    if(step===1){await showLessonPane(page,'code');await page.getByTestId('lesson-add-move_right').click();await showLessonPane(page,'stage')}
     await page.getByTestId('run-code-button').click()
     await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:15_000})
     if(step>=1)await expectStageWalk(page,100)
@@ -32,6 +35,7 @@ test('first forest Blockly lesson requires actual execution before each step and
 test('bad Blockly program cannot be passed off as actual execution',async({page})=>{
   test.setTimeout(100_000)
   await page.goto('/learn/lesson/lesson-01-forest-hello')
+  await showLessonPane(page,'stage')
   // The first task intentionally offers only the start block. Run without it.
   await page.getByTestId('run-code-button').click()
   // TQ-008: the stage names the real reason instead of a generic “和要求一样”.
@@ -45,6 +49,7 @@ test('bad Blockly program cannot be passed off as actual execution',async({page}
 test('TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matching start/sequence remedial',async({page})=>{
   test.setTimeout(120_000)
   await page.goto('/learn/lesson/lesson-01-forest-hello')
+  await showLessonPane(page,'stage')
   await expect(page.getByTestId('lesson-playable-stage')).toBeVisible()
   await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
   await page.getByTestId('run-code-button').click()
@@ -62,6 +67,7 @@ test('TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matc
   await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier','3',{timeout:12_000})
   const link=page.getByTestId('lesson-remedial-link')
   await expect(link).toHaveAttribute('data-remedial-id','remedial-start-sequence')
+  await showLessonPane(page,'task')
   await link.click()
   await page.waitForURL('**/learn/remedial/remedial-start-sequence?from=lesson-01-forest-hello**')
   await expect(page.getByRole('heading',{name:'先学会“开始”和顺序'})).toBeVisible()
@@ -93,6 +99,7 @@ test('TQ-010: lesson 1 第 4 关 — the pre-built program without “开始时�
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 关')
   await solvePracticeStep(page,{goalType:'change-distance',guess:'half-way',build:[]})
   await page.getByTestId('lesson-complete-step').click()
+  await showLessonPane(page,'stage')
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
   await expect(page.getByTestId('lesson-task-card')).toContainText('少了开始？找错再修好')
   const task=page.getByTestId('mistake-task')
@@ -123,7 +130,9 @@ test('TQ-010: lesson 1 第 4 关 — the pre-built program without “开始时�
   await expect(page.getByTestId('mistake-run-result')).toContainText('你看懂啦')
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('哎呀')
   // Fix by tapping “开始时”: it snaps on top of the headless move block.
+  await showLessonPane(page,'code')
   await page.getByTestId('lesson-add-when_start').click()
+  await showLessonPane(page,'stage')
   await page.getByTestId('run-code-button').click()
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:15_000})
   await expect(page.getByTestId('mistake-fixed')).toContainText('修好啦')

@@ -1,5 +1,5 @@
 import {expect,test,type Page} from '@playwright/test'
-import {expectStageWalk,solveMistakeStep,solvePracticeStep} from './lesson-pane-helpers'
+import {expectStageWalk,showLessonPane,solveMistakeStep,solvePracticeStep} from './lesson-pane-helpers'
 
 type Mistake={expectCode:string;answer:string;fix:string[]}
 type Practice=Parameters<typeof solvePracticeStep>[1]
@@ -7,9 +7,12 @@ type Expect={scene:'森林'|'草地';walk:number;say?:string;noBubble?:boolean}
 /** TQ-011: warm-up → main build → second practice (第 3 关) → designed mistake (第 4 关). */
 async function play(page:Page,id:string,adds:Record<number,string[]>,practice:Practice,mistake:Mistake,expects:Expect[]){
   await page.goto('/learn/lesson/'+id)
+  await showLessonPane(page,'stage')
   await expect(page.getByTestId('lesson-playable-stage')).toBeVisible()
   for(let step=0;step<4;step++){
+    if((adds[step]??[]).length)await showLessonPane(page,'code')
     for(const type of adds[step]??[])await page.getByTestId('lesson-add-'+type).click()
+    if((adds[step]??[]).length)await showLessonPane(page,'stage')
     if(step===2)await solvePracticeStep(page,practice)
     // TQ-010: the designed mistake step opens on a pre-built wrong program.
     else if(step===3)await solveMistakeStep(page,mistake)
@@ -63,7 +66,9 @@ test('TQ-009: lesson 5 blocks and stage say exactly what happens (向右走 100 
   await expect(page.getByTestId('lesson-add-say_line')).toHaveCount(0)
   await expect(page.getByTestId('lesson-progress-strip')).toContainText('关卡 1 / 4')
   await expect(page.getByTestId('stage-walked-distance')).toContainText('已走 0 步')
+  await showLessonPane(page,'code')
   for(const type of ['when_start','move_right','switch_scene','repeat_twice'])await page.getByTestId('lesson-add-'+type).click()
+  await showLessonPane(page,'stage')
   // The real Blockly blocks carry the same labels as the palette buttons.
   const canvas=page.getByTestId('lesson-blockly-workspace').locator('.blocklyBlockCanvas').first()
   await expect(canvas).toContainText('向右走 100 步')
@@ -106,12 +111,16 @@ test('TQ-010: lesson 5 第 4 关 — “重复：再走 100 步” placed before
   await page.getByTestId('mistake-answer-zero').click()
   await expect(page.getByTestId('mistake-fix')).toContainText('挪到“切换场景”下面')
   // “再摆一次错误程序” puts the wrong program back; the observation is kept.
+  await showLessonPane(page,'code')
   await page.getByTestId('lesson-clear-program').click()
+  await showLessonPane(page,'stage')
   await page.getByTestId('mistake-reload').click()
   await expect(canvas).toContainText('重复：再走 100 步')
   await expect(page.getByTestId('mistake-observed')).toBeVisible()
+  await showLessonPane(page,'code')
   await page.getByTestId('lesson-clear-program').click()
   for(const type of ['when_start','move_right','switch_scene','repeat_twice'])await page.getByTestId('lesson-add-'+type).click()
+  await showLessonPane(page,'stage')
   await page.getByTestId('run-code-button').click()
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
   await expect(page.getByTestId('mistake-fixed')).toContainText('一共走了 200 步')
