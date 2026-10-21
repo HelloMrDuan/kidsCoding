@@ -57,6 +57,8 @@ export function explainRunFailure(
       return '这一关先不用说话，把“说一句话”拿走吧～'
     case 'wrong-line':
       return `${actor}这次要说“${goal?.message ?? ''}”哦。`
+    case 'unknown-line':
+      return '这句对白找不到啦，在“选一句对白”里重新挑一句吧。'
     case 'say-too-early':
       return `${actor}说话说早啦！先${go}到位，再开口。`
     case 'say-too-late':
