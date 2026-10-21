@@ -15,7 +15,7 @@ const REPEAT_NAME = getKidsBlockLabel('repeat_twice')
 /** Lessons 07–09: the butterfly flies, so its blocks say “向右飞 100 步” / “重复：再飞 100 步”. */
 const FLY = quoteBlock('move_right', 'fly')
 const FLY_NAME = getKidsBlockLabel('move_right', 'fly')
-const FLY_REPEAT_NAME = getKidsBlockLabel('repeat_twice', 'fly')
+const FLY_REPEAT = quoteBlock('repeat_twice', 'fly')
 
 /** TQ-003: one source for the duo lessons' three hint layers (classroom feedback + duo stage). */
 export const duoLessonHints = {
@@ -100,12 +100,13 @@ export const launchLessons: LaunchLessonDefinition[] = [
     goal: '让小狐狸向右走 100 步，完成第一次出场。',
     recommendedLevel: 'starter',
     steps: [
-      step('step-1', '认识今天的主角', '先看看今天的小狐狸，等会儿我们要让它自己走上舞台。', ['when_start'], ['when_start']),
-      step('step-2', '认识开始积木', '先放“开始时”，告诉小狐狸什么时候准备出场。', ['when_start'], ['when_start']),
-      step('step-3', '让舞台准备好', '确认“开始时”放在最前面，舞台就准备好了。', ['when_start'], ['when_start']),
-      step('step-4', '接上移动积木', `把${MOVE}接在后面，让小狐狸向右走 100 步、走上舞台。`, ['when_start', 'move_right'], ['when_start', 'move_right']),
+      // TQ-011: the three “只放开始时” steps (same goal, re-run) are merged into one.
+      step('step-1', '认识小狐狸和开始积木', '先看看今天的小狐狸。放一块“开始时”，按运行看看：只有“开始时”，小狐狸会走吗？', ['when_start'], ['when_start']),
+      step('step-2', '接上移动积木', `把${MOVE}接在“开始时”下面，让小狐狸向右走 100 步、走上舞台。`, ['when_start', 'move_right'], ['when_start', 'move_right']),
+      // TQ-011: second practice with a different goal (practice-steps.ts) — change the distance, predict the stop.
+      step('step-3', '新练习：走到小兔子身边', `小兔子在更远的地方等小狐狸。先猜一猜接两块${MOVE}小狐狸会停在哪里，再接上第二块，按运行看看。`, ['when_start', 'move_right'], ['when_start', 'move_right', 'move_right']),
       // TQ-010: designed mistake step (mistake-steps.ts) — a pre-built program without “开始时”.
-      step('step-5', '少了开始？找错再修好', `积木区有一段少了“开始时”的程序。先运行看看小狐狸会不会出场，再把“开始时”放到${MOVE}上面修好它。`, ['when_start', 'move_right'], ['when_start', 'move_right']),
+      step('step-4', '少了开始？找错再修好', `积木区有一段少了“开始时”的程序。先运行看看小狐狸会不会出场，再把“开始时”放到${MOVE}上面修好它。`, ['when_start', 'move_right'], ['when_start', 'move_right']),
     ],
     rewardCardId: 'theme-forest-fox',
     phase: 'trial',
@@ -117,7 +118,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
       '先看一个很短的示意，再回来试一次。',
       'remedial-start-sequence',
     ),
-    parentAdvice: '请孩子演示一下，小狐狸是怎么向右走 100 步出场的。',
+    parentAdvice: '请孩子演示一下，小狐狸是怎么向右走 100 步出场的；再问问：接两块移动积木，小狐狸会停在哪里？',
   },
   {
     id: 'lesson-02-forest-greeting',
@@ -126,12 +127,14 @@ export const launchLessons: LaunchLessonDefinition[] = [
     goal: '让小狐狸出场后说一句欢迎的话。',
     recommendedLevel: 'starter',
     steps: [
-      step('step-1', '先回顾小狐狸出场', `先接好“开始时”和${MOVE}，让小狐狸先走上舞台。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right']),
-      step('step-2', '认识说话积木', '这块“说一句话”积木会让小狐狸在出场后开口打招呼。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right']),
-      step('step-3', '出场后接一句欢迎话', '把“说一句话”接在移动后面，让小狐狸先出场，再打招呼。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
+      // TQ-011: “回顾出场” and “认识说话积木” had the same goal; merged.
+      step('step-1', '先让小狐狸出场', `先接好“开始时”和${MOVE}，让小狐狸走上舞台。等会儿我们要用“说一句话”让它打招呼。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right']),
+      // TQ-011: the preset line choice (old 第 5 关, same program as the mistake fix) now lives in the main build.
+      step('step-2', '出场后说一句欢迎话', '把“说一句话”接在移动后面，在“选一句对白”里挑一句你喜欢的话，再运行：小狐狸先出场，再说出你选的那句。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
+      // TQ-011: second practice — no move block, predict where the fox talks.
+      step('step-3', '新练习：站在原地打招呼', '这次小狐狸不走路。先猜一猜它会在哪里说话，再点「清空积木重拼」，只拼“开始时”和“说一句话”，按运行看看。', ['when_start', 'move_right', 'say_line'], ['when_start', 'say_line']),
       // TQ-010: designed mistake step — the pre-built program speaks before walking.
       step('step-4', '先说后走？找错再修好', `积木区摆了一段顺序反了的程序：小狐狸会先说话再出场。先运行看看，再把“说一句话”挪到${MOVE}后面。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
-      step('step-5', '换一句自己的话', '在“选一句对白”里挑一句你喜欢的话，再运行：小狐狸先出场，再说出你选的那句。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
     ],
     rewardCardId: 'theme-forest-rabbit',
     phase: 'trial',
@@ -148,28 +151,29 @@ export const launchLessons: LaunchLessonDefinition[] = [
   {
     id: 'lesson-03-forest-story',
     title: '森林里的第一次见面',
-    goal: '把动作和对白连起来，完成第一个完整小故事。',
+    goal: '让小狐狸走到小兔子身边再打招呼，完成第一次见面的完整小故事。',
     recommendedLevel: 'starter',
     steps: [
-      step('step-1', '看看今天要完成什么', '今天我们要把小狐狸的第一次见面做成一个完整小故事。', ['when_start'], ['when_start']),
-      step('step-2', '先让小狐狸出场', `先接好“开始时”和${MOVE}，让小狐狸走上舞台。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right']),
-      step('step-3', '再让小狐狸打招呼', '在移动后面接一块“说一句话”，让小狐狸出场后打招呼。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
-      // TQ-010: designed mistake step — the story greets before the fox walks on stage.
-      step('step-4', '故事顺序乱了？找错再修好', `积木区摆了一段顺序乱了的小故事：小狐狸还没出场就先打招呼。先运行看看，再把“说一句话”挪到${MOVE}后面。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
-      step('step-5', '回看第一个完整小故事', '点一下运行，看看小狐狸是不是已经做出了第一个完整故事。', ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
+      // TQ-011: lesson 3 no longer repeats lesson 2 block for block — the fox walks all the way to the rabbit.
+      step('step-1', '先走到小兔子身边', `接好“开始时”和两块${MOVE}，让小狐狸走 200 步，来到小兔子身边。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'move_right']),
+      step('step-2', '走到了，再打招呼', `在第二块${MOVE}后面接“说一句话”：小狐狸走到小兔子身边，再打招呼。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'move_right', 'say_line']),
+      // TQ-011: second practice — same blocks in another order, compare the result.
+      step('step-3', '新练习：边走边打招呼', `把“说一句话”挪到两块${MOVE}中间，按运行，再和上一关比一比哪里不一样。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line', 'move_right']),
+      // TQ-010: designed mistake step — the story greets before the fox walks to the rabbit.
+      step('step-4', '故事顺序乱了？找错再修好', `积木区摆了一段顺序乱了的小故事：小狐狸还没走到小兔子身边就先打招呼。先运行看看，再把“说一句话”挪到两块${MOVE}后面。`, ['when_start', 'move_right', 'say_line'], ['when_start', 'move_right', 'move_right', 'say_line']),
     ],
     rewardCardId: 'growth-first-project',
     phase: 'trial',
     mode: 'guided',
     sortOrder: 3,
     hintLayers: buildHintLayers(
-      '先让小狐狸出场，再让它开口打招呼。',
-      `顺序要是“开始时 → ${MOVE_NAME} → 说一句话”。`,
+      '先让小狐狸走到小兔子身边，再让它开口打招呼。',
+      `走到小兔子身边要两块${MOVE}，“说一句话”接在最后。`,
       '先看一下顺序示意，再回来把故事接完整。',
       'remedial-start-sequence',
     ),
     templateId: 'forest-meetup-stage',
-    parentAdvice: '和孩子一起回看第一个作品，问问他先看到什么、又听到了什么。',
+    parentAdvice: '和孩子一起回看第一次见面的故事，问问他：小狐狸走到哪里才打招呼？把说话挪到半路，故事有什么不一样？',
   },
   {
     id: 'lesson-04-meadow-scene',
@@ -177,12 +181,13 @@ export const launchLessons: LaunchLessonDefinition[] = [
     goal: '学会把故事从一个场景切换到另一个场景。',
     recommendedLevel: 'starter',
     steps: [
-      step('step-1', '先看看两个画面', '先认识森林和草地两个画面，等会儿我们要让故事换一个地方。', ['when_start'], ['when_start']),
-      step('step-2', '先把森林里的开场接好', `先接好“开始时”和${MOVE}，让小狐狸从森林里出发。`, ['when_start', 'move_right'], ['when_start', 'move_right']),
-      step('step-3', '认识切换场景积木', '这块“切换场景”积木可以让故事从森林换到草地。', ['when_start', 'move_right', 'switch_scene'], ['when_start', 'move_right']),
-      step('step-4', '接上草地场景', '把“切换场景”接在后面，让故事真的来到草地。', ['when_start', 'move_right', 'switch_scene'], ['when_start', 'move_right', 'switch_scene']),
+      // TQ-011: “看看两个画面 / 森林开场 / 认识切换场景” were the same program; merged.
+      step('step-1', '先在森林出发', `今天的故事有森林和草地两个画面。先接好“开始时”和${MOVE}，让小狐狸在森林里出发。`, ['when_start', 'move_right'], ['when_start', 'move_right']),
+      step('step-2', '走完换到草地', `把“切换场景”接在${MOVE}后面：小狐狸在森林走 100 步，故事再来到草地。`, ['when_start', 'move_right', 'switch_scene'], ['when_start', 'move_right', 'switch_scene']),
+      // TQ-011: second practice — walk further before the switch, predict where the scene changes.
+      step('step-3', '新练习：在森林多走一会儿', `这次在“切换场景”上面放两块${MOVE}。先猜一猜小狐狸在森林里走多少步才到草地，再拼好、按运行看看。`, ['when_start', 'move_right', 'switch_scene'], ['when_start', 'move_right', 'move_right', 'switch_scene']),
       // TQ-010: designed mistake step — the pre-built program switches scene before walking.
-      step('step-5', '先换场景？找错再修好', `积木区摆了一段顺序反了的程序：还没出发就换到草地。先运行看看，再把“切换场景”挪到${MOVE}后面。`, ['when_start', 'move_right', 'switch_scene'], ['when_start', 'move_right', 'switch_scene']),
+      step('step-4', '先换场景？找错再修好', `积木区摆了一段顺序反了的程序：还没出发就换到草地。先运行看看，再把“切换场景”挪到${MOVE}后面。`, ['when_start', 'move_right', 'switch_scene'], ['when_start', 'move_right', 'switch_scene']),
     ],
     rewardCardId: 'theme-meadow-bird',
     phase: 'trial',
@@ -195,7 +200,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
       'remedial-scene-switch',
     ),
     templateId: 'meadow-journey-stage',
-    parentAdvice: '请孩子指给你看，是哪一块积木让故事从森林换到了草地，小狐狸是走完 100 步才换的吗？',
+    parentAdvice: '请孩子指给你看，是哪一块积木让故事从森林换到了草地；把它往后挪，小狐狸会在森林里多走多远？',
   },
   {
     id: 'lesson-05-meadow-order',
@@ -203,12 +208,13 @@ export const launchLessons: LaunchLessonDefinition[] = [
     goal: '让故事按顺序发生：先在森林出发，再到草地，到了草地再走 100 步。',
     recommendedLevel: 'starter',
     steps: [
-      step('step-1', '回顾上节的转场', '先看一眼故事怎么从森林走到草地，今天我们要让它更有先后顺序。', ['when_start'], ['when_start']),
-      step('step-2', '先安排出发', `先让小狐狸从森林里出发：接好“开始时”和${MOVE}。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right']),
-      step('step-3', '再安排到达', '接上“切换场景”，让小狐狸来到草地。', ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene']),
-      step('step-4', '到草地后再走 100 步', `在“切换场景”后面接${REPEAT}，它会把移动再做一次，让小狐狸到草地后再走 100 步。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
+      // TQ-011: the review steps are merged into one warm-up.
+      step('step-1', '回顾出发和到达', `接好“开始时”、${MOVE}和“切换场景”：小狐狸在森林走 100 步，再来到草地。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene']),
+      step('step-2', '到草地后再走 100 步', `在“切换场景”后面接${REPEAT}，它会把移动再做一次，让小狐狸到草地后再走 100 步。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
+      // TQ-011: second practice — no scene switch, predict where the repeat takes the fox.
+      step('step-3', '新练习：不换场景，走到小鸟身边', `这次不去草地：点「清空积木重拼」，拼成“开始时 → ${MOVE_NAME} → ${REPEAT_NAME}”。先猜一猜小狐狸停在哪里，再按运行看看。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'repeat_twice']),
       // TQ-010: designed mistake step — the repeat block sits before any move.
-      step('step-5', '重复放早了？找错再修好', `积木区摆了一段${REPEAT}放在最前面的程序。先运行看看小狐狸会不会走，再把它挪到“切换场景”后面，让小狐狸一共走 200 步。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
+      step('step-4', '重复放早了？找错再修好', `积木区摆了一段${REPEAT}放在最前面的程序。先运行看看小狐狸会不会走，再把它挪到“切换场景”后面，让小狐狸一共走 200 步。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
     ],
     rewardCardId: 'growth-meadow-order',
     phase: 'trial',
@@ -226,15 +232,16 @@ export const launchLessons: LaunchLessonDefinition[] = [
   {
     id: 'lesson-06-meadow-story',
     title: '小动物旅行记',
-    goal: '把动作、转场和对白连起来，完成第二个完整小故事。',
+    goal: '把出发、转场、再走 100 步和一句话连成旅行故事，再比一比在森林和草地说话有什么不同，完成第二个完整小故事。',
     recommendedLevel: 'starter',
     steps: [
-      step('step-1', '看看今天的旅行故事', '今天我们要把出发、转场和旅行感受接起来，做成第二个完整小故事。', ['when_start'], ['when_start']),
-      step('step-2', '让小狐狸先出发', `先接好“开始时”和${MOVE}，让小狐狸从森林里出发。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right']),
-      step('step-3', '让故事走到新场景', '把“切换场景”接上去，让故事来到草地。', ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene']),
-      step('step-4', '到草地后再走 100 步，再说一句感受', `先接${REPEAT}，再接一块“说一句话”说出旅行感受，让故事更像真的完成了一次小旅行。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line']),
+      // TQ-011: the three warm-up steps rebuilt lesson 5 one block at a time; merged into one review.
+      step('step-1', '回顾旅行路线', `先拼出上节课的旅行：“开始时 → ${MOVE_NAME} → 切换场景 → ${REPEAT_NAME}”。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice']),
+      step('step-2', '到草地后说一句感受', '在最后接一块“说一句话”：小狐狸到草地走完 200 步，再说出旅行感受。', ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line']),
+      // TQ-011: second practice — speak in the forest instead, compare what the fox says.
+      step('step-3', '新练习：在森林里先说一句', '把“说一句话”挪到“切换场景”前面，按运行，再和上一关比一比：小狐狸说的话一样吗？', ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'say_line', 'switch_scene', 'repeat_twice']),
       // TQ-010: designed mistake step — the scene switch comes after both moves.
-      step('step-5', '换场景太晚？找错再修好', `积木区摆了一段“切换场景”放晚了的程序。先运行看看小狐狸在哪里走过头，再把“切换场景”挪到${MOVE}和${REPEAT}中间。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line']),
+      step('step-4', '换场景太晚？找错再修好', `积木区摆了一段“切换场景”放晚了的程序。先运行看看小狐狸在哪里走过头，再把“切换场景”挪到${MOVE}和${REPEAT}中间。`, ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line']),
     ],
     rewardCardId: 'theme-meadow-story',
     phase: 'trial',
@@ -247,7 +254,7 @@ export const launchLessons: LaunchLessonDefinition[] = [
       'remedial-scene-switch',
     ),
     templateId: 'meadow-journey-stage',
-    parentAdvice: '和孩子一起回看旅行故事，问问孩子小狐狸先在哪里、后来到了哪里、到了草地后又做了什么。',
+    parentAdvice: '和孩子一起回看旅行故事，问问孩子：小狐狸在森林里说话和到草地再说话，说的话一样吗？',
   },
   {
     id: 'lesson-07-garden-click',
@@ -256,12 +263,12 @@ export const launchLessons: LaunchLessonDefinition[] = [
     goal: '学会让蝴蝶在被点击时做出反应：点到它，它才向右飞 100 步。',
     recommendedLevel: 'foundation',
     steps: [
-      step('step-1', '认识今天的新规则', '今天蝴蝶不会一开始就自己动，要等你点到它，它才会回应你。', ['when_clicked'], ['when_clicked']),
-      step('step-2', '先让蝴蝶回应一次点击', `先把“被点击时”放在最前面，再接上${FLY}，让蝴蝶被点到后向右飞 100 步。`, ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
+      step('step-1', '认识今天的新规则', '今天蝴蝶不会一开始就自己动，要等你点到它，它才会回应你。先放“被点击时”，启动后点一下蝴蝶。', ['when_clicked'], ['when_clicked']),
+      step('step-2', '让蝴蝶回应一次点击', `先把“被点击时”放在最前面，再接上${FLY}，让蝴蝶被点到后向右飞 100 步。`, ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
+      // TQ-011: second practice (replaces two re-runs of the same click program) — predict the stop.
+      step('step-3', '新练习：点一下，飞到小青蛙身边', `小青蛙在更远的地方。先猜一猜接两块${FLY}蝴蝶会停在哪里，再接上第二块，启动后点一下蝴蝶看看。`, ['when_clicked', 'move_right'], ['when_clicked', 'move_right', 'move_right']),
       // TQ-010: designed mistake step — “开始时” makes the butterfly fly without a click.
-      step('step-3', '没点就飞？找错再修好', '积木区摆了一段用“开始时”开头的程序。先启动看看：没点蝴蝶，它会不会自己飞？再把开头换成“被点击时”，点一下蝴蝶验证。', ['when_start', 'when_clicked', 'move_right'], ['when_clicked', 'move_right']),
-      step('step-4', '把点击和飞起来接完整', `确认顺序是“被点击时”在前面，${FLY}在后面。`, ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
-      step('step-5', '试试点一下会发生什么', '点一下蝴蝶，看看它是不是已经会立刻飞起来了。', ['when_clicked', 'move_right'], ['when_clicked', 'move_right']),
+      step('step-4', '没点就飞？找错再修好', '积木区摆了一段用“开始时”开头的程序。先启动看看：没点蝴蝶，它会不会自己飞？再把开头换成“被点击时”，点一下蝴蝶验证。', ['when_start', 'when_clicked', 'move_right'], ['when_clicked', 'move_right']),
     ],
     rewardCardId: 'theme-garden-butterfly',
     phase: 'trial',
@@ -279,15 +286,16 @@ export const launchLessons: LaunchLessonDefinition[] = [
     id: 'lesson-08-garden-dialogue',
     templateId: 'garden-interaction-stage',
     title: '点一下，再说一句话',
-    goal: '让蝴蝶在点击后先飞起来，再说一句话回应你。',
+    goal: '让蝴蝶在点击后先飞起来，再说一句话回应你；再比一比“开始时”和“被点击时”有什么不同。',
     recommendedLevel: 'foundation',
     steps: [
-      step('step-1', '回顾上节的互动动作', '先想一想：点一下蝴蝶后，它是不是先飞起来了？今天我们要让它再说一句话。', ['when_clicked'], ['when_clicked']),
-      step('step-2', '先准备点击开关', '先把“被点击时”放在最前面，让蝴蝶准备好回应点击。', ['when_clicked'], ['when_clicked']),
-      step('step-3', '点一下先动起来', `把${FLY}接在后面，让蝴蝶被点到后先向右飞 100 步。`, ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right']),
-      step('step-4', '再接一句回应的话', '在移动后面接一块“说一句话”，让蝴蝶先飞再说。', ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right', 'say_line']),
+      // TQ-011: “回顾 / 准备点击开关 / 点一下先动起来” merged into one warm-up.
+      step('step-1', '回顾：点一下就飞', `先把“被点击时”放在最前面，再接${FLY}：点一下蝴蝶，它向右飞 100 步。`, ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right']),
+      step('step-2', '飞完再回应你', `在${FLY}后面接一块“说一句话”：点一下蝴蝶，它先飞，再回应你。`, ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right', 'say_line']),
+      // TQ-011: second practice — swap the start event and compare (lesson 8 no longer just moves lesson 2 under a click).
+      step('step-3', '新练习：换成“开始时”比一比', `点「清空积木重拼」，把开头换成“开始时”：拼成“开始时 → ${FLY_NAME} → 说一句话”，按运行，再和上一关比一比。`, ['when_start', 'when_clicked', 'move_right', 'say_line'], ['when_start', 'move_right', 'say_line']),
       // TQ-010: designed mistake step — the butterfly speaks before it flies.
-      step('step-5', '先说后飞？找错再修好', `积木区摆了一段蝴蝶先说话再飞的程序。启动并点一下蝴蝶看看，再把“说一句话”挪到${FLY}后面。`, ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right', 'say_line']),
+      step('step-4', '先说后飞？找错再修好', `积木区摆了一段蝴蝶先说话再飞的程序。启动并点一下蝴蝶看看，再把“说一句话”挪到${FLY}后面。`, ['when_clicked', 'move_right', 'say_line'], ['when_clicked', 'move_right', 'say_line']),
     ],
     rewardCardId: 'growth-garden-response',
     phase: 'trial',
@@ -299,7 +307,8 @@ export const launchLessons: LaunchLessonDefinition[] = [
       '先看一下“点一下，先飞再说”的小示意。',
       'remedial-click-trigger',
     ),
-    parentAdvice: '和孩子一起试试不同的点法，看看蝴蝶会不会都做出相同反应。',
+    // TQ-011: the old “试试不同的点法” had no matching ability in the classroom.
+    parentAdvice: '请孩子演示“开始时”和“被点击时”的区别：哪一个会等你点蝴蝶？蝴蝶说的话有什么不同？',
   },
   {
     id: 'lesson-09-garden-story',
@@ -307,25 +316,26 @@ export const launchLessons: LaunchLessonDefinition[] = [
     goal: '完成一个点一下就会有反应的互动故事。',
     recommendedLevel: 'foundation',
     steps: [
-      step('step-1', '看看今天要完成什么', '今天我们要做一段完整的互动表演，让蝴蝶在花园里回应你的点击。', ['when_clicked'], ['when_clicked']),
-      step('step-2', '先搭好互动开关', '先把“被点击时”放在最前面，告诉蝴蝶什么时候开始表演。', ['when_clicked'], ['when_clicked']),
-      step('step-3', '点一下，蝴蝶先飞起来', `接上${FLY}，让蝴蝶被点到后先向右飞 100 步。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right']),
-      step('step-4', '再加上一句回应的话', '在移动后面接一块“说一句话”，让互动故事更完整。', ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right', 'say_line']),
+      // TQ-011: “看看今天 / 搭好互动开关 / 先飞起来” merged into one warm-up.
+      step('step-1', '搭好互动开关，点一下就飞', `先把“被点击时”放在最前面，再接${FLY}，告诉蝴蝶什么时候开始表演。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right']),
+      step('step-2', '飞一段，回应你，再飞一段', `在${FLY}后面接“说一句话”，再接${FLY_REPEAT}：点一下蝴蝶，它飞 100 步就回应你，再接着飞 100 步。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right', 'say_line', 'repeat_twice']),
+      // TQ-011: second practice — reply after both flights, compare when the butterfly answers.
+      step('step-3', '新练习：飞完两段再回应', `把“说一句话”挪到${FLY_REPEAT}后面，启动并点一下蝴蝶，再和上一关比一比哪里不一样。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right', 'repeat_twice', 'say_line']),
       // TQ-010: designed mistake step — the reply comes before the butterfly flies twice.
-      step('step-5', '回应太早？找错再修好', `积木区摆了一段蝴蝶先说话、再飞两次的程序。启动并点一下蝴蝶看看；再把“说一句话”挪到飞的积木后面，让蝴蝶一共飞两次、飞 200 步，飞完第一次或两次后再回应你。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right', 'say_line', 'repeat_twice']),
+      step('step-4', '回应太早？找错再修好', `积木区摆了一段蝴蝶先说话、再飞两次的程序。启动并点一下蝴蝶看看；再把“说一句话”挪到飞的积木后面，让蝴蝶一共飞两次、飞 200 步，飞完第一次或两次后再回应你。`, ['when_clicked', 'move_right', 'say_line', 'repeat_twice'], ['when_clicked', 'move_right', 'say_line', 'repeat_twice']),
     ],
     rewardCardId: 'theme-garden-story',
     phase: 'trial',
     mode: 'guided',
     sortOrder: 9,
     hintLayers: buildHintLayers(
-      '先把点击开关放好，再接动作、回应的话，最后让它再飞 100 步。',
-      `可以是“被点击时 → ${FLY_NAME} → 说一句话 → ${FLY_REPEAT_NAME}”，也可以是“被点击时 → ${FLY_NAME} → ${FLY_REPEAT_NAME} → 说一句话”。`,
+      '先把点击开关放好，再接飞的积木、回应的话和再飞 100 步。',
+      `“被点击时”放在最前面，再接${FLY}、“说一句话”和${FLY_REPEAT}；看看这一关要蝴蝶飞到哪里再回应你。`,
       '先看一下完整互动故事的顺序，再回来把自己的表演接完。',
       'remedial-click-trigger',
     ),
     templateId: 'garden-interaction-stage',
-    parentAdvice: '请孩子给你演示一遍互动故事，再告诉你点哪里会触发变化，蝴蝶后来又多做了一次什么动作。',
+    parentAdvice: '请孩子给你演示一遍互动故事，再告诉你点哪里会触发变化；把“说一句话”挪到最后，蝴蝶回应你的时候有什么不一样？',
   },
   {
     id: 'lesson-10-second-friend',

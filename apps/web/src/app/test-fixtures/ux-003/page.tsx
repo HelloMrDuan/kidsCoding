@@ -101,7 +101,7 @@ export default function Ux003FixturePage() {
           <div data-testid="progress-track-full">
             <ProgressTrack
               steps={currentLesson.steps}
-              currentStepId={currentLesson.steps[4].id}
+              currentStepId={currentLesson.steps[currentLesson.steps.length - 1].id}
               completedStepIds={currentLesson.steps.map((step) => step.id)}
             />
           </div>

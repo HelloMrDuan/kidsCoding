@@ -110,6 +110,9 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
         setCharacterPosition(prev => prev + 100)
       } else if (type === 'switch_scene') {
         setStageScene('meadow')
+        // TQ-011: a line said in the forest stays in the forest — the new scene starts without
+        // the old bubble, so the meadow never shows “你好！” that was said before the switch.
+        setCharacterMessage(null)
       } else if (type === 'repeat_twice') {
         if (!blocks.slice(0, i).some(b => b.type === 'move_right')) {
           setExecutionState('error')

@@ -68,7 +68,7 @@ describe('buildParentOverview', () => {
       {
         lessonId: 'lesson-03-forest-story',
         lessonTitle: '森林里的第一次见面',
-        lessonSummary: '小狐狸已经会走上舞台，还会打招呼了。',
+        lessonSummary: '小狐狸已经会走到小兔子身边，再打招呼了。',
         href: '/parent/projects/lesson-03-forest-story',
         updatedAt: '2026-03-31T10:00:00.000Z',
       },

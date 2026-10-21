@@ -21,17 +21,17 @@ import { getMistakeStep, getMistakeStepAt, isDesignedMistakeRun, mistakeStepCopy
 const SINGLE_ACTOR = launchLessons.slice(0, 9)
 const CHARACTER = { fox: '小狐狸', butterfly: '小蝴蝶' } as const
 
-/** Expected design per lesson (from docs/roadmap/evidence/TQ-002 item 4). */
+/** Expected design per lesson (from docs/roadmap/evidence/TQ-002 item 4); TQ-011 made it 第 4 关 everywhere. */
 const EXPECTED: Record<string, { stepId: string; code: string }> = {
-  'lesson-01-forest-hello': { stepId: 'step-5', code: 'missing-start' },
+  'lesson-01-forest-hello': { stepId: 'step-4', code: 'missing-start' },
   'lesson-02-forest-greeting': { stepId: 'step-4', code: 'say-too-early' },
   'lesson-03-forest-story': { stepId: 'step-4', code: 'say-too-early' },
-  'lesson-04-meadow-scene': { stepId: 'step-5', code: 'scene-switch-early' },
-  'lesson-05-meadow-order': { stepId: 'step-5', code: 'repeat-without-move' },
-  'lesson-06-meadow-story': { stepId: 'step-5', code: 'scene-switch-late' },
-  'lesson-07-garden-click': { stepId: 'step-3', code: 'needs-click-trigger' },
-  'lesson-08-garden-dialogue': { stepId: 'step-5', code: 'say-too-early' },
-  'lesson-09-garden-story': { stepId: 'step-5', code: 'say-too-early' },
+  'lesson-04-meadow-scene': { stepId: 'step-4', code: 'scene-switch-early' },
+  'lesson-05-meadow-order': { stepId: 'step-4', code: 'repeat-without-move' },
+  'lesson-06-meadow-story': { stepId: 'step-4', code: 'scene-switch-late' },
+  'lesson-07-garden-click': { stepId: 'step-4', code: 'needs-click-trigger' },
+  'lesson-08-garden-dialogue': { stepId: 'step-4', code: 'say-too-early' },
+  'lesson-09-garden-story': { stepId: 'step-4', code: 'say-too-early' },
 }
 
 /** Quoted UI words that are not block names. */
@@ -64,10 +64,11 @@ describe('TQ-010 one designed mistake step per lesson 01–09', () => {
     }
   })
 
-  it('the stored step index matches the lesson, and lessons keep their 5 关', () => {
+  it('the stored step index matches the lesson, and lessons stay short (4–6 关, TQ-011)', () => {
     for (const design of mistakeSteps) {
       const { lesson, index } = stepOf(design.lessonId, design.stepId)
-      expect(lesson.steps, design.lessonId).toHaveLength(5)
+      expect(lesson.steps.length, design.lessonId).toBeGreaterThanOrEqual(4)
+      expect(lesson.steps.length, design.lessonId).toBeLessThanOrEqual(6)
       expect(index, design.lessonId).toBe(design.stepIndex)
       expect(getMistakeStepAt(design.lessonId, design.stepIndex)).toBe(design)
     }
@@ -126,8 +127,8 @@ describe('TQ-010 one designed mistake step per lesson 01–09', () => {
   })
 
   it('lesson 09 accepts both reply timings after the fix (fly once or twice, then reply)', () => {
-    const options = getStepJudgeOptions('lesson-09-garden-story', 'step-5')
-    const required = stepOf('lesson-09-garden-story', 'step-5').step.requiredBlockTypes
+    const options = getStepJudgeOptions('lesson-09-garden-story', 'step-4')
+    const required = stepOf('lesson-09-garden-story', 'step-4').step.requiredBlockTypes
     const late = ['when_clicked', 'move_right', 'repeat_twice', 'say_line'].map((type) => ({ type }))
     expect(evaluateObservable(required, late, options).passed).toBe(true)
   })

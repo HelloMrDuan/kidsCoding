@@ -616,6 +616,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-mistake-title { font-weight: 800; color: #7a4a06; }
 .kc-mistake-choice { border: 2px solid #f0a64a; border-radius: 999px; padding: 7px 14px; background: #fff; color: #8a5208; font-weight: 800; font-size: 13px; box-shadow: 0 2px 0 #f6d7ad; text-align: left; }
 .kc-mistake-choice-on { background: #a85a05; border-color: #7f4404; color: #fff; box-shadow: 0 3px 0 #7f4404; }
+/* TQ-011: second-practice panel (a different goal from the main build) */
+.kc-practice-task { border: 1px solid #a9d3f5; border-radius: 8px; background: #f0f8ff; padding: 12px 14px; color: #173b5c; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.kc-practice-title { font-weight: 800; color: #12477a; }
+.kc-practice-choice { border: 2px solid #5aa7e8; border-radius: 999px; padding: 7px 14px; background: #fff; color: #145a96; font-weight: 800; font-size: 13px; box-shadow: 0 2px 0 #c4e0f8; text-align: left; }
+.kc-practice-choice:disabled { opacity: 0.7; cursor: default; }
+.kc-practice-choice-on { background: #1f6fb8; border-color: #15548d; color: #fff; box-shadow: 0 3px 0 #15548d; }
+.kc-practice-choice-on:disabled { opacity: 1; }
 
 /* ============ Frozen V2 global shell: sidebar + top bar ============ */
 .kc-app { display: grid; grid-template-columns: 222px minmax(0, 1fr); min-height: 100vh; background: var(--kc-canvas, #f3f6fb); }

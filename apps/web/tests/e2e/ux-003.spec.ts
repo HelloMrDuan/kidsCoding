@@ -82,14 +82,14 @@ for (const [name, width, height] of [
     await unreleased.click({ force: true })
     expect(page.url()).toBe(urlBefore)
 
-    // --- ProgressTrack: position (3) vs completion (2 of 5) ---
+    // --- ProgressTrack: position (3) vs completion (2 of 4; TQ-011 made lesson 03 four 关) ---
     const trackReal = page.getByTestId('progress-track-real').getByTestId('progress-track')
-    await expect(trackReal.getByTestId('progress-track-text')).toContainText('步骤 3 / 5')
+    await expect(trackReal.getByTestId('progress-track-text')).toContainText('步骤 3 / 4')
     const bar = trackReal.getByTestId('progress-track-bar')
     await expect(bar).toHaveAttribute('role', 'progressbar')
     await expect(bar).toHaveAttribute('aria-valuenow', '2')
-    await expect(bar).toHaveAttribute('aria-valuemax', '5')
-    await expect(bar.locator('i')).toHaveCSS('width', '52px') // 40% of the 130px prototype track
+    await expect(bar).toHaveAttribute('aria-valuemax', '4')
+    await expect(bar.locator('i')).toHaveCSS('width', '65px') // 50% (2 of 4) of the 130px prototype track
     await expect(bar).toHaveCSS('background-color', 'rgb(231, 238, 249)')
     await expect(bar.locator('i')).toHaveCSS('background-color', 'rgb(36, 99, 235)')
 
@@ -105,7 +105,7 @@ for (const [name, width, height] of [
     ).toHaveCSS('width', '130px')
     await expect(
       page.getByTestId('progress-track-not-started').getByTestId('progress-track-text'),
-    ).toContainText('共 5 步')
+    ).toContainText('共 4 步')
 
     // No horizontal overflow at this viewport (long titles stay ellipsized).
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)

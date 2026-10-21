@@ -187,6 +187,9 @@ export function SceneBackdrop({ scene }: { scene: SceneId }) {
     meadow: { sky: ['#c6e8ff', '#f2fbef'], hill: '#a8d39a', ground: ['#7cb26a', '#86bb73'], tree: '#69a35d' },
     garden: { sky: ['#f6e3f4', '#fdf6ec'], hill: '#c2dcb0', ground: ['#78ad74', '#82b67e'], tree: '#6aa069' },
   }[scene]
+  // TQ-011: the meadow is its own place (open grass, sun, flowers) — not the forest's mountains and pines,
+  // so “切换场景” visibly takes the story somewhere new.
+  if (scene === 'meadow') return <MeadowBackdrop />
   return (
     <svg className="kc-scene-backdrop" viewBox="0 0 400 240" preserveAspectRatio="none" aria-hidden="true" focusable="false">
       <defs>
@@ -209,14 +212,78 @@ export function SceneBackdrop({ scene }: { scene: SceneId }) {
         <path d="M352 168 L370 108 L388 168Z" />
         <path d="M24 168 L38 128 L52 168Z" />
       </g>
-      {scene === 'garden' ? (
-        <g>
-          <circle cx="60" cy="186" r="5" fill="#f59ac0" /><circle cx="120" cy="196" r="4" fill="#ffd36b" />
-          <circle cx="250" cy="190" r="5" fill="#f59ac0" /><circle cx="330" cy="198" r="4" fill="#ffd36b" />
-        </g>
-      ) : null}
       <rect y="168" width="400" height="72" fill="#9ac59b" />
       <rect y="204" width="400" height="36" fill={`url(#kc-ground-${scene})`} />
+      {/* Garden flowers sit on top of the grass so they are actually visible. */}
+      {scene === 'garden' ? (
+        <g>
+          <MeadowFlower x={60} y={180} color="#f59ac0" r={4} />
+          <MeadowFlower x={120} y={192} color="#ffd36b" r={3.4} />
+          <MeadowFlower x={250} y={184} color="#f59ac0" r={4} />
+          <MeadowFlower x={22} y={196} color="#b99cf2" r={3.4} />
+        </g>
+      ) : null}
+    </svg>
+  )
+}
+
+function MeadowFlower({ x, y, color, r = 3 }: { x: number; y: number; color: string; r?: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <path d={`M0 0 V${r * 3}`} stroke="#4f9a55" strokeWidth="1.4" strokeLinecap="round" />
+      {[0, 72, 144, 216, 288].map((a) => (
+        <circle key={a} cx={Math.cos((a * Math.PI) / 180) * r} cy={Math.sin((a * Math.PI) / 180) * r} r={r * 0.8} fill={color} />
+      ))}
+      <circle r={r * 0.62} fill="#ffd84a" />
+    </g>
+  )
+}
+
+function GrassTuft({ x, y }: { x: number; y: number }) {
+  return <path d={`M${x - 5} ${y} Q${x - 4} ${y - 7} ${x - 1} ${y - 9} Q${x} ${y - 4} ${x + 1} ${y} Q${x + 3} ${y - 8} ${x + 6} ${y - 7} Q${x + 4} ${y - 3} ${x + 5} ${y}Z`} fill="#5f9f52" />
+}
+
+/** Open sunny meadow: rolling round hills, no trees, flowers and grass tufts in the grass. */
+function MeadowBackdrop() {
+  const flowers: Array<[number, number, string, number?]> = [
+    [34, 178, '#ff8fb1'], [70, 186, '#ffffff', 2.6], [112, 176, '#c58cff'], [148, 190, '#ff8fb1', 2.6],
+    [236, 180, '#ffffff'], [268, 192, '#ffcf3f', 2.6], [318, 178, '#ff8fb1'], [356, 188, '#c58cff', 2.6],
+    [388, 176, '#ffffff', 2.4], [190, 184, '#ffcf3f', 2.4],
+  ]
+  return (
+    <svg className="kc-scene-backdrop" viewBox="0 0 400 240" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="kc-sky-meadow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#a8e0ff" />
+          <stop offset="1" stopColor="#fff6d8" />
+        </linearGradient>
+        <linearGradient id="kc-grass-meadow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#9ed77e" />
+          <stop offset="1" stopColor="#7cc45f" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#kc-sky-meadow)" />
+      <circle cx="342" cy="40" r="22" fill="#ffe27a" opacity=".55" />
+      <circle cx="342" cy="40" r="15" fill="#ffd84a" />
+      <ellipse cx="90" cy="38" rx="34" ry="9" fill="#fff" opacity=".8" />
+      <ellipse cx="112" cy="32" rx="18" ry="8" fill="#fff" opacity=".8" />
+      <ellipse cx="236" cy="26" rx="26" ry="7" fill="#fff" opacity=".7" />
+      <path d="M0 150 Q60 112 130 138 Q200 160 260 128 Q330 98 400 136 V180 H0Z" fill="#c4e8a4" />
+      <path d="M0 166 Q80 136 170 156 Q250 172 320 148 Q370 134 400 148 V186 H0Z" fill="#a9db88" />
+      <path d="M150 150 Q178 158 206 150" stroke="#fff" strokeWidth="2" fill="none" opacity=".35" strokeLinecap="round" />
+      <rect y="170" width="400" height="70" fill="url(#kc-grass-meadow)" />
+      <path d="M0 214 Q100 206 200 214 Q300 222 400 212 V240 H0Z" fill="#6fb655" />
+      {[[22, 214], [96, 224], [168, 212], [250, 226], [330, 216], [384, 230]].map(([x, y]) => (
+        <GrassTuft key={`${x}-${y}`} x={x} y={y} />
+      ))}
+      {flowers.map(([x, y, color, r]) => (
+        <MeadowFlower key={`${x}-${y}`} x={x} y={y} color={color} r={r} />
+      ))}
+      <g fill="#ff9fc0" opacity=".9">
+        <ellipse cx="206" cy="92" rx="4" ry="2.6" transform="rotate(-30 206 92)" />
+        <ellipse cx="213" cy="92" rx="4" ry="2.6" transform="rotate(30 213 92)" />
+      </g>
+      <path d="M209.5 89 V96" stroke="#7a4a5c" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   )
 }

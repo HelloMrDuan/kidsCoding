@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 
 import { getFoundationUnitByLessonId } from '@/content/curriculum/foundation-units'
 import { getMistakeStep, getMistakeStepAt } from '@/content/curriculum/mistake-steps'
+import { asksClickPrediction, getPracticeStepAt, getPracticeStepFor, isPracticeAnswered } from '@/content/curriculum/practice-steps'
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
@@ -98,6 +99,9 @@ export default function LessonPage() {
   const [mistakeObserved, setMistakeObserved] = useState(false)
   const [mistakeAnswer, setMistakeAnswer] = useState<string | null>(null)
   const mistakeObservedRef = useRef(false)
+  // TQ-011: lessons 01–09 each have one second-practice step with a goal different from the main build.
+  const practiceStep = getPracticeStepFor(lessonId ?? '', lesson?.steps.find((item) => item.id === currentStepId))
+  const [practiceAnswer, setPracticeAnswer] = useState<string | null>(null)
   // Bumped to rebuild the Blockly workspace from `blocks` (e.g. “再摆一次错误程序”).
   const [workspaceVersion, setWorkspaceVersion] = useState(0)
 
@@ -132,6 +136,11 @@ export default function LessonPage() {
           setBlocks(resumedMistake.wrongProgram)
         }
         setLocalSaveState(draft ? 'saved' : 'unsaved')
+        // TQ-011: resuming at the practice or mistake step, the main build is already done —
+        // “刚完成的小结果” shows that result, not the lesson's opening instruction.
+        if (getPracticeStepAt(lessonId, lastStep) || resumedMistake) {
+          setFeedback(getFoundationLessonFeedback(lessonId, 'progress'))
+        }
         return
       }
 
@@ -201,8 +210,9 @@ export default function LessonPage() {
       mistakeObservedRef.current = false
       setMistakeObserved(false)
       setMistakeAnswer(null)
+      setPracticeAnswer(null)
     },
-    [lessonId, setHasRunSuccess, setMistakeObserved, setMistakeAnswer],
+    [lessonId, setHasRunSuccess, setMistakeObserved, setMistakeAnswer, setPracticeAnswer],
   )
 
   const handleRunSuccess=useCallback(() => {
@@ -232,6 +242,16 @@ export default function LessonPage() {
     if (lessonId) setLocalSaveState(saveLessonDraft(lessonId, stepIndex, wrong) ? 'saved' : 'failed')
     setWorkspaceVersion((version) => version + 1)
   }, [lessonId, stepIndex, setHasRunSuccess, setWorkspaceVersion])
+  // TQ-011: once the child answers, the “先回答/先猜一猜” nudge is no longer true; show the
+  // last real result again instead of a stale instruction.
+  const handlePracticeAnswer = useCallback((answerId: string) => {
+    setPracticeAnswer(answerId)
+    setFeedback((current) =>
+      current.startsWith('先回答舞台上的问题') || current.startsWith('先在舞台上猜一猜')
+        ? getFoundationLessonFeedback(lessonId ?? '', 'progress')
+        : current,
+    )
+  }, [lessonId, setPracticeAnswer, setFeedback])
   const handleRunClear=useCallback(() => {
     setHasRunSuccess(false)
     if (['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lessonId)) setFeedback('先运行积木，观察两个朋友的实际位置，再完成本关学习活动。')
@@ -277,7 +297,8 @@ export default function LessonPage() {
     failedAttempts,
     hintLayers: currentLesson.hintLayers,
   })
-  const hintCopy = hintState.activeHint?.copy
+  // TQ-011: the lesson-level hints describe the main build; the practice step has its own goal.
+  const hintCopy = practiceStep && hintState.tier > 0 && hintState.tier < 3 ? practiceStep.hint : hintState.activeHint?.copy
   // TQ-008: tier-3 remedial follows the lesson's unit concept, not one fixed page.
   const remedialLessonId = hintState.showRemedialJump
     ? getRemedialIdForLesson(currentLesson.id, hintState.activeHint?.remedialLessonId)
@@ -320,9 +341,15 @@ export default function LessonPage() {
       setFeedback(`先回答舞台上的问题：${mistakeStep.question}`)
       return
     }
+    if (practiceStep?.mode === 'predict' && !practiceAnswer) {
+      // TQ-011: a prediction is only a prediction when it is made before the run.
+      setFeedback(`先在舞台上猜一猜：${practiceStep.question}`)
+      return
+    }
     if (needsRun && correct && !hasRunSuccess) {
       // Not a mistake: the program is right but has not been run yet.
-      setFeedback(currentLesson.id.includes('garden-') ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一关。')
+      // TQ-011: follow the step's own start event (lesson-08's practice starts with “开始时”).
+      setFeedback(step.requiredBlockTypes[0] === 'when_clicked' ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一关。')
       return
     }
     if (!correct) {
@@ -342,6 +369,12 @@ export default function LessonPage() {
       return
     }
 
+    if (practiceStep && !isPracticeAnswered(practiceStep, practiceAnswer)) {
+      // TQ-011: the comparison is the point of the practice — answer it before moving on.
+      setFeedback(`先回答舞台上的问题：${practiceStep.question}`)
+      return
+    }
+
     countedRunFailureRef.current = null
 
     setFailedAttempts(0)
@@ -350,7 +383,8 @@ export default function LessonPage() {
     if (stepIndex < currentLesson.steps.length - 1) {
       clearLessonDraft(currentLesson.id, stepIndex)
       goToStep(stepIndex + 1)
-      setFeedback(getFoundationLessonFeedback(currentLesson.id, 'progress'))
+      // TQ-011: after the practice the result is the practice's own (not the main build's again).
+      setFeedback(practiceStep ? practiceStep.done : getFoundationLessonFeedback(currentLesson.id, 'progress'))
       return
     }
 
@@ -471,7 +505,7 @@ export default function LessonPage() {
             ) : (
               <BlocklyWorkspace
                 key={`workspace-${workspaceVersion}`}
-                enableProgramTools={Boolean(mistakeStep) || ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)}
+                enableProgramTools={Boolean(mistakeStep || practiceStep) || ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)}
                 snapStartOnTop={Boolean(mistakeStep)}
                 allowedBlocks={step.allowedBlocks}
                 blocks={blocks}
@@ -509,7 +543,9 @@ export default function LessonPage() {
                     requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex} judgeOptions={judgeOptions}
                     onRunSuccess={handleRunSuccess} onRunClear={handleRunClear} onRunFailure={handleRunFailure}
                     mistake={mistakeStep} mistakeObserved={mistakeObserved} mistakeAnswer={mistakeAnswer}
-                    onMistakeAnswer={setMistakeAnswer} onReloadMistake={mistakeStep ? handleReloadMistake : undefined}/>
+                    onMistakeAnswer={setMistakeAnswer} onReloadMistake={mistakeStep ? handleReloadMistake : undefined}
+                    practice={practiceStep} practiceAnswer={practiceAnswer} onPracticeAnswer={handlePracticeAnswer}
+                    askClickPrediction={asksClickPrediction(currentLesson.id, step.id)}/>
                 ) : (
                   <PreviewStage blocks={blocks} template={currentTemplate}/>
                 )}

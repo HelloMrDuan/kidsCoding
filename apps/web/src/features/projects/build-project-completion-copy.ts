@@ -8,11 +8,11 @@ type ProjectCompletionCopy = {
 const PROJECT_COMPLETION_COPY: Record<string, ProjectCompletionCopy> = {
   'lesson-03-forest-story': {
     summary:
-      '小狐狸已经会走上舞台，还会打招呼了。先回看作品，再进入下一单元。',
+      '小狐狸已经会走到小兔子身边，再打招呼了。先回看作品，再进入下一单元。',
     spotlightTag: '第一个完整作品',
     spotlightTitle: '你做出了一个完整作品',
     spotlightBody:
-      '这次，小狐狸走上舞台，还会打招呼了。现在可以继续第二单元，让故事从一个画面走到另一个画面。',
+      '这次，小狐狸走到小兔子身边，再打招呼了。现在可以继续第二单元，让故事从一个画面走到另一个画面。',
   },
   'lesson-06-meadow-story': {
     summary:

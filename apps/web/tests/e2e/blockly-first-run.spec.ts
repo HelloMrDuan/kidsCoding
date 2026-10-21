@@ -1,5 +1,5 @@
 import {expect,test} from '@playwright/test'
-import {expectStageWalk,solveMistakeStep} from './lesson-pane-helpers'
+import {expectStageWalk,solveMistakeStep,solvePracticeStep} from './lesson-pane-helpers'
 
 test('first forest Blockly lesson requires actual execution before each step and awards completion once',async({page})=>{
   test.setTimeout(180_000)
@@ -9,14 +9,18 @@ test('first forest Blockly lesson requires actual execution before each step and
   await page.getByTestId('lesson-add-when_start').click()
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('请先点击舞台')
-  for(let step=0;step<4;step++){
-    if(step===3)await page.getByTestId('lesson-add-move_right').click()
+  for(let step=0;step<2;step++){
+    if(step===1)await page.getByTestId('lesson-add-move_right').click()
     await page.getByTestId('run-code-button').click()
     await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:15_000})
-    if(step>=3)await expectStageWalk(page,100)
+    if(step>=1)await expectStageWalk(page,100)
     await page.getByTestId('lesson-complete-step').click()
   }
-  // TQ-010: 第 5 关 is the designed mistake step (no “开始时”).
+  // TQ-011: 第 3 关 is the second practice — predict, then walk 200 步 to the rabbit.
+  await solvePracticeStep(page,{goalType:'change-distance',guess:'beside-friend',build:['move_right']})
+  await expectStageWalk(page,200)
+  await page.getByTestId('lesson-complete-step').click()
+  // TQ-010: 第 4 关 is the designed mistake step (no “开始时”).
   await solveMistakeStep(page,{expectCode:'missing-start',answer:'stayed',fix:['when_start','move_right']})
   await expectStageWalk(page,100)
   await page.getByTestId('lesson-complete-step').click()
@@ -76,21 +80,20 @@ test('TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matc
   await page.waitForURL('**/learn/lesson/lesson-01-forest-hello')
 })
 
-test('TQ-010: lesson 1 第 5 关 — the pre-built program without “开始时” is run, observed, explained and fixed',async({page})=>{
+test('TQ-010: lesson 1 第 4 关 — the pre-built program without “开始时” is run, observed, explained and fixed',async({page})=>{
   test.setTimeout(150_000)
   await page.addInitScript(()=>{
     if(sessionStorage.getItem('tq010-seeded'))return
     sessionStorage.setItem('tq010-seeded','1')
-    // Resume at 第 5 关 with no draft for it: the step opens on its designed wrong program.
+    // Resume at 第 3 关 (the practice); 第 4 关 has no draft, so it opens on its designed wrong program.
     const lessonId='lesson-01-forest-hello'
-    sessionStorage.setItem(`kc-lesson-draft:${lessonId}:3`,JSON.stringify({schemaVersion:1,lessonId,stepIndex:3,blocks:[{type:'when_start'},{type:'move_right'}],updatedAt:new Date().toISOString()}))
+    sessionStorage.setItem(`kc-lesson-draft:${lessonId}:2`,JSON.stringify({schemaVersion:1,lessonId,stepIndex:2,blocks:[{type:'when_start'},{type:'move_right'},{type:'move_right'}],updatedAt:new Date().toISOString()}))
   })
   await page.goto('/learn/lesson/lesson-01-forest-hello')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
-  await page.getByTestId('run-code-button').click()
-  await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:15_000})
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 关')
+  await solvePracticeStep(page,{goalType:'change-distance',guess:'half-way',build:[]})
   await page.getByTestId('lesson-complete-step').click()
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
   await expect(page.getByTestId('lesson-task-card')).toContainText('少了开始？找错再修好')
   const task=page.getByTestId('mistake-task')
   await expect(task).toContainText('纠错实验：少了“开始时”')
@@ -102,7 +105,7 @@ test('TQ-010: lesson 1 第 5 关 — the pre-built program without “开始时�
   // Cannot skip the experiment.
   await page.getByTestId('lesson-complete-step').click()
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('先按舞台上的运行按钮')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
+  await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
   // Run it: the fox does not move, and the stage says why.
   await page.getByTestId('run-code-button').click()
   await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code','missing-start',{timeout:12_000})

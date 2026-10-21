@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
 import { isDesignedMistakeRun, type MistakeStepDesign } from '@/content/curriculum/mistake-steps'
+import { isPracticeAnswered, type PracticeStepDesign } from '@/content/curriculum/practice-steps'
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 import { ResetIcon } from '@/features/ui/reset-icon'
 import { evaluateObservable, type JudgeOptions, type ProgramBlock, type RunFailureCode } from '../blockly/observable-run'
@@ -90,6 +91,10 @@ export function PlayableStage({
   mistakeAnswer = null,
   onMistakeAnswer,
   onReloadMistake,
+  practice,
+  practiceAnswer = null,
+  onPracticeAnswer,
+  askClickPrediction,
 }: {
   blocks: ProgramBlock[]
   template?: ProjectTemplateDefinition
@@ -113,6 +118,16 @@ export function PlayableStage({
   onMistakeAnswer?: (choiceId: string) => void
   /** TQ-010: put the designed wrong program back on the workspace. */
   onReloadMistake?: () => void
+  /** TQ-011: this step is the lesson's second practice (a goal different from the main build). */
+  practice?: PracticeStepDesign
+  /** TQ-011: the child's guess (predict) or comparison answer (compare). */
+  practiceAnswer?: string | null
+  onPracticeAnswer?: (choiceId: string) => void
+  /**
+   * TQ-011: ask the garden “先猜一猜” before starting a click program. Defaults to every click
+   * step; the classroom asks it only where it teaches something (lesson-07 main + mistake).
+   */
+  askClickPrediction?: boolean
 }) {
   const {
     executionState,
@@ -137,7 +152,14 @@ export function PlayableStage({
   const [attemptId, setAttemptId] = useState(0)
   const reportedAttemptRef = useRef(-1)
   const clickLesson=requiredBlocks[0]==='when_clicked'
+  const askPrediction = askClickPrediction ?? clickLesson
   const [prediction,setPrediction]=useState<'automatic'|'needs-click'|null>(null)
+  // TQ-011: second practice. predict = guess before running; compare = answer after a successful run.
+  const practicePick = practice?.choices.find((choice) => choice.id === practiceAnswer)
+  const practiceGuessNeeded = practice?.mode === 'predict' && !practicePick
+  const practiceQuestionVisible = practice ? practice.mode === 'predict' || executionState === 'success' || Boolean(practicePick) : false
+  const practiceDone = Boolean(practice && executionState === 'success' && isPracticeAnswered(practice, practiceAnswer))
+  const practiceLocked = practice?.mode === 'predict' && executionState !== 'idle' && executionState !== 'error'
   const visualScene=stageScene==='meadow'?'草地':template?.starterScene==='garden'?'花园':'森林'
   const sceneId: SceneId = stageScene==='meadow'?'meadow':template?.starterScene==='garden'?'garden':'forest'
   const mainId = template?.starterCharacters[0] ?? 'fox'
@@ -191,7 +213,7 @@ export function PlayableStage({
 
         <div className="kc-stage-actors">
           <button type="button" aria-label={clickLesson?'点击蝴蝶触发积木程序':mainLabel}
-            disabled={!clickLesson||executionState!=='armed'} onClick={()=>void clickCharacter()}
+            disabled={executionState!=='armed'} onClick={()=>void clickCharacter()}
             className="kc-stage-actor kc-stage-actor-main"
             style={{ '--kc-walk': stageWalkProgress(characterPosition) } as CSSProperties}
             data-steps={characterPosition}
@@ -217,7 +239,7 @@ export function PlayableStage({
       </div>
 
       <div className="kc-stage-panel space-y-3">
-      {clickLesson ? (
+      {askPrediction ? (
         <div data-testid="garden-prediction" className="rounded-[8px] border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-bold text-amber-950">先猜一猜：只按“启动点击程序”，没有点蝴蝶，它会自己飞起来吗？</p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -236,6 +258,36 @@ export function PlayableStage({
                 : prediction==='needs-click'?'你预测对了：点击事件发生后，积木才开始执行。':'观察到了吗？只有点击蝴蝶后程序才执行，再想想“被点击时”的意义。'}
             </p>
           ) : null}
+        </div>
+      ) : null}
+      {practice ? (
+        <div data-testid="practice-task" data-goal-type={practice.goalType} data-mode={practice.mode} className="kc-practice-task">
+          <p className="kc-practice-title">🎯 {practice.title}</p>
+          <p data-testid="practice-setup" className="mt-1">{practice.setup}</p>
+          {practiceQuestionVisible ? (
+            <div className="mt-2">
+              <p className="font-bold" id="practice-question-label" data-testid="practice-question">
+                {practice.mode === 'predict' ? '先猜一猜：' : '比一比：'}{practice.question}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="practice-question-label">
+                {practice.choices.map((choice) => (
+                  <button key={choice.id} type="button" data-testid={`practice-answer-${choice.id}`}
+                    aria-pressed={practiceAnswer === choice.id} disabled={practiceLocked}
+                    className={`kc-practice-choice ${practiceAnswer === choice.id ? 'kc-practice-choice-on' : ''}`}
+                    onClick={() => onPracticeAnswer?.(choice.id)}>{choice.label}</button>
+                ))}
+              </div>
+              {practicePick ? (
+                <p data-testid="practice-answer-reply" className="mt-2 font-semibold">
+                  {practice.mode === 'predict' && executionState !== 'success' ? '猜好啦！现在让程序动起来，看看你猜得对不对。' : practicePick.reply}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+          {practiceGuessNeeded ? (
+            <p data-testid="practice-need-guess" className="mt-2 text-sm font-semibold">👆 先选一个你的猜测，运行按钮就会亮起来。</p>
+          ) : null}
+          {practiceDone ? <p data-testid="practice-done" className="mt-2 font-bold text-emerald-800">✅ {practice.done}</p> : null}
         </div>
       ) : null}
       {mistake ? (
@@ -268,7 +320,7 @@ export function PlayableStage({
         </div>
       ) : null}
         <div aria-live="polite">
-            {clickLesson && executionState==='armed' ? (
+            {executionState==='armed' ? (
               <div data-testid="garden-await-click" className="kc-feedback">
                 程序已准备，但蝴蝶还没动。现在请亲自点击舞台上的蝴蝶！
               </div>
@@ -284,7 +336,11 @@ export function PlayableStage({
               </div>
             ) : null}
 
-            {executionState === 'success' && (mistake && !(mistakeObserved && mistakeAnswered) ? (
+            {executionState === 'success' && (practice && !practiceDone ? (
+              <div className="kc-feedback" data-testid="practice-need-answer">
+                运行成功了！先回答上面的问题：{practice.question}
+              </div>
+            ) : mistake && !(mistakeObserved && mistakeAnswered) ? (
               <div className="kc-feedback" data-testid="mistake-need-observe">
                 {mistakeObserved ? '运行成功了！先回答上面的问题：你看到了什么？' : '运行成功了！不过这一关要先看看错误程序会怎样。点“再摆一次错误程序”，运行看看。'}
               </div>
@@ -293,7 +349,7 @@ export function PlayableStage({
                 🎉 太棒了！运行成功！点击“完成这一关”继续。
               </div>
             ))}
-          {executionState !== 'error' && executionState !== 'success' && !(clickLesson && executionState==='armed') ? (
+          {executionState !== 'error' && executionState !== 'success' && executionState !== 'armed' ? (
             <div className="kc-feedback">{clickLesson ? '准备就绪。先按「启动点击程序」，再点一下蝴蝶。' : '准备就绪。点击「运行」观察角色动作与对白。'}</div>
           ) : null}
         </div>
@@ -302,7 +358,7 @@ export function PlayableStage({
             type="button"
             className="kc-action-surface disabled:opacity-50"
             onClick={handleRun}
-            disabled={executionState === 'running' || executionState === 'armed' || (clickLesson && prediction===null)}
+            disabled={executionState === 'running' || executionState === 'armed' || (askPrediction && prediction===null) || practiceGuessNeeded}
             data-testid="run-code-button"
           >
             {executionState === 'armed' ? '等待点击蝴蝶…' : executionState === 'running' ? '运行中...' : clickLesson?'▶ 启动点击程序':'▶ 运行'}

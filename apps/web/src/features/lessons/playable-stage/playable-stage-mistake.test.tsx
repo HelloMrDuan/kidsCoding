@@ -8,17 +8,17 @@ import { PlayableStage } from './playable-stage'
 /** TQ-010: the designed mistake → observe → fix panel on the lessons 01–09 stage. */
 const forest = launchTemplates.find((template) => template.id === 'forest-meetup-stage')
 const garden = launchTemplates.find((template) => template.id === 'garden-interaction-stage')
-const l01 = getMistakeStep('lesson-01-forest-hello', 'step-5')!
-const l07 = getMistakeStep('lesson-07-garden-click', 'step-3')!
-const l01Step = launchLessons[0].steps[4]
-const l07Step = launchLessons[6].steps[2]
+const l01 = getMistakeStep('lesson-01-forest-hello', 'step-4')!
+const l07 = getMistakeStep('lesson-07-garden-click', 'step-4')!
+const l01Step = launchLessons[0].steps[3]
+const l07Step = launchLessons[6].steps[3]
 
 describe('PlayableStage designed mistake step (TQ-010)', () => {
   it('L01: the wrong program (no “开始时”) leaves the fox at 0 steps and reports the designed failure', async () => {
     const onRunFailure = vi.fn()
     render(
       <PlayableStage blocks={l01.wrongProgram} mistake={l01} onReloadMistake={vi.fn()} onRunFailure={onRunFailure}
-        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     expect(screen.getByTestId('mistake-task')).toHaveTextContent('纠错实验：少了“开始时”')
     expect(screen.getByTestId('mistake-setup')).toHaveTextContent('只有“向右走 100 步”')
@@ -37,20 +37,20 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
     const onMistakeAnswer = vi.fn()
     const { rerender } = render(
       <PlayableStage blocks={l01.wrongProgram} mistake={l01} mistakeObserved onMistakeAnswer={onMistakeAnswer}
-        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     expect(screen.getByTestId('mistake-question')).toHaveTextContent('按了运行，小狐狸怎么了？')
     fireEvent.click(screen.getByTestId('mistake-answer-walked'))
     expect(onMistakeAnswer).toHaveBeenCalledWith('walked')
     rerender(
       <PlayableStage blocks={l01.wrongProgram} mistake={l01} mistakeObserved mistakeAnswer="walked" onMistakeAnswer={onMistakeAnswer}
-        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     expect(screen.getByTestId('mistake-answer-reply')).toHaveTextContent('再看看舞台')
     expect(screen.queryByTestId('mistake-fix')).toBeNull()
     rerender(
       <PlayableStage blocks={l01.wrongProgram} mistake={l01} mistakeObserved mistakeAnswer="stayed" onMistakeAnswer={onMistakeAnswer}
-        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     expect(screen.getByTestId('mistake-answer-stayed')).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByTestId('mistake-fix')).toHaveTextContent('把“开始时”放到“向右走 100 步”上面')
@@ -60,7 +60,7 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
     const onRunSuccess = vi.fn()
     render(
       <PlayableStage blocks={l01.fixedProgram} mistake={l01} mistakeObserved mistakeAnswer="stayed"
-        onRunSuccess={onRunSuccess} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunSuccess={onRunSuccess} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     fireEvent.click(screen.getByTestId('run-code-button'))
     await waitFor(() => expect(onRunSuccess).toHaveBeenCalled(), { timeout: 5000 })
@@ -73,7 +73,7 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
     const onReloadMistake = vi.fn()
     render(
       <PlayableStage blocks={l01.fixedProgram} mistake={l01} onReloadMistake={onReloadMistake}
-        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     fireEvent.click(screen.getByTestId('run-code-button'))
     expect(await screen.findByTestId('mistake-need-observe', {}, { timeout: 5000 })).toHaveTextContent('再摆一次错误程序')
@@ -86,7 +86,7 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
     const onRunFailure = vi.fn()
     render(
       <PlayableStage blocks={l07.wrongProgram} mistake={l07} onRunFailure={onRunFailure}
-        onRunSuccess={vi.fn()} requiredBlocks={l07Step.requiredBlockTypes} stepIndex={2} template={garden} />,
+        onRunSuccess={vi.fn()} requiredBlocks={l07Step.requiredBlockTypes} stepIndex={3} template={garden} />,
     )
     fireEvent.click(screen.getByTestId('garden-predict-click'))
     fireEvent.click(screen.getByTestId('run-code-button'))
@@ -100,7 +100,7 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
 
   it('after the right answer, the designed wrong run still shows no “哎呀” box (the child was right)', async () => {
     const props = { blocks: l01.wrongProgram, mistake: l01, onRunFailure: vi.fn(), onRunSuccess: vi.fn(),
-      requiredBlocks: l01Step.requiredBlockTypes, stepIndex: 4, template: forest }
+      requiredBlocks: l01Step.requiredBlockTypes, stepIndex: 3, template: forest }
     const { rerender } = render(<PlayableStage {...props} />)
     fireEvent.click(screen.getByTestId('run-code-button'))
     expect(await screen.findByTestId('mistake-run-result')).toBeInTheDocument()
@@ -115,7 +115,7 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
     const onRunFailure = vi.fn()
     render(
       <PlayableStage blocks={l01.wrongProgram} mistake={l01} mistakeObserved mistakeAnswer="stayed" onRunFailure={onRunFailure}
-        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     fireEvent.click(screen.getByTestId('run-code-button'))
     expect(await screen.findByTestId('stage-run-error')).toHaveTextContent('哎呀，差一点点！')
@@ -127,7 +127,7 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
     const onRunFailure = vi.fn()
     render(
       <PlayableStage blocks={[{ type: 'move_right' }, { type: 'move_right' }]} mistake={l01} mistakeObserved mistakeAnswer="stayed"
-        onRunFailure={onRunFailure} onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunFailure={onRunFailure} onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     fireEvent.click(screen.getByTestId('run-code-button'))
     expect(await screen.findByTestId('stage-run-error')).toHaveAttribute('data-failure-code', 'missing-start')
@@ -140,7 +140,7 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
   it('both reset-style buttons use the same decorative SVG icon, not the “↺” glyph', () => {
     render(
       <PlayableStage blocks={l01.wrongProgram} mistake={l01} onReloadMistake={vi.fn()}
-        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={4} template={forest} />,
+        onRunSuccess={vi.fn()} requiredBlocks={l01Step.requiredBlockTypes} stepIndex={3} template={forest} />,
     )
     for (const id of ['mistake-reload', 'reset-code-button']) {
       const button = screen.getByTestId(id)
@@ -157,7 +157,7 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
     const onRunSuccess = vi.fn()
     render(
       <PlayableStage blocks={l07.fixedProgram} mistake={l07} mistakeObserved mistakeAnswer="flew-alone"
-        onRunSuccess={onRunSuccess} requiredBlocks={l07Step.requiredBlockTypes} stepIndex={2} template={garden} />,
+        onRunSuccess={onRunSuccess} requiredBlocks={l07Step.requiredBlockTypes} stepIndex={3} template={garden} />,
     )
     fireEvent.click(screen.getByTestId('garden-predict-auto'))
     fireEvent.click(screen.getByTestId('run-code-button'))

@@ -10,7 +10,7 @@ type ParentOverviewInput = {
 
 function describeProjectResult(lessonId: string) {
   if (lessonId === 'lesson-03-forest-story') {
-    return '小狐狸已经会走上舞台，还会打招呼了。'
+    return '小狐狸已经会走到小兔子身边，再打招呼了。'
   }
 
   if (lessonId === 'lesson-06-meadow-story') {
@@ -46,7 +46,7 @@ function describeProjectResult(lessonId: string) {
   }
 
   if (lessonId === 'lesson-08-garden-dialogue') {
-    return '现在，蝴蝶已经会先飞再说了。'
+    return '现在，蝴蝶已经会先飞再说了，还分得清“开始时”和“被点击时”。'
   }
 
   if (lessonId === 'lesson-10-second-friend') {
