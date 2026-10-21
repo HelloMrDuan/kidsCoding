@@ -23,7 +23,7 @@ type ProjectCompleteCardProps = {
   stars: number
   totalCards: number
   rewardCards: RewardCard[]
-  blocks: Array<{ type: string }>
+  blocks: Array<{ type: string; line?: string }>
   template?: ProjectTemplateDefinition
   onReplay: () => void
   primaryHref: string
@@ -101,14 +101,19 @@ export function ProjectCompleteCard({
             当前累计 {stars} 颗星星，已收集 {totalCards} 张卡片。{completionCopy.summary}
           </p>
 
-          <div
-            className="kc-stage-3d mt-5 rounded-[1.5rem] bg-[#f5fbff] p-4"
-            data-testid="project-complete-lite-preview"
-          >
-            <div className="scale-[0.92] origin-top">
-              {playableProject ?? <PreviewStage blocks={blocks} template={template} />}
+          {/* TQ-012: a playable project is not scaled (Blockly drag coordinates must stay true). */}
+          {playableProject ? (
+            <div className="mt-5" data-testid="project-complete-lite-preview">{playableProject}</div>
+          ) : (
+            <div
+              className="kc-stage-3d mt-5 rounded-[1.5rem] bg-[#f5fbff] p-4"
+              data-testid="project-complete-lite-preview"
+            >
+              <div className="scale-[0.92] origin-top">
+                <PreviewStage blocks={blocks} template={template} />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button

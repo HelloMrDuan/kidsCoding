@@ -7,7 +7,15 @@
  * line of the meadow / garden group is the scene default (defaultSayMessage) so a say block
  * with no choice still says what it always said.
  */
-export type SayLinePreset = { id: string; text: string }
+export type SayLinePreset = {
+  id: string
+  text: string
+  /**
+   * TQ-012: the scene this line only makes sense in (“我到草地啦！” is a meadow line). Unset =
+   * fine anywhere. Unit projects reject a line said in the other scene (`line-wrong-place`).
+   */
+  scene?: 'forest' | 'meadow'
+}
 
 export const FOREST_GREETING_LINES: readonly SayLinePreset[] = [
   { id: 'hello', text: '你好！' },
@@ -16,12 +24,18 @@ export const FOREST_GREETING_LINES: readonly SayLinePreset[] = [
   { id: 'lets-play', text: '一起来玩吧！' },
 ]
 
-/** TQ-012: lesson-06 travel feelings; first line = meadow default. */
+/**
+ * TQ-012: lesson-06 travel lines; first line = meadow default. Lines are scene-specific: the
+ * meadow and its bird can only be greeted after “切换场景”; before leaving the forest the fox
+ * says a setting-off line. “旅行真好玩！” fits both places.
+ */
 export const MEADOW_TRAVEL_LINES: readonly SayLinePreset[] = [
-  { id: 'meadow-arrived', text: '我到草地啦！' },
-  { id: 'meadow-pretty', text: '草地真漂亮！' },
+  { id: 'meadow-arrived', text: '我到草地啦！', scene: 'meadow' },
+  { id: 'meadow-pretty', text: '草地真漂亮！', scene: 'meadow' },
+  { id: 'meadow-hi-bird', text: '小鸟，你好呀！', scene: 'meadow' },
   { id: 'meadow-fun', text: '旅行真好玩！' },
-  { id: 'meadow-hi-bird', text: '小鸟，你好呀！' },
+  { id: 'travel-depart', text: '出发去旅行啦！', scene: 'forest' },
+  { id: 'forest-bye', text: '森林再见！', scene: 'forest' },
 ]
 
 /** TQ-012: lesson-09 butterfly replies; first line = click default. */
@@ -29,7 +43,7 @@ export const GARDEN_REPLY_LINES: readonly SayLinePreset[] = [
   { id: 'garden-got-click', text: '蝴蝶收到你的点击啦！' },
   { id: 'garden-thanks', text: '谢谢你点我！' },
   { id: 'garden-dance', text: '看我跳个舞！' },
-  { id: 'garden-fly-together', text: '我们一起飞吧！' },
+  { id: 'garden-happy', text: '飞得真开心！' },
 ]
 
 export const ALL_SAY_LINE_GROUPS: readonly (readonly SayLinePreset[])[] = [
@@ -39,6 +53,7 @@ export const ALL_SAY_LINE_GROUPS: readonly (readonly SayLinePreset[])[] = [
 ]
 
 const PRESET_TEXT = new Map(ALL_SAY_LINE_GROUPS.flat().map((line) => [line.id, line.text]))
+const PRESET_SCENE = new Map(ALL_SAY_LINE_GROUPS.flat().map((line) => [line.id, line.scene]))
 
 /** Text of a preset line id (any group); null for no / unknown id (unknown ids never reach the stage). */
 export function resolveSayLine(id: string | undefined | null) {
@@ -47,4 +62,9 @@ export function resolveSayLine(id: string | undefined | null) {
 
 export function isKnownSayLine(id: string | undefined | null) {
   return !!id && PRESET_TEXT.has(id)
+}
+
+/** TQ-012: the only scene a preset line fits; undefined = any scene (or unknown id). */
+export function sayLineScene(id: string | undefined | null) {
+  return id ? PRESET_SCENE.get(id) : undefined
 }

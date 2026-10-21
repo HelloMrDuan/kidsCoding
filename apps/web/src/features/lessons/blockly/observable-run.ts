@@ -51,6 +51,7 @@ export type DifferenceCode =
   | 'extra-say'
   | 'wrong-line'
   | 'unknown-line'
+  | 'line-wrong-place'
   | 'say-too-early'
   | 'say-too-late'
 

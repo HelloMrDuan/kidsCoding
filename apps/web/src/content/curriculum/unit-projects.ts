@@ -10,6 +10,8 @@ import {
   FOREST_GREETING_LINES,
   GARDEN_REPLY_LINES,
   MEADOW_TRAVEL_LINES,
+  resolveSayLine,
+  sayLineScene,
   type SayLinePreset,
 } from '@/features/lessons/blockly/say-line-presets'
 import { sanitizeSnapshotBlocks, type SnapshotBlock } from '@/features/progress/project-snapshot'
@@ -26,7 +28,8 @@ import { launchLessons } from './launch-lessons'
  * - acceptedPrograms: reference programs; a program passes when its OBSERVABLE result
  *   matches ANY of them (observable-run.ts evaluateAcceptedPrograms), not a block-for-block match.
  * - sayLineChoices (L03/L06/L09): the child picks the line; with acceptedPrograms the child
- *   also picks WHERE it is said. Both choices are judged correct.
+ *   also picks WHERE it is said. Both choices are judged correct, as long as a scene-specific
+ *   line is said in its scene (L06: meadow lines after the switch, forest lines before).
  *
  * Kept in code (not the lesson payload) so a database copy of the curriculum cannot drop it.
  * Copy is short for 5–7 year olds and quotes block names from block-labels.ts.
@@ -117,7 +120,7 @@ const SEEDS: Seed[] = [
     lessonId: 'lesson-06-meadow-story',
     title: '小动物旅行记',
     prompt: '小狐狸去草地旅行，走完 200 步，还要说一句话。',
-    choiceHint: '选一句对白，再想想：在森林说，还是到草地再说？',
+    choiceHint: '在森林说出发的话，还是到草地再说？',
     actor: '小狐狸',
     verb: 'walk',
     sayLineChoices: MEADOW_TRAVEL_LINES,
@@ -208,6 +211,31 @@ export function getUnitProjectJudgeOptions(lessonId: string): JudgeOptions {
   return options
 }
 
+const SCENE_NAME = { forest: '森林', meadow: '草地' } as const
+
+/**
+ * TQ-012: a scene-specific line (say-line-presets `scene`) must be said in that scene, e.g.
+ * “我到草地啦！” / “小鸟，你好呀！” only after “切换场景”. Returns a kid-facing hint naming the
+ * line and a line of this project that fits where it was said, or null when every line fits.
+ */
+export function findLineWrongPlace(lessonId: string, blocks: ProgramBlock[]): string | null {
+  const project = BY_LESSON.get(lessonId)
+  let scene: 'forest' | 'meadow' = 'forest'
+  for (const block of blocks) {
+    if (block.type === 'switch_scene') scene = 'meadow'
+    if (block.type !== 'say_line') continue
+    const fits = sayLineScene(block.line)
+    if (!fits || fits === scene) continue
+    const text = resolveSayLine(block.line)
+    const suggestion = project?.sayLineChoices?.find((line) => line.scene === scene)
+    const tip = suggestion ? `在${SCENE_NAME[scene]}可以说“${suggestion.text}”。` : ''
+    return fits === 'meadow'
+      ? `“${text}”要到草地再说哦！${tip}`
+      : `“${text}”要在森林里说哦，到草地就晚啦。${tip}`
+  }
+  return null
+}
+
 /** Judge a unit project program: passes when it observably matches ANY accepted program. */
 export function evaluateUnitProject(lessonId: string, blocks: ProgramBlock[]): ObservableVerdict {
   const project = BY_LESSON.get(lessonId)
@@ -217,5 +245,8 @@ export function evaluateUnitProject(lessonId: string, blocks: ProgramBlock[]): O
   if (verdict.passed && blocks.some((block) => !project.allowedBlocks.includes(block.type))) {
     return { ...verdict, passed: false, reason: '这块积木这节课还用不上，先把它拿走吧。', code: 'unsupported-block' }
   }
+  // The order is right, but the chosen line does not fit the scene it is said in.
+  const wrongPlace = verdict.passed ? findLineWrongPlace(lessonId, blocks) : null
+  if (wrongPlace) return { ...verdict, passed: false, reason: wrongPlace, code: 'line-wrong-place' }
   return verdict
 }

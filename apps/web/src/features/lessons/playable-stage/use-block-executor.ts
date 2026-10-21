@@ -1,12 +1,15 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { quoteBlock } from '../blockly/block-labels'
-import { evaluateObservable, MAX_PROGRAM_BLOCKS, sayMessageFor, simulateProgram, type JudgeOptions, type ProgramBlock } from '../blockly/observable-run'
+import { evaluateObservable, MAX_PROGRAM_BLOCKS, sayMessageFor, simulateProgram, type JudgeOptions, type ObservableVerdict, type ProgramBlock } from '../blockly/observable-run'
 
 const NO_JUDGE_OPTIONS: JudgeOptions = {}
 
+/** TQ-012: a custom judge (unit projects accept several programs); replaces evaluateObservable. */
+export type ProgramJudge = (blocks: ProgramBlock[]) => ObservableVerdict
+
 export type ExecutionState = 'idle' | 'armed' | 'running' | 'success' | 'error'
 
-export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' | 'graduation' = false, judgeOptions: JudgeOptions = NO_JUDGE_OPTIONS) {
+export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' | 'graduation' = false, judgeOptions: JudgeOptions = NO_JUDGE_OPTIONS, judge?: ProgramJudge) {
   const dialogueEnabled = duoEnabled === 'dialogue'
   const graduationEnabled = duoEnabled === 'graduation'
   const [giftFound, setGiftFound] = useState(false)
@@ -134,7 +137,7 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
     }
     if (!duoEnabled) {
       // SYS-103: judge the observed result, so equivalent programs pass and counter-examples fail.
-      const verdict = evaluateObservable(requiredBlocks, blocks, judgeOptions)
+      const verdict = judge ? judge(blocks) : evaluateObservable(requiredBlocks, blocks, judgeOptions)
       if (!verdict.passed) {
         fail(verdict.reason)
         return
@@ -167,7 +170,7 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
       }
     }
     if (runIdRef.current === id) setExecutionState('success')
-  }, [blocks, requiredBlocks, duoEnabled, dialogueEnabled, graduationEnabled, stepIndex, judgeOptions])
+  }, [blocks, requiredBlocks, duoEnabled, dialogueEnabled, graduationEnabled, stepIndex, judgeOptions, judge])
 
   const run = useCallback(async () => {
     reset()

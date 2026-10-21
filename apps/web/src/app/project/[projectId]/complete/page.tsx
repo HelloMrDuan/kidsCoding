@@ -10,6 +10,8 @@ import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum
 import { buildProjectCompletionCopy } from '@/features/projects/build-project-completion-copy'
 import { ProjectCompleteCard } from '@/features/projects/project-complete-card'
 import { DuoProject } from '@/features/lessons/playable-stage/duo-project'
+import { UnitProject } from '@/features/lessons/playable-stage/unit-project'
+import { getUnitProject } from '@/content/curriculum/unit-projects'
 import { resolveProjectContinueAction } from '@/features/projects/resolve-project-continue-action'
 import {
   defaultGuestProgress,
@@ -46,6 +48,15 @@ export default function ProjectCompletePage() {
       <Link className="inline-flex min-h-11 items-center rounded-full bg-emerald-800 px-5 text-white" href={`/learn/lesson/${lesson.id}`}>回课堂继续寻宝</Link>
     </section></main>
   }
+  // TQ-012: lessons 01–09 reopen the child's own saved program — only after the lesson was
+  // really completed on this device (same gate as the graduation show).
+  const unitProject = getUnitProject(lesson.id)
+  if (unitProject && (!progress.completedLessonIds.includes(lesson.id) || snapshotBlocks.length === 0)) {
+    return <main className="min-h-screen bg-amber-50 p-6"><section className="mx-auto max-w-xl rounded-3xl bg-white p-6" data-testid="unit-project-locked">
+      <h1 className="text-2xl font-bold">这个作品还没有完成</h1><p className="my-4 leading-7">本机还没有这节课的作品。请先回课堂完成练习，作品会自动保存在这里。</p>
+      <Link className="inline-flex min-h-11 items-center rounded-full bg-emerald-800 px-5 text-white" href={`/learn/lesson/${lesson.id}`}>回课堂完成这节课</Link>
+    </section></main>
+  }
   const completionCopy = buildProjectCompletionCopy(lesson.id)
   const currentTemplate = curriculum.templates.find(
     (item) => item.id === lesson.templateId,
@@ -66,7 +77,9 @@ export default function ProjectCompletePage() {
       <ProjectCompleteCard
         key={`${lesson.id}-${replayCount}`}
         blocks={snapshotBlocks}
-        playableProject={['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lesson.id) ? <DuoProject lessonId={lesson.id} key={`${lesson.id}:${snapshotBlocks.length > 0}`} initialBlocks={snapshotBlocks}/> : undefined}
+        playableProject={unitProject
+          ? <UnitProject lessonId={lesson.id} key={lesson.id} initialBlocks={snapshotBlocks}/>
+          : ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lesson.id) ? <DuoProject lessonId={lesson.id} key={`${lesson.id}:${snapshotBlocks.length > 0}`} initialBlocks={snapshotBlocks}/> : undefined}
         completionCopy={completionCopy}
         isFoundationGraduate={isFoundationGraduate}
         lessonTitle={lesson.title}

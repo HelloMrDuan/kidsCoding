@@ -17,6 +17,7 @@ import {
   getUnitProject,
   getUnitProjectJudgeOptions,
   getUnitProjectStartBlocks,
+  findLineWrongPlace,
   UNIT_PROJECT_LESSON_IDS,
   unitProjects,
 } from './unit-projects'
@@ -98,16 +99,43 @@ describe('TQ-012 unit project judging', () => {
     expect(evaluateUnitProject(L03, prog(['when_start', 'move_right', 'say_line'])).code).toBe('too-few-moves')
   })
 
-  it('L06: say in the meadow at the end or in the forest before switching — both pass', () => {
+  it('L06: say in the meadow at the end or in the forest before switching — both pass with a line that fits', () => {
+    const meadowEnd = ['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line']
+    const forestFirst = ['when_start', 'move_right', 'say_line', 'switch_scene', 'repeat_twice']
     for (const line of MEADOW_TRAVEL_LINES) {
-      expect(evaluateUnitProject(L06, prog(['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], line.id)).passed).toBe(true)
-      expect(evaluateUnitProject(L06, prog(['when_start', 'move_right', 'say_line', 'switch_scene', 'repeat_twice'], line.id)).passed).toBe(true)
+      expect(evaluateUnitProject(L06, prog(meadowEnd, line.id)).passed).toBe(line.scene !== 'forest')
+      expect(evaluateUnitProject(L06, prog(forestFirst, line.id)).passed).toBe(line.scene !== 'meadow')
     }
+    // both places offer at least two fitting lines
+    expect(MEADOW_TRAVEL_LINES.filter((line) => line.scene !== 'forest').length).toBeGreaterThanOrEqual(2)
+    expect(MEADOW_TRAVEL_LINES.filter((line) => line.scene !== 'meadow').length).toBeGreaterThanOrEqual(2)
     // no choice: the scene default line still passes in both places
-    expect(evaluateUnitProject(L06, prog(['when_start', 'move_right', 'say_line', 'switch_scene', 'repeat_twice'])).passed).toBe(true)
-    expect(evaluateUnitProject(L06, prog(['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'])).passed).toBe(true)
+    expect(evaluateUnitProject(L06, prog(forestFirst)).passed).toBe(true)
+    expect(evaluateUnitProject(L06, prog(meadowEnd)).passed).toBe(true)
     // switching too late still fails
     expect(evaluateUnitProject(L06, prog(['when_start', 'move_right', 'repeat_twice', 'switch_scene', 'say_line'])).passed).toBe(false)
+  })
+
+  it('L06: a meadow line said in the forest (or a forest line in the meadow) fails with a friendly hint', () => {
+    for (const id of ['meadow-arrived', 'meadow-pretty', 'meadow-hi-bird']) {
+      const verdict = evaluateUnitProject(L06, prog(['when_start', 'move_right', 'say_line', 'switch_scene', 'repeat_twice'], id))
+      expect(verdict.code).toBe('line-wrong-place')
+      expect(verdict.reason).toMatch(/要到草地再说/)
+      expect(verdict.reason).toMatch(/在森林可以说“出发去旅行啦！”/)
+      expect(explainRunFailure(verdict)).toBe(verdict.reason)
+    }
+    const late = evaluateUnitProject(L06, prog(['when_start', 'move_right', 'switch_scene', 'repeat_twice', 'say_line'], 'forest-bye'))
+    expect(late.code).toBe('line-wrong-place')
+    expect(late.reason).toMatch(/“森林再见！”要在森林里说/)
+    expect(late.reason).toMatch(/在草地可以说“我到草地啦！”/)
+    // a wrong order is reported first (the place of the line is only checked on a right order)
+    expect(evaluateUnitProject(L06, prog(['when_start', 'say_line', 'move_right', 'switch_scene', 'repeat_twice'], 'meadow-arrived')).code).toBe('say-too-early')
+    expect(explainRunFailure({ code: 'line-wrong-place', goal: null, actual: null })).toMatch(/换一句/)
+  })
+
+  it('L03 / L09 lines have no scene restriction (they make sense after any accepted order)', () => {
+    for (const line of [...FOREST_GREETING_LINES, ...GARDEN_REPLY_LINES]) expect(line.scene).toBeUndefined()
+    expect(findLineWrongPlace(L09, prog(['when_clicked', 'move_right', 'say_line', 'repeat_twice'], 'garden-happy'))).toBeNull()
   })
 
   it('L09: reply after one flight or after both — both pass; replying before flying fails', () => {
