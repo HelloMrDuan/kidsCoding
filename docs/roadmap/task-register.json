@@ -128,6 +128,32 @@
       "notes": ""
     },
     {
+      "id": "OPS-006",
+      "title": "本地 Supabase CLI 脚本测试跨平台修复",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-001"
+      ],
+      "scope": "apps/web/scripts/local-supabase-cli.mjs 及 local-supabase-cli / install-cli-core / setup-core 三个脚本测试",
+      "acceptance": [
+        "5 项因 Windows 路径分隔符写死而在 Linux 失败的测试完成跨平台修复，Windows 与 Linux 语义一致且断言不放宽",
+        "Linux 全量 Vitest 通过且本 PR CI 全绿后方可合并"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/102",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "Linux: affected 3 files 13/13 passed",
+          "Linux: full Vitest 661/661 on main baseline (was 656/661 with the 5 platform failures)"
+        ],
+        "reviewer": null
+      },
+      "notes": "InstaBox 预发布部署验收中发现；源码改为按目标平台拼路径，测试期望按平台形式修正。"
+    },
+    {
       "id": "TQ-001",
       "title": "逐课教学审核表与评分工具",
       "priority": "P0",
