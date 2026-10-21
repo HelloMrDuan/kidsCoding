@@ -261,3 +261,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-20 | TQ-010 | 前 9 课每课一个纠错关（TQ-002d）：mistake-steps 单一来源，第 1～9 课各替换一个重复关为“真实错误 → 观察 → 回答 → 修复”关（课程仍 5 关），积木区自动摆好错误程序、可“再摆一次错误程序”；设计内错误运行不显示“哎呀”框、不计入提示升级；重置类按钮（重置、再摆一次错误程序、补救页再排一次/再试一次、格子课回到起点）改用 aria-hidden SVG 图标替换“↺”；正反例单测、组件测试与 L01/L05/L07 纠错关 E2E。课程仍 L3 | [#99](https://github.com/HelloMrDuan/kidsCoding/pull/99) | `3b2dee21a032b69199e1156b31e729d410b7a632` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39429034193) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39429034297) | completed |
+
+## OPS-006 执行记录
+
+| 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-21 | OPS-006 | 本地 Supabase CLI 路径助手改按目标平台拼路径（win32/posix），三个脚本测试的跨平台期望修正（精确相等断言未放宽）；Linux 受影响文件 13/13、全量 Vitest 661/661（修复前 656/661） | [#102](https://github.com/HelloMrDuan/kidsCoding/pull/102) | `2f26130b0a4b32d6b650fdabb756df3b07a847e1` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489646) / [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489645) | **completed**；Windows 主机行为不变（宿主恒等于目标）；无遗留 |
