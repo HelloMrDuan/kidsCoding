@@ -519,7 +519,7 @@
       "title": "儿童隐私与云同步审查（最小采集、接口收紧、RLS）",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "TQ-012"
       ],
@@ -533,10 +533,17 @@
         "单测覆盖"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/110",
+        "prNumber": 110,
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "apps/web/src/app/api/guest/route.test.ts（13 例：丢弃测评答案/姓名/未知字段、保留预设对白 line、413 体积上限、8 种非法类型 400、无云端 synced:false、写库失败 502、Cookie 复用）",
+          "apps/web/src/features/progress/guest-snapshot-payload.test.ts（3 例：客户端最小形状、经服务端校验后 bind-account 合并仍正确、首访空会话）",
+          "apps/web/src/features/privacy/child-privacy-migration.test.ts（28 例：每张建表启用 RLS、儿童数据本人只读无写策略、guest_snapshots 无 API 角色策略、历史答案清除、清理函数）",
+          "apps/web/scripts/child-privacy-rls.sql（CI scratch-rls-postgres 真实 PostgreSQL 16：A/B 互不可见、authenticated 不能直写、anon 无权限、guest_snapshots 不可读写、清理只删过期行且 API 角色不可调用）",
+          "apps/web/src/features/progress/sync-guest-snapshot.test.ts、apps/web/src/features/lessons/guided-lesson-shell.test.tsx（不上传答案；同步处告知文案）"
+        ],
         "reviewer": null
       },
       "notes": "TQ-002 第7项前半（后半学习证据留 TQ-014，学习证据按用户决定只存本机）。真实 Supabase 环境 RLS/清理调度验证 → CLOUD-103；监护人同意、删除与保留流程 → CLOUD-105；家长成长报告 UX-503 受本任务 RLS 约束。课程成熟度仍为 L3。"
