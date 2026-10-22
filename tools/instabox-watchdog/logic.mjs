@@ -120,18 +120,33 @@ export function parseDeepCheck(stdout) {
   const tjOk = tjHealth.includes('"status":"ok"') || tjHealth.includes('"status": "ok"');
   const kidsContainer = containers.find((c) => c.name.includes('kidscoding'));
   const tjContainers = containers.filter((c) => c.name.includes('tianji'));
-  const tjTokens = tjContainers.map((c) => tjTagToken(c.image)).filter(Boolean);
+  // Tianji is a sealed PAIR: the api and web containers are identified
+  // by their image repositories (falling back to container names) and
+  // each must exist, be up, and carry the same version token. Finding
+  // just one of them is never healthy.
+  const tjApi =
+    tjContainers.find((c) => c.image.includes('tianji-api')) ||
+    tjContainers.find((c) => c.name.includes('api'));
+  const tjWeb =
+    tjContainers.find((c) => c.image.includes('tianji-web')) ||
+    tjContainers.find((c) => c.name.includes('web'));
+  const tjApiToken = tjApi ? tjTagToken(tjApi.image) : null;
+  const tjWebToken = tjWeb ? tjTagToken(tjWeb.image) : null;
   return {
     kidsOk,
     tjOk,
     kidsSha: SHA40.test(kidsShaRaw) ? kidsShaRaw : null,
     containers,
+    kidsContainerFound: Boolean(kidsContainer),
     kidsContainerUp: Boolean(kidsContainer && /up/i.test(kidsContainer.status)),
     kidsImageSha: kidsContainer ? shaFromImageTag(kidsContainer.image) : null,
     tjContainersUp:
       tjContainers.length > 0 && tjContainers.every((c) => /up/i.test(c.status)),
-    // The sealed Tianji pair must carry the same version token.
-    tjTagsConsistent: tjTokens.length > 0 && tjTokens.every((t) => t === tjTokens[0]),
+    tjApiUp: Boolean(tjApi && /up/i.test(tjApi.status)),
+    tjWebUp: Boolean(tjWeb && /up/i.test(tjWeb.status)),
+    tjTagsConsistent: Boolean(
+      tjApiToken && tjWebToken && tjApiToken === tjWebToken,
+    ),
     healthy: kidsOk && tjOk,
   };
 }
@@ -148,8 +163,17 @@ export function assessDeep(deep, expectedKidsSha) {
   if (!deep.kidsOk) problems.push('kids health endpoint not ok');
   if (!deep.tjOk) problems.push('tianji health endpoint not ok');
   if (!deep.kidsContainerUp) problems.push('kidscoding container not up');
-  if (!deep.tjContainersUp) problems.push('tianji containers not all up');
-  if (!deep.tjTagsConsistent) problems.push('tianji api/web image version tags differ');
+  // No silent skip: if the running Kids image's tag cannot be parsed
+  // as a full 40-char commit SHA, the three-way SHA comparison cannot
+  // be performed — that is a fault, not a pass.
+  if (deep.kidsContainerFound && !deep.kidsImageSha) {
+    problems.push('running kids image tag does not carry a full 40-char SHA');
+  }
+  if (!deep.tjApiUp) problems.push('tianji api container missing or not up');
+  if (!deep.tjWebUp) problems.push('tianji web container missing or not up');
+  if (!deep.tjTagsConsistent) {
+    problems.push('tianji api/web image version tags differ or are unparseable');
+  }
   if (deep.kidsImageSha && deep.kidsSha && deep.kidsImageSha !== deep.kidsSha) {
     problems.push(
       `running kids image ${deep.kidsImageSha} != recorded deployed SHA ${deep.kidsSha}`,

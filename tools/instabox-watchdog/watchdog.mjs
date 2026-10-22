@@ -206,7 +206,7 @@ async function main() {
       'deep-check',
       `kidsOk=${deep.kidsOk} tjOk=${deep.tjOk} kidsSha=${deep.kidsSha || 'unknown'} ` +
         `expectedSha=${EXPECTED_KIDS_SHA || 'not-provided'} imageSha=${deep.kidsImageSha || 'unknown'} ` +
-        `kidsContainerUp=${deep.kidsContainerUp} tjContainersUp=${deep.tjContainersUp} ` +
+        `kidsContainerUp=${deep.kidsContainerUp} tjApiUp=${deep.tjApiUp} tjWebUp=${deep.tjWebUp} ` +
         `tjTagsConsistent=${deep.tjTagsConsistent} problems=${JSON.stringify(deep.problems || [])}`,
     );
   }

@@ -136,6 +136,54 @@ test('tianji sealed pair must carry the same version token', () => {
   assert.equal(a.healthy, false);
 });
 
+// NEGATIVE: an unparseable Kids image tag must NOT silently skip the
+// three-way SHA comparison.
+test('kids image without a full 40-char SHA tag is a fault, never a skip', () => {
+  for (const tag of ['local', 'df56de7b', 'latest']) {
+    const out = HEALTHY.replace(
+      `kidscoding-web:${SHA}`,
+      `kidscoding-web:${tag}`,
+    );
+    const d = parseDeepCheck(out);
+    assert.equal(d.kidsContainerFound, true);
+    assert.equal(d.kidsImageSha, null);
+    const a = assessDeep(d, SHA);
+    assert.equal(a.healthy, false, `tag=${tag} must be unhealthy`);
+    assert.ok(
+      a.problems.some((p) => p.includes('full 40-char SHA')),
+      a.problems.join(';'),
+    );
+  }
+});
+
+// NEGATIVE: a single Tianji container is never healthy — api and web
+// must both exist, both be up, and carry matching version tokens.
+test('tianji requires BOTH api and web containers up with matching versions', () => {
+  const onlyApi = HEALTHY.replace(/;tianji-web-1\|[^;]*;/, ';');
+  let a = assessDeep(parseDeepCheck(onlyApi), SHA);
+  assert.equal(a.healthy, false);
+  assert.ok(a.problems.some((p) => p.includes('tianji web')), a.problems.join(';'));
+
+  const onlyWeb = HEALTHY.replace(/;tianji-api-1\|[^;]*;/, ';');
+  a = assessDeep(parseDeepCheck(onlyWeb), SHA);
+  assert.equal(a.healthy, false);
+  assert.ok(a.problems.some((p) => p.includes('tianji api')), a.problems.join(';'));
+
+  const webDown = HEALTHY.replace(
+    'tianji-web:static-82b119e|Up 2 hours',
+    'tianji-web:static-82b119e|Exited (0) 5 minutes ago',
+  );
+  a = assessDeep(parseDeepCheck(webDown), SHA);
+  assert.equal(a.healthy, false);
+  assert.ok(a.problems.some((p) => p.includes('tianji web')), a.problems.join(';'));
+
+  const unparseable = HEALTHY.replace('tianji-api:sealed-82b119e', 'tianji-api:latest');
+  const d = parseDeepCheck(unparseable);
+  assert.equal(d.tjTagsConsistent, false);
+  a = assessDeep(d, SHA);
+  assert.equal(a.healthy, false);
+});
+
 test('endpoint failure is an app fault with the SHA still visible', () => {
   const d = parseDeepCheck(HEALTHY.replace('KIDS_HEALTH={"status":"ok"}', 'KIDS_HEALTH=CURL_FAIL'));
   assert.equal(d.kidsOk, false);
