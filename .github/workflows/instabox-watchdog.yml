@@ -18,7 +18,7 @@ name: instabox-watchdog
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '7,17,27,37,47,57 * * * *'
   workflow_dispatch:
 
 # One watchdog at a time: a second trigger queues instead of running
