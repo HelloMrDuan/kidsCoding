@@ -9,8 +9,8 @@
 //                 put(key, null) deletes. Keys: 'status', 'episode',
 //                 'lock'.
 //   deps.fetchExpectedSha — async () => 40-hex SHA of the KidsCoding
-//                 deployment branch head on GitHub, or null when it
-//                 cannot be resolved (recorded, never hidden).
+//                 deployment branch head on GitHub; null/fetch errors
+//                 fail closed and never produce an OK verdict.
 //   deps.now    — () => epoch ms; deps.sleep — async (ms) => void
 //   deps.log    — (event, detail) => void
 //   deps.config — { machineId, hold, ...tunables }
@@ -191,7 +191,16 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
     if (!res || res.exitCode !== 0) {
       throw new Error(`deep check command exited ${res ? res.exitCode : 'no-response'}`);
     }
-    return assessDeep(parseDeepCheck(res.stdout || ''), await expectedKidsSha());
+    // Strict three-way SHA contract: a failed GitHub lookup must not
+    // silently bypass the expected-versus-deployed comparison.
+    const expected = await expectedKidsSha();
+    if (!expected) {
+      throw new ApiError('expected KidsCoding GitHub SHA unavailable', {
+        code: 'expected_sha_unavailable',
+        retryable: true,
+      });
+    }
+    return assessDeep(parseDeepCheck(res.stdout || ''), expected);
   }
 
   async function pollState(want, timeoutMs) {
