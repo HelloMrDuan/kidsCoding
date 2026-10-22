@@ -1,6 +1,6 @@
 # InstaBox 主监控（Cloudflare Workers 版）
 
-platforms-core-01 的**新主监控**：Cloudflare Workers Cron Triggers 每 10 分钟在 Cloudflare 的调度器上运行，完全独立于 GitHub 和机器本身。它与 GitHub 版 `tools/instabox-watchdog/` 是**并行实现**，共用同一套判定逻辑（`src/logic.mjs` 由 GitHub 版逐字移植）：状态判定、错误分类、Kids SHA 三方核对、双应用健康检查、fail-closed（监控自身出错一律 BLOCKED_*，绝不误报健康）。
+platforms-core-01 的**新主监控**：Cloudflare Workers Cron Triggers 每 10 分钟在 Cloudflare 的调度器上运行，完全独立于 GitHub 和机器本身。它与 GitHub 版 `tools/instabox-watchdog/` 是**并行实现**，共用同一套判定逻辑（`src/logic.mjs` 由 GitHub 版逐字移植）：状态判定、错误分类、Kids SHA 三方核对（GitHub 预期 SHA 获取失败必须报错）、双应用健康检查、fail-closed（监控自身出错一律 BLOCKED_*，绝不误报健康）。
 
 切换完成前 GitHub 版保持不动；切换顺序见文末。
 
@@ -37,7 +37,7 @@ curl -X POST https://instabox-watchdog.<你的子域>.workers.dev/run \
 - `src/api.mjs`：InstaBox 官方 REST API 客户端（fetch 直连 `api.instabox.sh`，与官方 SDK 相同的端点与错误形状；不模拟网页登录、不靠 HTTP 保活）。
 - `src/core.mjs`：编排（状态轮询、operation 轮询、episode 上限、KV 锁、状态落盘）。依赖注入，可在 Node 中完整单测。
 - `src/worker.mjs`：Worker 入口（`scheduled()` + `/status`、`/run`）。
-- `test/`：`node --test`，逻辑层与编排层共 32 个用例，含故障负例（鉴权失败、断网、容量不足跨轮上限、冲突不重发、锁占用零调用、深查失败不报健康、SHA 不符等）。
+- `test/`：`node --test`，逻辑层、编排层及 Worker 入口共 34 个用例，含故障负例（鉴权失败、断网、容量不足跨轮上限、冲突不重发、锁占用零调用、深查失败不报健康、SHA 不符等）。
 
 本地测试：
 
