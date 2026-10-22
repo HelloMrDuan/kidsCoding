@@ -45,7 +45,7 @@ export default function AssessmentPage() {
             这不是考试。每次只选一个最像的答案，做完我们就直接带孩子进入学习地图。
           </p>
           <p
-            className="mt-2 max-w-3xl text-sm leading-7 text-[var(--kc-text-soft)]"
+            className="mt-2 max-w-3xl text-sm leading-7 text-[var(--kc-text)]"
             data-testid="onboarding-privacy-note"
           >
             答题内容只留在这台设备上；服务器只记年龄段和起点，不存名字。

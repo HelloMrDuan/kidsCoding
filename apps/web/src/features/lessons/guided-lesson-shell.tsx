@@ -270,8 +270,9 @@ export function GuidedLessonShell({
             ) : null}
             {cloudSyncState !== 'local-only' ? (
               // TQ-013: say plainly what is uploaded at the sync point, before it happens.
+              // Darker V2 text token (--kc-text): muted grey is only ~4.2:1 at 12px on white.
               <span
-                className="kc-text-muted text-xs"
+                className="text-xs text-[var(--kc-text)]"
                 data-testid="lesson-cloud-privacy-note"
               >
                 {CLOUD_PRIVACY_NOTE}

@@ -7,7 +7,7 @@
 - `apps/web/src/app/api/guest/route.ts`：64 KB 上限（413）、非法类型 400、写库失败 502（以前忽略错误仍报已同步）、刷新 `updated_at`。
 - `sync-guest-snapshot.ts`：不再上传测评答案；`merge-guest-snapshot.ts` 兼容旧行与新形状，绑定账号流程不变。
 - 迁移 `apps/web/supabase/migrations/202610220011_child_privacy_rls.sql`：所有早期表开 RLS；儿童数据表本人只读；`guest_snapshots` 与配置表仅 service role；清掉历史答案；`purge_stale_guest_snapshots(30)` + 有 pg_cron 时自动每日调度。
-- 文案：课堂进度条“完成后，进度和积木会存到服务器，不存名字”；测评页“答题内容只留在这台设备上；服务器只记年龄段和起点，不存名字。”
+- 文案：课堂进度条“完成后，进度和积木会存到服务器，不存名字”；测评页“答题内容只留在这台设备上；服务器只记年龄段和起点，不存名字。”两处改用 V2 文字色 `--kc-text`（#18243a）：课堂说明 12px 在白底 15.53:1，测评说明 14px 在 `--kc-canvas`（#f3f6fb）14.34:1（原 `--kc-text-muted` 分别为 4.18:1 / 3.86:1）。
 - teaching-reviews lesson-01～12 的 `minor-privacy-risk` 备注更新：仍为 `unchecked`（真实环境未验证），成熟度保持 L3。
 
 ## 测试
