@@ -1,0 +1,28 @@
+# InstaBox primary watchdog on Cloudflare Workers.
+# Deploy steps live in README.md. Two values must be supplied at
+# deploy time and are intentionally NOT real in this committed file:
+#   - the KV namespace id below (create the namespace, then paste id)
+#   - the INSTABOX_API_KEY secret (set with `wrangler secret put`
+#     or in the dashboard; never write it into this file or git)
+
+name = "instabox-watchdog"
+main = "src/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# Primary monitor cadence: every 10 minutes, same as the GitHub
+# watchdog it replaces. Cron Triggers fire from Cloudflare's
+# scheduler, independent of GitHub and of the InstaBox machine.
+[triggers]
+crons = ["*/10 * * * *"]
+
+[[kv_namespaces]]
+binding = "WATCHDOG_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+MACHINE_ID = "m_agqv2gsjiybrpuen46a2rpxohe"
+GITHUB_REPO = "HelloMrDuan/kidsCoding"
+GITHUB_BRANCH = "tq-011"
+# Maintenance master switch: "true" = monitor and report only,
+# never resume. Change in the dashboard or here and redeploy.
+WATCHDOG_HOLD = "false"
