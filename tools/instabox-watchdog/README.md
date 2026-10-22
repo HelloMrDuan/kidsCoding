@@ -17,10 +17,16 @@
 2. 按状态行事：
    - `running`：不调用 Resume；经 `commands` 在机内深查
      KidsCoding `127.0.0.1:3000/api/health`、天机
-     `127.0.0.1:8080/health`、Kids 部署 SHA（代理状态文件）、
-     Docker 容器清单。
-   - `suspended`（暂停）/ `stopped`：调用官方 `resume()` 恢复，
-     恢复后复查状态并做同样的深查（含部署 SHA 核对）。
+     `127.0.0.1:8080/health`、Docker 容器状态，并严格核对
+     Kids 部署 SHA：工作流每轮先从 GitHub 实时取部署分支
+     `tq-011` 的头 SHA，与机器上的部署记录和正在运行的镜像
+     标签三方对比，不一致即 APP_FAULT 告警。
+   - `suspended`（闲置暂停）：调用官方 `resume()` 恢复，
+     恢复后复查状态并做同样的深查（含 SHA 核对）。
+   - `stopped`（所有者主动停机）：**不自动恢复**，只记录
+     （STOPPED_MANUAL，非故障、不告警），防维护期反复启动。
+     另可设仓库变量 `INSTABOX_WATCHDOG_HOLD=true` 进入维护
+     模式：只报告、永不 Resume。
    - `resuming` 等过渡态：等待并复查，绝不并发重复 Resume
      （工作流并发组 + 状态机双重保证）。
    - `no_capacity` / 配额类（429）：本轮最多 2 次尝试、45 秒退避，
@@ -32,7 +38,9 @@
 3. 产物：`verdict.json`（含完整事件轨迹）作为 Actions artifact
    保留 14 天；失败判定（BLOCKED_* / APP_FAULT）时自动开/更新
    带 `instabox-watchdog` 标签的 Issue 告警，恢复后自动评论并
-   关闭；工作流运行同时标红。
+   关闭；工作流运行同时标红。监控自身失败（连不上 API、查不到
+   状态、深查执行不了）一律 fail-closed：非零退出 + 告警，
+   绝不以「过渡态」静默通过。
 
 ## 明确不做
 

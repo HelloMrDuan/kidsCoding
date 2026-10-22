@@ -20,8 +20,11 @@ export function decideForState(state) {
     case 'running':
       return 'deep-check';
     case 'suspended':
+      return 'resume'; // idle pause: the watchdog's one recovery job
     case 'stopped':
-      return 'resume';
+      // A stopped machine was shut down deliberately (owner stop or
+      // archive). Never auto-resume it: that would fight maintenance.
+      return 'observe';
     case 'error':
     case 'deleting':
     case 'deleted':
@@ -72,6 +75,21 @@ export function resumeRetryable(errorClass) {
   return errorClass === 'capacity' || errorClass === 'transient';
 }
 
+const SHA40 = /^[0-9a-f]{40}$/;
+
+/** Extract the commit SHA from an image reference's tag, if it is one. */
+export function shaFromImageTag(image) {
+  const tag = String(image || '').split(':').pop() || '';
+  return SHA40.test(tag) ? tag : null;
+}
+
+/** Trailing version token of a tianji image tag (sealed-<sha>/static-<sha>). */
+export function tjTagToken(image) {
+  const tag = String(image || '').split(':').pop() || '';
+  const m = /([0-9a-f]{7,40})$/.exec(tag);
+  return m ? m[1] : null;
+}
+
 /**
  * Parse the deep-check command output printed inside the machine.
  * Expected marker lines:
@@ -87,7 +105,7 @@ export function parseDeepCheck(stdout) {
   };
   const kidsHealth = get('KIDS_HEALTH');
   const tjHealth = get('TJ_HEALTH');
-  const kidsSha = get('KIDS_SHA');
+  const kidsShaRaw = get('KIDS_SHA');
   const containersRaw = get('CONTAINERS');
   const containers = containersRaw
     ? containersRaw
@@ -102,26 +120,76 @@ export function parseDeepCheck(stdout) {
   const tjOk = tjHealth.includes('"status":"ok"') || tjHealth.includes('"status": "ok"');
   const kidsContainer = containers.find((c) => c.name.includes('kidscoding'));
   const tjContainers = containers.filter((c) => c.name.includes('tianji'));
+  const tjTokens = tjContainers.map((c) => tjTagToken(c.image)).filter(Boolean);
   return {
     kidsOk,
     tjOk,
-    kidsSha: /^[0-9a-f]{40}$/.test(kidsSha) ? kidsSha : null,
+    kidsSha: SHA40.test(kidsShaRaw) ? kidsShaRaw : null,
     containers,
     kidsContainerUp: Boolean(kidsContainer && /up/i.test(kidsContainer.status)),
+    kidsImageSha: kidsContainer ? shaFromImageTag(kidsContainer.image) : null,
     tjContainersUp:
       tjContainers.length > 0 && tjContainers.every((c) => /up/i.test(c.status)),
+    // The sealed Tianji pair must carry the same version token.
+    tjTagsConsistent: tjTokens.length > 0 && tjTokens.every((t) => t === tjTokens[0]),
     healthy: kidsOk && tjOk,
   };
 }
 
-/** Final verdict for a run, from the pieces the monitor collected. */
+/**
+ * Full health assessment: endpoints AND container states AND the
+ * deployed-SHA comparison. `expectedKidsSha` is the GitHub head of the
+ * deployment branch (tq-011), resolved by the workflow at run time;
+ * when it is provided, a mismatch is an application fault, never a
+ * silent pass.
+ */
+export function assessDeep(deep, expectedKidsSha) {
+  const problems = [];
+  if (!deep.kidsOk) problems.push('kids health endpoint not ok');
+  if (!deep.tjOk) problems.push('tianji health endpoint not ok');
+  if (!deep.kidsContainerUp) problems.push('kidscoding container not up');
+  if (!deep.tjContainersUp) problems.push('tianji containers not all up');
+  if (!deep.tjTagsConsistent) problems.push('tianji api/web image version tags differ');
+  if (deep.kidsImageSha && deep.kidsSha && deep.kidsImageSha !== deep.kidsSha) {
+    problems.push(
+      `running kids image ${deep.kidsImageSha} != recorded deployed SHA ${deep.kidsSha}`,
+    );
+  }
+  if (expectedKidsSha) {
+    if (!deep.kidsSha) {
+      problems.push('kids deployed SHA unreadable on the machine');
+    } else if (deep.kidsSha !== expectedKidsSha) {
+      problems.push(
+        `kids SHA mismatch: deployed ${deep.kidsSha} != expected GitHub head ${expectedKidsSha}`,
+      );
+    }
+    if (deep.kidsImageSha && deep.kidsImageSha !== expectedKidsSha) {
+      problems.push(
+        `running kids image ${deep.kidsImageSha} != expected GitHub head ${expectedKidsSha}`,
+      );
+    }
+  }
+  return { ...deep, healthy: problems.length === 0, problems };
+}
+
+/**
+ * Final verdict for a run. FAIL-CLOSED: whenever an error class is
+ * present, the verdict is a failing BLOCKED_* one — a monitoring
+ * failure must never exit 0 or masquerade as a transitional state.
+ * IN_TRANSITION / OK are reachable only with no recorded error.
+ */
 export function verdictFor({ state, action, deep, errorClass }) {
   if (errorClass === 'auth') return 'BLOCKED_AUTH';
   if (errorClass === 'not-found') return 'BLOCKED_NOT_FOUND';
-  if (action === 'blocked') return 'BLOCKED_STATE';
-  if (action === 'resume-failed') {
-    return errorClass === 'capacity' ? 'BLOCKED_CAPACITY' : 'BLOCKED_RESUME';
+  if (errorClass) {
+    if (action === 'resume-failed') {
+      return errorClass === 'capacity' ? 'BLOCKED_CAPACITY' : 'BLOCKED_RESUME';
+    }
+    return errorClass === 'capacity' ? 'BLOCKED_CAPACITY' : 'BLOCKED_MONITOR';
   }
+  if (action === 'blocked') return 'BLOCKED_STATE';
+  if (action === 'observe') return 'STOPPED_MANUAL';
+  if (action === 'held') return 'HELD';
   if (deep) return deep.healthy ? 'OK' : 'APP_FAULT';
   if (action === 'wait') return 'IN_TRANSITION';
   if (state === 'running') return 'OK';
@@ -134,5 +202,6 @@ export const FAILING_VERDICTS = new Set([
   'BLOCKED_STATE',
   'BLOCKED_CAPACITY',
   'BLOCKED_RESUME',
+  'BLOCKED_MONITOR',
   'APP_FAULT',
 ]);

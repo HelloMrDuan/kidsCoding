@@ -23,12 +23,21 @@ import {
   classifyError,
   resumeRetryable,
   parseDeepCheck,
+  assessDeep,
   verdictFor,
   FAILING_VERDICTS,
 } from './logic.mjs';
 
 const MACHINE_ID = process.env.INSTABOX_MACHINE_ID || 'm_agqv2gsjiybrpuen46a2rpxohe';
 const API_KEY = process.env.INSTABOX_API_KEY || '';
+// Expected KidsCoding deployment: the GitHub head of the deployment
+// branch (tq-011), resolved by the workflow at run time. When set,
+// the watchdog strictly compares it against the machine's recorded
+// deployed SHA and the running image's tag.
+const EXPECTED_KIDS_SHA = process.env.EXPECTED_KIDS_SHA || '';
+// Maintenance hold (repo variable INSTABOX_WATCHDOG_HOLD=true):
+// report state, never resume.
+const HOLD = process.env.INSTABOX_WATCHDOG_HOLD === 'true';
 const startedAt = new Date();
 const events = [];
 
@@ -49,7 +58,7 @@ const DEEP_CHECK_CMD = [
 
 async function deepCheck(sbx) {
   const res = await sbx.commands.run(DEEP_CHECK_CMD, { timeoutMs: 60_000 });
-  return parseDeepCheck(res.stdout || '');
+  return assessDeep(parseDeepCheck(res.stdout || ''), EXPECTED_KIDS_SHA || null);
 }
 
 async function waitForState(sbx, want, timeoutMs) {
@@ -100,6 +109,17 @@ async function main() {
   let action = decideForState(info.state);
   let deep = null;
   let lastError = '';
+
+  if (action === 'observe') {
+    // Deliberately stopped by the owner: never auto-resume, and this
+    // is not a failure — no alert, exit 0.
+    log('observe-only', 'machine is stopped (owner action); not resuming');
+    return finish('STOPPED_MANUAL', { state: info.state }, 'owner-stopped; watchdog does not resume stopped machines');
+  }
+  if (HOLD && action === 'resume') {
+    log('held', 'INSTABOX_WATCHDOG_HOLD is on; reporting only');
+    return finish('HELD', { state: info.state }, 'maintenance hold is on');
+  }
 
   if (action === 'wait') {
     // Transitional (incl. resuming): poll briefly; never issue a
@@ -155,6 +175,8 @@ async function main() {
     action = 'deep-check';
     // A resumed VM's processes continue, but give services a moment
     // and re-check up to 3 times before calling it an app fault.
+    // Fail-closed: if the deep check itself never succeeds, that is a
+    // monitoring failure (BLOCKED_MONITOR), never a silent OK.
     for (let i = 1; i <= 3; i++) {
       try {
         deep = await deepCheck(sbx);
@@ -163,6 +185,9 @@ async function main() {
       }
       if (deep && deep.healthy) break;
       if (i < 3) await sleep(30_000);
+    }
+    if (!deep) {
+      return finish('BLOCKED_MONITOR', { state: info.state }, 'deep check unavailable after resume');
     }
   } else if (action === 'deep-check') {
     try {
@@ -180,7 +205,9 @@ async function main() {
     log(
       'deep-check',
       `kidsOk=${deep.kidsOk} tjOk=${deep.tjOk} kidsSha=${deep.kidsSha || 'unknown'} ` +
-        `kidsContainerUp=${deep.kidsContainerUp} tjContainersUp=${deep.tjContainersUp}`,
+        `expectedSha=${EXPECTED_KIDS_SHA || 'not-provided'} imageSha=${deep.kidsImageSha || 'unknown'} ` +
+        `kidsContainerUp=${deep.kidsContainerUp} tjContainersUp=${deep.tjContainersUp} ` +
+        `tjTagsConsistent=${deep.tjTagsConsistent} problems=${JSON.stringify(deep.problems || [])}`,
     );
   }
   return finish(verdictFor({ state: info.state, action, deep }), { state: info.state, deep }, lastError);
@@ -210,7 +237,7 @@ function finish(verdict, extra, detail) {
         `- Time (UTC): ${record.finishedAt}`,
         `- Detail: ${record.detail || '—'}`,
         deep && Object.keys(deep).length
-          ? `- KidsCoding health ok: ${deep.kidsOk} · Tianji health ok: ${deep.tjOk} · Kids deployed SHA: ${deep.kidsSha || 'unknown'}`
+          ? `- KidsCoding health ok: ${deep.kidsOk} · Tianji health ok: ${deep.tjOk} · Kids deployed SHA: ${deep.kidsSha || 'unknown'} · Problems: ${(deep.problems || []).join('; ') || '—'}`
           : '',
         '',
         'The watchdog reports and recovers machine lifecycle only; it does not restart or rebuild application containers. Inspect the workflow run log for the full event trace.',
