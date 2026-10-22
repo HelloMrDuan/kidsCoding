@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useBlockExecutor } from './use-block-executor'
 import styles from './duo-stage.module.css'
-import { duoLessonHints } from '@/content/curriculum/launch-lessons'
 import { getKidsBlockLabel, quoteBlock } from '@/features/lessons/blockly/block-labels'
+import { isDuoDesignedMistakeRun, judgeDuoProgram, type DuoMode } from './duo-judge'
 
 function Friend({ bear = false }: { bear?: boolean }) {
   return <svg viewBox="0 0 80 80" aria-hidden="true">
@@ -18,21 +18,44 @@ function Friend({ bear = false }: { bear?: boolean }) {
 }
 
 
-export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRunClear, dialogue = false, graduation = false }: {
+function PlayIcon() {
+  return <svg className={styles.runIcon} viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5v9l7.5-4.5z" fill="currentColor" /></svg>
+}
+
+function CloudIcon() {
+  return <svg viewBox="0 0 32 20" aria-hidden="true"><path d="M9 17a5 5 0 1 1 .8-9.9A7 7 0 0 1 23 6.6 5.5 5.5 0 0 1 22.5 17Z" fill="#ffffff" /></svg>
+}
+
+function SunIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="#f2b33d" /><g stroke="#f2b33d" strokeWidth="2" strokeLinecap="round"><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19" /></g></svg>
+}
+
+function FlagIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 21.5v-17" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none" /><path d="M6.5 5.2c3.8-2.2 7.6 1.9 11.5 0v8.6c-3.9 1.9-7.7-2.2-11.5 0" fill="currentColor" /></svg>
+}
+
+export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRunClear, onRunFailure, dialogue = false, graduation = false }: {
   blocks: Array<{ type: string }>
   requiredBlocks: string[]
   stepIndex: number
   onRunSuccess: () => void
   onRunClear: () => void
+  /** TQ-015: a failed run, reported once per Run press; the classroom escalates hints 1 → 2 → 3. */
+  onRunFailure?: (failure: { code: string | null; message: string; designedMistake?: boolean }) => void
   dialogue?: boolean
   graduation?: boolean
 }) {
   const executor = useBlockExecutor(blocks, requiredBlocks, stepIndex, graduation ? 'graduation' : dialogue ? 'dialogue' : true)
-  const activeHints = duoLessonHints[graduation ? 'lesson-12-graduation-show' : dialogue ? 'lesson-11-duo-rehearsal' : 'lesson-10-second-friend']
+  const mode: DuoMode = graduation ? 'graduation' : dialogue ? 'dialogue' : 'independent'
+  const verdict = useMemo(() => judgeDuoProgram(blocks, mode, stepIndex), [blocks, mode, stepIndex])
   const [prediction, setPrediction] = useState<'bear' | 'both' | null>(null)
   const [observedMistake, setObservedMistake] = useState(false)
   const [reflection, setReflection] = useState<'own' | 'together' | null>(null)
-  const [hintCount, setHintCount] = useState(0)
+  // TQ-015: each press of “运行” is one attempt; a failed attempt is reported exactly once,
+  // even when two failures in a row leave executionState at 'error'.
+  const [attemptId, setAttemptId] = useState(0)
+  const reportedAttemptRef = useRef(-1)
+  const [designedRun, setDesignedRun] = useState(false)
   const { executionState, characterPosition, partnerPosition, activeActor, characterMessage } = executor
   const ready = executionState === 'success' && (stepIndex !== 0 || prediction !== null) &&
     (stepIndex !== 3 || observedMistake) && (stepIndex !== 4 || reflection === 'own')
@@ -41,6 +64,24 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
     if (ready) onRunSuccess()
     else onRunClear()
   }, [ready, onRunSuccess, onRunClear])
+
+  useEffect(() => {
+    if (executionState !== 'error' || reportedAttemptRef.current === attemptId) return
+    reportedAttemptRef.current = attemptId
+    onRunFailure?.({
+      code: verdict.passed ? null : verdict.code,
+      message: executor.errorMessage ?? verdict.reason ?? '',
+      designedMistake: designedRun,
+    })
+  }, [executionState, attemptId, onRunFailure, verdict, designedRun, executor.errorMessage])
+
+  function handleRun() {
+    setAttemptId((id) => id + 1)
+    // TQ-015: the step-4 designed mistake is the experiment — it never counts as a failed attempt.
+    setDesignedRun(stepIndex === 3 && !observedMistake && isDuoDesignedMistakeRun(verdict, mode))
+    onRunClear()
+    void executor.run()
+  }
 
   // Capture the observed result once; keep it when the child edits the repair.
   if (!observedMistake && stepIndex === 3 && executionState === 'error' &&
@@ -72,17 +113,17 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
       <div className={styles.buttons}>
         <button data-testid="reset-code-button" onClick={() => { executor.reset(); onRunClear() }}>重置舞台</button>
         <button className={styles.run} data-testid="run-code-button" disabled={executionState === 'running' || (stepIndex === 0 && prediction === null)}
-          onClick={() => { onRunClear(); void executor.run() }}>{executionState === 'running' ? '正在行动…' : '▶ 运行积木'}</button>
+          onClick={handleRun}>{executionState === 'running' ? '正在行动…' : <><PlayIcon />运行积木</>}</button>
       </div>
     </div>
     <div className={styles.landscape}>
-      <div className={styles.sky} aria-hidden="true">☁　☀　☁</div>
+      <div className={styles.sky} aria-hidden="true"><CloudIcon /><SunIcon /><CloudIcon /></div>
       {([{ label: '小狐狸', position: characterPosition, bear: false, active: activeActor === 'main', goal: stepIndex === 0 ? 0 : 100 },
         { label: '小熊', position: partnerPosition, bear: true, active: activeActor === 'partner', goal: graduation ? stepIndex < 2 ? 0 : 200 : (dialogue ? stepIndex === 0 : stepIndex < 2) ? 0 : 100 }]).map(friend =>
         <div key={friend.label} className={styles.lane}>
           <div className={styles.laneLabel}><strong>{friend.label}</strong><span data-testid={friend.bear ? 'duo-bear-distance' : 'duo-fox-distance'}>已走 {friend.position} / 目标 {friend.goal} 步</span></div>
           <div className={styles.track}>
-            <div className={styles.flag} style={graduation ? { left: `${friend.bear ? 85 : 42.5}%` } : undefined} aria-hidden="true">⚑<small>{graduation && friend.bear ? 200 : 100}</small></div>
+            <div className={styles.flag} style={graduation ? { left: `${friend.bear ? 85 : 42.5}%` } : undefined} aria-hidden="true"><FlagIcon /><small>{graduation && friend.bear ? 200 : 100}</small></div>
             <div className={`${styles.friend} ${friend.active ? styles.active : ''}`}
               data-testid={friend.bear ? 'stage-character-partner' : 'stage-character-main'} data-position={friend.position}
               style={{ left: `${graduation ? Math.min(friend.position, 235) * .425 : Math.min(friend.position, 200) / 2}%` }}>
@@ -95,7 +136,7 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
     </div>
     {graduation && <div className={styles.gift} data-testid="graduation-gift" data-found={String(executor.giftFound)}>
       <svg viewBox="0 0 60 60" aria-hidden="true"><path d="M8 26h44v28H8z" fill="#dfa848"/><path d="M5 19h50v12H5z" fill="#efc56e"/><path d="M26 19h8v35h-8z" fill="#497459"/><path d="M30 19C8 17 15 2 25 10l5 9c22-2 15-17 5-9z" fill="none" stroke="#497459" strokeWidth="4"/></svg>
-      <div><strong>{executor.giftFound ? '礼物已找到！' : '礼物等待两位朋友到位'}</strong><p>{executor.giftFound ? '已验证：狐狸 100 步、小熊 200 步。重跑会重新寻找；重置会收起礼物。' : '目标：狐狸 100 步，小熊 200 步。只拼积木或只到一个目标都不会找到礼物。'}</p></div>
+      <div><strong>{executor.giftFound ? '礼物已找到！' : '礼物等待两位朋友到位'}</strong><p>{executor.giftFound ? '已验证：狐狸 100 步、小熊 200 步。重跑会重新寻找；重置会收起礼物。' : '狐狸 100 步，小熊 200 步，两个都到才有礼物。'}</p></div>
     </div>}
     {dialogue && <div className={styles.dialogueBoard} data-testid="duo-dialogue-board" aria-label="角色对白记录">
       <p><strong>小狐狸说：</strong><span data-testid="duo-fox-speech-record">{characterMessage ?? '还没有说话'}</span></p>
@@ -112,8 +153,6 @@ export function DuoStage({ blocks, requiredBlocks, stepIndex, onRunSuccess, onRu
         {ready && <p>可以点击“完成这一关”继续。</p>}</>}
     </div>
     {executor.actionLog.length > 0 && <ol className={styles.log} data-testid="duo-action-log">{executor.actionLog.map((line, i) => <li key={i}>{line}</li>)}</ol>}
-    <div className={styles.buttons}><button data-testid="duo-show-hint" disabled={hintCount === activeHints.length} onClick={() => setHintCount(count => count + 1)}>看看提示（{hintCount}/3）</button></div>
-    {activeHints.slice(0, hintCount).map((hint, i) => <p className={styles.hint} key={hint}>{i + 1}. {hint}</p>)}
     {stepIndex === 4 && <div className={styles.activity}>
       <strong>{graduation ? '我的毕业寻宝作品' : dialogue ? '我的出发排练作品' : '我的野餐作品'}</strong><p>{graduation ? `选一种方案：小熊移动后接${quoteBlock('repeat_twice')}，或给小熊接两块移动。还可以给狐狸加问候、给小熊加庆祝话。保持狐狸 100 步、小熊 200 步，再运行验证。` : dialogue ? '保留小熊的出发对白，也可以在切换前给狐狸另加“你好！”。两位朋友各走 100 步，目标对白仍由小熊说。' : '你可以保留两位朋友各走 100 步，也可以在切换前给小狐狸加一句问候。两种作品都能过关。'}</p>
       <p>想一想：为什么{graduation ? '小熊再做一次时，狐狸仍停在 100 步？' : dialogue ? '小熊说话时，狐狸不会跟着说？' : '两位朋友不会一起移动？'}</p>

@@ -9,7 +9,9 @@ import { ResetIcon } from '@/features/ui/reset-icon'
 
 /** TQ-008: tiny hands-on practice on a remedial page. Nothing is graded or stored. */
 export function RemedialPractice({ practice }: { practice: RemedialPracticeData }) {
-  return practice.kind === 'order' ? <OrderPractice practice={practice} /> : <ClickPractice practice={practice} />
+  if (practice.kind === 'order') return <OrderPractice practice={practice} />
+  if (practice.kind === 'switch') return <SwitchPractice practice={practice} />
+  return <ClickPractice practice={practice} />
 }
 
 function OrderPractice({ practice }: { practice: Extract<RemedialPracticeData, { kind: 'order' }> }) {
@@ -125,6 +127,118 @@ function ClickPractice({ practice }: { practice: Extract<RemedialPracticeData, {
           </button>
         ) : null}
       </div>
+    </div>
+  )
+}
+
+/** TQ-015: feel the switch — a move only ever goes to the friend you are operating now. */
+function SwitchPractice({ practice }: { practice: Extract<RemedialPracticeData, { kind: 'switch' }> }) {
+  const [actor, setActor] = useState<'fox' | 'bear'>('fox')
+  const [foxSteps, setFoxSteps] = useState(0)
+  const [bearSteps, setBearSteps] = useState(0)
+  const [nudge, setNudge] = useState<string | null>(null)
+  const done = foxSteps === 100 && bearSteps === 100
+
+  function move() {
+    if (done) return
+    if (actor === 'fox') {
+      if (foxSteps >= 100) {
+        setNudge('小狐狸已经到 100 步啦，先点“切换到另一位朋友”，再让小熊走。')
+        return
+      }
+      setFoxSteps(100)
+      setNudge(null)
+    } else {
+      if (bearSteps >= 100) return
+      setBearSteps(100)
+      setNudge(null)
+    }
+  }
+
+  function switchActor() {
+    if (done) return
+    if (actor === 'bear') {
+      setNudge('已经切换过啦，现在让小熊走吧。')
+      return
+    }
+    if (foxSteps < 100) {
+      setNudge('先让小狐狸走 100 步，再切换哦。')
+      return
+    }
+    setActor('bear')
+    setNudge(null)
+  }
+
+  function reset() {
+    setActor('fox')
+    setFoxSteps(0)
+    setBearSteps(0)
+    setNudge(null)
+  }
+
+  const lanes = [
+    { id: 'fox' as const, label: '小狐狸', steps: foxSteps, active: actor === 'fox' },
+    { id: 'bear' as const, label: '小熊', steps: bearSteps, active: actor === 'bear' },
+  ]
+
+  return (
+    <div className="rounded-[1.5rem] bg-orange-50 p-5" data-testid="remedial-practice">
+      <p className="text-base font-bold text-slate-900">{practice.prompt}</p>
+      <p className="mt-3 text-sm font-semibold text-slate-600" data-testid="remedial-active-actor">
+        当前操作：<strong className="text-slate-900">{actor === 'fox' ? '小狐狸' : '小熊'}</strong>
+      </p>
+      <div className="mt-3 space-y-3 rounded-[1.25rem] bg-white px-4 py-3">
+        {lanes.map((lane) => (
+          <div className="flex items-center gap-3" key={lane.id}>
+            <span className="w-14 shrink-0 text-sm font-bold text-slate-700">{lane.label}</span>
+            <span className="relative block h-[52px] w-[128px] shrink-0">
+              <span
+                className={`absolute left-0 top-0 h-[52px] w-[52px] transition-transform duration-500 ${lane.active && !done ? 'rounded-full ring-2 ring-emerald-500' : ''}`}
+                style={{ transform: lane.steps > 0 ? 'translateX(72px)' : 'none' }}
+              >
+                <CharacterArt className="h-full w-full" id={lane.id} />
+              </span>
+            </span>
+            <span className="text-sm font-semibold text-slate-500" data-testid={`remedial-${lane.id}-steps`}>已走 {lane.steps} 步</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2" aria-label="可以点的积木">
+        <button
+          className="kc-block-chip"
+          data-block="move_right"
+          data-testid="remedial-card-move_right"
+          disabled={done}
+          onClick={move}
+          type="button"
+        >
+          {getKidsBlockLabel('move_right')}
+        </button>
+        <button
+          className="kc-block-chip"
+          data-block="switch_character"
+          data-testid="remedial-card-switch_character"
+          disabled={done}
+          onClick={switchActor}
+          type="button"
+        >
+          {getKidsBlockLabel('switch_character')}
+        </button>
+      </div>
+      <div aria-live="polite">
+        {nudge ? <p className="mt-3 text-sm font-semibold text-amber-800" data-testid="remedial-nudge">{nudge}</p> : null}
+        {done ? <p className="mt-3 text-base font-bold text-emerald-700" data-testid="remedial-success">🎉 {practice.success}</p> : null}
+      </div>
+      {foxSteps > 0 || bearSteps > 0 ? (
+        <button
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700"
+          onClick={reset}
+          type="button"
+        >
+          <ResetIcon size={14} />
+          再试一次
+        </button>
+      ) : null}
     </div>
   )
 }
