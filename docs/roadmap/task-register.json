@@ -590,6 +590,24 @@
       }
     },
     {
+      "id": "TQ-019",
+      "title": "完成页双角色作品失败提示升级（1→2→3 与三级补救卡）",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-015"
+      ],
+      "scope": "TQ-015 遗留：完成页（/project/[projectId]/complete）的双角色作品 DuoProject 在 TQ-015 删除舞台手动提示后，运行失败只剩舞台一行错因、无任何升级提示。本任务为 DuoProject 接入与课堂同一套提示体系：运行失败按次计数（DuoStage onRunFailure），用 buildHintState 与本课 hintLayers 渲染 kc-hint 提示卡（1→2→3），第 3 级出补救卡（RemedialLinkCard）跳「角色切换」补救页；运行成功清零计数。不改课堂流程、不改 V2 布局",
+      "acceptance": [
+        "完成页双角色作品运行失败出现第 1 级提示，再次失败升到第 2、3 级，文案与课堂同一来源（launchLessons hintLayers）",
+        "第 3 级出现补救卡并可打开 remedial-switch-character 补救页（from=本课、step=step-3）",
+        "运行成功后提示消失、计数清零；保存门槛（通过才可保存）不变",
+        "组件测试覆盖失败升级/成功清零/补救跳转；e2e 覆盖完成页真实流程；eslint/vitest/构建通过，三端截图验收"
+      ],
+      "notes": "TQ-015 关账时明确遗留（原交接编号 TQ-019）。课程成熟度仍为 L3。"
+    },
+    {
       "id": "UX-001",
       "title": "设计Tokens规范化",
       "priority": "P0",
