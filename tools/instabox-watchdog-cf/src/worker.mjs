@@ -114,11 +114,15 @@ export default {
       );
     }
     if (request.method === 'POST' && url.pathname === '/run') {
-      if (env.RUN_TOKEN) {
-        const auth = request.headers.get('authorization') || '';
-        if (auth !== `Bearer ${env.RUN_TOKEN}`) {
-          return new Response('unauthorized', { status: 401 });
-        }
+      // Fail closed: without an explicitly configured RUN_TOKEN,
+      // the manual endpoint is disabled. A public URL must never
+      // allow anonymous callers to trigger Resume.
+      if (!env.RUN_TOKEN) {
+        return new Response('manual execution disabled', { status: 403 });
+      }
+      const auth = request.headers.get('authorization') || '';
+      if (auth !== `Bearer ${env.RUN_TOKEN}`) {
+        return new Response('unauthorized', { status: 401 });
       }
       const record = await runOnce(env, 'manual');
       return Response.json(record, { headers: { 'cache-control': 'no-store' } });
