@@ -594,7 +594,7 @@
       "title": "完成页双角色作品失败提示升级（1→2→3 与三级补救卡）",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-015"
       ],
@@ -605,7 +605,24 @@
         "运行成功后提示消失、计数清零；保存门槛（通过才可保存）不变",
         "组件测试覆盖失败升级/成功清零/补救跳转；e2e 覆盖完成页真实流程；eslint/vitest/构建通过，三端截图验收"
       ],
-      "notes": "TQ-015 关账时明确遗留（原交接编号 TQ-019）。课程成熟度仍为 L3。"
+      "notes": "TQ-015 关账时明确遗留（原交接编号 TQ-019）。课程成熟度仍为 L3。",
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/114",
+        "prNumber": 114,
+        "mergeCommit": "15358c92a7c1e29aaa0e66f65e2375f035471243",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39778229323",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39778229357",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39769521714",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39769521721",
+        "reviewer": "owner 2026-10-22 选择重跑（选项 1），第三轮 CI 8/8 后按常设授权合并",
+        "tests": [
+          "apps/web/src/features/lessons/playable-stage/duo-project.test.tsx：3 例（失败 1→2→3 升级渲染 kc-hint 与补救卡、点补救卡 router.push 到本课补救页、成功运行清零且通过加复盘后保存解锁），真实 DuoStage 与 duo-judge 判定，仅替身 BlocklyWorkspace 与 useRouter",
+          "本地 vitest 全量 130 文件 782 测试全过；eslint 改动文件 0 错误；tsc 零新增类型错误；生产构建通过",
+          "本地 e2e（内置 Chromium，desktop+mobile）：TQ-019 新用例与 TQ-015 用例全过；duo 三主用例仅在 errors 空断言处失败，已在 origin/main 对照复现（沙箱拦 Blockly 装饰音效 fetch 的已知伪影），功能断言全过",
+          "GitHub PR CI 第三轮 8/8 全绿（前两轮均在最后一步 V2 CSS 视觉规格处被外部 cancelled、非失败，该步与本任务改动文件无关；含真实 Chrome 的 curriculum-web 全量 e2e 与 Lessons 10–12 触控双角色 e2e）；合并后 main CI 8/8",
+          "三断点截图（本地生产构建，真实完成第 10 课到完成页并制造 3 次失败）：tier=3 提示卡与补救卡（remedial-switch-character）渲染正常，DOM 实测三端一致"
+        ]
+      }
     },
     {
       "id": "UX-001",
