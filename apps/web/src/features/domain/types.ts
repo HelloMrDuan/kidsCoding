@@ -82,6 +82,12 @@ export type RemedialPractice =
       prompt: string
       success: string
     }
+  | {
+      /** TQ-015: move the fox, switch, then move the bear — actions follow the current actor. */
+      kind: 'switch'
+      prompt: string
+      success: string
+    }
 
 export type RemedialLessonDefinition = {
   id: string
