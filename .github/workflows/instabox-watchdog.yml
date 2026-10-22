@@ -1,0 +1,135 @@
+# InstaBox external watchdog — platforms-core-01
+#
+# Runs on a GitHub-hosted runner (this public repo: standard runners
+# are free) every 10 minutes, entirely OUTSIDE the InstaBox machine,
+# so it keeps working while the machine is idle-paused. It uses only
+# the official @insforge/instabox-sdk lifecycle API:
+#   state check (connect with resume: false) -> resume() if paused ->
+#   in-machine deep check (localhost health, containers, deployed SHA).
+# It never simulates user activity, never touches containers, and the
+# API key comes only from the INSTABOX_API_KEY repo Secret.
+#
+# Placement: .github/workflows/instabox-watchdog.yml on the default
+# branch (schedule events only ever run from the default branch; the
+# job guard below also blocks manual runs started from other refs).
+# The watchdog program lives in tools/instabox-watchdog/ (same branch).
+
+name: instabox-watchdog
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+# One watchdog at a time: a second trigger queues instead of running
+# a concurrent resume against the same machine.
+concurrency:
+  group: instabox-watchdog
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write # alert issue on BLOCKED / APP_FAULT, auto-close on recovery
+
+jobs:
+  watchdog:
+    name: monitor and recover platforms-core-01
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tools/instabox-watchdog
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: tools/instabox-watchdog/package-lock.json
+
+      - name: Install the pinned SDK
+        run: npm ci --no-audit --no-fund
+
+      - name: Self-test the decision logic (no API key involved)
+        run: npm test
+
+      - name: Resolve the expected KidsCoding deployment SHA
+        id: expected
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The prerelease channel deploys branch tq-011; its current
+          # GitHub head is what the machine must be running. Resolved
+          # live each run (fail-closed: if this lookup fails, the run
+          # fails visibly instead of skipping the comparison).
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/branches/tq-011" --jq '.commit.sha')
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Expected KidsCoding SHA (tq-011 head): $sha"
+
+      - name: Run the watchdog
+        id: watchdog
+        continue-on-error: true
+        env:
+          # The API key exists ONLY in this step's environment, and
+          # only on runs from the default branch (see the job guard:
+          # schedule always uses the default branch, and manual runs
+          # from other refs are skipped before any step executes).
+          INSTABOX_API_KEY: ${{ secrets.INSTABOX_API_KEY }}
+          INSTABOX_MACHINE_ID: m_agqv2gsjiybrpuen46a2rpxohe
+          EXPECTED_KIDS_SHA: ${{ steps.expected.outputs.sha }}
+          # Optional maintenance hold: set the repo variable
+          # INSTABOX_WATCHDOG_HOLD=true to make the watchdog
+          # report-only (it never resumes while held). A machine the
+          # owner deliberately STOPPED is never resumed regardless.
+          INSTABOX_WATCHDOG_HOLD: ${{ vars.INSTABOX_WATCHDOG_HOLD }}
+        run: node watchdog.mjs
+
+      - name: Raise or update the alert issue on a failing verdict
+        if: always() && steps.watchdog.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create instabox-watchdog --repo "$GITHUB_REPOSITORY" \
+            --color B60205 --description "InstaBox watchdog alerts" --force >/dev/null 2>&1 || true
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label instabox-watchdog --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body-file alert.md
+            echo "alert updated on issue #$existing"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --label instabox-watchdog \
+              --title "InstaBox watchdog alert: platforms-core-01 needs attention" \
+              --body-file alert.md
+          fi
+
+      - name: Close the alert issue on recovery
+        if: always() && steps.watchdog.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label instabox-watchdog --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" \
+              --body "Watchdog verdict is healthy again ($(date -u +%FT%TZ)); closing automatically."
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY"
+          fi
+
+      - name: Keep the run record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: watchdog-verdict-${{ github.run_id }}
+          path: |
+            tools/instabox-watchdog/verdict.json
+            tools/instabox-watchdog/alert.md
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Fail the run on a failing verdict
+        if: steps.watchdog.outcome == 'failure'
+        run: |
+          echo "::error::Watchdog verdict was failing; see verdict.json artifact and the alert issue."
+          exit 1
