@@ -292,13 +292,15 @@ test('lock held by another run -> LOCKED, zero API calls, liveness untouched', a
   assert.ok(status.lastLockSkipAt);
 });
 
-test('expected SHA unavailable -> still OK on machine-side checks, gap explicitly recorded', async () => {
+test('expected SHA unavailable -> BLOCKED_MONITOR; never silently skip three-way check', async () => {
   const store = makeStore();
   const clock = makeClock();
   const api = makeApi({ states: ['running'] });
   const rec = await runWatchdog(depsFor({ api, store, clock, sha: null }));
-  assert.equal(rec.verdict, 'OK');
-  assert.equal(rec.expectedShaMissing, true);
+  assert.equal(rec.verdict, 'BLOCKED_MONITOR');
+  const status = await store.get('status');
+  assert.equal(status.lastHealthyAt, undefined);
+  assert.equal(status.lastVerdict, 'BLOCKED_MONITOR');
 });
 
 test('unknown machine state -> BLOCKED_STATE, no resume', async () => {
