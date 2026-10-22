@@ -556,7 +556,7 @@
       "title": "双角色判定统一与提示升级（duo-judge、课堂提示 1→2→3、角色切换补救页）",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-013"
       ],
@@ -568,7 +568,26 @@
         "运行按钮、旗子、天空使用 SVG，无文字符号残留",
         "三个双角色 e2e 改为检查课堂提示层级；eslint/vitest/生产构建/e2e 通过，三端截图验收"
       ],
-      "notes": "接续另一工作副本交接（原分支 tq-015 提交 cd1d124 未推送至 GitHub），由 kid小宝在最新 main bb77fed 上重建同等实现并续完未完成项；完成页双角色作品的提示问题留 TQ-019 处理。"
+      "notes": "接续另一工作副本交接（原分支 tq-015 提交 cd1d124 未推送至 GitHub），由 kid小宝在 main bb77fed 上重建同等实现并续完未完成项后合并。本地沙箱 e2e 的 Failed to fetch（Blockly 装饰音效被代理拦截）与 Pixel 7 可见性失败已在 origin/main 对照复现，属环境伪影；GitHub CI 真实 Chrome 全绿。完成页双角色作品的提示问题留 TQ-019 处理。课程成熟度仍为 L3。",
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/112",
+        "prNumber": 112,
+        "mergeCommit": "4ce60da6c2bf8c122f2ac89c47f4e2dc4144f3d8",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39751772198",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39751772169",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39749107341",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39749107336",
+        "reviewer": "owner（HelloMrDuan）2026-10-22 确认本地截图与 CI 结果后同意合并",
+        "tests": [
+          "apps/web/src/features/lessons/playable-stage/duo-judge.test.ts（判定纯函数：没切换/太早切换/重复切换/动错角色/对白给错人/小熊没说/距离不对/重复接错位置/不支持的积木 + 三课通过形状 + 设计错误识别）",
+          "apps/web/src/features/lessons/playable-stage/duo-executor.test.ts、duo-dialogue-executor.test.ts、duo-graduation-executor.test.ts（按新短句更新断言）",
+          "apps/web/src/features/lessons/remedial-practice.test.tsx（2 例：switch 练习顺序完成、顺序错给温和提示）",
+          "apps/web/src/features/lessons/remedial-routing.test.ts（第 10～12 课路由到 remedial-switch-character）",
+          "apps/web/tests/e2e/blockly-duo.spec.ts（新增：失败 3 次升到 3 级并打开角色切换补救页完成练习；主流程改以真实失败运行驱动 1→2 级断言）",
+          "apps/web/tests/e2e/blockly-duo-dialogue.spec.ts、blockly-duo-graduation.spec.ts（同上改写 + 新短句断言）",
+          "vitest 全量 129 文件 / 779 测试通过；eslint 改动文件 0 错误；生产构建通过；本地三端截图（L10 三级提示 桌面/平板/手机、补救页 桌面/手机）经 owner 确认"
+        ]
+      }
     },
     {
       "id": "UX-001",
