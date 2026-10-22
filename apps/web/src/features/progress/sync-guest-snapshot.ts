@@ -1,5 +1,6 @@
 import type { OnboardingSession } from '@/features/onboarding/onboarding-session'
 
+import { toGuestSyncPayload } from './guest-snapshot-payload'
 import type { GuestProgress } from './local-progress'
 
 export type GuestSyncResult = {
@@ -28,7 +29,9 @@ export async function syncGuestSnapshot({
     response = await fetch('/api/guest', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ onboarding, progress }),
+      // TQ-013: only the minimal whitelist leaves the device; assessment answers,
+      // stars, streak and other local-only fields are never uploaded.
+      body: JSON.stringify(toGuestSyncPayload({ onboarding, progress })),
     })
   } catch {
     return { ok: false, synced: false }

@@ -167,6 +167,10 @@ describe('GuidedLessonShell', () => {
     expect(screen.getByTestId('lesson-save-cloud')).toHaveTextContent(
       '已同步到云端',
     )
+    // TQ-013: honest disclosure of what the sync sends.
+    expect(screen.getByTestId('lesson-cloud-privacy-note')).toHaveTextContent(
+      '完成后，进度和积木会存到服务器，不存名字',
+    )
     expect(
       screen.queryByTestId('lesson-cloud-failure'),
     ).not.toBeInTheDocument()
