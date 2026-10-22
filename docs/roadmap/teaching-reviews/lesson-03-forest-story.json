@@ -111,7 +111,7 @@
     },
     "minor-privacy-risk": {
       "status": "unchecked",
-      "note": "完成课时会调用 syncGuestSnapshot 向 /api/guest 上传进度与作品快照（apps/web/src/app/learn/lesson/[lessonId]/page.tsx handleNext）；本次审计没有审查云端隔离与儿童隐私，lesson-maturity 也把“儿童隐私、输入和沙箱安全完成审核”列为未完成。"
+      "note": "TQ-013 代码层已核查：完成课时 syncGuestSnapshot → /api/guest 只上传完成课/徽章/卡片 id 与作品积木快照（积木类型+预设对白 id），不传测评答案、姓名或自由文本；接口有白名单、类型校验与 64KB 上限；迁移 202610220011 为早期表开启 RLS（本人只读，guest_snapshots 仅 service role）并提供 30 天清理，已在一次性 PostgreSQL 中验证（apps/web/scripts/child-privacy-rls.sql）。仍为 unchecked：Supabase 真实环境 RLS/清理调度未验证（CLOUD-103），监护人同意与删除流程未做（CLOUD-105）。详见 docs/roadmap/evidence/TQ-013/privacy-review.md。"
     },
     "broken-or-false-success": {
       "status": "pass",

@@ -78,6 +78,9 @@ const CLOUD_SYNC_COPY: Record<Exclude<LessonCloudSyncState, 'idle'>, string> =
     failed: '云端同步失败',
   }
 
+/** TQ-013: honest, short disclosure of what the lesson sync sends (ids only, no name). */
+export const CLOUD_PRIVACY_NOTE = '完成后，进度和积木会存到服务器，不存名字'
+
 const PANE_TABS: Array<{ id: LessonPane; label: string }> = [
   { id: 'task', label: '任务' },
   { id: 'code', label: '积木' },
@@ -263,6 +266,15 @@ export function GuidedLessonShell({
                 data-testid="lesson-save-cloud"
               >
                 {CLOUD_SYNC_COPY[cloudSyncState]}
+              </span>
+            ) : null}
+            {cloudSyncState !== 'local-only' ? (
+              // TQ-013: say plainly what is uploaded at the sync point, before it happens.
+              <span
+                className="kc-text-muted text-xs"
+                data-testid="lesson-cloud-privacy-note"
+              >
+                {CLOUD_PRIVACY_NOTE}
               </span>
             ) : null}
             {localSaveState === 'failed' && onRetryLocalSave ? (

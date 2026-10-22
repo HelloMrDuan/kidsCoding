@@ -9,10 +9,12 @@ export function mergeGuestSnapshot({
     onboarding: { ageBand: string; recommendedLevel: string }
     progress: {
       completedLessonIds: string[]
-      stars: number
+      /** Not uploaded since TQ-013; older guest rows may still carry it. */
+      stars?: number
       badgeIds: string[]
       cardIds: string[]
-      completedProjectIds: string[]
+      /** Not uploaded since TQ-013; older guest rows may still carry it. */
+      completedProjectIds?: string[]
       projectSnapshots?: Array<{
         lessonId: string
         updatedAt: string

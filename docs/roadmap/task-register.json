@@ -515,6 +515,33 @@
       "notes": "TQ-002 建议修复第 6 项（TQ-002f）。课程成熟度仍为 L3，不因本任务升级；未经儿童试学。"
     },
     {
+      "id": "TQ-013",
+      "title": "儿童隐私与云同步审查（最小采集、接口收紧、RLS）",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-012"
+      ],
+      "scope": "TQ-002 第7项（TQ-002g）前半：docs/roadmap/evidence/TQ-013/privacy-review.md；/api/guest 白名单与体积上限、客户端不再上传测评答案（guest-snapshot-payload.ts、sync-guest-snapshot.ts）；迁移 202610220011 为早期表启用 RLS 与 guest_snapshots 30 天清理；课堂/测评同步处如实告知",
+      "acceptance": [
+        "privacy-review 文档列出全部儿童数据字段（本机/云端、用途、是否必需、保留期）与 PIPL/《儿童个人信息网络保护规定》差距表，注明非法律意见",
+        "/api/guest 字段白名单、类型校验、体积上限（413），不再上传测评答案",
+        "初始表启用 RLS 且仅本人可访问，guest_snapshots 仅 service role；真实环境验证留 CLOUD-103",
+        "guest_snapshots 保留期清理方案落地",
+        "同步处如实告知",
+        "单测覆盖"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "TQ-002 第7项前半（后半学习证据留 TQ-014，学习证据按用户决定只存本机）。真实 Supabase 环境 RLS/清理调度验证 → CLOUD-103；监护人同意、删除与保留流程 → CLOUD-105；家长成长报告 UX-503 受本任务 RLS 约束。课程成熟度仍为 L3。"
+    },
+    {
       "id": "UX-001",
       "title": "设计Tokens规范化",
       "priority": "P0",
