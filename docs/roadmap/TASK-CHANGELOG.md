@@ -285,3 +285,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-22 | TQ-013 | 儿童隐私与云同步审查（TQ-002g 前半）：privacy-review 数据清单与 PIPL/《儿童个人信息网络保护规定》差距表（AI 整理，非法律意见）；/api/guest 字段白名单、类型校验 400、64 KB 上限 413、写库失败 502，客户端不再上传测评答案；迁移 202610220011 早期表全部启用 RLS、儿童数据本人只读、guest_snapshots 仅 service role、清除历史答案、30 天清理函数（有 pg_cron 时每日调度）；CI 真实 PostgreSQL 16 RLS 脚本；课堂/测评同步处如实告知（--kc-text，对比度 ≥4.5:1）。真实 Supabase 验证留 CLOUD-103，监护人同意/删除留 CLOUD-105；课程仍 L3 | [#110](https://github.com/HelloMrDuan/kidsCoding/pull/110) | `fe79d575a58e9c6f1b660f97bc7853c5b7f34c77` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39723835621) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39723835636) | completed |
+
+## TQ-015 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-22 | TQ-015 | 双角色判定统一与提示升级：第 10～12 课判定抽为纯函数 duo-judge（失败原因改儿童短句：还没切换角色/对白给错人/还差 100 步/重复切换没有用）；DuoStage 删除舞台手动提示按钮，运行失败上报课堂页按 1→2→3 升级，第 4 关故意犯错的观察运行不计失败；课堂 handleNext 修正（程序正确仅活动未完成时点完成不误计失败）；新增「角色切换」补救页 remedial-switch-character（kind=switch 互动练习），第 10～12 课三级提示路由至此；运行按钮/旗子/天空改 SVG；毕业礼物卡文案改短句；三个双角色 e2e 改为真实失败驱动提示层级断言并新增 tier-3 补救页 e2e。本任务接续另一工作副本交接（原 cd1d124 未推送），在 main bb77fed 上重建。本地沙箱 e2e 两类伪影（Blockly 音效 Failed to fetch、Pixel 7 可见性）已在 origin/main 对照复现；完成页作品提示问题留 TQ-019；课程仍 L3 | [#112](https://github.com/HelloMrDuan/kidsCoding/pull/112) | `4ce60da6c2bf8c122f2ac89c47f4e2dc4144f3d8` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39751772198) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39751772169) | completed |
