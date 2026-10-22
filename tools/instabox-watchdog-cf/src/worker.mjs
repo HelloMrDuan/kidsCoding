@@ -3,7 +3,7 @@
 // Bindings and configuration (see wrangler.toml and README.md):
 //   env.WATCHDOG_KV       KV namespace holding status/episode/lock
 //   env.INSTABOX_API_KEY  Worker Secret (never in code, git or logs)
-//   env.RUN_TOKEN         optional Worker Secret guarding POST /run
+//   env.RUN_TOKEN         Worker Secret required to enable POST /run
 //   env.MACHINE_ID        var, default below
 //   env.GITHUB_REPO       var: repo whose branch head is the expected
 //                         Kids deployed SHA (public API, no token)
