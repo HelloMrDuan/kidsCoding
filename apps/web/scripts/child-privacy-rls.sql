@@ -2,8 +2,11 @@
 -- TQ-013: disposable PostgreSQL check of migration 202610220011_child_privacy_rls.sql.
 -- Mimics Supabase's auth.uid()/roles. Real Supabase verification remains CLOUD-103.
 create schema auth;
-create role authenticated nologin;
-create role anon nologin;
+-- Roles are cluster-wide; CI may already have created them for scratch-cloud-rls.sql.
+do $$ begin
+  if not exists (select 1 from pg_roles where rolname = 'authenticated') then create role authenticated nologin; end if;
+  if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon nologin; end if;
+end $$;
 grant usage on schema public, auth to authenticated, anon;
 create table auth.users (id uuid primary key);
 create function auth.uid() returns uuid language sql stable
