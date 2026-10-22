@@ -279,3 +279,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-21 | TQ-012 | 前 9 课单元作品（TQ-002f）：unit-projects 单一来源，第 1～9 课完成页作品可运行、可本机保存、可重开修改，替换静态预览；第 3/6/9 课孩子可选对白/在哪里说/先后顺序，两种不同方案都判为正确；改动后须重新运行通过才能保存，存储写满如实报错，未完成课堂不能打开作品；快照带所选对白并兼容旧快照；1440 保存区首屏、375 分页且无横向滚动；完成页/完成卡 V2 视觉；单测、组件测试与 unit-project E2E。课程仍 L3，未经儿童试学 | [#108](https://github.com/HelloMrDuan/kidsCoding/pull/108) | `768f29720cef4ae5bf4ac9f01f27dc1e4c53e37a` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39608931445) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39608931176) | completed |
+
+## TQ-013 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-22 | TQ-013 | 儿童隐私与云同步审查（TQ-002g 前半）：privacy-review 数据清单与 PIPL/《儿童个人信息网络保护规定》差距表（AI 整理，非法律意见）；/api/guest 字段白名单、类型校验 400、64 KB 上限 413、写库失败 502，客户端不再上传测评答案；迁移 202610220011 早期表全部启用 RLS、儿童数据本人只读、guest_snapshots 仅 service role、清除历史答案、30 天清理函数（有 pg_cron 时每日调度）；CI 真实 PostgreSQL 16 RLS 脚本；课堂/测评同步处如实告知（--kc-text，对比度 ≥4.5:1）。真实 Supabase 验证留 CLOUD-103，监护人同意/删除留 CLOUD-105；课程仍 L3 | [#110](https://github.com/HelloMrDuan/kidsCoding/pull/110) | `fe79d575a58e9c6f1b660f97bc7853c5b7f34c77` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39723835621) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39723835636) | completed |
