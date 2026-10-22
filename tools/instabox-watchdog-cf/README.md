@@ -61,7 +61,7 @@ npx wrangler kv namespace create WATCHDOG_KV
 
 # 3. 设置密钥（粘贴新 Key，终端不回显；绝不写入任何文件）
 npx wrangler secret put INSTABOX_API_KEY
-# 可选：保护 /run 端点，自设一串随机值
+# 如需启用手动 /run 端点必须配置；未设置 RUN_TOKEN 时 /run 返回 403
 npx wrangler secret put RUN_TOKEN
 
 # 4. 部署
