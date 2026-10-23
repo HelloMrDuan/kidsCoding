@@ -126,7 +126,7 @@
       "title": "历史已合并功能建立事实对照",
       "priority": "P0",
       "category": "OPS",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "OPS-001"
       ],
@@ -141,7 +141,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "2026-10-23 认领：以采样 main 412120d 重写 01-REPO-BASELINE.md 为事实对照版——实测 PR 盘点（117 已合并）、内容资产计数、九大功能域对照表（PR 来源×运行能力×台账状态→已完/部分/未完）、与 2026-10-11 旧版的五项差异、发布口径单列；复核 43 个 completed 条目证据链齐全，无漏账。"
     },
     {
       "id": "OPS-006",
