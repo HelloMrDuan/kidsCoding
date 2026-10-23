@@ -1,0 +1,40 @@
+# tj-watchdog: primary watchdog for the Tianji machine tj-core-01.
+# Fully independent of instabox-watchdog (platforms-core-01): its own
+# Worker, its own KV namespace, its own InstaBox API key secret.
+# Deploy steps live in README.md. Values that must be supplied at
+# deploy time are placeholders on purpose:
+#   - the KV namespace id below (create a NEW namespace for this
+#     worker; never reuse the instabox-watchdog namespace)
+#   - MACHINE_ID (tj-core-01's real ID from the InstaBox API machine
+#     list; never the platforms-core-01 ID, never guessed from the
+#     machine name)
+#   - the INSTABOX_API_KEY secret (a DEDICATED key for this worker,
+#     set with `wrangler secret put` or in the dashboard; never write
+#     it into this file or git)
+
+name = "tj-watchdog"
+main = "src/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# Primary monitor cadence: every 10 minutes, offset to :05/:15/:25/
+# :35/:45/:55 so it never fires in the same minute as the
+# platforms-core-01 watchdog. Runs from Cloudflare's scheduler —
+# independent of GitHub and of the InstaBox machine.
+[triggers]
+crons = ["5,15,25,35,45,55 * * * *"]
+
+[[kv_namespaces]]
+binding = "TJ_WATCHDOG_KV"
+id = "REPLACE_WITH_TJ_KV_NAMESPACE_ID"
+
+[vars]
+MACHINE_ID = "m_agqwnq7rh7fahkx2dsyymvvdsu"
+MACHINE_NAME = "tj-core-01"
+# 'lifecycle' = initial phase (Tianji not deployed yet): lifecycle
+# checks + resume only, NO application health verdicts.
+# Switch to 'tianji' only after the Tianji migration completes and
+# the activation checklist in README.md has been worked through.
+HEALTH_MODE = "lifecycle"
+# Maintenance master switch: "true" = monitor and report only,
+# never resume. Change in the dashboard or here and redeploy.
+WATCHDOG_HOLD = "false"

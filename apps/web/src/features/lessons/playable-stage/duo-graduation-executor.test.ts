@@ -49,7 +49,7 @@ describe('lesson 12 actual graduation gift', () => {
     expect(result.current.executionState).toBe('error')
     expect(result.current.characterPosition).toBe(100)
     expect(result.current.partnerPosition).toBe(100)
-    expect(result.current.errorMessage).toContain('小熊 200 步')
+    expect(result.current.errorMessage).toContain('还差 100 步')
     expect(result.current.giftFound).toBe(false)
   })
   it.each([
@@ -108,6 +108,6 @@ describe('lesson 12 actual graduation gift', () => {
     await run(result)
     expect(result.current.giftFound).toBe(false)
     expect(result.current.partnerPosition).toBe(0)
-    expect(result.current.errorMessage).toContain('没有接')
+    expect(result.current.errorMessage).toContain('没接好')
   })
 })

@@ -71,4 +71,22 @@ export const remedialLessons: RemedialLessonDefinition[] = [
       success: '你点到它，它才飞起来！这就是“被点击时”。',
     },
   },
+  {
+    id: 'remedial-switch-character',
+    title: '先学会切换角色',
+    focus: '移动和说话只交给现在操作的朋友。先让小狐狸走，再切换，然后让小熊走自己的路。',
+    returnToLessonId: 'lesson-10-second-friend',
+    returnToStepId: 'step-3',
+    steps: [],
+    keyPoints: [
+      '每位朋友有自己的位置，移动只算在现在操作的朋友身上。',
+      `${quoteBlock('switch_character')}之后，后面的积木就交给小熊了。`,
+      `先让小狐狸走 100 步，再切换，再让小熊走 100 步；漏掉切换，小熊一步也不会动。`,
+    ],
+    practice: {
+      kind: 'switch',
+      prompt: '动手试试：先让小狐狸走 100 步，再点“切换到另一位朋友”，最后让小熊走 100 步。',
+      success: '做到啦！切换之后，移动就交给小熊了，小狐狸停在自己的 100 步。',
+    },
+  },
 ]

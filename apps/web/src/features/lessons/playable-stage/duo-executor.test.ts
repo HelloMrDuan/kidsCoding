@@ -99,7 +99,7 @@ describe('lesson 10 independent actors', () => {
     const { result } = renderHook(() => useBlockExecutor(correct.map((type, i) => ({ type, disconnected: i === 2 })), correct, 2, true))
     await run(result)
     expect(result.current.executionState).toBe('error')
-    expect(result.current.errorMessage).toContain('没有接')
+    expect(result.current.errorMessage).toContain('没接好')
     expect(result.current.characterPosition).toBe(0)
     expect(result.current.partnerPosition).toBe(0)
   })

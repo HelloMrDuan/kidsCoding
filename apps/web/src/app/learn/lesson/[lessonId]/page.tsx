@@ -20,6 +20,7 @@ import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
 import { PlayableStage } from '@/features/lessons/playable-stage'
 import { getMainCharacterLabel } from '@/features/lessons/playable-stage/playable-stage'
 import { DuoStage } from '@/features/lessons/playable-stage/duo-stage'
+import { judgeDuoProgram } from '@/features/lessons/playable-stage/duo-judge'
 import { buildHintState } from '@/features/lessons/build-hint-state'
 import { getRemedialIdForLesson } from '@/features/lessons/remedial-routing'
 import { completeLaunchLesson } from '@/features/lessons/complete-launch-lesson'
@@ -222,10 +223,13 @@ export default function LessonPage() {
   const handleRunFailure = useCallback((failure?: { code: string | null; designedMistake?: boolean }) => {
     // TQ-010: running the designed wrong program is the experiment, not a failed attempt
     // (also when it is run again after “再摆一次错误程序”). The stage decides which run that is.
+    // TQ-015: duo stages flag their own step-4 designed mistake the same way.
     const design = getMistakeStepAt(lessonId ?? '', stepIndex)
-    if (design && failure?.designedMistake) {
-      mistakeObservedRef.current = true
-      setMistakeObserved(true)
+    if (failure?.designedMistake) {
+      if (design) {
+        mistakeObservedRef.current = true
+        setMistakeObserved(true)
+      }
       return
     }
     // Every failed real run is one failed attempt: hints escalate 1 → 2 → 3.
@@ -350,6 +354,13 @@ export default function LessonPage() {
       // Not a mistake: the program is right but has not been run yet.
       // TQ-011: follow the step's own start event (lesson-08's practice starts with “开始时”).
       setFeedback(step.requiredBlockTypes[0] === 'when_clicked' ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一关。')
+      return
+    }
+    if (duoLesson && !correct && judgeDuoProgram(blocksRef.current, currentLesson.id === 'lesson-12-graduation-show' ? 'graduation' : currentLesson.id === 'lesson-11-duo-rehearsal' ? 'dialogue' : 'independent', safeStepIndex).passed) {
+      // TQ-015: the duo program itself is right — only the step activity (prediction,
+      // mistake experiment or reflection) is still open. Like the single-role
+      // “program is right but not run yet” case above, this is not a failed attempt.
+      setFeedback('请先运行并观察角色结果，完成本关的预测、错误实验或复盘。舞台会告诉你还缺什么。')
       return
     }
     if (!correct) {
@@ -537,7 +548,7 @@ export default function LessonPage() {
               <>
                 {['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id) ? (
                   <DuoStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} requiredBlocks={step.requiredBlockTypes}
-                    graduation={currentLesson.id === 'lesson-12-graduation-show'} dialogue={currentLesson.id === 'lesson-11-duo-rehearsal'} stepIndex={stepIndex} onRunSuccess={handleRunSuccess} onRunClear={handleRunClear}/>
+                    graduation={currentLesson.id === 'lesson-12-graduation-show'} dialogue={currentLesson.id === 'lesson-11-duo-rehearsal'} stepIndex={stepIndex} onRunSuccess={handleRunSuccess} onRunClear={handleRunClear} onRunFailure={handleRunFailure}/>
                 ) : ['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id) ? (
                   <PlayableStage key={`${currentLesson.id}:${stepIndex}`} blocks={blocks} template={currentTemplate}
                     requiredBlocks={step.requiredBlockTypes} stepIndex={stepIndex} judgeOptions={judgeOptions}

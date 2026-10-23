@@ -1,0 +1,1 @@
+{"description":"InstaBox primary watchdog on Cloudflare Workers Cron Triggers (independent implementation alongside tools/instabox-watchdog).","devDependencies":{"wrangler":"^4.0.0"},"name":"instabox-watchdog-cf","private":true,"scripts":{"deploy":"wrangler deploy","tail":"wrangler tail","test":"node --test test/*.test.mjs"},"type":"module","version":"1.0.0"}

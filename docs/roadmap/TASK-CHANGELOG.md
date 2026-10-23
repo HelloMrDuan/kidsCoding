@@ -273,3 +273,59 @@
 | 记录日期 | Task-ID | 实际成果 | PR | 合并 SHA | main CI | 状态及遗留 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-21 | OPS-006 | 本地 Supabase CLI 路径助手改按目标平台拼路径（win32/posix），三个脚本测试的跨平台期望修正（精确相等断言未放宽）；Linux 受影响文件 13/13、全量 Vitest 661/661（修复前 656/661） | [#102](https://github.com/HelloMrDuan/kidsCoding/pull/102) | `2f26130b0a4b32d6b650fdabb756df3b07a847e1` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489646) / [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39571489645) | **completed**；Windows 主机行为不变（宿主恒等于目标）；无遗留 |
+
+## TQ-012 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-21 | TQ-012 | 前 9 课单元作品（TQ-002f）：unit-projects 单一来源，第 1～9 课完成页作品可运行、可本机保存、可重开修改，替换静态预览；第 3/6/9 课孩子可选对白/在哪里说/先后顺序，两种不同方案都判为正确；改动后须重新运行通过才能保存，存储写满如实报错，未完成课堂不能打开作品；快照带所选对白并兼容旧快照；1440 保存区首屏、375 分页且无横向滚动；完成页/完成卡 V2 视觉；单测、组件测试与 unit-project E2E。课程仍 L3，未经儿童试学 | [#108](https://github.com/HelloMrDuan/kidsCoding/pull/108) | `768f29720cef4ae5bf4ac9f01f27dc1e4c53e37a` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39608931445) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39608931176) | completed |
+
+## TQ-013 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-22 | TQ-013 | 儿童隐私与云同步审查（TQ-002g 前半）：privacy-review 数据清单与 PIPL/《儿童个人信息网络保护规定》差距表（AI 整理，非法律意见）；/api/guest 字段白名单、类型校验 400、64 KB 上限 413、写库失败 502，客户端不再上传测评答案；迁移 202610220011 早期表全部启用 RLS、儿童数据本人只读、guest_snapshots 仅 service role、清除历史答案、30 天清理函数（有 pg_cron 时每日调度）；CI 真实 PostgreSQL 16 RLS 脚本；课堂/测评同步处如实告知（--kc-text，对比度 ≥4.5:1）。真实 Supabase 验证留 CLOUD-103，监护人同意/删除留 CLOUD-105；课程仍 L3 | [#110](https://github.com/HelloMrDuan/kidsCoding/pull/110) | `fe79d575a58e9c6f1b660f97bc7853c5b7f34c77` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39723835621) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39723835636) | completed |
+
+## TQ-015 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-22 | TQ-015 | 双角色判定统一与提示升级：第 10～12 课判定抽为纯函数 duo-judge（失败原因改儿童短句：还没切换角色/对白给错人/还差 100 步/重复切换没有用）；DuoStage 删除舞台手动提示按钮，运行失败上报课堂页按 1→2→3 升级，第 4 关故意犯错的观察运行不计失败；课堂 handleNext 修正（程序正确仅活动未完成时点完成不误计失败）；新增「角色切换」补救页 remedial-switch-character（kind=switch 互动练习），第 10～12 课三级提示路由至此；运行按钮/旗子/天空改 SVG；毕业礼物卡文案改短句；三个双角色 e2e 改为真实失败驱动提示层级断言并新增 tier-3 补救页 e2e。本任务接续另一工作副本交接（原 cd1d124 未推送），在 main bb77fed 上重建。本地沙箱 e2e 两类伪影（Blockly 音效 Failed to fetch、Pixel 7 可见性）已在 origin/main 对照复现；完成页作品提示问题留 TQ-019；课程仍 L3 | [#112](https://github.com/HelloMrDuan/kidsCoding/pull/112) | `4ce60da6c2bf8c122f2ac89c47f4e2dc4144f3d8` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39751772198) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39751772169) | completed |
+
+## TQ-019 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-22 | TQ-019 | 完成页双角色作品接入提示升级：DuoProject 新增失败计数，DuoStage 每次失败运行经 onRunFailure 上报（沿用舞台既有"每次失败只报一次"纪律），用与课堂相同的 buildHintState 与本课 hintLayers 渲染 kc-hint 提示卡，1→2→3 升级；第 3 级渲染补救链接卡，点击经 router 跳 /learn/remedial/<本课补救 id>?from=<课程>&step=step-3（第 10～12 课为 remedial-switch-character）；运行成功清零计数，编辑不重置；保存门槛不变（判定通过+复盘才可保存）。新增组件测试 3 例与真实流程 e2e（走完第 10 课→完成页删移动块→失败升至三级→点开补救页）；本地 vitest 全量 782 全过、三断点截图核验 tier=3。PR CI 前两轮均在最后一步 V2 CSS 视觉规格处被外部 cancelled（非失败、与改动文件无关），第三轮 8/8 全绿后合并；课程仍 L3 | [#114](https://github.com/HelloMrDuan/kidsCoding/pull/114) | `15358c92a7c1e29aaa0e66f65e2375f035471243` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39778229323) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39778229357) | completed |
+
+## OPS-002 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-23 | OPS-002 | 每批真实交付关联任务 ID：新建 .github/PULL_REQUEST_TEMPLATE.md，把单任务制度前置到写 PR 时——首行唯一 Task-ID 占位（占位文本不匹配任务 CI 正则，漏填必被拒）、变更范围须与台账 scope 一致的声明、成功/失败边界/恢复证据栏、台账确认与审核人检查清单（唯一编号、范围一致、证据真实、合并后复核 main CI）。任务 CI 的强制校验（恰一行 Task-ID、编号存在、状态非 todo、只改一个台账条目）已由 check-task-ledger.py 落地，本任务补上缺失的模板环节；本地模拟校验正例通过、无编号/双编号/占位原文三反例均被拒；PR #116 为首个按模板填写的真实 PR | [#116](https://github.com/HelloMrDuan/kidsCoding/pull/116) | `9b98ba7ba6fdfc6bbbd68cf44693ba84a1ef05ce` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39895205320) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39895205295) | completed |
+
+## OPS-004 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-23 | OPS-004 | 每批完成后刷新任务记录（收尾机制成文）：在 11-TASK-EXECUTION-POLICY.md 新增第 7 节——触发条件为功能 PR 合并且 main 双工作流全绿；收尾五步：取证（PR/合并 SHA/main CI 双链接逐个验可达）、从最新 main 开只改台账与日志的关账 PR（同一 Task-ID 声明）、回填 completed 与 evidence 全字段（reviewer 记授权来源、tests 分清本地/CI）、CHANGELOG 追加一行执行记录、关账合并后看 main CI 并从主分支原始文件读回复核。另含强制校验与审计口径（check-task-ledger.py 已强制 completed 证据字段；认领时审计 42 个已完成任务证据链 42/42 完整）与失败路径（main CI 红回 in_progress、写入中断先只读核查再重试、证据不足停 merged_waiting_ci/blocked）。本任务关账即按此五步执行的首个样本 | [#119](https://github.com/HelloMrDuan/kidsCoding/pull/119) | `39b0f6f5d10ebe8481fd7c22a9f576ac7f293789` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39913905709) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39913905673) | completed |
+
+## OPS-005 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-23 | OPS-005 | 历史已合并功能事实对照：01-REPO-BASELINE.md 从 2026-10-11 快照（采样 e745aa3）全面刷新至采样 main 412120d。PR 盘点经 API 实测：117 个已合并、#1 与 #104 关闭未合并、#117 开放中（运维线）；内容资产逐个文件计数（18 路线、72 单元、432 目录课仍全部 outline_not_playable、192 详案、72 毕业蓝图、12 启蒙不计入 432）；九大功能域对照表按「当前能力事实 × 台账状态」判定已完/部分/未完（启蒙 12 课链路、课堂地图 UX、教学机制、流程机制为已完；Scratch/Python 实验室、账号云同步、作品系统为部分；逐课台账 432 为未完，属既定口径非漏账）；发布口径单列（release-evidence 门禁基本 unchecked、RELEASE-103 待 ≥3 名儿童真实试点，不冒称发布）；与旧版五项差异逐项列明；复核 43 个 completed 条目证据链齐全 | [#121](https://github.com/HelloMrDuan/kidsCoding/pull/121) | `c4ff5ea3ef3b4a733afaad38b66e8343263b1ade` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39922704457) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39922704236) | completed |
+
+
+## OPS-008 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-23 | OPS-008 | Next.js standalone 生产打包：apps/web/next.config.ts 新增 output:'standalone'，仅打包方式变更，页面设计、课程功能与数据库行为不变。预发布机以 main c4ff5ea 同源代码 + 本改动完成隔离实证：standalone 镜像 398MB（现行生产 prune 版 1.01GB、原版 1.7GB），追踪后 node_modules 65M、.next 13M，node server.js 直启、容器 healthy，/api/health、首页、课程目录、课时页、作品页五探针全 200；PR CI 8/8 全绿，main CI 于关账时 7/8 已绿（task-ledger 与 curriculum 其余 6 项），scratch-real-vm-browser 在 GitHub runner 长时间未完成（同项 PR 已通过、代码相同），duan 明确指示不等 runner 关账 | [#123](https://github.com/HelloMrDuan/kidsCoding/pull/123) | `554a7c2c84d9867307445c8a0dd5d620a0a2a62e` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304434) / [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304427) | completed；预发布通道仍指 tq-011（代码未含 standalone），部署侧 standalone 运行层 Dockerfile 已备妥并验证、待通道目标更新后切换并做真实部署验收；OPS-007 的 deploy/Dockerfile.web 在其合并后随行对齐 |
+
+
+## OPS-007 执行记录
+
+| 日期 | Task-ID | 实际工作 | PR | 当前验证 | 状态 |
+|---|---|---|---|---|---|
+| 2026-10-23 | OPS-007 | 引入 push 构建 GHCR 镜像的工作流，更新生产 Dockerfile 为 OPS-008 已验证的 Next.js standalone 结构；GHCR 发布≠机器已部署。 | [#125](https://github.com/HelloMrDuan/kidsCoding/pull/125) | config-check、test 通过；E2E、镜像发布和服务器真实拉取仍待验证 | in_review |

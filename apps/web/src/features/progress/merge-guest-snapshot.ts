@@ -1,6 +1,6 @@
 import { LESSON_COMPLETION_STARS } from '@/features/rewards/award-lesson-completion'
 
-import { normalizeProjectSnapshots } from './project-snapshot'
+import { normalizeProjectSnapshots, type SnapshotBlock } from './project-snapshot'
 
 export function mergeGuestSnapshot({
   snapshot,
@@ -9,14 +9,16 @@ export function mergeGuestSnapshot({
     onboarding: { ageBand: string; recommendedLevel: string }
     progress: {
       completedLessonIds: string[]
-      stars: number
+      /** Not uploaded since TQ-013; older guest rows may still carry it. */
+      stars?: number
       badgeIds: string[]
       cardIds: string[]
-      completedProjectIds: string[]
+      /** Not uploaded since TQ-013; older guest rows may still carry it. */
+      completedProjectIds?: string[]
       projectSnapshots?: Array<{
         lessonId: string
         updatedAt: string
-        blocks: Array<{ type: string }>
+        blocks: SnapshotBlock[]
       }>
     }
   }

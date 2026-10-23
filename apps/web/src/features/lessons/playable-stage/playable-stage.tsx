@@ -9,7 +9,7 @@ import { motionVerbForTemplate, motionWord } from '../blockly/block-labels'
 import { explainRunFailure } from '../blockly/run-feedback'
 
 import { CharacterArt, SceneBackdrop, type SceneId } from './character-art'
-import { useBlockExecutor } from './use-block-executor'
+import { useBlockExecutor, type ProgramJudge } from './use-block-executor'
 
 /**
  * TQ-009: steps are story distance, not pixels. 200 steps (the longest walk in lessons 01–09)
@@ -95,6 +95,8 @@ export function PlayableStage({
   practiceAnswer = null,
   onPracticeAnswer,
   askClickPrediction,
+  judge,
+  successMessage,
 }: {
   blocks: ProgramBlock[]
   template?: ProjectTemplateDefinition
@@ -128,6 +130,10 @@ export function PlayableStage({
    * step; the classroom asks it only where it teaches something (lesson-07 main + mistake).
    */
   askClickPrediction?: boolean
+  /** TQ-012: custom judge (unit projects accept several programs); replaces evaluateObservable. */
+  judge?: ProgramJudge
+  /** TQ-012: success copy outside the classroom (no “完成这一关” button there). */
+  successMessage?: string
 }) {
   const {
     executionState,
@@ -138,11 +144,11 @@ export function PlayableStage({
     run,
     reset,
     clickCharacter,
-  } = useBlockExecutor(blocks, requiredBlocks, stepIndex, false, judgeOptions)
+  } = useBlockExecutor(blocks, requiredBlocks, stepIndex, false, judgeOptions, judge)
 
   const { mainLabel, secondLabel, sceneCopy } = getTemplateCharacterLabels(template)
   // TQ-008: the same judge the executor used, explained for a 5–7 year old.
-  const verdict = useMemo(() => evaluateObservable(requiredBlocks, blocks, judgeOptions), [requiredBlocks, blocks, judgeOptions])
+  const verdict = useMemo(() => (judge ? judge(blocks) : evaluateObservable(requiredBlocks, blocks, judgeOptions)), [requiredBlocks, blocks, judgeOptions, judge])
   const failureCode = verdict.passed ? null : verdict.code
   // TQ-009: the butterfly flies (“飞”), the fox walks (“走”) — feedback and the distance chip follow the stage.
   const motionVerb = motionVerbForTemplate(template?.id)
@@ -346,7 +352,7 @@ export function PlayableStage({
               </div>
             ) : (
               <div className="kc-feedback kc-feedback-success">
-                🎉 太棒了！运行成功！点击“完成这一关”继续。
+                {successMessage ?? '🎉 太棒了！运行成功！点击“完成这一关”继续。'}
               </div>
             ))}
           {executionState !== 'error' && executionState !== 'success' && executionState !== 'armed' ? (

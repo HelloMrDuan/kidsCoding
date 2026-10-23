@@ -1,14 +1,18 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { quoteBlock } from '../blockly/block-labels'
-import { evaluateObservable, MAX_PROGRAM_BLOCKS, sayMessageFor, simulateProgram, type JudgeOptions, type ProgramBlock } from '../blockly/observable-run'
+import { evaluateObservable, MAX_PROGRAM_BLOCKS, sayMessageFor, simulateProgram, type JudgeOptions, type ObservableVerdict, type ProgramBlock } from '../blockly/observable-run'
+import { judgeDuoProgram, type DuoMode } from './duo-judge'
 
 const NO_JUDGE_OPTIONS: JudgeOptions = {}
 
+/** TQ-012: a custom judge (unit projects accept several programs); replaces evaluateObservable. */
+export type ProgramJudge = (blocks: ProgramBlock[]) => ObservableVerdict
+
 export type ExecutionState = 'idle' | 'armed' | 'running' | 'success' | 'error'
 
-export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' | 'graduation' = false, judgeOptions: JudgeOptions = NO_JUDGE_OPTIONS) {
+export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[], stepIndex: number = 0, duoEnabled: boolean | 'dialogue' | 'graduation' = false, judgeOptions: JudgeOptions = NO_JUDGE_OPTIONS, judge?: ProgramJudge) {
   const dialogueEnabled = duoEnabled === 'dialogue'
   const graduationEnabled = duoEnabled === 'graduation'
+  const duoMode: DuoMode | null = !duoEnabled ? null : graduationEnabled ? 'graduation' : dialogueEnabled ? 'dialogue' : 'independent'
   const [giftFound, setGiftFound] = useState(false)
   const [executionState, setExecutionState] = useState<ExecutionState>('idle')
   const [characterPosition, setCharacterPosition] = useState(0)
@@ -41,8 +45,11 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
   // moves a sprite: click-triggered code only starts after a real UI click.
   const execute = useCallback(async (id: number) => {
     setExecutionState('running')
-    if (duoEnabled && blocks.some(block => block.disconnected)) {
-      setErrorMessage('有积木没有接在“开始时”下面。请把动作连成一条程序再运行。')
+    // TQ-015: duo verdicts and kid-short failure reasons come from the pure judge;
+    // this hook only animates the same program and surfaces the judge's result.
+    const duoVerdict = duoMode ? judgeDuoProgram(blocks, duoMode, stepIndex) : null
+    if (duoVerdict && (duoVerdict.code === 'not-connected' || duoVerdict.code === 'no-start')) {
+      setErrorMessage(duoVerdict.reason)
       setExecutionState('error')
       return
     }
@@ -61,7 +68,8 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
       const type = blocks[i].type
       if (duoEnabled) {
         // Lessons 10–12 interpret the actual connected program with two targets.
-        // Validate observed coordinates, not a precomputed answer animation.
+        // The judge has already simulated this exact program: stop where it fails.
+        if (duoVerdict && duoVerdict.failIndex === i) { fail(duoVerdict.reason ?? ''); return }
         if (type === 'move_right') {
           setActorActions({ main: actor === 'main' ? 'moving' : 'idle', partner: actor === 'partner' ? 'moving' : 'idle' })
           if (actor === 'main') {
@@ -73,13 +81,10 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
           }
           setActionLog(prev => [...prev, `${actor === 'main' ? '小狐狸' : '小熊'}向右走 100 步`])
         } else if (type === 'switch_character') {
-          if (actor === 'partner') { fail('已经在操作小熊了。本课只切换一次，重复切换没有新目标。'); return }
-          if (fox !== 100) { fail('先让小狐狸走 100 步，再把操作权交给小熊。'); return }
           actor = 'partner'
           setActiveActor(actor)
           setActionLog(prev => [...prev, '切换到小熊：后面的动作只给小熊'])
         } else if (type === 'repeat_twice' && graduationEnabled) {
-          if (blocks[i - 1]?.type !== 'move_right') { fail(`${quoteBlock('repeat_twice')}要接在当前角色的移动后面，切换不会把狐狸的移动交给小熊重复。`); return }
           setActorActions({ main: actor === 'main' ? 'moving' : 'idle', partner: actor === 'partner' ? 'moving' : 'idle' })
           if (actor === 'main') { fox += 100; setCharacterPosition(fox) }
           else { bear += 100; setPartnerPosition(bear) }
@@ -97,10 +102,8 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
         } else if (type === 'say_line' && actor === 'main' && stepIndex === 4) {
           setCharacterMessage('你好！')
           setActionLog(prev => [...prev, '小狐狸说：你好！'])
-        } else {
-          fail(type === 'say_line' ? '这次改造只给小狐狸加问候，请放在切换之前。' : '这块积木还不能在本课执行。请用开始、移动和角色切换。')
-          return
         }
+        // Any other block was already stopped by the judge's failIndex above.
         await new Promise(resolve => setTimeout(resolve, 180))
         if (runIdRef.current !== id) return
         setActorActions({ main: 'idle', partner: 'idle' })
@@ -134,32 +137,16 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
     }
     if (!duoEnabled) {
       // SYS-103: judge the observed result, so equivalent programs pass and counter-examples fail.
-      const verdict = evaluateObservable(requiredBlocks, blocks, judgeOptions)
+      const verdict = judge ? judge(blocks) : evaluateObservable(requiredBlocks, blocks, judgeOptions)
       if (!verdict.passed) {
         fail(verdict.reason)
         return
       }
     }
     if (duoEnabled) {
-      const expectedFox = stepIndex === 0 ? 0 : 100
-      const expectedBear = graduationEnabled ? (stepIndex < 2 ? 0 : 200) : dialogueEnabled ? (stepIndex === 0 ? 0 : 100) : stepIndex < 2 ? 0 : 100
-      if (fox !== expectedFox || bear !== expectedBear) {
-        fail(`目标：小狐狸 ${expectedFox} 步、小熊 ${expectedBear} 步；实际：小狐狸 ${fox} 步、小熊 ${bear} 步。${bear === 0 && expectedBear > 0 ? '小熊还没动，看看操作权交给谁了。' : '检查移动次数和动作目标。'}`)
+      if (duoVerdict && !duoVerdict.passed) {
+        fail(duoVerdict.reason ?? '')
         return
-      }
-      if (dialogueEnabled) {
-        if (foxMessage !== null && stepIndex < 4) {
-          fail('实际是小狐狸说了“你好！”，小熊的目标对白没有交给正确角色。把说话积木移到切换之后。')
-          return
-        }
-        if (stepIndex >= 2 && bearMessage !== '我们一起出发吧！') {
-          fail('两位朋友到位了，但小熊还没说“我们一起出发吧！”。检查切换后有没有说话积木。')
-          return
-        }
-        if (stepIndex < 2 && (foxMessage !== null || bearMessage !== null)) {
-          fail('这一关先观察起点或独立移动，暂时不用说话积木。')
-          return
-        }
       }
       if (graduationEnabled && stepIndex >= 2) {
         setGiftFound(true)
@@ -167,7 +154,7 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
       }
     }
     if (runIdRef.current === id) setExecutionState('success')
-  }, [blocks, requiredBlocks, duoEnabled, dialogueEnabled, graduationEnabled, stepIndex, judgeOptions])
+  }, [blocks, requiredBlocks, duoEnabled, duoMode, dialogueEnabled, graduationEnabled, stepIndex, judgeOptions, judge])
 
   const run = useCallback(async () => {
     reset()
@@ -188,7 +175,7 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
       }
     }
     if (duoEnabled ? blocks[0]?.type !== 'when_start' : blocks[0]?.type !== 'when_start' && blocks[0]?.type !== 'when_clicked') {
-      setErrorMessage('请把“开始时”放在最前面，告诉朋友什么时候行动。')
+      setErrorMessage(duoMode ? judgeDuoProgram(blocks, duoMode, stepIndex).reason : '请把“开始时”放在最前面，告诉朋友什么时候行动。')
       setExecutionState('error')
       return
     }
@@ -200,7 +187,7 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
     await new Promise(resolve => setTimeout(resolve, 330))
     if (runIdRef.current !== id) return
     await execute(id)
-  }, [blocks, requiredBlocks, reset, execute, duoEnabled])
+  }, [blocks, requiredBlocks, reset, execute, duoEnabled, duoMode, stepIndex])
 
   const clickCharacter = useCallback(async () => {
     if (executionState !== 'armed' || blocks[0]?.type !== 'when_clicked') return

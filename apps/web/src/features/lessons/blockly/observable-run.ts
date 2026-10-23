@@ -50,6 +50,8 @@ export type DifferenceCode =
   | 'missing-say'
   | 'extra-say'
   | 'wrong-line'
+  | 'unknown-line'
+  | 'line-wrong-place'
   | 'say-too-early'
   | 'say-too-late'
 
@@ -125,6 +127,18 @@ export type JudgeOptions = {
   acceptedLines?: readonly string[]
   /** The line may be spoken at any point after the first move, as long as the walk is complete. */
   sayAnyTimeAfterMove?: boolean
+  /**
+   * TQ-012: preset line ids a say block may carry here. When set, a say block whose `line`
+   * is not in this list fails with `unknown-line` instead of silently falling back to the
+   * scene default (a stale or tampered snapshot never passes as the child's choice).
+   */
+  allowedLineIds?: readonly string[]
+}
+
+function hasUnknownLine(blocks: ProgramBlock[], options: JudgeOptions) {
+  const allowed = options.allowedLineIds
+  if (!allowed) return false
+  return blocks.some((block) => block.type === 'say_line' && block.line != null && block.line !== '' && !allowed.includes(block.line))
 }
 
 type Difference = { code: DifferenceCode; reason: string } | null
@@ -181,8 +195,56 @@ export function evaluateObservable(
   if (!reference.ok) return { passed: false, goal: null, actual: null, reason: '这一关的目标还没有配置好。', code: 'goal-misconfigured' }
   const actual = simulateProgram(blocks)
   if (!actual.ok) return { passed: false, goal: reference.observed, actual: null, reason: actual.reason, code: actual.code }
+  if (hasUnknownLine(blocks, options)) {
+    return { passed: false, goal: reference.observed, actual: actual.observed, reason: '这句对白这里不能用，请在“选一句对白”里重新挑一句。', code: 'unknown-line' }
+  }
   const difference = describeDifference(reference.observed, actual.observed, options)
   return difference
     ? { passed: false, goal: reference.observed, actual: actual.observed, reason: difference.reason, code: difference.code }
     : { passed: true, goal: reference.observed, actual: actual.observed, reason: '', code: null }
+}
+
+/**
+ * TQ-012: order in which describeDifference checks the observable result. A difference found
+ * later means the program matched more of that goal, so it is the closest reference.
+ */
+const DIFFERENCE_ORDER: readonly RunFailureCode[] = [
+  'needs-click-trigger',
+  'needs-start-trigger',
+  'missing-scene-switch',
+  'extra-scene-switch',
+  'scene-switch-early',
+  'scene-switch-late',
+  'too-few-moves',
+  'too-many-moves',
+  'extra-say',
+  'missing-say',
+  'wrong-line',
+  'say-too-early',
+  'say-too-late',
+]
+
+/**
+ * TQ-012: a unit project accepts several different programs (e.g. say the line at the end OR
+ * halfway). Passes when the program's observable result matches ANY reference program;
+ * otherwise reports the difference to the closest reference so feedback stays specific.
+ * References must be non-empty; a misconfigured reference never makes a program pass.
+ */
+export function evaluateAcceptedPrograms(
+  referencePrograms: readonly (readonly string[])[],
+  blocks: ProgramBlock[],
+  options: JudgeOptions = {},
+): ObservableVerdict {
+  if (referencePrograms.length === 0) {
+    return { passed: false, goal: null, actual: null, reason: '这一关的目标还没有配置好。', code: 'goal-misconfigured' }
+  }
+  let closest: ObservableVerdict | null = null
+  for (const reference of referencePrograms) {
+    const verdict = evaluateObservable([...reference], blocks, options)
+    if (verdict.passed) return verdict
+    // Cannot run / unknown line / misconfigured: same answer whichever reference is used.
+    if (verdict.actual === null || verdict.code === 'unknown-line' || verdict.code === 'goal-misconfigured') return verdict
+    if (!closest || DIFFERENCE_ORDER.indexOf(verdict.code!) > DIFFERENCE_ORDER.indexOf(closest.code!)) closest = verdict
+  }
+  return closest!
 }

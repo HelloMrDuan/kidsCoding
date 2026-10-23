@@ -23,7 +23,7 @@ type ProjectCompleteCardProps = {
   stars: number
   totalCards: number
   rewardCards: RewardCard[]
-  blocks: Array<{ type: string }>
+  blocks: Array<{ type: string; line?: string }>
   template?: ProjectTemplateDefinition
   onReplay: () => void
   primaryHref: string
@@ -83,12 +83,12 @@ export function ProjectCompleteCard({
 
   if (!isMilestone) {
     return (
-      <section className="mx-auto max-w-4xl rounded-[2rem] bg-white p-8 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
+      <section className="kc-panel mx-auto max-w-4xl p-8">
         <div
-          className="kc-panel-3d rounded-[1.75rem] border border-[#dceef7] bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_100%)] p-5"
+          className="kc-panel-3d p-5"
           data-testid="project-complete-lite-card"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-orange-500">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--kc-action)]">
             完成这一课
           </p>
           <h1
@@ -101,25 +101,30 @@ export function ProjectCompleteCard({
             当前累计 {stars} 颗星星，已收集 {totalCards} 张卡片。{completionCopy.summary}
           </p>
 
-          <div
-            className="kc-stage-3d mt-5 rounded-[1.5rem] bg-[#f5fbff] p-4"
-            data-testid="project-complete-lite-preview"
-          >
-            <div className="scale-[0.92] origin-top">
-              {playableProject ?? <PreviewStage blocks={blocks} template={template} />}
+          {/* TQ-012: a playable project is not scaled (Blockly drag coordinates must stay true). */}
+          {playableProject ? (
+            <div className="mt-5" data-testid="project-complete-lite-preview">{playableProject}</div>
+          ) : (
+            <div
+              className="kc-stage-3d mt-5 bg-[var(--kc-canvas)] p-4"
+              data-testid="project-complete-lite-preview"
+            >
+              <div className="scale-[0.92] origin-top">
+                <PreviewStage blocks={blocks} template={template} />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button
-              className="kc-button-3d inline-flex items-center justify-center rounded-full bg-[#ff8b4e] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_28px_rgba(255,139,78,0.28)] transition hover:bg-[#ff7b38]"
+              className="kc-action-surface min-h-12 text-lg"
               onClick={onReplay}
               type="button"
             >
               回看我的作品
             </button>
             <Link
-              className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-4 text-lg font-bold text-slate-800 transition hover:bg-slate-50"
+              className="kc-action-surface kc-btn-outline min-h-12 text-lg"
               href={primaryHref}
             >
               {primaryLabel}
@@ -135,17 +140,17 @@ export function ProjectCompleteCard({
   }
 
   return (
-    <section className={`mx-auto max-w-5xl rounded-[2.5rem] bg-[linear-gradient(180deg,#fff9ef_0%,#ffffff_100%)] ${playableProject ? 'p-3 md:p-8' : 'p-6 md:p-8'} shadow-[0_24px_60px_rgba(15,23,42,0.1)]`}>
+    <section className={`kc-panel mx-auto max-w-5xl ${playableProject ? 'p-3 md:p-8' : 'p-6 md:p-8'}`}>
       <div className={`grid gap-6 ${playableProject ? '' : 'lg:grid-cols-[1.15fr_0.85fr]'} lg:items-start`}>
         <div className="space-y-5">
-          <p className="inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold uppercase tracking-[0.28em] text-orange-500 shadow-[0_10px_24px_rgba(255,139,78,0.12)]">
+          <p className="inline-flex rounded-full border border-[var(--kc-line)] bg-[var(--kc-canvas)] px-4 py-2 text-sm font-semibold uppercase tracking-[0.28em] text-[var(--kc-action)]">
             {completionCopy.spotlightTag}
           </p>
           {playableProject ? <div data-testid="project-complete-stage">{playableProject}</div> : <div
-            className="kc-stage-3d rounded-[2rem] border border-[#dceef7] bg-[radial-gradient(circle_at_top,#fffdf8_0%,#fff0d9_24%,#dff4ff_58%,#ffffff_100%)] p-4 shadow-[0_20px_44px_rgba(56,189,248,0.12)]"
+            className="kc-stage-3d border border-[var(--kc-line)] bg-[var(--kc-canvas)] p-4"
             data-testid="project-complete-stage"
           >
-            <div className="rounded-[1.75rem] bg-white/70 p-3 backdrop-blur-sm">
+            <div className="rounded-[var(--kc-radius-pane)] bg-[var(--kc-surface)] p-3">
               <PreviewStage blocks={blocks} template={template} />
             </div>
           </div>}
@@ -184,14 +189,14 @@ export function ProjectCompleteCard({
 
           <div className="flex flex-col gap-3">
             <button
-              className="kc-button-3d inline-flex items-center justify-center rounded-full bg-[#ff8b4e] px-6 py-4 text-lg font-bold text-white shadow-[0_16px_28px_rgba(255,139,78,0.28)] transition hover:bg-[#ff7b38]"
+              className="kc-action-surface min-h-12 text-lg"
               onClick={onReplay}
               type="button"
             >
               回看我的作品
             </button>
             <Link
-              className="kc-button-3d inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-4 text-lg font-bold text-slate-800 transition hover:bg-slate-50"
+              className="kc-action-surface kc-btn-outline min-h-12 text-lg"
               href={primaryHref}
             >
               {primaryLabel}

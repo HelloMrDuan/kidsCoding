@@ -382,6 +382,77 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   }
 }
 
+/* TQ-012: playable unit project on the lesson 01–09 completion page.
+   Reuses the UX-202 classroom pieces (kc-lesson-col panes, kc-task-mark, kc-chip,
+   mobile 舞台/积木 tabs) and V2 tokens only; no new palette or radius.
+   Stage and blocks sit side by side; at <=768px one pane at a time behind tabs. */
+.kc-unit-project { display: flex; flex-direction: column; gap: 12px; min-width: 0; text-align: left; }
+.kc-unit-brief h2 { font-size: 19px; font-weight: 800; line-height: 1.43; margin: 10px 0 6px; color: var(--kc-text); }
+.kc-unit-brief p { color: #526079; font-size: 13px; line-height: 1.8; }
+.kc-unit-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+/* Stage + save stack in the left column, blocks span both rows on the right, so the
+   save button sits right under 运行/重置 instead of below the (taller) Blockly column. */
+.kc-unit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: 'stage code' 'save code';
+  gap: 12px;
+}
+.kc-unit-pane-stage { grid-area: stage; }
+.kc-unit-pane-code { grid-area: code; }
+.kc-unit-tabs { display: none; }
+.kc-unit-save {
+  grid-area: save;
+  align-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--kc-surface);
+  border: 1px solid var(--kc-line);
+  border-radius: var(--kc-radius-pane);
+}
+.kc-unit-status { flex: 1 1 220px; font-size: 13px; line-height: 1.7; color: #526079; }
+.kc-unit-status-error { color: var(--kc-danger); font-weight: 700; }
+@media (max-width: 768px) {
+  .kc-unit-grid { display: block; }
+  .kc-unit-grid .kc-unit-pane { display: none; }
+  .kc-unit-grid .kc-unit-pane.kc-mobile-visible { display: flex; }
+  .kc-unit-tabs {
+    display: flex;
+    background: white;
+    padding: 9px;
+    gap: 5px;
+    border: 1px solid var(--kc-line);
+    border-radius: var(--kc-radius-pane);
+  }
+  .kc-unit-tabs button {
+    border: 0;
+    background: #f2f5fa;
+    color: #6c7b91;
+    border-radius: 7px;
+    padding: 9px 16px;
+    flex: 1;
+  }
+  .kc-unit-tabs button[aria-selected='true'] { color: #fff; background: var(--kc-action); }
+  .kc-unit-save { margin-top: 12px; }
+  .kc-unit-save .kc-action-surface { width: 100%; }
+  /* While editing in 积木 the save area stays in reach at the bottom of the screen. */
+  .kc-unit-project[data-pane='code'] .kc-unit-save {
+    position: sticky;
+    bottom: 8px;
+    z-index: 5;
+    box-shadow: var(--kc-shadow-panel);
+  }
+}
+/* ≤600px the shell's fixed bottom nav (.kc-mobile-bottom) covers the last 62px. */
+@media (max-width: 600px) {
+  .kc-unit-project[data-pane='code'] .kc-unit-save { bottom: calc(var(--kc-mobile-nav-height) + 8px); }
+}
+
 /* UX-101: learning map (AdventureMap).
    Geometry and palette are copied from the approved prototype
    (docs/design/kidscoding-v2/prototype.html: .map-layout, .map-aside,

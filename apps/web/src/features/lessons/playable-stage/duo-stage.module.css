@@ -12,7 +12,9 @@
 .buttons button:disabled { opacity: .55; cursor: default; }
 .buttons button:focus-visible { outline: 3px solid #9b4e17; outline-offset: 3px; }
 .landscape { background: linear-gradient(#d9eff1, #f1f5d7); border-radius: 20px; padding: 12px 16px 18px; border: 1px solid #cbddd3; }
-.sky { color: #365e55; font-size: 24px; text-align: right; letter-spacing: .4em; }
+.sky { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+.sky svg { height: 22px; width: auto; }
+.runIcon { width: 11px; height: 11px; margin-right: 6px; vertical-align: -1px; }
 .lane { margin-top: 12px; }
 .laneLabel { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; font-size: 13px; }
 .laneLabel span { font-variant-numeric: tabular-nums; }
@@ -26,7 +28,8 @@
 .dialogueStage .friend em { top: -32px; left: -20px; width: 110px; padding: 3px 5px; font-size: 11px; line-height: 1.4; font-style: normal; white-space: normal; }
 .dialogueBoard { display: grid; gap: 8px; margin-top: 14px; padding: 14px; background: #e9efdf; border-radius: 14px; font-size: 14px; line-height: 1.7; }
 .dialogueBoard small { font-size: 12px; }
-.flag { position: absolute; left: 50%; top: 8px; color: #9b4e17; font-size: 30px; transform: translateX(52px); }
+.flag { position: absolute; left: 50%; top: 8px; color: #9b4e17; transform: translateX(52px); }
+.flag svg { width: 26px; height: 26px; display: block; }
 .flag small { display: block; font-size: 11px; font-weight: 800; line-height: 1; }
 .start { position: absolute; bottom: -22px; left: 4px; font-size: 11px; }
 .result { margin: 18px 0 12px; background: white; border-radius: 14px; padding: 14px; font-size: 14px; line-height: 1.8; }

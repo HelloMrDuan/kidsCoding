@@ -108,8 +108,8 @@
       "note": "角色/礼物为代码自绘原创 SVG"
     },
     "minor-privacy-risk": {
-      "status": "pass",
-      "note": "作品仅存本机，无云端/公开发布入口"
+      "status": "unchecked",
+      "note": "TQ-013 代码层已核查：完成课时 syncGuestSnapshot → /api/guest 只上传完成课/徽章/卡片 id 与作品积木快照（积木类型+预设对白 id），不传测评答案、姓名或自由文本；接口有白名单、类型校验与 64KB 上限；迁移 202610220011 为早期表开启 RLS（本人只读，guest_snapshots 仅 service role）并提供 30 天清理，已在一次性 PostgreSQL 中验证（apps/web/scripts/child-privacy-rls.sql）。仍为 unchecked：Supabase 真实环境 RLS/清理调度未验证（CLOUD-103），监护人同意与删除流程未做（CLOUD-105）。详见 docs/roadmap/evidence/TQ-013/privacy-review.md。（更正：此前记为 pass 并写“作品仅存本机，无云端”，但本课完成同样经 learn/lesson/[lessonId] 调用 syncGuestSnapshot 上传进度，故改回 unchecked。）"
     },
     "broken-or-false-success": {
       "status": "pass",

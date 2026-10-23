@@ -39,7 +39,7 @@ describe('lesson 11 independent dialogue', () => {
     expect(result.current.partnerPosition).toBe(100)
     expect(result.current.characterMessage).toBe('你好！')
     expect(result.current.partnerMessage).toBeNull()
-    expect(result.current.errorMessage).toContain('正确角色')
+    expect(result.current.errorMessage).toContain('对白给错人')
   })
   it('marks only the bear as speaking while its instruction executes', async () => {
     const { result } = mount()
@@ -119,6 +119,6 @@ describe('lesson 11 independent dialogue', () => {
     await run(result)
     expect(result.current.executionState).toBe('error')
     expect(result.current.partnerMessage).toBeNull()
-    expect(result.current.errorMessage).toContain('没有接')
+    expect(result.current.errorMessage).toContain('没接好')
   })
 })

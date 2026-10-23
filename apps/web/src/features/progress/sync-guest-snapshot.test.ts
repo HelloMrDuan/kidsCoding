@@ -17,6 +17,20 @@ beforeEach(() => {
 })
 
 describe('syncGuestSnapshot', () => {
+  it('TQ-013: never uploads assessment answers or local-only fields', async () => {
+    await syncGuestSnapshot({
+      onboarding: {
+        ageBand: 'age_6_8',
+        recommendedLevel: 'starter',
+        answers: [{ questionId: 'q1', optionId: 'a', score: 2 }],
+      },
+      progress: { ...PROGRESS, stars: 9 },
+    })
+    const body = JSON.parse(String(vi.mocked(fetch).mock.calls[0][1]?.body))
+    expect(body.onboarding).toEqual({ ageBand: 'age_6_8', recommendedLevel: 'starter' })
+    expect(JSON.stringify(body)).not.toMatch(/answers|stars|streakDays/)
+  })
+
   it('reports synced when the server persisted the snapshot to the cloud', async () => {
     await expect(
       syncGuestSnapshot({ onboarding: ONBOARDING, progress: PROGRESS }),
