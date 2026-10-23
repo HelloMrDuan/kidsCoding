@@ -183,7 +183,7 @@
       "title": "Next.js standalone 生产打包与镜像瘦身",
       "priority": "P1",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "OPS-001"
       ],
@@ -194,13 +194,23 @@
         "镜像体积显著下降并给出同机实测：现行生产 1.01GB（prune 版）→ standalone 候选 398MB（main 基线、同构建参数）"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/123",
+        "mergeCommit": "554a7c2c84d9867307445c8a0dd5d620a0a2a62e",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304434",
+        "tests": [
+          "PR #123 CI 8/8 green (curriculum + task-ledger)",
+          "main CI curriculum: https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304434",
+          "main CI task-ledger: https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304427",
+          "main CI 关账回填时点：task-ledger 已绿、curriculum 6/7 已绿（curriculum-web 等），scratch-real-vm-browser 在 GitHub runner 长时间 in_progress（同项在 PR #123 已通过、代码相同）；duan 2026-10-23 明确指示不等 runner，据 PR 8/8 与 main 已绿部分关账",
+          "预发布机隔离实证（main c4ff5ea 同源代码 + standalone 配置）：镜像 398MB、追踪后 node_modules 65M、五探针全 200、容器 healthy"
+        ],
+        "reviewer": "owner 2026-10-23 在场批准（任务新建与 PR 合并均经审批卡确认）",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304427",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39925538334",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39925538324",
+        "prNumber": 123
       },
-      "notes": "2026-10-23 由 duan 批准新建（双机存储优化收尾第 3 项）。认领前已在预发布机以 main c4ff5ea 同源代码完成隔离实证：standalone 镜像 398MB、追踪后 node_modules 65M、五探针全 200、容器健康。"
+      "notes": "已合并且 main CI 通过。next.config.ts 仅新增 output:'standalone'，页面/课程/数据库行为不变；部署侧 standalone 运行层 Dockerfile 已在预发布机验证（398MB）。预发布通道仍构建 tq-011（代码未含本改动），通道目标更新后切换部署 Dockerfile 并做真实部署验收；OPS-007 的 deploy/Dockerfile.web 在其合并后随行对齐。main CI 的 scratch-real-vm-browser 于关账时仍在 runner 上未完成（非失败），后续若结论异常另行处理。"
     },
     {
       "id": "TQ-001",
