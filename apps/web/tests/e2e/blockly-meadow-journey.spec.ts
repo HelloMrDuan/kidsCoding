@@ -1,5 +1,5 @@
 import {expect,test,type Page} from '@playwright/test'
-import {expectStageWalk,solveMistakeStep,solvePracticeStep} from './lesson-pane-helpers'
+import {expectStageWalk,solveMistakeStep,solvePracticeStep,clickLessonControl,showLessonPane} from './lesson-pane-helpers'
 
 type Mistake={expectCode:string;answer:string;fix:string[]}
 type Practice=Parameters<typeof solvePracticeStep>[1]
@@ -7,14 +7,15 @@ type Expect={scene:'森林'|'草地';walk:number;say?:string;noBubble?:boolean}
 /** TQ-011: warm-up → main build → second practice (第 3 关) → designed mistake (第 4 关). */
 async function play(page:Page,id:string,adds:Record<number,string[]>,practice:Practice,mistake:Mistake,expects:Expect[]){
   await page.goto('/learn/lesson/'+id)
+  await showLessonPane(page, 'stage')
   await expect(page.getByTestId('lesson-playable-stage')).toBeVisible()
   for(let step=0;step<4;step++){
-    for(const type of adds[step]??[])await page.getByTestId('lesson-add-'+type).click()
+    for(const type of adds[step]??[])await clickLessonControl(page, 'lesson-add-'+type)
     if(step===2)await solvePracticeStep(page,practice)
     // TQ-010: the designed mistake step opens on a pre-built wrong program.
     else if(step===3)await solveMistakeStep(page,mistake)
     else{
-      await page.getByTestId('run-code-button').click()
+      await clickLessonControl(page, 'run-code-button')
       await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:25_000})
     }
     await expect(page.getByTestId('stage-current-scene')).toContainText(expects[step].scene)
@@ -22,7 +23,7 @@ async function play(page:Page,id:string,adds:Record<number,string[]>,practice:Pr
     if(expects[step].say)await expect(page.getByTestId('stage-character-main')).toContainText(expects[step].say!)
     // TQ-011: a line said before “切换场景” does not follow the fox into the meadow.
     if(expects[step].noBubble)await expect(page.getByTestId('stage-character-main').locator('.kc-stage-speech')).toHaveCount(0)
-    await page.getByTestId('lesson-complete-step').click()
+    await clickLessonControl(page, 'lesson-complete-step')
   }
   await page.waitForURL('**/project/'+id+'/complete')
   await expect(page.getByTestId('project-complete-heading')).toBeVisible()
@@ -63,12 +64,12 @@ test('TQ-009: lesson 5 blocks and stage say exactly what happens (向右走 100 
   await expect(page.getByTestId('lesson-add-say_line')).toHaveCount(0)
   await expect(page.getByTestId('lesson-progress-strip')).toContainText('关卡 1 / 4')
   await expect(page.getByTestId('stage-walked-distance')).toContainText('已走 0 步')
-  for(const type of ['when_start','move_right','switch_scene','repeat_twice'])await page.getByTestId('lesson-add-'+type).click()
+  for(const type of ['when_start','move_right','switch_scene','repeat_twice'])await clickLessonControl(page, 'lesson-add-'+type)
   // The real Blockly blocks carry the same labels as the palette buttons.
   const canvas=page.getByTestId('lesson-blockly-workspace').locator('.blocklyBlockCanvas').first()
   await expect(canvas).toContainText('向右走 100 步')
   await expect(canvas).toContainText('重复：再走 100 步')
-  await page.getByTestId('run-code-button').click()
+  await clickLessonControl(page, 'run-code-button')
   // 第 1 关 stops on arrival (100 步); the repeat walks again, so the run fails and says so in steps.
   await expect(page.getByTestId('stage-run-reason')).toContainText('要走 100 步，现在走了 200 步',{timeout:20_000})
   await expect(page.getByTestId('stage-walked-distance')).toContainText('已走 200 步')
@@ -92,31 +93,31 @@ test('TQ-010: lesson 5 第 4 关 — “重复：再走 100 步” placed before
   // The wrong guess gets the honest result in the stage's own words.
   await expect(page.getByTestId('practice-answer-reply')).toContainText('小狐狸已走 200 步')
   await expect(page.getByTestId('stage-current-scene')).toContainText('森林')
-  await page.getByTestId('lesson-complete-step').click()
+  await clickLessonControl(page, 'lesson-complete-step')
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
   await expect(page.getByTestId('mistake-task')).toContainText('纠错实验：“重复：再走 100 步”放早了')
   await expect(page.getByTestId('mistake-setup')).toContainText('“开始时 → 重复：再走 100 步 → 向右走 100 步 → 切换场景”')
   const canvas=page.getByTestId('lesson-blockly-workspace').locator('.blocklyBlockCanvas').first()
   await expect(canvas).toContainText('重复：再走 100 步')
-  await page.getByTestId('run-code-button').click()
+  await clickLessonControl(page, 'run-code-button')
   await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code','repeat-without-move',{timeout:12_000})
   await expect(page.getByTestId('stage-run-error')).toHaveCount(0)
   await expect(page.getByTestId('stage-walked-distance')).toContainText('小狐狸已走 0 步')
   await expect(page.getByTestId('stage-current-scene')).toContainText('森林')
-  await page.getByTestId('mistake-answer-zero').click()
+  await clickLessonControl(page, 'mistake-answer-zero')
   await expect(page.getByTestId('mistake-fix')).toContainText('挪到“切换场景”下面')
   // “再摆一次错误程序” puts the wrong program back; the observation is kept.
-  await page.getByTestId('lesson-clear-program').click()
-  await page.getByTestId('mistake-reload').click()
+  await clickLessonControl(page, 'lesson-clear-program')
+  await clickLessonControl(page, 'mistake-reload')
   await expect(canvas).toContainText('重复：再走 100 步')
   await expect(page.getByTestId('mistake-observed')).toBeVisible()
-  await page.getByTestId('lesson-clear-program').click()
-  for(const type of ['when_start','move_right','switch_scene','repeat_twice'])await page.getByTestId('lesson-add-'+type).click()
-  await page.getByTestId('run-code-button').click()
+  await clickLessonControl(page, 'lesson-clear-program')
+  for(const type of ['when_start','move_right','switch_scene','repeat_twice'])await clickLessonControl(page, 'lesson-add-'+type)
+  await clickLessonControl(page, 'run-code-button')
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功',{timeout:20_000})
   await expect(page.getByTestId('mistake-fixed')).toContainText('一共走了 200 步')
   await expectStageWalk(page,200)
   await expect(page.getByTestId('stage-current-scene')).toContainText('草地')
-  await page.getByTestId('lesson-complete-step').click()
+  await clickLessonControl(page, 'lesson-complete-step')
   await page.waitForURL('**/project/lesson-05-meadow-order/complete')
 })
