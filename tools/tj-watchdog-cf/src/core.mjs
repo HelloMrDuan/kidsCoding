@@ -164,6 +164,9 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
   const machineId = cfg.machineId;
 
   // Fail closed: an unconfigured deployment must never target the old machine.
+  if (machineId === 'm_agqv2gsjiybrpuen46a2rpxohe') {
+    return finish('BLOCKED_CONFIG', { detail: 'the old KidsCoding machine ID is explicitly forbidden' });
+  }
   if (!/^m_[a-z0-9]{10,}$/.test(String(machineId || ''))) {
     return finish('BLOCKED_CONFIG', { detail: 'MACHINE_ID must be the real tj-core-01 machine id' });
   }
@@ -229,7 +232,14 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
       errorClass: cls,
     });
   }
-  log('machine-state', `${info.name || machineId} state=${info.state}`);
+  // A valid-looking ID for the wrong machine must never be woken.
+  if (info.name !== 'tj-core-01') {
+    return finish('BLOCKED_CONFIG', {
+      state: info.state,
+      detail: 'machine identity mismatch: expected tj-core-01',
+    });
+  }
+  log('machine-state', `${info.name} state=${info.state}`);
   let state = info.state;
   let action = decideForState(state);
 
