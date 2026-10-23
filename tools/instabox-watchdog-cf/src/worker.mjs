@@ -80,6 +80,7 @@ async function runOnce(env, trigger) {
     config: {
       machineId: env.MACHINE_ID || DEFAULT_MACHINE_ID,
       hold: env.WATCHDOG_HOLD === 'true',
+      checkTianji: env.CHECK_TIANJI !== 'false',
     },
   });
   const line = {

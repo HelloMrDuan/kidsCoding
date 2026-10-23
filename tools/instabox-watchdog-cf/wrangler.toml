@@ -26,3 +26,9 @@ GITHUB_BRANCH = "tq-011"
 # Maintenance master switch: "true" = monitor and report only,
 # never resume. Change in the dashboard or here and redeploy.
 WATCHDOG_HOLD = "false"
+# Scope: since the 2026-10-23 migration, Tianji runs on its own
+# machine (tj-core-01, monitored by tj-watchdog). This worker is
+# KidsCoding-only: "false" = do not require Tianji health/containers
+# on platforms-core-01. Remove or set "true" only if Tianji ever
+# returns to this machine.
+CHECK_TIANJI = "false"

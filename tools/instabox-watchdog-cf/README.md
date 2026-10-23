@@ -86,3 +86,16 @@ npx wrangler deploy
 ## 回滚
 
 Cloudflare 侧异常时：重新在 GitHub Actions 页 Enable `instabox-watchdog` 工作流即可恢复旧主监控；本 Worker 可用 `npx wrangler deployments list` 查看版本、用 dashboard 或 `wrangler rollback` 回退，或直接把 `WATCHDOG_HOLD` 置 `true` 让它只监控不动作。
+
+## Scope change (2026-10-23, Tianji migration)
+
+Tianji moved to its own machine (tj-core-01, monitored by the separate
+`tj-watchdog` worker). This worker is now KidsCoding-only:
+`CHECK_TIANJI = "false"` in wrangler.toml makes the deep check skip all
+Tianji requirements (health endpoint, api/web containers, tag
+consistency) while every KidsCoding check — health, container state,
+and the three-way deployed-SHA comparison — stays fail-closed. The
+default in code remains dual-site (`CHECK_TIANJI` unset or "true"), so
+this scope change is explicit in this worker's deployed config only.
+Redeploy this worker after pulling this change, or Tianji's absence on
+platforms-core-01 will keep producing APP_FAULT.

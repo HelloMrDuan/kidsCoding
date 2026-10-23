@@ -200,7 +200,7 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
         retryable: true,
       });
     }
-    return assessDeep(parseDeepCheck(res.stdout || ''), expected);
+    return assessDeep(parseDeepCheck(res.stdout || ''), expected, { checkTianji: cfg.checkTianji !== false });
   }
 
   async function pollState(want, timeoutMs) {
