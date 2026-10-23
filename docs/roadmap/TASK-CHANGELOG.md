@@ -303,3 +303,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-23 | OPS-002 | 每批真实交付关联任务 ID：新建 .github/PULL_REQUEST_TEMPLATE.md，把单任务制度前置到写 PR 时——首行唯一 Task-ID 占位（占位文本不匹配任务 CI 正则，漏填必被拒）、变更范围须与台账 scope 一致的声明、成功/失败边界/恢复证据栏、台账确认与审核人检查清单（唯一编号、范围一致、证据真实、合并后复核 main CI）。任务 CI 的强制校验（恰一行 Task-ID、编号存在、状态非 todo、只改一个台账条目）已由 check-task-ledger.py 落地，本任务补上缺失的模板环节；本地模拟校验正例通过、无编号/双编号/占位原文三反例均被拒；PR #116 为首个按模板填写的真实 PR | [#116](https://github.com/HelloMrDuan/kidsCoding/pull/116) | `9b98ba7ba6fdfc6bbbd68cf44693ba84a1ef05ce` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39895205320) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39895205295) | completed |
+
+## OPS-004 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-23 | OPS-004 | 每批完成后刷新任务记录（收尾机制成文）：在 11-TASK-EXECUTION-POLICY.md 新增第 7 节——触发条件为功能 PR 合并且 main 双工作流全绿；收尾五步：取证（PR/合并 SHA/main CI 双链接逐个验可达）、从最新 main 开只改台账与日志的关账 PR（同一 Task-ID 声明）、回填 completed 与 evidence 全字段（reviewer 记授权来源、tests 分清本地/CI）、CHANGELOG 追加一行执行记录、关账合并后看 main CI 并从主分支原始文件读回复核。另含强制校验与审计口径（check-task-ledger.py 已强制 completed 证据字段；认领时审计 42 个已完成任务证据链 42/42 完整）与失败路径（main CI 红回 in_progress、写入中断先只读核查再重试、证据不足停 merged_waiting_ci/blocked）。本任务关账即按此五步执行的首个样本 | [#119](https://github.com/HelloMrDuan/kidsCoding/pull/119) | `39b0f6f5d10ebe8481fd7c22a9f576ac7f293789` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39913905709) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39913905673) | completed |
