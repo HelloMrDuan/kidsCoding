@@ -37,7 +37,7 @@
       "title": "每批真实交付关联任务ID",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": ".github/PULL_REQUEST_TEMPLATE.md 和任务CI",
       "acceptance": [
@@ -46,11 +46,19 @@
         "任务状态随PR和main CI复核"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/116",
+        "prNumber": 116,
+        "mergeCommit": "9b98ba7ba6fdfc6bbbd68cf44693ba84a1ef05ce",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39895205320",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39895205295",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39893254139",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39893254137",
+        "reviewer": "owner 2026-10-23 指令「按照项目中的计划执行」，按常设授权合并",
+        "tests": [
+          "新建 .github/PULL_REQUEST_TEMPLATE.md：首行唯一 Task-ID 占位（占位文本不匹配 CI 正则、漏填必被拒）、变更范围与台账 scope 一致声明、正反/恢复证据栏、台账确认与审核人检查清单",
+          "本地模拟 PR 校验（TASK_VALIDATE_PR=1，base=ba4baaf）：正例恰一行 Task-ID: OPS-002 通过；反例无编号、双编号、模板占位原文三种均被 check-task-ledger.py 拒绝",
+          "PR #116 本身即首个按新模板填写的真实 PR，其 task-ledger CI 在真实环境通过；PR CI 8/8、合并后 main CI 8/8"
+        ]
       },
       "notes": "2026-10-23 认领：仓库尚无 PR 模板，贡献者只能靠 CI 失败才知道单任务规则。本任务新建 .github/PULL_REQUEST_TEMPLATE.md（唯一 Task-ID 行、范围一致声明、正反/恢复证据、审核人清单），任务 CI 的强制校验已由 check-task-ledger.py 落地，本 PR 即首个按模板执行的真实 PR。"
     },
