@@ -21,7 +21,7 @@ function clock() {
   let now=1760000000000;
   return {now:()=>now, sleep:async (ms)=>{now+=ms;}};
 }
-function fakeApi({states=['running'],out=HEALTHY,errors=[],execCode=0}={}) {
+function fakeApi({states=['running'],out=HEALTHY,errors=[],execCode=0,name='tj-core-01'}={}) {
   const calls={getMachine:0,resumeMachine:0,exec:0,getOperation:0};
   return {
     calls,
@@ -29,7 +29,7 @@ function fakeApi({states=['running'],out=HEALTHY,errors=[],execCode=0}={}) {
       const at=Math.min(calls.getMachine++,states.length-1);
       const x=states[at];
       if(x instanceof Error)throw x;
-      return {state:x, id:MACHINE};
+      return {state:x, id:MACHINE, name};
     },
     async resumeMachine() {
       const at=calls.resumeMachine++;
@@ -134,5 +134,19 @@ test('before Resume POST, another actor changing machine to running prevents dup
   const api=fakeApi({states:['suspended','running']});
   const result=await runWatchdog(deps({api}));
   assert.equal(result.verdict,'APP_PENDING');
+  assert.equal(api.calls.resumeMachine,0);
+});
+
+test('wrong name with syntactically valid Machine ID is rejected before Resume', async()=>{
+  const api=fakeApi({states:['suspended'],name:'platforms-core-01'});
+  const result=await runWatchdog(deps({api}));
+  assert.equal(result.verdict,'BLOCKED_CONFIG');
+  assert.equal(api.calls.resumeMachine,0);
+});
+test('the known old machine ID is rejected even if a response could be spoofed', async()=>{
+  const api=fakeApi({states:['suspended'],name:'tj-core-01'});
+  const result=await runWatchdog(deps({api,machineId:'m_agqv2gsjiybrpuen46a2rpxohe'}));
+  assert.equal(result.verdict,'BLOCKED_CONFIG');
+  assert.equal(api.calls.getMachine,0);
   assert.equal(api.calls.resumeMachine,0);
 });
