@@ -37,7 +37,7 @@
       "title": "每批真实交付关联任务ID",
       "priority": "P0",
       "category": "OPS",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [],
       "scope": ".github/PULL_REQUEST_TEMPLATE.md 和任务CI",
       "acceptance": [
@@ -52,7 +52,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "2026-10-23 认领：仓库尚无 PR 模板，贡献者只能靠 CI 失败才知道单任务规则。本任务新建 .github/PULL_REQUEST_TEMPLATE.md（唯一 Task-ID 行、范围一致声明、正反/恢复证据、审核人清单），任务 CI 的强制校验已由 check-task-ledger.py 落地，本 PR 即首个按模板执行的真实 PR。"
     },
     {
       "id": "OPS-003",
