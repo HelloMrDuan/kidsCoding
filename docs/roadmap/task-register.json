@@ -171,6 +171,30 @@
       "notes": "InstaBox 预发布部署验收中发现并修复；已合并且 main CI 通过。Windows 主机行为不变（真实使用时宿主恒等于目标）。"
     },
     {
+      "id": "OPS-008",
+      "title": "Next.js standalone 生产打包与镜像瘦身",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_progress",
+      "dependencies": [
+        "OPS-001"
+      ],
+      "scope": "apps/web/next.config.ts 启用 output:'standalone'；生产镜像改用 standalone 运行层（部署侧 Dockerfile 本任务内对齐，OPS-007 的 deploy/Dockerfile.web 合并后随行对齐）；页面设计、课程功能与数据库行为不变",
+      "acceptance": [
+        "next.config.ts 仅新增 output:'standalone'，不改任何页面、课程与数据逻辑；仓库全量测试与 PR CI 全绿",
+        "以 standalone 产物构建的镜像可独立运行：/api/health、首页、课程目录、课时页、作品页全 200，行为与现行生产一致",
+        "镜像体积显著下降并给出同机实测：现行生产 1.01GB（prune 版）→ standalone 候选 398MB（main 基线、同构建参数）"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "2026-10-23 由 duan 批准新建（双机存储优化收尾第 3 项）。认领前已在预发布机以 main c4ff5ea 同源代码完成隔离实证：standalone 镜像 398MB、追踪后 node_modules 65M、五探针全 200、容器健康。"
+    },
+    {
       "id": "TQ-001",
       "title": "逐课教学审核表与评分工具",
       "priority": "P0",
