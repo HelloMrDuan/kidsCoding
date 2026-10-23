@@ -302,6 +302,25 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
         const waitMs = cfg.resumeBackoffMs - (now() - episode.lastAttemptAt);
         if (waitMs > 0) await sleep(waitMs);
       }
+      // A separate monitor may have started recovery since our first state
+      // read. Re-read immediately before any Resume POST. This is necessary
+      // even with a KV lease, which is not an atomic cross-worker mutex.
+      const latest = await api.getMachine(machineId);
+      if (latest.state !== 'suspended') {
+        state = latest.state;
+        log('resume-skipped-state-changed', state);
+        if (state === 'running') {
+          resumed = true;
+          break;
+        }
+        if (state === 'stopped') {
+          return finish('STOPPED_MANUAL', { state, detail: 'owner stopped during recovery' });
+        }
+        if (decideForState(state) === 'blocked') {
+          return finish('BLOCKED_STATE', { state, detail: 'machine changed to non-resumable state' });
+        }
+        return finish('IN_TRANSITION', { state, detail: 'another actor is changing machine state' });
+      }
       episode.attempts += 1;
       episode.lastAttemptAt = now();
       await store.put('episode', episode);
