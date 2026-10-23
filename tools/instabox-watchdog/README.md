@@ -57,3 +57,15 @@
 npm ci
 npm test   # 纯逻辑单测：状态机、错误分类、深查解析（无需 Key）
 ```
+
+## Scope change (2026-10-23, Tianji migration)
+
+Tianji moved to its own machine (tj-core-01, monitored by the separate
+Cloudflare `tj-watchdog`). This watchdog is now KidsCoding-only by
+default: `watchdog.mjs` passes `checkTianji: false` to the assessment,
+so Tianji's absence on platforms-core-01 no longer produces APP_FAULT,
+while every KidsCoding check (health, container, three-way deployed-SHA
+comparison) stays fail-closed. The pure logic in `logic.mjs` still
+defaults to the dual-site contract; re-enable Tianji checks only by
+setting `CHECK_TIANJI=true` in the workflow env (see the comment in
+`watchdog.mjs` for the exact workflow line).

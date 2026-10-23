@@ -158,10 +158,16 @@ export function parseDeepCheck(stdout) {
  * when it is provided, a mismatch is an application fault, never a
  * silent pass.
  */
-export function assessDeep(deep, expectedKidsSha) {
+export function assessDeep(deep, expectedKidsSha, opts = {}) {
+  // checkTianji: the GitHub watchdog's entry point passes false since
+  // the 2026-10-23 migration (Tianji moved to tj-core-01 with its own
+  // tj-watchdog; platforms-core-01 is Kids-only). The pure-logic
+  // default stays true so the dual-site contract remains testable and
+  // re-enabling is a one-line entry-point change.
+  const checkTianji = opts.checkTianji !== false;
   const problems = [];
   if (!deep.kidsOk) problems.push('kids health endpoint not ok');
-  if (!deep.tjOk) problems.push('tianji health endpoint not ok');
+  if (checkTianji && !deep.tjOk) problems.push('tianji health endpoint not ok');
   if (!deep.kidsContainerUp) problems.push('kidscoding container not up');
   // No silent skip: if the running Kids image's tag cannot be parsed
   // as a full 40-char commit SHA, the three-way SHA comparison cannot
@@ -169,9 +175,9 @@ export function assessDeep(deep, expectedKidsSha) {
   if (deep.kidsContainerFound && !deep.kidsImageSha) {
     problems.push('running kids image tag does not carry a full 40-char SHA');
   }
-  if (!deep.tjApiUp) problems.push('tianji api container missing or not up');
-  if (!deep.tjWebUp) problems.push('tianji web container missing or not up');
-  if (!deep.tjTagsConsistent) {
+  if (checkTianji && !deep.tjApiUp) problems.push('tianji api container missing or not up');
+  if (checkTianji && !deep.tjWebUp) problems.push('tianji web container missing or not up');
+  if (checkTianji && !deep.tjTagsConsistent) {
     problems.push('tianji api/web image version tags differ or are unparseable');
   }
   if (deep.kidsImageSha && deep.kidsSha && deep.kidsImageSha !== deep.kidsSha) {

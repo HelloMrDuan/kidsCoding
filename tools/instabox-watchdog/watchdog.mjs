@@ -38,6 +38,13 @@ const EXPECTED_KIDS_SHA = process.env.EXPECTED_KIDS_SHA || '';
 // Maintenance hold (repo variable INSTABOX_WATCHDOG_HOLD=true):
 // report state, never resume.
 const HOLD = process.env.INSTABOX_WATCHDOG_HOLD === 'true';
+// Scope (2026-10-23 migration): Tianji moved to its own machine
+// (tj-core-01, monitored by tj-watchdog), so this watchdog is
+// KidsCoding-only by default and must not fault on Tianji's absence.
+// If Tianji ever returns to this machine, set CHECK_TIANJI=true in
+// the workflow env (add `CHECK_TIANJI: ${{ vars.CHECK_TIANJI }}` to
+// the watchdog step's env block in .github/workflows/instabox-watchdog.yml).
+const CHECK_TIANJI = process.env.CHECK_TIANJI === 'true';
 const startedAt = new Date();
 const events = [];
 
@@ -58,7 +65,7 @@ const DEEP_CHECK_CMD = [
 
 async function deepCheck(sbx) {
   const res = await sbx.commands.run(DEEP_CHECK_CMD, { timeoutMs: 60_000 });
-  return assessDeep(parseDeepCheck(res.stdout || ''), EXPECTED_KIDS_SHA || null);
+  return assessDeep(parseDeepCheck(res.stdout || ''), EXPECTED_KIDS_SHA || null, { checkTianji: CHECK_TIANJI });
 }
 
 async function waitForState(sbx, want, timeoutMs) {

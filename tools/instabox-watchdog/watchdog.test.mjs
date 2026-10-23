@@ -193,3 +193,18 @@ test('endpoint failure is an app fault with the SHA still visible', () => {
   assert.equal(verdictFor({ action: 'deep-check', deep: a }), 'APP_FAULT');
   assert.equal(verdictFor({ action: 'deep-check', deep: assessDeep(parseDeepCheck(HEALTHY), SHA) }), 'OK');
 });
+
+test('assessDeep: checkTianji=false is Kids-only scope (post-migration)', () => {
+  const noTj = [
+    `KIDS_HEALTH={"status":"ok"}`,
+    'TJ_HEALTH=CURL_FAIL',
+    `KIDS_SHA=${SHA}`,
+    `CONTAINERS=kidscoding-web|ghcr.io/hellomrduan/kidscoding-web:${SHA}|Up 2 hours (healthy)`,
+  ].join('\n');
+  const dual = assessDeep(parseDeepCheck(noTj), SHA);
+  assert.equal(dual.healthy, false);
+  assert.ok(dual.problems.some((x) => x.includes('tianji')));
+  const kidsOnly = assessDeep(parseDeepCheck(noTj), SHA, { checkTianji: false });
+  assert.equal(kidsOnly.healthy, true);
+  assert.deepEqual(kidsOnly.problems, []);
+});
