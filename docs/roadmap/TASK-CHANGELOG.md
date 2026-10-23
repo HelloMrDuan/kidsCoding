@@ -291,3 +291,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-22 | TQ-015 | 双角色判定统一与提示升级：第 10～12 课判定抽为纯函数 duo-judge（失败原因改儿童短句：还没切换角色/对白给错人/还差 100 步/重复切换没有用）；DuoStage 删除舞台手动提示按钮，运行失败上报课堂页按 1→2→3 升级，第 4 关故意犯错的观察运行不计失败；课堂 handleNext 修正（程序正确仅活动未完成时点完成不误计失败）；新增「角色切换」补救页 remedial-switch-character（kind=switch 互动练习），第 10～12 课三级提示路由至此；运行按钮/旗子/天空改 SVG；毕业礼物卡文案改短句；三个双角色 e2e 改为真实失败驱动提示层级断言并新增 tier-3 补救页 e2e。本任务接续另一工作副本交接（原 cd1d124 未推送），在 main bb77fed 上重建。本地沙箱 e2e 两类伪影（Blockly 音效 Failed to fetch、Pixel 7 可见性）已在 origin/main 对照复现；完成页作品提示问题留 TQ-019；课程仍 L3 | [#112](https://github.com/HelloMrDuan/kidsCoding/pull/112) | `4ce60da6c2bf8c122f2ac89c47f4e2dc4144f3d8` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39751772198) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39751772169) | completed |
+
+## TQ-019 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-22 | TQ-019 | 完成页双角色作品接入提示升级：DuoProject 新增失败计数，DuoStage 每次失败运行经 onRunFailure 上报（沿用舞台既有"每次失败只报一次"纪律），用与课堂相同的 buildHintState 与本课 hintLayers 渲染 kc-hint 提示卡，1→2→3 升级；第 3 级渲染补救链接卡，点击经 router 跳 /learn/remedial/<本课补救 id>?from=<课程>&step=step-3（第 10～12 课为 remedial-switch-character）；运行成功清零计数，编辑不重置；保存门槛不变（判定通过+复盘才可保存）。新增组件测试 3 例与真实流程 e2e（走完第 10 课→完成页删移动块→失败升至三级→点开补救页）；本地 vitest 全量 782 全过、三断点截图核验 tier=3。PR CI 前两轮均在最后一步 V2 CSS 视觉规格处被外部 cancelled（非失败、与改动文件无关），第三轮 8/8 全绿后合并；课程仍 L3 | [#114](https://github.com/HelloMrDuan/kidsCoding/pull/114) | `15358c92a7c1e29aaa0e66f65e2375f035471243` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39778229323) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39778229357) | completed |
