@@ -1,0 +1,18 @@
+# Independent Tianji watchdog. Do not use the KidsCoding namespace or ID.
+name = "tj-watchdog"
+main = "src/worker.mjs"
+compatibility_date = "2026-10-01"
+
+[triggers]
+crons = ["5,15,25,35,45,55 * * * *"]
+
+[[kv_namespaces]]
+binding = "WATCHDOG_KV"
+id = "REPLACE_WITH_NEW_TJ_KV_NAMESPACE_ID"
+
+[vars]
+# Find the *real* new ID in InstaBox; NEVER use the old machine ID.
+MACHINE_ID = "REPLACE_WITH_REAL_TJ_MACHINE_ID"
+WATCHDOG_HOLD = "false"
+# Until Tianji moves, mark app as pending instead of claiming it is healthy.
+TIANJI_DEPLOYED = "false"

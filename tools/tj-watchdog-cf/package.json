@@ -1,0 +1,15 @@
+{
+  "name": "tj-watchdog-cf",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Independent Tianji Cloudflare watchdog using the existing InstaBox REST lifecycle contract",
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  }
+}

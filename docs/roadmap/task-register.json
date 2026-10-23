@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-17",
+  "updatedAt": "2026-10-23",
   "policy": "11-TASK-EXECUTION-POLICY.md",
   "tasks": [
     {
@@ -2247,6 +2247,31 @@
         "reviewer": null
       },
       "notes": ""
+    },
+    {
+      "id": "OPS-007",
+      "title": "新增天机专用 InstaBox Cloudflare 主监控（复用原监控）",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-001"
+      ],
+      "scope": "tools/tj-watchdog-cf/**，隔离新机器的 Machine ID、KV、Cron 和天机健康检查；保留原 KidsCoding 监控",
+      "acceptance": [
+        "复制并隔离原有 InstaBox REST 监控，新 Worker 只支持 tj-core-01 的真实 Machine ID，未知或占位 ID 拒绝调用",
+        "迁移前 APP_PENDING 不报业务健康，迁移后验证 8080/health 与 Tianji API/Web 双容器版本一致",
+        "自然 suspended 才可有限 Resume，stopped 不启动，401/capacity/重叠执行失败透明",
+        "提供真正的单元负例与 CI 证据，不修改既有 KidsCoding 监控；Cloudflare 实时 Cron 和 Resume 单独验收"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/117",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "代码 PR 审核阶段；Cloudflare 尚未部署，真实新机 Machine ID 与新 KV ID 尚待环境注入；Muse 备用任务尚未通过本对话创建。"
     }
   ]
 }
