@@ -95,7 +95,7 @@
       "title": "每批完成后刷新任务记录",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "OPS-001"
       ],
@@ -105,11 +105,19 @@
         "证据包含PR、合并SHA、main CI、实际正反测试"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/119",
+        "prNumber": 119,
+        "mergeCommit": "39b0f6f5d10ebe8481fd7c22a9f576ac7f293789",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39913905709",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39913905673",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39910850483",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39910850598",
+        "reviewer": "owner 2026-10-23 指令「按照项目中的计划执行」，按常设授权合并",
+        "tests": [
+          "11-TASK-EXECUTION-POLICY.md 新增第 7 节收尾机制：触发条件（合并后 main CI 双工作流全绿才可关账）、收尾五步（取证/关账 PR/回填清单/日志格式/合并后读回复核）、强制校验与审计口径、失败与例外路径（main CI 红回 in_progress、写入中断先只读核查）",
+          "认领时审计全部 completed 产品任务证据链 42/42 完整；本地 check-task-ledger.py 全量校验与模拟 PR 校验（正例一行 Task-ID: OPS-004）通过",
+          "PR #119 CI 8/8、合并后 main CI 8/8；本关账即按新第 7 节五步执行的首个样本"
+        ]
       },
       "notes": "2026-10-23 认领：收尾做法已在跑（关账 PR 模式）且 CI 强制 completed 证据字段，认领时审计 42 个已完成任务证据链 42/42 完整；缺口是制度文档只有一句话、无可照做的规程。本任务在 11-TASK-EXECUTION-POLICY.md 新增第 7 节收尾机制（触发条件、五步、强制校验与审计、失败路径），并以本任务自身的关账全程作为首个按规程执行的样本。"
     },
