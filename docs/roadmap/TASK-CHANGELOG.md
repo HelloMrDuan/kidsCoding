@@ -297,3 +297,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-22 | TQ-019 | 完成页双角色作品接入提示升级：DuoProject 新增失败计数，DuoStage 每次失败运行经 onRunFailure 上报（沿用舞台既有"每次失败只报一次"纪律），用与课堂相同的 buildHintState 与本课 hintLayers 渲染 kc-hint 提示卡，1→2→3 升级；第 3 级渲染补救链接卡，点击经 router 跳 /learn/remedial/<本课补救 id>?from=<课程>&step=step-3（第 10～12 课为 remedial-switch-character）；运行成功清零计数，编辑不重置；保存门槛不变（判定通过+复盘才可保存）。新增组件测试 3 例与真实流程 e2e（走完第 10 课→完成页删移动块→失败升至三级→点开补救页）；本地 vitest 全量 782 全过、三断点截图核验 tier=3。PR CI 前两轮均在最后一步 V2 CSS 视觉规格处被外部 cancelled（非失败、与改动文件无关），第三轮 8/8 全绿后合并；课程仍 L3 | [#114](https://github.com/HelloMrDuan/kidsCoding/pull/114) | `15358c92a7c1e29aaa0e66f65e2375f035471243` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39778229323) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39778229357) | completed |
+
+## OPS-002 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-23 | OPS-002 | 每批真实交付关联任务 ID：新建 .github/PULL_REQUEST_TEMPLATE.md，把单任务制度前置到写 PR 时——首行唯一 Task-ID 占位（占位文本不匹配任务 CI 正则，漏填必被拒）、变更范围须与台账 scope 一致的声明、成功/失败边界/恢复证据栏、台账确认与审核人检查清单（唯一编号、范围一致、证据真实、合并后复核 main CI）。任务 CI 的强制校验（恰一行 Task-ID、编号存在、状态非 todo、只改一个台账条目）已由 check-task-ledger.py 落地，本任务补上缺失的模板环节；本地模拟校验正例通过、无编号/双编号/占位原文三反例均被拒；PR #116 为首个按模板填写的真实 PR | [#116](https://github.com/HelloMrDuan/kidsCoding/pull/116) | `9b98ba7ba6fdfc6bbbd68cf44693ba84a1ef05ce` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39895205320) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39895205295) | completed |
