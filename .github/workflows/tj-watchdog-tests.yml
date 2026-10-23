@@ -1,0 +1,34 @@
+name: Tianji watchdog tests
+on:
+  pull_request:
+    paths:
+      - 'tools/tj-watchdog-cf/**'
+      - '.github/workflows/tj-watchdog-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/tj-watchdog-cf/**'
+      - '.github/workflows/tj-watchdog-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: tools/tj-watchdog-cf
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Wrangler
+        run: npm install --no-audit --no-fund
+      - name: Test isolated Tianji watchdog
+        run: npm test
+      - name: Wrangler config validation
+        run: npx wrangler deploy --dry-run --outdir ./dist
