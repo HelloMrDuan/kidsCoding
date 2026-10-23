@@ -95,7 +95,7 @@
       "title": "每批完成后刷新任务记录",
       "priority": "P0",
       "category": "OPS",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "OPS-001"
       ],
@@ -111,7 +111,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "2026-10-23 认领：收尾做法已在跑（关账 PR 模式）且 CI 强制 completed 证据字段，认领时审计 42 个已完成任务证据链 42/42 完整；缺口是制度文档只有一句话、无可照做的规程。本任务在 11-TASK-EXECUTION-POLICY.md 新增第 7 节收尾机制（触发条件、五步、强制校验与审计、失败路径），并以本任务自身的关账全程作为首个按规程执行的样本。"
     },
     {
       "id": "OPS-005",
