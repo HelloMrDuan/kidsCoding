@@ -309,3 +309,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-23 | OPS-004 | 每批完成后刷新任务记录（收尾机制成文）：在 11-TASK-EXECUTION-POLICY.md 新增第 7 节——触发条件为功能 PR 合并且 main 双工作流全绿；收尾五步：取证（PR/合并 SHA/main CI 双链接逐个验可达）、从最新 main 开只改台账与日志的关账 PR（同一 Task-ID 声明）、回填 completed 与 evidence 全字段（reviewer 记授权来源、tests 分清本地/CI）、CHANGELOG 追加一行执行记录、关账合并后看 main CI 并从主分支原始文件读回复核。另含强制校验与审计口径（check-task-ledger.py 已强制 completed 证据字段；认领时审计 42 个已完成任务证据链 42/42 完整）与失败路径（main CI 红回 in_progress、写入中断先只读核查再重试、证据不足停 merged_waiting_ci/blocked）。本任务关账即按此五步执行的首个样本 | [#119](https://github.com/HelloMrDuan/kidsCoding/pull/119) | `39b0f6f5d10ebe8481fd7c22a9f576ac7f293789` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39913905709) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39913905673) | completed |
+
+## OPS-005 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-23 | OPS-005 | 历史已合并功能事实对照：01-REPO-BASELINE.md 从 2026-10-11 快照（采样 e745aa3）全面刷新至采样 main 412120d。PR 盘点经 API 实测：117 个已合并、#1 与 #104 关闭未合并、#117 开放中（运维线）；内容资产逐个文件计数（18 路线、72 单元、432 目录课仍全部 outline_not_playable、192 详案、72 毕业蓝图、12 启蒙不计入 432）；九大功能域对照表按「当前能力事实 × 台账状态」判定已完/部分/未完（启蒙 12 课链路、课堂地图 UX、教学机制、流程机制为已完；Scratch/Python 实验室、账号云同步、作品系统为部分；逐课台账 432 为未完，属既定口径非漏账）；发布口径单列（release-evidence 门禁基本 unchecked、RELEASE-103 待 ≥3 名儿童真实试点，不冒称发布）；与旧版五项差异逐项列明；复核 43 个 completed 条目证据链齐全 | [#121](https://github.com/HelloMrDuan/kidsCoding/pull/121) | `c4ff5ea3ef3b4a733afaad38b66e8343263b1ade` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39922704457) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39922704236) | completed |

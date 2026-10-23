@@ -126,7 +126,7 @@
       "title": "历史已合并功能建立事实对照",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "OPS-001"
       ],
@@ -135,11 +135,19 @@
         "按已合并PR和实际运行能力核对已完、部分、未完成，不能自动认定正式发布"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/121",
+        "prNumber": 121,
+        "mergeCommit": "c4ff5ea3ef3b4a733afaad38b66e8343263b1ade",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39922704457",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39922704236",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39920578300",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/39920578350",
+        "reviewer": "owner 2026-10-23 指令「按照项目中的计划执行」，按常设授权合并",
+        "tests": [
+          "01-REPO-BASELINE.md 以采样 main 412120d 全面刷新：PR 盘点经 GitHub API 实测（117 已合并、#1/#104 关闭未合并、#117 开放中）；内容资产逐个文件计数（18/72/432 outline_not_playable/192 详案/72 蓝图/12 启蒙不入 432）",
+          "九大功能域对照表逐项给出当前能力事实与台账状态并判定已完/部分/未完；与 2026-10-11 旧版五项差异逐项列明（双角色已推翻旧结论、PR #1 已关、CI 8 检查、发布门禁台账演进、采样与任务数更新）；发布口径与已完严格分开（门禁基本 unchecked、RELEASE-103 待真实试点）",
+          "复核 43 个 completed 产品任务证据链齐全（check-task-ledger.py 全量校验通过）；PR #121 CI 8/8、合并后 main CI 8/8"
+        ]
       },
       "notes": "2026-10-23 认领：以采样 main 412120d 重写 01-REPO-BASELINE.md 为事实对照版——实测 PR 盘点（117 已合并）、内容资产计数、九大功能域对照表（PR 来源×运行能力×台账状态→已完/部分/未完）、与 2026-10-11 旧版的五项差异、发布口径单列；复核 43 个 completed 条目证据链齐全，无漏账。"
     },
