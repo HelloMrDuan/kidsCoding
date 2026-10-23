@@ -55,7 +55,7 @@ test('before Tianji migration running -> APP_PENDING; never exec or claim health
   assert.equal(s.lastHealthyAt,undefined);
 });
 test('before migration suspended -> bounded Resume -> APP_PENDING; no application calls',async()=>{
-  const api=fakeApi({states:['suspended','running']});
+  const api=fakeApi({states:['suspended','suspended','running']});
   const result=await runWatchdog(deps({api}));
   assert.equal(result.verdict,'APP_PENDING');
   assert.equal(api.calls.resumeMachine,1);
@@ -121,5 +121,18 @@ test('backup lock held means zero API calls',async()=>{
   const result=await runWatchdog(deps({api,tm,state:st}));
   assert.equal(result.verdict,'LOCKED');
   assert.equal(api.calls.getMachine,0);
+  assert.equal(api.calls.resumeMachine,0);
+});
+
+test('before Resume POST, a newly stopped machine is never woken', async()=>{
+  const api=fakeApi({states:['suspended','stopped']});
+  const result=await runWatchdog(deps({api}));
+  assert.equal(result.verdict,'STOPPED_MANUAL');
+  assert.equal(api.calls.resumeMachine,0);
+});
+test('before Resume POST, another actor changing machine to running prevents duplicate Resume', async()=>{
+  const api=fakeApi({states:['suspended','running']});
+  const result=await runWatchdog(deps({api}));
+  assert.equal(result.verdict,'APP_PENDING');
   assert.equal(api.calls.resumeMachine,0);
 });
