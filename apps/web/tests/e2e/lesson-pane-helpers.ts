@@ -15,6 +15,27 @@ export async function showLessonPane(
   }
 }
 
+/** Real mobile interaction: select the visible classroom tab before clicking.
+ * On desktop the tabs are absent/hidden, so behavior stays unchanged.
+ * This does not alter acceptance assertions, app code or frozen V2 layout.
+ */
+export async function clickLessonControl(page: Page, testId: string) {
+  if (testId.startsWith('lesson-add-') || testId === 'lesson-clear-program') {
+    await showLessonPane(page, 'code')
+  } else if (
+    testId === 'run-code-button' ||
+    testId.startsWith('stage-') ||
+    testId.startsWith('practice-') ||
+    testId.startsWith('mistake-') ||
+    testId.startsWith('garden-')
+  ) {
+    await showLessonPane(page, 'stage')
+  } else if (testId === 'lesson-remedial-link') {
+    await showLessonPane(page, 'task')
+  }
+  await page.getByTestId(testId).click()
+}
+
 type Box = { x: number; y: number; width: number; height: number }
 const overlaps = (a: Box, b: Box) =>
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height
@@ -26,6 +47,7 @@ const overlaps = (a: Box, b: Box) =>
  * name tags never overlap — so a child always sees the friend they travelled to.
  */
 export async function expectStageWalk(page: Page, steps: number) {
+  await showLessonPane(page, 'stage')
   const main = page.getByTestId('stage-character-main')
   const friend = page.getByTestId('stage-character-friend')
   await expect(main).toHaveAttribute('data-steps', String(steps))
@@ -77,14 +99,15 @@ export async function solveMistakeStep(
     wrongWaitsForClick?: boolean
   },
 ) {
+  await showLessonPane(page, 'stage')
   await expect(page.getByTestId('mistake-task')).toBeVisible()
   await expect(page.getByTestId('mistake-setup')).toBeVisible()
-  if (options.predict ?? options.garden) await page.getByTestId('garden-predict-click').click()
+  if (options.predict ?? options.garden) await clickLessonControl(page, 'garden-predict-click')
   else await expect(page.getByTestId('garden-prediction')).toHaveCount(0)
-  await page.getByTestId('run-code-button').click()
+  await clickLessonControl(page, 'run-code-button')
   if (options.wrongWaitsForClick) {
     await expect(page.getByTestId('garden-await-click')).toBeVisible()
-    await page.getByTestId('stage-character-main').click()
+    await clickLessonControl(page, 'stage-character-main')
   }
   // The designed wrong run is the experiment: a neutral note, never the failure-style “哎呀” box.
   await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code', options.expectCode, { timeout: 20_000 })
@@ -93,19 +116,19 @@ export async function solveMistakeStep(
   // The designed mistake is the experiment, not a failed attempt: no hint tier is raised.
   await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
   // Observed but not answered: the step does not pass yet.
-  await page.getByTestId('lesson-complete-step').click()
+  await clickLessonControl(page, 'lesson-complete-step')
   await expect(page.getByTestId('lesson-feedback-card')).toContainText('先回答舞台上的问题')
-  await page.getByTestId(`mistake-answer-${options.answer}`).click()
+  await clickLessonControl(page, `mistake-answer-${options.answer}`)
   await expect(page.getByTestId('mistake-fix')).toBeVisible()
   // Answered right: still no “哎呀” box under the panel.
   await expect(page.getByTestId('mistake-run-result')).toContainText('你看懂啦')
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('哎呀')
-  await page.getByTestId('lesson-clear-program').click()
-  for (const type of options.fix) await page.getByTestId(`lesson-add-${type}`).click()
-  await page.getByTestId('run-code-button').click()
+  await clickLessonControl(page, 'lesson-clear-program')
+  for (const type of options.fix) await clickLessonControl(page, `lesson-add-${type}`)
+  await clickLessonControl(page, 'run-code-button')
   if (options.garden) {
     await expect(page.getByTestId('garden-await-click')).toBeVisible()
-    await page.getByTestId('stage-character-main').click()
+    await clickLessonControl(page, 'stage-character-main')
   }
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 20_000 })
   await expect(page.getByTestId('mistake-fixed')).toBeVisible()
@@ -135,6 +158,7 @@ export async function solvePracticeStep(
     click?: boolean
   },
 ) {
+  await showLessonPane(page, 'stage')
   const task = page.getByTestId('practice-task')
   await expect(task).toBeVisible()
   await expect(task).toHaveAttribute('data-goal-type', options.goalType)
@@ -145,31 +169,31 @@ export async function solvePracticeStep(
     // A prediction is made before the run: no guess, no run, no completion.
     await expect(page.getByTestId('practice-need-guess')).toBeVisible()
     await expect(page.getByTestId('run-code-button')).toBeDisabled()
-    await page.getByTestId('lesson-complete-step').click()
+    await clickLessonControl(page, 'lesson-complete-step')
     await expect(page.getByTestId('lesson-feedback-card')).toContainText('先在舞台上猜一猜')
-    await page.getByTestId(`practice-answer-${options.guess}`).click()
+    await clickLessonControl(page, `practice-answer-${options.guess}`)
     await expect(page.getByTestId('practice-answer-reply')).toContainText('猜好啦')
   } else {
     await expect(page.getByTestId('practice-question')).toHaveCount(0)
   }
-  if (options.clear) await page.getByTestId('lesson-clear-program').click()
-  for (const type of options.build) await page.getByTestId(`lesson-add-${type}`).click()
-  await page.getByTestId('run-code-button').click()
+  if (options.clear) await clickLessonControl(page, 'lesson-clear-program')
+  for (const type of options.build) await clickLessonControl(page, `lesson-add-${type}`)
+  await clickLessonControl(page, 'run-code-button')
   if (options.click) {
     await expect(page.getByTestId('garden-await-click')).toBeVisible()
-    await page.getByTestId('stage-character-main').click()
+    await clickLessonControl(page, 'stage-character-main')
   }
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 25_000 })
   if (options.answer) {
     await expect(page.getByTestId('practice-need-answer')).toBeVisible()
-    await page.getByTestId('lesson-complete-step').click()
+    await clickLessonControl(page, 'lesson-complete-step')
     await expect(page.getByTestId('lesson-feedback-card')).toContainText('先回答舞台上的问题')
     if (options.wrongAnswer) {
-      await page.getByTestId(`practice-answer-${options.wrongAnswer}`).click()
+      await clickLessonControl(page, `practice-answer-${options.wrongAnswer}`)
       await expect(page.getByTestId('practice-answer-reply')).toContainText('再看看舞台')
       await expect(page.getByTestId('practice-done')).toHaveCount(0)
     }
-    await page.getByTestId(`practice-answer-${options.answer}`).click()
+    await clickLessonControl(page, `practice-answer-${options.answer}`)
     await expect(page.getByTestId('practice-answer-reply')).toContainText('对！')
   }
   await expect(page.getByTestId('practice-done')).toBeVisible()
