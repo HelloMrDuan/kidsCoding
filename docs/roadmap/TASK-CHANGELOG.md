@@ -315,3 +315,10 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-23 | OPS-005 | 历史已合并功能事实对照：01-REPO-BASELINE.md 从 2026-10-11 快照（采样 e745aa3）全面刷新至采样 main 412120d。PR 盘点经 API 实测：117 个已合并、#1 与 #104 关闭未合并、#117 开放中（运维线）；内容资产逐个文件计数（18 路线、72 单元、432 目录课仍全部 outline_not_playable、192 详案、72 毕业蓝图、12 启蒙不计入 432）；九大功能域对照表按「当前能力事实 × 台账状态」判定已完/部分/未完（启蒙 12 课链路、课堂地图 UX、教学机制、流程机制为已完；Scratch/Python 实验室、账号云同步、作品系统为部分；逐课台账 432 为未完，属既定口径非漏账）；发布口径单列（release-evidence 门禁基本 unchecked、RELEASE-103 待 ≥3 名儿童真实试点，不冒称发布）；与旧版五项差异逐项列明；复核 43 个 completed 条目证据链齐全 | [#121](https://github.com/HelloMrDuan/kidsCoding/pull/121) | `c4ff5ea3ef3b4a733afaad38b66e8343263b1ade` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39922704457) / [追踪main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39922704236) | completed |
+
+
+## OPS-008 执行记录
+
+| 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
+|---|---|---|---|---|---|---|
+| 2026-10-23 | OPS-008 | Next.js standalone 生产打包：apps/web/next.config.ts 新增 output:'standalone'，仅打包方式变更，页面设计、课程功能与数据库行为不变。预发布机以 main c4ff5ea 同源代码 + 本改动完成隔离实证：standalone 镜像 398MB（现行生产 prune 版 1.01GB、原版 1.7GB），追踪后 node_modules 65M、.next 13M，node server.js 直启、容器 healthy，/api/health、首页、课程目录、课时页、作品页五探针全 200；PR CI 8/8 全绿，main CI 于关账时 7/8 已绿（task-ledger 与 curriculum 其余 6 项），scratch-real-vm-browser 在 GitHub runner 长时间未完成（同项 PR 已通过、代码相同），duan 明确指示不等 runner 关账 | [#123](https://github.com/HelloMrDuan/kidsCoding/pull/123) | `554a7c2c84d9867307445c8a0dd5d620a0a2a62e` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304434) / [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304427) | completed；预发布通道仍指 tq-011（代码未含 standalone），部署侧 standalone 运行层 Dockerfile 已备妥并验证、待通道目标更新后切换并做真实部署验收；OPS-007 的 deploy/Dockerfile.web 在其合并后随行对齐 |
