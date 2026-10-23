@@ -1,0 +1,1 @@
+{"description":"Cloudflare Workers primary watchdog for the Tianji InstaBox machine tj-core-01. Independent of instabox-watchdog (platforms-core-01).","name":"tj-watchdog-cf","private":true,"scripts":{"test":"node --test test/*.test.mjs"},"type":"module"}
