@@ -2442,6 +2442,32 @@
         "reviewer": null
       },
       "notes": "镜像天机 OPS-011 的已合并修复，专门处理 platforms-core-01；生产 CF 部署、真实 suspended episode 恢复尚未验收。"
+    },
+    {
+      "id": "OPS-013",
+      "title": "KidsCoding Cloudflare GitHub SHA 拉取抖动与限流防护",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-012"
+      ],
+      "scope": "tools/instabox-watchdog-cf/src/{worker,core}.mjs、test/worker.test.mjs、README；只修主监控 GitHub SHA 获取，不动两台业务机/其它 Worker。",
+      "acceptance": [
+        "GitHub 5xx/网络短暂抖动进行至多三次实际拉取；HTTP 403/429 不触发热重试并保留限流诊断。",
+        "任意查询失败不得返回缓存旧 SHA、不得将版本未知报告 OK；真实 SHA 不一致继续 APP_FAULT。",
+        "可选 GITHUB_TOKEN Secret 使用只读 GitHub API 不落日志；专项测试/台账 CI 绿、PR 合并后再由属主部署并观察自然 Cron。"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/132",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "Worker GitHub SDK mocked HTTP: 502/503、网络错误、403/429、invalid SHA、optional Token、路径注入负例；CI 待验证"
+        ],
+        "reviewer": null
+      },
+      "notes": "2026-10-24 UTC 08:11 Kids CF Worker 状态 running 但 BLOCKED_MONITOR: expected KidsCoding GitHub SHA unavailable；同一轮初次 GitHub 错误被缓存为 null，深查重试不会重新 GET。07:40 的 APP_FAULT 另按真实漂移核验。"
     }
   ]
 }
