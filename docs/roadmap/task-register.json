@@ -243,7 +243,7 @@
       "title": "双机看门狗监控修复：APP_FAULT 误报、Resume 幂等键、深检重试与 KV 写入削减",
       "priority": "P1",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-001"
       ],
@@ -258,12 +258,18 @@
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/127",
         "tests": [
-          "本地 node --test：tools/tj-watchdog-cf 54/54 pass",
-          "本地 node --test：tools/instabox-watchdog-cf 44/44 pass",
-          "本地 node --test：tools/instabox-watchdog 18/18 pass"
-        ]
+          "本地 node --test：tools/tj-watchdog-cf 54/54 pass（含 sameVersionToken 矩阵、生产混合长度令牌 OK、真实漂移仍 APP_FAULT、深检抛错重试/上限、单轮 KV 仅 1 写）",
+          "本地 node --test：tools/instabox-watchdog-cf 44/44 pass（含混合长度 tj 令牌一致性、深检抛错重试、per-episode 幂等键稳定）",
+          "本地 node --test：tools/instabox-watchdog 18/18 pass（含 attemptDeepCheck 三态单测）",
+          "PR #127 CI：task-ledger 绿（run 40052121992）；main task-ledger run 40052272971 绿"
+        ],
+        "mergeCommit": "48d81e282cc243e91fa99b2b0334526caf417f8d",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40052272971",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40052121971",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40052121992",
+        "prNumber": 127
       },
-      "notes": "2026-10-24 duan 直接派单。根因实测：tj /status 近 20 轮全 APP_FAULT 且 detail 为镜像标签不一致，机内实查记录=bef41968 全 SHA、api 镜像 cicd-prerelease-bef41968、web 镜像 GHCR 全 SHA、/health ok。CF 实际部署须 duan 在 Cloudflare 侧执行（或提供 CF API token 经保险库），部署与真实验收在本任务关账前完成；GitHub schedule 节拍稀疏为平台行为，不在本任务可修范围。"
+      "notes": "已完成并合入 main。CF 部署已由 duan 在 Cloudflare 侧执行：tj-watchdog /status 于 2026-10-24 02:25Z 起连续两轮 verdict=OK（此前每轮 APP_FAULT），lastHealthyAt 推进至 02:35:12Z，独立 curl 复核一致。instabox-watchdog（旧机 CF Worker）部署状态未知（/status URL 从未交接，无法独立核验），其源码已在 main；新版 CF Resume（Idempotency-Key）部署后尚未遇到真实 suspended episode，未实测；备用层 Resume 链路（两台均多次实测成功）不受影响；GitHub 主监控下次 schedule 运行将自动使用 main 新代码。"
     },
     {
       "id": "TQ-001",
