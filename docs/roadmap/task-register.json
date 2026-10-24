@@ -2390,6 +2390,32 @@
         "reviewer": null
       },
       "notes": "KidsCoding main SHA cee5d1f95f11c702458cfc730097ea5844bf915b 已实机部署成功 (2026-10-24T03:32:34Z; health ok; 镜像摘要 sha256:a5d16ad626f6c32f5b592e9cf639cae00be189483b90e62a949b34c25a24e25c)。看门狗迁移 PR #129 待 CI/合并；Cloudflare 实际 GITHUB_BRANCH=main 配置与真实 Cron 尚未核验，禁止标 completed。"
+    },
+    {
+      "id": "OPS-011",
+      "title": "天机 Cloudflare 主监控平台冷却处理与自动恢复验证",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-009"
+      ],
+      "scope": "tools/tj-watchdog-cf/src/{api,core,worker}.mjs、test、README及GitHub Actions；不改KidsCoding产品或天机部署代理。",
+      "acceptance": [
+        "确认 Cron 06:45/06:55 均运行，失败因为 machine_cooldown 被计入两次上限；对明确无操作的冷却按截止时间等待并避免消耗普通恢复预算。",
+        "冷却期零 POST，冷却到期新幂等键仅发起一次合法 Resume，错误截止时间/operationId/并发/Stopped 仍失败关闭；重试有界。",
+        "CI 执行真实 Node 单测通过；Cloudflare 生产代码部署、下次真实 suspended episode 主监控独立恢复+服务健康需另行取证，不把代码合并当生产恢复。"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "新增真实时间线模拟、错误边界负例、平台 API 错误合同测试；PR CI 待核验"
+        ],
+        "reviewer": null
+      },
+      "notes": "2026-10-24 真实事故：tj-core-01 06:36Z 冷却拒绝、06:45Z/06:55Z Cron 实际执行而 06:55Z 被 episode attempts=2 阻断，07:00Z 由 Muse 备用层成功恢复。"
     }
   ]
 }

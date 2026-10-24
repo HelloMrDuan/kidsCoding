@@ -81,3 +81,27 @@ test('positional timeout call shape still works (backward compat)', async () => 
   assert.equal(calls.length, 1);
   assert.match(calls[0].url, /\/v1\/machines\/m_test\/exec$/);
 });
+
+
+test('API client preserves structured cooldown deadline and operationId', async () => {
+  const { fetchImpl } = stubFetch(() => ({
+    ok: false,
+    status: 409,
+    text: async () => JSON.stringify({ error: {
+      code: 'machine_cooldown',
+      message: 'machine is cooling down until 2026-10-24T06:45:27Z',
+      retryable: true,
+      cooldownUntil: '2026-10-24T06:45:27Z',
+      operationId: null,
+    } }),
+  }));
+  const api = createApi({ apiKey: 'k', fetchImpl });
+  await assert.rejects(api.resumeMachine('m_test', { idempotencyKey: 'k-test' }), (err) => {
+    assert.equal(err.code, 'machine_cooldown');
+    assert.equal(err.status, 409);
+    assert.equal(err.retryable, true);
+    assert.equal(err.cooldownUntil, '2026-10-24T06:45:27Z');
+    assert.equal(err.operationId, null);
+    return true;
+  });
+});

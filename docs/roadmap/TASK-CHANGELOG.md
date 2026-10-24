@@ -340,3 +340,9 @@
 | 日期 | Task-ID | 实际工作 | PR | 当前验证 | 状态 |
 |---|---|---|---|---|---|
 | 2026-10-24 | OPS-010 | KidsCoding 已实机部署 main `cee5d1f95f11c702458cfc730097ea5844bf915b`（03:32:34Z DEPLOYED、GHCR digest 一致、health ok）；GitHub 备用监控与 Cloudflare Worker 源码/配置预期 SHA 统一切换 main，保留真正版本漂移告警。Cloudflare 已部署 Worker 仍需控制台更新并用真实 Cron 核验，不冒称监控生效。 | [#129](https://github.com/HelloMrDuan/kidsCoding/pull/129) | PR CI 待跑，Cloudflare 现网未核验 | in_review |
+
+## OPS-011 执行记录
+
+| 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
+|---|---|---|---|---|---|
+| 2026-10-24 | OPS-011 | tj-watchdog 的 machine_cooldown 时间门、冷却请求不占普通预算、冷却后幂等键换代、并发/模糊错误 fail-closed、单独冷却次数保护；仅天机主监控，保留 Muse 备用层 | 待本次 PR | Cloudflare Cron 06:45、06:55 确有 scheduled 调用，06:55 resume-cap-reached；本轮单测与 CI 待验证，现网 Worker 未部署 | in_review |

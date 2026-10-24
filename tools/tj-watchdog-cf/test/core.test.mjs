@@ -486,3 +486,98 @@ test('tianji mode: production mixed-length image tokens verdict OK', async () =>
   );
   assert.equal(rec.verdict, 'OK');
 });
+
+
+const cooldownError = (until = '2026-10-24T06:45:27Z', opts = {}) =>
+  new ApiError(`machine is cooling down until ${until}`, {
+    status: 409, code: 'machine_cooldown', retryable: true, ...opts,
+  });
+
+test('REAL EPISODE: 06:36 cooldown, 06:45 hold, 06:55 resume with new idempotency key', async () => {
+  const api = new FakeApi();
+  api.state = 'suspended';
+  api.resumeErrorQueue = [cooldownError()];
+  const store = new FakeStore();
+  const clock = makeClock(Date.parse('2026-10-24T06:36:00Z'));
+  let rec = await runWatchdog(makeDeps({ api, store, clock }));
+  assert.equal(rec.verdict, 'COOLDOWN_WAIT');
+  assert.equal(api.resumeCalls, 1); // no hot-loop / no immediate second POST
+  assert.equal(store.map.get('episode').attempts, 0); // explicit no-op 409 refunded
+  assert.equal(store.map.get('episode').cooldownRejections, 1);
+  assert.equal(store.map.get('episode').cooldownGeneration, 1);
+  assert.equal(store.map.get('episode').cooldownUntil, '2026-10-24T06:45:57.000Z');
+
+  clock.t = Date.parse('2026-10-24T06:45:12Z');
+  rec = await runWatchdog(makeDeps({ api, store, clock }));
+  assert.equal(rec.verdict, 'COOLDOWN_WAIT');
+  assert.equal(api.resumeCalls, 1);
+  assert.equal(store.map.get('episode').attempts, 0);
+
+  clock.t = Date.parse('2026-10-24T06:55:12Z');
+  rec = await runWatchdog(makeDeps({ api, store, clock }));
+  assert.equal(rec.verdict, 'LIFECYCLE_OK');
+  assert.equal(rec.resumed, true);
+  assert.equal(api.resumeCalls, 2);
+  assert.equal(api.successfulResumes, 1);
+  assert.notEqual(api.resumeArgs[0].opts.idempotencyKey, api.resumeArgs[1].opts.idempotencyKey);
+  assert.equal(store.map.has('episode'), false);
+});
+
+test('cooldown with explicit operation ID is ambiguous and MUST consume budget', async () => {
+  const api = new FakeApi();
+  api.state = 'suspended';
+  api.resumeErrorQueue = [cooldownError('2026-10-24T06:45:27Z', { operationId: 'op_in_flight' })];
+  const store = new FakeStore();
+  const rec = await runWatchdog(makeDeps({ api, store, clock: makeClock() }));
+  assert.equal(rec.verdict, 'BLOCKED_RESUME');
+  assert.equal(store.map.get('episode').attempts, 1);
+  assert.equal(store.map.get('episode').cooldownGeneration, 0);
+  assert.equal(api.resumeCalls, 1);
+});
+
+test('malformed cooldown deadline fails closed; never refund blindly', async () => {
+  const api = new FakeApi();
+  api.state = 'suspended';
+  api.resumeErrorQueue = [cooldownError('unknown')];
+  const store = new FakeStore();
+  const rec = await runWatchdog(makeDeps({ api, store, clock: makeClock() }));
+  assert.equal(rec.verdict, 'BLOCKED_RESUME');
+  assert.equal(store.map.get('episode').attempts, 1);
+  assert.equal(api.resumeCalls, 1);
+});
+
+test('repeated verified cooldowns are rate-bounded across Cron runs', async () => {
+  const api = new FakeApi();
+  api.state = 'suspended';
+  const store = new FakeStore();
+  const clock = makeClock(Date.parse('2026-10-24T06:00:00Z'));
+  const config = { episodeMaxCooldownRejections: 2 };
+  for (let i = 0; i < 2; i++) {
+    api.resumeErrorQueue.push(cooldownError(new Date(clock.now() + 120000).toISOString()));
+    const rec = await runWatchdog(makeDeps({ api, store, clock, config }));
+    assert.equal(rec.verdict, 'COOLDOWN_WAIT');
+    clock.t += 300000;
+  }
+  const rec = await runWatchdog(makeDeps({ api, store, clock, config }));
+  assert.equal(rec.verdict, 'BLOCKED_RESUME');
+  assert.equal(api.resumeCalls, 2);
+  assert.equal(store.map.get('episode').attempts, 0);
+});
+
+test('cooldown does not mask a manual stop or another monitor resuming', async () => {
+  const store = new FakeStore();
+  store.map.set('episode', {
+    suspendedSince: '2026-10-24T06:36:00Z', attempts: 0,
+    cooldownUntil: '2026-10-24T06:55:00Z', cooldownGeneration: 1,
+  });
+  const api = new FakeApi();
+  api.state = 'running';
+  let rec = await runWatchdog(makeDeps({ api, store, clock: makeClock(Date.parse('2026-10-24T06:45:00Z')) }));
+  assert.equal(rec.verdict, 'LIFECYCLE_OK');
+  assert.equal(api.resumeCalls, 0);
+  assert.equal(store.map.has('episode'), false);
+  api.state = 'stopped';
+  rec = await runWatchdog(makeDeps({ api, store, clock: makeClock(Date.parse('2026-10-24T06:45:00Z')) }));
+  assert.equal(rec.verdict, 'STOPPED_MANUAL');
+  assert.equal(api.resumeCalls, 0);
+});

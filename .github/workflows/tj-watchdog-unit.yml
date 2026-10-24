@@ -1,0 +1,28 @@
+name: Tianji Watchdog Cooldown Regression
+
+on:
+  pull_request:
+    paths:
+      - "tools/tj-watchdog-cf/**"
+      - ".github/workflows/tj-watchdog-unit.yml"
+      - "docs/roadmap/task-register.json"
+  push:
+    branches: [main]
+    paths:
+      - "tools/tj-watchdog-cf/**"
+      - ".github/workflows/tj-watchdog-unit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test-tj-watchdog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run TJ main watchdog logic, API, concurrency and cooldown regressions
+        working-directory: tools/tj-watchdog-cf
+        run: npm test
