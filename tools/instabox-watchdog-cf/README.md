@@ -99,3 +99,12 @@ default in code remains dual-site (`CHECK_TIANJI` unset or "true"), so
 this scope change is explicit in this worker's deployed config only.
 Redeploy this worker after pulling this change, or Tianji's absence on
 platforms-core-01 will keep producing APP_FAULT.
+
+
+## 2026-10-24 OPS-012：旧机 KidsCoding 主监控冷却重试加固
+
+KidsCoding 专用平台机 `platforms-core-01` 的 InstaBox 也会返回 `409 machine_cooldown`。对比天机本次已解决的 `resume-cap-reached` 事故，旧机 CF Worker 原来同样将平台冷却计入 episode 两次上限，容易在冷却结束前耗尽。保留既有 Kids-only SHA 核对与 `WATCHDOG_KV` 单独命名空间、`*/10` Cron 以及 WATCHDOG_HOLD、CHECK_TIANJI=false。
+
+修改规则：仅明确 `machine_cooldown`、可解析的 UTC 截止时间且无操作 ID 时，退还写前尝试预算、记录截止时间加 30 秒余量、冷却结束前不再发 POST；确认无操作的下一次合法尝试使用 `cooldownGeneration` 更换 Idempotency-Key。最多 6 次冷却拒绝，普通非冷却失败每暂停 episode 仍最多 2 次；畸形返回、有操作 ID 或模糊失败继续 fail-closed。手动停止不唤醒，运行成功恢复时清理 episode。
+
+源代码 PR/单测/主线 CI 成功不代表生产 Worker 已更新；需使用原有 Cloudflare 账户和专用 WATCHDOG_KV 将确切合并提交部署到 `instabox-watchdog`，保留现网 Secrets 和变量。真实自然暂停后 CF 自行 Resume 并通过 3000/api/health 与部署 SHA 核验，才可关账主监控自动恢复。Muse 备用层不关闭。

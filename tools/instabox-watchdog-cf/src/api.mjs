@@ -9,12 +9,14 @@
 // never logged or persisted by this module.
 
 export class ApiError extends Error {
-  constructor(message, { status = 0, code = '', retryable = false } = {}) {
+  constructor(message, { status = 0, code = '', retryable = false, cooldownUntil = null, operationId = null } = {}) {
     super(message);
     this.name = 'InstaBoxApiError';
     this.status = status;
     this.code = code;
     this.retryable = retryable;
+    this.cooldownUntil = cooldownUntil;
+    this.operationId = operationId;
   }
 }
 
@@ -69,6 +71,8 @@ export function createApi({ apiKey, baseUrl = DEFAULT_BASE, fetchImpl } = {}) {
           status: res.status,
           code: errBody.code || '',
           retryable: errBody.retryable === true,
+          cooldownUntil: errBody.cooldownUntil || null,
+          operationId: errBody.operationId || null,
         },
       );
     }

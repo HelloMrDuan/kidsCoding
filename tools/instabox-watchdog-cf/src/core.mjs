@@ -56,13 +56,27 @@ export const DEEP_CHECK_CMD = [
  * platform requires an Idempotency-Key header (1-200 printable
  * characters) on POST /v1/machines/<id>/resume; without it the call
  * is rejected with bad_request and the machine stays suspended.
- * The key is derived from the episode's suspendedSince timestamp,
- * so every retry inside the same episode carries the same key (a
- * racing duplicate POST becomes a no-op instead of a second
- * resume), while a new episode gets a fresh key.
+ * Ordinary retries share the episode's suspendedSince key. Only a
+ * verified 409 machine_cooldown rejection with NO created operation
+ * increments cooldownGeneration, yielding a new key for the next
+ * eligible attempt (so an old 409 cannot be replayed by idempotency
+ * caching). Network or ambiguous errors NEVER rotate the key.
  */
 export function episodeResumeKey(episode) {
-  return `watchdog-resume-${episode && episode.suspendedSince ? episode.suspendedSince : 'unknown'}`;
+  const base = episode && episode.suspendedSince ? episode.suspendedSince : 'unknown';
+  const generation = Number.isSafeInteger(episode?.cooldownGeneration) && episode.cooldownGeneration > 0
+    ? `-cooldown-${episode.cooldownGeneration}` : '';
+  return `watchdog-resume-${base}${generation}`;
+}
+
+/** A known platform cooldown must have a valid deadline AND no operation ID. */
+export function verifiedCooldownUntilMs(err) {
+  if (!err || err.code !== 'machine_cooldown' || err.operationId) return null;
+  const source = [err.cooldownUntil, err.message].filter(Boolean).join(' ');
+  const match = source.match(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\b/);
+  if (!match) return null;
+  const ms = Date.parse(match[0]);
+  return Number.isFinite(ms) ? ms : null;
 }
 
 export const DEFAULTS = {
@@ -75,6 +89,9 @@ export const DEFAULTS = {
   deepCheckIntervalMs: 30_000,
   lockTtlMs: 25 * 60_000,
   episodeMaxAttempts: 2,
+  episodeMaxCooldownRejections: 6,
+  cooldownGraceMs: 30_000,
+  cooldownRetryFloorMs: 60_000,
   runHistoryKeep: 20,
 };
 
@@ -321,7 +338,27 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
       attempts: 0,
       lastAttemptAt: 0,
       lastError: '',
+      cooldownGeneration: 0,
+      cooldownRejections: 0,
+      cooldownUntil: null,
     };
+    // Treat platform cooldown as a time gate, NOT a normal resume
+    // failure. This check must run before the attempt-cap guard.
+    const cooldownEnd = Date.parse(episode.cooldownUntil || '');
+    if (Number.isFinite(cooldownEnd) && now() < cooldownEnd) {
+      log('cooldown-wait', `until=${episode.cooldownUntil}; no Resume POST`);
+      return finish('COOLDOWN_WAIT', {
+        state,
+        detail: `InstaBox cooldown until ${episode.cooldownUntil}; no resume request made`,
+      });
+    }
+    if ((episode.cooldownRejections || 0) >= cfg.episodeMaxCooldownRejections) {
+      log('cooldown-cap-reached', `rejections=${episode.cooldownRejections}`);
+      return finish('BLOCKED_RESUME', {
+        state,
+        detail: `platform cooldown rejection cap reached (${cfg.episodeMaxCooldownRejections}); needs review`,
+      });
+    }
     if (episode.attempts >= cfg.episodeMaxAttempts) {
       log('resume-cap-reached', `episode attempts=${episode.attempts}`);
       return finish('BLOCKED_RESUME', {
@@ -357,6 +394,35 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
         const cls = classifyError(err);
         lastError = `${cls}: ${err.code || ''} ${err.message || err}`;
         episode.lastError = lastError;
+        // A definite platform refusal that created no operation can
+        // be refunded safely; retain write-ahead accounting for all
+        // ambiguous errors. Back off to its deadline plus clock skew.
+        const cooldownMs = verifiedCooldownUntilMs(err);
+        if (cooldownMs !== null) {
+          episode.attempts = Math.max(0, episode.attempts - 1);
+          episode.cooldownRejections = (episode.cooldownRejections || 0) + 1;
+          episode.cooldownGeneration = (episode.cooldownGeneration || 0) + 1;
+          episode.cooldownUntil = new Date(
+            Math.max(cooldownMs + cfg.cooldownGraceMs, now() + cfg.cooldownRetryFloorMs),
+          ).toISOString();
+          await store.put('episode', episode);
+          log('resume-cooldown', `until=${episode.cooldownUntil}; rejections=${episode.cooldownRejections}`);
+          return finish('COOLDOWN_WAIT', {
+            state,
+            detail: `machine_cooldown: next eligible attempt after ${episode.cooldownUntil}`,
+            cooldownUntil: episode.cooldownUntil,
+          });
+        }
+        // A malformed cooldown response or one with an operation ID
+        // is NOT a generic retryable transient: fail closed once.
+        if (err.code === 'machine_cooldown') {
+          await store.put('episode', episode);
+          log('resume-cooldown-unverified', lastError);
+          return finish('BLOCKED_RESUME', {
+            state,
+            detail: `unsafe machine_cooldown response (invalid deadline or operation ID): ${lastError}`,
+          });
+        }
         await store.put('episode', episode);
         log('resume-failed', lastError);
         if (cls === 'conflict') {
