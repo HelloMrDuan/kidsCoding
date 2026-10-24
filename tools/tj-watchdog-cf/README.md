@@ -76,3 +76,11 @@ curl https://tj-watchdog.<你的子域>.workers.dev/status
 - `src/core.mjs` — 编排（防撞恢复协议、episode 跨轮上限、状态记录）
 - `src/worker.mjs` — Worker 入口（scheduled + GET /status + POST /run）
 - `test/` — node:test 单测（`npm test`，含并发负例）
+
+## 2026-10-24 OPS-011：平台冷却恢复修复
+
+真实 Cron 在 UTC 06:45、06:55 均执行；不是 Cron 丢触发。原恢复逻辑将 `409 machine_cooldown` 计入每 episode 两次预算，且 45s 后重复请求，导致 06:55 `resume-cap-reached`，由 Muse 07:00 备用层恢复。
+
+新机制：只有带有效截止时间、且无 operationId 的明确 `machine_cooldown` 才返还当前 write-ahead 尝试预算；保存截止时间（另加 30s 边界余量）并在 Cron 到期前零 POST；下一次合法 POST 使用新的 cooldownGeneration 幂等键，避免旧 409 响应被幂等重放。普通容量、网络错误仍遵守原有 2 次上限；冷却拒绝另设每 episode 最多 6 次保护。模糊截止时间、已有操作 ID 均 fail-closed。Running 清空 episode；手工 Stopped 不恢复。主/备竞态仍依赖机器操作状态与平台幂等，不把 KV 当强锁。
+
+验收两层：仓库 `node --test test/*.test.mjs` + GitHub Actions 全绿，只证明代码逻辑；**必须由账号持有人用 Wrangler 将通过的版本部署到现网 tj-watchdog**，再以真实自然暂停、冷却、Cron 成功 Resume、Web/API 健康的生产证据验收。PR 合并或源码修改本身不代表 Worker 已升级。

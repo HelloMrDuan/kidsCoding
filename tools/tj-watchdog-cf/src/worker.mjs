@@ -84,7 +84,7 @@ async function runOnce(env, trigger) {
   };
   if (
     record.verdict &&
-    !['OK', 'LIFECYCLE_OK', 'STOPPED_MANUAL', 'HELD', 'IN_TRANSITION', 'RESUME_IN_PROGRESS'].includes(
+    !['OK', 'LIFECYCLE_OK', 'STOPPED_MANUAL', 'HELD', 'IN_TRANSITION', 'RESUME_IN_PROGRESS', 'COOLDOWN_WAIT'].includes(
       record.verdict,
     )
   ) {
