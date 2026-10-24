@@ -2370,7 +2370,7 @@
       "title": "KidsCoding 部署监控预期 SHA 切换 main（GitHub + Cloudflare）",
       "priority": "P1",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "OPS-007"
       ],
@@ -2381,7 +2381,7 @@
         "监控更新不触发应用部署，不接触凭据、不复用其他应用的机器或机密；真实 SHA 漂移仍判 APP_FAULT。"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/129",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
@@ -2389,7 +2389,7 @@
         ],
         "reviewer": null
       },
-      "notes": "业务实际 main 部署已由用户实机证实：2026-10-24T03:32:34Z KidsCoding SHA cee5d1f95f11c702458cfc730097ea5844bf915b，GHCR 镜像 digest sha256:a5d16ad626f6c32f5b592e9cf639cae00be189483b90e62a949b34c25a24e25c；/api/health status=ok。尚未完成本任务的监控 PR 与 Cloudflare Worker 实际配置/定时核验，禁止标 completed。"
+      "notes": "KidsCoding main SHA cee5d1f95f11c702458cfc730097ea5844bf915b 已实机部署成功 (2026-10-24T03:32:34Z; health ok; 镜像摘要 sha256:a5d16ad626f6c32f5b592e9cf639cae00be189483b90e62a949b34c25a24e25c)。看门狗迁移 PR #129 待 CI/合并；Cloudflare 实际 GITHUB_BRANCH=main 配置与真实 Cron 尚未核验，禁止标 completed。"
     }
   ]
 }
