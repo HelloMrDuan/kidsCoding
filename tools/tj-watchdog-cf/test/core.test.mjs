@@ -37,6 +37,7 @@ class FakeApi {
     this.resumeCalls = 0;
     this.successfulResumes = 0;
     this.resumeErrorQueue = [];
+    this.resumeArgs = [];
     this.onResume = null;
     this.execCalls = 0;
     this.execStdout = '';
@@ -52,8 +53,9 @@ class FakeApi {
     if (this.getMachineError) throw this.getMachineError;
     return { id, name: 'tj-core-01', state: this.state, operationId: this.operationId };
   }
-  async resumeMachine(id) {
+  async resumeMachine(id, opts) {
     this.resumeCalls += 1;
+    this.resumeArgs.push({ id, opts: opts || {} });
     if (this.onResume) return this.onResume(this);
     if (this.resumeErrorQueue.length) throw this.resumeErrorQueue.shift();
     this.successfulResumes += 1;
@@ -402,4 +404,85 @@ test('import smoke: worker module loads', async () => {
   const worker = await import('../src/worker.mjs');
   assert.equal(typeof worker.default.scheduled, 'function');
   assert.equal(typeof worker.default.fetch, 'function');
+});
+
+test('resume attempts in one episode carry a stable Idempotency-Key', async () => {
+  // Regression test for the real 2026-10-23 tj-core-01 episode: the
+  // platform rejected both resume POSTs with bad_request because no
+  // Idempotency-Key header was sent. Both attempts of one episode
+  // must carry the same key.
+  const api = new FakeApi();
+  api.state = 'suspended';
+  api.resumeErrorQueue = [capacityError(), capacityError(), capacityError()];
+  const store = new FakeStore();
+  const clock = makeClock();
+  const rec1 = await runWatchdog(makeDeps({ api, store, clock }));
+  assert.equal(rec1.verdict, 'BLOCKED_CAPACITY');
+  assert.equal(api.resumeCalls, 2);
+  assert.equal(api.resumeArgs.length, 2);
+  const k1 = api.resumeArgs[0].opts.idempotencyKey;
+  const k2 = api.resumeArgs[1].opts.idempotencyKey;
+  assert.ok(k1, 'attempt 1 must carry an Idempotency-Key');
+  assert.equal(k2, k1, 'both attempts of one episode must share the key');
+  assert.match(k1, /^[\x20-\x7E]{1,200}$/);
+});
+
+// ---------- 2026-10-24 fixes: KV write budget + deep-check retries ----------
+
+test('plain running run performs exactly one KV write (status) and no claim', async () => {
+  const api = new FakeApi();
+  const store = new FakeStore();
+  const puts = [];
+  const rawPut = store.put.bind(store);
+  store.put = async (key, value) => {
+    puts.push(key);
+    return rawPut(key, value);
+  };
+  const rec = await runWatchdog(makeDeps({ api, store, clock: makeClock() }));
+  assert.equal(rec.verdict, 'LIFECYCLE_OK');
+  assert.deepEqual(puts, ['status']);
+  assert.equal(store.map.has('claim'), false);
+});
+
+test('steady-state deep check: one transient exec failure is retried, verdict OK', async () => {
+  const api = new FakeApi();
+  api.execStdout = HEALTHY_STDOUT;
+  const rawExec = api.exec.bind(api);
+  let thrown = false;
+  api.exec = async (...args) => {
+    if (!thrown) {
+      thrown = true;
+      api.execCalls += 1;
+      throw new ApiError('network error calling POST exec', { code: 'network_error', retryable: true });
+    }
+    return rawExec(...args);
+  };
+  const rec = await runWatchdog(
+    makeDeps({ api, store: new FakeStore(), clock: makeClock(), config: { healthMode: 'tianji' } }),
+  );
+  assert.equal(rec.verdict, 'OK');
+  assert.equal(api.execCalls, 2);
+});
+
+test('steady-state deep check: persistent exec failure fails closed after all tries', async () => {
+  const api = new FakeApi();
+  api.execError = new ApiError('network error calling POST exec', { code: 'network_error', retryable: true });
+  const rec = await runWatchdog(
+    makeDeps({ api, store: new FakeStore(), clock: makeClock(), config: { healthMode: 'tianji' } }),
+  );
+  assert.equal(rec.verdict, 'BLOCKED_MONITOR');
+  assert.equal(api.execCalls, 3); // deepCheckTries, then fail closed
+});
+
+test('tianji mode: production mixed-length image tokens verdict OK', async () => {
+  const api = new FakeApi();
+  api.execStdout = [
+    'TJ_HEALTH={"status":"ok","engine":"ready","rag_ready":true}',
+    'TJ_RECORD=bef41968860a21f06651ead493de7b2628a72b8f',
+    'CONTAINERS=tianji-tianji-api-1|tianji-api:cicd-prerelease-bef41968|Up 15 hours (healthy);tianji-tianji-web-1|ghcr.io/hellomrduan/tianji-web:bef41968860a21f06651ead493de7b2628a72b8f|Up 15 hours',
+  ].join('\n');
+  const rec = await runWatchdog(
+    makeDeps({ api, store: new FakeStore(), clock: makeClock(), config: { healthMode: 'tianji' } }),
+  );
+  assert.equal(rec.verdict, 'OK');
 });

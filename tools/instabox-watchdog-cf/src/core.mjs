@@ -51,6 +51,20 @@ export const DEEP_CHECK_CMD = [
   'echo "KIDS_HEALTH=$KIDS_HEALTH"; echo "TJ_HEALTH=$TJ_HEALTH"; echo "KIDS_SHA=$KIDS_SHA"; echo "CONTAINERS=$CONTAINERS"; exit 0',
 ].join('; ');
 
+/**
+ * Stable idempotency key for one suspended episode. The InstaBox
+ * platform requires an Idempotency-Key header (1-200 printable
+ * characters) on POST /v1/machines/<id>/resume; without it the call
+ * is rejected with bad_request and the machine stays suspended.
+ * The key is derived from the episode's suspendedSince timestamp,
+ * so every retry inside the same episode carries the same key (a
+ * racing duplicate POST becomes a no-op instead of a second
+ * resume), while a new episode gets a fresh key.
+ */
+export function episodeResumeKey(episode) {
+  return `watchdog-resume-${episode && episode.suspendedSince ? episode.suspendedSince : 'unknown'}`;
+}
+
 export const DEFAULTS = {
   statePollTimeoutMs: 240_000,
   statePollIntervalMs: 15_000,
@@ -327,7 +341,12 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
       await store.put('episode', episode);
       try {
         log('resume-attempt', `attempt ${episode.attempts} from state=${state}`);
-        const op = await api.resumeMachine(machineId);
+        // The platform serializes resume operations per machine; a
+        // stable per-episode Idempotency-Key keeps retries (and a
+        // racing duplicate POST) from creating a second operation.
+        const op = await api.resumeMachine(machineId, {
+          idempotencyKey: episodeResumeKey(episode),
+        });
         if (op && op.id && op.state !== 'succeeded') await pollOperation(op.id);
         info = await api.getMachine(machineId);
         state = info.state;
@@ -404,16 +423,27 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
       });
     }
   } else if (action === 'deep-check') {
-    try {
-      deep = await deepCheck();
-    } catch (err) {
-      const cls = classifyError(err);
-      log('deep-check-failed', `${cls}: ${err.message || err}`);
-      return finish(verdictFor({ errorClass: cls }), {
-        state,
-        detail: String(err.message || err),
-        errorClass: cls,
-      });
+    // Steady state: a THROWN deep check is a monitoring-path failure
+    // (exec or network), not an application fault — retry it bounded
+    // times before reporting BLOCKED_*; only the last failure
+    // decides. An obtained unhealthy assessment is a real signal and
+    // is reported at once (APP_FAULT), never retried away.
+    for (let i = 1; i <= cfg.deepCheckTries; i++) {
+      try {
+        deep = await deepCheck();
+        break;
+      } catch (err) {
+        const cls = classifyError(err);
+        log('deep-check-failed', `${cls}: ${err.message || err}`);
+        if (i === cfg.deepCheckTries) {
+          return finish(verdictFor({ errorClass: cls }), {
+            state,
+            detail: String(err.message || err),
+            errorClass: cls,
+          });
+        }
+        await sleep(cfg.deepCheckIntervalMs);
+      }
     }
   }
 

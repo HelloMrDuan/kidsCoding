@@ -8,6 +8,7 @@ import {
   classifyError,
   resumeRetryable,
   parseDeepCheck,
+  sameVersionToken,
   assessDeep,
   verdictFor,
   isRunSuccess,
@@ -220,4 +221,39 @@ test('assessDeep: checkTianji=false makes this worker Kids-only (post-migration 
   // Kids faults still fault in Kids-only scope.
   const kidsDown = assessDeep(parseDeepCheck(noTj.replace('"status":"ok"', '"status":"down"')), SHA, { checkTianji: false });
   assert.equal(kidsDown.healthy, false);
+});
+
+test('sameVersionToken: same commit at different token lengths matches', () => {
+  assert.equal(sameVersionToken(SHA, SHA), true);
+  assert.equal(sameVersionToken(SHA, 'df56de7b'), true); // cicd-prerelease-<short>
+  assert.equal(sameVersionToken('df56de7b', SHA), true);
+  assert.equal(sameVersionToken('82b119e', '82b119e'), true);
+  assert.equal(sameVersionToken(SHA, OTHER_SHA.slice(0, 8)), false); // another commit
+  assert.equal(sameVersionToken('82b119e', 'd65f81b'), false);
+  assert.equal(sameVersionToken(SHA, null), false);
+  assert.equal(sameVersionToken('abc', 'abcdef0'), false); // below the 7-char floor
+});
+
+test('deep-check parser: mixed-length tianji tokens are consistent, drift is not', () => {
+  const mixed = HEALTHY.replace(
+    'tianji-api:sealed-82b119e',
+    'tianji-api:cicd-prerelease-df56de7b',
+  ).replace(
+    'tianji-web:static-82b119e',
+    `ghcr.io/hellomrduan/tianji-web:${SHA}`,
+  );
+  const d = parseDeepCheck(mixed);
+  assert.equal(d.tjTagsConsistent, true);
+  assert.equal(assessDeep(d, SHA).healthy, true);
+
+  const drifted = HEALTHY.replace(
+    'tianji-api:sealed-82b119e',
+    'tianji-api:cicd-prerelease-6a637259',
+  ).replace(
+    'tianji-web:static-82b119e',
+    `ghcr.io/hellomrduan/tianji-web:${SHA}`,
+  );
+  const d2 = parseDeepCheck(drifted);
+  assert.equal(d2.tjTagsConsistent, false);
+  assert.equal(assessDeep(d2, SHA).healthy, false);
 });

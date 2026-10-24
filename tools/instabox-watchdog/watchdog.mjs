@@ -26,6 +26,7 @@ import {
   assessDeep,
   verdictFor,
   FAILING_VERDICTS,
+  attemptDeepCheck,
 } from './logic.mjs';
 
 const MACHINE_ID = process.env.INSTABOX_MACHINE_ID || 'm_agqv2gsjiybrpuen46a2rpxohe';
@@ -197,13 +198,22 @@ async function main() {
       return finish('BLOCKED_MONITOR', { state: info.state }, 'deep check unavailable after resume');
     }
   } else if (action === 'deep-check') {
-    try {
-      deep = await deepCheck(sbx);
-    } catch (err) {
-      const cls = classifyError(err);
-      log('deep-check-failed', `${cls}: ${err.message || err}`);
-      return finish(verdictFor({ errorClass: cls }), { state: info.state }, String(err.message || err));
+    // Steady state: retry THROWN deep-check errors (transient
+    // monitoring-path failures such as a runner-side "fetch failed")
+    // before failing closed as BLOCKED_*; an obtained unhealthy
+    // assessment is reported at once as APP_FAULT.
+    const attempt = await attemptDeepCheck(() => deepCheck(sbx), {
+      tries: 3,
+      intervalMs: 30_000,
+      sleep,
+      onThrow: (err, i) =>
+        log('deep-check-failed', `attempt ${i}: ${err.message || err}`),
+    });
+    if (attempt.error) {
+      const cls = classifyError(attempt.error);
+      return finish(verdictFor({ errorClass: cls }), { state: info.state }, String(attempt.error.message || attempt.error));
     }
+    deep = attempt.deep;
   } else if (action === 'blocked') {
     return finish('BLOCKED_STATE', { state: info.state }, `machine state=${info.state}`);
   }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-17",
+  "updatedAt": "2026-10-24",
   "policy": "11-TASK-EXECUTION-POLICY.md",
   "tasks": [
     {
@@ -211,6 +211,33 @@
         "prNumber": 123
       },
       "notes": "已合并且 main CI 通过。next.config.ts 仅新增 output:'standalone'，页面/课程/数据库行为不变；部署侧 standalone 运行层 Dockerfile 已在预发布机验证（398MB）。预发布通道仍构建 tq-011（代码未含本改动），通道目标更新后切换部署 Dockerfile 并做真实部署验收；OPS-007 的 deploy/Dockerfile.web 在其合并后随行对齐。main CI 的 scratch-real-vm-browser 于关账时仍在 runner 上未完成（非失败），后续若结论异常另行处理。"
+    },
+    {
+      "id": "OPS-009",
+      "title": "双机看门狗监控修复：APP_FAULT 误报、Resume 幂等键、深检重试与 KV 写入削减",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-001"
+      ],
+      "scope": "tools/tj-watchdog-cf、tools/instabox-watchdog-cf、tools/instabox-watchdog 三套看门狗：版本令牌前缀一致性比较（修复同一 commit 因全/短 SHA 令牌长度不同被判漂移、机器 running 且应用健康仍每轮 APP_FAULT 的误报）；Resume 调用补 per-episode Idempotency-Key 并入库（tj 已部署版已有、仓库缺失；instabox CF 仅有草稿补丁）；稳态深检对抛错（监控通道失败）做有界重试后再 fail-closed，真实不健康评估仍立即 APP_FAULT；tj 删除只写不读的 advisory claim KV 写入（普通一轮 KV 写入 3→1）。不改 .github/workflows/，不改应用代码与 V2 视觉。",
+      "acceptance": [
+        "生产形态深检（记录/GHCR web 为 40 位全 SHA、api 为 cicd-prerelease-<8 位短 SHA>、应用健康）判定 OK，不再 APP_FAULT；api 运行真正不同的 commit 时仍 APP_FAULT（负向测试在内）",
+        "三套测试本地真实运行全绿：tj-watchdog-cf 54/54、instabox-watchdog-cf 44/44、instabox-watchdog 18/18",
+        "Resume 请求带稳定 per-episode Idempotency-Key（线级测试断言请求头）；机器暂停时仍走原有界重试与 fresh-state gate，running 时不重复 Resume",
+        "tj 普通一轮恰好 1 次 KV 写入（status），claim 键不再写入（单测断言）",
+        "Cloudflare 部署后 /status 实测 verdict=OK 且 lastHealthyAt 推进；GitHub 主监控在 schedule 运行时不再因单次 exec 瞬时失败判失败"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/127",
+        "tests": [
+          "本地 node --test：tools/tj-watchdog-cf 54/54 pass",
+          "本地 node --test：tools/instabox-watchdog-cf 44/44 pass",
+          "本地 node --test：tools/instabox-watchdog 18/18 pass"
+        ]
+      },
+      "notes": "2026-10-24 duan 直接派单。根因实测：tj /status 近 20 轮全 APP_FAULT 且 detail 为镜像标签不一致，机内实查记录=bef41968 全 SHA、api 镜像 cicd-prerelease-bef41968、web 镜像 GHCR 全 SHA、/health ok。CF 实际部署须 duan 在 Cloudflare 侧执行（或提供 CF API token 经保险库），部署与真实验收在本任务关账前完成；GitHub schedule 节拍稀疏为平台行为，不在本任务可修范围。"
     },
     {
       "id": "TQ-001",

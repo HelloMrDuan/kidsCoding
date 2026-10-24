@@ -91,6 +91,27 @@ export function tjTagToken(image) {
 }
 
 /**
+ * Do two version tokens name the same commit? Tokens are trailing
+ * hex runs (7-40 chars) taken from image tags and the deployed
+ * record. The same commit legitimately appears at different lengths:
+ * the deploy record stores the full 40-char SHA and the GHCR web
+ * image carries it in full, while the locally built api image is
+ * tagged cicd-prerelease-<8-char short SHA>. Strict string equality
+ * therefore reports a permanent mismatch for one and the same
+ * deployment — the 2026-10-24 APP_FAULT false positive, where state
+ * was running and the app healthy yet every run alerted. Tokens
+ * match when identical or when one is a prefix of the other;
+ * anything else is genuine version drift and still faults.
+ */
+export function sameVersionToken(a, b) {
+  if (!a || !b) return false;
+  const x = String(a);
+  const y = String(b);
+  if (x.length < 7 || y.length < 7) return false;
+  return x === y || x.startsWith(y) || y.startsWith(x);
+}
+
+/**
  * Parse the Tianji deep-check output printed inside the machine.
  * Expected marker lines:
  *   TJ_HEALTH=<body or CURL_FAIL>
@@ -138,7 +159,9 @@ export function parseTianjiDeepCheck(stdout) {
     tjWebUp: Boolean(tjWeb && /up/i.test(tjWeb.status)),
     tjApiToken,
     tjWebToken,
-    tjTagsConsistent: Boolean(tjApiToken && tjWebToken && tjApiToken === tjWebToken),
+    tjTagsConsistent: Boolean(
+      tjApiToken && tjWebToken && sameVersionToken(tjApiToken, tjWebToken),
+    ),
     recordPresent: Boolean(tjRecordRaw && tjRecordRaw !== 'MISSING'),
     recordToken,
   };
@@ -159,7 +182,7 @@ export function assessTianji(deep) {
   }
   if (!deep.recordPresent || !deep.recordToken) {
     problems.push('tianji deployed record unreadable on the machine');
-  } else if (deep.tjApiToken && deep.recordToken !== deep.tjApiToken) {
+  } else if (deep.tjApiToken && !sameVersionToken(deep.recordToken, deep.tjApiToken)) {
     problems.push(
       `tianji deployed record ${deep.recordToken} != running api image token ${deep.tjApiToken}`,
     );

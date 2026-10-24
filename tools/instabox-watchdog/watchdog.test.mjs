@@ -8,6 +8,8 @@ import {
   classifyError,
   resumeRetryable,
   parseDeepCheck,
+  sameVersionToken,
+  attemptDeepCheck,
   assessDeep,
   verdictFor,
   FAILING_VERDICTS,
@@ -207,4 +209,59 @@ test('assessDeep: checkTianji=false is Kids-only scope (post-migration)', () => 
   const kidsOnly = assessDeep(parseDeepCheck(noTj), SHA, { checkTianji: false });
   assert.equal(kidsOnly.healthy, true);
   assert.deepEqual(kidsOnly.problems, []);
+});
+
+test('sameVersionToken: same commit at different token lengths matches', () => {
+  assert.equal(sameVersionToken(SHA, SHA), true);
+  assert.equal(sameVersionToken(SHA, 'df56de7b'), true); // cicd-prerelease-<short>
+  assert.equal(sameVersionToken('df56de7b', SHA), true);
+  assert.equal(sameVersionToken(SHA, OTHER_SHA.slice(0, 8)), false); // another commit
+  assert.equal(sameVersionToken('82b119e', 'd65f81b'), false);
+  assert.equal(sameVersionToken(SHA, null), false);
+  assert.equal(sameVersionToken('abc', 'abcdef0'), false); // below the 7-char floor
+});
+
+test('attemptDeepCheck: a thrown error is retried, first success wins', async () => {
+  let calls = 0;
+  const { deep, error } = await attemptDeepCheck(
+    async () => {
+      calls += 1;
+      if (calls < 3) throw new TypeError('fetch failed');
+      return { healthy: true };
+    },
+    { tries: 3, intervalMs: 0, sleep: async () => {} },
+  );
+  assert.equal(calls, 3);
+  assert.equal(error, undefined);
+  assert.equal(deep.healthy, true);
+});
+
+test('attemptDeepCheck: persistent throws return the last error (caller fails closed)', async () => {
+  let calls = 0;
+  const { deep, error } = await attemptDeepCheck(
+    async () => {
+      calls += 1;
+      throw new TypeError('fetch failed');
+    },
+    { tries: 3, intervalMs: 0, sleep: async () => {} },
+  );
+  assert.equal(calls, 3);
+  assert.equal(deep, undefined);
+  assert.ok(error instanceof TypeError);
+  // A raw fetch TypeError classifies as a monitoring failure, never
+  // as an application fault.
+  assert.equal(verdictFor({ errorClass: classifyError(error) }), 'BLOCKED_MONITOR');
+});
+
+test('attemptDeepCheck: a returned assessment is never retried, even unhealthy', async () => {
+  let calls = 0;
+  const { deep } = await attemptDeepCheck(
+    async () => {
+      calls += 1;
+      return { healthy: false, problems: ['kids health endpoint not ok'] };
+    },
+    { tries: 3, intervalMs: 0, sleep: async () => {} },
+  );
+  assert.equal(calls, 1);
+  assert.equal(deep.healthy, false);
 });

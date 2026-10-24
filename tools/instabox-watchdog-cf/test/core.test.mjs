@@ -55,7 +55,7 @@ function makeClock(start = 1_760_000_000_000) {
 function makeApi(script = {}) {
   const states = script.states || ['running'];
   const opStates = script.opStates || ['succeeded'];
-  const calls = { getMachine: 0, resume: 0, exec: 0, getOperation: 0 };
+  const calls = { getMachine: 0, resume: 0, exec: 0, getOperation: 0, resumeArgs: [] };
   let si = 0;
   let oi = 0;
   return {
@@ -67,8 +67,9 @@ function makeApi(script = {}) {
       if (s instanceof Error) throw s;
       return { id: MACHINE_ID, name: 'platforms-core-01', state: s };
     },
-    async resumeMachine() {
+    async resumeMachine(id, opts) {
       calls.resume += 1;
+      calls.resumeArgs.push({ id, opts: opts || {} });
       const e = (script.resumeErrors || [])[calls.resume - 1];
       if (e) throw e;
       return { id: 'op-1', state: script.resumeOpState || 'succeeded' };
@@ -332,4 +333,56 @@ test('missing API key -> BLOCKED_AUTH before any state decision', async () => {
   const deps = depsFor({ api: null, store, clock });
   const rec = await runWatchdog(deps);
   assert.equal(rec.verdict, 'BLOCKED_AUTH');
+});
+
+test('resume attempts in one episode carry a stable Idempotency-Key', async () => {
+  // Same regression as the tj watchdog: the platform rejects resume
+  // POSTs without the Idempotency-Key header with bad_request.
+  const store = makeStore();
+  const clock = makeClock();
+  const api = makeApi({
+    states: ['suspended'],
+    resumeErrors: [capacityErr(), capacityErr()],
+  });
+  const rec = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(rec.verdict, 'BLOCKED_CAPACITY');
+  assert.equal(api.calls.resume, 2);
+  assert.equal(api.calls.resumeArgs.length, 2);
+  const k1 = api.calls.resumeArgs[0].opts.idempotencyKey;
+  const k2 = api.calls.resumeArgs[1].opts.idempotencyKey;
+  assert.ok(k1, 'attempt 1 must carry an Idempotency-Key');
+  assert.equal(k2, k1, 'both attempts of one episode must share the key');
+  assert.match(k1, /^[\x20-\x7E]{1,200}$/);
+});
+
+// 2026-10-24: a THROWN deep check is a monitoring-path failure, not
+// an app fault — bounded retries before failing closed.
+test('deep check exec failure is retried: one transient failure -> OK', async () => {
+  const store = makeStore();
+  const clock = makeClock();
+  const api = makeApi({ states: ['running'] });
+  const rawExec = api.exec.bind(api);
+  let n = 0;
+  api.exec = async (...args) => {
+    n += 1;
+    if (n === 1) {
+      throw new ApiError('exec channel down', { status: 0, code: 'network_error', retryable: true });
+    }
+    return rawExec(...args);
+  };
+  const rec = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(rec.verdict, 'OK');
+  assert.equal(n, 2);
+});
+
+test('deep check exec failure is bounded: persistent failure -> BLOCKED_MONITOR after 3 tries', async () => {
+  const store = makeStore();
+  const clock = makeClock();
+  const api = makeApi({
+    states: ['running'],
+    execError: new ApiError('exec channel down', { status: 0, code: 'network_error', retryable: true }),
+  });
+  const rec = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(rec.verdict, 'BLOCKED_MONITOR');
+  assert.equal(api.calls.exec, 3);
 });

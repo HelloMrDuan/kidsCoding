@@ -96,6 +96,26 @@ export function tjTagToken(image) {
 }
 
 /**
+ * Do two version tokens name the same commit? Tokens are trailing
+ * hex runs (7-40 chars) taken from image tags and the deployed
+ * record. The same commit legitimately appears at different lengths:
+ * the deploy record stores the full 40-char SHA and the GHCR web
+ * image carries it in full, while the locally built api image is
+ * tagged cicd-prerelease-<8-char short SHA>. Strict string equality
+ * therefore reports a permanent mismatch for one and the same
+ * deployment — the 2026-10-24 APP_FAULT false positive. Tokens match
+ * when identical or when one is a prefix of the other; anything else
+ * is genuine version drift and still faults.
+ */
+export function sameVersionToken(a, b) {
+  if (!a || !b) return false;
+  const x = String(a);
+  const y = String(b);
+  if (x.length < 7 || y.length < 7) return false;
+  return x === y || x.startsWith(y) || y.startsWith(x);
+}
+
+/**
  * Parse the deep-check command output printed inside the machine.
  * Expected marker lines:
  *   KIDS_HEALTH=<body or CURL_FAIL>
@@ -150,7 +170,7 @@ export function parseDeepCheck(stdout) {
     tjApiUp: Boolean(tjApi && /up/i.test(tjApi.status)),
     tjWebUp: Boolean(tjWeb && /up/i.test(tjWeb.status)),
     tjTagsConsistent: Boolean(
-      tjApiToken && tjWebToken && tjApiToken === tjWebToken,
+      tjApiToken && tjWebToken && sameVersionToken(tjApiToken, tjWebToken),
     ),
     healthy: kidsOk && tjOk,
   };
