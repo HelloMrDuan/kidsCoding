@@ -352,4 +352,4 @@
 
 | 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
 |---|---|---|---|---|---|
-| 2026-10-24 | OPS-012 | platforms-core-01 的 Cloudflare `instabox-watchdog` 恢复冷却期处理：不计入普通重试、按平台截止时间等待、合法重试新幂等键、未知错误失败关闭、手动停止保护与专项测试；不更改生产数据或天机现网 | 待新 PR | PR CI 与现网部署尚未验证，Muse 备用层保持开启 | in_review |
+| 2026-10-24 | OPS-012 | platforms-core-01 的 Cloudflare `instabox-watchdog` 恢复冷却期处理：不计入普通重试、按平台截止时间等待、合法重试新幂等键、未知错误失败关闭、手动停止保护与专项测试；不更改生产数据或天机现网 | [#131](https://github.com/HelloMrDuan/kidsCoding/pull/131) | PR CI 与现网部署尚未验证，Muse 备用层保持开启 | in_review |

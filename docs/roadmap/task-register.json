@@ -2433,7 +2433,7 @@
         "Node 专项 CI 全绿且任务台账通过，生产 instabox-watchdog 部署有实际版本 ID；下一次自然暂停 CF 主监控独立恢复并通过 Kids 服务健康，才能关账真实恢复能力。"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/131",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
