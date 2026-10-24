@@ -511,6 +511,17 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
           cooldownUntil: episode.cooldownUntil,
         });
       }
+      // Unknown or ambiguous machine_cooldown responses are NOT
+      // ordinary transients: retrying would risk exhausting the
+      // budget and/or duplicating an in-flight operation.
+      if (err.code === 'machine_cooldown') {
+        await store.put('episode', episode);
+        log('resume-cooldown-unverified', lastError);
+        return finish('BLOCKED_RESUME', {
+          state,
+          detail: `unsafe machine_cooldown response (missing valid deadline or operation ID present): ${lastError}`,
+        });
+      }
       await store.put('episode', episode);
       log('resume-failed', lastError);
       if (cls === 'conflict') {
