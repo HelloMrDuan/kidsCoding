@@ -62,13 +62,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # The prerelease channel deploys branch tq-011; its current
+          # The prerelease channel now deploys main; its current
           # GitHub head is what the machine must be running. Resolved
           # live each run (fail-closed: if this lookup fails, the run
           # fails visibly instead of skipping the comparison).
-          sha=$(gh api "repos/$GITHUB_REPOSITORY/branches/tq-011" --jq '.commit.sha')
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
-          echo "Expected KidsCoding SHA (tq-011 head): $sha"
+          echo "Expected KidsCoding SHA (main head): $sha"
 
       - name: Run the watchdog
         id: watchdog

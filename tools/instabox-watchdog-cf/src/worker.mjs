@@ -7,7 +7,7 @@
 //   env.MACHINE_ID        var, default below
 //   env.GITHUB_REPO       var: repo whose branch head is the expected
 //                         Kids deployed SHA (public API, no token)
-//   env.GITHUB_BRANCH     var: deployment branch (default tq-011)
+//   env.GITHUB_BRANCH     var: deployment branch (default main)
 //   env.WATCHDOG_HOLD     var: "true" = monitor only, never resume
 //
 // HTTP surface:
@@ -47,7 +47,7 @@ function kvStore(kv) {
 
 async function fetchExpectedSha(env) {
   const repo = env.GITHUB_REPO || 'HelloMrDuan/kidsCoding';
-  const branch = env.GITHUB_BRANCH || 'tq-011';
+  const branch = env.GITHUB_BRANCH || 'main';
   const res = await fetch(
     `https://api.github.com/repos/${repo}/branches/${encodeURIComponent(branch)}`,
     {
