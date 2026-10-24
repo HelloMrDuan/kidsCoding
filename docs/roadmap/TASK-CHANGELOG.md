@@ -328,3 +328,9 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-24 | OPS-009 | 双机看门狗监控修复：tj-watchdog 自 bef41968 部署后每轮误报 APP_FAULT（机内实查：部署记录与 GHCR web 镜像=40 位全 SHA、api 镜像=cicd-prerelease-bef41968 8 位令牌，严格字符串相等使同一 commit 恒判不等）。三套 logic 改 sameVersionToken 前缀一致性比较（≥7 位、一方为前缀），真实漂移仍 APP_FAULT（负向测试）；tj+instabox CF 的 Resume per-episode Idempotency-Key 正式入库（仓库缺失的 tj 修复从已部署副本回收，避免按仓库重部署把 Resume 打回 bad_request）；三套稳态深检对抛错（监控通道失败）有界重试后才 fail-closed，真实不健康仍立即 APP_FAULT；tj 删除只写不读的 claim KV 写入（普通一轮 KV 写入 3→1；两 Worker 合计约 864→576 写/日）。GitHub 主监控失败模式定案：三次失败全为 runner 侧单次 exec "fetch failed"→BLOCKED_MONITOR（01:26Z schedule 运行 success 并自动关闭告警 issue #126，判定逻辑无误），schedule 约 3–4h 节拍为平台行为、仓库无解。Cron 漏触发审计：tj 近 20 轮节拍完整，历史空窗多为 KV 读回退（lastRunAt 倒退）所致。CF 部署已由 duan 执行：tj /status 于 02:25Z 起连续两轮 verdict=OK、lastHealthyAt 推进至 02:35:12Z，独立 curl 复核一致 | [#127](https://github.com/HelloMrDuan/kidsCoding/pull/127) | `48d81e282cc243e91fa99b2b0334526caf417f8d` | [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/40052272971) | completed；未决：instabox-watchdog（旧机 CF Worker）部署状态未知（/status URL 未交接）；新版 CF Resume 尚未遇到真实 suspended episode 未实测；GitHub 主监控下次 schedule 将使用新代码 |
+
+## OPS-007 执行记录
+
+| 日期 | Task-ID | 实际工作 | PR | 当前验证 | 状态 |
+|---|---|---|---|---|---|
+| 2026-10-23 | OPS-007 | 引入 push 构建 GHCR 镜像的工作流，更新生产 Dockerfile 为 OPS-008 已验证的 Next.js standalone 结构；GHCR 发布≠机器已部署。 | [#125](https://github.com/HelloMrDuan/kidsCoding/pull/125) | config-check、test 通过；E2E、镜像发布和服务器真实拉取仍待验证 | in_review |

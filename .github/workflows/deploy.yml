@@ -1,0 +1,236 @@
+# KidsCoding multi-branch deploy pipeline.  (v2)
+# Target location in repo: .github/workflows/deploy.yml
+#
+# Contract:
+# - push to ANY branch -> config check, unit tests, mobile+desktop
+#   Blockly E2E gate, then build & push a SHA-locked image to GHCR.
+# - pull_request        -> checks and tests only (no build, no image,
+#   no deploy secrets beyond the public publishable key config).
+# - Per-ref concurrency group, never cancel an in-progress run, so an
+#   older pipeline cannot be interrupted mid-flight and a newer one
+#   queues behind it.
+# - DEPLOYMENT BOUNDARY: this workflow publishes an image; it does NOT
+#   deploy. Following verified machine-side migration, main is the only
+#   designated auto-deploy source. The on-machine deploy agent must
+#   independently be switched from tq-011 to main before this is live. Other branches stop at a published GHCR image; a
+#   preview for them is a separate, explicitly provisioned
+#   environment and never overwrites the prerelease site. main uses
+#   the stable channel (on this machine: build/verify only, by the
+#   resource policy).
+# - A green run here means "image published", NEVER "deployed".
+#   Deployment is proven only by the machine agent's deploys.log
+#   DEPLOYED record whose SHA equals github.sha AND the live site
+#   serving that build. A 429 from the public wake URL is a gateway
+#   limit, not a deployment result.
+name: deploy-pipeline
+
+"on":
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-kidscoding-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+  NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+
+jobs:
+  config-check:
+    name: config-check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Real build-configuration gate: every public build input must
+      # be present and well-formed, and the repo's own env checker
+      # must pass in (non-production) prerelease mode. Values are
+      # never printed; only presence/shape is asserted.
+      - name: Verify build configuration is real and complete
+        run: |
+          fail=0
+          for name in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_APP_URL NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY; do
+            value="${!name:-}"
+            if [ -z "$value" ]; then echo "::error::$name is missing or empty"; fail=1; fi
+          done
+          case "${NEXT_PUBLIC_SUPABASE_URL:-}" in
+            https://*) ;;
+            *) echo "::error::NEXT_PUBLIC_SUPABASE_URL must be an https URL"; fail=1 ;;
+          esac
+          case "${NEXT_PUBLIC_APP_URL:-}" in
+            https://*) ;;
+            *) echo "::error::NEXT_PUBLIC_APP_URL must be an https URL"; fail=1 ;;
+          esac
+          key="${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-}"
+          if [ "${#key}" -lt 100 ]; then echo "::error::NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY looks truncated"; fail=1; fi
+          case "$key" in
+            *placeholder*|*changeme*|*example*) echo "::error::publishable key looks like a placeholder"; fail=1 ;;
+          esac
+          [ "$fail" = 0 ] || exit 1
+          npm run env:check
+
+  test:
+    name: test
+    needs: config-check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests (vitest)
+        run: npm run test:run
+
+  e2e-blockly:
+    name: e2e-blockly (mobile gate)
+    needs: config-check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install real Chrome for Playwright
+        run: npx playwright install chrome --with-deps
+
+      # Required release gate: the Blockly lesson E2E family must pass
+      # on the mobile viewport (real Chromium) and stay green on
+      # desktop. The playwright config builds and serves the app
+      # itself (webServer on 127.0.0.1:3100).
+      - name: Blockly E2E — mobile + desktop
+        run: |
+          SPECS="tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-meadow-journey.spec.ts"
+          npx playwright test $SPECS --project=mobile
+          npx playwright test $SPECS --project=desktop
+
+  build:
+    name: build
+    needs: [test, e2e-blockly]
+    # Images are built and pushed only for branch pushes, never for PRs.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Slugify branch name for docker tag
+        id: slug
+        run: |
+          slug="$(printf '%s' '${{ github.ref_name }}' | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/^[.-]+//; s/[.-]+$//')"
+          echo "ref_slug=${slug}" >> "${GITHUB_OUTPUT}"
+          echo "Branch '${{ github.ref_name }}' -> tag slug '${slug}'"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/web
+          file: deploy/Dockerfile.web
+          push: true
+          tags: |
+            ghcr.io/hellomrduan/kidscoding-web:${{ github.sha }}
+            ghcr.io/hellomrduan/kidscoding-web:channel-${{ steps.slug.outputs.ref_slug }}
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+            NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
+
+      # Honest status: this is where the workflow's responsibility
+      # ends. Deployment (for the designated active branch only) is
+      # performed by the on-machine agent and is verified against its
+      # deploys.log SHA record, not by this run.
+      - name: Publish summary (NOT a deployment)
+        run: |
+          echo "IMAGE PUBLISHED — deployment has NOT happened yet."
+          echo "branch: ${{ github.ref_name }}"
+          echo "sha: ${{ github.sha }}"
+          echo "images pushed:"
+          echo "  ghcr.io/hellomrduan/kidscoding-web:${{ github.sha }}"
+          echo "  ghcr.io/hellomrduan/kidscoding-web:channel-${{ steps.slug.outputs.ref_slug }}"
+          echo "If this branch is the designated active branch, the on-machine"
+          echo "deploy agent will apply image :${{ github.sha }} after the wake"
+          echo "below. Verify deployment ONLY via the agent's deploys.log"
+          echo "DEPLOYED record for this exact SHA and the live site."
+
+  # Official wake-up only for main, never for feature branches.
+  # The on-machine agent remains a separate, required deployment gate.
+  # A visit to the published port URL resumes an idle-paused machine,
+  # after which the agent's cycle may apply the new image. This job never fails the pipeline and never claims a
+  # deployment: the public gateway has a small connection budget, so
+  # a 429 here says nothing about deployment success or failure.
+  wake:
+    name: wake-machine
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Visit published URL to resume the machine (official wake)
+        run: |
+          for i in 1 2 3 4 5; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' -m 30 https://3000-agqv2gsjiybrpuen46a2rpxohe.instabox.tech/ || true)"
+            echo "wake attempt $i -> HTTP $code (wake signal only; not a deploy result)"
+            [ "$code" = "200" ] && break
+            sleep 20
+          done
+          echo "Deployment, if any, is recorded by the on-machine agent in deploys.log."

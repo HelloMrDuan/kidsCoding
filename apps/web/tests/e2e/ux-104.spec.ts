@@ -113,11 +113,20 @@ for (const [name, width, height] of [
       await card.click()
     }
     await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // A real click may scroll the card into view before navigating. The
+    // departure-time position persisted by the app is the restore target.
+    const departureOffset = await page.evaluate(() =>
+      Number(sessionStorage.getItem('kc-scroll-restore:learn-map')),
+    )
+    expect(departureOffset).toBeGreaterThan(0)
     await page.goBack()
     await expect(page.getByTestId('adventure-map')).toBeVisible()
-    await page.waitForTimeout(500)
-    const after = await page.evaluate(() => window.scrollY)
-    expect(after).toBe(before)
+    // Assert exact restoration once hydration has settled, rather than
+    // sampling at an arbitrary fixed delay or relaxing pixel tolerance.
+    await expect.poll(async () =>
+      page.evaluate(() => Math.round(window.scrollY)),
+      { timeout: 4000 },
+    ).toBe(departureOffset)
 
     await page.unrouteAll({ behavior: 'ignoreErrors' })
     await context.close()

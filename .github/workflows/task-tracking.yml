@@ -23,6 +23,17 @@ jobs:
       - name: Validate 61 product tasks, 432 lessons and one-task-per-PR rule
         env:
           TASK_VALIDATE_PR: ${{ github.event_name == 'pull_request' && '1' || '0' }}
-          TASK_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           TASK_PR_BODY: ${{ github.event.pull_request.body }}
-        run: python scripts/check-task-ledger.py
+        run: |
+          # The PR event's base.sha can be stale after main advances.
+          # Compare against the actual common ancestor of the checked-out
+          # PR merge ref and current target branch; do not relax task rules.
+          if [ "$TASK_VALIDATE_PR" = "1" ]; then
+            TASK_BASE_SHA="$(git merge-base HEAD "origin/$GITHUB_BASE_REF")"
+            if [ -z "$TASK_BASE_SHA" ]; then
+              echo "::error::Could not resolve current PR merge-base"
+              exit 1
+            fi
+            export TASK_BASE_SHA
+          fi
+          python scripts/check-task-ledger.py

@@ -179,6 +179,32 @@
       "notes": "InstaBox 预发布部署验收中发现并修复；已合并且 main CI 通过。Windows 主机行为不变（真实使用时宿主恒等于目标）。"
     },
     {
+      "id": "OPS-007",
+      "title": "多分支自动部署流水线（push 触发构建→GHCR→InstaBox 部署代理）",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-001"
+      ],
+      "scope": ".github/workflows/deploy.yml + deploy/Dockerfile.web (standalone)；push 构建 GHCR 镜像；仅正式指定分支由现有服务器代理接管部署",
+      "acceptance": [
+        "push 到任意分支自动运行测试并构建锁定完整 SHA 的 GHCR 镜像（标签含 slug 化分支 channel），PR 事件不构建镜像、不引用部署密钥",
+        "镜像构建沿用已验证的 deploy/Dockerfile.web（上下文 apps/web）；流水线与本 PR CI 全绿后方可合并"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/125",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "GitHub Actions deploy-pipeline run 39928988843: config-check and test passed on rerun (E2E pending at branch sync)",
+          "Production Dockerfile uses Next.js standalone, as required by completed OPS-008; GHCR image and live deployment are still pending verification"
+        ],
+        "reviewer": null
+      },
+      "notes": "CI / GHCR 发布与机器端自动部署需分别验收；本条 in_review，不冒称 DEPLOYED"
+    },
+    {
       "id": "OPS-008",
       "title": "Next.js standalone 生产打包与镜像瘦身",
       "priority": "P1",
