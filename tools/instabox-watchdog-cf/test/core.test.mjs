@@ -42,6 +42,7 @@ function makeClock(start = 1_760_000_000_000) {
   let t = start;
   return {
     now: () => t,
+    advanceTo: (absoluteMs) => { t = absoluteMs; },
     sleep: async (ms) => {
       t += ms;
     },
@@ -385,4 +386,110 @@ test('deep check exec failure is bounded: persistent failure -> BLOCKED_MONITOR 
   const rec = await runWatchdog(depsFor({ api, store, clock }));
   assert.equal(rec.verdict, 'BLOCKED_MONITOR');
   assert.equal(api.calls.exec, 3);
+});
+
+
+const cooldownErr = (until = '2026-10-24T06:45:27Z', opts = {}) =>
+  new ApiError(`machine is cooling down until ${until}`, {
+    status: 409, code: 'machine_cooldown', retryable: true, ...opts,
+  });
+
+test('OPS-012 real timeline: 06:36 cooldown, 06:45 no POST, 06:55 successful resume with fresh key', async () => {
+  const t0 = Date.parse('2026-10-24T06:36:00Z');
+  const clock = makeClock(t0);
+  const store = makeStore();
+  const api = makeApi({
+    states: ['suspended', 'suspended', 'suspended', 'running'],
+    resumeErrors: [cooldownErr()],
+  });
+  let result = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(result.verdict, 'COOLDOWN_WAIT');
+  assert.equal(api.calls.resume, 1);
+  let ep = await store.get('episode');
+  assert.equal(ep.attempts, 0);
+  assert.equal(ep.cooldownRejections, 1);
+  assert.equal(ep.cooldownGeneration, 1);
+  assert.equal(ep.cooldownUntil, '2026-10-24T06:45:57.000Z');
+
+  clock.advanceTo(Date.parse('2026-10-24T06:45:12Z'));
+  result = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(result.verdict, 'COOLDOWN_WAIT');
+  assert.equal(api.calls.resume, 1);
+
+  clock.advanceTo(Date.parse('2026-10-24T06:55:12Z'));
+  result = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(result.verdict, 'OK');
+  assert.equal(api.calls.resume, 2);
+  assert.equal(api.calls.exec, 1);
+  assert.notEqual(api.calls.resumeArgs[0].opts.idempotencyKey, api.calls.resumeArgs[1].opts.idempotencyKey);
+  assert.equal(await store.get('episode'), null);
+});
+
+test('OPS-012 malformed cooldown deadline fails closed, no hot-loop', async () => {
+  const clock = makeClock();
+  const store = makeStore();
+  const api = makeApi({
+    states: ['suspended'],
+    resumeErrors: [cooldownErr('unknown')],
+  });
+  const result = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(result.verdict, 'BLOCKED_RESUME');
+  assert.equal(api.calls.resume, 1);
+  assert.equal((await store.get('episode')).attempts, 1);
+});
+
+test('OPS-012 cooldown response with operationId cannot be refunded', async () => {
+  const clock = makeClock();
+  const store = makeStore();
+  const api = makeApi({
+    states: ['suspended'],
+    resumeErrors: [cooldownErr('2026-10-24T06:45:27Z', { operationId: 'op_123' })],
+  });
+  const result = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(result.verdict, 'BLOCKED_RESUME');
+  assert.equal(api.calls.resume, 1);
+  assert.equal((await store.get('episode')).attempts, 1);
+});
+
+test('OPS-012 repeated explicit cooldown refusals have independent finite cap', async () => {
+  const clock = makeClock(Date.parse('2026-10-24T06:00:00Z'));
+  const store = makeStore();
+  const api = makeApi({
+    states: ['suspended'],
+    resumeErrors: [
+      cooldownErr('2026-10-24T06:01:00Z'),
+      cooldownErr('2026-10-24T06:03:00Z'),
+    ],
+  });
+  let r = await runWatchdog({
+    ...depsFor({ api, store, clock }),
+    config: { machineId: MACHINE_ID, episodeMaxCooldownRejections: 2 },
+  });
+  assert.equal(r.verdict, 'COOLDOWN_WAIT');
+  clock.advanceTo(Date.parse('2026-10-24T06:02:30Z'));
+  r = await runWatchdog({
+    ...depsFor({ api, store, clock }),
+    config: { machineId: MACHINE_ID, episodeMaxCooldownRejections: 2 },
+  });
+  assert.equal(r.verdict, 'COOLDOWN_WAIT');
+  clock.advanceTo(Date.parse('2026-10-24T06:04:00Z'));
+  r = await runWatchdog({
+    ...depsFor({ api, store, clock }),
+    config: { machineId: MACHINE_ID, episodeMaxCooldownRejections: 2 },
+  });
+  assert.equal(r.verdict, 'BLOCKED_RESUME');
+  assert.equal(api.calls.resume, 2);
+  assert.equal((await store.get('episode')).attempts, 0);
+});
+
+test('OPS-012 manual stopped machine after cooldown is never resumed', async () => {
+  const store = makeStore({
+    episode: { suspendedSince: '2026-10-24T06:36:00Z', attempts: 0, cooldownUntil: '2026-10-24T07:00:00Z', cooldownGeneration: 1 },
+  });
+  const clock = makeClock(Date.parse('2026-10-24T06:40:00Z'));
+  const api = makeApi({ states: ['stopped'] });
+  const rec = await runWatchdog(depsFor({ api, store, clock }));
+  assert.equal(rec.verdict, 'STOPPED_MANUAL');
+  assert.equal(api.calls.resume, 0);
+  assert.equal(await store.get('episode'), null);
 });

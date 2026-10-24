@@ -91,7 +91,7 @@ async function runOnce(env, trigger) {
   };
   if (
     record.verdict &&
-    !['OK', 'STOPPED_MANUAL', 'HELD', 'IN_TRANSITION', 'LOCKED'].includes(record.verdict)
+    !['OK', 'STOPPED_MANUAL', 'HELD', 'IN_TRANSITION', 'LOCKED', 'COOLDOWN_WAIT'].includes(record.verdict)
   ) {
     console.error(JSON.stringify({ alert: true, ...line }));
   } else {

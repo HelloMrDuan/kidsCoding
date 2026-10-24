@@ -2416,6 +2416,32 @@
         "reviewer": null
       },
       "notes": "2026-10-24 真实事故：tj-core-01 06:36Z 冷却拒绝、06:45Z/06:55Z Cron 实际执行而 06:55Z 被 episode attempts=2 阻断，07:00Z 由 Muse 备用层成功恢复。"
+    },
+    {
+      "id": "OPS-012",
+      "title": "KidsCoding 旧机 Cloudflare 主监控平台冷却重试与生产验证",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-011"
+      ],
+      "scope": "tools/instabox-watchdog-cf/src/{api,core,worker}.mjs、test 与 README；独立 CI；不修改业务、天机 Worker、密钥或部署脚本。",
+      "acceptance": [
+        "保留 KidsCoding 独立 KV、*/10 Cron、独立健康检查与 SHA 三方核验，冷却结束前零 Resume POST。",
+        "明确无操作的 machine_cooldown 不消耗普通两次预算；到期新幂等键尝试；畸形结果与已有操作 ID 失败关闭、冷却次数另限额；Stopped 禁止 Resume。",
+        "Node 专项 CI 全绿且任务台账通过，生产 instabox-watchdog 部署有实际版本 ID；下一次自然暂停 CF 主监控独立恢复并通过 Kids 服务健康，才能关账真实恢复能力。"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "Node CORE/REST 模拟：冷却时间线、边界负例、手动停止、安全幂等"
+        ],
+        "reviewer": null
+      },
+      "notes": "镜像天机 OPS-011 的已合并修复，专门处理 platforms-core-01；生产 CF 部署、真实 suspended episode 恢复尚未验收。"
     }
   ]
 }

@@ -1,0 +1,28 @@
+name: KidsCoding Cloudflare Watchdog Regression
+
+on:
+  pull_request:
+    paths:
+      - "tools/instabox-watchdog-cf/**"
+      - ".github/workflows/kids-cloudflare-watchdog-regression.yml"
+      - "docs/roadmap/task-register.json"
+  push:
+    branches: [main]
+    paths:
+      - "tools/instabox-watchdog-cf/**"
+      - ".github/workflows/kids-cloudflare-watchdog-regression.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-kids-cloudflare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Execute real KidsCoding Worker unit tests (no live API calls)
+        working-directory: tools/instabox-watchdog-cf
+        run: npm test

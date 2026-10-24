@@ -346,3 +346,10 @@
 | 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
 |---|---|---|---|---|---|
 | 2026-10-24 | OPS-011 | tj-watchdog 的 machine_cooldown 时间门、冷却请求不占普通预算、冷却后幂等键换代、并发/模糊错误 fail-closed、单独冷却次数保护；仅天机主监控，保留 Muse 备用层 | [#130](https://github.com/HelloMrDuan/kidsCoding/pull/130) | Cloudflare Cron 06:45、06:55 确有 scheduled 调用，06:55 resume-cap-reached；本轮单测与 CI 待验证，现网 Worker 未部署 | in_review |
+
+
+## OPS-012 执行记录
+
+| 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
+|---|---|---|---|---|---|
+| 2026-10-24 | OPS-012 | platforms-core-01 的 Cloudflare `instabox-watchdog` 恢复冷却期处理：不计入普通重试、按平台截止时间等待、合法重试新幂等键、未知错误失败关闭、手动停止保护与专项测试；不更改生产数据或天机现网 | 待新 PR | PR CI 与现网部署尚未验证，Muse 备用层保持开启 | in_review |
