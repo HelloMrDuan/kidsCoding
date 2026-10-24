@@ -24,7 +24,14 @@ export function createApi({ apiKey, baseUrl = DEFAULT_BASE, fetchImpl } = {}) {
   const doFetch = fetchImpl || ((...args) => fetch(...args));
   const base = String(baseUrl || DEFAULT_BASE).replace(/\/$/, '');
 
-  async function request(method, path, body, timeoutMs = 30_000) {
+  async function request(method, path, body, opts = {}) {
+    // opts: { timeoutMs, idempotencyKey }. A bare number is still
+    // accepted as the timeout for backward compatibility with the
+    // older positional call shape.
+    const timeoutMs =
+      typeof opts === 'number' ? opts : opts.timeoutMs ?? 30_000;
+    const idempotencyKey =
+      typeof opts === 'object' && opts !== null ? opts.idempotencyKey : undefined;
     let res;
     try {
       res = await doFetch(base + path, {
@@ -33,6 +40,7 @@ export function createApi({ apiKey, baseUrl = DEFAULT_BASE, fetchImpl } = {}) {
           'X-API-Key': apiKey,
           Accept: 'application/json',
           ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+          ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
         },
         body: body !== undefined ? JSON.stringify(body) : undefined,
         signal: AbortSignal.timeout(timeoutMs),
@@ -72,9 +80,22 @@ export function createApi({ apiKey, baseUrl = DEFAULT_BASE, fetchImpl } = {}) {
     getMachine(id) {
       return request('GET', `/v1/machines/${encodeURIComponent(id)}`);
     },
-    /** Resume a suspended machine. Returns an operation object. */
-    resumeMachine(id) {
-      return request('POST', `/v1/machines/${encodeURIComponent(id)}/resume`);
+    /**
+     * Resume a suspended machine. Returns an operation object.
+     *
+     * The platform REQUIRES an Idempotency-Key header on this call
+     * (1-200 printable characters); without it the request is
+     * rejected with bad_request and the machine stays suspended.
+     * Pass a key that is stable for one suspended episode so that
+     * retries of the same episode never create a second operation.
+     */
+    resumeMachine(id, { idempotencyKey } = {}) {
+      return request(
+        'POST',
+        `/v1/machines/${encodeURIComponent(id)}/resume`,
+        undefined,
+        { idempotencyKey },
+      );
     },
     /** Read one long-running operation (for resume polling). */
     getOperation(id) {

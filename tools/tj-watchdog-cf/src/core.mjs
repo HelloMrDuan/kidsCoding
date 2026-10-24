@@ -4,7 +4,7 @@
 // Workers (fetch + KV) and in Node unit tests (fakes):
 //   deps.api    — createApi() client (or a fake with the same shape)
 //   deps.store  — async KV: get(key), put(key, value); put(key, null)
-//                 deletes. Keys: 'status', 'episode', 'claim'.
+//                 deletes. Keys: 'status', 'episode'.
 //   deps.now    — () => epoch ms; deps.sleep — async (ms) => void
 //   deps.log    — (event, detail) => void
 //   deps.config — { machineId, machineName, hold, healthMode, ... }
@@ -14,9 +14,11 @@
 // NOT an atomic lock: two overlapping runs can both read "no lock" or
 // a stale episode counter. This module therefore never treats KV as a
 // lock and never derives safety from it:
-//   - The 'claim' key is ADVISORY TELEMETRY ONLY. It is written
-//     best-effort so a human can see a run is in flight; no decision
-//     in this module reads it. A lost or stale claim changes nothing.
+//   - An earlier revision wrote an advisory 'claim' key (telemetry
+//     only; no decision ever read it). It was removed on 2026-10-24:
+//     it cost two KV writes per run against the free-tier daily
+//     write quota and bought nothing. A plain run now performs
+//     exactly one KV write (the 'status' record).
 //   - The actual anti-collision mechanism is the InstaBox API, which
 //     serializes operations per machine:
 //       1. WRITE-AHEAD: the episode attempt is persisted BEFORE any
@@ -68,6 +70,20 @@ export const DEEP_CHECK_CMD = [
   'CONTAINERS=$(docker ps --format "{{.Names}}|{{.Image}}|{{.Status}}" 2>/dev/null | tr "\\n" ";")',
   'echo "TJ_HEALTH=$TJ_HEALTH"; echo "TJ_RECORD=$TJ_RECORD"; echo "CONTAINERS=$CONTAINERS"; exit 0',
 ].join('; ');
+
+/**
+ * Stable idempotency key for one suspended episode. The InstaBox
+ * platform requires an Idempotency-Key header (1-200 printable
+ * characters) on POST /v1/machines/<id>/resume; without it the call
+ * is rejected with bad_request and the machine stays suspended.
+ * The key is derived from the episode's suspendedSince timestamp,
+ * so every retry inside the same episode carries the same key (a
+ * racing duplicate POST becomes a no-op instead of a second
+ * resume), while a new episode gets a fresh key.
+ */
+export function episodeResumeKey(episode) {
+  return `watchdog-resume-${episode && episode.suspendedSince ? episode.suspendedSince : 'unknown'}`;
+}
 
 export const DEFAULTS = {
   statePollTimeoutMs: 240_000,
@@ -149,24 +165,6 @@ export async function runWatchdog(deps) {
     return record;
   }
 
-  // Advisory claim: telemetry only. Written best-effort AFTER the
-  // config gate; never read for any decision in this module.
-  async function writeClaim() {
-    try {
-      await deps.store.put('claim', { runId, at: now() });
-    } catch {
-      // A failed claim write must not affect the run: it is not a lock.
-    }
-  }
-  async function clearClaim() {
-    try {
-      const claim = await deps.store.get('claim');
-      if (claim && claim.runId === runId) await deps.store.put('claim', null);
-    } catch {
-      // Advisory only; a stale claim is harmless by design.
-    }
-  }
-
   // Config gate: this worker must NEVER fall back to another machine's
   // ID. A missing or placeholder MACHINE_ID is a hard config failure
   // with zero API calls.
@@ -182,7 +180,6 @@ export async function runWatchdog(deps) {
     return finish('BLOCKED_AUTH', { detail: 'INSTABOX_API_KEY secret is missing' });
   }
 
-  await writeClaim();
   try {
     return await execute({ cfg, deps, now, sleep, log, finish });
   } catch (err) {
@@ -190,8 +187,6 @@ export async function runWatchdog(deps) {
     return finish('BLOCKED_MONITOR', {
       detail: `unhandled error: ${String((err && err.message) || err)}`,
     });
-  } finally {
-    await clearClaim();
   }
 }
 
@@ -257,21 +252,32 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
       });
     }
     let deep = null;
-    const tries = resumed ? cfg.deepCheckTries : 1;
+    const tries = cfg.deepCheckTries;
     for (let i = 1; i <= tries; i++) {
       try {
         deep = await deepCheck();
       } catch (err) {
+        // A THROWN deep check is a monitoring-path failure (exec or
+        // network), not an application fault: retry it bounded times
+        // before reporting BLOCKED_*. Only the last failure decides.
         const cls = classifyError(err);
         log('deep-check-failed', `${cls}: ${err.message || err}`);
-        return finish(verdictFor({ errorClass: cls }), {
-          state,
-          resumed: Boolean(resumed),
-          detail: String(err.message || err),
-          errorClass: cls,
-        });
+        if (i === tries) {
+          return finish(verdictFor({ errorClass: cls }), {
+            state,
+            resumed: Boolean(resumed),
+            detail: String(err.message || err),
+            errorClass: cls,
+          });
+        }
+        await sleep(cfg.deepCheckIntervalMs);
+        continue;
       }
       if (deep.healthy) break;
+      // An obtained assessment is a real signal. In steady state it
+      // is reported at once (APP_FAULT); only a just-resumed machine
+      // gets settling retries while its services come up.
+      if (!resumed) break;
       if (i < tries) await sleep(cfg.deepCheckIntervalMs);
     }
     log(
@@ -429,7 +435,12 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
     // machine; a racing POST is rejected with operation_conflict.
     try {
       log('resume-attempt', `attempt ${episode.attempts} from state=suspended`);
-      const op = await api.resumeMachine(machineId);
+      // The platform serializes resume operations per machine; a
+      // stable per-episode Idempotency-Key keeps retries (and a
+      // racing duplicate POST) from creating a second operation.
+      const op = await api.resumeMachine(machineId, {
+        idempotencyKey: episodeResumeKey(episode),
+      });
       if (op && op.id && op.state !== 'succeeded') await pollOperation(op.id);
       info = await api.getMachine(machineId);
       state = info.state;

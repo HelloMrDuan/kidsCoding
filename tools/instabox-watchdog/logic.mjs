@@ -91,6 +91,26 @@ export function tjTagToken(image) {
 }
 
 /**
+ * Do two version tokens name the same commit? Tokens are trailing
+ * hex runs (7-40 chars) taken from image tags and the deployed
+ * record. The same commit legitimately appears at different lengths:
+ * the deploy record stores the full 40-char SHA and the GHCR web
+ * image carries it in full, while the locally built api image is
+ * tagged cicd-prerelease-<8-char short SHA>. Strict string equality
+ * therefore reports a permanent mismatch for one and the same
+ * deployment — the 2026-10-24 APP_FAULT false positive. Tokens match
+ * when identical or when one is a prefix of the other; anything else
+ * is genuine version drift and still faults.
+ */
+export function sameVersionToken(a, b) {
+  if (!a || !b) return false;
+  const x = String(a);
+  const y = String(b);
+  if (x.length < 7 || y.length < 7) return false;
+  return x === y || x.startsWith(y) || y.startsWith(x);
+}
+
+/**
  * Parse the deep-check command output printed inside the machine.
  * Expected marker lines:
  *   KIDS_HEALTH=<body or CURL_FAIL>
@@ -145,7 +165,7 @@ export function parseDeepCheck(stdout) {
     tjApiUp: Boolean(tjApi && /up/i.test(tjApi.status)),
     tjWebUp: Boolean(tjWeb && /up/i.test(tjWeb.status)),
     tjTagsConsistent: Boolean(
-      tjApiToken && tjWebToken && tjApiToken === tjWebToken,
+      tjApiToken && tjWebToken && sameVersionToken(tjApiToken, tjWebToken),
     ),
     healthy: kidsOk && tjOk,
   };
@@ -235,3 +255,34 @@ export const FAILING_VERDICTS = new Set([
   'BLOCKED_MONITOR',
   'APP_FAULT',
 ]);
+
+/**
+ * Run a deep-check function with bounded retries for THROWN errors
+ * only. A returned assessment — healthy or not — is a real signal and
+ * is never retried here. A throw means the monitoring path itself
+ * failed (e.g. the in-machine exec call hit a transient network
+ * error: the 2026-10-23 GitHub-runner runs failed with exactly one
+ * "fetch failed" each and were reported BLOCKED_MONITOR on first
+ * sight, feeding the primary monitor's STALE record). Resolves to
+ * { deep } on the first success or { error } with the last throw
+ * after `tries` attempts; the caller still fails closed.
+ */
+export async function attemptDeepCheck(
+  fn,
+  { tries = 3, intervalMs = 30_000, sleep, onThrow } = {},
+) {
+  const wait =
+    sleep || ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+  let lastError = null;
+  for (let i = 1; i <= tries; i++) {
+    try {
+      const deep = await fn();
+      return { deep };
+    } catch (err) {
+      lastError = err;
+      if (onThrow) onThrow(err, i);
+      if (i < tries) await wait(intervalMs);
+    }
+  }
+  return { error: lastError };
+}

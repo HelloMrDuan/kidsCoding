@@ -6,6 +6,7 @@ import {
   classifyError,
   resumeRetryable,
   tjTagToken,
+  sameVersionToken,
   parseTianjiDeepCheck,
   assessTianji,
   verdictFor,
@@ -182,4 +183,61 @@ test('healthModeFromEnv: deployed-flag mapping stays fail-closed', () => {
   assert.equal(healthModeFromEnv({ HEALTH_MODE: 'lifecycle', TIANJI_DEPLOYED: 'true' }), 'lifecycle');
   assert.equal(healthModeFromEnv({ HEALTH_MODE: 'tianji', TIANJI_DEPLOYED: 'false' }), 'tianji');
   assert.equal(healthModeFromEnv({ HEALTH_MODE: 'bogus' }), 'lifecycle');
+});
+
+test('sameVersionToken: same commit at different token lengths matches', () => {
+  const full = 'bef41968860a21f06651ead493de7b2628a72b8f';
+  assert.equal(sameVersionToken(full, full), true);
+  assert.equal(sameVersionToken(full, 'bef41968'), true); // cicd-prerelease-<short>
+  assert.equal(sameVersionToken('bef41968', full), true);
+  assert.equal(sameVersionToken('82b119e', '82b119e'), true); // sealed pair
+  assert.equal(sameVersionToken(full, 'bef4196'), true); // 7-char prefix floor
+});
+
+test('sameVersionToken: different commits and junk still differ', () => {
+  const full = 'bef41968860a21f06651ead493de7b2628a72b8f';
+  assert.equal(sameVersionToken(full, 'd65f81b2'), false); // prefix of another commit
+  assert.equal(sameVersionToken('82b119e', 'd65f81b'), false);
+  assert.equal(sameVersionToken(full, null), false);
+  assert.equal(sameVersionToken(null, full), false);
+  assert.equal(sameVersionToken('abc', 'abcdef0'), false); // below the 7-char floor
+});
+
+// Regression for the 2026-10-24 false positive: the production
+// deployment pairs a full-SHA GHCR web image + full-SHA record with
+// a cicd-prerelease-<short> api image. state=running and the app
+// healthy produced APP_FAULT on every run under strict equality.
+const PROD_STDOUT = [
+  'TJ_HEALTH={"status":"ok","engine":"ready","rag_ready":true}',
+  'TJ_RECORD=bef41968860a21f06651ead493de7b2628a72b8f',
+  'CONTAINERS=tianji-tianji-api-1|tianji-api:cicd-prerelease-bef41968|Up 15 hours (healthy);tianji-tianji-web-1|ghcr.io/hellomrduan/tianji-web:bef41968860a21f06651ead493de7b2628a72b8f|Up 15 hours',
+].join('\n');
+
+test('parseTianjiDeepCheck: production mixed-length tokens are consistent', () => {
+  const deep = parseTianjiDeepCheck(PROD_STDOUT);
+  assert.equal(deep.tjApiToken, 'bef41968');
+  assert.equal(deep.tjWebToken, 'bef41968860a21f06651ead493de7b2628a72b8f');
+  assert.equal(deep.recordToken, 'bef41968860a21f06651ead493de7b2628a72b8f');
+  assert.equal(deep.tjTagsConsistent, true);
+  const assessed = assessTianji(deep);
+  assert.equal(assessed.healthy, true);
+  assert.deepEqual(assessed.problems, []);
+  assert.equal(
+    verdictFor({ state: 'running', action: 'running', deep: assessed, healthMode: 'tianji' }),
+    'OK',
+  );
+});
+
+test('assessTianji: api running a genuinely different commit still faults', () => {
+  const out = PROD_STDOUT.replace(
+    'cicd-prerelease-bef41968',
+    'cicd-prerelease-d65f81b2',
+  );
+  const assessed = assessTianji(parseTianjiDeepCheck(out));
+  assert.equal(assessed.tjTagsConsistent, false);
+  assert.equal(assessed.healthy, false);
+  assert.equal(
+    verdictFor({ state: 'running', action: 'running', deep: assessed, healthMode: 'tianji' }),
+    'APP_FAULT',
+  );
 });
