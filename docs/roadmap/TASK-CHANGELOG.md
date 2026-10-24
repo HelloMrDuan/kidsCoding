@@ -322,3 +322,10 @@
 | 日期 | Task-ID | 内容 | PR | 合并提交 | main CI | 状态 |
 |---|---|---|---|---|---|---|
 | 2026-10-23 | OPS-008 | Next.js standalone 生产打包：apps/web/next.config.ts 新增 output:'standalone'，仅打包方式变更，页面设计、课程功能与数据库行为不变。预发布机以 main c4ff5ea 同源代码 + 本改动完成隔离实证：standalone 镜像 398MB（现行生产 prune 版 1.01GB、原版 1.7GB），追踪后 node_modules 65M、.next 13M，node server.js 直启、容器 healthy，/api/health、首页、课程目录、课时页、作品页五探针全 200；PR CI 8/8 全绿，main CI 于关账时 7/8 已绿（task-ledger 与 curriculum 其余 6 项），scratch-real-vm-browser 在 GitHub runner 长时间未完成（同项 PR 已通过、代码相同），duan 明确指示不等 runner 关账 | [#123](https://github.com/HelloMrDuan/kidsCoding/pull/123) | `554a7c2c84d9867307445c8a0dd5d620a0a2a62e` | [课程main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304434) / [台账main CI](https://github.com/HelloMrDuan/kidsCoding/actions/runs/39926304427) | completed；预发布通道仍指 tq-011（代码未含 standalone），部署侧 standalone 运行层 Dockerfile 已备妥并验证、待通道目标更新后切换并做真实部署验收；OPS-007 的 deploy/Dockerfile.web 在其合并后随行对齐 |
+
+
+## OPS-007 执行记录
+
+| 日期 | Task-ID | 实际工作 | PR | 当前验证 | 状态 |
+|---|---|---|---|---|---|
+| 2026-10-23 | OPS-007 | 引入 push 构建 GHCR 镜像的工作流，更新生产 Dockerfile 为 OPS-008 已验证的 Next.js standalone 结构；GHCR 发布≠机器已部署。 | [#125](https://github.com/HelloMrDuan/kidsCoding/pull/125) | config-check、test 通过；E2E、镜像发布和服务器真实拉取仍待验证 | in_review |
