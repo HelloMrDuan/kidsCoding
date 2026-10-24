@@ -359,4 +359,4 @@
 
 | 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
 |---|---|---|---|---|---|
-| 2026-10-24 | OPS-013 | 修复 Kids CF watchdog 匿名 GitHub REST SHA 请求的单次抖动：网络/5xx 至多三次真实请求、403/429 限流退避/诊断、可选独立 GITHUB_TOKEN、不放宽 SHA 三方比对、不复用旧 SHA、不动 tj-watchdog | 待 PR | 08:11Z 现网 BLOCKED_MONITOR，后续必须用 Cloudflare 真实日志核对错误码；本次代码 CI 与生产部署待核验 | in_review |
+| 2026-10-24 | OPS-013 | 修复 Kids CF watchdog 匿名 GitHub REST SHA 请求的单次抖动：网络/5xx 至多三次真实请求、403/429 限流退避/诊断、可选独立 GITHUB_TOKEN、不放宽 SHA 三方比对、不复用旧 SHA、不动 tj-watchdog | [#132](https://github.com/HelloMrDuan/kidsCoding/pull/132) | 08:11Z 现网 BLOCKED_MONITOR，后续必须用 Cloudflare 真实日志核对错误码；本次代码 CI 与生产部署待核验 | in_review |

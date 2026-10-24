@@ -2459,7 +2459,7 @@
         "可选 GITHUB_TOKEN Secret 使用只读 GitHub API 不落日志；专项测试/台账 CI 绿、PR 合并后再由属主部署并观察自然 Cron。"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/132",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
