@@ -22,7 +22,7 @@ id = "REPLACE_WITH_KV_NAMESPACE_ID"
 [vars]
 MACHINE_ID = "m_agqv2gsjiybrpuen46a2rpxohe"
 GITHUB_REPO = "HelloMrDuan/kidsCoding"
-GITHUB_BRANCH = "tq-011"
+GITHUB_BRANCH = "main"
 # Maintenance master switch: "true" = monitor and report only,
 # never resume. Change in the dashboard or here and redeploy.
 WATCHDOG_HOLD = "false"

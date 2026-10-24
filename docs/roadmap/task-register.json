@@ -2364,6 +2364,32 @@
         "reviewer": null
       },
       "notes": ""
+    },
+    {
+      "id": "OPS-010",
+      "title": "KidsCoding 部署监控预期 SHA 切换 main（GitHub + Cloudflare）",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-007"
+      ],
+      "scope": ".github/workflows/instabox-watchdog.yml；tools/instabox-watchdog-cf/wrangler.toml、src/worker.mjs 与相关说明；仅更新 KidsCoding 预期分支 main；不影响已迁移的独立 Tianji 看门狗与机器。",
+      "acceptance": [
+        "GitHub 备用监控每次从 main 获取预期 SHA，仍严格核对机内部署 SHA 和运行容器；不会再以 tq-011 误判当前 main 部署。",
+        "Cloudflare Workers 源码默认值与 wrangler.toml 配置均为 main；现网 Worker 在 Cloudflare 环境变量 GITHUB_BRANCH 更新并部署后 /status 的最新真实定时轮次能证明监控恢复。",
+        "监控更新不触发应用部署，不接触凭据、不复用其他应用的机器或机密；真实 SHA 漂移仍判 APP_FAULT。"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/129",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "待 GitHub PR 监控自测及主线 CI；Cloudflare 实际配置变更尚未执行，需单独核验。"
+        ],
+        "reviewer": null
+      },
+      "notes": "KidsCoding main SHA cee5d1f95f11c702458cfc730097ea5844bf915b 已实机部署成功 (2026-10-24T03:32:34Z; health ok; 镜像摘要 sha256:a5d16ad626f6c32f5b592e9cf639cae00be189483b90e62a949b34c25a24e25c)。看门狗迁移 PR #129 待 CI/合并；Cloudflare 实际 GITHUB_BRANCH=main 配置与真实 Cron 尚未核验，禁止标 completed。"
     }
   ]
 }

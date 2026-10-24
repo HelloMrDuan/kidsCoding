@@ -6,7 +6,7 @@ platforms-core-01 的**新主监控**：Cloudflare Workers Cron Triggers 每 10 
 
 ## 行为合同（与 GitHub 版一致）
 
-- `running`：机内深查（双健康端点 + 容器状态 + 部署 SHA 对比 GitHub `tq-011` 头）。
+- `running`：机内深查（双健康端点 + 容器状态 + 部署 SHA 对比 GitHub `main` 头）。
 - `suspended`：**只有此状态**允许自动 Resume。每暂停 episode 最多 2 次尝试、间隔 ≥45 秒，上限**跨轮持久化**（KV 中的 episode 记录），只有 capacity/transient 类失败才重试。
 - `stopped`：所有者主动停机，永不恢复，只记录 `STOPPED_MANUAL`。
 - 过渡态（含 `resuming`）：只等待复查，绝不重复发起 Resume；`operation_conflict` 同样只等待。

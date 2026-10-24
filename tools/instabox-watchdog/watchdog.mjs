@@ -32,7 +32,7 @@ import {
 const MACHINE_ID = process.env.INSTABOX_MACHINE_ID || 'm_agqv2gsjiybrpuen46a2rpxohe';
 const API_KEY = process.env.INSTABOX_API_KEY || '';
 // Expected KidsCoding deployment: the GitHub head of the deployment
-// branch (tq-011), resolved by the workflow at run time. When set,
+// branch (main), resolved by the workflow at run time. When set,
 // the watchdog strictly compares it against the machine's recorded
 // deployed SHA and the running image's tag.
 const EXPECTED_KIDS_SHA = process.env.EXPECTED_KIDS_SHA || '';

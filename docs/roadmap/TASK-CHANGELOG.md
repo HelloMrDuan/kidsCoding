@@ -334,3 +334,9 @@
 | 日期 | Task-ID | 实际工作 | PR | 当前验证 | 状态 |
 |---|---|---|---|---|---|
 | 2026-10-23 | OPS-007 | 引入 push 构建 GHCR 镜像的工作流，更新生产 Dockerfile 为 OPS-008 已验证的 Next.js standalone 结构；GHCR 发布≠机器已部署。 | [#125](https://github.com/HelloMrDuan/kidsCoding/pull/125) | config-check、test 通过；E2E、镜像发布和服务器真实拉取仍待验证 | in_review |
+
+## OPS-010 执行记录
+
+| 日期 | Task-ID | 实际工作 | PR | 当前验证 | 状态 |
+|---|---|---|---|---|---|
+| 2026-10-24 | OPS-010 | KidsCoding 已实机部署 main `cee5d1f95f11c702458cfc730097ea5844bf915b`（03:32:34Z DEPLOYED、GHCR digest 一致、health ok）；GitHub 备用监控与 Cloudflare Worker 源码/配置预期 SHA 统一切换 main，保留真正版本漂移告警。Cloudflare 已部署 Worker 仍需控制台更新并用真实 Cron 核验，不冒称监控生效。 | [#129](https://github.com/HelloMrDuan/kidsCoding/pull/129) | PR CI 待跑，Cloudflare 现网未核验 | in_review |
