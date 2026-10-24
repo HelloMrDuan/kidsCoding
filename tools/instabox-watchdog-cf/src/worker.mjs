@@ -8,6 +8,8 @@
 //   env.GITHUB_REPO       var: repo whose branch head is the expected
 //                         Kids deployed SHA (public API, no token)
 //   env.GITHUB_BRANCH     var: deployment branch (default main)
+//   env.GITHUB_TOKEN      optional GitHub read-only API token (Worker Secret),
+//                         NEVER printed or put in the KV state
 //   env.WATCHDOG_HOLD     var: "true" = monitor only, never resume
 //
 // HTTP surface:
@@ -45,23 +47,78 @@ function kvStore(kv) {
   };
 }
 
-async function fetchExpectedSha(env) {
+/** GitHub head SHA lookup must never invent a commit or fall back to a
+ * stale cached SHA. Auth is OPTIONAL (a Worker Secret); non-transient
+ * HTTP 403/429/401 are never hot-retried. 5xx/network failures get
+ * short, bounded retries within the same scheduled run.
+ *
+ * Both fetch and sleep are injectable to test the actual retry logic.
+ */
+export async function fetchExpectedSha(
+  env,
+  { fetchImpl = fetch, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)) } = {},
+) {
   const repo = env.GITHUB_REPO || 'HelloMrDuan/kidsCoding';
   const branch = env.GITHUB_BRANCH || 'main';
-  const res = await fetch(
-    `https://api.github.com/repos/${repo}/branches/${encodeURIComponent(branch)}`,
-    {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'User-Agent': 'instabox-watchdog-cf',
-      },
-      signal: AbortSignal.timeout(15_000),
-    },
-  );
-  if (!res.ok) throw new Error(`github branch lookup HTTP ${res.status}`);
-  const data = await res.json();
-  const sha = data && data.commit && data.commit.sha;
-  return typeof sha === 'string' && /^[0-9a-f]{40}$/.test(sha) ? sha : null;
+  // Reject invalid path input before making any request to GitHub.
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo) ||
+      !/^[A-Za-z0-9_./-]+$/.test(branch) || branch.includes('..')) {
+    throw new Error('invalid GitHub repo or branch configuration');
+  }
+  const url = `https://api.github.com/repos/${repo}/branches/${encodeURIComponent(branch)}`;
+  const headers = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'instabox-watchdog-cf',
+    ...(env.GITHUB_TOKEN ? { Authorization: `Bearer ${env.GITHUB_TOKEN}` } : {}),
+  };
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    let retry = false;
+    let error = null;
+    try {
+      const response = await fetchImpl(url, {
+        headers,
+        signal: AbortSignal.timeout(12_000),
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        const remaining = response.headers?.get('x-ratelimit-remaining') || '';
+        const reset = response.headers?.get('x-ratelimit-reset') || '';
+        const retryAfter = response.headers?.get('retry-after') || '';
+        const rateLimited = response.status === 429 ||
+          (response.status === 403 && (remaining === '0' || retryAfter));
+        const safeDetail = rateLimited
+          ? `GitHub rate limit HTTP ${response.status}, remaining=${remaining || 'unknown'}, reset_epoch=${reset || 'unknown'}`
+          : `GitHub branch lookup HTTP ${response.status}`;
+        error = new Error(safeDetail);
+        // Respect documented GitHub rate-limiting rules: do NOT
+        // retry 403/429 in this run or impersonate success.
+        retry = !rateLimited && (response.status === 408 || response.status >= 500);
+      } else {
+        let data;
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error('GitHub branch returned invalid JSON');
+        }
+        const sha = data && data.commit && data.commit.sha;
+        if (typeof sha !== 'string' || !/^[0-9a-f]{40}$/.test(sha)) {
+          throw new Error('GitHub branch returned invalid 40-character SHA');
+        }
+        return sha;
+      }
+    } catch (cause) {
+      error = cause;
+      // Fetch DNS/timeout/connection errors are transient. Malformed
+      // GitHub responses are not. Never include token values in logs.
+      retry = !(cause.message || '').startsWith('GitHub branch returned');
+    }
+    if (!retry || attempt === 3) {
+      throw new Error(error?.message || 'GitHub branch lookup failed');
+    }
+    await sleep(attempt === 1 ? 500 : 1_500);
+  }
+  throw new Error('GitHub branch lookup failed');
 }
 
 async function runOnce(env, trigger) {

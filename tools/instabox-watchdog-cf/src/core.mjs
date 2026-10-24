@@ -203,13 +203,15 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
 
   let expectedSha = null;
   let expectedShaResolved = false;
+  let expectedShaError = '';
   async function expectedKidsSha() {
     if (!expectedShaResolved) {
       expectedShaResolved = true;
       try {
         expectedSha = await deps.fetchExpectedSha();
       } catch (err) {
-        log('expected-sha-error', String((err && err.message) || err));
+        expectedShaError = String((err && err.message) || err);
+        log('expected-sha-error', expectedShaError);
         expectedSha = null;
       }
       log('expected-sha', expectedSha || 'unavailable (recorded; machine-side checks still enforced)');
@@ -226,10 +228,15 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
     // silently bypass the expected-versus-deployed comparison.
     const expected = await expectedKidsSha();
     if (!expected) {
-      throw new ApiError('expected KidsCoding GitHub SHA unavailable', {
-        code: 'expected_sha_unavailable',
-        retryable: true,
-      });
+      throw new ApiError(
+        expectedShaError
+          ? `expected KidsCoding GitHub SHA unavailable: ${expectedShaError}`
+          : 'expected KidsCoding GitHub SHA unavailable',
+        {
+          code: 'expected_sha_unavailable',
+          retryable: true,
+        },
+      );
     }
     return assessDeep(parseDeepCheck(res.stdout || ''), expected, { checkTianji: cfg.checkTianji !== false });
   }

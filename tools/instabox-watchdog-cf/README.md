@@ -108,3 +108,12 @@ KidsCoding 专用平台机 `platforms-core-01` 的 InstaBox 也会返回 `409 ma
 修改规则：仅明确 `machine_cooldown`、可解析的 UTC 截止时间且无操作 ID 时，退还写前尝试预算、记录截止时间加 30 秒余量、冷却结束前不再发 POST；确认无操作的下一次合法尝试使用 `cooldownGeneration` 更换 Idempotency-Key。最多 6 次冷却拒绝，普通非冷却失败每暂停 episode 仍最多 2 次；畸形返回、有操作 ID 或模糊失败继续 fail-closed。手动停止不唤醒，运行成功恢复时清理 episode。
 
 源代码 PR/单测/主线 CI 成功不代表生产 Worker 已更新；需使用原有 Cloudflare 账户和专用 WATCHDOG_KV 将确切合并提交部署到 `instabox-watchdog`，保留现网 Secrets 和变量。真实自然暂停后 CF 自行 Resume 并通过 3000/api/health 与部署 SHA 核验，才可关账主监控自动恢复。Muse 备用层不关闭。
+
+
+## OPS-013：GitHub `main` SHA 获取可靠性与限流诊断（2026-10-24）
+
+真实现象：`platforms-core-01` 为 `running` 时仍间歇报告 `BLOCKED_MONITOR`，最后详情 `expected KidsCoding GitHub SHA unavailable`，同时可能有真实版本漂移导致 `APP_FAULT`。旧 Worker 对 `api.github.com/repos/HelloMrDuan/kidsCoding/branches/main` 只发一次匿名请求；首次失败后同轮深查重试并不重新请求 GitHub，导致偶发故障当轮无法恢复。
+
+本次改动限定 `tools/instabox-watchdog-cf`：GitHub 502/503/超时等瞬时故障最多三次实际 GET（500ms、1500ms 间隔）；HTTP 403/429 不盲重试，限流时记录 remaining 与 reset_epoch；HTTP 401/404、格式错误、无 40 位 SHA 都直接 fail-closed。**没有退化为缓存旧 SHA、弱化三方版本比对或把 GitHub 失败记 OK**。认证是可选 Worker Secret `GITHUB_TOKEN`，建议在确认日志确实 403/429 限流后由账户持有人配置最小只读凭据；源码和状态不输出令牌。如果依旧失败，查看 `/status` 的 lastAlert.detail 或 Workers Logs 的 `expected-sha-error` 获取具体 HTTP 状态，再决定是否配置 Token。
+
+部署：合并后用确切 main SHA 部署 `instabox-watchdog`，复用现网 KidsCoding KV `4945e95561e545508c703df75933013e`、`CHECK_TIANJI=false`、`GITHUB_BRANCH=main`、现有 Secrets、Observability true；不要动天机 `tj-watchdog`。PR+单测≠现网。真机 `running`、GitHub SHA 有效、Kids 部署 SHA 与容器版本一致才可 verdict=OK。

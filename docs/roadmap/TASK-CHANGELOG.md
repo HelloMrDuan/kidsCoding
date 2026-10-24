@@ -353,3 +353,10 @@
 | 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
 |---|---|---|---|---|---|
 | 2026-10-24 | OPS-012 | platforms-core-01 的 Cloudflare `instabox-watchdog` 恢复冷却期处理：不计入普通重试、按平台截止时间等待、合法重试新幂等键、未知错误失败关闭、手动停止保护与专项测试；不更改生产数据或天机现网 | [#131](https://github.com/HelloMrDuan/kidsCoding/pull/131) | PR CI 与现网部署尚未验证，Muse 备用层保持开启 | in_review |
+
+
+## OPS-013 执行记录
+
+| 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
+|---|---|---|---|---|---|
+| 2026-10-24 | OPS-013 | 修复 Kids CF watchdog 匿名 GitHub REST SHA 请求的单次抖动：网络/5xx 至多三次真实请求、403/429 限流退避/诊断、可选独立 GITHUB_TOKEN、不放宽 SHA 三方比对、不复用旧 SHA、不动 tj-watchdog | 待 PR | 08:11Z 现网 BLOCKED_MONITOR，后续必须用 Cloudflare 真实日志核对错误码；本次代码 CI 与生产部署待核验 | in_review |
