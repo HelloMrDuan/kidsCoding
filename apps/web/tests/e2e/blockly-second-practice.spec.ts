@@ -32,6 +32,8 @@ test('TQ-011: lesson 4 第 3 关 — predict where the scene changes, a wrong or
   await expect(page.getByTestId('lesson-clear-program')).toBeVisible()
   // No guess, no run.
   await expect(page.getByTestId('run-code-button')).toBeDisabled()
+  // UX-202 mobile classroom: this message is inside the stage pane.
+  await showLessonPane(page, 'stage')
   await expect(page.getByTestId('practice-need-guess')).toBeVisible()
   await clickLessonControl(page, 'practice-answer-one-hundred')
   await expect(page.getByTestId('practice-answer-reply')).toContainText('猜好啦')
