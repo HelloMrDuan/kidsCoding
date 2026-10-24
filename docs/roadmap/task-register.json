@@ -2407,7 +2407,7 @@
         "CI 执行真实 Node 单测通过；Cloudflare 生产代码部署、下次真实 suspended episode 主监控独立恢复+服务健康需另行取证，不把代码合并当生产恢复。"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/130",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [

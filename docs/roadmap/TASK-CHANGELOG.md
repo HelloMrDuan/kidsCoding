@@ -345,4 +345,4 @@
 
 | 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
 |---|---|---|---|---|---|
-| 2026-10-24 | OPS-011 | tj-watchdog 的 machine_cooldown 时间门、冷却请求不占普通预算、冷却后幂等键换代、并发/模糊错误 fail-closed、单独冷却次数保护；仅天机主监控，保留 Muse 备用层 | 待本次 PR | Cloudflare Cron 06:45、06:55 确有 scheduled 调用，06:55 resume-cap-reached；本轮单测与 CI 待验证，现网 Worker 未部署 | in_review |
+| 2026-10-24 | OPS-011 | tj-watchdog 的 machine_cooldown 时间门、冷却请求不占普通预算、冷却后幂等键换代、并发/模糊错误 fail-closed、单独冷却次数保护；仅天机主监控，保留 Muse 备用层 | [#130](https://github.com/HelloMrDuan/kidsCoding/pull/130) | Cloudflare Cron 06:45、06:55 确有 scheduled 调用，06:55 resume-cap-reached；本轮单测与 CI 待验证，现网 Worker 未部署 | in_review |
