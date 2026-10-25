@@ -80,9 +80,11 @@ self.onmessage = async (event) => {
         'except Exception as __kc_error:',
         '    __kc_custom = "ERROR:" + type(__kc_error).__name__'
       ].join('\n'));
-      const proxy = python.globals.get('__kc_custom');
-      const custom = proxy.toJs();
-      proxy.destroy();
+      // __kc_custom is always a Python str, which globals.get() returns as a
+      // plain JS string (not a PyProxy), so there is no .toJs() to call.
+      const customRaw = python.globals.get('__kc_custom');
+      const custom = typeof customRaw === 'string' ? customRaw : String(customRaw);
+      if (customRaw && typeof customRaw.destroy === 'function') customRaw.destroy();
       self.postMessage({kind:'RESULT',output:output.slice(0,4000),custom,error:null});
     } else {
       python.runPython('exec(compile(' + JSON.stringify(source) + ', "<learner>", "exec"), {"__builtins__": __builtins__})');
