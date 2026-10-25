@@ -16,6 +16,11 @@
 | apps/web/public/kc-scenes/garden.svg | 花园 | 本项目手绘，逐路径提取自 `character-art.tsx` 的 SceneBackdrop（garden 配色 + 花） | original | 3066 |
 | apps/web/public/kc-scenes/graduation-island.svg | 毕业岛 | 本项目新绘，与上述资产同一扁平柔和风格；对应课堂 `forest-stage`（毕业舞台）概念，文件名为毕业岛 | original | 3343 |
 
+机器可读登记：上表 7 个文件同时登记在
+`apps/web/src/content/curriculum/asset-licenses-v1.json`（SYS-105 课程 schema
+门禁会扫描 `public/` 全量文件并要求每文件都有 original/authorized 授权条目；
+只写本文档不够，门禁会报 `unlicensed_asset`）。
+
 ## 与运行时渲染的关系
 
 课堂舞台当前仍由 `character-art.tsx` 的内联 SVG 渲染（V2 冻结布局与色板不动，

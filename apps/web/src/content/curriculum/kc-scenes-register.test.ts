@@ -48,6 +48,23 @@ describe('kc-scenes asset register (UX-004)', () => {
     }
   })
 
+  it('every kc-scenes file is also registered in the machine-readable license ledger', () => {
+    // The SYS-105 curriculum schema gate scans all of public/ and requires a
+    // license entry in asset-licenses-v1.json for each file; a docs-only
+    // register is not enough.
+    const v1 = JSON.parse(
+      readFileSync(
+        path.resolve(__dirname, '../../../../../apps/web/src/content/curriculum/asset-licenses-v1.json'),
+        'utf8',
+      ),
+    ) as { assets: Array<{ path: string; license: string }> }
+    for (const file of ACCEPTANCE_SET) {
+      const entry = v1.assets.find((a) => a.path === `kc-scenes/${file}`)
+      expect(entry).toBeDefined()
+      expect(entry!.license).toBe('original')
+    }
+  })
+
   it('register documents the low-bandwidth fallback', () => {
     const md = readFileSync(REGISTER, 'utf8')
     expect(md).toContain('低带宽降级')

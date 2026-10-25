@@ -12,6 +12,13 @@
     { "path": "v2/work-2.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
     { "path": "v2/work-3.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
     { "path": "v2/work-4.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
-    { "path": "v2/work-5.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" }
+    { "path": "v2/work-5.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
+    { "path": "kc-scenes/fox.svg", "license": "original", "source": "本项目手绘 SVG，UX-004 自 character-art.tsx 的 Fox 逐路径提取" },
+    { "path": "kc-scenes/bear.svg", "license": "original", "source": "本项目手绘 SVG，UX-004 自 character-art.tsx 的 Bear 逐路径提取" },
+    { "path": "kc-scenes/butterfly.svg", "license": "original", "source": "本项目手绘 SVG，UX-004 自 character-art.tsx 的 Butterfly 逐路径提取" },
+    { "path": "kc-scenes/forest.svg", "license": "original", "source": "本项目手绘 SVG，UX-004 自 character-art.tsx 的 SceneBackdrop（forest 配色）逐路径提取" },
+    { "path": "kc-scenes/meadow.svg", "license": "original", "source": "本项目手绘 SVG，UX-004 自 character-art.tsx 的 MeadowBackdrop 逐路径提取" },
+    { "path": "kc-scenes/garden.svg", "license": "original", "source": "本项目手绘 SVG，UX-004 自 character-art.tsx 的 SceneBackdrop（garden 配色）逐路径提取" },
+    { "path": "kc-scenes/graduation-island.svg", "license": "original", "source": "本项目新绘 SVG，UX-004 与上述资产同一扁平柔和风格" }
   ]
 }
