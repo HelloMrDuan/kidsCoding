@@ -1,0 +1,17 @@
+<!-- KidsCoding original artwork (UX-004). License: original, this project. Source: character-art.tsx V2 stage art, extracted verbatim; graduation-island drawn in the same style. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110" role="img" aria-label="小熊">
+<ellipse cx="50" cy="104" rx="30" ry="5" fill="#305a43" opacity=".22" />
+<ellipse cx="50" cy="86" rx="21" ry="17" fill="#c4885a" stroke="#7a4b2c" stroke-width="3" />
+<ellipse cx="50" cy="89" rx="12" ry="10" fill="#f3dcc0" />
+<ellipse cx="38" cy="100" rx="9" ry="5" fill="#8b5a36" />
+<ellipse cx="62" cy="100" rx="9" ry="5" fill="#8b5a36" />
+<circle cx="22" cy="22" r="13" fill="#c4885a" stroke="#7a4b2c" stroke-width="3" />
+<circle cx="78" cy="22" r="13" fill="#c4885a" stroke="#7a4b2c" stroke-width="3" />
+<circle cx="22" cy="22" r="6" fill="#f3c9a4" /><circle cx="78" cy="22" r="6" fill="#f3c9a4" />
+<ellipse cx="50" cy="50" rx="34" ry="31" fill="#c4885a" stroke="#7a4b2c" stroke-width="3" />
+<ellipse cx="50" cy="62" rx="15" ry="12" fill="#f6e0c6" />
+<ellipse cx="36" cy="45" rx="5.6" ry="6.8" fill="#1a2739" /><ellipse cx="64" cy="45" rx="5.6" ry="6.8" fill="#1a2739" /><circle cx="37.8" cy="42.4" r="2.2" fill="#fff" /><circle cx="65.8" cy="42.4" r="2.2" fill="#fff" /><circle cx="34.4" cy="47.4" r="1" fill="#fff" opacity=".8" /><circle cx="62.4" cy="47.4" r="1" fill="#fff" opacity=".8" />
+<g fill="#ff8fa3" opacity=".55"><ellipse cx="25" cy="58" rx="6" ry="3.6" /><ellipse cx="75" cy="58" rx="6" ry="3.6" /></g>
+<ellipse cx="50" cy="57" rx="6" ry="4.2" fill="#3a2016" />
+<path d="M44 65 Q50 70 56 65" fill="none" stroke="#3a2016" stroke-width="2.4" stroke-linecap="round" />
+</svg>

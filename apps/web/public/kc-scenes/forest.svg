@@ -1,0 +1,19 @@
+<!-- KidsCoding original artwork (UX-004). License: original, this project. Source: character-art.tsx V2 stage art, extracted verbatim; graduation-island drawn in the same style. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" preserveAspectRatio="none" role="img" aria-label="森林">
+<defs>
+<linearGradient id="kc-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bcdcf7" /><stop offset="1" stop-color="#e7f5fd" /></linearGradient>
+<pattern id="kc-ground" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><rect width="20" height="40" fill="#5d916e" /><rect x="20" width="20" height="40" fill="#649d78" /></pattern>
+</defs>
+<rect width="400" height="240" fill="url(#kc-sky)" />
+<ellipse cx="96" cy="40" rx="38" ry="9" fill="#fff" opacity=".7" />
+<ellipse cx="300" cy="28" rx="30" ry="7" fill="#fff" opacity=".6" />
+<path d="M20 170 L70 100 L105 140 L150 70 L200 135 L235 95 L280 170Z" fill="#8ebba6" opacity=".7" />
+<path d="M300 170 Q330 120 360 130 Q390 140 400 120 V170Z" fill="#8ebba6" opacity=".55" />
+<g fill="#4f8a66">
+<path d="M330 168 L345 118 L360 168Z" />
+<path d="M352 168 L370 108 L388 168Z" />
+<path d="M24 168 L38 128 L52 168Z" />
+</g>
+<rect y="168" width="400" height="72" fill="#9ac59b" />
+<rect y="204" width="400" height="36" fill="url(#kc-ground)" />
+</svg>
