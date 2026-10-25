@@ -13,7 +13,7 @@
   let timer = null;
   let currentId = null;
   let ready = false;
-  let currentProgram={spawnCount:10,fallStep:13};
+  let currentProgram={spawnCount:10,fallStep:13,interval:0.3};
   function send(kind, info = {}) {
     window.parent.postMessage({kind,id:currentId,...info},'*');
   }
@@ -35,7 +35,8 @@
     const required=[
       ['flag','event_whenflagclicked'],['repeat','control_repeat'],
       ['spawn','control_create_clone_of'],['clone_flag','control_start_as_clone'],
-      ['move_y','motion_changeyby'],['delete','control_delete_this_clone']
+      ['move_y','motion_changeyby'],['delete','control_delete_this_clone'],
+      ['wait','control_wait']
     ];
     for(const [id,opcode] of required){
       if(sprite.blocks.getBlock(id)?.opcode!==opcode)throw new Error('不属于本课程的流星积木脚本');
@@ -48,9 +49,12 @@
     }
     const spawnCount=numberAt('repeat','TIMES');
     const fallStep=-numberAt('move_y','DY');
+    const interval=numberAt('wait','DURATION');
     if(!Number.isInteger(spawnCount)||spawnCount<1||spawnCount>15||
-       !Number.isInteger(fallStep)||fallStep<5||fallStep>25) throw new Error('数字积木超过允许范围');
-    return {spawnCount,fallStep};
+       !Number.isInteger(fallStep)||fallStep<5||fallStep>25||
+       !Number.isFinite(interval)||interval<0.1||interval>1.0||
+       Math.abs(interval*10-Math.round(interval*10))>1e-9) throw new Error('数字积木超过允许范围');
+    return {spawnCount,fallStep,interval};
   }
   function snapshot() {
     if (!vm || !vm.runtime) return;
@@ -78,7 +82,9 @@
     if (data.kind === 'CONFIGURE' && data.id === currentId && vm && ready) {
       const program = data.program;
       if (!program || !Number.isInteger(program.spawnCount) || program.spawnCount < 1 || program.spawnCount > 15 ||
-          !Number.isInteger(program.fallStep) || program.fallStep < 5 || program.fallStep > 25) {
+          !Number.isInteger(program.fallStep) || program.fallStep < 5 || program.fallStep > 25 ||
+          !Number.isFinite(program.interval) || program.interval < 0.1 || program.interval > 1.0 ||
+          Math.abs(program.interval*10-Math.round(program.interval*10)) > 1e-9) {
         send('ERROR',{error:'积木参数无效，禁止执行。'});
         return;
       }
@@ -101,7 +107,8 @@
         }
         updateNativeNumber('repeat','TIMES',program.spawnCount);
         updateNativeNumber('move_y','DY',-program.fallStep);
-        currentProgram={spawnCount:program.spawnCount,fallStep:program.fallStep};
+        updateNativeNumber('wait','DURATION',program.interval);
+        currentProgram={spawnCount:program.spawnCount,fallStep:program.fallStep,interval:program.interval};
         send('CONFIGURED',{program:currentProgram});
         snapshot();
       } catch (error) {
@@ -144,10 +151,12 @@
         }
         const count = readNativeNumber('repeat','TIMES');
         const fall = -readNativeNumber('move_y','DY');
-        if (count !== currentProgram.spawnCount || fall !== currentProgram.fallStep) {
+        const interval = readNativeNumber('wait','DURATION');
+        if (count !== currentProgram.spawnCount || fall !== currentProgram.fallStep ||
+            Math.abs(interval-currentProgram.interval) > 1e-9) {
           throw new Error('重新载入后的 Scratch 数字积木不匹配');
         }
-        window.parent.postMessage({kind:'PROJECT_EXPORTED',id:currentId,archive,program:{spawnCount:count,fallStep:fall}},'*',[archive]);
+        window.parent.postMessage({kind:'PROJECT_EXPORTED',id:currentId,archive,program:{spawnCount:count,fallStep:fall,interval}},'*',[archive]);
       } catch (error) {
         send('ERROR',{error:'Scratch VM 项目导出或回读失败：'+String(error).slice(0,500)});
       } finally {
