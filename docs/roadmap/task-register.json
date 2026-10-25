@@ -443,7 +443,7 @@
       "title": "建立432课逐课教研复核模板",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-001"
       ],
@@ -453,9 +453,13 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/138",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "mergeCommit": "c04a4315fe99b0abf682a30cc95858a2672ec042",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40180100494",
+        "tests": [
+          "docs/roadmap/432-review-template.json parses as JSON; template fields cover lessonId, maturityLevel, playableEvidence, publishEvidence, childTrial, blockers",
+          "PR CI rerun all green: curriculum 40178752028, deploy 40178752031 (test green), task-tracking 40178752084 (task-ledger green)",
+          "scripts/check-task-ledger.py local simulation passes on closeout tree"
+        ],
         "reviewer": null
       },
       "notes": ""
