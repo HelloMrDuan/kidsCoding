@@ -417,7 +417,7 @@
       "title": "G3 Scratch流星课程教研复核",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-001"
       ],
@@ -426,10 +426,14 @@
         "真VM克隆参数实验、失败重试、保存/导入、开放改造和限制显式标注"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/136",
+        "mergeCommit": "26cff39ffaaf8ef0a8adfa80605db2f519c265f9",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40169788991",
+        "tests": [
+          "apps/web/tests/e2e/scratch-vm.spec.ts (10 cases, 9 pass local with local scratch-vm; export-filename assertion is a sandbox artifact, green on CI scratch-real-vm-browser)",
+          "apps/web/src/features/scratch-vm/scratch-meteor-blocks.test.ts (5 unit tests)",
+          "vitest full 793/793 local on PR head; curriculum contract 485/485 local on PR head; PR CI run 40168473024 all green incl. scratch-real-vm-browser and task-ledger"
+        ],
         "reviewer": null
       },
       "notes": ""
