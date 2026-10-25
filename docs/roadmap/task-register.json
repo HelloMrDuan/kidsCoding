@@ -1325,7 +1325,7 @@
       "title": "Blockly工具箱分类缩放删除体验",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-202"
       ],

@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as Blockly from 'blockly'
+import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 
 import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
-import { BLOCK_LABEL_FIELD, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
+import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
 import { restoreBlockSequence } from './restore-block-sequence'
 import type { SayLinePreset } from './say-line-presets'
 
@@ -22,6 +23,61 @@ const MIN_FIT_SCALE = 0.6
 const FIT_MARGIN = 12
 /** Blockly's scrollbars sit inside the view; keep blocks clear of them. */
 const SCROLLBAR_ALLOWANCE = 16
+
+let keyboardNavigationRegistered = false
+
+/**
+ * UX-203: the keyboard-navigation plugin's styles and its deferring toolbox
+ * must be registered once per page load, before Blockly.inject.
+ * NOTE: @blockly/keyboard-navigation@3.0.5's own
+ * KeyboardNavigation.registerNavigationDeferringToolbox() infinitely
+ * recurses (it calls itself instead of the standalone registrar), so the
+ * same one-class registration is done here directly with Blockly's public
+ * registry API. The class body is identical to the plugin's
+ * NavigationDeferringToolbox: a Toolbox whose keydown handling is a no-op
+ * so the plugin owns keyboard navigation.
+ */
+class NavigationDeferringToolbox extends Blockly.Toolbox {
+  protected override onKeyDown_(_e: KeyboardEvent) {
+    // No-op, prevent keyboard handling by superclass in order to defer to
+    // global keyboard navigation.
+  }
+}
+
+function ensureKeyboardNavigationRegistered() {
+  if (keyboardNavigationRegistered) return
+  KeyboardNavigation.registerKeyboardNavigationStyles()
+  Blockly.registry.register(
+    Blockly.registry.Type.TOOLBOX,
+    Blockly.registry.DEFAULT,
+    NavigationDeferringToolbox,
+    true,
+  )
+  keyboardNavigationRegistered = true
+}
+
+/**
+ * UX-203: category toolbox for the allowed blocks (verb labels preserved).
+ * Falls back to an empty flyout when a lesson allows no blocks at all, so a
+ * category toolbox is never injected with zero categories.
+ */
+function buildKidsToolbox(allowedBlocks: string[], motionVerb: MotionVerb) {
+  const categories = buildKidsToolboxCategories(allowedBlocks)
+  if (categories.length === 0) return { kind: 'flyoutToolbox' as const, contents: [] }
+  return {
+    kind: 'categoryToolbox' as const,
+    contents: categories.map((category) => ({
+      kind: 'category' as const,
+      name: category.name,
+      colour: category.colour,
+      contents: category.types.map((type) =>
+        VERB_LABELLED_BLOCKS.includes(type)
+          ? { kind: 'block' as const, type, fields: { [BLOCK_LABEL_FIELD]: getKidsBlockLabel(type, motionVerb) } }
+          : { kind: 'block' as const, type },
+      ),
+    })),
+  }
+}
 
 /**
  * TQ-008: on narrow canvases (375/768) the flyout leaves little room, so a stack with the
@@ -172,6 +228,7 @@ export function BlocklyWorkspace({
   const mountRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
   const showFromTopRef = useRef<(() => void) | null>(null)
+  const lastSelectedBlockIdRef = useRef<string | null>(null)
   const latestBlocksRef = useRef(blocks)
   const choicesKey = sayLineChoices?.map((choice) => `${choice.id}:${choice.text}`).join('|') ?? ''
   const choicesRef = useRef(sayLineChoices)
@@ -201,6 +258,7 @@ export function BlocklyWorkspace({
 
   useEffect(() => {
     registerKidsBlocks()
+    ensureKeyboardNavigationRegistered()
 
     if (!mountRef.current) {
       return
@@ -210,22 +268,15 @@ export function BlocklyWorkspace({
       renderer: 'zelos',
       theme: getKidsBlockTheme(),
       grid: { spacing: 18, length: 2, colour: '#dbe4f1', snap: false },
-      toolbox: {
-        kind: 'flyoutToolbox',
-        contents: stableAllowedBlocks.map((type) =>
-          VERB_LABELLED_BLOCKS.includes(type)
-            ? { kind: 'block', type, fields: { [BLOCK_LABEL_FIELD]: getKidsBlockLabel(type, motionVerb) } }
-            : { kind: 'block', type },
-        ),
-      },
-      trashcan: false,
+      toolbox: buildKidsToolbox(stableAllowedBlocks, motionVerb),
+      trashcan: true,
       move: {
         scrollbars: true,
         drag: true,
         wheel: true,
       },
       zoom: {
-        controls: false,
+        controls: true,
         wheel: true,
         startScale: BASE_SCALE,
         minScale: MIN_FIT_SCALE,
@@ -234,6 +285,7 @@ export function BlocklyWorkspace({
     })
 
     workspaceRef.current = workspace
+    const keyboardNav = new KeyboardNavigation(workspace)
     const restoredBlocks = restoreBlockSequence(
       latestBlocksRef.current,
       stableAllowedBlocks,
@@ -270,6 +322,11 @@ export function BlocklyWorkspace({
 
     let previousSnapshot = JSON.stringify(latestBlocksRef.current)
     const handleChange = (event?: Blockly.Events.Abstract) => {
+      // UX-203: remember the last selected block id so the delete button
+      // (whose own mousedown deselects first) can still remove it.
+      if (event instanceof Blockly.Events.Selected && event.newElementId) {
+        lastSelectedBlockIdRef.current = event.newElementId
+      }
       const next = snapshotOf(workspace)
       const key = JSON.stringify(next)
       // Focus, selection and viewport changes do not edit the program.
@@ -300,8 +357,10 @@ export function BlocklyWorkspace({
       resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
       workspace.removeChangeListener(handleChange)
+      keyboardNav.dispose()
       workspace.dispose()
       workspaceRef.current = null
+      lastSelectedBlockIdRef.current = null
     }
     // choicesKey re-injects when the lesson's preset lines change (snapshotOf only reads refs).
   }, [allowedBlockKey, onSnapshotChange, stableAllowedBlocks, choicesKey, motionVerb])
@@ -368,6 +427,28 @@ export function BlocklyWorkspace({
     showFromTopRef.current?.()
   }
 
+  /** UX-203: delete the block the child selected in the workspace (click or keyboard). */
+  function deleteSelectedBlock() {
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    // Clicking this button deselects the block first (Blockly clears the
+    // selection on outside mousedown), so getSelected() is already null by
+    // click time. Fall back to the last block the change listener saw
+    // selected; a stale id simply resolves to nothing.
+    const selected = Blockly.getSelected()
+    let target: Blockly.BlockSvg | null = null
+    if (selected instanceof Blockly.BlockSvg && selected.workspace === workspace) target = selected
+    if (!target && lastSelectedBlockIdRef.current) {
+      const byId = workspace.getBlockById(lastSelectedBlockIdRef.current)
+      if (byId instanceof Blockly.BlockSvg) target = byId
+    }
+    lastSelectedBlockIdRef.current = null
+    if (!target) return
+    target.dispose(true)
+    onSnapshotChange(snapshotOf(workspace))
+    showFromTopRef.current?.()
+  }
+
   return (
     <section className="flex flex-col gap-3" data-testid="lesson-blockly-workspace">
       {/* isolate: Blockly's flyout (z-index 20) must not paint over the sticky top bar when scrolled. */}
@@ -377,6 +458,8 @@ export function BlocklyWorkspace({
           className="relative h-[420px] overflow-hidden bg-white"
         />
       </div>
+      {/* UX-203: host for the keyboard-navigation "/" help popup (empty until opened). */}
+      <div id="shortcuts" />
 
       <div className="rounded-[8px] border border-[#e8eef8] bg-[#f3f6fc] p-3">
         <div className="flex items-center justify-between gap-3">
@@ -384,6 +467,9 @@ export function BlocklyWorkspace({
           <span className="kc-text-muted text-[11px]">不会拖也可以点按钮</span>
         </div>
         <div className="mt-2 flex flex-wrap gap-2" data-testid="lesson-block-palette">
+          {/* UX-203: delete is core workspace UX like the trashcan, so it is
+              not gated with the practice-only 撤回 / 清空 tools. */}
+          <button type="button" data-testid="lesson-delete-selected" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={deleteSelectedBlock}>删除选中积木</button>
           {enableProgramTools && <>
             <button type="button" data-testid="lesson-remove-last" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={removeLastBlock}>撤回最后一块</button>
             <button type="button" data-testid="lesson-clear-program" className="kc-action-surface kc-btn-outline kc-btn-sm"
