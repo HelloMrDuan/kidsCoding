@@ -391,7 +391,7 @@
       "title": "P0第一单元Python教学质量复核",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "TQ-001"
       ],
@@ -400,10 +400,14 @@
         "真Pyodide、多输入错误反馈、两种不同练习、源码保存/恢复与分数可信边界"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/133",
+        "mergeCommit": "95ffb59b25d715533ccade4905d4bda728f08e08",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40154025639",
+        "tests": [
+          "apps/web/tests/e2e/python-lab.spec.ts (4 tests, real Pyodide; CI python-browser-trial green on PR head 2fc08b21)",
+          "apps/web/tests/e2e/python-multi.spec.ts (7 tests, real Pyodide; CI python-browser-trial green on PR head 2fc08b21)",
+          "vitest python-lab 13/13; affected areas 117/117; curriculum contract 485/485 local on merge tree"
+        ],
         "reviewer": null
       },
       "notes": ""
