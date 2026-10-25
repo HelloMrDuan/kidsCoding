@@ -443,7 +443,7 @@
       "title": "建立432课逐课教研复核模板",
       "priority": "P1",
       "category": "TQ",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "TQ-001"
       ],
@@ -452,7 +452,7 @@
         "每课独立状态/评审证据、不能因有详案就变更可玩或发布"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/138",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
