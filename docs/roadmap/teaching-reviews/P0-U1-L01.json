@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "P0-U1-L01",
+  "reviewedCommit": "c972cc24447ab3108d9c5cb0a3bb43f23f1daaf9",
+  "reviewedAt": "2026-10-25",
+  "reviewer": "kid小宝（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "P0 Python 入门",
+  "prerequisites": [],
+  "newConcepts": [
+    "print 输出一行文字"
+  ],
+  "references": [],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "print(\"你好，编程世界\") 单一新概念，与 G0 积木输出概念衔接"
+      ],
+      "defects": [
+        "只有一个新概念，分量偏轻"
+      ]
+    },
+    "story": {
+      "score": 12,
+      "evidence": [
+        "控制台打招呼情境；开始前先预测“什么变化证明成功”"
+      ],
+      "defects": [
+        "情境只有一行输出，故事延展弱"
+      ]
+    },
+    "practice": {
+      "score": 20,
+      "evidence": [
+        "练习 A：固定目标输出真运行；练习 B：改过初始代码后跑出自己的一句问候语（e2e 验证，且未改代码直接运行不计完成）"
+      ],
+      "defects": [
+        "练习 B 只有一行输出，变化维度单一"
+      ]
+    },
+    "feedback": {
+      "score": 13,
+      "evidence": [
+        "三层错因提示：语法错/名字错/结果不符各有现象→原因→修复；真实标准输出与目标对照显示"
+      ],
+      "defects": [
+        "无逐组用例对照（单输出任务本身只有一组）"
+      ]
+    },
+    "creation": {
+      "score": 10,
+      "evidence": [
+        "练习 B 允许任意问候语，草稿存本机浏览器，刷新后可继续编辑"
+      ],
+      "defects": [
+        "问候语未形成可展示的作品件，仅为草稿"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "页面明示“不产生可信成绩记录”；通过判定只用于本地练习展示"
+      ],
+      "defects": [
+        "无儿童试学，无独立人审，不能作为正式结论"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "沙箱 iframe + Pyodide 0.27.7 真执行，e2e 见证真实运行"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "练习 A 固定用例 + 练习 B 自选输入，均为亲手编写运行"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "e2e 含真实错误与边界反例（语法错、名字错、空白与超长输入）"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "评分只比返回值，多种写法可通过；练习 B 允许任意自选参数"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "未宣称课程已发布；课程 JSON 仍为 detailed_not_published"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "无外部课程、角色、课件或音频素材"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "代码与草稿只存本机浏览器，不上传；L06 只接受虚构昵称"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存重开经 e2e 验证；成绩边界在页面明示非正式考核"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "课程 ID 与 python-lab 路由一致，状态未冒称为已发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "L01：print(\"你好，编程世界\") 真 Pyodide 运行，输出与目标一致（python-lab.spec.ts）",
+    "failureCase": "语法错：print(\"缺失括号\" → SyntaxError 三层提示；初始代码直接运行 → 输出不符目标且练习 B 不计完成",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清可能原因（概念）",
+      "第三层：给出具体做法（动手修复）"
+    ],
+    "practiceA": "练习 A：固定目标输出，真实运行判定",
+    "practiceB": "练习 B：改过初始代码后跑出自己的一句问候语",
+    "equivalentSolutions": [
+      "print 用单引号与双引号均通过（只比输出）",
+      "先定义变量再 print 变量亦通过"
+    ],
+    "saveReopen": "草稿存 kids-python-local-practice-v1:P0-U1-L01，刷新后源码与练习 B 状态恢复（e2e 验证）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/python-lab.spec.ts › TQ-005 first lesson saves its draft and counts only an edited custom greeting as practice B",
+      "apps/web/tests/e2e/python-lab.spec.ts › TQ-005 syntax errors show three ordered hint layers"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学"
+  ]
+}

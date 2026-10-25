@@ -66,6 +66,38 @@ test('fifth Python lesson strips whitespace and handles blank input rather than 
   await expect(page.getByTestId('python-case-2')).toContainText('请输入名字')
 })
 
+test('TQ-005 second practice runs self-chosen arguments and ignores copies of fixed cases', async ({page}) => {
+  test.setTimeout(180_000)
+  await page.goto('/learn/python-lab/P0-U1-L02')
+  await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+  await page.getByTestId('python-multi-source').fill('def introduce(name, hobby):\n    return f"我是{name}，喜欢{hobby}"')
+  await page.getByTestId('python-custom-arg-0').fill('小雨')
+  await page.getByTestId('python-custom-arg-1').fill('画画')
+  await page.getByTestId('python-custom-run').click()
+  await expect(page.getByTestId('python-custom-result')).toContainText('我是小雨，喜欢画画', {timeout:70_000})
+  await expect(page.getByTestId('python-custom-done')).toHaveCount(0)
+  await page.getByTestId('python-custom-arg-1').fill('唱歌')
+  await page.getByTestId('python-custom-run').click()
+  await expect(page.getByTestId('python-custom-result')).toContainText('我是小雨，喜欢唱歌', {timeout:70_000})
+  await expect(page.getByTestId('python-custom-done')).toBeVisible()
+  await page.reload()
+  await expect(page.getByTestId('python-custom-done')).toBeVisible()
+})
+
+test('TQ-005 real NameError shows three ordered hint layers instead of a generic failure', async ({page}) => {
+  test.setTimeout(150_000)
+  await page.goto('/learn/python-lab/P0-U1-L03')
+  await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+  await page.getByTestId('python-multi-source').fill('def weather_line(city, weather):\n    return f"{city}今天{weathr}"')
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-error-hints')).toBeVisible({timeout:70_000})
+  await expect(page.getByTestId('python-error-hints')).toContainText('NameError')
+  await expect(page.getByTestId('python-error-hints')).toContainText('现象：')
+  await expect(page.getByTestId('python-error-hints')).toContainText('可能原因：')
+  await expect(page.getByTestId('python-error-hints')).toContainText('动手修复：')
+  await expect(page.getByTestId('python-multi-passed')).toHaveCount(0)
+})
+
 test('sixth Python capstone executes a real three-input card, rejects bad data, and restores source', async ({page}) => {
   test.setTimeout(180_000)
   await page.goto('/learn/catalog/P0-U1-L06')

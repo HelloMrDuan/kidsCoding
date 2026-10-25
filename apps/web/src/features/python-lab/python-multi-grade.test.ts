@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { gradeMultiCases, pythonPracticeLessons, isMultiPythonLessonId } from './python-multi-grade'
+import { gradeMultiCases, pythonPracticeLessons, isMultiPythonLessonId, isCustomArgsDifferentFromCases } from './python-multi-grade'
+
+describe('TQ-005 practice B custom arguments must differ from every fixed case', () => {
+  it('accepts genuinely new arguments and rejects copies of fixed cases', () => {
+    expect(isCustomArgsDifferentFromCases('P0-U1-L02', ['小雨', '画画'])).toBe(false)
+    expect(isCustomArgsDifferentFromCases('P0-U1-L02', ['小雨', '唱歌'])).toBe(true)
+    expect(isCustomArgsDifferentFromCases('P0-U1-L02', ['小雨'])).toBe(false)
+    expect(isCustomArgsDifferentFromCases('P0-U1-L06', ['  ', '画画', '蓝'])).toBe(false)
+    expect(isCustomArgsDifferentFromCases('P0-U1-L06', ['小云', '画画', '蓝'])).toBe(true)
+  })
+  it('labels one input per function argument for every multi lesson', () => {
+    for (const lesson of Object.values(pythonPracticeLessons)) {
+      expect(lesson.argLabels).toHaveLength(lesson.cases[0].args.length)
+    }
+  })
+})
 
 describe('multi-case real Python practice grading contract', () => {
   it('registers five independent lesson IDs with three or six diverse cases', () => {

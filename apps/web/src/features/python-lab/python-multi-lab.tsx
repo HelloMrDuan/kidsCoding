@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import {gradeMultiCases,pythonPracticeLessons,type MultiPythonLessonId} from './python-multi-grade'
+import {gradeMultiCases,pythonPracticeLessons,isCustomArgsDifferentFromCases,type MultiPythonLessonId} from './python-multi-grade'
+import {pythonHintLayers} from './python-error-hints'
 
 const PREFIX='kids-python-local-practice-v1:'
-type RunMsg={kind:'FRAME_READY'|'LOADED'|'RESULT';id?:number;error?:string|null;cases?:unknown;output?:string}
+type RunMsg={kind:'FRAME_READY'|'LOADED'|'RESULT';id?:number;error?:string|null;cases?:unknown;output?:string;custom?:unknown}
 
 export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   const lesson=pythonPracticeLessons[lessonId]
@@ -18,19 +19,29 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   const [passedCount,setPassedCount]=useState(0)
   const [observed,setObserved]=useState<string[]>([])
   const [status,setStatus]=useState('修改代码后，点击真实 Python 多用例评测。首次运行需要加载引擎。')
+  const [hintLayers,setHintLayers]=useState<[string,string,string]|null>(null)
+  const [customArgs,setCustomArgs]=useState<string[]>(()=>lesson.argLabels.map(()=>''))
+  const [customBusy,setCustomBusy]=useState(false)
+  const [customResult,setCustomResult]=useState<string|null>(null)
+  const [practiceB,setPracticeB]=useState(false)
   const frame=useRef<HTMLIFrameElement>(null)
   const id=useRef(0)
   const active=useRef(false)
   const timeout=useRef<ReturnType<typeof setTimeout>|null>(null)
+  const customId=useRef(0)
+  const customActive=useRef(false)
+  const customTimeout=useRef<ReturnType<typeof setTimeout>|null>(null)
+  const customArgsRef=useRef<string[]>([])
 
   useEffect(()=>{
     const timer=window.setTimeout(()=>{
     try {
       const raw=window.localStorage.getItem(PREFIX+lessonId)
       if(raw) {
-        const draft=JSON.parse(raw) as {source?:string;passed?:boolean;savedAt?:string}
+        const draft=JSON.parse(raw) as {source?:string;passed?:boolean;practiceB?:boolean;savedAt?:string}
         if(typeof draft.source==='string'&&draft.source.length<=5000)setSource(draft.source)
         setPassed(draft.passed===true)
+        setPracticeB(draft.practiceB===true)
         if(typeof draft.savedAt==='string')setSavedAt(draft.savedAt)
       }
     } catch { /* Local storage may be blocked; the editor still works. */ }
@@ -43,16 +54,28 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
     if(!hydrated)return
     try {
       const time=new Date().toISOString()
-      window.localStorage.setItem(PREFIX+lessonId,JSON.stringify({source,passed,savedAt:time}))
+      window.localStorage.setItem(PREFIX+lessonId,JSON.stringify({source,passed,practiceB,savedAt:time}))
       window.setTimeout(()=>setSavedAt(time),0)
     } catch { /* Browser privacy or storage limits may block saving. */ }
-  },[lessonId,source,passed,hydrated])
+  },[lessonId,source,passed,practiceB,hydrated])
 
   useEffect(()=>{
     const probe=window.setInterval(()=>frame.current?.contentWindow?.postMessage({kind:'PING'},'*'),300)
     const listener=(event:MessageEvent<RunMsg>)=>{
       if(event.source!==frame.current?.contentWindow || event.origin!=='null' || !event.data)return
       if(event.data.kind==='FRAME_READY') {clearInterval(probe);setReady(true);return}
+      if(customActive.current&&event.data.id===customId.current){
+        if(event.data.kind==='RESULT'){
+          if(customTimeout.current)clearTimeout(customTimeout.current)
+          customActive.current=false;setCustomBusy(false)
+          if(event.data.error){setCustomResult('引擎错误：'+event.data.error);setHintLayers(pythonHintLayers(event.data.error).layers);return}
+          const value=typeof event.data.custom==='string'?event.data.custom:''
+          setCustomResult(value)
+          if(value.startsWith('ERROR:')){setHintLayers(pythonHintLayers(value).layers)}
+          else if(isCustomArgsDifferentFromCases(lessonId,customArgsRef.current)){setPracticeB(true)}
+        }
+        return
+      }
       if(!active.current||event.data.id!==id.current)return
       if(event.data.kind==='LOADED') {
         setStatus(`Python 已加载，正在对${lesson.cases.length}组不同参数逐一执行……`)
@@ -66,11 +89,16 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
         const verdict=gradeMultiCases(lesson.cases,results,event.data.error??null)
         setPassed(verdict.passed);setPassedCount(verdict.passedCount)
         setStatus(event.data.error?'程序报错：'+event.data.error:verdict.feedback)
+        const firstCaseError=results.find((x):x is string=>typeof x==='string'&&x.startsWith('ERROR:'))
+        if(event.data.error)setHintLayers(pythonHintLayers(event.data.error).layers)
+        else if(firstCaseError)setHintLayers(pythonHintLayers(firstCaseError).layers)
+        else if(!verdict.passed)setHintLayers(pythonHintLayers(null,true).layers)
+        else setHintLayers(null)
       }
     }
     window.addEventListener('message',listener)
-    return ()=>{clearInterval(probe);window.removeEventListener('message',listener);if(timeout.current)clearTimeout(timeout.current);frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*');active.current=false}
-  },[lesson.cases])
+    return ()=>{clearInterval(probe);window.removeEventListener('message',listener);if(timeout.current)clearTimeout(timeout.current);if(customTimeout.current)clearTimeout(customTimeout.current);frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*');active.current=false;customActive.current=false}
+  },[lesson.cases,lessonId])
 
   function run(){
     if(busy||!ready||!frame.current?.contentWindow)return
@@ -81,6 +109,17 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
     setStatus('正在加载 Pyodide 并开始真实多用例运行……')
     timeout.current=setTimeout(()=>{frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*');active.current=false;setBusy(false);setStatus('引擎加载超时，请检查网络。')},35000)
     frame.current.contentWindow.postMessage({kind:'RUN_TESTS',id:id.current,source,tests:lesson.cases.map(t=>({function:t.function,args:[...t.args]}))},'*')
+  }
+  function runCustom(){
+    if(customBusy||!ready||!frame.current?.contentWindow)return
+    if(source.length>5000){setCustomResult('代码超过5000字符，无法运行。');return}
+    if(customArgs.some(a=>a.length>40)){setCustomResult('自选参数每项最多40字。');return}
+    customId.current+=1
+    customActive.current=true
+    customArgsRef.current=[...customArgs]
+    setCustomBusy(true);setCustomResult(null)
+    customTimeout.current=setTimeout(()=>{frame.current?.contentWindow?.postMessage({kind:'STOP',id:customId.current},'*');customActive.current=false;setCustomBusy(false);setCustomResult('引擎加载超时，请检查网络。')},35000)
+    frame.current.contentWindow.postMessage({kind:'RUN_CUSTOM',id:customId.current,source,function:lesson.cases[0].function,args:[...customArgs]},'*')
   }
   return <main className="min-h-screen bg-[linear-gradient(145deg,#eafbf1,#edf6ff_60%,#fff2dc)] px-4 py-7">
     <div className="mx-auto max-w-6xl space-y-5">
@@ -97,7 +136,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
           <textarea id="python-multi-source" data-testid="python-multi-source" value={source} disabled={busy} onChange={event=>{setSource(event.target.value);setPassed(false)}}
             spellCheck={false} className="mt-4 min-h-64 w-full rounded-xl bg-slate-950 p-5 font-mono text-sm leading-7 text-emerald-200 disabled:opacity-50" />
           <div className="mt-4 flex flex-wrap gap-3">
-            <button data-testid="python-multi-run" disabled={!ready||busy} type="button" onClick={run} className="rounded-full bg-emerald-700 px-6 py-3 font-bold text-white disabled:opacity-50">
+            <button data-testid="python-multi-run" disabled={!ready||busy||customBusy} type="button" onClick={run} className="rounded-full bg-emerald-700 px-6 py-3 font-bold text-white disabled:opacity-50">
               {busy?'运行中…':`▶ 运行${lesson.cases.length}组测试`}
             </button>
             <button type="button" onClick={()=>{setSource(lesson.startCode);setPassed(false);setObserved([]);setStatus('已重置编辑区。')}} className="rounded-full bg-slate-100 px-6 py-3 font-bold">恢复初始代码</button>
@@ -126,8 +165,29 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
             </section>
           ) : null}
           <p className="mt-4 text-sm text-slate-500">提示：{lesson.hint}</p>
+          {hintLayers?<div data-testid="python-error-hints" className="mt-4 space-y-2 rounded-xl bg-amber-50 p-4 text-sm leading-7">
+            <p className="font-black text-amber-900">三层错因提示（按顺序看）</p>
+            {hintLayers.map((line,index)=><p key={index} className="text-slate-700">{line}</p>)}
+          </div>:null}
         </section>
       </div>
+      <section className="rounded-[2rem] bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-black">3 · 练习 B：自选输入实验</h2>
+        <p className="mt-2 text-sm leading-7 text-slate-600">换一组固定用例里没有的参数，让同一个函数真实跑一次，观察输出怎么变。这个练习只练观察，不评分、不产生正式成绩。</p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          {lesson.argLabels.map((label,index)=>(
+            <label key={index} className="text-sm font-bold text-slate-700">{label}
+              <input data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
+                className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal" />
+            </label>
+          ))}
+          <button data-testid="python-custom-run" disabled={!ready||customBusy||busy} type="button" onClick={runCustom} className="rounded-full bg-sky-700 px-6 py-2 font-bold text-white disabled:opacity-50">
+            {customBusy?'运行中…':'▶ 用自选参数运行'}
+          </button>
+        </div>
+        {customResult!==null?<p data-testid="python-custom-result" className="mt-4 rounded-xl bg-sky-50 p-4 text-sm leading-7 whitespace-pre-wrap">{customResult}</p>:null}
+        {practiceB?<p data-testid="python-custom-done" className="mt-3 rounded-xl bg-emerald-50 p-4 font-black text-emerald-800">⭐ 练习 B 已完成：你用固定用例以外的一组参数真实跑通过一次。</p>:null}
+      </section>
       <iframe ref={frame} src="/python-lab-sandbox.html" sandbox="allow-scripts" title="隔离的多题Python评测执行器" className="hidden" aria-hidden="true" tabIndex={-1}/>
     </div>
   </main>

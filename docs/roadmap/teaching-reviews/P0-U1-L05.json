@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "P0-U1-L05",
+  "reviewedCommit": "c972cc24447ab3108d9c5cb0a3bb43f23f1daaf9",
+  "reviewedAt": "2026-10-25",
+  "reviewer": "kid小宝（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "P0 Python 入门",
+  "prerequisites": [],
+  "newConcepts": [
+    "strip 去空白",
+    "空值分支"
+  ],
+  "references": [],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "详案 learningSteps 含预测/拆解/编码/调试四步，与 09 门禁闭环对应"
+      ],
+      "defects": [
+        "新概念密度仍以单课 1～2 个为限"
+      ]
+    },
+    "story": {
+      "score": 12,
+      "evidence": [
+        "详案情境贯穿（见 track-p0-detailed-lessons-v1.json 对应课）"
+      ],
+      "defects": [
+        "故事主要在详案文字中，实验室页本身情境较薄"
+      ]
+    },
+    "practice": {
+      "score": 21,
+      "evidence": [
+        "练习 A：greet_name 三组含首尾空格与全空白；练习 B：自选参数真实调用"
+      ],
+      "defects": []
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "固定用例逐组实际 vs 目标对照；运行错误与单组抛错均进三层提示（现象→原因→修复）"
+      ],
+      "defects": [
+        "三层提示为按错误类型通用文本，未针对每课单列专属诊断"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "练习 B 自选名字/称呼组合；草稿进本机作品夹，可继续编辑"
+      ],
+      "defects": []
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "页面明示“不是可信的正式考核成绩”；草稿注释“not an authenticated grade”"
+      ],
+      "defects": [
+        "无儿童试学，无独立人审，不能作为正式结论"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "沙箱 iframe + Pyodide 0.27.7 真执行，e2e 见证真实运行"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "练习 A 固定用例 + 练习 B 自选输入，均为亲手编写运行"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "e2e 含真实错误与边界反例（语法错、名字错、空白与超长输入）"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "评分只比返回值，多种写法可通过；练习 B 允许任意自选参数"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "未宣称课程已发布；课程 JSON 仍为 detailed_not_published"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "无外部课程、角色、课件或音频素材"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "代码与草稿只存本机浏览器，不上传；L06 只接受虚构昵称"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存重开经 e2e 验证；成绩边界在页面明示非正式考核"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "课程 ID 与 python-lab 路由一致，状态未冒称为已发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "L05：greet_name 三组用例真运行 3/3，含全空白返回“请输入名字”（python-multi.spec.ts）",
+    "failureCase": "不处理空白 → 全空白用例失败；不 strip → 带空格名字原样输出失败",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清可能原因（概念）",
+      "第三层：给出具体做法（动手修复）"
+    ],
+    "practiceA": "练习 A：固定用例多组不同参数真运行",
+    "practiceB": "练习 B：自选一组固定用例以外的参数真实调用同一函数并观察结果（照抄固定用例不计完成）",
+    "equivalentSolutions": [
+      "f-string 与 + 拼接两种写法返回值相同即可通过（评分只比返回值）",
+      "先定义中间变量与直接返回表达式均可通过"
+    ],
+    "saveReopen": "草稿存 kids-python-local-practice-v1:<课 ID>，与 L02/L06 同一代码路径；L02/L06 的刷新恢复与作品夹往返经 e2e 验证",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/python-multi.spec.ts › TQ-005 second practice runs self-chosen arguments and ignores copies of fixed cases",
+      "apps/web/tests/e2e/python-multi.spec.ts › TQ-005 real NameError shows three ordered hint layers instead of a generic failure"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学"
+  ]
+}
