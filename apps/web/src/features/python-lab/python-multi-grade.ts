@@ -4,6 +4,7 @@ export const pythonPracticeLessons = {
   'P0-U1-L02': {
     title: '第2课 · 让程序自我介绍',
     prompt: '编写 introduce(name, hobby) 函数。无论名字和爱好如何变化，都要返回“我是{name}，喜欢{hobby}”。',
+    argLabels: ['名字', '爱好'],
     startCode: 'def introduce(name, hobby):\n    # 试着组合变量，返回自我介绍\n    return "待完成"',
     cases: [
       { function: 'introduce', args: ['小雨', '画画'], expected: '我是小雨，喜欢画画' },
@@ -15,6 +16,7 @@ export const pythonPracticeLessons = {
   'P0-U1-L03': {
     title: '第3课 · 文字拼接小助手',
     prompt: '编写 weather_line(city, weather) 函数。把不同城市和天气组合成“城市今天天气”。',
+    argLabels: ['城市', '天气'],
     startCode: 'def weather_line(city, weather):\n    # 使用 f-string 拼接文字\n    return city',
     cases: [
       { function: 'weather_line', args: ['北京', '晴'], expected: '北京今天晴' },
@@ -27,6 +29,7 @@ export const pythonPracticeLessons = {
   'P0-U1-L04': {
     title: '第4课 · 数字和字符串',
     prompt: '编写 number_or_text(left, right) 函数。两个参数是数字字符串，要分别计算整数加法和原字符串拼接，返回“相加=结果；拼接=结果”。注意数字 0 和前导 0。',
+    argLabels: ['左边的数', '右边的数'],
     startCode: 'def number_or_text(left, right):\n    # 数字字符串不能直接当整数相加\n    return left + right',
     cases: [
       { function: 'number_or_text', args: ['1', '1'], expected: '相加=2；拼接=11' },
@@ -38,6 +41,7 @@ export const pythonPracticeLessons = {
   'P0-U1-L05': {
     title: '第5课 · 输入你的名字',
     prompt: '编写 greet_name(name, prefix) 函数。先清除名字首尾空格，再返回“称呼，姓名”；如果名字只有空格，就返回“请输入名字”。',
+    argLabels: ['名字', '称呼'],
     startCode: 'def greet_name(name, prefix):\n    # 清理姓名，注意空白输入\n    return prefix + "，" + name',
     cases: [
       { function: 'greet_name', args: [' 小明 ', '你好'], expected: '你好，小明' },
@@ -49,6 +53,7 @@ export const pythonPracticeLessons = {
   'P0-U1-L06': {
     title: '第6课 · 制作个人名片生成器',
     prompt: '单元作品：编写 make_profile(nickname, hobby, color)，返回三行兴趣名片（昵称、爱好、喜欢的颜色）。去除每项首尾空格，空值、超过20字、包含换行或制表符时抛出 ValueError。请只填写虚构昵称，不填真实姓名、电话或住址。',
+    argLabels: ['昵称（请用虚构名字）', '爱好', '喜欢的颜色'],
     startCode: 'def make_profile(nickname, hobby, color):\n    # 先验证三个字段，再用换行拼接成名片\n    return "待完成"',
     cases: [
           {
@@ -108,11 +113,24 @@ export const pythonPracticeLessons = {
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
   },
-} as const satisfies Record<string, {title:string; prompt:string; startCode:string; cases: readonly PythonCase[]; hint:string}>
+} as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
 export type MultiPythonLessonId = keyof typeof pythonPracticeLessons
 export function isMultiPythonLessonId(id: string): id is MultiPythonLessonId {
   return Object.prototype.hasOwnProperty.call(pythonPracticeLessons, id)
+}
+
+/**
+ * TQ-005 练习 B 的完成判定：自选参数必须与全部固定用例都不同。
+ * 照抄某一组固定用例再跑一次不算“换参数练习”，只算重复运行。
+ */
+export function isCustomArgsDifferentFromCases(
+  lessonId: MultiPythonLessonId,
+  args: readonly string[],
+): boolean {
+  const lesson = pythonPracticeLessons[lessonId]
+  if (args.length !== lesson.cases[0].args.length) return false
+  return lesson.cases.every(test => JSON.stringify([...test.args]) !== JSON.stringify([...args]))
 }
 
 export function gradeMultiCases(

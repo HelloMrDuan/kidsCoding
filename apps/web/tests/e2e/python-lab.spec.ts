@@ -17,6 +17,34 @@ test('real Pyodide evaluates the first Python lesson, then corrects a failure', 
   await expect(page.getByTestId('python-output')).toHaveText('你好，编程世界')
 })
 
+test('TQ-005 first lesson saves its draft and counts only an edited custom greeting as practice B', async ({ page }) => {
+  test.setTimeout(180_000)
+  await page.goto('/learn/python-lab/P0-U1-L01')
+  await expect(page.getByTestId('python-run')).toBeEnabled({timeout:15_000})
+  await page.getByTestId('python-run').click()
+  await expect(page.getByTestId('python-output')).toHaveText('请把我改成正确的问候语', {timeout:70_000})
+  await expect(page.getByTestId('python-trial-custom-done')).toHaveCount(0)
+  await page.getByTestId('python-source').fill('print("你好，小伙伴")')
+  await page.getByTestId('python-run').click()
+  await expect(page.getByTestId('python-trial-custom-done')).toBeVisible({timeout:70_000})
+  await expect(page.getByTestId('python-local-save')).toContainText('已在本机保存')
+  await page.reload()
+  await expect(page.getByTestId('python-source')).toHaveValue('print("你好，小伙伴")')
+  await expect(page.getByTestId('python-trial-custom-done')).toBeVisible()
+})
+
+test('TQ-005 syntax errors show three ordered hint layers', async ({ page }) => {
+  test.setTimeout(120_000)
+  await page.goto('/learn/python-lab/P0-U1-L01')
+  await expect(page.getByTestId('python-run')).toBeEnabled({timeout:15_000})
+  await page.getByTestId('python-source').fill('print("缺失括号"')
+  await page.getByTestId('python-run').click()
+  await expect(page.getByTestId('python-error-hints')).toBeVisible({timeout:70_000})
+  await expect(page.getByTestId('python-error-hints')).toContainText('SyntaxError')
+  await expect(page.getByTestId('python-error-hints')).toContainText('动手修复：')
+  await expect(page.getByTestId('python-passed')).toHaveCount(0)
+})
+
 test('Python syntax errors cannot pass output assessment', async ({ page }) => {
   test.setTimeout(120_000)
   await page.goto('/learn/python-lab/P0-U1-L01')
