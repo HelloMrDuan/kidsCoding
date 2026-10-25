@@ -417,7 +417,7 @@
       "title": "G3 Scratch流星课程教研复核",
       "priority": "P1",
       "category": "TQ",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "TQ-001"
       ],

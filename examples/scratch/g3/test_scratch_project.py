@@ -27,6 +27,9 @@ class ScratchProjectStructureTests(unittest.TestCase):
         self.assertEqual(blocks["clone_flag"]["opcode"],"control_start_as_clone")
         self.assertEqual(blocks["delete"]["opcode"],"control_delete_this_clone")
         self.assertEqual(blocks["move_y"]["next"],"move_pause")
+        # Spawn interval must match the lesson text (G3-U1-L02: every 0.3s)
+        # and the shipped sample; all three were aligned by TQ-006.
+        self.assertEqual(blocks["wait"]["inputs"]["DURATION"],[1,[4,"0.3"]])
         self.assertEqual(blocks["move_pause"]["opcode"],"control_wait")
         self.assertEqual(blocks["move_pause"]["inputs"]["DURATION"],[1,[4,"0.05"]])
         for name,block in blocks.items():
@@ -43,6 +46,7 @@ class ScratchProjectStructureTests(unittest.TestCase):
         pause = blocks[movement["next"]]
         self.assertEqual(pause["opcode"],"control_wait")
         self.assertEqual(pause["inputs"]["DURATION"],[1,[4,"0.05"]])
+        self.assertEqual(blocks["wait"]["inputs"]["DURATION"],[1,[4,"0.3"]])
         self.assertEqual(blocks["delete"]["opcode"],"control_delete_this_clone")
 
     def test_sb3_is_complete_zip(self):

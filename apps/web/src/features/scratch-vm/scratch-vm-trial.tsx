@@ -24,7 +24,12 @@ export function ScratchVMTrial() {
   const [cloudStatus,setCloudStatus] = useState('云端保存需要登录。仅在你手动点击时读写自己的账号，不保存正式成绩。')
   const [draftStatus,setDraftStatus] = useState('本机作品还未自动保存；修改积木后点击“应用”即可自动保存。')
   const [editorRevision,setEditorRevision] = useState(0)
-  const [editorSeed,setEditorSeed] = useState<MeteorProgram>({spawnCount:10,fallStep:13})
+  const [editorSeed,setEditorSeed] = useState<MeteorProgram>({spawnCount:10,fallStep:13,interval:0.3})
+  const [retrying,setRetrying] = useState(false)
+  const [loadFailed,setLoadFailed] = useState(false)
+  const retrySavedRef = useRef(false)
+  const savedFailedRef = useRef(false)
+  const vmAvailableRef = useRef(false)
   const [exportDetails,setExportDetails] = useState('尚未导出项目。')
   const seenClones = useRef<Set<string>>(new Set())
   const [status, setStatus] = useState('正在加载 Scratch VM，请稍候……')
@@ -62,20 +67,24 @@ export function ScratchVMTrial() {
           frame.current?.contentWindow?.postMessage({kind:'LOAD',id:id.current,archive:saved,source:'saved'},'*',[saved])
         }else await loadOriginal()
       }catch(error){
-        if(!destroyed)setStatus('项目加载失败：'+String(error))
+        if(!destroyed){setLoadFailed(true);setStatus('项目加载失败：'+String(error))}
       }
     }
     const listener = (event: MessageEvent<VMMessage>) => {
       if(event.source!==frame.current?.contentWindow || event.origin!=='null' || !event.data)return
       const msg=event.data
       if(msg.kind==='FRAME_READY' && !loaded) {
+        vmAvailableRef.current=!!msg.available
         if(msg.available)void start()
-        else setStatus('Scratch VM 下载失败，请检查 jsDelivr。')
+        else {setLoadFailed(true);setStatus('Scratch VM 下载失败，请检查 jsDelivr。')}
         return
       }
       if(msg.id!==id.current)return
       if(msg.kind==='PROJECT_LOADED') {
         setLoaded(true)
+        setLoadFailed(false)
+        setRetrying(false)
+        retrySavedRef.current=false
         setImporting(false)
         loadingSaved=false
         setApplied(msg.program??null)
@@ -157,7 +166,7 @@ export function ScratchVMTrial() {
         anchor.click()
         anchor.remove()
         window.setTimeout(()=>URL.revokeObjectURL(url),5_000)
-        setExportDetails('Scratch VM 已导出并在独立 VM 重新载入验证：'+msg.program?.spawnCount+'颗 / 每步'+msg.program?.fallStep)
+        setExportDetails('Scratch VM 已导出并在独立 VM 重新载入验证：'+msg.program?.spawnCount+'颗 / 每步'+msg.program?.fallStep+' / 每'+msg.program?.interval+'秒')
         setStatus('作品已从真实 Scratch VM 导出为 .sb3，可以用兼容 Scratch 3 的编辑器打开。')
       } else if(msg.kind==='STARTED') {
         vmRunning.current=true
@@ -175,11 +184,26 @@ export function ScratchVMTrial() {
         setExporting(false)
         setImporting(false)
         setSaving(false)
-        if(loadingSaved){
+        setLoadFailed(true)
+        if(retrySavedRef.current){
+          retrySavedRef.current=false
+          savedFailedRef.current=true
+          setDraftStatus('本机旧草稿不兼容，正在恢复课程示例；原文件未自动上传。')
+          void (async()=>{
+            try{
+              const response=await fetch('/scratch-samples/meteor-clones.sb3',{cache:'no-store'})
+              if(!response.ok)throw new Error('没有找到示例 .sb3')
+              const archive=await response.arrayBuffer()
+              id.current+=1
+              frame.current?.contentWindow?.postMessage({kind:'LOAD',id:id.current,archive,source:'sample'},'*',[archive])
+            }catch(error){setRetrying(false);setStatus('项目加载失败：'+String(error))}
+          })()
+        }else if(loadingSaved){
           loadingSaved=false
           setDraftStatus('本机旧草稿不兼容，正在恢复课程示例；原文件未自动上传。')
           void loadOriginal().catch(error=>setStatus('恢复课程示例失败：'+String(error)))
         }else{
+          setRetrying(false)
           setStatus(msg.error??'Scratch VM 执行失败')
         }
       }
@@ -197,7 +221,7 @@ export function ScratchVMTrial() {
   const changeProgram = useCallback((value:MeteorProgram|null)=>setDraft(value),[])
   async function saveToCloud() {
     if(cloudBusy||saving||running||exporting||importing||!draft||!applied||
-      applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep)return
+      applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep||applied.interval!==draft.interval)return
     setCloudBusy(true)
     setCloudStatus('正在把当前 Scratch .sb3 保存到登录账号……')
     try {
@@ -235,6 +259,34 @@ export function ScratchVMTrial() {
       setCloudStatus('已获取账号私有项目，正在交由真实 Scratch VM 校验……')
     }catch(error){setCloudStatus(String(error))}
     finally{setCloudBusy(false)}
+  }
+  async function retryLoad() {
+    if(retrying||loaded||!frame.current?.contentWindow)return
+    // A failed CDN script never appears by re-posting LOAD; only a fresh
+    // iframe document re-fetches it, so that case reloads the page instead.
+    // (Local drafts live in IndexedDB and survive the reload.)
+    if(!vmAvailableRef.current){window.location.reload();return}
+    setRetrying(true)
+    setStatus('正在重试加载 Scratch VM，请稍候……')
+    try{
+      let saved:ArrayBuffer|null=null
+      try{saved=await readScratchDraft()}catch{ /* Browsers can deny local IndexedDB; sample still loads. */ }
+      if(saved && !savedFailedRef.current){
+        retrySavedRef.current=true
+        id.current+=1
+        frame.current.contentWindow.postMessage({kind:'LOAD',id:id.current,archive:saved,source:'saved'},'*',[saved])
+      }else{
+        const response=await fetch('/scratch-samples/meteor-clones.sb3',{cache:'no-store'})
+        if(!response.ok)throw new Error('没有找到示例 .sb3')
+        const archive=await response.arrayBuffer()
+        id.current+=1
+        frame.current.contentWindow.postMessage({kind:'LOAD',id:id.current,archive,source:'sample'},'*',[archive])
+      }
+    }catch(error){
+      setRetrying(false)
+      setLoadFailed(true)
+      setStatus('项目加载失败：'+String(error))
+    }
   }
   async function resetOriginal() {
     if(running||exporting||importing||saving||cloudBusy)return
@@ -283,8 +335,14 @@ export function ScratchVMTrial() {
         <header className="rounded-[2rem] bg-white p-7 shadow-sm">
           <p className="text-sm font-extrabold text-indigo-700">Scratch VM 实验室 · 官方运行引擎试用</p>
           <h1 className="mt-3 text-3xl font-black">流星分身雨</h1>
-          <p className="mt-3 text-slate-600">拖动积木，改变生成数量和下落步长，写入真正的 Scratch VM 后观察流星分身运行。</p>
+          <p className="mt-3 text-slate-600">拖动积木，改变生成数量、下落步长和生成间隔，写入真正的 Scratch VM 后观察流星分身运行。</p>
           <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；可下载或重新导入 .sb3；应用积木后本机自动保存真正的 .sb3，云端保存需登录后主动点击，不保存正式成绩、不开放其他 Scratch 课程。</p>
+          <ul data-testid="scratch-limitations" className="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-600">
+            <li>只能改三个数字：生成数量（1～15 颗）、下落步长（5～25）、生成间隔（0.1～1.0 秒，步长 0.1 秒）。</li>
+            <li>不能新增角色、造型、音效、新积木或变量；不能改分身下落到底部后删除的规则。</li>
+            <li>“生成间隔随时间递减”需要变量与循环逻辑，完整 Scratch 编辑器才能做，本实验不支持；导出的 .sb3 可用兼容 Scratch 3 的编辑器继续改造。</li>
+            <li>舞台只按 VM 坐标画简化图标，没有接 Scratch WebGL 渲染器；加载失败时点“重新加载”可重试，失败不会覆盖已保存的作品。</li>
+          </ul>
         </header>
         <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <section className="rounded-[2rem] bg-white p-5 shadow-sm">
@@ -304,12 +362,17 @@ export function ScratchVMTrial() {
               <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||exporting||importing||saving||cloudBusy||!draft}
                 className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{if(draft){setApplied(null);frame.current?.contentWindow?.postMessage({kind:'CONFIGURE',id:id.current,program:draft},'*')}}}>应用积木到 VM</button>
-              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||cloudBusy||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+              {!loaded&&loadFailed&&(
+                <button data-testid="scratch-retry-load" type="button" disabled={retrying}
+                  className="rounded-full bg-rose-600 px-6 py-3 font-bold text-white disabled:opacity-40"
+                  onClick={()=>void retryLoad()}>{retrying?'重新加载中…':'↻ 重新加载'}</button>
+              )}
+              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||cloudBusy||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep||applied.interval!==draft.interval}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();seenClones.current.clear();setCreatedTotal(0);setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
                 ▶ 绿旗运行
               </button>
-              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||cloudBusy||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||cloudBusy||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep||applied.interval!==draft.interval}
                 className="rounded-full bg-amber-100 px-6 py-3 font-bold text-amber-950 disabled:opacity-40"
                 onClick={()=>{setExporting(true);setExportDetails('正在由真实 Scratch VM 打包，并重新载入检查……');frame.current?.contentWindow?.postMessage({kind:'EXPORT',id:id.current},'*')}}>
                 {exporting?'导出中…':'↓ 保存为 .sb3'}
@@ -321,7 +384,7 @@ export function ScratchVMTrial() {
               </label>
               <button data-testid="scratch-cloud-save" type="button"
                 disabled={!loaded||!applied||!draft||saving||running||importing||exporting||cloudBusy||
-                  applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep}
+                  applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep||applied.interval!==draft.interval}
                 className="rounded-full bg-violet-700 px-6 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>void saveToCloud()}>保存到我的账号</button>
               <button data-testid="scratch-cloud-restore" type="button"
@@ -342,7 +405,7 @@ export function ScratchVMTrial() {
             <p data-testid="scratch-export-status" className="mt-5 text-sm text-indigo-700">{exportDetails}</p>
             <p data-testid="scratch-local-save-status" className="mt-3 text-sm text-emerald-800">{draftStatus}</p>
             <p data-testid="scratch-cloud-status" className="mt-3 text-sm text-violet-800">{cloudStatus}</p>
-            <p className="mt-5 text-sm">已应用 VM 积木：<strong data-testid="scratch-applied-program">{applied?`${applied.spawnCount}颗 / 每步${applied.fallStep}`:'等待应用'}</strong></p>
+            <p className="mt-5 text-sm">已应用 VM 积木：<strong data-testid="scratch-applied-program">{applied?`${applied.spawnCount}颗 / 每步${applied.fallStep} / 每${applied.interval}秒`:'等待应用'}</strong></p>
             <p className="mt-2 text-sm">本轮 VM 实际创建分身总数：<strong data-testid="scratch-created-total">{createdTotal}</strong></p>
             <p className="mt-5 text-sm">正在运行：<strong>{running?'是':'否'}</strong></p>
             <p className="mt-2 text-sm">实际可见流星分身：<strong data-testid="scratch-live-clones">{clones.length}</strong></p>
