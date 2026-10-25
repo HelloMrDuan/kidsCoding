@@ -1,0 +1,16 @@
+<!-- KidsCoding original artwork (UX-004). License: original, this project. Source: character-art.tsx V2 stage art, extracted verbatim; graduation-island drawn in the same style. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110" role="img" aria-label="小蝴蝶">
+<ellipse cx="50" cy="104" rx="18" ry="4" fill="#305a43" opacity=".18" />
+<path d="M46 46 Q16 6 6 32 Q2 56 44 54Z" fill="#b48cff" stroke="#6a45c2" stroke-width="3" stroke-linejoin="round" />
+<path d="M54 46 Q84 6 94 32 Q98 56 56 54Z" fill="#b48cff" stroke="#6a45c2" stroke-width="3" stroke-linejoin="round" />
+<path d="M45 58 Q12 60 18 82 Q28 94 46 64Z" fill="#ff9cc8" stroke="#c4528a" stroke-width="3" stroke-linejoin="round" />
+<path d="M55 58 Q88 60 82 82 Q72 94 54 64Z" fill="#ff9cc8" stroke="#c4528a" stroke-width="3" stroke-linejoin="round" />
+<circle cx="22" cy="32" r="6" fill="#fff" opacity=".75" /><circle cx="78" cy="32" r="6" fill="#fff" opacity=".75" />
+<circle cx="28" cy="76" r="4" fill="#fff6a8" /><circle cx="72" cy="76" r="4" fill="#fff6a8" />
+<rect x="44" y="44" width="12" height="44" rx="6" fill="#4a3a78" />
+<circle cx="50" cy="36" r="13" fill="#5a4790" />
+<path d="M45 25 Q40 10 33 10 M55 25 Q60 10 67 10" fill="none" stroke="#4a3a78" stroke-width="2.6" stroke-linecap="round" />
+<circle cx="33" cy="10" r="3" fill="#ffd34d" /><circle cx="67" cy="10" r="3" fill="#ffd34d" />
+<ellipse cx="45" cy="35" rx="5.6" ry="6.8" fill="#fff" /><ellipse cx="55" cy="35" rx="5.6" ry="6.8" fill="#fff" /><circle cx="46.8" cy="32.4" r="2.2" fill="#fff" /><circle cx="56.8" cy="32.4" r="2.2" fill="#fff" /><circle cx="43.4" cy="37.4" r="1" fill="#fff" opacity=".8" /><circle cx="53.4" cy="37.4" r="1" fill="#fff" opacity=".8" />
+<path d="M46 42 Q50 45 54 42" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" />
+</svg>

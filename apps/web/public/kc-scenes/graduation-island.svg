@@ -1,0 +1,37 @@
+<!-- KidsCoding original artwork (UX-004). License: original, this project. Source: character-art.tsx V2 stage art, extracted verbatim; graduation-island drawn in the same style. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" preserveAspectRatio="none" role="img" aria-label="毕业岛">
+<defs>
+<linearGradient id="kc-sky-island" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe3ff" /><stop offset="1" stop-color="#fff3d6" /></linearGradient>
+<linearGradient id="kc-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ee" /><stop offset="1" stop-color="#4aa3dd" /></linearGradient>
+</defs>
+<rect width="400" height="240" fill="url(#kc-sky-island)" />
+<circle cx="52" cy="42" r="20" fill="#ffe27a" opacity=".55" />
+<circle cx="52" cy="42" r="14" fill="#ffd84a" />
+<ellipse cx="250" cy="34" rx="34" ry="8" fill="#fff" opacity=".8" />
+<ellipse cx="330" cy="26" rx="22" ry="7" fill="#fff" opacity=".7" />
+<rect y="150" width="400" height="90" fill="url(#kc-sea)" />
+<path d="M0 168 Q80 160 160 168 Q260 176 400 164 V180 H0Z" fill="#fff" opacity=".25" />
+<path d="M0 196 Q100 188 200 196 Q300 204 400 192 V210 H0Z" fill="#fff" opacity=".22" />
+<ellipse cx="200" cy="196" rx="118" ry="30" fill="#f6dd9e" />
+<ellipse cx="200" cy="190" rx="96" ry="22" fill="#ffe9ad" />
+<path d="M150 176 Q170 150 200 150 Q232 150 250 176 Q220 166 200 166 Q180 166 150 176Z" fill="#8fce7e" />
+<path d="M186 168 L186 118" stroke="#8b5a36" stroke-width="3" stroke-linecap="round" />
+<path d="M186 118 L228 128 L186 140Z" fill="#2463eb" />
+<path d="M120 176 L120 128" stroke="#8b5a36" stroke-width="2.4" stroke-linecap="round" />
+<path d="M120 128 L152 134 L120 142Z" fill="#ff9a3c" />
+<g>
+<path d="M150 176 H250" stroke="#8b5a36" stroke-width="3" stroke-linecap="round" />
+<path d="M150 176 L150 168 M175 176 L175 166 M200 176 L200 166 M225 176 L225 168 M250 176 L250 168" stroke="#8b5a36" stroke-width="2.4" stroke-linecap="round" />
+<path d="M150 166 L175 166 L162 178Z" fill="#ff8fb1" />
+<path d="M175 166 L200 166 L187 178Z" fill="#ffd84a" />
+<path d="M200 166 L225 166 L212 178Z" fill="#7cc4ee" />
+<path d="M225 166 L250 166 L237 178Z" fill="#b48cff" />
+</g>
+<g transform="translate(258 150)">
+<path d="M-26 -8 L26 -8 L0 12Z" fill="#152238" />
+<ellipse cx="0" cy="12" rx="20" ry="6" fill="#152238" />
+<path d="M22 0 Q34 10 30 26" fill="none" stroke="#ffd84a" stroke-width="2" stroke-linecap="round" />
+<circle cx="30" cy="28" r="4" fill="#ffd84a" />
+</g>
+<g transform="translate(96 186)"><path d="M0 0 V9.00" stroke="#4f9a55" stroke-width="1.4" stroke-linecap="round" /><circle cx="3.00" cy="0.00" r="2.40" fill="#ff8fb1" /><circle cx="0.93" cy="2.85" r="2.40" fill="#ff8fb1" /><circle cx="-2.43" cy="1.76" r="2.40" fill="#ff8fb1" /><circle cx="-2.43" cy="-1.76" r="2.40" fill="#ff8fb1" /><circle cx="0.93" cy="-2.85" r="2.40" fill="#ff8fb1" /><circle r="1.86" fill="#ffd84a" /></g><g transform="translate(312 188)"><path d="M0 0 V7.80" stroke="#4f9a55" stroke-width="1.4" stroke-linecap="round" /><circle cx="2.60" cy="0.00" r="2.08" fill="#ffd36b" /><circle cx="0.80" cy="2.47" r="2.08" fill="#ffd36b" /><circle cx="-2.10" cy="1.53" r="2.08" fill="#ffd36b" /><circle cx="-2.10" cy="-1.53" r="2.08" fill="#ffd36b" /><circle cx="0.80" cy="-2.47" r="2.08" fill="#ffd36b" /><circle r="1.61" fill="#ffd84a" /></g>
+</svg>
