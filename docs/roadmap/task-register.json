@@ -903,7 +903,7 @@
       "title": "原创四世界插画资产规范与接入",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-001"
       ],
@@ -913,10 +913,14 @@
         "许可台账/低带宽降级"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/140",
+        "mergeCommit": "63370e4ef3c4e697c40c97bc962a617bfca9d999",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40189694483",
+        "tests": [
+          "kc-scenes register test 5/5 local (acceptance set, ledger/file parity, SVG viewBox, 15KB budget, v1-ledger coverage)",
+          "PR CI all green after fix: curriculum 40188321396, deploy 40188321392, task-tracking 40188321431 (gate pass 17 success + 3 skipped)",
+          "7 SVGs rendered in local real Chromium and visually verified; scripts/check-task-ledger.py local simulation passes on closeout tree"
+        ],
         "reviewer": null
       },
       "notes": ""
