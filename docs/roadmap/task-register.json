@@ -1603,7 +1603,7 @@
       "title": "Scratch VM真实舞台工作台布局",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-002"
       ],
@@ -1613,10 +1613,10 @@
         "受限实验标注准确，PC/手机"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/148",
+        "mergeCommit": "6d38ef84ad6a8369a515ced39dcc9eca06124617",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40324387304",
+        "tests": ["e2e local: scratch-workbench-ux401 4 passed + 2 project-applicability skips (desktop+mobile); workbench domains/labels visible at 1440/768/375, zero horizontal overflow, mobile tap chain green-flag→clones→move→delete→stop; 3-breakpoint screenshots kept"],
         "reviewer": null
       },
       "notes": ""
@@ -1626,7 +1626,7 @@
       "title": "Scratch角色素材代码自由编辑",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-401"
       ],
@@ -1636,10 +1636,10 @@
         "不伪装完整Scratch"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/148",
+        "mergeCommit": "6d38ef84ad6a8369a515ced39dcc9eca06124617",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40324387304",
+        "tests": ["e2e local: scratch-characters-ux402 15 passed + 1 skip (desktop+mobile); dual-character sample, character area, per-character programs and separate runs, 4 illegal fixtures refused with reasons, single-character old project compatible; helper vitest scratch-character-stats 5/5; old scratch-vm.spec.ts 8 assertions updated to dual-character totals"],
         "reviewer": null
       },
       "notes": ""
@@ -1649,7 +1649,7 @@
       "title": "Scratch真VM导入导出与国内网络回归",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-402"
       ],
@@ -1658,10 +1658,10 @@
         "实际VM反复绿旗、清克隆、损坏sb3、项目恢复和资源可达性有证据"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/148",
+        "mergeCommit": "6d38ef84ad6a8369a515ced39dcc9eca06124617",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40324387304",
+        "tests": ["e2e local: scratch-vm-regression-ux403 3 tests (green flag x3 with fresh counts, run-after-refusal recovery, CDN reachability recorded as observed: cdn-unreachable branch locally, failure state shown); old scratch-vm.spec.ts 18/20, 2 failures are the export filename assertion proven environmental (minimal blob-download probe yields 'download' in sandbox browsers; app download code byte-identical to main; CI authoritative); full vitest 136 files 815 tests all green"],
         "reviewer": null
       },
       "notes": ""
