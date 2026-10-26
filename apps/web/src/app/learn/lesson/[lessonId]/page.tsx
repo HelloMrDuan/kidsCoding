@@ -193,11 +193,12 @@ export default function LessonPage() {
       // next step. Only a saved draft should override the in-progress blocks.
       // TQ-010: a designed mistake step opens on its pre-built wrong program.
       const nextMistake = lessonId ? getMistakeStepAt(lessonId, nextStepIndex) : undefined
-      const openMistake = Boolean(nextMistake && !(draft && draft.blocks.length > 0))
       const nextBlocks =
         draft && draft.blocks.length > 0 ? draft.blocks : nextMistake ? nextMistake.wrongProgram : blocksRef.current
-      // Save the pre-built program as this step's draft, so a reload resumes at the experiment.
-      if (openMistake && lessonId) saveLessonDraft(lessonId, nextStepIndex, nextBlocks)
+      // UX-502: persist the carried program as the new step's draft, so a
+      // reload resumes at the new step instead of restarting at step 0.
+      // This also covers the mistake-step pre-built program case.
+      if (lessonId) saveLessonDraft(lessonId, nextStepIndex, nextBlocks)
       blocksRef.current = nextBlocks
       setBlocks(nextBlocks)
       setStepIndex(nextStepIndex)

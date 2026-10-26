@@ -362,6 +362,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .kc-lesson-grid { display: block; padding: 8px; }
   .kc-lesson-grid .kc-lesson-col { display: none; min-height: 500px; }
   .kc-lesson-grid .kc-lesson-col.kc-mobile-visible { display: flex; }
+  /* UX-205: Run / Next stay reachable at the bottom on phones, including
+     when the soft keyboard shrinks the viewport. Desktop rules untouched. */
+  .kc-lesson-footer { position: sticky; bottom: 0; }
+  .kc-stage-panel .kc-run-actions { position: sticky; bottom: 0; }
   .kc-mobile-tabs {
     display: flex;
     background: white;

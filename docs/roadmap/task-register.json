@@ -1381,7 +1381,7 @@
       "title": "手机课堂分区切换不丢代码",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-203"
       ],
@@ -1404,7 +1404,7 @@
       "title": "课堂多端完整E2E与截图",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-204",
         "UX-205"
@@ -1771,7 +1771,7 @@
       "title": "纠错学习与奖励收藏状态一致",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-206"
       ],
