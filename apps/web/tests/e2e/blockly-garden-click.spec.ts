@@ -160,7 +160,10 @@ test('TQ-009: the butterfly flies — lesson 9 blocks, palette, stage and feedba
   await expect(page.getByTestId('stage-walked-distance')).toContainText('小蝴蝶已飞 0 步')
   // The restored program and the flyout are real Blockly blocks with the same “飞” labels.
   const workspace=page.getByTestId('lesson-blockly-workspace')
-  await expect(workspace.locator('.blocklyBlockCanvas').first()).toContainText('向右飞 100 步')
+  await expect(workspace.locator('svg.blocklySvg .blocklyBlockCanvas')).toContainText('向右飞 100 步')
+  // Category toolbox: the flyout only shows a category after it is opened.
+  // Click the category row, not the label span: the row intercepts the hit.
+  await workspace.locator('.blocklyToolboxCategory', { hasText: '控制' }).click()
   await expect(workspace.locator('.blocklyFlyout').first()).toContainText('重复：再飞 100 步')
   await expect(workspace).not.toContainText('向右走')
   await expect(workspace).not.toContainText('再走')
@@ -171,7 +174,7 @@ test('TQ-009: the butterfly flies — lesson 9 blocks, palette, stage and feedba
   await expect(page.getByTestId('stage-walked-distance')).toContainText('小蝴蝶已飞 100 步')
   // A dragged-in copy keeps the label too: adding the repeat by button shows “再飞”.
   await page.getByTestId('lesson-add-repeat_twice').click()
-  await expect(workspace.locator('.blocklyBlockCanvas').first()).toContainText('重复：再飞 100 步')
+  await expect(workspace.locator('svg.blocklySvg .blocklyBlockCanvas')).toContainText('重复：再飞 100 步')
 })
 
 test('TQ-010: lesson 7 第 4 关 — “开始时” makes the butterfly fly without a click; fixed with “被点击时” it waits for the click',async({page})=>{
@@ -186,7 +189,7 @@ test('TQ-010: lesson 7 第 4 关 — “开始时” makes the butterfly fly wit
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
   await expect(page.getByTestId('lesson-task-card')).toContainText('没点就飞？找错再修好')
   await expect(page.getByTestId('mistake-setup')).toContainText('“开始时 → 向右飞 100 步”')
-  const canvas=page.getByTestId('lesson-blockly-workspace').locator('.blocklyBlockCanvas').first()
+  const canvas=page.getByTestId('lesson-blockly-workspace').locator('svg.blocklySvg .blocklyBlockCanvas')
   await expect(canvas).toContainText('开始时')
   await expect(canvas).toContainText('向右飞 100 步')
   await page.getByTestId('garden-predict-click').click()

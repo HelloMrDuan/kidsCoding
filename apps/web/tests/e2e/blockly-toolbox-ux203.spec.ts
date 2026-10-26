@@ -27,7 +27,7 @@ test.beforeEach(async ({ page }) => {
 async function workspaceBlockCount(page: Page) {
   // Connected blocks nest inside their parent's <g>, so top-level groups
   // count stacks, not blocks. Every block root carries .blocklyDraggable.
-  return page.locator('.blocklyBlockCanvas .blocklyDraggable').count()
+  return page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable').count()
 }
 
 /** Screen center of a zoom widget button's visible 32x32 sprite cell. */
@@ -84,7 +84,7 @@ test('zoom controls and trashcan are present and zoom-in changes the workspace s
 test('删除选中积木 removes the selected block', async ({ page }) => {
   await clickLessonControl(page, 'lesson-add-when_start')
   await expect.poll(() => workspaceBlockCount(page)).toBe(1)
-  await page.locator('.blocklyBlockCanvas .blocklyDraggable').first().click()
+  await page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable').first().click()
   await clickLessonControl(page, 'lesson-delete-selected')
   await expect.poll(() => workspaceBlockCount(page)).toBe(0)
 })
@@ -92,7 +92,7 @@ test('删除选中积木 removes the selected block', async ({ page }) => {
 test('keyboard Delete removes the selected block', async ({ page }) => {
   await clickLessonControl(page, 'lesson-add-when_start')
   await expect.poll(() => workspaceBlockCount(page)).toBe(1)
-  await page.locator('.blocklyBlockCanvas .blocklyDraggable').first().click()
+  await page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable').first().click()
   await page.keyboard.press('Delete')
   await expect.poll(() => workspaceBlockCount(page)).toBe(0)
 })
@@ -102,10 +102,10 @@ test('dragging a block moves it in the workspace', async ({ page }) => {
   await clickLessonControl(page, 'lesson-add-move_right')
   await expect.poll(() => workspaceBlockCount(page)).toBe(2)
   // The two blocks start as one connected stack (one top-level group).
-  await expect.poll(() => page.locator('.blocklyBlockCanvas > g').count()).toBe(1)
+  await expect.poll(() => page.locator('svg.blocklySvg .blocklyBlockCanvas > g').count()).toBe(1)
   // Block type is a class on the block group, so this tracks move_right
   // even if the DOM order changes when it is dragged out of its stack.
-  const block = page.locator('.blocklyBlockCanvas .blocklyDraggable.move_right')
+  const block = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.move_right')
   // On short viewports the palette clicks scroll the block partly out of
   // view (or under the sticky bar), so a raw mousedown would miss it.
   await block.scrollIntoViewIfNeeded()
@@ -113,7 +113,7 @@ test('dragging a block moves it in the workspace', async ({ page }) => {
   // (it only guarantees viewport intersection); nudge it to y=160 so the
   // drag start point is genuinely hittable on every viewport.
   await page.evaluate(() => {
-    const el = document.querySelector('.blocklyBlockCanvas .blocklyDraggable.move_right')
+    const el = document.querySelector('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.move_right')
     const r = el?.getBoundingClientRect()
     if (r && r.y + r.height / 2 < 120) window.scrollBy(0, r.y + r.height / 2 - 160)
   })
@@ -127,7 +127,7 @@ test('dragging a block moves it in the workspace', async ({ page }) => {
   // Dragging move_right out of the stack leaves two top-level stacks.
   // (Screen x is not asserted: the workspace auto-fit scrolls a dragged
   // stack back into view, so screen position alone cannot prove a drag.)
-  await expect.poll(() => page.locator('.blocklyBlockCanvas > g').count()).toBe(2)
+  await expect.poll(() => page.locator('svg.blocklySvg .blocklyBlockCanvas > g').count()).toBe(2)
   await expect.poll(() => workspaceBlockCount(page)).toBe(2)
 })
 

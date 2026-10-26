@@ -66,7 +66,7 @@ test('TQ-009: lesson 5 blocks and stage say exactly what happens (向右走 100 
   await expect(page.getByTestId('stage-walked-distance')).toContainText('已走 0 步')
   for(const type of ['when_start','move_right','switch_scene','repeat_twice'])await clickLessonControl(page, 'lesson-add-'+type)
   // The real Blockly blocks carry the same labels as the palette buttons.
-  const canvas=page.getByTestId('lesson-blockly-workspace').locator('.blocklyBlockCanvas').first()
+  const canvas=page.getByTestId('lesson-blockly-workspace').locator('svg.blocklySvg .blocklyBlockCanvas')
   await expect(canvas).toContainText('向右走 100 步')
   await expect(canvas).toContainText('重复：再走 100 步')
   await clickLessonControl(page, 'run-code-button')
@@ -97,7 +97,7 @@ test('TQ-010: lesson 5 第 4 关 — “重复：再走 100 步” placed before
   await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
   await expect(page.getByTestId('mistake-task')).toContainText('纠错实验：“重复：再走 100 步”放早了')
   await expect(page.getByTestId('mistake-setup')).toContainText('“开始时 → 重复：再走 100 步 → 向右走 100 步 → 切换场景”')
-  const canvas=page.getByTestId('lesson-blockly-workspace').locator('.blocklyBlockCanvas').first()
+  const canvas=page.getByTestId('lesson-blockly-workspace').locator('svg.blocklySvg .blocklyBlockCanvas')
   await expect(canvas).toContainText('重复：再走 100 步')
   await clickLessonControl(page, 'run-code-button')
   await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code','repeat-without-move',{timeout:12_000})
