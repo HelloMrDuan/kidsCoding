@@ -102,7 +102,7 @@ test('TQ-010: lesson 1 第 4 关 — the pre-built program without “开始时�
   await expect(task).toContainText('纠错实验：少了“开始时”')
   await expect(task).toContainText('只有“向右走 100 步”')
   // The workspace really holds the wrong program: a move block and no start hat.
-  const canvas=page.getByTestId('lesson-blockly-workspace').locator('.blocklyBlockCanvas').first()
+  const canvas=page.getByTestId('lesson-blockly-workspace').locator('svg.blocklySvg .blocklyBlockCanvas')
   await expect(canvas).toContainText('向右走 100 步')
   await expect(canvas).not.toContainText('开始时')
   // Cannot skip the experiment.

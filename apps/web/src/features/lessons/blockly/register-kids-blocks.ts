@@ -64,12 +64,7 @@ export function getKidsBlockTheme() {
 
 let isRegistered = false
 
-export function registerKidsBlocks() {
-  if (isRegistered) {
-    return
-  }
-
-  Blockly.defineBlocksWithJsonArray([
+const KIDS_BLOCK_DEFINITIONS = [
     {
       type: 'when_start',
       message0: '%1 ' + kidsBlockLabels.when_start,
@@ -203,8 +198,52 @@ export function registerKidsBlocks() {
       nextStatement: null,
       style: 'kc_item',
     },
-  ])
+]
+
+export function registerKidsBlocks() {
+  if (isRegistered) {
+    return
+  }
+
+  Blockly.defineBlocksWithJsonArray(KIDS_BLOCK_DEFINITIONS)
 
   isRegistered = true
+}
+
+/**
+ * UX-203: toolbox categories group the kids blocks by their theme style, so
+ * the workspace toolbox shows one coloured category per family instead of a
+ * flat flyout. The style map is derived from the block definitions above,
+ * never hand-copied, so a new block lands in its category automatically.
+ */
+const KIDS_BLOCK_STYLE_BY_TYPE: Record<string, string> = Object.fromEntries(
+  KIDS_BLOCK_DEFINITIONS.map((definition) => [definition.type, definition.style]),
+)
+
+export type KidsToolboxCategory = { name: string; colour: string; types: string[] }
+
+const KIDS_TOOLBOX_CATEGORIES: Array<{ name: string; colour: string; styles: string[] }> = [
+  { name: '开始', colour: '#ffab19', styles: ['kc_event', 'kc_event_click'] },
+  { name: '移动', colour: '#4c97ff', styles: ['kc_motion'] },
+  { name: '说话', colour: '#3fbf6a', styles: ['kc_looks'] },
+  { name: '场景', colour: '#9966ff', styles: ['kc_scene'] },
+  { name: '朋友', colour: '#ff6680', styles: ['kc_friend'] },
+  { name: '物品', colour: '#cf63cf', styles: ['kc_item'] },
+  { name: '控制', colour: '#0fbdbd', styles: ['kc_control'] },
+]
+
+export function buildKidsToolboxCategories(allowedBlocks: string[]): KidsToolboxCategory[] {
+  const grouped = KIDS_TOOLBOX_CATEGORIES.map((category) => ({
+    name: category.name,
+    colour: category.colour,
+    types: allowedBlocks.filter((type) => category.styles.includes(KIDS_BLOCK_STYLE_BY_TYPE[type] ?? '')),
+  })).filter((category) => category.types.length > 0)
+  // A lesson allowing a block this file does not define yet keeps it usable
+  // (and visible) instead of silently dropping it from the toolbox.
+  const unknown = allowedBlocks.filter((type) => !(type in KIDS_BLOCK_STYLE_BY_TYPE))
+  if (unknown.length > 0) {
+    grouped.push({ name: '更多', colour: '#6f7d92', types: unknown })
+  }
+  return grouped
 }
 
