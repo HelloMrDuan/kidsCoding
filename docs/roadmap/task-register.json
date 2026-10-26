@@ -1353,7 +1353,7 @@
       "title": "角色舞台可观察互动反馈",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "EDU-103",
         "UX-203"
@@ -1364,10 +1364,14 @@
         "重置与未触发状态准确"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/144",
+        "mergeCommit": "60d7914172b9af7a281400f0ce65311fb0255e23",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40261437744",
+        "tests": [
+          "unit local full suite 135 files 810 tests green, incl. new playable-stage-observe 7/7",
+          "e2e local: stage-observe-ux204 10/10 (5 tests x desktop+mobile); desktop+mobile screenshots verified, stage layout and colors unchanged",
+          "PR CI all green on 5d40734b: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web 40261437744 and task-ledger 40261437595"
+        ],
         "reviewer": null
       },
       "notes": ""
