@@ -1325,7 +1325,7 @@
       "title": "Blockly工具箱分类缩放删除体验",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-202"
       ],
@@ -1335,10 +1335,15 @@
         "错误和空程序不假成功"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/142",
+        "mergeCommit": "3c7cc436794f67af06cd6bfbcc2c65afcdfd2f15",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40252373057",
+        "tests": [
+          "unit local full suite 134 files 803 tests green, incl. new toolbox-categories 5/5",
+          "e2e local: blockly-toolbox-ux203 12/12 desktop+mobile; CI specs first-run/second-practice/meadow-journey green after main-canvas scoping; garden-click desktop 8/8 after category flyout fix",
+          "PR CI all green on e5d34fd0: gate pass 17 success + 3 skipped (deploy config/e2e/test, curriculum incl. scratch, task-tracking, watchdog regressions); main CI green: curriculum 40252373057, deploy 40252373053, task-tracking 40252373042",
+          "three viewports screenshots verified 1440/768/375, page three-zone layout unchanged; keyboard plugin upstream recursion bug worked around via public-registry deferring toolbox (commented in code)"
+        ],
         "reviewer": null
       },
       "notes": ""
