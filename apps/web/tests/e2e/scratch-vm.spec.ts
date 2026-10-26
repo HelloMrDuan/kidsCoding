@@ -1,6 +1,20 @@
 import { expect, test } from '@playwright/test'
+import {readFileSync} from 'node:fs'
 import {readFile} from 'node:fs/promises'
 import {deflateRawSync,inflateRawSync} from 'node:zlib'
+
+// Local-only CDN workaround (same as the UX-401/402/403 specs): this
+// sandbox's browser tunnel cannot reach jsDelivr, so when
+// SCRATCH_VM_LOCAL_CDN=1 the pinned production script (scratch-vm@5.0.300,
+// downloaded verbatim) is served from a local file via route interception.
+// CI never sets this variable and always exercises the real CDN path.
+test.beforeEach(async ({page}) => {
+  if (process.env.SCRATCH_VM_LOCAL_CDN !== '1') return
+  const vmCode = readFileSync(process.env.SCRATCH_VM_LOCAL_FILE ?? '/tmp/scratch-local/scratch-vm.min.js')
+  await page.route('https://cdn.jsdelivr.net/**', (route) =>
+    route.fulfill({ body: vmCode, contentType: 'application/javascript' }),
+  )
+})
 
 // Minimal ZIP reader/writer for one TQ-006 test: it re-packs the checked-in
 // sample with a single project.json field changed, without a zip dependency.
@@ -123,7 +137,10 @@ test('Blockly editor changes the number and falling movement of real Scratch VM 
   await page.getByTestId('scratch-apply-blocks').click()
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('2颗 / 每步25 / 每0.3秒',{timeout:12_000})
   await page.getByTestId('scratch-green-flag').click()
-  await expect(page.getByTestId('scratch-created-total')).toHaveText('2',{timeout:18_000})
+  // Two-character sample: edited 流星 2 + untouched 星星 6.
+  await expect(page.getByTestId('scratch-created-total')).toHaveText('8',{timeout:18_000})
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'流星'})).toContainText('已创建 2')
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'星星'})).toContainText('已创建 6')
   await expect(page.getByTestId('scratch-movement-observed')).toHaveText('是',{timeout:18_000})
   await expect(page.getByTestId('scratch-deletion-observed')).toHaveText('是',{timeout:18_000})
   await page.getByTestId('scratch-stop').click()
@@ -134,7 +151,9 @@ test('Blockly editor changes the number and falling movement of real Scratch VM 
   await page.getByTestId('scratch-apply-blocks').click()
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('5颗 / 每步25 / 每0.3秒',{timeout:12_000})
   await page.getByTestId('scratch-green-flag').click()
-  await expect(page.getByTestId('scratch-created-total')).toHaveText('5',{timeout:18_000})
+  await expect(page.getByTestId('scratch-created-total')).toHaveText('11',{timeout:18_000})
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'流星'})).toContainText('已创建 5')
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'星星'})).toContainText('已创建 6')
   await page.getByTestId('scratch-stop').click()
   await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
 })
@@ -158,11 +177,13 @@ test('exports a genuine Scratch VM .sb3 and reloads it in a fresh VM to verify e
   expect(zip.byteLength).toBeGreaterThan(500)
   expect(zip[0]).toBe(0x50)
   expect(zip[1]).toBe(0x4b)
-  await expect(page.getByTestId('scratch-export-status')).toContainText('独立 VM 重新载入验证：3颗 / 每步20 / 每0.3秒')
+  await expect(page.getByTestId('scratch-export-status')).toContainText('独立 VM 重新载入验证：流星 3颗 / 每步20 / 每0.3秒；星星 6颗 / 每步12 / 每0.5秒')
   await expect(page.getByTestId('scratch-vm-status')).toContainText('已从真实 Scratch VM 导出')
   // The export must not break the editor or its VM: green flag still runs the edited version.
   await page.getByTestId('scratch-green-flag').click()
-  await expect(page.getByTestId('scratch-created-total')).toHaveText('3',{timeout:18_000})
+  await expect(page.getByTestId('scratch-created-total')).toHaveText('9',{timeout:18_000})
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'流星'})).toContainText('已创建 3')
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'星星'})).toContainText('已创建 6')
   await page.getByTestId('scratch-stop').click()
   await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
 })
@@ -192,7 +213,9 @@ test('exported real Scratch .sb3 reimports and restores Blockly for continued au
   await expect(page.getByTestId('scratch-edit-fall-step')).toHaveValue('18')
   await expect(page.getByTestId('scratch-editor-validity')).toContainText('连接正确')
   await page.getByTestId('scratch-green-flag').click()
-  await expect(page.getByTestId('scratch-created-total')).toHaveText('4',{timeout:18_000})
+  await expect(page.getByTestId('scratch-created-total')).toHaveText('10',{timeout:18_000})
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'流星'})).toContainText('已创建 4')
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'星星'})).toContainText('已创建 6')
   await page.getByTestId('scratch-stop').click()
   await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
 
@@ -220,7 +243,9 @@ test('Scratch VM genuine sb3 is auto-saved in IndexedDB and restored after brows
   await expect(page.getByTestId('scratch-edit-fall-step')).toHaveValue('19')
   await expect(page.getByTestId('scratch-green-flag')).toBeEnabled()
   await page.getByTestId('scratch-green-flag').click()
-  await expect(page.getByTestId('scratch-created-total')).toHaveText('4',{timeout:20_000})
+  await expect(page.getByTestId('scratch-created-total')).toHaveText('10',{timeout:20_000})
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'流星'})).toContainText('已创建 4')
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'星星'})).toContainText('已创建 6')
   await page.getByTestId('scratch-stop').click()
   await expect(page.getByTestId('scratch-live-clones')).toHaveText('0')
 
@@ -264,6 +289,12 @@ test('account cloud buttons save an actual Scratch VM sb3 and restore it in a fr
       draft:{lessonId:'G3-U1-L02',archiveBase64:stored,updatedAt:'2026-10-10T16:00:00Z'},
     }}))
     const other=await separateDevice.newPage()
+    if (process.env.SCRATCH_VM_LOCAL_CDN === '1') {
+      const vmCode = readFileSync(process.env.SCRATCH_VM_LOCAL_FILE ?? '/tmp/scratch-local/scratch-vm.min.js')
+      await other.route('https://cdn.jsdelivr.net/**', (route) =>
+        route.fulfill({ body: vmCode, contentType: 'application/javascript' }),
+      )
+    }
     await other.goto('/learn/scratch-lab/G3-U1-L02')
     await expect(other.getByTestId('scratch-green-flag')).toBeEnabled({timeout:60_000})
     await expect(other.getByTestId('scratch-edit-spawn-count')).toHaveValue('10')
@@ -272,7 +303,9 @@ test('account cloud buttons save an actual Scratch VM sb3 and restore it in a fr
     await expect(other.getByTestId('scratch-applied-program')).toHaveText('3颗 / 每步21 / 每0.3秒')
     await expect(other.getByTestId('scratch-edit-spawn-count')).toHaveValue('3')
     await other.getByTestId('scratch-green-flag').click()
-    await expect(other.getByTestId('scratch-created-total')).toHaveText('3',{timeout:18_000})
+    await expect(other.getByTestId('scratch-created-total')).toHaveText('9',{timeout:18_000})
+    await expect(other.locator('[data-testid="scratch-character-stats"]',{hasText:'流星'})).toContainText('已创建 3')
+    await expect(other.locator('[data-testid="scratch-character-stats"]',{hasText:'星星'})).toContainText('已创建 6')
     await other.getByTestId('scratch-stop').click()
     await expect(other.getByTestId('scratch-live-clones')).toHaveText('0')
   }finally{
@@ -292,7 +325,9 @@ test('TQ-006 spawn interval is a real VM parameter and its limits are labelled',
   await page.getByTestId('scratch-apply-blocks').click()
   await expect(page.getByTestId('scratch-applied-program')).toHaveText('10颗 / 每步13 / 每1秒',{timeout:12_000})
   await page.getByTestId('scratch-green-flag').click()
-  await expect(page.getByTestId('scratch-created-total')).toHaveText('10',{timeout:30_000})
+  await expect(page.getByTestId('scratch-created-total')).toHaveText('16',{timeout:30_000})
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'流星'})).toContainText('已创建 10')
+  await expect(page.locator('[data-testid="scratch-character-stats"]',{hasText:'星星'})).toContainText('已创建 6')
   await expect(page.getByTestId('scratch-deletion-observed')).toHaveText('是',{timeout:30_000})
   await page.getByTestId('scratch-stop').click()
   await expect(page.getByTestId('scratch-live-clones')).toHaveText('0',{timeout:8_000})

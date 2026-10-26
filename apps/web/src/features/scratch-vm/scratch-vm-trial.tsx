@@ -2,20 +2,26 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import {ScratchMeteorBlocks,type MeteorProgram} from './scratch-meteor-blocks'
+import {ScratchMeteorBlocks} from './scratch-meteor-blocks'
+import {allProgramsApplied, formatProgram, iconForCharacter, liveClonesByCharacter, type MeteorProgram} from './scratch-character-stats'
 import {readScratchDraft,saveScratchDraft,removeScratchDraft,isScratchArchive,SCRATCH_DRAFT_LESSON_ID} from './scratch-local-draft'
 import {encodeScratchDraft,parseScratchCloudResponse} from './scratch-cloud-draft'
 
 type Sprite = { id: string; name: string; x: number; y: number; visible: boolean; original: boolean }
-type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram; archive?:ArrayBuffer; imported?:boolean; source?:'sample'|'file'|'saved'|'cloud' }
+type CharacterInfo = { name: string; costume: string }
+type VMMessage = { kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'; id: number | null; available?: boolean; targets?: Sprite[]; error?: string; targetNames?: string[]; program?:MeteorProgram; programs?:Record<string,MeteorProgram>; characters?:CharacterInfo[]; character?:string; archive?:ArrayBuffer; imported?:boolean; source?:'sample'|'file'|'saved'|'cloud' }
 
 export function ScratchVMTrial() {
   const frame = useRef<HTMLIFrameElement>(null)
   const id = useRef(0)
   const [loaded, setLoaded] = useState(false)
   const [running, setRunning] = useState(false)
-  const [draft, setDraft] = useState<MeteorProgram|null>(null)
-  const [applied, setApplied] = useState<MeteorProgram|null>(null)
+  // Per-character state (UX-402): each character owns its own program.
+  // drafts are the editor's unapplied values; programs are what the VM runs.
+  const [characters, setCharacters] = useState<CharacterInfo[]>([])
+  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null)
+  const [drafts, setDrafts] = useState<Record<string, MeteorProgram | null>>({})
+  const [programs, setPrograms] = useState<Record<string, MeteorProgram>>({})
   const [createdTotal, setCreatedTotal] = useState(0)
   const [exporting,setExporting] = useState(false)
   const [importing,setImporting] = useState(false)
@@ -24,7 +30,6 @@ export function ScratchVMTrial() {
   const [cloudStatus,setCloudStatus] = useState('云端保存需要登录。仅在你手动点击时读写自己的账号，不保存正式成绩。')
   const [draftStatus,setDraftStatus] = useState('本机作品还未自动保存；修改积木后点击“应用”即可自动保存。')
   const [editorRevision,setEditorRevision] = useState(0)
-  const [editorSeed,setEditorSeed] = useState<MeteorProgram>({spawnCount:10,fallStep:13,interval:0.3})
   const [retrying,setRetrying] = useState(false)
   const [loadFailed,setLoadFailed] = useState(false)
   const retrySavedRef = useRef(false)
@@ -38,8 +43,34 @@ export function ScratchVMTrial() {
   const [observedMovement, setObservedMovement] = useState(false)
   const [observedDeletion, setObservedDeletion] = useState(false)
   const knownCloneIds = useRef<Set<string>>(new Set())
+  const knownCloneNames = useRef<Map<string,string>>(new Map())
   const vmRunning = useRef(false)
   const latestY = useRef<Map<string,number>>(new Map())
+  const seenByName = useRef<Map<string, Set<string>>>(new Map())
+  const movementByName = useRef<Set<string>>(new Set())
+  const deletionByName = useRef<Set<string>>(new Set())
+  const [characterStats, setCharacterStats] = useState<Record<string, {live: number; created: number; movement: boolean; deletion: boolean}>>({})
+
+  const characterNames = characters.map(c => c.name)
+  const selectedDraft = selectedCharacter ? drafts[selectedCharacter] ?? null : null
+  const selectedApplied = selectedCharacter ? programs[selectedCharacter] ?? null : null
+  const allApplied = allProgramsApplied(characterNames, programs, drafts)
+
+  const resetRunObservations = useCallback(() => {
+    vmRunning.current = false
+    knownCloneIds.current.clear()
+    knownCloneNames.current.clear()
+    seenClones.current.clear()
+    seenByName.current.clear()
+    movementByName.current.clear()
+    deletionByName.current.clear()
+    latestY.current.clear()
+    setCreatedTotal(0)
+    setCharacterStats({})
+    setObservedClones(false)
+    setObservedMovement(false)
+    setObservedDeletion(false)
+  }, [])
 
   useEffect(() => {
     let destroyed=false
@@ -87,21 +118,15 @@ export function ScratchVMTrial() {
         retrySavedRef.current=false
         setImporting(false)
         loadingSaved=false
-        setApplied(msg.program??null)
-        if(msg.program){
-          setEditorSeed(msg.program)
-          setEditorRevision(v=>v+1)
-          setDraft(msg.program)
-        }
-        vmRunning.current=false
-        seenClones.current.clear()
-        knownCloneIds.current.clear()
-        latestY.current.clear()
-        setCreatedTotal(0)
+        const nextPrograms = msg.programs ?? {}
+        const nextCharacters = msg.characters ?? []
+        setPrograms(nextPrograms)
+        setCharacters(nextCharacters)
+        setDrafts(nextPrograms)
+        setSelectedCharacter(nextCharacters[0]?.name ?? null)
+        setEditorRevision(v=>v+1)
+        resetRunObservations()
         setSprites([])
-        setObservedClones(false)
-        setObservedMovement(false)
-        setObservedDeletion(false)
         setRunning(false)
         if(msg.source==='file'||msg.source==='cloud'){
           setSaving(true)
@@ -115,23 +140,45 @@ export function ScratchVMTrial() {
         setSprites(current)
         const clones=current.filter(t=>!t.original&&t.visible)
         const liveCloneIds = new Set(current.filter(t=>!t.original).map(t=>t.id))
+        const liveNames = new Map(current.filter(t=>!t.original).map(t=>[t.id, t.name] as const))
         if (vmRunning.current && [...knownCloneIds.current].some(id=>!liveCloneIds.has(id))) {
           setObservedDeletion(true)
+          for (const id of knownCloneIds.current) {
+            if (!liveCloneIds.has(id) && knownCloneNames.current.has(id)) deletionByName.current.add(knownCloneNames.current.get(id)!)
+          }
         }
         knownCloneIds.current=liveCloneIds
+        knownCloneNames.current=liveNames
         if(vmRunning.current) {
-          for (const target of current.filter(t=>!t.original)) seenClones.current.add(target.id)
+          for (const target of current.filter(t=>!t.original)) {
+            seenClones.current.add(target.id)
+            if (!seenByName.current.has(target.name)) seenByName.current.set(target.name, new Set())
+            seenByName.current.get(target.name)!.add(target.id)
+          }
           setCreatedTotal(seenClones.current.size)
         }
         if(clones.length)setObservedClones(true)
         for(const target of clones) {
           const key=target.id
           const prior=latestY.current.get(key)
-          if(prior!==undefined&&target.y<prior-1)setObservedMovement(true)
+          if(prior!==undefined&&target.y<prior-1){setObservedMovement(true);movementByName.current.add(target.name)}
           latestY.current.set(key,target.y)
         }
+        const live = liveClonesByCharacter(current)
+        const nextStats: Record<string, {live: number; created: number; movement: boolean; deletion: boolean}> = {}
+        for (const name of [...seenByName.current.keys(), ...Object.keys(live)]) {
+          nextStats[name] = {
+            live: live[name] ?? 0,
+            created: seenByName.current.get(name)?.size ?? 0,
+            movement: movementByName.current.has(name),
+            deletion: deletionByName.current.has(name),
+          }
+        }
+        setCharacterStats(nextStats)
       } else if(msg.kind==='CONFIGURED') {
-        setApplied(msg.program??null)
+        if (msg.character && msg.program) {
+          setPrograms(prev => ({...prev, [msg.character!]: msg.program!}))
+        }
         setSaving(true)
         frame.current?.contentWindow?.postMessage({kind:'SAVE_DRAFT',id:id.current},'*')
         setStatus('参数已写入真实 Scratch VM，点击绿旗验证变化。')
@@ -166,20 +213,27 @@ export function ScratchVMTrial() {
         anchor.click()
         anchor.remove()
         window.setTimeout(()=>URL.revokeObjectURL(url),5_000)
-        setExportDetails('Scratch VM 已导出并在独立 VM 重新载入验证：'+msg.program?.spawnCount+'颗 / 每步'+msg.program?.fallStep+' / 每'+msg.program?.interval+'秒')
+        const summary = msg.programs
+          ? Object.entries(msg.programs).map(([name, p]) => `${name} ${formatProgram(p)}`).join('；')
+          : '未知'
+        setExportDetails('Scratch VM 已导出并在独立 VM 重新载入验证：'+summary)
         setStatus('作品已从真实 Scratch VM 导出为 .sb3，可以用兼容 Scratch 3 的编辑器打开。')
       } else if(msg.kind==='STARTED') {
         vmRunning.current=true
         setRunning(true)
-        setStatus('Scratch VM 正在执行绿旗、创建分身、改变 y 坐标和删除分身。')
+        setStatus(msg.character
+          ? `Scratch VM 正在单独执行${msg.character}的绿旗程序。`
+          : 'Scratch VM 正在执行绿旗、创建分身、改变 y 坐标和删除分身。')
       } else if(msg.kind==='STOPPED') {
         vmRunning.current=false
         knownCloneIds.current.clear()
+        knownCloneNames.current.clear()
         setRunning(false)
         setStatus('已通过 Scratch VM stopAll 停止脚本。')
       } else if(msg.kind==='ERROR') {
         vmRunning.current=false
         knownCloneIds.current.clear()
+        knownCloneNames.current.clear()
         setRunning(false)
         setExporting(false)
         setImporting(false)
@@ -216,12 +270,13 @@ export function ScratchVMTrial() {
       window.removeEventListener('message',listener)
       frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*')
     }
-  }, [])
+  }, [resetRunObservations])
 
-  const changeProgram = useCallback((value:MeteorProgram|null)=>setDraft(value),[])
+  const changeProgram = useCallback((value:MeteorProgram|null)=>{
+    setDrafts(prev => selectedCharacter ? {...prev, [selectedCharacter]: value} : prev)
+  },[selectedCharacter])
   async function saveToCloud() {
-    if(cloudBusy||saving||running||exporting||importing||!draft||!applied||
-      applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep||applied.interval!==draft.interval)return
+    if(cloudBusy||saving||running||exporting||importing||!allApplied)return
     setCloudBusy(true)
     setCloudStatus('正在把当前 Scratch .sb3 保存到登录账号……')
     try {
@@ -335,10 +390,10 @@ export function ScratchVMTrial() {
         <header className="rounded-[2rem] bg-white p-7 shadow-sm">
           <p className="text-sm font-extrabold text-indigo-700">Scratch VM 实验室 · 官方运行引擎试用</p>
           <h1 className="mt-3 text-3xl font-black">流星分身雨</h1>
-          <p className="mt-3 text-slate-600">拖动积木，改变生成数量、下落步长和生成间隔，写入真正的 Scratch VM 后观察流星分身运行。</p>
+          <p className="mt-3 text-slate-600">点击角色切换编辑对象，拖动积木，改变生成数量、下落步长和生成间隔，写入真正的 Scratch VM 后观察各角色分身运行。</p>
           <p className="mt-3 text-sm text-amber-700">目前仅提供受限积木编辑，不是完整 Scratch 编辑器；可下载或重新导入 .sb3；应用积木后本机自动保存真正的 .sb3，云端保存需登录后主动点击，不保存正式成绩、不开放其他 Scratch 课程。</p>
           <ul data-testid="scratch-limitations" className="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-600">
-            <li>只能改三个数字：生成数量（1～15 颗）、下落步长（5～25）、生成间隔（0.1～1.0 秒，步长 0.1 秒）。</li>
+            <li>每个角色只能改三个数字：生成数量（1～15 颗）、下落步长（5～25）、生成间隔（0.1～1.0 秒，步长 0.1 秒）。</li>
             <li>不能新增角色、造型、音效、新积木或变量；不能改分身下落到底部后删除的规则。</li>
             <li>“生成间隔随时间递减”需要变量与循环逻辑，完整 Scratch 编辑器才能做，本实验不支持；导出的 .sb3 可用兼容 Scratch 3 的编辑器继续改造。</li>
             <li>舞台只按 VM 坐标画简化图标，没有接 Scratch WebGL 渲染器；加载失败时点“重新加载”可重试，失败不会覆盖已保存的作品。</li>
@@ -355,24 +410,24 @@ export function ScratchVMTrial() {
               {spritesInBounds.map((sprite)=>(
                 <span key={sprite.id} className="absolute text-3xl" data-testid="scratch-live-clone"
                   style={{left:`${(sprite.x+240)/480*100}%`,top:`${(180-sprite.y)/360*100}%`,transform:'translate(-50%,-50%)'}}
-                >☄️</span>
+                >{iconForCharacter(sprite.name)}</span>
               ))}
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||exporting||importing||saving||cloudBusy||!draft}
+              <button data-testid="scratch-apply-blocks" type="button" disabled={!loaded||running||exporting||importing||saving||cloudBusy||!selectedDraft||!selectedCharacter}
                 className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40"
-                onClick={()=>{if(draft){setApplied(null);frame.current?.contentWindow?.postMessage({kind:'CONFIGURE',id:id.current,program:draft},'*')}}}>应用积木到 VM</button>
+                onClick={()=>{if(selectedDraft&&selectedCharacter){frame.current?.contentWindow?.postMessage({kind:'CONFIGURE',id:id.current,character:selectedCharacter,program:selectedDraft},'*')}}}>应用积木到 VM</button>
               {!loaded&&loadFailed&&(
                 <button data-testid="scratch-retry-load" type="button" disabled={retrying}
                   className="rounded-full bg-rose-600 px-6 py-3 font-bold text-white disabled:opacity-40"
                   onClick={()=>void retryLoad()}>{retrying?'重新加载中…':'↻ 重新加载'}</button>
               )}
-              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||cloudBusy||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep||applied.interval!==draft.interval}
+              <button data-testid="scratch-green-flag" type="button" disabled={!loaded||!allApplied||running||exporting||importing||saving||cloudBusy}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
-                onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();seenClones.current.clear();setCreatedTotal(0);setObservedClones(false);setObservedMovement(false);setObservedDeletion(false);latestY.current.clear();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
+                onClick={()=>{resetRunObservations();frame.current?.contentWindow?.postMessage({kind:'RUN',id:id.current},'*')}}>
                 ▶ 绿旗运行
               </button>
-              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!applied||!draft||running||exporting||importing||saving||cloudBusy||applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep||applied.interval!==draft.interval}
+              <button data-testid="scratch-export-sb3" type="button" disabled={!loaded||!allApplied||running||exporting||importing||saving||cloudBusy}
                 className="rounded-full bg-amber-100 px-6 py-3 font-bold text-amber-950 disabled:opacity-40"
                 onClick={()=>{setExporting(true);setExportDetails('正在由真实 Scratch VM 打包，并重新载入检查……');frame.current?.contentWindow?.postMessage({kind:'EXPORT',id:id.current},'*')}}>
                 {exporting?'导出中…':'↓ 保存为 .sb3'}
@@ -383,8 +438,7 @@ export function ScratchVMTrial() {
                   className="sr-only" onChange={event=>{const file=event.target.files?.[0]??null;event.target.value='';void importFile(file)}}/>
               </label>
               <button data-testid="scratch-cloud-save" type="button"
-                disabled={!loaded||!applied||!draft||saving||running||importing||exporting||cloudBusy||
-                  applied.spawnCount!==draft.spawnCount||applied.fallStep!==draft.fallStep||applied.interval!==draft.interval}
+                disabled={!loaded||!allApplied||saving||running||importing||exporting||cloudBusy}
                 className="rounded-full bg-violet-700 px-6 py-3 font-bold text-white disabled:opacity-40"
                 onClick={()=>void saveToCloud()}>保存到我的账号</button>
               <button data-testid="scratch-cloud-restore" type="button"
@@ -396,7 +450,7 @@ export function ScratchVMTrial() {
                 onClick={()=>void resetOriginal()}>恢复课程初始程序</button>
               <button data-testid="scratch-stop" type="button" disabled={!loaded}
                 className="rounded-full bg-rose-100 px-6 py-3 font-bold text-rose-800 disabled:opacity-40"
-                onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*')}}>■ 停止</button>
+                onClick={()=>{vmRunning.current=false;knownCloneIds.current.clear();knownCloneNames.current.clear();frame.current?.contentWindow?.postMessage({kind:'STOP',id:id.current},'*')}}>■ 停止</button>
             </div>
           </section>
           <section className="rounded-[2rem] bg-white p-6 shadow-sm">
@@ -405,17 +459,62 @@ export function ScratchVMTrial() {
             <p data-testid="scratch-export-status" className="mt-5 text-sm text-indigo-700">{exportDetails}</p>
             <p data-testid="scratch-local-save-status" className="mt-3 text-sm text-emerald-800">{draftStatus}</p>
             <p data-testid="scratch-cloud-status" className="mt-3 text-sm text-violet-800">{cloudStatus}</p>
-            <p className="mt-5 text-sm">已应用 VM 积木：<strong data-testid="scratch-applied-program">{applied?`${applied.spawnCount}颗 / 每步${applied.fallStep} / 每${applied.interval}秒`:'等待应用'}</strong></p>
+            <p className="mt-5 text-sm">已应用 VM 积木：<strong data-testid="scratch-applied-program">{selectedApplied?formatProgram(selectedApplied):'等待应用'}</strong></p>
             <p className="mt-2 text-sm">本轮 VM 实际创建分身总数：<strong data-testid="scratch-created-total">{createdTotal}</strong></p>
             <p className="mt-5 text-sm">正在运行：<strong>{running?'是':'否'}</strong></p>
-            <p className="mt-2 text-sm">实际可见流星分身：<strong data-testid="scratch-live-clones">{clones.length}</strong></p>
+            <p className="mt-2 text-sm">实际可见分身：<strong data-testid="scratch-live-clones">{clones.length}</strong></p>
             <p className="mt-2 text-sm">VM 已创建分身：<strong data-testid="scratch-clone-observed">{observedClones?'是':'否'}</strong></p>
             <p className="mt-2 text-sm">VM 已执行向下运动：<strong data-testid="scratch-movement-observed">{observedMovement?'是':'否'}</strong></p>
             <p className="mt-2 text-sm">VM 已自然删除分身：<strong data-testid="scratch-deletion-observed">{observedDeletion?'是':'否'}</strong></p>
-            <p className="mt-5 text-xs leading-6 text-slate-500">流星的实时坐标来自 Scratch VM 对象状态，前台只按坐标绘制简化图标，尚未接入 Scratch WebGL 渲染器。项目未上传用户数据。</p>
+            {characters.map(c => {
+              const stats = characterStats[c.name] ?? {live: 0, created: 0, movement: false, deletion: false}
+              return (
+                <p key={c.name} data-testid="scratch-character-stats" className="mt-2 text-sm">
+                  {iconForCharacter(c.name)} {c.name}：可见分身 {stats.live} · 已创建 {stats.created} · 已运动 {stats.movement?'是':'否'} · 已删除 {stats.deletion?'是':'否'}
+                </p>
+              )
+            })}
+            <p className="mt-5 text-xs leading-6 text-slate-500">各角色的实时坐标来自 Scratch VM 对象状态，前台只按坐标绘制简化图标，尚未接入 Scratch WebGL 渲染器。项目未上传用户数据。</p>
           </section>
         </div>
-        <ScratchMeteorBlocks key={editorRevision} initialProgram={editorSeed} onProgramChange={changeProgram}/>
+        <section data-testid="scratch-character-list" className="rounded-[2rem] bg-white p-5 shadow-sm">
+          <h2 className="text-xl font-black">角色区</h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">点击角色切换编辑对象；每个角色有自己独立的积木程序，改一个角色不会动另一个角色。</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {characters.map(c => {
+              const selected = c.name === selectedCharacter
+              const program = programs[c.name]
+              return (
+                <article key={c.name} data-testid="scratch-character-card"
+                  onClick={() => setSelectedCharacter(c.name)}
+                  className={`cursor-pointer rounded-2xl border-2 p-4 ${selected ? 'border-indigo-600 bg-indigo-50' : 'border-slate-200 bg-white'}`}>
+                  <p className="text-base font-black">
+                    <span className="mr-2 text-2xl">{iconForCharacter(c.name)}</span>
+                    {c.name}{selected && <span className="ml-2 rounded-full bg-indigo-700 px-2 py-0.5 text-xs font-bold text-white">当前角色</span>}
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">造型：{c.costume}</p>
+                  <p className="mt-1 text-sm text-slate-600">程序：{program ? formatProgram(program) : '未加载'}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button data-testid="scratch-select-character" type="button"
+                      className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-bold text-indigo-900"
+                      onClick={(event) => {event.stopPropagation();setSelectedCharacter(c.name)}}>
+                      {selected ? '正在编辑' : `编辑${c.name}`}
+                    </button>
+                    <button data-testid="scratch-run-character" type="button"
+                      disabled={!loaded||!allApplied||running||exporting||importing||saving||cloudBusy}
+                      className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-900 disabled:opacity-40"
+                      onClick={(event) => {event.stopPropagation();resetRunObservations();frame.current?.contentWindow?.postMessage({kind:'RUN_CHARACTER',id:id.current,name:c.name},'*')}}>
+                      ▶ 只运行{c.name}
+                    </button>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        </section>
+        {selectedCharacter && (
+          <ScratchMeteorBlocks key={`${selectedCharacter}:${editorRevision}`} characterName={selectedCharacter} initialProgram={drafts[selectedCharacter] ?? undefined} onProgramChange={changeProgram}/>
+        )}
         <iframe ref={frame} src="/scratch-vm-sandbox.html" sandbox="allow-scripts" title="Scratch VM 受限运行沙箱" className="hidden" aria-hidden="true" tabIndex={-1}/>
       </div>
     </main>

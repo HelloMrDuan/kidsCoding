@@ -9,11 +9,39 @@
 <script src="https://cdn.jsdelivr.net/npm/scratch-vm@5.0.300/dist/web/scratch-vm.min.js"></script>
 <script>
 (() => {
+  // Controlled multi-character model (UX-402). This sandbox never runs an
+  // arbitrary Scratch project: it only accepts projects structurally
+  // identical to the lesson sample (same block ids, opcodes, wiring and
+  // constants), with 1-2 sprites from an explicit allowlist and three
+  // editable numbers per sprite inside fixed ranges. Anything else is
+  // fail-closed: the last working project is never replaced.
   let vm = null;
   let timer = null;
   let currentId = null;
   let ready = false;
-  let currentProgram={spawnCount:10,fallStep:13,interval:0.3};
+  let currentPrograms = {};
+  let currentCharacters = [];
+  const LEGAL_CHARACTERS = ['流星', '星星'];
+  const MAX_SPRITES = 2;
+  const MAX_ZIP_ENTRIES = 50;
+  const MAX_UNCOMPRESSED_BYTES = 20_000_000;
+  const EXPECTED_OPCODES = {
+    flag: 'event_whenflagclicked', hide: 'looks_hide', repeat: 'control_repeat',
+    spawn: 'control_create_clone_of', menu: 'control_create_clone_of_menu',
+    wait: 'control_wait', clone_flag: 'control_start_as_clone', show: 'looks_show',
+    set_y: 'motion_sety', down: 'control_repeat', move_y: 'motion_changeyby',
+    wait_fall: 'control_wait', delete: 'control_delete_this_clone',
+  };
+  const EXPECTED_NEXT = {
+    flag: 'hide', hide: 'repeat', repeat: null, spawn: 'wait', menu: null,
+    wait: null, clone_flag: 'show', show: 'set_y', set_y: 'down', down: 'delete',
+    move_y: 'wait_fall', wait_fall: null, delete: null,
+  };
+  const EXPECTED_PARENT = {
+    flag: null, hide: 'flag', repeat: 'hide', spawn: 'repeat', menu: 'spawn',
+    wait: 'spawn', clone_flag: null, show: 'clone_flag', set_y: 'show',
+    down: 'set_y', move_y: 'down', wait_fall: 'move_y', delete: 'down',
+  };
   function send(kind, info = {}) {
     window.parent.postMessage({kind,id:currentId,...info},'*');
   }
@@ -27,34 +55,169 @@
     vm = null;
   }
 
-  function readMeteorProgram(candidate) {
-    const originals=candidate.runtime.targets.filter(t=>t.isOriginal);
-    if(originals.length!==2 || originals.filter(t=>t.isStage).length!==1) throw new Error('只允许本课程的双角色项目');
-    const sprite=originals.find(t=>!t.isStage && t.getName()==='流星');
-    if(!sprite)throw new Error('流星角色不存在');
-    const required=[
-      ['flag','event_whenflagclicked'],['repeat','control_repeat'],
-      ['spawn','control_create_clone_of'],['clone_flag','control_start_as_clone'],
-      ['move_y','motion_changeyby'],['delete','control_delete_this_clone'],
-      ['wait','control_wait']
+  // Minimal ZIP central-directory scan: bounds entry count, total
+  // uncompressed size and entry names before the VM ever parses the file.
+  // No decompression happens here; the VM still does the real parsing.
+  function validateZipArchive(buffer) {
+    const bytes = new Uint8Array(buffer);
+    const view = new DataView(buffer);
+    const tailStart = Math.max(0, bytes.length - 65557);
+    let eocd = -1;
+    for (let i = bytes.length - 22; i >= tailStart; i--) {
+      if (view.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) throw new Error('ZIP 结构非法');
+    const totalEntries = view.getUint16(eocd + 10, true);
+    const cdSize = view.getUint32(eocd + 12, true);
+    const cdOffset = view.getUint32(eocd + 16, true);
+    if (totalEntries === 0xffff || cdOffset === 0xffffffff) throw new Error('不支持 ZIP64 工程');
+    if (totalEntries < 1 || totalEntries > MAX_ZIP_ENTRIES) throw new Error('ZIP 条目数量不符合要求');
+    if (cdOffset + cdSize > bytes.length) throw new Error('ZIP 目录越界');
+    const namePattern = /^(project\.json|[0-9a-f]{32}\.(svg|png|jpg|jpeg|wav|mp3))$/;
+    let offset = cdOffset;
+    let totalUncompressed = 0;
+    let sawProject = false;
+    for (let n = 0; n < totalEntries; n++) {
+      if (view.getUint32(offset, true) !== 0x02014b50) throw new Error('ZIP 目录损坏');
+      const uncompressed = view.getUint32(offset + 24, true);
+      const nameLen = view.getUint16(offset + 28, true);
+      const extraLen = view.getUint16(offset + 30, true);
+      const commentLen = view.getUint16(offset + 32, true);
+      const name = new TextDecoder().decode(bytes.subarray(offset + 46, offset + 46 + nameLen));
+      if (!namePattern.test(name)) throw new Error('ZIP 条目路径非法：' + name.slice(0, 80));
+      if (name === 'project.json') sawProject = true;
+      totalUncompressed += uncompressed;
+      if (totalUncompressed > MAX_UNCOMPRESSED_BYTES) throw new Error('ZIP 解包后体积超限');
+      offset += 46 + nameLen + extraLen + commentLen;
+    }
+    if (!sawProject) throw new Error('ZIP 缺少 project.json');
+  }
+
+  // NOTE: after loadProject, blocks use the VM's internal representation:
+  // inputs are {block, shadow} objects and fields are {name, value} objects,
+  // not the raw sb3 arrays. All checks below read that shape.
+  function readVmNumber(sprite, block, inputName) {
+    const ref = block?.inputs?.[inputName];
+    const inputBlock = sprite.blocks.getBlock(ref?.block);
+    if (!inputBlock || !inputBlock.opcode.startsWith('math_')) {
+      throw new Error('数值积木丢失：' + inputName);
+    }
+    const value = Number(inputBlock.fields?.NUM?.value);
+    if (!Number.isFinite(value)) throw new Error('数值积木非法');
+    return value;
+  }
+  function readSpriteProgram(sprite) {
+    const blocks = sprite.blocks;
+    if (!blocks._blocks) throw new Error('无法读取积木集合');
+    const byId = blocks._blocks;
+    const ids = Object.keys(byId);
+    const expectedIds = Object.keys(EXPECTED_OPCODES);
+    if (!expectedIds.every(id => ids.includes(id))) {
+      throw new Error('积木集合不符合课程模型');
+    }
+    // The VM turns each numeric primitive into a generated math_* block, so
+    // the loaded set is the 13 lesson blocks plus exactly the 6 math blocks
+    // referenced by the numeric inputs. Anything else is rejected.
+    const numericRefs = [
+      byId.repeat?.inputs?.TIMES?.block, byId.set_y?.inputs?.Y?.block,
+      byId.down?.inputs?.TIMES?.block, byId.move_y?.inputs?.DY?.block,
+      byId.wait?.inputs?.DURATION?.block, byId.wait_fall?.inputs?.DURATION?.block,
     ];
-    for(const [id,opcode] of required){
-      if(sprite.blocks.getBlock(id)?.opcode!==opcode)throw new Error('不属于本课程的流星积木脚本');
+    if (numericRefs.some(ref => typeof ref !== 'string' || !byId[ref])) {
+      throw new Error('数值积木丢失');
     }
-    function numberAt(parentId,input){
-      const parent=sprite.blocks.getBlock(parentId);
-      const nested=sprite.blocks.getBlock(parent?.inputs?.[input]?.block);
-      if(!nested || !nested.opcode.startsWith('math_'))throw new Error('数值积木丢失');
-      return Number(nested.fields?.NUM?.value);
+    const allowed = new Set([...expectedIds, ...numericRefs]);
+    for (const id of ids) {
+      if (!allowed.has(id)) throw new Error('积木集合不符合课程模型');
     }
-    const spawnCount=numberAt('repeat','TIMES');
-    const fallStep=-numberAt('move_y','DY');
-    const interval=numberAt('wait','DURATION');
-    if(!Number.isInteger(spawnCount)||spawnCount<1||spawnCount>15||
-       !Number.isInteger(fallStep)||fallStep<5||fallStep>25||
-       !Number.isFinite(interval)||interval<0.1||interval>1.0||
-       Math.abs(interval*10-Math.round(interval*10))>1e-9) throw new Error('数字积木超过允许范围');
-    return {spawnCount,fallStep,interval};
+    for (const ref of numericRefs) {
+      if (!byId[ref].opcode.startsWith('math_')) throw new Error('数值积木类型非法');
+    }
+    for (const id of expectedIds) {
+      const block = byId[id];
+      if (block.opcode !== EXPECTED_OPCODES[id]) throw new Error('不允许的积木类型：' + block.opcode);
+      if ((block.next ?? null) !== EXPECTED_NEXT[id]) throw new Error('积木连接不符合课程模型');
+      if ((block.parent ?? null) !== EXPECTED_PARENT[id]) throw new Error('积木连接不符合课程模型');
+    }
+    if (byId.spawn.inputs?.CLONE_OPTION?.block !== 'menu' ||
+        byId.menu.fields?.CLONE_OPTION?.value !== '_myself_') {
+      throw new Error('分身来源不符合课程模型');
+    }
+    if (byId.repeat.inputs?.SUBSTACK?.block !== 'spawn' ||
+        byId.down.inputs?.SUBSTACK?.block !== 'move_y') {
+      throw new Error('积木嵌套不符合课程模型');
+    }
+    if (readVmNumber(sprite, byId.set_y, 'Y') !== 170) throw new Error('出生高度不符合课程模型');
+    if (readVmNumber(sprite, byId.down, 'TIMES') !== 30) throw new Error('下落步数不符合课程模型');
+    if (readVmNumber(sprite, byId.wait_fall, 'DURATION') !== 0.05) throw new Error('下落间隔不符合课程模型');
+    const spawnCount = readVmNumber(sprite, byId.repeat, 'TIMES');
+    const fallStep = -readVmNumber(sprite, byId.move_y, 'DY');
+    const interval = readVmNumber(sprite, byId.wait, 'DURATION');
+    if (!Number.isInteger(spawnCount) || spawnCount < 1 || spawnCount > 15 ||
+        !Number.isInteger(fallStep) || fallStep < 5 || fallStep > 25 ||
+        !Number.isFinite(interval) || interval < 0.1 || interval > 1.0 ||
+        Math.abs(interval * 10 - Math.round(interval * 10)) > 1e-9) {
+      throw new Error('数字积木超过允许范围');
+    }
+    return {spawnCount, fallStep, interval};
+  }
+  function readMeteorPrograms(candidate) {
+    const originals = candidate.runtime.targets.filter(t => t.isOriginal);
+    const stages = originals.filter(t => t.isStage);
+    const sprites = originals.filter(t => !t.isStage);
+    if (stages.length !== 1) throw new Error('舞台数量不符合课程模型');
+    if (sprites.length < 1 || sprites.length > MAX_SPRITES) throw new Error('角色数量不符合课程模型（1～2 个）');
+    const stage = stages[0];
+    const stageCostumes = typeof stage.getCostumes === 'function' ? stage.getCostumes() : (stage.sprite?.costumes ?? []);
+    const stageSounds = stage.sprite?.sounds ?? [];
+    // The VM's Blocks class exposes its map as _blocks (there is no
+    // getAllBlocks method); fall back to top-level scripts if that ever moves.
+    const stageBlockIds = stage.blocks._blocks
+      ? Object.keys(stage.blocks._blocks)
+      : stage.blocks.getScripts();
+    if (stageCostumes.length !== 1 || stageCostumes[0]?.dataFormat !== 'svg' ||
+        !/^[0-9a-f]{32}$/.test(stageCostumes[0]?.assetId ?? '') ||
+        stageSounds.length !== 0 || stageBlockIds.length !== 0) {
+      throw new Error('舞台资源不符合课程模型');
+    }
+    const seen = new Set();
+    const programs = {};
+    const characters = [];
+    for (const sprite of sprites) {
+      const name = typeof sprite.getName === 'function' ? sprite.getName() : sprite.sprite?.name;
+      if (!LEGAL_CHARACTERS.includes(name)) throw new Error('角色不在允许名单：' + String(name));
+      if (seen.has(name)) throw new Error('角色重复：' + name);
+      seen.add(name);
+      const costumes = typeof sprite.getCostumes === 'function' ? sprite.getCostumes() : (sprite.sprite?.costumes ?? []);
+      const sounds = sprite.sprite?.sounds ?? [];
+      if (costumes.length !== 1 || costumes[0]?.dataFormat !== 'svg' ||
+          !/^[0-9a-f]{32}$/.test(costumes[0]?.assetId ?? '') ||
+          sounds.length !== 0) {
+        throw new Error('角色资源不符合课程模型：' + name);
+      }
+      programs[name] = readSpriteProgram(sprite);
+      characters.push({name, costume: costumes[0]?.name ?? ''});
+    }
+    return {programs, characters};
+  }
+  function validProgram(program) {
+    return !!program && Number.isInteger(program.spawnCount) && program.spawnCount >= 1 && program.spawnCount <= 15 &&
+      Number.isInteger(program.fallStep) && program.fallStep >= 5 && program.fallStep <= 25 &&
+      Number.isFinite(program.interval) && program.interval >= 0.1 && program.interval <= 1.0 &&
+      Math.abs(program.interval * 10 - Math.round(program.interval * 10)) <= 1e-9;
+  }
+  function updateNativeNumber(sprite, parentId, inputName, nextNumber) {
+    const parent = sprite.blocks.getBlock(parentId);
+    const inputId = parent?.inputs?.[inputName]?.block;
+    const inputBlock = sprite.blocks.getBlock(inputId);
+    if (!inputBlock || !inputBlock.fields?.NUM || !inputBlock.opcode.startsWith('math_')) {
+      throw new Error('Scratch 项目中缺少数字输入积木：' + parentId);
+    }
+    // Updates an actual Scratch VM block field. Scratch VM handles its
+    // script cache invalidation; this does not animate a fake executor.
+    sprite.blocks.changeBlock({id: inputId, element: 'field', name: 'NUM', value: String(nextNumber)});
+    const actual = Number(sprite.blocks.getBlock(inputId)?.fields?.NUM?.value);
+    if (actual !== nextNumber) throw new Error('Scratch VM 未接受数值变更');
   }
   function snapshot() {
     if (!vm || !vm.runtime) return;
@@ -80,51 +243,55 @@
     }
 
     if (data.kind === 'CONFIGURE' && data.id === currentId && vm && ready) {
+      const character = data.character;
       const program = data.program;
-      if (!program || !Number.isInteger(program.spawnCount) || program.spawnCount < 1 || program.spawnCount > 15 ||
-          !Number.isInteger(program.fallStep) || program.fallStep < 5 || program.fallStep > 25 ||
-          !Number.isFinite(program.interval) || program.interval < 0.1 || program.interval > 1.0 ||
-          Math.abs(program.interval*10-Math.round(program.interval*10)) > 1e-9) {
+      if (typeof character !== 'string' || !currentCharacters.some(c => c.name === character)) {
+        send('ERROR',{error:'缺少合法角色标识，禁止修改。'});
+        return;
+      }
+      if (!validProgram(program)) {
         send('ERROR',{error:'积木参数无效，禁止执行。'});
         return;
       }
       try {
         vm.stopAll();
-        const sprite = vm.runtime.targets.find(t=>!t.isStage && t.isOriginal && t.getName()==='流星');
-        if (!sprite) throw new Error('找不到流星角色');
-        function updateNativeNumber(parentId,inputName,nextNumber) {
-          const parent = sprite.blocks.getBlock(parentId);
-          const inputId = parent?.inputs?.[inputName]?.block;
-          const inputBlock = sprite.blocks.getBlock(inputId);
-          if (!inputBlock || !inputBlock.fields?.NUM || !inputBlock.opcode.startsWith('math_')) {
-            throw new Error('Scratch 项目中缺少数字输入积木：'+parentId);
-          }
-          // Updates an actual Scratch VM block field. Scratch VM handles its
-          // script cache invalidation; this does not animate a fake executor.
-          sprite.blocks.changeBlock({id:inputId,element:'field',name:'NUM',value:String(nextNumber)});
-          const actual = Number(sprite.blocks.getBlock(inputId)?.fields?.NUM?.value);
-          if (actual !== nextNumber) throw new Error('Scratch VM 未接受数值变更');
-        }
-        updateNativeNumber('repeat','TIMES',program.spawnCount);
-        updateNativeNumber('move_y','DY',-program.fallStep);
-        updateNativeNumber('wait','DURATION',program.interval);
-        currentProgram={spawnCount:program.spawnCount,fallStep:program.fallStep,interval:program.interval};
-        send('CONFIGURED',{program:currentProgram});
+        const sprite = vm.runtime.targets.find(t => !t.isStage && t.isOriginal && t.getName() === character);
+        if (!sprite) throw new Error('找不到角色：' + character);
+        updateNativeNumber(sprite, 'repeat', 'TIMES', program.spawnCount);
+        updateNativeNumber(sprite, 'move_y', 'DY', -program.fallStep);
+        updateNativeNumber(sprite, 'wait', 'DURATION', program.interval);
+        currentPrograms[character] = {spawnCount: program.spawnCount, fallStep: program.fallStep, interval: program.interval};
+        send('CONFIGURED',{character, program: currentPrograms[character], programs: currentPrograms});
         snapshot();
       } catch (error) {
-        send('ERROR',{error:'修改 Scratch VM 积木失败：'+String(error).slice(0,400)});
+        send('ERROR',{error:'修改 Scratch VM 积木失败：' + String(error).slice(0, 400)});
+      }
+      return;
+    }
+
+    if (data.kind === 'RUN_CHARACTER' && data.id === currentId && vm && ready) {
+      const name = data.name;
+      try {
+        const target = vm.runtime.targets.find(t => !t.isStage && t.isOriginal && t.getName() === name);
+        if (!target) throw new Error('找不到角色：' + String(name));
+        // Real VM execution for this sprite only: start its green-flag hats.
+        vm.runtime.startHats('event_whenflagclicked', null, target);
+        snapshot();
+        send('STARTED',{character: name});
+      } catch (error) {
+        send('ERROR',{error:String(error).slice(0, 600)});
       }
       return;
     }
 
     if (data.kind === 'SAVE_DRAFT' && data.id === currentId && vm && ready) {
       try {
-        const blob=await vm.saveProjectSb3();
-        if(!(blob instanceof Blob)||blob.size<300||blob.size>5_000_000)throw new Error('Scratch 文件大小异常');
-        const archive=await blob.arrayBuffer();
+        const blob = await vm.saveProjectSb3();
+        if (!(blob instanceof Blob) || blob.size < 300 || blob.size > 5_000_000) throw new Error('Scratch 文件大小异常');
+        const archive = await blob.arrayBuffer();
         window.parent.postMessage({kind:'DRAFT_EXPORTED',id:currentId,archive},'*',[archive]);
-      }catch(error){
-        send('DRAFT_SAVE_FAILED',{error:'本机草稿打包失败：'+String(error).slice(0,350)});
+      } catch (error) {
+        send('DRAFT_SAVE_FAILED',{error:'本机草稿打包失败：' + String(error).slice(0, 350)});
       }
       return;
     }
@@ -141,24 +308,17 @@
         const archive = await blob.arrayBuffer();
         checker = new window.VirtualMachine();
         await checker.loadProject(archive.slice(0));
-        const sprite = checker.runtime.targets.find(t=>!t.isStage && t.isOriginal && t.getName()==='流星');
-        if (!sprite) throw new Error('导出后缺少流星角色');
-        function readNativeNumber(parentId,inputName) {
-          const block = sprite.blocks.getBlock(parentId);
-          const inputId = block?.inputs?.[inputName]?.block;
-          const inputBlock = sprite.blocks.getBlock(inputId);
-          return Number(inputBlock?.fields?.NUM?.value);
+        const reloaded = readMeteorPrograms(checker);
+        for (const [name, program] of Object.entries(currentPrograms)) {
+          const back = reloaded.programs[name];
+          if (!back || back.spawnCount !== program.spawnCount || back.fallStep !== program.fallStep ||
+              Math.abs(back.interval - program.interval) > 1e-9) {
+            throw new Error('重新载入后的 Scratch 数字积木不匹配：' + name);
+          }
         }
-        const count = readNativeNumber('repeat','TIMES');
-        const fall = -readNativeNumber('move_y','DY');
-        const interval = readNativeNumber('wait','DURATION');
-        if (count !== currentProgram.spawnCount || fall !== currentProgram.fallStep ||
-            Math.abs(interval-currentProgram.interval) > 1e-9) {
-          throw new Error('重新载入后的 Scratch 数字积木不匹配');
-        }
-        window.parent.postMessage({kind:'PROJECT_EXPORTED',id:currentId,archive,program:{spawnCount:count,fallStep:fall,interval}},'*',[archive]);
+        window.parent.postMessage({kind:'PROJECT_EXPORTED',id:currentId,archive,programs:currentPrograms},'*',[archive]);
       } catch (error) {
-        send('ERROR',{error:'Scratch VM 项目导出或回读失败：'+String(error).slice(0,500)});
+        send('ERROR',{error:'Scratch VM 项目导出或回读失败：' + String(error).slice(0, 500)});
       } finally {
         if (checker) {
           try { checker.quit(); } catch (_error) {}
@@ -172,37 +332,39 @@
         snapshot();
         send('STARTED');
       } catch (error) {
-        send('ERROR',{error:String(error).slice(0,600)});
+        send('ERROR',{error:String(error).slice(0, 600)});
       }
       return;
     }
     if (data.kind !== 'LOAD' || !Number.isSafeInteger(data.id) || !(data.archive instanceof ArrayBuffer)) return;
     // Transactional replacement: an invalid import cannot destroy the last working project.
-    const imported=Boolean(data.imported);
-    currentId=data.id;
-    if(!window.VirtualMachine){send('ERROR',{error:'Scratch VM 未加载，请检查 CDN 网络。'});return;}
-    let candidate=null;
+    const imported = Boolean(data.imported);
+    currentId = data.id;
+    if (!window.VirtualMachine) { send('ERROR',{error:'Scratch VM 未加载，请检查 CDN 网络。'}); return; }
+    let candidate = null;
     try {
-      if(data.archive.byteLength<300||data.archive.byteLength>5_000_000)throw new Error('项目大小不符合要求');
-      const signature=new Uint8Array(data.archive,0,2);
-      if(signature[0]!==0x50||signature[1]!==0x4b)throw new Error('项目不是 Scratch ZIP');
-      candidate=new window.VirtualMachine();
+      if (data.archive.byteLength < 300 || data.archive.byteLength > 5_000_000) throw new Error('项目大小不符合要求');
+      const signature = new Uint8Array(data.archive, 0, 2);
+      if (signature[0] !== 0x50 || signature[1] !== 0x4b) throw new Error('项目不是 Scratch ZIP');
+      validateZipArchive(data.archive);
+      candidate = new window.VirtualMachine();
       await candidate.loadProject(data.archive);
-      const program=readMeteorProgram(candidate);
+      const {programs, characters} = readMeteorPrograms(candidate);
       candidate.start();
       reset();
-      vm=candidate;
-      candidate=null;
-      ready=true;
-      currentProgram=program;
-      send('PROJECT_LOADED',{program,imported,source:data.source??'sample',
-        targetNames:vm.runtime.targets.map(t=>typeof t.getName==='function'?t.getName():'')});
+      vm = candidate;
+      candidate = null;
+      ready = true;
+      currentPrograms = programs;
+      currentCharacters = characters;
+      send('PROJECT_LOADED',{programs, characters, imported, source: data.source ?? 'sample',
+        targetNames: vm.runtime.targets.map(t => typeof t.getName === 'function' ? t.getName() : '')});
       snapshot();
-      timer=setInterval(snapshot,100);
-    }catch(error){
-      send('ERROR',{error:'导入 Scratch 项目失败，原作品不变：'+String(error).slice(0,600)});
-    }finally{
-      if(candidate)try{candidate.quit()}catch(_error){}
+      timer = setInterval(snapshot, 100);
+    } catch (error) {
+      send('ERROR',{error:'导入 Scratch 项目失败，原作品不变：' + String(error).slice(0, 600)});
+    } finally {
+      if (candidate) try { candidate.quit(); } catch (_error) {}
     }
   });
 })();
