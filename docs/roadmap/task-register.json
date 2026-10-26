@@ -1381,7 +1381,7 @@
       "title": "手机课堂分区切换不丢代码",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-203"
       ],
@@ -1391,10 +1391,10 @@
         "软键盘和吸底动作可用"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/146",
+        "mergeCommit": "8f57d9718f294c62d6fbfd50cdba059492c2d5eb",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40275987635",
+        "tests": ["e2e local: mobile-tabs-ux205 4 passed + 4 project-applicability skips (desktop+mobile); tab switches keep blocks and say choice, footer/run actions sticky on <=600px", "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"],
         "reviewer": null
       },
       "notes": ""
@@ -1404,7 +1404,7 @@
       "title": "课堂多端完整E2E与截图",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-204",
         "UX-205"
@@ -1415,10 +1415,10 @@
         "1440、768、375截图和触控链路"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/146",
+        "mergeCommit": "8f57d9718f294c62d6fbfd50cdba059492c2d5eb",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40275987635",
+        "tests": ["e2e local: lesson-ui-responsive 7 tests x desktop+mobile all green; L01/L05/L09/L12 success/error/recovery/reward legs, real tap chain on mobile", "screenshots l05-1440/768/375 verified locally (desktop+tablet+mobile layout assertions pass)", "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"],
         "reviewer": null
       },
       "notes": ""
@@ -1771,7 +1771,7 @@
       "title": "纠错学习与奖励收藏状态一致",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-206"
       ],
@@ -1780,10 +1780,10 @@
         "失败恢复至原课、奖励幂等、不靠刷点击领星"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/146",
+        "mergeCommit": "8f57d9718f294c62d6fbfd50cdba059492c2d5eb",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40275987635",
+        "tests": ["e2e local: lesson-recovery-ux502 3 tests x desktop+mobile all green; advance-reload resumes new step, remedial return restores failed program, click farming awards nothing, cards shelf exactly once", "unit local full suite 135 files 810 tests green (incl. goToStep draft fix)", "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"],
         "reviewer": null
       },
       "notes": ""
