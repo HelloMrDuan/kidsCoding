@@ -139,6 +139,11 @@ export function PlayableStage({
     executionState,
     characterPosition,
     characterMessage,
+    partnerPosition,
+    partnerMessage,
+    activeActor,
+    actorActions,
+    actionLog,
     stageScene,
     errorMessage,
     run,
@@ -205,6 +210,7 @@ export function PlayableStage({
     <section
       className="flex flex-1 flex-col"
       data-testid="lesson-playable-stage"
+      data-active-actor={activeActor}
     >
       <div className="kc-stage-scene" data-scene={sceneId}>
         <SceneBackdrop scene={sceneId} />
@@ -214,6 +220,10 @@ export function PlayableStage({
             <span data-testid="stage-current-scene" className="kc-stage-scene-chip">当前实际场景：{visualScene}</span>
             {/* TQ-009: copy says “走/飞 100 步”, so the stage shows the distance actually moved. */}
             <span data-testid="stage-walked-distance" className="kc-stage-scene-chip">{mainLabel}已{motionWord(motionVerb)} {characterPosition} 步</span>
+            {/* UX-204: the friend's position is observable too, even when it stays put. */}
+            {secondLabel ? (
+              <span data-testid="stage-friend-distance" className="kc-stage-scene-chip">{secondLabel}已{motionWord(motionVerb)} {partnerPosition} 步</span>
+            ) : null}
           </span>
         </div>
 
@@ -223,10 +233,14 @@ export function PlayableStage({
             className="kc-stage-actor kc-stage-actor-main"
             style={{ '--kc-walk': stageWalkProgress(characterPosition) } as CSSProperties}
             data-steps={characterPosition}
+            data-action={actorActions.main}
             data-testid="stage-character-main"
           >
             <CharacterArt id={mainId} className="kc-stage-actor-art" />
             <span className="kc-stage-nametag">{mainLabel}</span>
+            <span data-testid="stage-main-action" className="text-xs font-semibold text-slate-600">
+              {actorActions.main === 'moving' ? '正在移动' : actorActions.main === 'speaking' ? '正在说话' : activeActor === 'main' ? '正在操作' : '等待指令'}
+            </span>
 
             {characterMessage && (
               <span className="kc-stage-speech">
@@ -236,9 +250,22 @@ export function PlayableStage({
           </button>
 
           {secondLabel ? (
-            <div className="kc-stage-actor kc-stage-actor-friend" data-testid="stage-character-friend">
+            <div className="kc-stage-actor kc-stage-actor-friend"
+              data-steps={partnerPosition}
+              data-action={actorActions.partner}
+              data-testid="stage-character-friend"
+            >
               <CharacterArt id={secondId} className="kc-stage-actor-art" />
               <span className="kc-stage-nametag">{secondLabel}</span>
+              <span data-testid="stage-friend-action" className="text-xs font-semibold text-slate-600">
+                {actorActions.partner === 'moving' ? '正在移动' : actorActions.partner === 'speaking' ? '正在说话' : activeActor === 'partner' ? '正在操作' : '等待指令'}
+              </span>
+
+              {partnerMessage && (
+                <span className="kc-stage-speech">
+                  {partnerMessage}
+                </span>
+              )}
             </div>
           ) : null}
         </div>
@@ -355,10 +382,20 @@ export function PlayableStage({
                 {successMessage ?? '🎉 太棒了！运行成功！点击“完成这一关”继续。'}
               </div>
             ))}
-          {executionState !== 'error' && executionState !== 'success' && executionState !== 'armed' ? (
+          {/* UX-204: running is not idle — the ready copy must not show mid-run. */}
+          {executionState === 'running' ? (
+            <div className="kc-feedback">运行中，看看角色怎么做。</div>
+          ) : executionState !== 'error' && executionState !== 'success' && executionState !== 'armed' ? (
             <div className="kc-feedback">{clickLesson ? '准备就绪。先按「启动点击程序」，再点一下蝴蝶。' : '准备就绪。点击「运行」观察角色动作与对白。'}</div>
           ) : null}
         </div>
+        {/* UX-204: the run log makes each executed block observable — a repeat
+            shows as its own line instead of hiding inside the step total. */}
+        {actionLog.length > 0 ? (
+          <ol data-testid="stage-action-log" className="space-y-1 text-sm text-slate-700">
+            {actionLog.map((line, i) => <li key={i}>{line}</li>)}
+          </ol>
+        ) : null}
         <div className="kc-run-actions">
           <button
             type="button"

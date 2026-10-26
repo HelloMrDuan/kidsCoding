@@ -109,31 +109,45 @@ export function useBlockExecutor(blocks: ProgramBlock[], requiredBlocks: string[
         setActorActions({ main: 'idle', partner: 'idle' })
         continue
       }
+      // UX-204: the classroom stage observes the same per-block actions the duo
+      // stage already shows — moving/speaking windows plus a plain-language log,
+      // so a repeat is visible as its own event, not just a bigger step count.
+      // Log lines stay generic here: this path runs every 01–09 template, and
+      // the hook does not know the main character's label.
       if (type === 'move_right') {
+        setActorActions({ main: 'moving', partner: 'idle' })
         setCharacterPosition(prev => prev + 100)
+        setActionLog(prev => [...prev, '向右走 100 步'])
       } else if (type === 'switch_scene') {
         setStageScene('meadow')
         // TQ-011: a line said in the forest stays in the forest — the new scene starts without
         // the old bubble, so the meadow never shows “你好！” that was said before the switch.
         setCharacterMessage(null)
+        setActionLog(prev => [...prev, '切换场景到草地'])
       } else if (type === 'repeat_twice') {
         if (!blocks.slice(0, i).some(b => b.type === 'move_right')) {
           setExecutionState('error')
           return
         }
+        setActorActions({ main: 'moving', partner: 'idle' })
         setCharacterPosition(prev => prev + 100)
+        setActionLog(prev => [...prev, '再走 100 步（重复）'])
       } else if (type === 'say_line') {
-        setCharacterMessage(sayMessageFor(
+        const message = sayMessageFor(
           blocks[i],
           blocks.slice(0, i).some(b => b.type === 'switch_scene') ? 'meadow' : 'forest',
           blocks[0].type === 'when_clicked' ? 'click' : 'start',
-        ))
+        )
+        setActorActions({ main: 'speaking', partner: 'idle' })
+        setCharacterMessage(message)
+        setActionLog(prev => [...prev, `说：${message}`])
       } else {
         setExecutionState('error')
         return
       }
       await new Promise(resolve => setTimeout(resolve, 180))
       if (runIdRef.current !== id) return
+      setActorActions({ main: 'idle', partner: 'idle' })
     }
     if (!duoEnabled) {
       // SYS-103: judge the observed result, so equivalent programs pass and counter-examples fail.
