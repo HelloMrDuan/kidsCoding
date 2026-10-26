@@ -1603,7 +1603,7 @@
       "title": "Scratch VM真实舞台工作台布局",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-002"
       ],
@@ -1626,7 +1626,7 @@
       "title": "Scratch角色素材代码自由编辑",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-401"
       ],
@@ -1649,7 +1649,7 @@
       "title": "Scratch真VM导入导出与国内网络回归",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-402"
       ],
