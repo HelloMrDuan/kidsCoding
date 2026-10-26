@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'docs/roadmap/**'
+      - '!docs/roadmap/task-register.json'
+      - '!docs/roadmap/TASK-CHANGELOG.md'
       - 'docs/design/kidscoding-v2/**'
       - 'apps/web/src/app/globals.css'
       - 'apps/web/src/features/ui/**'
@@ -72,9 +74,16 @@ on:
       - 'apps/web/src/features/progress/**'
       - 'apps/web/src/features/privacy/**'
       - '.github/workflows/curriculum-content.yml'
+      - 'apps/web/tests/e2e/scratch-workbench-ux401.spec.ts'
+      - 'apps/web/tests/e2e/scratch-characters-ux402.spec.ts'
+      - 'apps/web/tests/e2e/scratch-vm-regression-ux403.spec.ts'
   push:
     branches:
       - main
+    paths:
+      - '**'
+      - '!docs/roadmap/task-register.json'
+      - '!docs/roadmap/TASK-CHANGELOG.md'
 
 permissions:
   contents: read
@@ -213,7 +222,7 @@ jobs:
       - name: Install actual Chrome
         run: npx playwright install chrome --with-deps
       - name: Run actual Scratch VM browser integration, no mocked VM
-        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts --project=desktop --workers=2
+        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-characters-ux402.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts --project=desktop --workers=2
       - name: Lessons 10–12 actual Chrome touch browser
         run: npx playwright test tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts --project=mobile --workers=2 --output=test-results/duo-touch
       - name: Frozen V2 production CSS, three viewports and keyboard/touch
