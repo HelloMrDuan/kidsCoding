@@ -2,18 +2,21 @@
 
 import {useEffect, useRef, useState} from 'react'
 import * as Blockly from 'blockly'
+import type {MeteorProgram} from './scratch-character-stats'
 
-export type MeteorProgram = {spawnCount: number; fallStep: number; interval: number}
+export type {MeteorProgram}
 
 export function isValidMeteorInterval(value: number): boolean {
   return Number.isFinite(value) && value>=0.1 && value<=1.0 && Math.abs(value*10-Math.round(value*10))<1e-9
 }
 
-function installMeteorBlocks() {
-  if (Blockly.Blocks['kc_meteor_start']) return
+// Block messages carry the selected character's name. The editor is
+// remounted on every character switch, so redefining here is safe: no live
+// workspace ever uses another character's messages.
+function installMeteorBlocks(characterName: string) {
   Blockly.defineBlocksWithJsonArray([
-    {type:'kc_meteor_start',message0:'当绿旗被点击',nextStatement:null,colour:118,tooltip:'流星雨从这里开始'},
-    {type:'kc_meteor_count',message0:'生成 %1 颗流星',args0:[{type:'field_number',name:'COUNT',value:10,min:1,max:15,precision:1}],previousStatement:null,nextStatement:null,colour:35,tooltip:'改变真正 Scratch 重复积木的次数'},
+    {type:'kc_meteor_start',message0:'当绿旗被点击',nextStatement:null,colour:118,tooltip:'从这里开始'},
+    {type:'kc_meteor_count',message0:`生成 %1 颗${characterName}`,args0:[{type:'field_number',name:'COUNT',value:10,min:1,max:15,precision:1}],previousStatement:null,nextStatement:null,colour:35,tooltip:'改变真正 Scratch 重复积木的次数'},
     {type:'kc_meteor_fall',message0:'每一步下降 %1',args0:[{type:'field_number',name:'STEP',value:13,min:5,max:25,precision:1}],previousStatement:null,nextStatement:null,colour:210,tooltip:'改变真正 Scratch 移动积木的 y 速度'},
     {type:'kc_meteor_interval',message0:'每 %1 秒生成一颗',args0:[{type:'field_number',name:'INTERVAL',value:0.3,min:0.1,max:1.0,precision:0.1}],previousStatement:null,nextStatement:null,colour:290,tooltip:'改变真正 Scratch 等待积木的生成间隔'},
   ])
@@ -37,14 +40,14 @@ export function readMeteorProgram(workspace: Blockly.Workspace): MeteorProgram |
   return {spawnCount,fallStep,interval:intervalSeconds}
 }
 
-export function ScratchMeteorBlocks({onProgramChange,initialProgram}:{onProgramChange:(program:MeteorProgram|null)=>void;initialProgram?:MeteorProgram}) {
+export function ScratchMeteorBlocks({onProgramChange,initialProgram,characterName}:{onProgramChange:(program:MeteorProgram|null)=>void;initialProgram?:MeteorProgram;characterName:string}) {
   const node=useRef<HTMLDivElement>(null)
   const workspace=useRef<Blockly.WorkspaceSvg|null>(null)
   const notify=useRef(onProgramChange)
   const [program,setProgram]=useState<MeteorProgram|null>(null)
   useEffect(()=>{notify.current=onProgramChange},[onProgramChange])
   useEffect(()=>{
-    installMeteorBlocks()
+    installMeteorBlocks(characterName)
     if (!node.current) return
     const ws=Blockly.inject(node.current,{
       toolbox:{kind:'flyoutToolbox',contents:[
@@ -96,11 +99,11 @@ export function ScratchMeteorBlocks({onProgramChange,initialProgram}:{onProgramC
   }
 
   return <section className="mt-6 rounded-[2rem] bg-white p-5 shadow-sm" data-testid="scratch-block-editor">
-    <h2 className="text-xl font-black">自己改一改流星程序</h2>
+    <h2 className="text-xl font-black">自己改一改{characterName}程序</h2>
     <p className="mt-2 text-sm leading-7 text-slate-600">拖动、连接或删除下面的积木。只有“绿旗 → 生成数量 → 下落步长 → 生成间隔”完整连接时才能应用。快捷数字框会同步修改积木字段。</p>
     <div ref={node} data-testid="scratch-blockly-mount" className="mt-4 h-[340px] w-full overflow-hidden rounded-2xl border border-slate-200"/>
     <div className="mt-4 grid gap-3 sm:grid-cols-2">
-      <label className="text-sm font-bold text-slate-700">生成流星数（1～15）
+      <label className="text-sm font-bold text-slate-700">生成{characterName}数（1～15）
         <input data-testid="scratch-edit-spawn-count" type="number" min={1} max={15} step={1}
           value={program?.spawnCount??10} onChange={e=>update('COUNT',Number(e.target.value))}
           className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>

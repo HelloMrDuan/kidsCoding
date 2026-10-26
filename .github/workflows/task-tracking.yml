@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate 61 product tasks, 432 lessons and one-task-per-PR rule
+      - name: Validate 82 product tasks, 432 lessons and declared-task-entries-per-PR rule
         env:
           TASK_VALIDATE_PR: ${{ github.event_name == 'pull_request' && '1' || '0' }}
           TASK_PR_BODY: ${{ github.event.pull_request.body }}
