@@ -95,7 +95,10 @@ describe('PlayableStage designed mistake step (TQ-010)', () => {
     expect(screen.queryByTestId('stage-run-error')).toBeNull()
     expect(screen.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
     expect(screen.getByTestId('stage-walked-distance')).toHaveTextContent('小蝴蝶已飞 100 步')
-    expect(onRunFailure).toHaveBeenCalledWith({ code: 'needs-click-trigger', message: expect.any(String), designedMistake: true })
+    // onRunFailure fires from a passive effect after the error render; on a
+    // slow runner the synchronous assertion below races that flush. waitFor
+    // keeps the exact same expectation, it only waits for the effect.
+    await waitFor(() => expect(onRunFailure).toHaveBeenCalledWith({ code: 'needs-click-trigger', message: expect.any(String), designedMistake: true }))
   })
 
   it('after the right answer, the designed wrong run still shows no “哎呀” box (the child was right)', async () => {
