@@ -136,16 +136,21 @@ def check_ledger() -> tuple[list[dict], list[dict]]:
 def validate_pr(task_map: dict[str, dict]) -> None:
     body = os.environ.get("TASK_PR_BODY", "")
     found = re.findall(r"(?m)^Task-ID:\s*([A-Z][A-Z0-9-]+)\s*$", body)
-    check(len(found) == 1, "PR description must contain exactly one standalone 'Task-ID: EDU-101' line")
-    tid = found[0]
-    check(tid in task_map, f"PR references unknown task ID {tid}")
-    check(task_map[tid]["status"] != "todo", f"{tid}: PR task still marked todo")
+    # Batch policy: one PR may carry several Task-IDs, but the declared set
+    # must match the changed entries exactly — no undeclared changes, no
+    # missing entries, no duplicates. Single-ID PRs behave as before.
+    check(len(found) >= 1, "PR description must contain at least one standalone 'Task-ID: EDU-101' line")
+    check(len(found) == len(set(found)), f"PR description lists a Task-ID twice: {sorted(found)}")
+    declared = set(found)
+    for tid in sorted(declared):
+        check(tid in task_map, f"PR references unknown task ID {tid}")
+        check(task_map[tid]["status"] != "todo", f"{tid}: PR task still marked todo")
     base = os.environ.get("TASK_BASE_SHA", "").strip()
     check(bool(re.fullmatch(r"[0-9a-f]{40}", base)), "TASK_BASE_SHA missing/invalid")
     old_product = prior_file(base, TASKS)
     old_lessons = prior_file(base, LESSONS)
     if old_product is None and old_lessons is None:
-        check(tid == "OPS-001", "initial registry bootstrapping must be OPS-001")
+        check(declared == {"OPS-001"}, "initial registry bootstrapping must be OPS-001")
         return
 
     changed: set[str] = set()
@@ -156,7 +161,7 @@ def validate_pr(task_map: dict[str, dict]) -> None:
         new_map = {x["id"]: x for x in now[key]}
         changed |= {k for k in set(old_map) | set(new_map) if old_map.get(k) != new_map.get(k)}
 
-    check(changed == {tid}, f"Each PR must update exactly its one Task-ID entry; changed={sorted(changed)}, declared={tid}")
+    check(changed == declared, f"Each PR must update exactly its declared Task-ID entries; changed={sorted(changed)}, declared={sorted(declared)}")
 
 
 def main() -> None:
