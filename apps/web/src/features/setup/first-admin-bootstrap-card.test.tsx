@@ -58,7 +58,11 @@ describe('FirstAdminBootstrapCard', () => {
       expect(requestOtp).toHaveBeenCalledWith('owner@example.com')
     })
 
-    fireEvent.change(screen.getByLabelText('验证码'), {
+    // The code field only renders after signInWithOtp resolves and React
+    // re-renders; a synchronous getBy query here races that update and
+    // flakes on slow runners. findBy waits for the same element.
+    const codeInput = await screen.findByLabelText('验证码')
+    fireEvent.change(codeInput, {
       target: { value: '123456' },
     })
     fireEvent.click(screen.getByRole('button', { name: '验证并继续' }))
