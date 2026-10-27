@@ -356,7 +356,7 @@ const L02: GridLesson = {
 const L03: GridLesson = {
   id: 'G0-U1-L03',
   title: '数一数，刚好走三步',
-  story: '松鼠在第 4 格的蘑菇屋等小狐狸。小狐狸要刚好走到门口：少走够不着，多走就走过了。',
+  story: '松鼠在蘑菇屋门口立了一块数数牌，牌上挂着三颗橡果：走一格，数一颗。小狐狸要刚好走到门口：少走够不着，多走就走过了。',
   concept: '动作次数与停在准确的位置',
   objectives: [
     '会先数格子，再接同样多的动作积木',
@@ -371,19 +371,29 @@ const L03: GridLesson = {
   },
   steps: [
     {
-      id: 'exactly-three',
-      kind: 'guided',
-      title: '刚好三步',
-      instruction: '蘑菇屋在第 4 格。数一数要走几格，接同样多的“向右走一格”。',
-      predict: '先猜一猜：要走几步？',
-      level: { cols: 6, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 3, y: 0 } },
-      allowedBlocks: ['when_start', r, f],
-      hints: [
-        '小狐狸停在蘑菇屋前面或后面，说明步数不对。',
-        '走几步就要接几块积木，一块不多一块不少。',
-        '数：1、2、3。接 3 块“向右走一格”。',
+      id: 'one-short',
+      kind: 'error-lab',
+      title: '错误实验：少数了一步',
+      instruction: '蘑菇屋在第 4 格，小兔子只接了 2 块“向右走一格”。这是一个故意的错误：先按原样运行，看看小狐狸停在哪，再补上缺的那一步。',
+      predict: '先猜一猜：只接 2 块，小狐狸会停在哪？',
+      predictChoices: [
+        { text: '刚好停在蘑菇屋', when: 'pass' },
+        { text: '停在蘑菇屋前面一格', when: 'not_at_goal' },
       ],
-      solutions: [P(r, r, r), P(f, f, f)],
+      errorLab: {
+        expect: 'not_at_goal',
+        expected: '如果步数够，小狐狸应该走 3 格，停在第 4 格的蘑菇屋。',
+        actual: '小狐狸只走了 2 格，停在蘑菇屋前面一格：少一块积木，就少走一格。',
+      },
+      level: { cols: 6, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 3, y: 0 }, scenery: 'counting' },
+      allowedBlocks: ['when_start', r, f],
+      starterBlocks: [{ type: 'when_start' }, { type: r }, { type: r }],
+      hints: [
+        '小狐狸停在蘑菇屋前面，还差一点点。',
+        '走几步就要接几块积木：从小狐狸数到蘑菇屋，数出几格就接几块。',
+        '数：1、2、3。在最下面再接 1 块“向右走一格”，一共 3 块。',
+      ],
+      solutions: [P(r, r, r), P(f, f, f), P(r, r, f)],
       counterExamples: [
         { program: P(r, r), failure: 'not_at_goal' },
         { program: P(r, r, r, r), failure: 'not_at_goal' },
@@ -395,7 +405,7 @@ const L03: GridLesson = {
       title: '更长的路：五步',
       instruction: '这次蘑菇屋在第 6 格。路长了也一样：先数，再接。',
       predict: '先猜一猜：比上一题多走几步？',
-      level: { cols: 7, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 5, y: 0 } },
+      level: { cols: 7, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 5, y: 0 }, scenery: 'counting' },
       allowedBlocks: ['when_start', r, f],
       hints: [
         '小狐狸停的格子和蘑菇屋差几格，提示里写着。',
@@ -411,7 +421,7 @@ const L03: GridLesson = {
       title: '练习 A：反方向数格子',
       instruction: '这次小狐狸站在右边、脸朝左，蘑菇屋在它左边 2 格。用“向左走一格”或“向前走一格”。',
       predict: '先猜一猜：脸朝左时，“向前走”会往哪边？',
-      level: { cols: 7, rows: 1, start: { x: 6, y: 0, facing: 'left' }, goal: { x: 4, y: 0 } },
+      level: { cols: 7, rows: 1, start: { x: 6, y: 0, facing: 'left' }, goal: { x: 4, y: 0 }, scenery: 'counting' },
       allowedBlocks: ['when_start', r, l, f],
       hints: [
         '小狐狸往右走就出地图了，方向反了。',
@@ -430,7 +440,7 @@ const L03: GridLesson = {
       title: '练习 B：多走了一步',
       instruction: '小兔子的程序走过了蘑菇屋。先运行看看差几格，再用“撤回最后一块”改好。',
       predict: '先猜一猜：这个程序会停在蘑菇屋的哪一边？',
-      level: { cols: 5, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 3, y: 0 } },
+      level: { cols: 5, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 3, y: 0 }, scenery: 'counting' },
       allowedBlocks: ['when_start', r, f],
       starterBlocks: [{ type: 'when_start' }, { type: r }, { type: r }, { type: r }, { type: r }],
       hints: [
@@ -441,14 +451,40 @@ const L03: GridLesson = {
       solutions: [P(r, r, r), P(r, r, f)],
       counterExamples: [{ program: P(r, r, r, r), failure: 'not_at_goal' }],
     },
+    {
+      id: 'my-count-card',
+      kind: 'creative',
+      title: '创意改造：松鼠的蘑菇屋在哪？',
+      instruction: '这次小狐狸站在路中间。由你来决定：先选一格，把松鼠的蘑菇屋放过去（左边、右边都可以）；再数一数，拼出刚好走到的程序。通过后，它就是你的“数数卡”作品。',
+      predict: '先猜一猜：蘑菇屋在小狐狸的哪一边？要走几步？',
+      creative: { prompt: '把松鼠的蘑菇屋放在第几格？', goalChoices: [{ x: 6, y: 0 }, { x: 0, y: 0 }, { x: 5, y: 0 }, { x: 1, y: 0 }] },
+      level: { cols: 7, rows: 1, start: { x: 3, y: 0, facing: 'right' }, goal: { x: 6, y: 0 }, scenery: 'counting' },
+      allowedBlocks: ['when_start', r, l],
+      hints: [
+        '小狐狸没停在你放的蘑菇屋上：步数或方向有一处不对。',
+        '先看蘑菇屋在左边还是右边，选同一边的箭头；再数隔几格，就接几块。',
+        '例如蘑菇屋在第 7 格：在右边，数 1、2、3，接 3 块“向右”；在第 1 格：在左边，接 3 块“向左”。',
+      ],
+      solutions: [P(r, r, r)],
+      counterExamples: [
+        { program: P(r, r), failure: 'not_at_goal' },
+        { program: P(r, r, r, r), failure: 'out_of_bounds' },
+        { program: P(l, l, l), failure: 'not_at_goal' },
+      ],
+    },
   ],
+  review: {
+    whatIf: '如果蘑菇屋离小狐狸 4 格，你接了 5 块，会停在哪？怎么改？',
+    answer: '会走过头，停在蘑菇屋后面 1 格（地图不够长就会走出地图）。撤回最后一块，剩 4 块就刚好：走几步就接几块。',
+  },
   reflection: '说一说：少一步和多一步，小狐狸分别停在哪里？',
   reflectionCheck: {
     question: '蘑菇屋在右边 3 格，要放几块“向右走一格”？',
     options: [{ text: '3 块', correct: true }, { text: '2 块', correct: false }, { text: '4 块', correct: false }],
-    why: '一块积木走一格：少一块停在前面，多一块就走出地图。',
+    why: '一块积木走一格：少一块停在前面，多一块就走过头。',
   },
-  parentQuestion: '请孩子先说出要走几步，再拼积木运行，看看猜得对不对。',
+  parentQuestion: '请孩子播放自己的“数数卡”，先说出蘑菇屋在哪边、要走几步，再看小狐狸走得对不对。',
+  project: { stepId: 'my-count-card', title: '我的数数卡' },
 }
 
 const L04: GridLesson = {

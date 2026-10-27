@@ -19,6 +19,7 @@ const ACCEPTANCE_SET = [
   'graduation-island.svg',
   'treehouse.svg', // G0-U1-L01 story scenery
   'post-signpost.svg', // G0-U1-L02 story scenery
+  'counting-board.svg', // G0-U1-L03 story scenery
 ]
 
 describe('kc-scenes asset register (UX-004)', () => {

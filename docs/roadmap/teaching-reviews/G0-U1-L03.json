@@ -1,17 +1,20 @@
 {
   "schemaVersion": 1,
   "lessonId": "G0-U1-L03",
-  "reviewedCommit": "32c86eafaf283db95961c168965ae4922c3c18a5",
-  "reviewedAt": "2026-10-19",
-  "reviewer": "Hark（AI 参考评分，亦为本课实现者）",
+  "reviewedCommit": "2cd03a5",
+  "reviewedAt": "2026-10-27",
+  "reviewer": "Hark A（AI 参考评分，亦为本课实现者）",
   "reviewerKind": "ai",
   "independent": false,
   "ageBand": "G0 启蒙（5～7 岁）",
   "prerequisites": [
+    "G0-U1-L01",
     "G0-U1-L02"
   ],
   "newConcepts": [
-    "数格子与步数"
+    "动作次数：走几格就接几块",
+    "少一步停在前面、多一步走过头，能说出差几格",
+    "撤回最后一块修好多走的程序"
   ],
   "references": [
     "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11 公开介绍）",
@@ -19,66 +22,69 @@
   ],
   "scores": {
     "knowledge": {
-      "score": 16,
+      "score": 17,
       "evidence": [
-        "apps/web/src/content/curriculum/g0-u1-grid-lessons.ts G0-U1-L03",
-        "标题「数一数，走几步」与内容一致；新概念：数格子与步数",
-        "六课递进：开始事件 → 四方向 → 数步数 → 转向 → 钥匙门前提 → 综合作品"
+        "g0-u1-grid-lessons.ts G0-U1-L03：三条可观察目标",
+        "5 关递进：错误实验（少数一步）→ 五步长路 → 反方向数格子（向前跟着脸）→ 多走一步撤回 → 左右任选位置的数数卡",
+        "只新增“次数准确”一个概念，方向沿用 L02"
       ],
       "defects": [
-        "与 L01/L02 的递进主要是“数数”，新意偏少",
-        "E2E 只覆盖部分关卡"
+        "“向前”与“向右/向左”的区别在练习 A 才出现，部分孩子可能需要家长解释"
       ]
     },
     "story": {
       "score": 13,
       "evidence": [
-        "小狐狸森林情境贯穿；每关有“先猜一猜”预测问题",
-        "EDU-105：说明、预测、诊断、提示都可中文语音朗读（read-aloud.tsx，E2E 验证）"
+        "松鼠的数数牌原创场景（apps/web/public/kc-scenes/counting-board.svg：三颗橡果标 1、2、3，已登记授权表），每关舞台左侧可见",
+        "错误实验两个可点选预测，猜错不阻塞"
       ],
       "defects": [
-        "朗读用浏览器自带声音，音色因设备而异；没有角色配音"
+        "朗读用浏览器自带声音，没有角色配音；单行地图上场景图偏小"
       ]
     },
     "practice": {
-      "score": 21,
+      "score": 22,
       "evidence": [
-        "4 关：两关带着做 + 练习 A 自己搭 + 练习 B 修别人的程序，均在网格舞台上亲手拼块运行",
-        "apps/web/src/content/curriculum/g0-u1-grid-lessons.test.ts 每关正解真跑通"
+        "练习 A（脸朝左反方向数格子）与练习 B（撤回多走的一块，调试）目标不同，均在真实网格引擎上运行",
+        "单元测试：每个创意位置正好的步数通过，少一块、多一块都失败，任一路线只到自己的目标",
+        "tests/e2e/grid-lab.spec.ts › G0-U1-L03 formal course…（2026-10-27 本地桌面 Chrome 实跑通过，以 PR CI 为准）"
       ],
       "defects": [
-        "练习 B 修错主要靠清空重拼，单块插入/替换对这个年龄偏难"
+        "数数仍靠孩子自己数，舞台没有逐格计数动画"
       ]
     },
     "feedback": {
       "score": 14,
       "evidence": [
-        "每种失败有本课专属诊断（diagnoses）",
-        "三层提示：现象 → 概念 → 具体做法；舞台显示撞到/落水的位置",
-        "EDU-105：失败时指出第几块积木出错（grid-lab-pointer.test.ts）"
+        "本课专属诊断（no_start / not_at_goal / out_of_bounds / disconnected），not_at_goal 提示差几格、往哪边差",
+        "三层提示：现象 → 规则 → 做法",
+        "错误实验显示“预想 vs 实际”：只走 2 格停在前面一格",
+        "复盘卡列出本节真实遇到并修好的错误（E2E 验证“没走到目标”“走出了地图”）"
       ],
       "defects": [
-        "没到目标（停早了）时只给差几格，不指具体积木"
+        "没到目标时不直接在舞台上标出差的格子"
       ]
     },
     "creation": {
-      "score": 8,
+      "score": 11,
       "evidence": [
-        "练习 A 允许多种路线，引擎按真实运行判定"
+        "创意改造：小狐狸站中间，孩子把蘑菇屋放在左边或右边 4 个位置之一，再数步数写程序；换位置后旧程序失效（单元测试 + E2E）",
+        "作品“我的数数卡”保存位置与程序，可真实回放"
       ],
       "defects": [
-        "没有开放创作，练习 A 是“多解路线”，不是自己出题或改地图"
+        "仍是 4 个预设位置，不能自己加障碍"
       ]
     },
     "assessment": {
       "score": 8,
       "evidence": [
-        "通过由真实引擎判定，反例在单元测试里给出指定错误",
-        "apps/web/tests/e2e/grid-lab.spec.ts：G0-U1-L02 and L03: river crash and one-step-too-far are diagnosed, then fixed",
-        "EDU-105：点选式反思判对错并保存，重开仍在（E2E）"
+        "通过只由真实引擎判定；伪造完成状态在草稿读取时被过滤",
+        "复盘卡：目标回顾 + 真实错误记录 + What-if（接多一块会停在哪、怎么改）；点选反思保存并重开仍在",
+        "三断点截图 docs/roadmap/evidence/G0-U1-L03/"
       ],
       "defects": [
-        "反思是点选题，开放表达仍靠家长；没有儿童试学"
+        "没有儿童试学；开放表达仍靠家长",
+        "评分者是实现者，非独立"
       ]
     }
   },
@@ -93,7 +99,7 @@
     },
     "no-failure-test": {
       "status": "pass",
-      "note": "单元测试反例 + E2E 真实失败再修正"
+      "note": "第 1 关是错误实验：必须先真实运行只有 2 块的起始程序、看到停在蘑菇屋前面一格才能完成；E2E 覆盖"
     },
     "rigid-answer": {
       "status": "pass",
@@ -101,19 +107,19 @@
     },
     "fake-project": {
       "status": "pass",
-      "note": "本课不声称项目完成"
+      "note": "“我的数数卡”只有在孩子选的位置上真实跑通后才出现，重开后可回放（E2E）"
     },
     "unlicensed-assets": {
       "status": "pass",
-      "note": "小狐狸与森林网格为自绘 SVG，文字为自写"
+      "note": "小狐狸、森林网格、松鼠数数牌均为项目自绘 SVG，已登记授权表；文字自写"
     },
     "minor-privacy-risk": {
       "status": "pass",
-      "note": "只存本机 localStorage（kids-grid-lesson-v1:），不上传"
+      "note": "只存本机 localStorage（kids-grid-lesson-v1:G0-U1-L03），不含姓名，不上传"
     },
     "broken-or-false-success": {
       "status": "pass",
-      "note": "练习 B 起始程序必失败；未到目标不判通过（单元测试 + E2E）"
+      "note": "练习 B 与错误实验起始程序必失败；换位置后旧通过作废；未到目标不判通过（单元测试 + E2E）"
     },
     "id-status-mismatch": {
       "status": "pass",
@@ -121,32 +127,33 @@
     }
   },
   "runEvidence": {
-    "normalRun": "L03 真实运行走对格数到达",
-    "failureCase": "多走一步 → out_of_bounds；少走 → not_at_goal 并提示还差几格",
+    "normalRun": "错误实验补 1 块后 3 块到达；创意关蘑菇屋放在最左边，3 块“向左”到达，重开后挪近一格，撤回一块后重新通过（E2E）",
+    "failureCase": "错误实验 2 块 → not_at_goal（预想/实际）；练习 A 脸朝左用“向右” → out_of_bounds；创意关向错方向数 → not_at_goal（E2E）",
     "hintLayers": [
       "第一层：说出发生了什么（现象）",
       "第二层：讲清这一课的规则（概念）",
-      "第三层：给出具体积木顺序（做法）"
+      "第三层：给出具体积木做法"
     ],
-    "practiceA": "练习 A 自己数格子搭程序",
-    "practiceB": "练习 B 修多走一步的程序",
+    "practiceA": "练习 A：脸朝左反方向数格子（向左或向前都判通过）",
+    "practiceB": "练习 B：多走一步，用撤回最后一块修好（起始程序必失败）",
     "equivalentSolutions": [
-      "正解 1（单元测试真跑通）",
-      "正解 2（单元测试真跑通）"
+      "P(r,r,r) / P(f,f,f) / P(r,r,f)（错误实验修好）",
+      "P(r×5) / P(f×5) / P(r,f,r,f,r)（五步）",
+      "P(l,l) / P(f,f)（练习 A）"
     ],
-    "saveReopen": "程序与关卡进度存 kids-grid-lesson-v1:G0-U1-L03，刷新后回到原关卡（grid-draft.test.ts + L01/L06 E2E 验证同一机制）",
+    "saveReopen": "程序、关卡进度、错误实验观察、蘑菇屋位置、真实错误记录存 kids-grid-lesson-v1:G0-U1-L03；刷新后回到完成页，作品可回放（E2E）",
     "e2eSpecs": [
-      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L02 and L03: river crash and one-step-too-far are diagnosed, then fixed"
+      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L03 formal course: one-short error lab, two practices, place the house either side, review, saved and reopened"
     ],
     "screenshots": [
-      "docs/roadmap/evidence/EDU-104/"
+      "docs/roadmap/evidence/G0-U1-L03/"
     ]
   },
   "maturityLevel": 3,
   "childTrial": "none",
   "blockers": [
     "AI 评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
-    "没有儿童试学"
+    "没有儿童试学（需真实儿童与监护人同意，不得模拟）"
   ],
-  "notes": "2026-10-19 EDU-105 打磨后再评（AI 参考分，评分者也是实现者）。"
+  "notes": "2026-10-27 Hark A 正式课程化后评分：新增错误实验（少数一步）、创意改造（蘑菇屋放左边或右边）、复盘卡、作品回放与原创松鼠数数牌场景（AI 参考分 85/100，评分者也是实现者；被审代码为 hark-a/g0-u1-l03 分支，基于 main 2cd03a5）。"
 }
