@@ -171,6 +171,28 @@ export function TurnSign() {
   )
 }
 
+/** G0-U1-L05 story scenery: the key hook board — key first, then the lock (original art, V2 flat style). */
+export function KeyHook() {
+  return (
+    <g data-grid-item="keyhook">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="30" width="6" height="30" rx="2" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2" />
+      <rect x="4" y="4" width="48" height="28" rx="5" fill="#ffe2b8" stroke="#a0704a" strokeWidth="2.5" />
+      <path d="M14 8 v5" stroke="#5e3b1c" strokeWidth="2" strokeLinecap="round" />
+      <g transform="translate(14 19)">
+        <circle r="5" fill="#fff6c9" stroke="#f5b300" strokeWidth="2" />
+        <path d="M0 5 v7 M0 9 h3 M0 12 h3" stroke="#f5b300" strokeWidth="2.2" strokeLinecap="round" />
+      </g>
+      <path d="M24 18 h7 M28 14.5 l3.5 3.5 -3.5 3.5" stroke="#4c97ff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <g transform="translate(42 19)">
+        <path d="M-4 -2 v-3 a4 4 0 0 1 8 0 v3" stroke="#7a4a1c" strokeWidth="2" fill="none" />
+        <rect x="-6" y="-2" width="12" height="10" rx="2" fill="#c9823e" stroke="#7a4a1c" strokeWidth="1.5" />
+        <circle cx="0" cy="3" r="1.6" fill="#7a4a1c" />
+      </g>
+    </g>
+  )
+}
+
 function Bump({ x, y }: Cell) {
   return (
     <g transform={`translate(${x * T + 32} ${y * T + 32})`} data-grid-item="bump">
@@ -203,7 +225,7 @@ export function GridStage({ level, state, trail = [], label }: { level: GridLeve
       data-fox-cell={`${state.x},${state.y}`}
       data-fox-facing={state.facing}
     >
-      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : <Treehouse />}</g> : null}
+      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : <Treehouse />}</g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}

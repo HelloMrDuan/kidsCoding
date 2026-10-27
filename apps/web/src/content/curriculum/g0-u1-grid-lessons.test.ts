@@ -6,7 +6,7 @@ import { g0u1GridLessons } from './g0-u1-grid-lessons'
 const toBlocks = (program: string[]) => program.map(type => ({ type }))
 const lessons = Object.values(g0u1GridLessons)
 /** Lessons that have had the Hark A formal-course pass (error lab + creative remake + review + work). */
-const FORMAL = ['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04']
+const FORMAL = ['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05']
 const MOVES: Record<string, [number, number]> = { move_up: [0, -1], move_down: [0, 1], move_left: [-1, 0], move_right_cell: [1, 0] }
 
 /** Shortest dry route (BFS over the four direction blocks) — proves a goal is reachable with real blocks. */
@@ -56,8 +56,34 @@ function shortestTurnRoute(level: GridLevel): string[] | null {
   return null
 }
 
+/** Shortest key → door → goal route over (cell, has key, door open) with the four direction blocks — checked by the real engine. */
+function shortestKeyRoute(level: GridLevel): string[] | null {
+  const blocked = new Set([...(level.water ?? []), ...(level.rocks ?? [])].map(c => `${c.x},${c.y}`))
+  const door = level.door!, key = level.key!
+  const key4 = (x: number, y: number, k: boolean, o: boolean) => `${x},${y},${k},${o}`
+  const seen = new Map<string, string[]>([[key4(level.start.x, level.start.y, false, false), []]])
+  const queue: Array<[number, number, boolean, boolean]> = [[level.start.x, level.start.y, false, false]]
+  while (queue.length) {
+    const [x, y, k, o] = queue.shift()!
+    const path = seen.get(key4(x, y, k, o))!
+    if (x === level.goal.x && y === level.goal.y) return path
+    const next: Array<[string, number, number, boolean, boolean]> = []
+    for (const [type, [dx, dy]] of Object.entries(MOVES)) next.push([type, x + dx, y + dy, k, o])
+    if (!k && x === key.x && y === key.y) next.push(['pick_key', x, y, true, o])
+    if (k && !o && Math.abs(x - door.x) + Math.abs(y - door.y) === 1) next.push(['open_door', x, y, k, true])
+    for (const [type, nx, ny, nk, no] of next) {
+      if (nx < 0 || ny < 0 || nx >= level.cols || ny >= level.rows || blocked.has(`${nx},${ny}`)) continue
+      if (nx === door.x && ny === door.y && !no) continue
+      if (seen.has(key4(nx, ny, nk, no))) continue
+      seen.set(key4(nx, ny, nk, no), [...path, type])
+      queue.push([nx, ny, nk, no])
+    }
+  }
+  return null
+}
+
 describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
-  it('covers L01–L06; formal-course lessons (L01–L04) have five steps, the rest four; L06 is the unit project', () => {
+  it('covers L01–L06; formal-course lessons (L01–L05) have five steps, the rest four; L06 is the unit project', () => {
     expect(lessons.map(l => l.id)).toEqual(['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05', 'G0-U1-L06'])
     const project = g0u1GridLessons['G0-U1-L06'].project!
     expect(g0u1GridLessons['G0-U1-L06'].steps.find(s => s.id === project.stepId)?.kind).toBe('practice-a')
@@ -312,6 +338,55 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
       expect(lesson.project?.stepId).toBe(creative.id)
       expect(lesson.review?.answer).toContain('向右转')
       for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('turnsign')
+    })
+  })
+  describe('G0-U1-L05 formal-course pass (error lab, creative remake, review)', () => {
+    const lesson = g0u1GridLessons['G0-U1-L05']
+    const lab = lesson.steps.find(s => s.kind === 'error-lab')!
+    const creative = lesson.steps.find(s => s.kind === 'creative')!
+
+    it('keeps the five-step shape: error lab, guided, two different practices, creative', () => {
+      expect(lesson.steps.map(s => s.kind)).toEqual(['error-lab', 'guided', 'practice-a', 'practice-b', 'creative'])
+    })
+
+    it('the error lab walks straight into the locked door; the door never opens by itself', () => {
+      expect(runGridProgram(lab.level, lab.starterBlocks!).failure).toBe('door_locked')
+      expect(lab.errorLab!.expect).toBe('door_locked')
+      const [a, b] = lab.predictChoices!
+      expect(a.when).not.toBe(b.when)
+      expect([a.when, b.when]).toContain(lab.errorLab!.expect)
+    })
+
+    it('every friend behind the door is reached only by key → open → walk; skipping the key or swapping the order fails; one route never fits two friends', () => {
+      const choices = creative.creative!.goalChoices
+      expect(choices.length).toBeGreaterThanOrEqual(3)
+      expect(creative.creative!.labels).toHaveLength(choices.length)
+      const routes = choices.map(goal => {
+        const level = stepLevel(creative, { creative: { [creative.id]: { goal } } })
+        expect(goal.x).toBeGreaterThan(level.door!.x) // every friend lives behind the door
+        const route = shortestKeyRoute(level)
+        expect(route, `goal ${goal.x},${goal.y}`).not.toBeNull()
+        expect(route!.indexOf('pick_key')).toBeGreaterThanOrEqual(0)
+        expect(route!.indexOf('pick_key')).toBeLessThan(route!.indexOf('open_door'))
+        expect(runGridProgram(level, toBlocks(['when_start', ...route!])).passed).toBe(true)
+        expect(runGridProgram(level, toBlocks(['when_start', ...route!.filter(t => t !== 'pick_key')])).passed, 'no key').toBe(false)
+        const swapped = [...route!]
+        const ki = swapped.indexOf('pick_key'), oi = swapped.indexOf('open_door')
+        ;[swapped[ki], swapped[oi]] = [swapped[oi], swapped[ki]]
+        expect(runGridProgram(level, toBlocks(['when_start', ...swapped])).passed, 'swapped').toBe(false)
+        return { level, route: route! }
+      })
+      for (const [i, a] of routes.entries()) {
+        for (const [j, b] of routes.entries()) {
+          if (i !== j) expect(runGridProgram(b.level, toBlocks(['when_start', ...a.route])).passed, `${i}→${j}`).toBe(false)
+        }
+      }
+    })
+
+    it('the creative remake is the saved lesson work, review asks a what-if, and every step shows the key hook board', () => {
+      expect(lesson.project?.stepId).toBe(creative.id)
+      expect(lesson.review?.answer).toContain('先捡钥匙')
+      for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('keyhook')
     })
   })
 })
