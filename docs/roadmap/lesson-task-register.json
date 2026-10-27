@@ -1362,7 +1362,7 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/160",
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/163",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (7 tests; local Playwright Chromium 7/7 on PR head; CI real-Chrome result pending)",
