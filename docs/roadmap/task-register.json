@@ -2179,7 +2179,7 @@
       "title": "跨设备A账号登录草稿恢复",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "CLOUD-101"
       ],
