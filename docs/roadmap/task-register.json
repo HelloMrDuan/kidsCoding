@@ -1720,7 +1720,7 @@
       "title": "Python浏览器跨端完整回归",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-412"
       ],
@@ -1729,11 +1729,13 @@
         "实际Pyodide、超时错误/恢复、375/768/1440键盘截图与E2E"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/151",
+        "mergeCommit": "6c6972bbd2e33b075a2181442fe42ada38e60350",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40435151052",
+        "tests": [
+          "e2e: python-cross-device-ux413 6/6 in CI python-batch3 (16/16) + local 6/6; infinite-loop timeout + recovery rerun, three-breakpoint keyboard E2E, desktop + mobile focus screenshots verified"
+        ],
+        "reviewer": "duan 2026-10-27 instruction authorized merge; executed by kid小宝 via connector"
       },
       "notes": ""
     },
