@@ -14,6 +14,8 @@ export type GridLevel = {
   water?: Cell[]
   key?: Cell
   door?: Cell
+  /** Story decoration drawn under the start cell; never affects a run. */
+  scenery?: 'treehouse'
 }
 
 export const GRID_BLOCK_TYPES = [

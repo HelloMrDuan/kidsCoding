@@ -1,5 +1,5 @@
 import type { GridLesson } from '@/content/curriculum/g0-u1-grid-lessons'
-import { GRID_BLOCK_TYPES, GRID_MAX_ACTIONS } from './grid-engine'
+import { GRID_BLOCK_TYPES, GRID_MAX_ACTIONS, type Cell, type GridFailure } from './grid-engine'
 
 export const GRID_DRAFT_PREFIX = 'kids-grid-lesson-v1:'
 export const gridDraftKey = (lessonId: string) => GRID_DRAFT_PREFIX + lessonId
@@ -12,7 +12,15 @@ export type GridDraft = {
   savedAt: string | null
   /** EDU-105: index of the reflection option the child tapped. */
   reflection?: number
+  /** error-lab steps where the child ran the planned mistake and saw the expected failure. */
+  observed?: string[]
+  /** creative steps: the cell the child moved the goal to. */
+  creative?: Record<string, { goal: Cell }>
+  /** Distinct engine failures the child really met in this lesson (for 复盘). */
+  mistakes?: GridFailure[]
 }
+
+const FAILURES = new Set<string>(['no_start', 'disconnected', 'unknown_block', 'too_many', 'out_of_bounds', 'hit_rock', 'fell_in_water', 'door_locked', 'no_key_here', 'not_at_door', 'need_key', 'not_at_goal'])
 
 const KNOWN = new Set<string>(['when_start', ...GRID_BLOCK_TYPES])
 
@@ -36,7 +44,28 @@ export function parseGridDraft(lesson: GridLesson, raw: string | null): GridDraf
     const savedAt = typeof value.savedAt === 'string' && Number.isFinite(Date.parse(value.savedAt)) ? value.savedAt : null
     const options = lesson.reflectionCheck?.options.length ?? 0
     const reflection = Number.isInteger(value.reflection) && (value.reflection as number) >= 0 && (value.reflection as number) < options ? (value.reflection as number) : undefined
-    return { stepIndex, programs, passed: [...new Set(passed)], savedAt, ...(reflection === undefined ? {} : { reflection }) }
+    const errorLabIds = lesson.steps.filter(s => s.kind === 'error-lab').map(s => s.id)
+    const observed = Array.isArray(value.observed) ? [...new Set((value.observed as unknown[]).filter((id): id is string => typeof id === 'string' && errorLabIds.includes(id)))] : []
+    const creative: NonNullable<GridDraft['creative']> = {}
+    if (value.creative && typeof value.creative === 'object') {
+      for (const step of lesson.steps) {
+        const entry = (value.creative as Record<string, unknown>)[step.id] as { goal?: { x?: unknown; y?: unknown } } | undefined
+        const goal = entry?.goal
+        if (!step.creative || !goal) continue
+        const match = step.creative.goalChoices.find(c => c.x === goal.x && c.y === goal.y)
+        if (match) creative[step.id] = { goal: { x: match.x, y: match.y } }
+      }
+    }
+    const mistakes = Array.isArray(value.mistakes) ? [...new Set((value.mistakes as unknown[]).filter((m): m is GridFailure => typeof m === 'string' && FAILURES.has(m)))] : []
+    // A passed creative step without its chosen goal can't be replayed: don't trust it.
+    const trusted = [...new Set(passed)].filter(id => !lesson.steps.find(s => s.id === id)?.creative || creative[id])
+    return {
+      stepIndex, programs, passed: trusted, savedAt,
+      ...(reflection === undefined ? {} : { reflection }),
+      ...(observed.length ? { observed } : {}),
+      ...(Object.keys(creative).length ? { creative } : {}),
+      ...(mistakes.length ? { mistakes } : {}),
+    }
   } catch {
     return null
   }

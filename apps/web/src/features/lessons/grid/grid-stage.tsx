@@ -73,6 +73,32 @@ function Goal({ x, y }: Cell) {
   )
 }
 
+/** G0-U1-L01 story scenery: the fox's treehouse with its two command signs (original art, V2 flat style). */
+export function Treehouse() {
+  return (
+    <g data-grid-item="treehouse">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <path d="M20 60 V30 h16 V60 Z" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2.5" />
+      <path d="M24 44 q4 -3 8 0" stroke="#5e3b1c" strokeWidth="2" fill="none" opacity=".6" />
+      <circle cx="28" cy="10" r="22" fill="#4fae55" stroke="#2f7d3a" strokeWidth="2.5" />
+      <circle cx="10" cy="20" r="12" fill="#5cbf60" stroke="#2f7d3a" strokeWidth="2" />
+      <circle cx="46" cy="20" r="12" fill="#5cbf60" stroke="#2f7d3a" strokeWidth="2" />
+      <rect x="12" y="14" width="32" height="20" rx="4" fill="#ffe2b8" stroke="#a0704a" strokeWidth="2.5" />
+      <path d="M8 16 L28 2 L48 16 Z" fill="#ff8a3d" stroke="#b5562a" strokeWidth="2.5" strokeLinejoin="round" />
+      <rect x="23" y="21" width="10" height="13" rx="5" fill="#a0704a" />
+      <circle cx="17" cy="24" r="3" fill="#7fd0ff" stroke="#a0704a" strokeWidth="1.5" />
+      <g transform="translate(-2 38)">
+        <rect width="22" height="11" rx="3" fill="#ffbf00" stroke="#a87400" strokeWidth="1.5" />
+        <path d="M5 5.5 h12" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+      </g>
+      <g transform="translate(34 38)">
+        <rect width="22" height="11" rx="3" fill="#4c97ff" stroke="#2f6fd1" strokeWidth="1.5" />
+        <path d="M5 5.5 h10 M12 2.5 l3.5 3 -3.5 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      </g>
+    </g>
+  )
+}
+
 function Bump({ x, y }: Cell) {
   return (
     <g transform={`translate(${x * T + 32} ${y * T + 32})`} data-grid-item="bump">
@@ -86,6 +112,8 @@ export type GridStageState = { x: number; y: number; facing: Facing; hasKey: boo
 export function GridStage({ level, state, trail = [], label }: { level: GridLevel; state: GridStageState; trail?: Cell[]; label?: string }) {
   const w = level.cols * T
   const h = level.rows * T
+  // The treehouse sits just left of the map, so the fox visibly leaves home; it is never a cell.
+  const left = level.scenery === 'treehouse' ? 64 : 0
   const tiles = []
   for (let y = 0; y < level.rows; y++) {
     for (let x = 0; x < level.cols; x++) {
@@ -96,13 +124,14 @@ export function GridStage({ level, state, trail = [], label }: { level: GridLeve
   return (
     <svg
       className="kc-grid-stage"
-      viewBox={`-8 -8 ${w + 16} ${h + 16}`}
+      viewBox={`${-8 - left} -8 ${w + 16 + left} ${h + 16}`}
       role="img"
       aria-label={label ?? `森林网格 ${level.cols}×${level.rows}，小狐狸在第 ${state.x + 1} 列第 ${state.y + 1} 行，面朝${{ up: '上', right: '右', down: '下', left: '左' }[state.facing]}`}
       data-testid="grid-stage"
       data-fox-cell={`${state.x},${state.y}`}
       data-fox-facing={state.facing}
     >
+      {left ? <g transform={`translate(${-left - 2} 2)`}><Treehouse /></g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}
