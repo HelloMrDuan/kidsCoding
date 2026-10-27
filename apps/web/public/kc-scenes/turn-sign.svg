@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 64 70" role="img" aria-label="路口转弯牌：向左转、向右转两只弯箭头，旁边一块小石头">
+<g>
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="28" width="6" height="32" rx="2" fill="#9b6a3c" stroke="#5e3b1c" stroke-width="2" />
+      <circle cx="28" cy="18" r="17" fill="#ffe2b8" stroke="#a0704a" stroke-width="2.5" />
+      <path d="M24 28 V18 Q24 11 17 11 H13" stroke="#4c97ff" stroke-width="3" fill="none" stroke-linecap="round" />
+      <path d="M16 7 L11 11 L16 15" stroke="#4c97ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M32 28 V18 Q32 11 39 11 H43" stroke="#ff8a3d" stroke-width="3" fill="none" stroke-linecap="round" />
+      <path d="M40 7 L45 11 L40 15" stroke="#ff8a3d" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M4 60 q2 -9 9 -9 q8 0 10 9 Z" fill="#9aa3ad" stroke="#5f6b76" stroke-width="2" stroke-linejoin="round" />
+      <path d="M9 55 q3 -2 6 0" stroke="#fff" stroke-width="1.5" fill="none" opacity=".6" />
+    </g>
+</svg>

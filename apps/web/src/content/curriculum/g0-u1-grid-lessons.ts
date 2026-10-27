@@ -490,7 +490,7 @@ const L03: GridLesson = {
 const L04: GridLesson = {
   id: 'G0-U1-L04',
   title: '转个弯，绕开大石头',
-  story: '一块大石头挡住了直路。小狐狸不能穿过石头，要先转个弯，绕过去再走。',
+  story: '一块大石头挡住了直路。路口有块转弯牌，画着向左转、向右转两只弯箭头。小狐狸不能穿过石头，要先转个弯，绕过去再走。',
   concept: '转向与把路线分成几段',
   objectives: [
     '知道“向左转、向右转”只转身不走路，转完要再“向前走”',
@@ -507,22 +507,33 @@ const L04: GridLesson = {
   },
   steps: [
     {
-      id: 'first-turn',
-      kind: 'guided',
-      title: '第一次转弯',
-      instruction: '这一课只有“向前走、向左转、向右转”。小狐狸脸朝右：先向前走 1 格，再向左转（转身朝上），然后向前走 2 格。',
-      predict: '先猜一猜：小狐狸脸朝右的时候，“向左转”会让它面朝哪边？',
-      level: { cols: 3, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 1, y: 0 } },
-      allowedBlocks: ['when_start', f, tl, tr],
-      hints: [
-        '小狐狸走出了地图或停错了地方，转弯的方向不对。',
-        '“转”只改变脸朝哪边，不走路；转完再“向前走”才会动。',
-        '向前走 1 格 → 向左转 → 向前走 2 格。',
+      id: 'turn-not-walk',
+      kind: 'error-lab',
+      title: '错误实验：转了身却没走',
+      instruction: '蘑菇屋就在小狐狸上面 1 格。小兔子的程序只有一块“向左转”。这是一个故意的错误：先按原样运行，看看小狐狸会不会走到蘑菇屋，再修好它。',
+      predict: '先猜一猜：只有一块“向左转”，小狐狸会怎样？',
+      predictChoices: [
+        { text: '往上走到蘑菇屋', when: 'pass' },
+        { text: '只转身，站在原地', when: 'not_at_goal' },
       ],
-      solutions: [P(f, tl, f, f), P(tl, f, f, tr, f)],
+      errorLab: {
+        expect: 'not_at_goal',
+        expected: '如果“转”也会走路，小狐狸应该走到上面的蘑菇屋。',
+        actual: '小狐狸只是转身朝上，还站在原地：转弯只改脸的方向，不走路，转完要再“向前走”。',
+      },
+      level: { cols: 3, rows: 3, start: { x: 1, y: 2, facing: 'right' }, goal: { x: 1, y: 1 }, scenery: 'turnsign' },
+      allowedBlocks: ['when_start', f, tl, tr],
+      starterBlocks: [{ type: 'when_start' }, { type: tl }],
+      hints: [
+        '小狐狸转了身，可是一步也没走。',
+        '“转”只改变脸朝哪边，不走路；转完再“向前走”才会动。',
+        '在“向左转”下面接 1 块“向前走一格”。',
+      ],
+      solutions: [P(tl, f)],
       counterExamples: [
-        { program: P(f, tr, f), failure: 'out_of_bounds' },
-        { program: P(f, tl), failure: 'not_at_goal' },
+        { program: P(tl), failure: 'not_at_goal' },
+        { program: P(tr, f), failure: 'out_of_bounds' },
+        { program: P(f), failure: 'not_at_goal' },
       ],
     },
     {
@@ -531,7 +542,7 @@ const L04: GridLesson = {
       title: '绕过大石头',
       instruction: '直走会撞到石头。先往上绕一格，再转回来向右走到终点蘑菇屋。',
       predict: '先猜一猜：一直向前走，会在第几步撞到石头？',
-      level: { cols: 5, rows: 4, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 4, y: 1 }, rocks: [{ x: 2, y: 2 }, { x: 2, y: 3 }] },
+      level: { cols: 5, rows: 4, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 4, y: 1 }, rocks: [{ x: 2, y: 2 }, { x: 2, y: 3 }], scenery: 'turnsign' },
       allowedBlocks: ['when_start', f, tl, tr],
       hints: [
         '小狐狸撞到了石头，说明它在石头前没有转弯。',
@@ -550,7 +561,7 @@ const L04: GridLesson = {
       title: '练习 A：从小桥过河',
       instruction: '小河上只有中间一排是小桥。转到中间那一排，过桥后再转弯到右上角的蘑菇屋。',
       predict: '先猜一猜：一共要转几次弯？',
-      level: { cols: 5, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 4, y: 0 }, water: [{ x: 2, y: 0 }, { x: 2, y: 2 }] },
+      level: { cols: 5, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 4, y: 0 }, water: [{ x: 2, y: 0 }, { x: 2, y: 2 }], scenery: 'turnsign' },
       allowedBlocks: ['when_start', f, tl, tr],
       hints: [
         '掉进了小河：这一排没有桥。',
@@ -566,7 +577,7 @@ const L04: GridLesson = {
       title: '练习 B：转错了方向',
       instruction: '小兔子的程序把两次转弯弄反了，小狐狸撞上了石头。先运行看它怎么走，再改好（可以清空后重拼）。',
       predict: '先猜一猜：小兔子的第一次转弯，让小狐狸往上还是往下？',
-      level: { cols: 5, rows: 4, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 4, y: 1 }, rocks: [{ x: 2, y: 2 }, { x: 2, y: 3 }] },
+      level: { cols: 5, rows: 4, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 4, y: 1 }, rocks: [{ x: 2, y: 2 }, { x: 2, y: 3 }], scenery: 'turnsign' },
       allowedBlocks: ['when_start', f, tl, tr],
       starterBlocks: [{ type: 'when_start' }, { type: f }, { type: tr }, { type: f }, { type: tl }, { type: f }, { type: f }, { type: f }],
       hints: [
@@ -577,6 +588,30 @@ const L04: GridLesson = {
       solutions: [P(f, tl, f, tr, f, f, f)],
       counterExamples: [{ program: P(f, tr, f, tl, f, f, f), failure: 'hit_rock' }],
     },
+    {
+      id: 'my-turn-card',
+      kind: 'creative',
+      title: '创意改造：绕到哪位朋友家？',
+      instruction: '大石头挡在小狐狸前面。由你来决定：先选一位朋友，蘑菇屋就搬到那一格；再用“向前走、向左转、向右转”拼出一条不撞石头的路。通过后，它就是你的“转弯路线卡”作品。',
+      predict: '先猜一猜：去你选的朋友家，要转几次弯？第一次往左转还是往右转？',
+      creative: {
+        prompt: '要绕到哪位朋友家？',
+        goalChoices: [{ x: 3, y: 2 }, { x: 1, y: 0 }, { x: 3, y: 0 }, { x: 0, y: 0 }],
+        labels: ['小熊 · 石头后面', '小兔 · 上排第二格', '小松鼠 · 右上角', '小刺猬 · 左上角'],
+      },
+      level: { cols: 4, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 3, y: 2 }, rocks: [{ x: 2, y: 2 }], scenery: 'turnsign' },
+      allowedBlocks: ['when_start', f, tl, tr],
+      hints: [
+        '小狐狸撞到了石头、走出了地图，或者停在了别的格子：有一次转弯或步数不对。',
+        '先想朋友家在小狐狸的哪边；脸朝右时“向左转”朝上，朝上时“向右转”又朝右。每转一次，接着“向前走”。',
+        '例如去小熊家：向前 1 → 向左转 → 向前 1 → 向右转 → 向前 2 → 向右转 → 向前 1。',
+      ],
+      solutions: [P(f, tl, f, tr, f, f, tr, f), P(tl, f, tr, f, f, f, tr, f)],
+      counterExamples: [
+        { program: P(f, f), failure: 'hit_rock' },
+        { program: P(f, tl, f, tr, f, f), failure: 'not_at_goal' },
+      ],
+    },
   ],
   reflection: '说一说：“向左转”和“向左走一格”有什么不一样？',
   reflectionCheck: {
@@ -584,7 +619,12 @@ const L04: GridLesson = {
     options: [{ text: '朝上', correct: true }, { text: '朝左', correct: false }, { text: '朝下', correct: false }],
     why: '转弯是站在小狐狸自己的位置转身：脸朝右时，它的左手在上面。',
   },
-  parentQuestion: '请孩子站起来当小狐狸，跟着自己的程序转身、走路，看看会不会撞到“石头”。',
+  review: {
+    whatIf: '如果小狐狸脸朝上，想往右走，要先接哪块积木？',
+    answer: '先接“向右转”，让脸朝右，再接“向前走一格”。转弯只转身，走路靠“向前走”。',
+  },
+  parentQuestion: '请孩子播放自己的“转弯路线卡”，站起来当小狐狸，跟着程序转身、走路，说说每次转完脸朝哪边。',
+  project: { stepId: 'my-turn-card', title: '我的转弯路线卡' },
 }
 
 const L05: GridLesson = {

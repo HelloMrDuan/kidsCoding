@@ -18,8 +18,9 @@
 | apps/web/public/kc-scenes/treehouse.svg | 小狐狸的树屋（含“开始时”与箭头两块指令牌） | 本项目新绘（Hark A，G0-U1-L01），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `Treehouse` 与本文件几何一致 | original | 1444 |
 | apps/web/public/kc-scenes/post-signpost.svg | 森林邮局与四向路牌（上、下、左、右四只箭头） | 本项目新绘（Hark A，G0-U1-L02），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `Signpost` 与本文件几何一致 | original | 1469 |
 | apps/web/public/kc-scenes/counting-board.svg | 松鼠的数数牌（三颗橡果，标 1、2、3） | 本项目新绘（Hark A，G0-U1-L03），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `CountingBoard` 与本文件几何一致 | original | 1392 |
+| apps/web/public/kc-scenes/turn-sign.svg | 路口转弯牌（向左转、向右转两只弯箭头）与小石头 | 本项目新绘（Hark A，G0-U1-L04），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `TurnSign` 与本文件几何一致 | original | 1172 |
 
-机器可读登记：上表 10 个文件同时登记在
+机器可读登记：上表 11 个文件同时登记在
 `apps/web/src/content/curriculum/asset-licenses-v1.json`（SYS-105 课程 schema
 门禁会扫描 `public/` 全量文件并要求每文件都有 original/authorized 授权条目；
 只写本文档不够，门禁会报 `unlicensed_asset`）。

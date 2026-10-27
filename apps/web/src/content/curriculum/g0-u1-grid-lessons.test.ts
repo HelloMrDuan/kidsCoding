@@ -6,7 +6,7 @@ import { g0u1GridLessons } from './g0-u1-grid-lessons'
 const toBlocks = (program: string[]) => program.map(type => ({ type }))
 const lessons = Object.values(g0u1GridLessons)
 /** Lessons that have had the Hark A formal-course pass (error lab + creative remake + review + work). */
-const FORMAL = ['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03']
+const FORMAL = ['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04']
 const MOVES: Record<string, [number, number]> = { move_up: [0, -1], move_down: [0, 1], move_left: [-1, 0], move_right_cell: [1, 0] }
 
 /** Shortest dry route (BFS over the four direction blocks) — proves a goal is reachable with real blocks. */
@@ -29,8 +29,35 @@ function shortestRoute(level: GridLevel): string[] | null {
   return null
 }
 
+/** Shortest route with only forward / turn-left / turn-right, searched over (cell, facing) — checked by the real engine. */
+function shortestTurnRoute(level: GridLevel): string[] | null {
+  const order = ['up', 'right', 'down', 'left'] as const
+  const step: Record<string, [number, number]> = { up: [0, -1], right: [1, 0], down: [0, 1], left: [-1, 0] }
+  const blocked = new Set([...(level.water ?? []), ...(level.rocks ?? [])].map(c => `${c.x},${c.y}`))
+  const key = (x: number, y: number, d: string) => `${x},${y},${d}`
+  const seen = new Map<string, string[]>([[key(level.start.x, level.start.y, level.start.facing), []]])
+  const queue: Array<[number, number, string]> = [[level.start.x, level.start.y, level.start.facing]]
+  while (queue.length) {
+    const [x, y, d] = queue.shift()!
+    const path = seen.get(key(x, y, d))!
+    if (x === level.goal.x && y === level.goal.y) return path
+    const i = order.indexOf(d as (typeof order)[number])
+    const next: Array<[string, number, number, string]> = [
+      ['move_forward', x + step[d][0], y + step[d][1], d],
+      ['turn_left', x, y, order[(i + 3) % 4]],
+      ['turn_right', x, y, order[(i + 1) % 4]],
+    ]
+    for (const [type, nx, ny, nd] of next) {
+      if (nx < 0 || ny < 0 || nx >= level.cols || ny >= level.rows || blocked.has(`${nx},${ny}`) || seen.has(key(nx, ny, nd))) continue
+      seen.set(key(nx, ny, nd), [...path, type])
+      queue.push([nx, ny, nd])
+    }
+  }
+  return null
+}
+
 describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
-  it('covers L01–L06; formal-course lessons (L01–L03) have five steps, the rest four; L06 is the unit project', () => {
+  it('covers L01–L06; formal-course lessons (L01–L04) have five steps, the rest four; L06 is the unit project', () => {
     expect(lessons.map(l => l.id)).toEqual(['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05', 'G0-U1-L06'])
     const project = g0u1GridLessons['G0-U1-L06'].project!
     expect(g0u1GridLessons['G0-U1-L06'].steps.find(s => s.id === project.stepId)?.kind).toBe('practice-a')
@@ -236,6 +263,55 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
       expect(lesson.project?.stepId).toBe(creative.id)
       expect(lesson.review?.answer).toContain('撤回最后一块')
       for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('counting')
+    })
+  })
+  describe('G0-U1-L04 formal-course pass (error lab, creative remake, review)', () => {
+    const lesson = g0u1GridLessons['G0-U1-L04']
+    const lab = lesson.steps.find(s => s.kind === 'error-lab')!
+    const creative = lesson.steps.find(s => s.kind === 'creative')!
+
+    it('keeps the five-step shape: error lab, guided, two different practices, creative', () => {
+      expect(lesson.steps.map(s => s.kind)).toEqual(['error-lab', 'guided', 'practice-a', 'practice-b', 'creative'])
+    })
+
+    it('the error lab shows a turn does not walk: the fox turns in place, and one forward block fixes it', () => {
+      const run = runGridProgram(lab.level, lab.starterBlocks!)
+      expect(run.failure).toBe('not_at_goal')
+      const last = run.frames[run.frames.length - 1]
+      expect([last.x, last.y, last.facing]).toEqual([lab.level.start.x, lab.level.start.y, 'up'])
+      expect(runGridProgram(lab.level, [...lab.starterBlocks!, { type: 'move_forward' }]).passed).toBe(true)
+      const [a, b] = lab.predictChoices!
+      expect(a.when).not.toBe(b.when)
+      expect([a.when, b.when]).toContain(lab.errorLab!.expect)
+    })
+
+    it('every friend is reachable around the rock with forward/turn blocks only, needs at least one turn, and one route never fits two friends', () => {
+      const choices = creative.creative!.goalChoices
+      expect(choices.length).toBeGreaterThanOrEqual(3)
+      expect(creative.creative!.labels).toHaveLength(choices.length)
+      expect(creative.allowedBlocks.filter(t => t !== 'when_start').sort()).toEqual(['move_forward', 'turn_left', 'turn_right'])
+      const routes = choices.map(goal => {
+        const level = stepLevel(creative, { creative: { [creative.id]: { goal } } })
+        const route = shortestTurnRoute(level)
+        expect(route, `goal ${goal.x},${goal.y}`).not.toBeNull()
+        expect(route!.some(t => t.startsWith('turn_')), `goal ${goal.x},${goal.y}`).toBe(true)
+        expect(runGridProgram(level, toBlocks(['when_start', ...route!])).passed).toBe(true)
+        return { level, route: route! }
+      })
+      for (const [i, a] of routes.entries()) {
+        for (const [j, b] of routes.entries()) {
+          if (i !== j) expect(runGridProgram(b.level, toBlocks(['when_start', ...a.route])).passed, `${i}→${j}`).toBe(false)
+        }
+      }
+      // The friend behind the rock really needs a detour: going straight hits the rock.
+      const behind = routes[0].level
+      expect(runGridProgram(behind, toBlocks(['when_start', 'move_forward', 'move_forward'])).failure).toBe('hit_rock')
+    })
+
+    it('the creative remake is the saved lesson work, review asks a what-if, and every step shows the turn sign', () => {
+      expect(lesson.project?.stepId).toBe(creative.id)
+      expect(lesson.review?.answer).toContain('向右转')
+      for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('turnsign')
     })
   })
 })
