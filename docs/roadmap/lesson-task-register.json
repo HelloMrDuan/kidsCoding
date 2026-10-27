@@ -1377,7 +1377,7 @@
       "unitId": "G2-U1",
       "focusConcept": "精灵",
       "plannedLearningOutcome": "能使用精灵解释并完成「角色换造型」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_progress",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1390,13 +1390,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/165",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U1-L02 block: 5 tests; local Playwright Chromium 12/12 for the spec; CI real-Chrome result pending)",
         "lessonReview": null
       },
-      "notes": "Hark B 实施中：真实 Scratch VM 原创演出舞台项目（小橘猫站立/挥手、小鸟收翅/展翅），练习A“换成……造型”、练习B“重复+下一个造型+等待”造型动画（多解）、给舞台换精灵造型找错+三层提示、创意换小鸟造型；.sb3 保存/导出/导入/重开、沙箱拒非法工程；PR 与 CI 证据待补。未经独立人工教研复核不得标 completed。"
+      "notes": "Hark B：真实 Scratch VM 原创演出项目；练习A换成挥手造型、练习B重复+下一个造型+等待造型舞（多解）、舞台换精灵造型找错+三层提示、创意小鸟展翅；.sb3 自动保存/导出回读/导入/重开、沙箱拒非法工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L02.json，非独立），需独立人工教研复核；无儿童试学。不得标 completed。"
     },
     {
       "id": "G2-U1-L03",
