@@ -300,22 +300,93 @@ test('G0-U1-L03 formal course: one-short error lab, two practices, place the hou
   await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
-test('G0-U1-L04 and L05: turning and key-before-door are judged by real runs', async ({ page }) => {
-  test.setTimeout(90_000)
+test('G0-U1-L04 formal course: turn-in-place error lab, two practices, detour to a friend, review, saved and reopened', async ({ page }) => {
+  test.setTimeout(170_000)
   await page.goto('/learn/catalog/G0-U1-L04')
   await page.getByTestId('grid-trial-entry').click()
-  await add(page, 'when_start')
-  await add(page, 'move_forward')
-  await add(page, 'turn_right')
-  await add(page, 'move_forward')
-  await runAndExpect(page, 'error', '转错了方向')
-  await page.getByTestId('lesson-clear-program').click()
-  await add(page, 'when_start')
-  await add(page, 'move_forward')
-  await add(page, 'turn_left')
-  await add(page, 'move_forward', 2)
-  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  // Original story scenery: the crossroads turn sign beside a small rock.
+  await expect(page.locator('[data-grid-item="turnsign"]')).toBeVisible()
 
+  // Step 1 — error lab: a lone “向左转” turns the fox but it never walks.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('猜错也没关系')
+  await expect(page.getByTestId('grid-feedback')).toContainText('站在原地')
+  await expect(page.getByTestId('grid-stage')).toHaveAttribute('data-fox-facing', 'up')
+  await add(page, 'move_forward')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Guided: straight ahead hits the rock; the detour passes.
+  await add(page, 'when_start')
+  await add(page, 'move_forward', 2)
+  await runAndExpect(page, 'error', '撞到石头')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_forward'); await add(page, 'turn_left'); await add(page, 'move_forward'); await add(page, 'turn_right'); await add(page, 'move_forward', 3)
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: only the middle row has a bridge.
+  await add(page, 'when_start')
+  await add(page, 'move_forward', 2)
+  await runAndExpect(page, 'error', '小河')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'turn_left'); await add(page, 'move_forward'); await add(page, 'turn_right'); await add(page, 'move_forward', 4); await add(page, 'turn_left'); await add(page, 'move_forward')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice B: the friend's turns are swapped; rebuild with the right turns.
+  await runAndExpect(page, 'error', '撞到石头')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_forward'); await add(page, 'turn_left'); await add(page, 'move_forward'); await add(page, 'turn_right'); await add(page, 'move_forward', 3)
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Creative remake: pick the friend behind the rock; straight hits the rock, the detour passes.
+  await page.getByTestId('grid-run').click()
+  await expect(page.getByTestId('grid-feedback')).toContainText('先选一格')
+  await page.getByTestId('grid-goal-choice-0').click() // 小熊 · 石头后面
+  await add(page, 'when_start')
+  await add(page, 'move_forward', 2)
+  await runAndExpect(page, 'error', '撞到石头')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_forward'); await add(page, 'turn_left'); await add(page, 'move_forward'); await add(page, 'turn_right'); await add(page, 'move_forward', 2); await add(page, 'turn_right'); await add(page, 'move_forward')
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  // 复盘: the mistakes this child really met.
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('撞到石头')
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('掉进小河')
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('没走到目标')
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('向右转')
+  await expect(page.getByTestId('grid-project-steps').locator('li')).toHaveCount(9)
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  // Close and reopen: the card replays for real behind the rock.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await page.getByTestId('grid-project-play').click()
+  await expect(page.getByTestId('grid-project-card').getByTestId('grid-stage')).toHaveAttribute('data-fox-cell', '3,2', { timeout: 20_000 })
+
+  // Modify after reopening: visit 小兔 instead; the old route no longer counts until rebuilt.
+  await page.getByTestId('grid-replay-my-turn-card').click()
+  await expect(page.getByTestId('grid-goal-choice-0')).toHaveAttribute('data-chosen', 'true')
+  await page.getByTestId('grid-goal-choice-1').click() // 小兔 · 上排第二格
+  await runAndExpect(page, 'error')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'turn_left'); await add(page, 'move_forward', 2); await add(page, 'turn_right'); await add(page, 'move_forward')
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
+})
+
+test('G0-U1-L05: key-before-door is judged by real runs', async ({ page }) => {
+  test.setTimeout(60_000)
   await page.goto('/learn/grid-lab/G0-U1-L05')
   await add(page, 'when_start')
   await add(page, 'move_right_cell', 4)
@@ -370,13 +441,14 @@ test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at
     Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: Utterance, configurable: true })
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { cancel() {}, getVoices: () => [], speak(u: Utterance) { spoken.push(u.lang + '|' + u.text); setTimeout(() => u.onend?.(), 50) } } })
   })
-  await page.goto('/learn/grid-lab/G0-U1-L04')
+  // (G0-U1-L04 now opens with its error lab, so this uses L05's first step: walking into the locked door.)
+  await page.goto('/learn/grid-lab/G0-U1-L05')
   await page.getByTestId('grid-read-instruction').click()
   await add(page, 'when_start')
-  await add(page, 'move_forward', 3)
-  await runAndExpect(page, 'error', '问题出在第 3 块')
+  await add(page, 'move_right_cell', 4)
+  await runAndExpect(page, 'error', '问题出在第 4 块')
   await page.getByTestId('grid-read-feedback').click()
   const spoken = await page.evaluate(() => (window as unknown as { __spoken: string[] }).__spoken)
-  expect(spoken[0]).toMatch(/^zh-CN\|第 1 关，第一次转弯/)
-  expect(spoken[1]).toMatch(/^zh-CN\|.*问题出在第 3 块/)
+  expect(spoken[0]).toMatch(/^zh-CN\|第 1 关，捡钥匙，开门/)
+  expect(spoken[1]).toMatch(/^zh-CN\|.*问题出在第 4 块/)
 })

@@ -15,8 +15,8 @@ export type GridLevel = {
   key?: Cell
   door?: Cell
   /** Story decoration drawn under the start cell; never affects a run. */
-  /** Original story art drawn beside the map (never a cell): L01 treehouse, L02 forest post signpost, L03 squirrel's acorn counting board. */
-  scenery?: 'treehouse' | 'signpost' | 'counting'
+  /** Original story art drawn beside the map (never a cell): L01 treehouse, L02 forest post signpost, L03 squirrel's acorn counting board, L04 turn sign. */
+  scenery?: 'treehouse' | 'signpost' | 'counting' | 'turnsign'
 }
 
 export const GRID_BLOCK_TYPES = [

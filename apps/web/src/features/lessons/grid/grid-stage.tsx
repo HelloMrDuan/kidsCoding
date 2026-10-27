@@ -154,6 +154,23 @@ export function CountingBoard() {
   )
 }
 
+/** G0-U1-L04 story scenery: the crossroads turn sign (turn left / turn right) beside a small rock (original art, V2 flat style). */
+export function TurnSign() {
+  return (
+    <g data-grid-item="turnsign">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="28" width="6" height="32" rx="2" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2" />
+      <circle cx="28" cy="18" r="17" fill="#ffe2b8" stroke="#a0704a" strokeWidth="2.5" />
+      <path d="M24 28 V18 Q24 11 17 11 H13" stroke="#4c97ff" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M16 7 L11 11 L16 15" stroke="#4c97ff" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M32 28 V18 Q32 11 39 11 H43" stroke="#ff8a3d" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M40 7 L45 11 L40 15" stroke="#ff8a3d" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 60 q2 -9 9 -9 q8 0 10 9 Z" fill="#9aa3ad" stroke="#5f6b76" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M9 55 q3 -2 6 0" stroke="#fff" strokeWidth="1.5" fill="none" opacity=".6" />
+    </g>
+  )
+}
+
 function Bump({ x, y }: Cell) {
   return (
     <g transform={`translate(${x * T + 32} ${y * T + 32})`} data-grid-item="bump">
@@ -186,7 +203,7 @@ export function GridStage({ level, state, trail = [], label }: { level: GridLeve
       data-fox-cell={`${state.x},${state.y}`}
       data-fox-facing={state.facing}
     >
-      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : <Treehouse />}</g> : null}
+      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : <Treehouse />}</g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}
