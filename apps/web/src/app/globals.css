@@ -1128,3 +1128,6 @@ a.kc-v2c-filter:hover { border-color: #b9cdf2; color: #2a63d6; }
 .kc-reflect-option { display: block; width: 100%; text-align: left; min-height: 48px; padding: 10px 16px; border-radius: 16px; border: 2px solid #dbe4f3; background: #fff; font-weight: 800; color: #1e2a44; cursor: pointer; }
 .kc-reflect-option[data-chosen='true'][data-correct='true'] { border-color: #2fbf8a; background: #e8f8f2; }
 .kc-reflect-option[data-chosen='true'][data-correct='false'] { border-color: #f5a623; background: #fff5e9; }
+/* G0-U1-L01: a neutral pick (prediction or creative goal) has no right/wrong colour, only a clear selected state. */
+.kc-reflect-option[data-chosen='true']:not([data-correct]) { border-color: var(--kc-action); background: #eef4ff; color: var(--kc-action-dark); }
+.kc-choice-compact { text-align: center; white-space: nowrap; padding-left: 8px; padding-right: 8px; }

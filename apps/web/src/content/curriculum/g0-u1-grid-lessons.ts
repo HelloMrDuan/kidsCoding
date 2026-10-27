@@ -1,4 +1,4 @@
-import type { GridFailure, GridLevel } from '@/features/lessons/grid/grid-engine'
+import type { Cell, GridFailure, GridLevel } from '@/features/lessons/grid/grid-engine'
 
 /**
  * EDU-104 — G0-U1 rewritten per the TQ-001 review sheet and made playable on
@@ -8,7 +8,15 @@ import type { GridFailure, GridLevel } from '@/features/lessons/grid/grid-engine
  * stays as history); trials are experimental (L3), never "published".
  */
 
-export type GridStepKind = 'guided' | 'practice-a' | 'practice-b'
+/**
+ * G0-U1 formal-course pass (Hark A, G0-U1-L01…): 'error-lab' is a planned
+ * mistake the child must run and see before fixing it; 'creative' lets the
+ * child change the map (where the goal sits) and then program their own route.
+ */
+export type GridStepKind = 'guided' | 'practice-a' | 'practice-b' | 'error-lab' | 'creative'
+
+/** One of two concrete outcomes the child picks before running ('pass' = reaches the goal). */
+export type GridPrediction = { text: string; when: 'pass' | GridFailure }
 
 export type GridLessonStep = {
   id: string
@@ -27,6 +35,12 @@ export type GridLessonStep = {
   solutions: string[][]
   /** Programs that must fail, with the engine failure they must produce. */
   counterExamples: Array<{ program: string[]; failure: GridFailure }>
+  /** Two concrete outcomes to choose between before running; a wrong guess never blocks. */
+  predictChoices?: [GridPrediction, GridPrediction]
+  /** error-lab: the starter program must be run and produce this failure before a fix counts. */
+  errorLab?: { expect: GridFailure; expected: string; actual: string }
+  /** creative: the child places the goal on one of these cells, then programs a route to it. */
+  creative?: { prompt: string; goalChoices: Cell[] }
 }
 
 export type GridLesson = {
@@ -42,6 +56,8 @@ export type GridLesson = {
   /** EDU-105: one-tap check of the lesson's idea; the child's choice is saved with the lesson. */
   reflectionCheck: { question: string; options: Array<{ text: string; correct: boolean }>; why: string }
   parentQuestion: string
+  /** 复盘: a what-if question with its answer, shown with the mistakes the child really met. */
+  review?: { whatIf: string; answer: string }
   /** Unit project: the child's own program from this step becomes a saved, replayable card. */
   project?: { stepId: string; title: string }
 }
@@ -77,11 +93,20 @@ const L01: GridLesson = {
   steps: [
     {
       id: 'leave-treehouse',
-      kind: 'guided',
-      title: '走出树屋',
-      instruction: '积木区里已经有一块向右的箭头，可它没有“开始时”。先按运行看看会怎样，再添上“开始时”。',
+      kind: 'error-lab',
+      title: '错误实验：没吹出发哨',
+      instruction: '积木区里已经有一块向右的箭头，可它没有“开始时”。这是一个故意的错误：先按原样运行，亲眼看看会怎样，再添上“开始时”修好它。',
       predict: '先猜一猜：没有“开始时”，小狐狸会动吗？',
-      level: { cols: 3, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 1, y: 0 } },
+      predictChoices: [
+        { text: '会往右走一格', when: 'pass' },
+        { text: '一动不动', when: 'no_start' },
+      ],
+      errorLab: {
+        expect: 'no_start',
+        expected: '如果箭头自己会跑，小狐狸应该走到旁边一格。',
+        actual: '小狐狸一动不动：没有“开始时”，下面的积木都不会运行。',
+      },
+      level: { cols: 3, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 1, y: 0 }, scenery: 'treehouse' },
       allowedBlocks: ['when_start', r],
       starterBlocks: [{ type: r }],
       hints: [
@@ -101,7 +126,7 @@ const L01: GridLesson = {
       title: '走到蘑菇屋',
       instruction: '蘑菇屋在第 4 格。从小狐狸开始数，要走几格就接几块箭头。小狐狸脸朝右，“向前走一格”也是往右走。',
       predict: '先猜一猜：要接几块箭头才刚好到蘑菇屋？',
-      level: { cols: 4, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 3, y: 0 } },
+      level: { cols: 4, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 3, y: 0 }, scenery: 'treehouse' },
       allowedBlocks: ['when_start', r, f],
       hints: [
         '小狐狸停早了，或者走过了头，是箭头的数量不对。',
@@ -120,7 +145,7 @@ const L01: GridLesson = {
       title: '练习 A：停在小河前',
       instruction: '这次蘑菇屋后面就是小河，多走一格就会掉下去。让小狐狸刚好停在蘑菇屋。',
       predict: '先猜一猜：如果多接一块箭头，会发生什么？',
-      level: { cols: 5, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 2, y: 0 }, water: [{ x: 3, y: 0 }, { x: 4, y: 0 }] },
+      level: { cols: 5, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 2, y: 0 }, water: [{ x: 3, y: 0 }, { x: 4, y: 0 }], scenery: 'treehouse' },
       allowedBlocks: ['when_start', r, f],
       hints: [
         '掉进小河，说明箭头比要走的格子多。',
@@ -136,7 +161,7 @@ const L01: GridLesson = {
       title: '练习 B：找回掉队的积木',
       instruction: '小兔子拼的程序有一块箭头掉队了。先运行，看小狐狸停在哪；再把掉队的箭头接回“开始时”下面。',
       predict: '先猜一猜：掉队的箭头会不会跟着运行？',
-      level: { cols: 4, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 3, y: 0 } },
+      level: { cols: 4, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 3, y: 0 }, scenery: 'treehouse' },
       allowedBlocks: ['when_start', r, f],
       starterBlocks: [{ type: 'when_start' }, { type: r }, { type: r }, { type: r, disconnected: true }],
       hints: [
@@ -147,14 +172,39 @@ const L01: GridLesson = {
       solutions: [P(r, r, r), P(r, r, f)],
       counterExamples: [{ program: P(r, r), failure: 'not_at_goal' }],
     },
+    {
+      id: 'my-start-card',
+      kind: 'creative',
+      title: '创意改造：蘑菇屋搬家',
+      instruction: '这次由你来决定：先在下面选一格，把蘑菇屋搬过去；再拼出让小狐狸从树屋走到新蘑菇屋的程序。通过后，它就是你的“出发卡”作品。',
+      predict: '先猜一猜：蘑菇屋搬得越远，要接的箭头会更多还是更少？',
+      creative: { prompt: '把蘑菇屋搬到第几格？', goalChoices: [{ x: 2, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 0 }, { x: 5, y: 0 }] },
+      level: { cols: 6, rows: 1, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 2, y: 0 }, scenery: 'treehouse' },
+      allowedBlocks: ['when_start', r, f],
+      hints: [
+        '小狐狸没停在你放的蘑菇屋上，箭头的数量和你选的格子对不上。',
+        '蘑菇屋搬到哪，就从小狐狸开始数到哪：隔几格就接几块箭头。',
+        '例如蘑菇屋在第 3 格：从小狐狸数 1、2，就接 2 块箭头；在第 5 格就接 4 块。',
+      ],
+      solutions: [P(r, r), P(f, r)],
+      counterExamples: [
+        { program: P(r), failure: 'not_at_goal' },
+        { program: P(), failure: 'not_at_goal' },
+      ],
+    },
   ],
+  review: {
+    whatIf: '如果把蘑菇屋再往右搬一格，程序要怎么改？',
+    answer: '在最下面再接一块箭头。程序从上往下一块一块做，接几块就走几格。',
+  },
   reflection: '说一说：为什么没有“开始时”，小狐狸就不动？',
   reflectionCheck: {
     question: '没有“开始时”，小狐狸会怎样？',
     options: [{ text: '一动不动，等着出发', correct: true }, { text: '自己随便乱走', correct: false }, { text: '走得更快', correct: false }],
     why: '“开始时”就像发令枪，没有它，下面的积木都不会运行。',
   },
-  parentQuestion: '请孩子演示：先拿掉“开始时”运行一次，再放回去运行一次，说说两次有什么不同。',
+  parentQuestion: '请孩子演示：先拿掉“开始时”运行一次，再放回去运行一次，说说两次有什么不同；再播放孩子自己的“出发卡”，问问蘑菇屋为什么搬到那里。',
+  project: { stepId: 'my-start-card', title: '我的出发卡' },
 }
 
 const L02: GridLesson = {
