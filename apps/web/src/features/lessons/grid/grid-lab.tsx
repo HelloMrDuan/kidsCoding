@@ -264,7 +264,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
                     return (
                       <button key={`${cell.x}-${cell.y}`} type="button" className="kc-reflect-option kc-choice-compact" data-testid={`grid-goal-choice-${i}`}
                         aria-pressed={chosen?.x === cell.x && chosen?.y === cell.y}
-                        data-chosen={chosen?.x === cell.x && chosen?.y === cell.y ? 'true' : 'false'} onClick={() => chooseGoal(i)}>第 {cell.x + 1} 格</button>
+                        data-chosen={chosen?.x === cell.x && chosen?.y === cell.y ? 'true' : 'false'} onClick={() => chooseGoal(i)}>{step.creative!.labels?.[i] ?? (step.level.rows > 1 ? `第 ${cell.x + 1} 列第 ${cell.y + 1} 行` : `第 ${cell.x + 1} 格`)}</button>
                     )
                   })}
                 </div>

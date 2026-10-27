@@ -1,17 +1,40 @@
 import { describe, expect, it } from 'vitest'
-import { runGridProgram } from '@/features/lessons/grid/grid-engine'
+import { runGridProgram, type GridLevel } from '@/features/lessons/grid/grid-engine'
 import { stepLevel } from '@/features/lessons/grid/grid-lab'
 import { g0u1GridLessons } from './g0-u1-grid-lessons'
 
 const toBlocks = (program: string[]) => program.map(type => ({ type }))
 const lessons = Object.values(g0u1GridLessons)
+/** Lessons that have had the Hark A formal-course pass (error lab + creative remake + review + work). */
+const FORMAL = ['G0-U1-L01', 'G0-U1-L02']
+const MOVES: Record<string, [number, number]> = { move_up: [0, -1], move_down: [0, 1], move_left: [-1, 0], move_right_cell: [1, 0] }
+
+/** Shortest dry route (BFS over the four direction blocks) — proves a goal is reachable with real blocks. */
+function shortestRoute(level: GridLevel): string[] | null {
+  const key = (x: number, y: number) => `${x},${y}`
+  const wet = new Set((level.water ?? []).map(c => key(c.x, c.y)))
+  const seen = new Map<string, string[]>([[key(level.start.x, level.start.y), []]])
+  const queue: Array<[number, number]> = [[level.start.x, level.start.y]]
+  while (queue.length) {
+    const [x, y] = queue.shift()!
+    const path = seen.get(key(x, y))!
+    if (x === level.goal.x && y === level.goal.y) return path
+    for (const [type, [dx, dy]] of Object.entries(MOVES)) {
+      const nx = x + dx, ny = y + dy
+      if (nx < 0 || ny < 0 || nx >= level.cols || ny >= level.rows || wet.has(key(nx, ny)) || seen.has(key(nx, ny))) continue
+      seen.set(key(nx, ny), [...path, type])
+      queue.push([nx, ny])
+    }
+  }
+  return null
+}
 
 describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
-  it('covers L01–L06; L01 has five steps (formal-course pass), the rest four; L06 is the unit project', () => {
+  it('covers L01–L06; formal-course lessons (L01, L02) have five steps, the rest four; L06 is the unit project', () => {
     expect(lessons.map(l => l.id)).toEqual(['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05', 'G0-U1-L06'])
     const project = g0u1GridLessons['G0-U1-L06'].project!
     expect(g0u1GridLessons['G0-U1-L06'].steps.find(s => s.id === project.stepId)?.kind).toBe('practice-a')
-    for (const lesson of lessons) expect(lesson.steps).toHaveLength(lesson.id === 'G0-U1-L01' ? 5 : 4)
+    for (const lesson of lessons) expect(lesson.steps).toHaveLength(FORMAL.includes(lesson.id) ? 5 : 4)
   })
 
   for (const lesson of lessons) {
@@ -115,6 +138,58 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
 
     it('keeps two practices with different goals besides the error lab and the remake', () => {
       expect(lesson.steps.map(s => s.kind)).toEqual(['error-lab', 'guided', 'practice-a', 'practice-b', 'creative'])
+    })
+  })
+  describe('G0-U1-L02 formal-course pass (error lab, creative remake, review)', () => {
+    const lesson = g0u1GridLessons['G0-U1-L02']
+    const lab = lesson.steps.find(s => s.kind === 'error-lab')!
+    const creative = lesson.steps.find(s => s.kind === 'creative')!
+
+    it('keeps the same five-step shape as L01: error lab, guided, two different practices, creative', () => {
+      expect(lesson.steps.map(s => s.kind)).toEqual(['error-lab', 'guided', 'practice-a', 'practice-b', 'creative'])
+    })
+
+    it('the error lab is a wrong-direction mistake: the starter really walks off the map, and the predictions are two concrete outcomes', () => {
+      expect(runGridProgram(lab.level, lab.starterBlocks!).failure).toBe('out_of_bounds')
+      expect(lab.errorLab!.expect).toBe('out_of_bounds')
+      expect(lab.starterBlocks!.map(b => b.type)).toContain('move_down')
+      const [a, b] = lab.predictChoices!
+      expect(a.when).not.toBe(b.when)
+      expect([a.when, b.when]).toContain(lab.errorLab!.expect)
+      expect(lab.errorLab!.expected).not.toBe(lab.errorLab!.actual)
+    })
+
+    it('every friend the child may pick is reachable on dry land with the four direction blocks; one route never fits two friends', () => {
+      const choices = creative.creative!.goalChoices
+      expect(choices.length).toBeGreaterThanOrEqual(3)
+      expect(creative.creative!.labels).toHaveLength(choices.length)
+      const routes = choices.map(goal => {
+        const level = stepLevel(creative, { creative: { [creative.id]: { goal } } })
+        expect(level.water?.some(w => w.x === goal.x && w.y === goal.y), `goal ${goal.x},${goal.y} on water`).toBeFalsy()
+        const route = shortestRoute(level)
+        expect(route, `goal ${goal.x},${goal.y}`).not.toBeNull()
+        expect(runGridProgram(level, toBlocks(['when_start', ...route!])).passed).toBe(true)
+        return { level, route: route! }
+      })
+      // Picking another friend invalidates the old route: each route fails on every other goal.
+      for (const [i, a] of routes.entries()) {
+        for (const [j, b] of routes.entries()) {
+          if (i !== j) expect(runGridProgram(b.level, toBlocks(['when_start', ...a.route])).passed, `${i}→${j}`).toBe(false)
+        }
+      }
+      // The choices really need different directions (not only "right"): at least one goal is straight up.
+      expect(routes.some(r => r.route.every(t => t === 'move_up'))).toBe(true)
+      expect(routes.some(r => r.route.includes('move_up') && r.route.includes('move_right_cell'))).toBe(true)
+    })
+
+    it('the creative remake is the saved lesson work, and review has a what-if with an answer', () => {
+      expect(lesson.project?.stepId).toBe(creative.id)
+      expect(lesson.review?.whatIf.length).toBeGreaterThan(6)
+      expect(lesson.review?.answer).toContain('向左')
+    })
+
+    it('every step shows the original post-office scenery', () => {
+      for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('signpost')
     })
   })
 })

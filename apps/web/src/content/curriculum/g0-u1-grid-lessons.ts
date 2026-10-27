@@ -40,7 +40,7 @@ export type GridLessonStep = {
   /** error-lab: the starter program must be run and produce this failure before a fix counts. */
   errorLab?: { expect: GridFailure; expected: string; actual: string }
   /** creative: the child places the goal on one of these cells, then programs a route to it. */
-  creative?: { prompt: string; goalChoices: Cell[] }
+  creative?: { prompt: string; goalChoices: Cell[]; /** Story names for the choices, same order (e.g. who the letter goes to). */ labels?: string[] }
 }
 
 export type GridLesson = {
@@ -210,7 +210,7 @@ const L01: GridLesson = {
 const L02: GridLesson = {
   id: 'G0-U1-L02',
   title: '给森林邮差指路',
-  story: '小狐狸今天当森林邮差，要把信送到小伙伴的蘑菇屋。蘑菇屋有时在上面，有时在右边，路上还有一条小河。',
+  story: '小狐狸今天当森林邮差。邮局门口立着一块路牌，四只箭头指向上、下、左、右。信要送到小伙伴的蘑菇屋，选对方向的箭头，信才能送到。',
   concept: '上下左右四个方向与路线顺序',
   objectives: [
     '能分清上、下、左、右四个方向积木，各走一格',
@@ -221,27 +221,38 @@ const L02: GridLesson = {
     no_start: '信还没送出去：程序最上面要有“开始时”。',
     out_of_bounds: '走出地图了，方向选反了或者走多了。看看蘑菇屋在小狐狸的哪一边。',
     fell_in_water: '扑通！路线经过了蓝色的小河。换一条全是草地的路。',
-    not_at_goal: '小狐狸停在了别的格子，蘑菇屋还没到。对照提示里差几格，换方向或补一块。',
+    not_at_goal: '小狐狸停在了别的格子，蘑菇屋还没到。数一数还差几格，换方向或补一块。',
     disconnected: '有方向积木没接在队伍里。接好再运行。',
   },
   steps: [
     {
-      id: 'deliver-up',
-      kind: 'guided',
-      title: '往上送信',
-      instruction: '蘑菇屋在小狐狸正上方 2 格。选“向上走一格”，接 2 块。',
-      predict: '先猜一猜：蘑菇屋在小狐狸的哪一边？',
-      level: { cols: 3, rows: 3, start: { x: 1, y: 2, facing: 'up' }, goal: { x: 1, y: 0 } },
+      id: 'wrong-way',
+      kind: 'error-lab',
+      title: '错误实验：箭头指反了',
+      instruction: '蘑菇屋在小狐狸正上方 2 格，可小兔子拼的是两块“向下走一格”。这是一个故意的错误：先按原样运行，看看小狐狸往哪走，再把方向改对。',
+      predict: '先猜一猜：用“向下”的箭头，小狐狸会走到哪里？',
+      predictChoices: [
+        { text: '往上走到蘑菇屋', when: 'pass' },
+        { text: '往下走出地图', when: 'out_of_bounds' },
+      ],
+      errorLab: {
+        expect: 'out_of_bounds',
+        expected: '如果箭头方向对，小狐狸应该往上走 2 格，到达蘑菇屋。',
+        actual: '小狐狸第一步就往下走出了地图：“向下”和蘑菇屋的方向正好相反。',
+      },
+      level: { cols: 3, rows: 3, start: { x: 1, y: 2, facing: 'up' }, goal: { x: 1, y: 0 }, scenery: 'signpost' },
       allowedBlocks: ['when_start', u, d, l, r],
+      starterBlocks: [{ type: 'when_start' }, { type: d }, { type: d }],
       hints: [
-        '小狐狸往别的方向走了，箭头的方向和蘑菇屋的方向不一样。',
-        '每块方向积木只管一件事：往哪边走一格。',
-        '蘑菇屋在上面：接 2 块“向上走一格”。',
+        '小狐狸一下子就出了地图，它走的方向和蘑菇屋在的方向不一样。',
+        '方向积木写着往哪边走：蘑菇屋在上面，就要用“向上”。',
+        '把两块“向下走一格”换成两块“向上走一格”，再运行。',
       ],
       solutions: [P(u, u)],
       counterExamples: [
-        { program: P(r, r), failure: 'out_of_bounds' },
+        { program: P(d, d), failure: 'out_of_bounds' },
         { program: P(u), failure: 'not_at_goal' },
+        { program: P(r, r), failure: 'out_of_bounds' },
       ],
     },
     {
@@ -250,7 +261,7 @@ const L02: GridLesson = {
       title: '拐个弯送信',
       instruction: '蘑菇屋在右上角。先横着走到蘑菇屋下面，再往上走；反过来先上后右也可以。',
       predict: '先猜一猜：横着要走几格，竖着要走几格？',
-      level: { cols: 4, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 2, y: 0 } },
+      level: { cols: 4, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 2, y: 0 }, scenery: 'signpost' },
       allowedBlocks: ['when_start', u, d, l, r],
       hints: [
         '小狐狸到了另一个格子，方向或格数有一处不对。',
@@ -270,6 +281,7 @@ const L02: GridLesson = {
         cols: 5, rows: 4,
         start: { x: 0, y: 3, facing: 'right' }, goal: { x: 4, y: 0 },
         water: [{ x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 }, { x: 1, y: 1 }],
+        scenery: 'signpost',
       },
       allowedBlocks: ['when_start', u, d, l, r],
       hints: [
@@ -290,6 +302,7 @@ const L02: GridLesson = {
         cols: 4, rows: 3,
         start: { x: 0, y: 2, facing: 'right' }, goal: { x: 3, y: 0 },
         water: [{ x: 1, y: 1 }, { x: 2, y: 1 }],
+        scenery: 'signpost',
       },
       allowedBlocks: ['when_start', u, d, l, r],
       starterBlocks: [{ type: 'when_start' }, { type: r }, { type: u }, { type: u }, { type: r }, { type: r }],
@@ -301,14 +314,43 @@ const L02: GridLesson = {
       solutions: [P(u, u, r, r, r), P(r, r, r, u, u)],
       counterExamples: [{ program: P(r, u, u, r, r), failure: 'fell_in_water' }],
     },
+    {
+      id: 'my-route-card',
+      kind: 'creative',
+      title: '创意改造：信送给谁？',
+      instruction: '这次由你来决定：先在下面选一位收信的小伙伴，蘑菇屋就搬到那一格；再拼出一条不碰小河的送信路线。通过后，它就是你的“送信路线卡”作品。',
+      predict: '先猜一猜：你选的小伙伴在小狐狸的哪一边？要先横着走还是先竖着走？',
+      creative: {
+        prompt: '这封信送给谁？',
+        goalChoices: [{ x: 3, y: 0 }, { x: 0, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 1 }],
+        labels: ['小熊 · 右上角', '小兔 · 正上方', '小松鼠 · 上排中间', '小刺猬 · 右边中间'],
+      },
+      level: { cols: 4, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 3, y: 0 }, water: [{ x: 1, y: 1 }], scenery: 'signpost' },
+      allowedBlocks: ['when_start', u, d, l, r],
+      hints: [
+        '小狐狸没停在你选的蘑菇屋上，或者掉进了小河：方向或格数有一处不对。',
+        '先看蘑菇屋在小狐狸的哪一边，横着差几格、竖着差几格，再挑一条干的路。',
+        '例如送给小熊：先向右 3 格，再向上 2 格；送给小兔：只要向上 2 格。',
+      ],
+      solutions: [P(r, r, r, u, u), P(u, u, r, r, r)],
+      counterExamples: [
+        { program: P(r, u), failure: 'fell_in_water' },
+        { program: P(r, r, r, u), failure: 'not_at_goal' },
+      ],
+    },
   ],
+  review: {
+    whatIf: '如果小伙伴的蘑菇屋在小狐狸的左边，要用哪块方向积木？',
+    answer: '用“向左走一格”。蘑菇屋在哪一边，就选指向那一边的箭头；隔几格就接几块。',
+  },
   reflection: '说一说：你选了哪条路？为什么不能直接穿过小河？',
   reflectionCheck: {
-    question: '为什么不能直接穿过小河？',
-    options: [{ text: '小狐狸会掉进河里', correct: true }, { text: '小河会自己变没', correct: false }, { text: '走河里更快', correct: false }],
-    why: '小河是走不过去的格子，要换一排没有河的路绕过去。',
+    question: '蘑菇屋在小狐狸上面，应该用哪块积木？',
+    options: [{ text: '向上走一格', correct: true }, { text: '向下走一格', correct: false }, { text: '随便哪块都行', correct: false }],
+    why: '方向积木写着往哪边走，蘑菇屋在上面就要用“向上”；用反了会越走越远，甚至走出地图。',
   },
-  parentQuestion: '请孩子指着屏幕，说出自己的路线：“先往哪边走几格，再往哪边走几格”。',
+  parentQuestion: '请孩子播放自己的“送信路线卡”，指着屏幕说出路线：“先往哪边走几格，再往哪边走几格”，再问问为什么要绕开小河。',
+  project: { stepId: 'my-route-card', title: '我的送信路线卡' },
 }
 
 const L03: GridLesson = {
