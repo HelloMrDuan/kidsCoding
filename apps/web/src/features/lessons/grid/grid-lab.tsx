@@ -3,13 +3,13 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import type { GridLesson } from '@/content/curriculum/g0-u1-grid-lessons'
+import type { GridLesson, GridLessonStep } from '@/content/curriculum/g0-u1-grid-lessons'
 import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { getKidsBlockLabel } from '@/features/lessons/blockly/register-kids-blocks'
 import { GuidedLessonShell, type LessonLocalSaveState } from '@/features/lessons/guided-lesson-shell'
 import { ReadAloudButton } from '@/features/lessons/voice/read-aloud'
 import { ResetIcon } from '@/features/ui/reset-icon'
-import { runGridProgram, type GridFailure, type GridRun } from './grid-engine'
+import { runGridProgram, type GridFailure, type GridLevel, type GridRun } from './grid-engine'
 import { GridStage, useGridPlayback } from './grid-stage'
 import { parseGridDraft, gridDraftKey, type GridDraft } from './grid-draft'
 
@@ -26,6 +26,28 @@ export function failingBlockNote(run: GridRun, blocks: Block[]): string | null {
   return `问题出在第 ${index} 块“${getKidsBlockLabel(blocks[index].type)}”。`
 }
 
+/** The level a step really runs on: a creative step uses the goal the child placed. */
+export function stepLevel(step: GridLessonStep, draft: Pick<GridDraft, 'creative'>): GridLevel {
+  const goal = step.creative ? draft.creative?.[step.id]?.goal : undefined
+  return goal ? { ...step.level, goal } : step.level
+}
+
+/** Short names for the mistakes listed in 复盘. */
+export const MISTAKE_LABELS: Record<GridFailure, string> = {
+  no_start: '忘了“开始时”',
+  disconnected: '有积木掉队',
+  unknown_block: '用了这关没有的积木',
+  too_many: '积木太多',
+  out_of_bounds: '走出了地图',
+  hit_rock: '撞到石头',
+  fell_in_water: '掉进小河',
+  door_locked: '门还锁着',
+  no_key_here: '这里没有钥匙',
+  not_at_door: '离门太远',
+  need_key: '没拿钥匙就开门',
+  not_at_goal: '没走到目标',
+}
+
 /**
  * EDU-104 grid classroom: the V2 three-zone shell with a real Blockly
  * workspace and the SYS-106 engine. A step passes only after a real run
@@ -40,11 +62,15 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
   const [failures, setFailures] = useState(0)
   const [notice, setNotice] = useState<string | null>(null)
   const [finished, setFinished] = useState(false)
+  const [guess, setGuess] = useState<number | null>(null)
 
   const step = lesson.steps[Math.min(draft.stepIndex, lesson.steps.length - 1)]
   const blocks: Block[] = draft.programs[step.id] ?? step.starterBlocks ?? []
   const passedHere = draft.passed.includes(step.id)
-  const { state, trail, done } = useGridPlayback(step.level, run)
+  const level = stepLevel(step, draft)
+  const needsGoal = !!step.creative && !draft.creative?.[step.id]
+  const observedHere = !step.errorLab || !!draft.observed?.includes(step.id)
+  const { state, trail, done } = useGridPlayback(level, run)
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -90,14 +116,42 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
   }, [hydrated, lesson])
 
   function handleRun() {
-    const result = runGridProgram(step.level, blocks)
+    if (needsGoal) {
+      setNotice('先选一格，把蘑菇屋搬过去，再运行。')
+      return
+    }
+    const result = runGridProgram(level, blocks)
     setRun(result)
     setNotice(null)
     if (result.passed) {
-      if (!passedHere) persist({ ...draft, passed: [...draft.passed, step.id] })
+      // An error-lab fix only counts after the planned mistake was really run and seen.
+      if (!passedHere && observedHere) persist({ ...draft, passed: [...draft.passed, step.id] })
     } else {
       setFailures(n => n + 1)
+      const mistakes = draft.mistakes ?? []
+      const seen = step.errorLab && result.failure === step.errorLab.expect && !draft.observed?.includes(step.id)
+      if (seen || !mistakes.includes(result.failure!)) {
+        persist({
+          ...draft,
+          mistakes: mistakes.includes(result.failure!) ? mistakes : [...mistakes, result.failure!],
+          ...(seen ? { observed: [...(draft.observed ?? []), step.id] } : {}),
+        })
+      }
     }
+  }
+
+  function chooseGoal(index: number) {
+    const goal = step.creative!.goalChoices[index]
+    setRun(null)
+    setNotice(null)
+    // Moving the house means the old pass no longer proves this map.
+    persist({ ...draft, creative: { ...(draft.creative ?? {}), [step.id]: { goal } }, passed: draft.passed.filter(id => id !== step.id) })
+  }
+
+  function restoreStarter() {
+    setRun(null)
+    setNotice(null)
+    persist({ ...draft, programs: { ...draft.programs, [step.id]: step.starterBlocks ?? [] } })
   }
 
   function handleReset() {
@@ -107,6 +161,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   function goToStep(index: number) {
     setRun(null)
+    setGuess(null)
     setFailures(0)
     setNotice(null)
     persist({ ...draft, stepIndex: index })
@@ -114,7 +169,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   function handleComplete() {
     if (!passedHere) {
-      setNotice('先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
+      setNotice(needsGoal ? '先选一格，把蘑菇屋搬过去，再拼程序运行。' : !observedHere ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。' : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
       return
     }
     if (draft.stepIndex < lesson.steps.length - 1) goToStep(draft.stepIndex + 1)
@@ -125,13 +180,22 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
     if (notice) return { tone: 'warning', text: notice }
     if (!run) return { tone: 'idle', text: passedHere ? '这一关已经通过。可以再试一种不同的程序，或者点“完成这一关”。' : '想好了就按“运行”，看看小狐狸会不会按你猜的走。' }
     if (!done) return { tone: 'idle', text: '小狐狸正在按积木一块一块走……' }
-    if (run.passed) return { tone: 'success', text: `🎉 ${run.message}` }
+    const outcome = run.passed ? 'pass' : run.failure
+    const picked = guess === null ? null : step.predictChoices?.[guess]
+    const guessNote = picked ? (picked.when === outcome ? `你猜“${picked.text}”，猜对了！` : `你猜“${picked.text}”，实际不一样，猜错也没关系，看看发生了什么。`) : ''
+    if (run.passed && !observedHere) {
+      return { tone: 'warning', text: `程序成功了！不过这是错误实验：先按原样运行一次，看看错在哪，再来修。` }
+    }
+    if (run.passed) return { tone: 'success', text: `🎉 ${guessNote}${run.message}` }
+    if (step.errorLab && run.failure === step.errorLab.expect) {
+      return { tone: 'error', text: `${guessNote}预想：${step.errorLab.expected} 实际：${step.errorLab.actual} 现在把它修好吧。` }
+    }
     const diagnosis = lesson.diagnoses[run.failure!] ?? run.message
     const pointer = failingBlockNote(run, blocks)
     // Keep the engine's measured gap ("往右还差 1 格") next to the lesson's diagnosis.
     const text = run.failure === 'not_at_goal' ? `${diagnosis}（${run.message}）` : diagnosis
-    return { tone: 'error', text: pointer ? `${text}${pointer}` : text }
-  }, [notice, run, done, passedHere, lesson.diagnoses, blocks])
+    return { tone: 'error', text: `${guessNote}${pointer ? `${text}${pointer}` : text}` }
+  }, [notice, run, done, passedHere, lesson.diagnoses, blocks, guess, step, observedHere])
 
   const hintLayer = failures === 0 ? -1 : Math.min(failures - 1, 2)
   const hintCopy = hintLayer >= 0 ? `（第 ${hintLayer + 1} 层）${step.hints[hintLayer]}` : undefined
@@ -144,8 +208,9 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
           <p className="mt-2 kc-text-muted">给家长：{lesson.parentQuestion}</p>
           <p className="mt-2 kc-text-muted">这是实验课，成绩只保存在本机，不是正式课程成绩。</p>
         </div>
+        <ReviewCard lesson={lesson} mistakes={draft.mistakes ?? []} />
         <ReflectionCheck lesson={lesson} chosen={draft.reflection} onChoose={i => persist({ ...draft, reflection: i })} />
-        {lesson.project ? <ProjectCard lesson={lesson} blocks={draft.programs[lesson.project.stepId] ?? []} /> : null}
+        {lesson.project ? <ProjectCard lesson={lesson} draft={draft} /> : null}
         <div className="mt-4 flex flex-wrap gap-2">
           {lesson.steps.map((s, i) => (
             <button key={s.id} type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" data-testid={`grid-replay-${s.id}`}
@@ -181,10 +246,33 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
             <div className="flex flex-wrap items-center gap-2 rounded-[8px] border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-950" data-testid="grid-predict">
               <span className="flex-1">🤔 {step.predict}</span>
               <ReadAloudButton key={step.id} testId="grid-read-instruction" text={`第 ${draft.stepIndex + 1} 关，${step.title}。${step.instruction}。${step.predict}`} />
+              {step.predictChoices ? (
+                <div className="grid w-full gap-2 sm:grid-cols-2" data-testid="grid-predict-choices">
+                  {step.predictChoices.map((choice, i) => (
+                    <button key={choice.text} type="button" className="kc-reflect-option" data-testid={`grid-predict-choice-${i}`}
+                      data-chosen={guess === i ? 'true' : 'false'} aria-pressed={guess === i} onClick={() => setGuess(i)}>{choice.text}</button>
+                  ))}
+                </div>
+              ) : null}
             </div>
+            {step.creative ? (
+              <div className="mt-3 rounded-[8px] border border-sky-200 bg-sky-50 p-3 text-sm font-bold text-sky-950" data-testid="grid-creative">
+                <p>🍄 {step.creative.prompt}</p>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {step.creative.goalChoices.map((cell, i) => {
+                    const chosen = draft.creative?.[step.id]?.goal
+                    return (
+                      <button key={`${cell.x}-${cell.y}`} type="button" className="kc-reflect-option kc-choice-compact" data-testid={`grid-goal-choice-${i}`}
+                        aria-pressed={chosen?.x === cell.x && chosen?.y === cell.y}
+                        data-chosen={chosen?.x === cell.x && chosen?.y === cell.y ? 'true' : 'false'} onClick={() => chooseGoal(i)}>第 {cell.x + 1} 格</button>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : null}
           </div>
           <div className="kc-stage-panel">
-            <GridStage level={step.level} state={state} trail={run ? trail : []} />
+            <GridStage level={level} state={state} trail={run ? trail : []} />
           </div>
           <div className="kc-stage-panel space-y-3 pt-0">
             <div aria-live="polite" data-testid="grid-feedback" data-tone={feedback.tone}
@@ -201,6 +289,9 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
                 {run && !done ? '运行中…' : '▶ 运行'}
               </button>
               <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-reset" disabled={!!run && !done} onClick={handleReset}><ResetIcon />回到起点</button>
+              {step.errorLab && !observedHere && JSON.stringify(blocks) !== JSON.stringify(step.starterBlocks ?? []) ? (
+                <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-restore-starter" onClick={restoreStarter}>换回原来的错误程序</button>
+              ) : null}
               {failures > 0 && hintLayer < 2 ? (
                 <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-more-hint" onClick={() => setFailures(n => n + 1)}>再给点提示</button>
               ) : null}
@@ -217,12 +308,14 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 }
 
 /** Unit project: the child's own passing route, saved locally, replayed by the real engine. */
-function ProjectCard({ lesson, blocks }: { lesson: GridLesson; blocks: Block[] }) {
+function ProjectCard({ lesson, draft }: { lesson: GridLesson; draft: GridDraft }) {
   const project = lesson.project!
   const step = lesson.steps.find(s => s.id === project.stepId)!
+  const blocks = useMemo(() => draft.programs[project.stepId] ?? [], [draft.programs, project.stepId])
+  const level = useMemo(() => stepLevel(step, draft), [step, draft])
   const [run, setRun] = useState<GridRun | null>(null)
-  const { state, trail, done } = useGridPlayback(step.level, run)
-  const verdict = useMemo(() => runGridProgram(step.level, blocks), [step.level, blocks])
+  const { state, trail, done } = useGridPlayback(level, run)
+  const verdict = useMemo(() => runGridProgram(level, blocks), [level, blocks])
   return (
     <section className="kc-surface-3d mt-4 rounded-[18px] p-5" data-testid="grid-project-card">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -237,13 +330,37 @@ function ProjectCard({ lesson, blocks }: { lesson: GridLesson; blocks: Block[] }
         ))}
       </ol>
       <div className="mt-4 max-w-[420px]">
-        <GridStage level={step.level} state={state} trail={run ? trail : []} />
+        <GridStage level={level} state={state} trail={run ? trail : []} />
       </div>
       <button type="button" className="kc-action-surface mt-3" data-testid="grid-project-play" disabled={!!run && !done}
-        onClick={() => setRun(runGridProgram(step.level, blocks))}>
-        {run && !done ? '播放中…' : '▶ 播放我的寻路卡'}
+        onClick={() => setRun(runGridProgram(level, blocks))}>
+        {run && !done ? '播放中…' : `▶ 播放${project.title}`}
       </button>
       <p className="kc-text-muted mt-2 text-sm">作品保存在这台设备上，下次打开这节课还在。</p>
+    </section>
+  )
+}
+
+/** 复盘: what the lesson set out to do, the mistakes this child really met and fixed, and a what-if. */
+function ReviewCard({ lesson, mistakes }: { lesson: GridLesson; mistakes: GridFailure[] }) {
+  const [shown, setShown] = useState(false)
+  return (
+    <section className="kc-surface-3d mt-4 rounded-[18px] p-5" data-testid="grid-review">
+      <h3 className="text-lg font-black">📝 复盘</h3>
+      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
+        {lesson.objectives.map(o => <li key={o}>{o}</li>)}
+      </ul>
+      <p className="mt-3 text-sm font-bold" data-testid="grid-review-mistakes">
+        {mistakes.length ? `这节课你遇到过、又自己修好的错：${mistakes.map(m => MISTAKE_LABELS[m]).join('、')}。` : '这节课你一次都没出错。'}
+      </p>
+      {lesson.review ? (
+        <div className="mt-3 text-sm">
+          <p className="font-bold">🔁 {lesson.review.whatIf}</p>
+          {shown ? <p className="mt-1" data-testid="grid-review-answer">{lesson.review.answer}</p> : (
+            <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm mt-2" data-testid="grid-review-reveal" onClick={() => setShown(true)}>想好了，看看答案</button>
+          )}
+        </div>
+      ) : null}
     </section>
   )
 }
