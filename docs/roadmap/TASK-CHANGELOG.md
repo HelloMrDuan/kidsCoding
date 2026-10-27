@@ -22,6 +22,7 @@
 | 日期 | Task-ID | 工作范围 | PR | 证据与剩余边界 | 状态 |
 |---|---|---|---|---|---|
 | 2026-10-27 | G0-U1-L01 | 小狐狸认识按钮正式候选课程 5 关：错误实验（缺“开始时”须先真跑故障，预测/预期 vs 实际）、引导、练习A边界、练习B调试、创意改造（自选目标、换目标旧完成失效）；三层提示、复盘卡、作品“我的出发卡”保存/刷新恢复/回放、草稿防伪过滤；原创树屋 SVG 已登记授权 | [#161](https://github.com/HelloMrDuan/kidsCoding/pull/161) | PR CI 16 success + 2 skipped（首轮 scratch-touch-browser 被取消，重新触发后通过）；合并 ddb9bc7；main CI：curriculum 40481206300、task-ledger 40481206295、deploy 40481206343 全 success（27 个作业）；grid-lab E2E 在 CI 真浏览器分片通过；三断点截图见 docs/roadmap/evidence/G0-U1-L01/；AI 参考教研 85/100（实现者自评，非独立）；关账 PR 先后因 main 上并行台账/日志追加冲突重开（#164、#166、#171），内容不变；无独立人工复核、无儿童试学 | in_review（待独立人工教研） |
+| 2026-10-27 | G0-U1-L02 | 给森林邮差指路正式候选课程 5 关：错误实验（蘑菇屋在上却用“向下×2”，须先真跑出走出地图，预想 vs 实际）、引导拐弯（3 种正解）、练习A绕开小河、练习B修掉河路线、创意改造“信送给谁”（4 位小伙伴位置，BFS 证明干地可达、换人旧通过作废）；复盘卡、作品“我的送信路线卡”保存/恢复/回放；原创邮局四向路牌 SVG 已登记授权 | [#172](https://github.com/HelloMrDuan/kidsCoding/pull/172) | PR CI 16 success + 2 skipped；合并 9f62a8a；main CI：curriculum 40490711889（15 作业）、task-ledger 40490711911 全 success；deploy 40490711890 的 test 作业失败于既有用例 playable-stage-feedback.test.tsx:67（say-too-early 回调断言竞态，非本课代码；同树 PR CI 通过，本地 3/3 通过），未重跑（无 Actions 写权限），建议另立任务修该竞态；grid-lab E2E 在 CI 真浏览器分片通过；三断点截图 docs/roadmap/evidence/G0-U1-L02/；AI 参考教研 85/100（实现者自评，非独立）；关账 PR #177 首轮 scratch-touch-browser 被取消（docs-only，无关），重推触发；无独立人工复核、无儿童试学 | in_review（待独立人工教研） |
 
 ## EDU-101 执行记录
 
