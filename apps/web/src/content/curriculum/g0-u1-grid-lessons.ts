@@ -630,7 +630,7 @@ const L04: GridLesson = {
 const L05: GridLesson = {
   id: 'G0-U1-L05',
   title: '先拿钥匙再开门',
-  story: '树洞门锁着，金钥匙放在路上。小狐狸要先捡钥匙、再开门，最后才能走过去。顺序反了，门不会开。',
+  story: '树洞门锁着，门口的挂钩牌上画着钥匙和小锁：先拿钥匙，才能开锁。金钥匙放在路上，小狐狸要先捡钥匙、再开门，最后才能走过去。顺序反了，门不会开。',
   concept: '先后顺序与前提条件',
   objectives: [
     '知道开门要有钥匙：“捡起钥匙”必须在“打开树洞门”前面',
@@ -650,17 +650,27 @@ const L05: GridLesson = {
   },
   steps: [
     {
-      id: 'key-then-door',
-      kind: 'guided',
-      title: '捡钥匙，开门',
-      instruction: '向右走 2 格到钥匙上，“捡起钥匙”；再走 1 格到门边，“打开树洞门”；最后走 2 格到蘑菇屋。',
-      predict: '先猜一猜：不捡钥匙直接往前走，会发生什么？',
-      level: { cols: 6, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 5, y: 1 }, key: { x: 2, y: 1 }, door: { x: 4, y: 1 }, rocks: [{ x: 4, y: 0 }, { x: 4, y: 2 }] },
+      id: 'locked-door',
+      kind: 'error-lab',
+      title: '错误实验：直接冲向锁着的门',
+      instruction: '小兔子的程序是一直向右走 4 格，没有捡钥匙，也没有开门。这是一个故意的错误：先按原样运行，看看门会不会自己开，再按“捡钥匙 → 开门 → 走过去”修好。',
+      predict: '先猜一猜：不捡钥匙一直往前走，会怎样？',
+      predictChoices: [
+        { text: '穿过门走到蘑菇屋', when: 'pass' },
+        { text: '被锁着的门挡住', when: 'door_locked' },
+      ],
+      errorLab: {
+        expect: 'door_locked',
+        expected: '如果门不锁，小狐狸应该一路走到蘑菇屋。',
+        actual: '咚！小狐狸撞在锁着的门上停下了：门不会自己开，要先捡钥匙、在门边开门。',
+      },
+      level: { cols: 6, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 5, y: 1 }, key: { x: 2, y: 1 }, door: { x: 4, y: 1 }, rocks: [{ x: 4, y: 0 }, { x: 4, y: 2 }], scenery: 'keyhook' },
       allowedBlocks: ['when_start', r, f, k, o],
+      starterBlocks: [{ type: 'when_start' }, { type: r }, { type: r }, { type: r }, { type: r }],
       hints: [
         '小狐狸被门挡住了，门还锁着。',
         '要按顺序做三件事：捡钥匙 → 开门 → 走过去。',
-        '向右 2 → 捡起钥匙 → 向右 1 → 打开树洞门 → 向右 2。',
+        '清空后重拼：向右 2 → 捡起钥匙 → 向右 1 → 打开树洞门 → 向右 2。',
       ],
       solutions: [P(r, r, k, r, o, r, r), P(f, f, k, f, o, f, f)],
       counterExamples: [
@@ -674,7 +684,7 @@ const L05: GridLesson = {
       title: '钥匙不在路上',
       instruction: '这次钥匙在上面一排。先去拿钥匙，再回到门前开门。',
       predict: '先猜一猜：拿到钥匙后，要往哪边回到门前？',
-      level: { cols: 6, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 5, y: 1 }, key: { x: 1, y: 0 }, door: { x: 4, y: 1 }, rocks: [{ x: 4, y: 0 }, { x: 4, y: 2 }] },
+      level: { cols: 6, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 5, y: 1 }, key: { x: 1, y: 0 }, door: { x: 4, y: 1 }, rocks: [{ x: 4, y: 0 }, { x: 4, y: 2 }], scenery: 'keyhook' },
       allowedBlocks: ['when_start', u, d, l, r, k, o],
       hints: [
         '门打不开，或者“这里没有钥匙”：钥匙还没捡到。',
@@ -693,7 +703,7 @@ const L05: GridLesson = {
       title: '练习 A：绕远路拿钥匙',
       instruction: '门在右边一排石头中间，钥匙在左下角。自己设计路线：先拿钥匙，再开门，走到蘑菇屋。',
       predict: '先猜一猜：你的程序里，“捡起钥匙”应该排在“打开树洞门”的前面还是后面？',
-      level: { cols: 6, rows: 3, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 5, y: 0 }, key: { x: 1, y: 2 }, door: { x: 3, y: 0 }, rocks: [{ x: 3, y: 1 }, { x: 3, y: 2 }] },
+      level: { cols: 6, rows: 3, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 5, y: 0 }, key: { x: 1, y: 2 }, door: { x: 3, y: 0 }, rocks: [{ x: 3, y: 1 }, { x: 3, y: 2 }], scenery: 'keyhook' },
       allowedBlocks: ['when_start', u, d, l, r, k, o],
       hints: [
         '门没开：钥匙还没捡，或者开门时不在门边。',
@@ -709,7 +719,7 @@ const L05: GridLesson = {
       title: '练习 B：忘了捡钥匙',
       instruction: '小兔子的程序路过钥匙却没有捡，门打不开。先运行看看，再把“捡起钥匙”放到对的位置（可以清空后重拼）。',
       predict: '先猜一猜：程序会在哪一块积木停下来？',
-      level: { cols: 6, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 5, y: 1 }, key: { x: 2, y: 1 }, door: { x: 4, y: 1 }, rocks: [{ x: 4, y: 0 }, { x: 4, y: 2 }] },
+      level: { cols: 6, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 5, y: 1 }, key: { x: 2, y: 1 }, door: { x: 4, y: 1 }, rocks: [{ x: 4, y: 0 }, { x: 4, y: 2 }], scenery: 'keyhook' },
       allowedBlocks: ['when_start', r, f, k, o],
       starterBlocks: [{ type: 'when_start' }, { type: r }, { type: r }, { type: r }, { type: o }, { type: r }, { type: r }],
       hints: [
@@ -720,6 +730,31 @@ const L05: GridLesson = {
       solutions: [P(r, r, k, r, o, r, r)],
       counterExamples: [{ program: P(r, r, r, k, o, r, r), failure: 'no_key_here' }],
     },
+    {
+      id: 'my-key-card',
+      kind: 'creative',
+      title: '创意改造：门后住着谁？',
+      instruction: '门后面住着好几位朋友。由你来决定：先选一位，蘑菇屋就搬到那一格；再拼出“拿钥匙 → 开门 → 走到朋友家”的程序。通过后，它就是你的“开门卡”作品。',
+      predict: '先猜一猜：你的程序里，三件事的顺序是什么？',
+      creative: {
+        prompt: '门后要去哪位朋友家？',
+        goalChoices: [{ x: 5, y: 1 }, { x: 5, y: 0 }, { x: 4, y: 2 }, { x: 5, y: 2 }],
+        labels: ['小熊 · 门正对面', '小兔 · 右上角', '小松鼠 · 门后下面', '小刺猬 · 右下角'],
+      },
+      level: { cols: 6, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 5, y: 1 }, key: { x: 1, y: 0 }, door: { x: 3, y: 1 }, rocks: [{ x: 3, y: 0 }, { x: 3, y: 2 }], scenery: 'keyhook' },
+      allowedBlocks: ['when_start', u, d, l, r, k, o],
+      hints: [
+        '门没开、撞到门或石头，或者停在了别的格子：三件事的顺序或位置不对。',
+        '先去上面拿钥匙，再回到门左边那一格开门，走过门后再找朋友家。',
+        '例如去小熊家：向右 1 → 向上 1 → 捡起钥匙 → 向下 1 → 向右 1 → 打开树洞门 → 向右 3。',
+      ],
+      solutions: [P(r, u, k, d, r, o, r, r, r), P(u, r, k, d, r, o, r, r, r)],
+      counterExamples: [
+        { program: P(r, r, r), failure: 'door_locked' },
+        { program: P(r, r, o), failure: 'need_key' },
+        { program: P(r, u, k, d, r, r), failure: 'door_locked' },
+      ],
+    },
   ],
   reflection: '说一说：为什么“捡起钥匙”一定要在“打开树洞门”前面？',
   reflectionCheck: {
@@ -727,7 +762,12 @@ const L05: GridLesson = {
     options: [{ text: '捡钥匙 → 开门 → 走过去', correct: true }, { text: '开门 → 捡钥匙 → 走过去', correct: false }, { text: '直接走过去', correct: false }],
     why: '开门要先有钥匙，所以“捡起钥匙”必须排在“打开树洞门”前面。',
   },
-  parentQuestion: '请孩子把“捡钥匙”和“开门”两块积木对调后运行，说说门为什么打不开。',
+  review: {
+    whatIf: '如果把“打开树洞门”放到“捡起钥匙”前面，会怎样？',
+    answer: '门打不开：开门时手里还没有钥匙。要先捡钥匙、走到门边开门，再走过去。',
+  },
+  parentQuestion: '请孩子播放自己的“开门卡”，说说三件事的顺序；再把“捡钥匙”和“开门”对调运行一次，说说门为什么打不开。',
+  project: { stepId: 'my-key-card', title: '我的开门卡' },
 }
 
 const BIG_MAP: GridLevel = {

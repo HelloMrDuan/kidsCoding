@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 64 70" role="img" aria-label="钥匙挂钩牌：先拿钥匙，再开小锁">
+<g>
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="30" width="6" height="30" rx="2" fill="#9b6a3c" stroke="#5e3b1c" stroke-width="2" />
+      <rect x="4" y="4" width="48" height="28" rx="5" fill="#ffe2b8" stroke="#a0704a" stroke-width="2.5" />
+      <path d="M14 8 v5" stroke="#5e3b1c" stroke-width="2" stroke-linecap="round" />
+      <g transform="translate(14 19)">
+        <circle r="5" fill="#fff6c9" stroke="#f5b300" stroke-width="2" />
+        <path d="M0 5 v7 M0 9 h3 M0 12 h3" stroke="#f5b300" stroke-width="2.2" stroke-linecap="round" />
+      </g>
+      <path d="M24 18 h7 M28 14.5 l3.5 3.5 -3.5 3.5" stroke="#4c97ff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <g transform="translate(42 19)">
+        <path d="M-4 -2 v-3 a4 4 0 0 1 8 0 v3" stroke="#7a4a1c" stroke-width="2" fill="none" />
+        <rect x="-6" y="-2" width="12" height="10" rx="2" fill="#c9823e" stroke="#7a4a1c" stroke-width="1.5" />
+        <circle cx="0" cy="3" r="1.6" fill="#7a4a1c" />
+      </g>
+    </g>
+</svg>

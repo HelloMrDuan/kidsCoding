@@ -21,6 +21,7 @@ const ACCEPTANCE_SET = [
   'post-signpost.svg', // G0-U1-L02 story scenery
   'counting-board.svg', // G0-U1-L03 story scenery
   'turn-sign.svg', // G0-U1-L04 story scenery
+  'key-hook.svg', // G0-U1-L05 story scenery
 ]
 
 describe('kc-scenes asset register (UX-004)', () => {

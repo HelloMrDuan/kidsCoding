@@ -385,20 +385,89 @@ test('G0-U1-L04 formal course: turn-in-place error lab, two practices, detour to
   await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
-test('G0-U1-L05: key-before-door is judged by real runs', async ({ page }) => {
-  test.setTimeout(60_000)
+test('G0-U1-L05 formal course: locked-door error lab, two practices, a friend behind the door, review, saved and reopened', async ({ page }) => {
+  test.setTimeout(180_000)
   await page.goto('/learn/grid-lab/G0-U1-L05')
-  await add(page, 'when_start')
-  await add(page, 'move_right_cell', 4)
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  // Original story scenery: the key hook board (key → lock).
+  await expect(page.locator('[data-grid-item="keyhook"]')).toBeVisible()
+
+  // Step 1 — error lab: walking straight into the locked door.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('猜错也没关系')
+  await expect(page.getByTestId('grid-feedback')).toContainText('锁着的门')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'pick_key'); await add(page, 'move_right_cell'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Guided: picking up where there is no key is diagnosed; the detour for the key passes.
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'pick_key')
+  await runAndExpect(page, 'error', '这里没有钥匙')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_up'); await add(page, 'pick_key'); await add(page, 'move_down'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: opening without the key fails; the long way round passes.
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'open_door')
+  await runAndExpect(page, 'error', '没有钥匙')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_down'); await add(page, 'move_down'); await add(page, 'move_right_cell'); await add(page, 'pick_key'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'move_right_cell'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice B: the friend walked past the key; put “捡起钥匙” in the right place.
+  await runAndExpect(page, 'error', '没有钥匙')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'pick_key'); await add(page, 'move_right_cell'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Creative remake: a friend behind the door; rushing at the door fails, key → open → walk passes.
+  await page.getByTestId('grid-run').click()
+  await expect(page.getByTestId('grid-feedback')).toContainText('先选一格')
+  await page.getByTestId('grid-goal-choice-0').click() // 小熊 · 门正对面
+  // Story-named choices wrap two per row and never clip their label.
+  for (let i = 0; i < 4; i += 1) {
+    const clipped = await page.getByTestId(`grid-goal-choice-${i}`).evaluate(el => el.scrollWidth > el.clientWidth + 1)
+    expect(clipped, `choice ${i}`).toBe(false)
+  }
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
   await runAndExpect(page, 'error', '门还锁着')
   await page.getByTestId('lesson-clear-program').click()
-  await add(page, 'when_start')
-  await add(page, 'move_right_cell', 2)
-  await add(page, 'pick_key')
-  await add(page, 'move_right_cell')
-  await add(page, 'open_door')
-  await add(page, 'move_right_cell', 2)
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_up'); await add(page, 'pick_key'); await add(page, 'move_down'); await add(page, 'move_right_cell'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
   await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  // 复盘: the mistakes this child really met.
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('门还锁着')
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('这里没有钥匙')
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('没拿钥匙就开门')
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('先捡钥匙')
+  await expect(page.getByTestId('grid-project-steps').locator('li')).toHaveCount(10)
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  // Close and reopen: the card replays for real through the opened door.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await page.getByTestId('grid-project-play').click()
+  await expect(page.getByTestId('grid-project-card').getByTestId('grid-stage')).toHaveAttribute('data-fox-cell', '5,1', { timeout: 25_000 })
+
+  // Modify after reopening: visit 小兔 instead; the old route stops one cell short until extended.
+  await page.getByTestId('grid-replay-my-key-card').click()
+  await expect(page.getByTestId('grid-goal-choice-0')).toHaveAttribute('data-chosen', 'true')
+  await page.getByTestId('grid-goal-choice-1').click() // 小兔 · 右上角
+  await runAndExpect(page, 'error')
+  await add(page, 'move_up')
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
 test('G0-U1-L06 unit project: own route card is saved, reopened and replayed', async ({ page }) => {
@@ -441,14 +510,19 @@ test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at
     Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: Utterance, configurable: true })
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { cancel() {}, getVoices: () => [], speak(u: Utterance) { spoken.push(u.lang + '|' + u.text); setTimeout(() => u.onend?.(), 50) } } })
   })
-  // (G0-U1-L04 now opens with its error lab, so this uses L05's first step: walking into the locked door.)
+  // Error labs show “expected vs actual” instead, so this uses L05 step 2 (error lab already done in a saved draft).
   await page.goto('/learn/grid-lab/G0-U1-L05')
+  await page.evaluate(() => localStorage.setItem('kids-grid-lesson-v1:G0-U1-L05', JSON.stringify({ stepIndex: 1, passed: ['locked-door'], observed: ['locked-door'], programs: {}, savedAt: null })))
+  await page.reload()
   await page.getByTestId('grid-read-instruction').click()
   await add(page, 'when_start')
-  await add(page, 'move_right_cell', 4)
+  await add(page, 'move_right_cell')
+  await add(page, 'move_up')
+  await add(page, 'move_right_cell')
+  await add(page, 'pick_key')
   await runAndExpect(page, 'error', '问题出在第 4 块')
   await page.getByTestId('grid-read-feedback').click()
   const spoken = await page.evaluate(() => (window as unknown as { __spoken: string[] }).__spoken)
-  expect(spoken[0]).toMatch(/^zh-CN\|第 1 关，捡钥匙，开门/)
+  expect(spoken[0]).toMatch(/^zh-CN\|第 2 关，钥匙不在路上/)
   expect(spoken[1]).toMatch(/^zh-CN\|.*问题出在第 4 块/)
 })

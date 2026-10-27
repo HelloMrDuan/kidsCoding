@@ -258,7 +258,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
             {step.creative ? (
               <div className="mt-3 rounded-[8px] border border-sky-200 bg-sky-50 p-3 text-sm font-bold text-sky-950" data-testid="grid-creative">
                 <p>🍄 {step.creative.prompt}</p>
-                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <div className={`mt-2 grid grid-cols-2 gap-2 ${step.creative.labels ? '' : 'sm:grid-cols-4'}`} data-testid="grid-goal-choices">
                   {step.creative.goalChoices.map((cell, i) => {
                     const chosen = draft.creative?.[step.id]?.goal
                     return (
