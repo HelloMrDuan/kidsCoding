@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U1-L02",
+  "reviewedCommit": "bed5420aa87c5cda69e049bbc5b16363c458e64c",
+  "reviewedAt": "2026-10-27",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U1-L01"
+  ],
+  "newConcepts": [
+    "造型：同一精灵的不同样子；“换成……造型”指定、“下一个造型”按顺序循环；造型属于精灵，舞台只有背景"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u1-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/165"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "conceptExplain 三条：造型是同一精灵的不同样子、换成 vs 下一个、造型属于精灵",
+        "找错针对“把精灵造型用在舞台上”误区；nextLesson 指向 L03 背景和声音"
+      ],
+      "defects": [
+        "未覆盖“上一个造型”与按编号换造型"
+      ]
+    },
+    "story": {
+      "score": 12,
+      "evidence": [
+        "演出情境：小橘猫上台挥手、点一下跳舞，小鸟展翅看演出",
+        "预测：点站立的猫会怎样，VM 首次造型变化对照预测"
+      ],
+      "defects": [
+        "预测仍为二选一；无朗读"
+      ]
+    },
+    "practice": {
+      "score": 21,
+      "evidence": [
+        "练习 A：换成挥手，绿旗后 VM 造型为挥手（E2E）",
+        "练习 B：重复次数+等待秒数，VM 快照记录点击后造型变化 ≥3 次；1 次不过关；3×0.2s、6×0.3s 均过关"
+      ],
+      "defects": [
+        "不能拖入新积木类型或改变积木顺序"
+      ]
+    },
+    "feedback": {
+      "score": 13,
+      "evidence": [
+        "真实错误：舞台执行 Scratch looks_switchcostumeto(挥手)，VM 报告所有对象造型前后不变",
+        "三层提示：现象→原因→修复"
+      ],
+      "defects": [
+        "提示固定文案"
+      ]
+    },
+    "creation": {
+      "score": 10,
+      "evidence": [
+        "创意：小鸟展翅出场+自定舞步",
+        "导出真 .sb3（5 个原创 SVG）独立 VM 回读，重新导入恢复"
+      ],
+      "defects": [
+        "不能绘制新造型（需完整 Scratch）"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U1L02 只读 VM 观察（单测）",
+        "页面明示不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 在沙箱 iframe 中执行；E2E 无 VM mock"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "舞台换精灵造型无效、重复 1 次不过关、6 类非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "练习 B 次数 3～10 与 0.2～1.0 秒任意组合均通过"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "新增 3 个 SVG 为本项目原创，已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U1-L02：真 Scratch VM 加载原创演出项目；点猫“下一个造型”站立→挥手；换成挥手后绿旗 VM 造型为挥手",
+    "failureCase": "选中舞台应用“换成（挥手）造型”→ VM 舞台/小橘猫/小鸟造型前后都不变；重复 1 次只换 1 次不算舞；他精灵造型/0.05 秒/重复 99/多余造型/forever/他课工程均被拒且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：舞台背景和小橘猫造型都没有变化",
+      "第二层（想原因）：挥手是小橘猫的造型，舞台只有自己的背景",
+      "第三层（去修复）：选中小橘猫，把绿旗下的换成造型改成挥手"
+    ],
+    "practiceA": "练习 A：小橘猫绿旗换成挥手造型",
+    "practiceB": "练习 B：重复+下一个造型+等待做造型舞（≥3 次变化）",
+    "equivalentSolutions": [
+      "重复 3 次、等待 0.2 秒",
+      "重复 6 次、等待 0.3 秒",
+      "重复 4 次、等待 0.7 秒"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U1-L02 角色换造型（5 个用例）"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 Scratch WebGL 渲染器；本课无云端保存",
+    "不能绘制/新增造型"
+  ]
+}

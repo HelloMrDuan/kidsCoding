@@ -109,8 +109,59 @@ def lesson_g2_u1_l01():
     return "g2-u1-l01-park-friends.sb3.b64", project, files, params
 
 
+def costume_scripts_cat():
+    """Green flag -> switch to a chosen costume; clicked -> repeat N { next costume; wait }."""
+    return {
+        "cat_flag": block("event_whenflagclicked", "cat_switch", top=True, x=40, y=40),
+        "cat_switch": block("looks_switchcostumeto", parent="cat_flag", inputs={"COSTUME": [1, "cat_costume_menu"]}),
+        "cat_costume_menu": block("looks_costume", parent="cat_switch", fields={"COSTUME": ["站立", None]}, shadow=True),
+        "cat_click": block("event_whenthisspriteclicked", "cat_repeat", top=True, x=40, y=200),
+        "cat_repeat": block("control_repeat", parent="cat_click", inputs={"TIMES": num(1), "SUBSTACK": [2, "cat_next"]}),
+        "cat_next": block("looks_nextcostume", "cat_wait", parent="cat_repeat"),
+        "cat_wait": block("control_wait", parent="cat_next", inputs={"DURATION": num(0.5)}),
+    }
+
+
+def costume_scripts_bird():
+    return {
+        "bird_flag": block("event_whenflagclicked", "bird_switch", top=True, x=40, y=40),
+        "bird_switch": block("looks_switchcostumeto", parent="bird_flag", inputs={"COSTUME": [1, "bird_costume_menu"]}),
+        "bird_costume_menu": block("looks_costume", parent="bird_switch", fields={"COSTUME": ["收翅", None]}, shadow=True),
+        "bird_click": block("event_whenthisspriteclicked", "bird_next", top=True, x=40, y=200),
+        "bird_next": block("looks_nextcostume", parent="bird_click"),
+    }
+
+
+def lesson_g2_u1_l02():
+    """角色换造型: one sprite owns several costumes; switch to one, or step through them."""
+    backdrop, backdrop_file = svg_costume("演出舞台", "show-stage-backdrop.svg", 240, 180)
+    cat_stand, cat_stand_file = svg_costume("站立", "orange-cat.svg", 48, 48)
+    cat_wave, cat_wave_file = svg_costume("挥手", "orange-cat-wave.svg", 48, 48)
+    bird_rest, bird_rest_file = svg_costume("收翅", "blue-bird.svg", 32, 28)
+    bird_flap, bird_flap_file = svg_costume("展翅", "blue-bird-flap.svg", 32, 30)
+    project = {
+        "targets": [
+            stage([backdrop]),
+            sprite("小橘猫", [cat_stand, cat_wave], costume_scripts_cat(), 1, -60, -50),
+            sprite("小鸟", [bird_rest, bird_flap], costume_scripts_bird(), 2, 120, 40),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U1-L02"},
+    }
+    files = {c["md5ext"]: f for c, f in ((backdrop, backdrop_file), (cat_stand, cat_stand_file), (cat_wave, cat_wave_file),
+                                         (bird_rest, bird_rest_file), (bird_flap, bird_flap_file))}
+    params = [
+        {"target": "小橘猫", "block": "cat_costume_menu", "slot": "COSTUME", "kind": "choice", "options": ["站立", "挥手"]},
+        {"target": "小橘猫", "block": "cat_repeat", "slot": "TIMES", "kind": "int", "min": 1, "max": 10},
+        {"target": "小橘猫", "block": "cat_wait", "slot": "DURATION", "kind": "tenths", "min": 0.2, "max": 1.0},
+        {"target": "小鸟", "block": "bird_costume_menu", "slot": "COSTUME", "kind": "choice", "options": ["收翅", "展翅"]},
+    ]
+    return "g2-u1-l02-cat-costumes.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
+    "G2-U1-L02": lesson_g2_u1_l02,
 }
 
 

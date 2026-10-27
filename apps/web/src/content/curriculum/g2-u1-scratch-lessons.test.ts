@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
-import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2U1L01, g2u1L01, g2u1ScratchLessons, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
+import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, g2u1L01, g2u1L02, g2u1ScratchLessons, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -59,5 +59,45 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(inBirdNest({x: 151, y: 60})).toBe(false)
     expect(inBirdNest({x: 110, y: 44})).toBe(false)
     expect(inBirdNest({x: Number.NaN, y: 60})).toBe(false)
+  })
+
+  it('L02 tasks complete only from VM costume observations', () => {
+    const obs = emptyG2Observations()
+    expect(Object.values(evaluateG2U1L02(obs)).every(v => v === false)).toBe(true)
+    expect(evaluateG2Lesson(g2u1L02.id, obs)).toEqual(evaluateG2U1L02(obs))
+    obs.costumesAfterRun = {小橘猫: '站立', 小鸟: '收翅'}
+    expect(evaluateG2U1L02(obs).practiceA).toBe(false)
+    obs.costumesAfterRun = {小橘猫: '挥手', 小鸟: '收翅'}
+    expect(evaluateG2U1L02(obs).practiceA).toBe(true)
+    expect(evaluateG2U1L02(obs).create).toBe(false)
+    obs.costumesAfterRun = {小橘猫: '挥手', 小鸟: '展翅'}
+    expect(evaluateG2U1L02(obs).create).toBe(true)
+    obs.clickCostumeChanges = {小橘猫: 2, 小鸟: 5}
+    expect(evaluateG2U1L02(obs).practiceB).toBe(false)
+    obs.clickCostumeChanges = {小橘猫: 3}
+    expect(evaluateG2U1L02(obs).practiceB).toBe(true)
+    expect(evaluateG2U1L02(obs).debug).toBe(false)
+    expect(evaluateG2U1L02({...obs, stageCostumeRejected: true}).debug).toBe(true)
+  })
+
+  it('L02 prediction is read from the first costume change the VM showed after a click', () => {
+    const obs = emptyG2Observations()
+    expect(observedPrediction(g2u1L02.id, obs)).toBeNull()
+    obs.firstClickTransition = {小橘猫: {from: '挥手', to: '站立'}}
+    expect(observedPrediction(g2u1L02.id, obs)).toBeNull()
+    obs.firstClickTransition = {小橘猫: {from: '站立', to: '挥手'}}
+    expect(observedPrediction(g2u1L02.id, obs)).toBe(g2u1L02.predict.correct)
+  })
+
+  it('L02 offers each sprite only its own costumes and gives the stage none of the sprite costumes as its own', () => {
+    const cat = g2u1L02.targets.find(t => t.name === '小橘猫')!
+    const bird = g2u1L02.targets.find(t => t.name === '小鸟')!
+    const stage = g2u1L02.targets.find(t => t.kind === 'stage')!
+    expect(cat.costumes).toEqual(['站立', '挥手'])
+    expect(bird.costumes).toEqual(['收翅', '展翅'])
+    expect(stage.extraToolbox).toEqual(['kc2_switch_costume'])
+    expect(stage.scripts[0].body).toEqual([])
+    expect(g2u1L02.concept).not.toEqual(g2u1L01.concept)
+    expect(g2u1L02.sample).not.toEqual(g2u1L01.sample)
   })
 })

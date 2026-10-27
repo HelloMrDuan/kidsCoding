@@ -6,16 +6,20 @@
 // examples/scratch/g2/build_g2_projects.py. Nothing here is a published
 // course or a verified grade.
 
-export type G2Slot = { key: string; field: 'X' | 'Y' | 'MESSAGE'; label: string; min?: number; max?: number; maxLength?: number }
-export type G2BlockSpec = { type: 'kc2_goto' | 'kc2_say'; vmBlock: string; slots: G2Slot[] }
+export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION'
+export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
+export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait'
+export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[] }
 export type G2ScriptSpec = { hat: 'kc2_flag' | 'kc2_clicked'; body: G2BlockSpec[] }
 export type G2TargetSpec = {
   name: string
   kind: 'stage' | 'sprite'
   label: string
   scripts: G2ScriptSpec[]
-  /** Blocks offered in the toolbox beyond the target's own scripts (used for the stage error case). */
-  extraToolbox?: Array<'kc2_goto'>
+  /** Costume names offered by this target's costume dropdowns. */
+  costumes?: string[]
+  /** Blocks offered in the toolbox beyond the target's own scripts (used for the stage error cases). */
+  extraToolbox?: Array<'kc2_goto' | 'kc2_switch_costume'>
 }
 export type G2Task = { id: 'practiceA' | 'practiceB' | 'debug' | 'create'; title: string; goal: string; how: string; skill: string }
 export type G2Step = { id: string; solutions: string[]; counterExamples: string[] }
@@ -109,8 +113,83 @@ export const g2u1L01: G2Lesson = {
   nextLesson: 'G2-U1-L02 角色换造型',
 }
 
+const costumeSlot = (target: string, block: string, options: string[]): G2Slot[] => [
+  { key: `${target}|${block}|COSTUME`, field: 'COSTUME', label: '造型', options },
+]
+
+export const g2u1L02: G2Lesson = {
+  id: 'G2-U1-L02',
+  title: '角色换造型',
+  concept: '造型',
+  sample: '/scratch-samples/g2-u1-l02-cat-costumes.sb3.b64',
+  exportName: 'KidsCoding-角色换造型.sb3',
+  story: '演出马上开始！小橘猫上台时要换成“挥手”造型和观众打招呼，被点一下还要跳一段换造型的舞；树上的小鸟也想换个造型来看演出。',
+  conceptExplain: [
+    '造型是同一个精灵的不同样子：小橘猫有“站立”和“挥手”两个造型，它还是同一个精灵。',
+    '“换成某个造型”直接跳到指定的样子；“下一个造型”按顺序换到下一张，到最后一张再回到第一张。',
+    '造型属于精灵；舞台只有背景。想让小橘猫换造型，要先选中小橘猫再改它的积木。',
+  ],
+  predict: {
+    question: '小橘猫现在是“站立”造型。点它一下（重复 1 次：下一个造型），它会怎样？',
+    options: ['变成挥手', '保持站立'],
+    correct: '变成挥手',
+    explain: '“下一个造型”会从“站立”换到下一张“挥手”；再点一次又回到“站立”。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '用“换成……造型”指定样子', title: '练习 A：上台就挥手', goal: '把小橘猫“当绿旗被点击 → 换成（ ）造型”改成“挥手”，应用后点绿旗，让 Scratch VM 里的小橘猫真的换成挥手造型。', how: '在角色区选中小橘猫，改造型下拉框；没应用的积木不会运行。' },
+    { id: 'practiceB', skill: '用“重复 + 下一个造型”做造型动画', title: '练习 B：点一下跳段舞', goal: '把“当角色被点击 → 重复（ ）次：下一个造型、等待（ ）秒”的次数改成 3 次或更多，应用后在舞台上点小橘猫，让 VM 连续换至少 3 次造型。', how: '可以同时改等待秒数（0.2～1.0 秒）比较快慢；次数和快慢有很多种正确组合。' },
+    { id: 'debug', skill: '分清精灵造型和舞台背景（调试）', title: '找错：给舞台换“挥手”造型？', goal: '在角色区选中“舞台”，把“换成（挥手）造型”拼到绿旗下面并应用，观察 Scratch VM 的真实结果。', how: '看清楚谁变了、谁没变，再按提示把积木放回正确的精灵。' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：让小鸟也换装', goal: '把小鸟出场时的造型改成“展翅”，应用后点绿旗，再按你喜欢的节奏设置小橘猫的舞，保存为 .sb3。', how: '点小鸟也能用“下一个造型”在收翅和展翅之间切换。' },
+  ],
+  hints: [
+    '看现象：你让“舞台”换成“挥手”造型，Scratch VM 报告舞台背景和小橘猫的造型都没有变化。',
+    '想原因：“挥手”是小橘猫这个精灵的造型，舞台只有自己的背景（演出舞台），找不到叫“挥手”的造型，所以什么也没换。',
+    '去修复：在角色区选中“小橘猫”，把它绿旗下面“换成（ ）造型”改成“挥手”，应用后点绿旗。',
+  ],
+  reflection: [
+    '“换成挥手造型”和“下一个造型”有什么不同？',
+    '为什么给舞台换“挥手”造型没有用？',
+    '小橘猫的舞，你选了几次、几秒？换一个组合，看起来有什么不同？',
+  ],
+  limitations: [
+    '本实验只能修改：小橘猫和小鸟出场造型（从各自已有造型中选）、小橘猫舞蹈的重复次数（1～10）和等待秒数（0.2～1.0 秒，0.1 秒一格）。',
+    '不能新增或绘制造型（课程拓展“画一个眨眼造型”需要完整 Scratch 编辑器，可导出 .sb3 后继续改造），不能新增精灵、声音、积木或变量。',
+    '舞台画面按 Scratch VM 的真实造型和坐标绘制原创 SVG，没有接入 Scratch WebGL 渲染器；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    { name: 'Stage', kind: 'stage', label: '舞台', scripts: [{ hat: 'kc2_flag', body: [] }], extraToolbox: ['kc2_switch_costume'], costumes: ['站立', '挥手'] },
+    {
+      name: '小橘猫', kind: 'sprite', label: '小橘猫', costumes: ['站立', '挥手'],
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_switch_costume', vmBlock: 'cat_costume_menu', slots: costumeSlot('小橘猫', 'cat_costume_menu', ['站立', '挥手']) }] },
+        { hat: 'kc2_clicked', body: [{
+          type: 'kc2_repeat', vmBlock: 'cat_repeat', slots: [{ key: '小橘猫|cat_repeat|TIMES', field: 'TIMES', label: '次数', min: 1, max: 10 }],
+          children: [
+            { type: 'kc2_next_costume', vmBlock: 'cat_next', slots: [] },
+            { type: 'kc2_wait', vmBlock: 'cat_wait', slots: [{ key: '小橘猫|cat_wait|DURATION', field: 'DURATION', label: '等待秒数', min: 0.2, max: 1.0, tenths: true }] },
+          ],
+        }] },
+      ],
+    },
+    {
+      name: '小鸟', kind: 'sprite', label: '小鸟', costumes: ['收翅', '展翅'],
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_switch_costume', vmBlock: 'bird_costume_menu', slots: costumeSlot('小鸟', 'bird_costume_menu', ['收翅', '展翅']) }] },
+        { hat: 'kc2_clicked', body: [{ type: 'kc2_next_costume', vmBlock: 'bird_next', slots: [] }] },
+      ],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-switch-to-wave', solutions: ['小橘猫绿旗下“换成挥手造型”→ 点绿旗后 VM 造型为挥手'], counterExamples: ['仍是“换成站立造型”→ 点绿旗后还是站立'] },
+    { id: 'practiceB-costume-dance', solutions: ['重复 3 次、等待 0.5 秒 → 点小橘猫后 VM 连续换 3 次造型', '重复 6 次、等待 0.2 秒 → 更快地换 6 次'], counterExamples: ['重复 1 次 → 只换 1 次，不够一段舞', '等待 0.05 秒 → 超出允许范围被拒绝'] },
+    { id: 'debug-costume-belongs-to-sprite', solutions: ['选中小橘猫再改“换成挥手造型” → 小橘猫真的换造型'], counterExamples: ['选中舞台应用“换成挥手造型” → VM 中舞台与小橘猫造型都不变'] },
+  ],
+  nextLesson: 'G2-U1-L03 设置背景和声音',
+}
+
 export const g2u1ScratchLessons: Record<string, G2Lesson> = {
   [g2u1L01.id]: g2u1L01,
+  [g2u1L02.id]: g2u1L02,
 }
 
 export function getG2ScratchLesson(id: string): G2Lesson | null {
@@ -127,9 +206,20 @@ export type G2Observations = {
   positionsAfterRun: Record<string, G2Point> | null
   /** Latest text each sprite actually said in the VM. */
   lastSaid: Record<string, string>
+  /** Sprite costumes from the VM after at least one green-flag run. */
+  costumesAfterRun: Record<string, string> | null
+  /** Most costume changes the VM showed during one click run, per sprite. */
+  clickCostumeChanges: Record<string, number>
+  /** First costume change seen after clicking each sprite. */
+  firstClickTransition: Record<string, { from: string; to: string }>
+  /** The VM ran "switch costume" on the stage and no target changed costume. */
+  stageCostumeRejected: boolean
 }
 
-export const emptyG2Observations = (): G2Observations => ({ clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {} })
+export const emptyG2Observations = (): G2Observations => ({
+  clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
+  costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
+})
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
   if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return false
@@ -149,13 +239,28 @@ export function evaluateG2U1L01(obs: G2Observations): G2TaskState {
   }
 }
 
+export function evaluateG2U1L02(obs: G2Observations): G2TaskState {
+  return {
+    practiceA: obs.costumesAfterRun?.['小橘猫'] === '挥手',
+    practiceB: (obs.clickCostumeChanges['小橘猫'] ?? 0) >= 3,
+    debug: obs.stageCostumeRejected,
+    create: obs.costumesAfterRun?.['小鸟'] === '展翅',
+  }
+}
+
 /** What the VM actually showed for the lesson's prediction question (null until observed). */
 export function observedPrediction(id: string, obs: G2Observations): string | null {
   if (id === g2u1L01.id) return obs.clickedSpeakers.includes('小鸟') ? '小鸟说话' : null
+  if (id === g2u1L02.id) {
+    const first = obs.firstClickTransition['小橘猫']
+    if (!first || first.from !== '站立') return null
+    return first.to === '挥手' ? '变成挥手' : '保持站立'
+  }
   return null
 }
 
 export function evaluateG2Lesson(id: string, obs: G2Observations): G2TaskState | null {
   if (id === g2u1L01.id) return evaluateG2U1L01(obs)
+  if (id === g2u1L02.id) return evaluateG2U1L02(obs)
   return null
 }

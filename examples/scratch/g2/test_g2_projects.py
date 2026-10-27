@@ -63,6 +63,28 @@ class G2ProjectTests(unittest.TestCase):
         # The bird starts outside the nest so practice B needs a real edit.
         self.assertEqual(bird["blocks"]["bird_goto"]["inputs"]["X"], [1, [4, "-150"]])
 
+    def test_l02_sprites_own_several_costumes_and_the_stage_owns_only_its_backdrop(self):
+        project = project_for("G2-U1-L02")
+        stage, cat, bird = project["targets"]
+        self.assertEqual([c["name"] for c in stage["costumes"]], ["演出舞台"])
+        self.assertEqual(stage["blocks"], {})
+        self.assertEqual([c["name"] for c in cat["costumes"]], ["站立", "挥手"])
+        self.assertEqual([c["name"] for c in bird["costumes"]], ["收翅", "展翅"])
+        blocks = cat["blocks"]
+        self.assertEqual(blocks["cat_switch"]["opcode"], "looks_switchcostumeto")
+        self.assertEqual(blocks["cat_costume_menu"]["fields"]["COSTUME"][0], "站立")
+        self.assertTrue(blocks["cat_costume_menu"]["shadow"])
+        self.assertEqual(blocks["cat_repeat"]["opcode"], "control_repeat")
+        self.assertEqual(blocks["cat_repeat"]["inputs"]["SUBSTACK"], [2, "cat_next"])
+        self.assertEqual(blocks["cat_next"]["opcode"], "looks_nextcostume")
+        self.assertEqual(blocks["cat_wait"]["opcode"], "control_wait")
+        # Starts at one repeat so practice B needs a real edit.
+        self.assertEqual(blocks["cat_repeat"]["inputs"]["TIMES"], [1, [4, "1"]])
+        model = build_models()["G2-U1-L02"]
+        kinds = {(p["block"], p["slot"]): p["kind"] for p in model["params"]}
+        self.assertEqual(kinds[("cat_wait", "DURATION")], "tenths")
+        self.assertEqual(kinds[("cat_costume_menu", "COSTUME")], "choice")
+
 
 if __name__ == "__main__":
     unittest.main()

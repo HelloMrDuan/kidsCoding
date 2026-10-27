@@ -14,8 +14,9 @@ type CostumeAsset = {name: string; uri: string; w: number; h: number; cx: number
 type TargetAsset = {name: string; isStage: boolean; costumes: CostumeAsset[]; sounds: string[]}
 type SpriteState = {id: string; name: string; x: number; y: number; visible: boolean; size: number; original: boolean; costume: string}
 type MoveResult = {requested: G2Point; before: G2Point; after: G2Point; moved: boolean}
+type CostumeResult = {requested: string; before: Array<{name: string; costume: string}>; after: Array<{name: string; costume: string}>; changed: boolean; stageCostumes: string[]}
 type LabMessage = {
-  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' |
+  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' |
     'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'
   id: number | null
   available?: boolean
@@ -29,10 +30,12 @@ type LabMessage = {
   target?: string
   isStage?: boolean
   text?: string
-  requested?: G2Point
-  before?: G2Point
-  after?: G2Point
+  requested?: G2Point | string
+  before?: G2Point | CostumeResult['before']
+  after?: G2Point | CostumeResult['after']
   moved?: boolean
+  changed?: boolean
+  stageCostumes?: string[]
   archive?: ArrayBuffer
   error?: string
   phase?: 'load' | 'configure' | 'export'
@@ -60,6 +63,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const [prediction, setPrediction] = useState<string | null>(null)
   const [hintLevel, setHintLevel] = useState(0)
   const [moveResult, setMoveResult] = useState<MoveResult | null>(null)
+  const [costumeResult, setCostumeResult] = useState<CostumeResult | null>(null)
   const [stageClickNote, setStageClickNote] = useState('')
   const [status, setStatus] = useState('正在加载 Scratch VM，请稍候……')
   const [draftStatus, setDraftStatus] = useState('本机作品还未保存；应用积木后会自动保存真实 .sb3。')
@@ -67,6 +71,10 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const vmAvailable = useRef(false)
   const runSeen = useRef(false)
   const recentClicks = useRef<Map<string, number>>(new Map())
+  // Costume changes counted per sprite since its last click (from VM snapshots).
+  const lastCostume = useRef<Map<string, string>>(new Map())
+  const clickChanges = useRef<Map<string, number>>(new Map())
+  const clickFrom = useRef<Map<string, string>>(new Map())
   const savedFailed = useRef(false)
   const loadedRef = useRef(false)
   useEffect(() => { loadedRef.current = loaded }, [loaded])
@@ -137,9 +145,13 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         setEditorRevision(v => v + 1)
         setObs(emptyG2Observations())
         setMoveResult(null)
+        setCostumeResult(null)
         setRunning(false)
         runSeen.current = false
         recentClicks.current.clear()
+        lastCostume.current.clear()
+        clickChanges.current.clear()
+        clickFrom.current.clear()
         if (msg.source === 'file') {
           setSaving(true)
           post({kind: 'SAVE_DRAFT', id: id.current})
@@ -154,16 +166,41 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         setSprites(current)
         setBackdrop(msg.backdrop ?? '')
         setBubbles(msg.bubbles ?? {})
+        const changes: Record<string, number> = {}
+        const transitions: Record<string, {from: string; to: string}> = {}
+        for (const t of current) {
+          if (!t.original) continue
+          const before = lastCostume.current.get(t.name)
+          if (before !== undefined && before !== t.costume && clickChanges.current.has(t.name)) {
+            const count = (clickChanges.current.get(t.name) ?? 0) + 1
+            clickChanges.current.set(t.name, count)
+            changes[t.name] = count
+            if (count === 1) transitions[t.name] = {from: clickFrom.current.get(t.name) ?? before, to: t.costume}
+          }
+          lastCostume.current.set(t.name, t.costume)
+        }
+        if (Object.keys(changes).length) {
+          setObs(prev => {
+            const nextChanges = {...prev.clickCostumeChanges}
+            for (const [name, count] of Object.entries(changes)) nextChanges[name] = Math.max(nextChanges[name] ?? 0, count)
+            const nextFirst = {...prev.firstClickTransition}
+            for (const [name, t] of Object.entries(transitions)) if (!nextFirst[name]) nextFirst[name] = t
+            return {...prev, clickCostumeChanges: nextChanges, firstClickTransition: nextFirst}
+          })
+        }
         if (runSeen.current) {
           const positions: Record<string, G2Point> = {}
-          for (const t of current) if (t.original) positions[t.name] = {x: t.x, y: t.y}
-          setObs(prev => ({...prev, positionsAfterRun: positions}))
+          const costumes: Record<string, string> = {}
+          for (const t of current) if (t.original) { positions[t.name] = {x: t.x, y: t.y}; costumes[t.name] = t.costume }
+          setObs(prev => ({...prev, positionsAfterRun: positions, costumesAfterRun: costumes}))
         }
       } else if (msg.kind === 'CLICKED') {
         if (msg.isStage) {
           setStageClickNote('你点到的是舞台（背景）。舞台不是精灵，它没有“当角色被点击”的脚本，所以没有角色说话。')
         } else if (msg.target) {
           recentClicks.current.set(msg.target, Date.now())
+          clickChanges.current.set(msg.target, 0)
+          clickFrom.current.set(msg.target, lastCostume.current.get(msg.target) ?? '')
           setStageClickNote('')
           setStatus(`Scratch VM 正在执行${msg.target}自己的“当角色被点击”脚本。`)
         }
@@ -177,8 +214,18 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           lastSaid: {...prev.lastSaid, [target]: text},
           clickedSpeakers: fromClick && !prev.clickedSpeakers.includes(target) ? [...prev.clickedSpeakers, target] : prev.clickedSpeakers,
         }))
+      } else if (msg.kind === 'COSTUME_RESULT') {
+        if (typeof msg.requested === 'string' && Array.isArray(msg.before) && Array.isArray(msg.after)) {
+          const result: CostumeResult = {requested: msg.requested, before: msg.before, after: msg.after, changed: !!msg.changed, stageCostumes: msg.stageCostumes ?? []}
+          setCostumeResult(result)
+          if (!result.changed) {
+            setObs(prev => ({...prev, stageCostumeRejected: true}))
+            setHintLevel(level => Math.max(level, 1))
+            setStatus('没有任何对象换造型：Scratch VM 中舞台和精灵的造型前后相同。看看下面的提示。')
+          }
+        }
       } else if (msg.kind === 'MOVE_RESULT') {
-        if (msg.requested && msg.before && msg.after) {
+        if (msg.requested && typeof msg.requested === 'object' && msg.before && !Array.isArray(msg.before) && msg.after && !Array.isArray(msg.after)) {
           const result = {requested: msg.requested, before: msg.before, after: msg.after, moved: !!msg.moved}
           setMoveResult(result)
           if (!result.moved) {
@@ -223,6 +270,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         setStatus('作品已从真实 Scratch VM 导出为 .sb3，可以用兼容 Scratch 3 的编辑器打开。')
       } else if (msg.kind === 'STARTED') {
         runSeen.current = true
+        clickChanges.current.clear()
         setRunning(true)
         setStatus('Scratch VM 正在执行每个精灵的“当绿旗被点击”脚本。')
         window.setTimeout(() => { if (!destroyed) setRunning(false) }, 600)
@@ -266,6 +314,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
     if (!loaded || busy) return
     if (selectedTarget.kind === 'stage') {
       if (selectedProgram?.kind === 'stage-move') post({kind: 'TRY_MOVE', id: id.current, target: 'Stage', x: selectedProgram.x, y: selectedProgram.y})
+      if (selectedProgram?.kind === 'stage-costume') post({kind: 'TRY_COSTUME', id: id.current, target: 'Stage', costume: selectedProgram.costume})
       return
     }
     if (selectedProgram?.kind !== 'sprite' || !Object.keys(pendingForSelected).length) return
@@ -355,7 +404,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                 const scale = (Number.isFinite(sprite.size) ? sprite.size : 100) / 100
                 const bubble = bubbles[sprite.name]
                 return (
-                  <button key={sprite.id} type="button" data-testid="g2-stage-sprite" data-name={sprite.name} aria-label={`点${sprite.name}`}
+                  <button key={sprite.id} type="button" data-testid="g2-stage-sprite" data-name={sprite.name} data-costume={sprite.costume} aria-label={`点${sprite.name}`}
                     disabled={!loaded}
                     onClick={() => post({kind: 'CLICK', id: id.current, target: sprite.name})}
                     className="absolute p-0"
@@ -373,7 +422,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             {stageClickNote && <p data-testid="g2-stage-note" className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{stageClickNote}</p>}
             <div className="mt-5 flex flex-wrap gap-3">
               <button data-testid="g2-apply-blocks" type="button"
-                disabled={!loaded || busy || (selectedTarget.kind === 'stage' ? selectedProgram?.kind !== 'stage-move' : !Object.keys(pendingForSelected).length)}
+                disabled={!loaded || busy || (selectedTarget.kind === 'stage' ? selectedProgram?.kind !== 'stage-move' && selectedProgram?.kind !== 'stage-costume' : !Object.keys(pendingForSelected).length)}
                 className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40" onClick={apply}>应用积木到 VM</button>
               {!loaded && loadFailed && (
                 <button data-testid="g2-retry-load" type="button" disabled={retrying}
@@ -409,13 +458,18 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                 请求舞台移到 ({moveResult.requested.x}, {moveResult.requested.y})；VM 中舞台坐标：移动前 ({moveResult.before.x}, {moveResult.before.y}) → 移动后 ({moveResult.after.x}, {moveResult.after.y})。{moveResult.moved ? '舞台移动了。' : '舞台没有移动。'}
               </p>
             )}
+ {costumeResult && (
+              <p data-testid="g2-costume-result" className="mt-3 rounded-xl bg-rose-50 p-3 text-sm leading-6 text-rose-900">
+                请求舞台换成“{costumeResult.requested}”造型；舞台自己的背景只有：{costumeResult.stageCostumes.join('、') || '—'}。VM 中：{costumeResult.before.map((b, i) => `${b.name === 'Stage' ? '舞台' : b.name} ${b.costume} → ${costumeResult.after[i]?.costume ?? '—'}`).join('；')}。{costumeResult.changed ? '有对象换了造型。' : '没有任何对象换造型。'}
+              </p>
+            )}
             <p data-testid="g2-export-status" className="mt-5 text-sm text-indigo-700">{exportDetails}</p>
             <p data-testid="g2-local-save-status" className="mt-3 text-sm text-emerald-800">{draftStatus}</p>
             <p className="mt-5 text-sm">当前背景：<strong data-testid="g2-backdrop">{backdrop || '—'}</strong></p>
             {spriteTargets.map(t => {
               const s = spriteOf(t.name)
               return <p key={t.name} data-testid="g2-sprite-state" data-name={t.name} className="mt-2 text-sm">
-                {t.label}：x {s ? Math.round(s.x) : '—'} · y {s ? Math.round(s.y) : '—'}{obs.lastSaid[t.name] ? ` · 刚才说“${obs.lastSaid[t.name]}”` : ''}
+                {t.label}：x {s ? Math.round(s.x) : '—'} · y {s ? Math.round(s.y) : '—'}{t.costumes && t.costumes.length > 1 ? ` · 造型 ${s?.costume ?? '—'}` : ''}{obs.lastSaid[t.name] ? ` · 刚才说“${obs.lastSaid[t.name]}”` : ''}
               </p>
             })}
             <p className="mt-5 text-xs leading-6 text-slate-500">位置、造型和说的话都来自 Scratch VM 的对象状态；画面用原创 SVG 按 VM 坐标绘制，未接入 Scratch WebGL 渲染器。项目不会上传。</p>
