@@ -70,11 +70,11 @@ def greet_scripts(prefix, x, y, greeting):
     }
 
 
-def sprite(name, costumes, blocks, layer, x, y, sounds=None):
+def sprite(name, costumes, blocks, layer, x, y, sounds=None, direction=90, rotation="all around"):
     return {"isStage": False, "name": name, "variables": {}, "lists": {}, "broadcasts": {}, "blocks": blocks,
             "comments": {}, "currentCostume": 0, "costumes": costumes, "sounds": sounds or [], "volume": 100,
-            "layerOrder": layer, "visible": True, "x": x, "y": y, "size": 100, "direction": 90,
-            "draggable": False, "rotationStyle": "all around"}
+            "layerOrder": layer, "visible": True, "x": x, "y": y, "size": 100, "direction": direction,
+            "draggable": False, "rotationStyle": rotation}
 
 
 def stage(costumes, blocks=None, sounds=None):
@@ -238,10 +238,59 @@ def lesson_g2_u1_l03():
     return "g2-u1-l03-forest-concert.sb3.b64", project, files, params
 
 
+def angle(value):
+    return [1, [8, str(value)]]
+
+
+L04_CAT_START = (-100, -70)
+
+
+def lesson_g2_u1_l04():
+    """运动积木初体验: move N steps goes the way the sprite faces; turn right N degrees changes the direction."""
+    river, river_file = svg_costume("小河边", "riverside-backdrop.svg", 240, 180)
+    cat, cat_file = svg_costume("小橘猫", "orange-cat.svg", 48, 48)
+    wheel, wheel_file = svg_costume("风车", "pinwheel.svg", 40, 40)
+    cx, cy = L04_CAT_START
+    cat_blocks = {
+        "cat_flag": block("event_whenflagclicked", "cat_goto", top=True, x=40, y=40),
+        "cat_goto": block("motion_gotoxy", "cat_point", parent="cat_flag", inputs={"X": num(cx), "Y": num(cy)}),
+        # The bug the lesson starts with: the cat faces left (-90), so "move" walks away from the fish.
+        "cat_point": block("motion_pointindirection", "cat_move", parent="cat_goto", inputs={"DIRECTION": angle(-90)}),
+        "cat_move": block("motion_movesteps", "cat_say", parent="cat_point", inputs={"STEPS": num(100)}),
+        "cat_say": block("looks_sayforsecs", parent="cat_move", inputs={"MESSAGE": text("我走到这里啦！"), "SECS": num(2)}),
+    }
+    wheel_blocks = {
+        "wheel_click": block("event_whenthisspriteclicked", "wheel_repeat", top=True, x=40, y=40),
+        "wheel_repeat": block("control_repeat", parent="wheel_click", inputs={"TIMES": num(1), "SUBSTACK": [2, "wheel_turn"]}),
+        "wheel_turn": block("motion_turnright", "wheel_wait", parent="wheel_repeat", inputs={"DEGREES": num(15)}),
+        "wheel_wait": block("control_wait", parent="wheel_turn", inputs={"DURATION": num(0.2)}),
+    }
+    project = {
+        "targets": [
+            stage([river]),
+            sprite("小橘猫", [cat], cat_blocks, 1, cx, cy, direction=-90, rotation="left-right"),
+            sprite("风车", [wheel], wheel_blocks, 2, 0, 82),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U1-L04"},
+    }
+    files = {river["md5ext"]: river_file, cat["md5ext"]: cat_file, wheel["md5ext"]: wheel_file}
+    params = [
+        {"target": "小橘猫", "block": "cat_point", "slot": "DIRECTION", "kind": "choice", "options": ["90", "-90", "0", "180"]},
+        {"target": "小橘猫", "block": "cat_move", "slot": "STEPS", "kind": "int", "min": 10, "max": 300},
+        {"target": "小橘猫", "block": "cat_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "风车", "block": "wheel_repeat", "slot": "TIMES", "kind": "int", "min": 1, "max": 12},
+        {"target": "风车", "block": "wheel_turn", "slot": "DEGREES", "kind": "int", "min": 1, "max": 180},
+        {"target": "风车", "block": "wheel_wait", "slot": "DURATION", "kind": "tenths", "min": 0.2, "max": 1.0},
+    ]
+    return "g2-u1-l04-cat-walks.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
     "G2-U1-L03": lesson_g2_u1_l03,
+    "G2-U1-L04": lesson_g2_u1_l04,
 }
 
 

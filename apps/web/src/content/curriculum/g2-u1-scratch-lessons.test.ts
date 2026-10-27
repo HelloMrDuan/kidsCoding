@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
-import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
+import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -136,5 +136,46 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(stage.scripts[0].body.length).toBeGreaterThan(0)
     expect(bird.sounds).toEqual(['叽叽', '啾啾'])
     expect(new Set(Object.values(g2u1ScratchLessons).map(l => l.concept)).size).toBe(Object.keys(g2u1ScratchLessons).length)
+  })
+
+  it('L04 tasks come from VM flag-run positions (which way the cat walked) and VM-counted pinwheel turns', () => {
+    const obs = emptyG2Observations()
+    const run = (x: number) => ({backdrop: '小河边', stagePlays: 0, positions: {小橘猫: {x, y: -70}, 风车: {x: 0, y: 82}}})
+    expect(Object.values(evaluateG2U1L04(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u1L04.id, obs)).toBeNull()
+    obs.flagRuns = [run(-200)]
+    expect(observedPrediction(g2u1L04.id, obs)).toBe(g2u1L04.predict.correct)
+    expect(evaluateG2U1L04(obs).debug).toBe(false)
+    obs.flagRuns.push(run(0))
+    expect(evaluateG2U1L04(obs).debug).toBe(true)
+    expect(evaluateG2U1L04(obs).practiceA).toBe(false)
+    obs.flagRuns.push(run(140))
+    expect(evaluateG2U1L04(obs).practiceA).toBe(true)
+    // Walking right without first seeing the left-walk bug is not the debug task.
+    expect(evaluateG2U1L04({...obs, flagRuns: [run(140)]}).debug).toBe(false)
+    expect(observedPrediction(g2u1L04.id, {...obs, flagRuns: [run(140)]})).toBe('向右走')
+    expect(inFishZone({x: 99, y: -70})).toBe(false)
+    expect(inFishZone({x: 170, y: -70})).toBe(true)
+    expect(inFishZone({x: 140, y: 30})).toBe(false)
+    obs.clickTurns = {风车: [15]}
+    expect(evaluateG2U1L04(obs).practiceB).toBe(false)
+    obs.clickTurns = {风车: [15, 90]}
+    expect(evaluateG2U1L04(obs).practiceB).toBe(true)
+    obs.lastSaid = {小橘猫: L04_ARRIVAL}
+    obs.clickTurns = {风车: [90, 360]}
+    expect(evaluateG2U1L04(obs).create).toBe(false)
+    obs.lastSaid = {小橘猫: '小鱼我来啦'}
+    expect(evaluateG2U1L04(obs).create).toBe(true)
+    expect(evaluateG2U1L04({...obs, clickTurns: {风车: [90]}}).create).toBe(false)
+    expect(evaluateG2U1L04({...obs, flagRuns: [run(-200), run(0)]}).create).toBe(false)
+  })
+
+  it('L04 lets the cat change direction, steps and line, and the pinwheel only its turn loop', () => {
+    const cat = g2u1L04.targets.find(t => t.name === '小橘猫')!
+    const wheel = g2u1L04.targets.find(t => t.name === '风车')!
+    expect(cat.scripts[0].body.map(b => b.type)).toEqual(['kc2_goto_start', 'kc2_point_direction', 'kc2_move_steps', 'kc2_say'])
+    expect(cat.scripts[0].body[0].slots).toEqual([])
+    expect(wheel.scripts[0].body[0].children?.map(b => b.type)).toEqual(['kc2_turn_right', 'kc2_wait'])
+    expect(g2u1L04.showDirection).toBe(true)
   })
 })

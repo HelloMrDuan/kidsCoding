@@ -39,7 +39,7 @@ describe('SYS-102 single L0–L5 maturity source', () => {
   it('L3 trial lessons point at a real route and an existing e2e spec, and are not published', () => {
     const trials = [...allCatalogIds, ...launchLessons.map((l) => l.id)].filter((id) => getLessonMaturity(id)!.trialAvailable)
     expect(trials.sort()).toEqual(Object.keys(trialIntegrations).sort())
-    expect(trials).toHaveLength(28) // 7 lab pilots + 3 G2-U1 Scratch lab lessons + 6 G0-U1 grid lessons + 12 launch lessons
+    expect(trials).toHaveLength(29) // 7 lab pilots + 4 G2-U1 Scratch lab lessons + 6 G0-U1 grid lessons + 12 launch lessons
     for (const id of trials) {
       const m = getLessonMaturity(id)!
       expect(m.level).toBe(3)

@@ -108,6 +108,28 @@ class G2ProjectTests(unittest.TestCase):
                     self.assertEqual((len(data) - 44) // 2, sound["sampleCount"])
                     self.assertLess(len(data), 400_000)
 
+    def test_l04_motion_blocks_start_facing_left_and_the_pinwheel_turns_in_a_repeat(self):
+        project = project_for("G2-U1-L04")
+        stage, cat, wheel = project["targets"]
+        self.assertEqual([c["name"] for c in stage["costumes"]], ["小河边"])
+        self.assertEqual(stage["blocks"], {})
+        self.assertEqual((cat["name"], wheel["name"]), ("小橘猫", "风车"))
+        blocks = cat["blocks"]
+        self.assertEqual([blocks[b]["opcode"] for b in ("cat_goto", "cat_point", "cat_move", "cat_say")],
+                         ["motion_gotoxy", "motion_pointindirection", "motion_movesteps", "looks_sayforsecs"])
+        # The bug the lesson starts with: facing left, so the walk goes away from the fish.
+        self.assertEqual(blocks["cat_point"]["inputs"]["DIRECTION"], [1, [8, "-90"]])
+        self.assertEqual(cat["direction"], -90)
+        self.assertEqual(cat["rotationStyle"], "left-right")
+        wb = wheel["blocks"]
+        self.assertEqual(wb["wheel_repeat"]["inputs"]["SUBSTACK"], [2, "wheel_turn"])
+        self.assertEqual(wb["wheel_turn"]["opcode"], "motion_turnright")
+        self.assertEqual(wb["wheel_turn"]["inputs"]["DEGREES"], [1, [4, "15"]])
+        params = {(p["block"], p["slot"]): p for p in build_models()["G2-U1-L04"]["params"]}
+        self.assertEqual(params[("cat_point", "DIRECTION")]["options"], ["90", "-90", "0", "180"])
+        self.assertEqual((params[("cat_move", "STEPS")]["min"], params[("cat_move", "STEPS")]["max"]), (10, 300))
+        self.assertNotIn(("cat_goto", "X"), params)
+
 
 if __name__ == "__main__":
     unittest.main()
