@@ -1558,7 +1558,7 @@
       "title": "作品继续编辑预览导出及恢复",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-301"
       ],
@@ -1567,11 +1567,11 @@
         "作品关闭重开可编辑/导出，坏项目/离线/冲突有错误态"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/155",
+        "mergeCommit": "48791b29a4ceb64d0c3914d729e0391725f9b954",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40447120319",
+        "tests": ["e2e: portfolio-resume-export-ux302 6/6 in CI portfolio-ux302 + local 6/6; vitest 139 files 822 items green; eslint changed files 0 errors; Next build pass; PR CI gate pass on rerun (part2 guest-story flake cleared on close/reopen rerun)"],
+        "reviewer": "duan 2026-10-27 instruction authorized merge; executed by kid\u5c0f\u5b9d via connector"
       },
       "notes": ""
     },
