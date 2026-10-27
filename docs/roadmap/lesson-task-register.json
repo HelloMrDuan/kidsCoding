@@ -163,12 +163,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/183",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L06 unit project formal course: wrong-order error lab, two practices, own forest card for a new friend, review, saved and reopened（2026-10-27 本地桌面 Chrome 通过；以 PR CI 为准）",
+        "mergeCommit": "ccd17f348ef15ec4e22466f254c9bc3966a1da28",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40519905608",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L06 unit project formal course: wrong-order error lab, two practices, own forest card for a new friend, review, saved and reopened（PR #183 CI 与 main 6e0eab9 的 curriculum 真浏览器分片 --project=desktop 通过；另 2026-10-27 本地桌面 Chrome 7/7 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L06 五关正式课程化（错误实验·顺序错一块、热身石头和小河、练习A大地图、练习B修寻路卡、单元作品·给门后新伙伴做寻路卡）+ 复盘卡 + 作品回放 + 原创向导地图场景；证据 docs/roadmap/evidence/G0-U1-L06/，AI 参考教研 85/100（非独立）。全量目录仍为 outline_not_playable；未独立人工复核、未儿童试学、未发布。"
+      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L06 五关正式课程化（错误实验·顺序错一块、热身石头和小河、练习A大地图、练习B修寻路卡、单元作品·给门后新伙伴做寻路卡）+ 复盘卡 + 作品回放 + 原创向导地图场景；PR #183 已合并（ccd17f3）：ccd17f3 的 deploy 与 task-ledger 全绿，curriculum 因 scratch-touch-browser 超时 4 个作业被取消；紧接的 6e0eab9（含本课代码）curriculum 15 个作业全绿。证据 docs/roadmap/evidence/G0-U1-L06/，AI 参考教研 85/100（实现者自评，非独立）。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U2-L01",
