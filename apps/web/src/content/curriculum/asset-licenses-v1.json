@@ -5,6 +5,7 @@
     { "path": "assets/map-terrain.svg", "license": "original", "source": "本项目手绘 SVG，UX-101（commit 1d82165）" },
     { "path": "scratch-samples/meteor-clones.sb3", "license": "original", "source": "本项目原创 Scratch 示例作品（commit bf72b97）" },
     { "path": "scratch-samples/g2-u1-l01-park-friends.sb3.b64", "license": "original", "source": "本项目原创 G2-U1-L01 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（春日公园/小橘猫/小鸟），由 examples/scratch/g2/build_g2_projects.py 生成" },
+    { "path": "scratch-samples/g2-u1-l02-cat-costumes.sb3.b64", "license": "original", "source": "本项目原创 G2-U1-L02 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（演出舞台/小橘猫站立与挥手/小鸟收翅与展翅），由 examples/scratch/g2/build_g2_projects.py 生成" },
     { "path": "v2/hero-studio.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601，commit fbc8b68）" },
     { "path": "v2/track-blockly.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
     { "path": "v2/track-python.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },

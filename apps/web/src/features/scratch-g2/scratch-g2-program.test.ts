@@ -1,9 +1,9 @@
 import {describe, expect, it} from 'vitest'
-import {g2u1L01} from '@/content/curriculum/g2-u1-scratch-lessons'
+import {g2u1L01, g2u1L02} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {changedValues, checkSlotValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
-function block(type: string, fields: Record<string, string> = {}, next: BlockLike | null = null): BlockLike {
-  return {type, getNextBlock: () => next, getFieldValue: (name: string) => fields[name] ?? ''}
+function block(type: string, fields: Record<string, string> = {}, next: BlockLike | null = null, inner: BlockLike | null = null): BlockLike {
+  return {type, getNextBlock: () => next, getFieldValue: (name: string) => fields[name] ?? '', getInputTargetBlock: (name: string) => (name === 'DO' ? inner : null)}
 }
 const ws = (...tops: BlockLike[]): WorkspaceLike => ({getTopBlocks: () => tops})
 const cat = g2u1L01.targets.find(t => t.name === '小橘猫')!
@@ -50,5 +50,50 @@ describe('G2 restricted Blockly adapter (G2-U1-L01)', () => {
     const applied = {'小鸟|bird_goto|X': -150, '小鸟|bird_goto|Y': 110, '小橘猫|cat_goto|X': -120}
     expect(changedValues({'小鸟|bird_goto|X': 110, '小鸟|bird_goto|Y': 110}, applied)).toEqual({'小鸟|bird_goto|X': 110})
     expect(valuesForTarget(applied, '小鸟')).toEqual({'小鸟|bird_goto|X': -150, '小鸟|bird_goto|Y': 110})
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U1-L02 costumes)', () => {
+  const cat2 = g2u1L02.targets.find(t => t.name === '小橘猫')!
+  const stage2 = g2u1L02.targets.find(t => t.kind === 'stage')!
+  const dance = (times: string, secs: string, body?: BlockLike | null) =>
+    block('kc2_clicked', {}, block('kc2_repeat', {TIMES: times}, null, body === undefined ? block('kc2_next_costume', {}, block('kc2_wait', {DURATION: secs})) : body))
+  const flag = (costume: string) => block('kc2_flag', {}, block('kc2_switch_costume', {COSTUME: costume}))
+
+  it('reads the costume choice and the repeat/wait values nested inside the C-block', () => {
+    expect(readG2Program(ws(flag('挥手'), dance('3', '0.5')), cat2)).toEqual({kind: 'sprite', values: {
+      '小橘猫|cat_costume_menu|COSTUME': '挥手', '小橘猫|cat_repeat|TIMES': 3, '小橘猫|cat_wait|DURATION': 0.5,
+    }})
+    expect(readG2Program(ws(dance('6', '0.2'), flag('站立')), cat2)).toEqual({kind: 'sprite', values: {
+      '小橘猫|cat_costume_menu|COSTUME': '站立', '小橘猫|cat_repeat|TIMES': 6, '小橘猫|cat_wait|DURATION': 0.2,
+    }})
+  })
+
+  it('rejects another sprite\'s costume, an empty or reordered repeat body, and out-of-range times or seconds', () => {
+    expect(readG2Program(ws(flag('展翅'), dance('3', '0.5')), cat2)).toBeNull()
+    expect(readG2Program(ws(flag('挥手'), dance('3', '0.5', null)), cat2)).toBeNull()
+    expect(readG2Program(ws(flag('挥手'), dance('3', '0.5', block('kc2_wait', {DURATION: '0.5'}, block('kc2_next_costume')))), cat2)).toBeNull()
+    expect(readG2Program(ws(flag('挥手'), dance('0', '0.5')), cat2)).toBeNull()
+    expect(readG2Program(ws(flag('挥手'), dance('11', '0.5')), cat2)).toBeNull()
+    expect(readG2Program(ws(flag('挥手'), dance('3', '0.1')), cat2)).toBeNull()
+    expect(readG2Program(ws(flag('挥手'), dance('3', '0.25')), cat2)).toBeNull()
+    expect(readG2Program(ws(flag('挥手'), dance('3', '1.1')), cat2)).toBeNull()
+  })
+
+  it('treats "switch costume" under the stage green flag as the stage-costume error case', () => {
+    expect(readG2Program(ws(block('kc2_flag')), stage2)).toEqual({kind: 'stage-empty'})
+    expect(readG2Program(ws(flag('挥手')), stage2)).toEqual({kind: 'stage-costume', costume: '挥手'})
+    expect(readG2Program(ws(block('kc2_flag', {}, block('kc2_next_costume'))), stage2)).toBeNull()
+  })
+
+  it('validates tenths and costume slots like the sandbox', () => {
+    const wait = cat2.scripts[1].body[0].children![1].slots[0]
+    const costume = cat2.scripts[0].body[0].slots[0]
+    expect(checkSlotValue(wait, '0.2')).toBe(0.2)
+    expect(checkSlotValue(wait, '1')).toBe(1)
+    expect(checkSlotValue(wait, '0.15')).toBeNull()
+    expect(checkSlotValue(wait, 'abc')).toBeNull()
+    expect(checkSlotValue(costume, '挥手')).toBe('挥手')
+    expect(checkSlotValue(costume, '<script>')).toBeNull()
   })
 })
