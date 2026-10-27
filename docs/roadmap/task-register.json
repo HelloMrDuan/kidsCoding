@@ -1580,7 +1580,7 @@
       "title": "作品夹云端隔离与三屏交互",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-302"
       ],
@@ -1589,14 +1589,7 @@
         "账号A作品账号B不可读写",
         "未登录本机解释，1440/768/375测试"
       ],
-      "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
-      },
-      "notes": ""
+      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/159", "mergeCommit": "6a5ad31599b87ff149c31af319697dadfe35f6c3", "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40475971321", "tests": ["live table-layer A/B real accounts: anon 401, A write 201/read 1, B read 0, B write own row, A still own source; route session binding verified by code (GET eq user_id, PUT user from session, 401 anon); new portfolio-cloud-isolation-ux303 spec local 3/3 (logged-out, A/B presentation, 1440/768/375 no overflow); PR CI 22 success + 3 skipped; main CI curriculum 40475971321 + accountability 40475971469 + deploy 40475971332 green; eslint 0 errors; progress unit tests 11/11"], "reviewer": "duan 2026-10-27 three-account mode authorized platform chain; executed by kid小宝 via connector"}, "notes": ""
     },
     {
       "id": "UX-401",
