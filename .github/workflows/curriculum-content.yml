@@ -35,6 +35,7 @@ on:
       - 'examples/python/p0/**'
       - 'examples/python/advanced/**'
       - 'examples/scratch/g3/**'
+      - 'examples/scratch/g2/**'
       - 'apps/web/src/features/python-lab/**'
       - 'apps/web/src/features/progress/local-practice*'
       - 'apps/web/src/features/progress/cloud-python-drafts*'
@@ -48,6 +49,9 @@ on:
       - 'apps/web/src/app/api/practice/scratch/**'
       - 'apps/web/supabase/migrations/202610100010_scratch_private_drafts.sql'
       - 'apps/web/src/features/scratch-vm/**'
+      - 'apps/web/src/features/scratch-g2/**'
+      - 'apps/web/tests/e2e/scratch-g2-u1.spec.ts'
+      - 'apps/web/tests/e2e/scratch-g2-helpers.ts'
       - 'apps/web/src/features/lessons/playable-stage/**'
       - 'apps/web/src/app/learn/lesson/**'
       - 'apps/web/src/app/learn/remedial/**'
@@ -111,7 +115,7 @@ jobs:
       - name: ESLint
         run: npm run lint
       - name: Curriculum contract tests
-        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts src/features/progress/cloud-python-drafts.test.ts src/app/api/practice/drafts/route.test.ts src/features/scratch-vm/scratch-local-draft.test.ts src/features/scratch-vm/scratch-cloud-draft.test.ts src/app/api/practice/scratch/route.test.ts src/features/lessons/playable-stage/use-block-executor.test.ts src/features/lessons/playable-stage/duo-executor.test.ts src/features/lessons/playable-stage/duo-dialogue-executor.test.ts src/features/lessons/playable-stage/duo-graduation-executor.test.ts src/features/lessons/complete-launch-lesson.test.ts src/features/progress/local-progress-storage.test.ts src/features/projects/build-project-completion-copy.test.ts src/features/projects/project-complete-card.test.tsx src/content/curriculum/foundation-units.test.ts src/features/curriculum/teaching-review.test.ts src/content/curriculum/duo-lesson-hints.test.ts src/features/lessons/grid/grid-engine.test.ts src/features/lessons/grid/grid-stage.test.tsx src/features/curriculum/engine-capabilities.test.ts src/content/curriculum/g0-u1-grid-lessons.test.ts src/features/lessons/grid/grid-draft.test.ts src/features/lessons/grid/grid-lab-pointer.test.ts src/features/lessons/voice/read-aloud.test.tsx src/features/curriculum/lesson-maturity.test.ts src/features/curriculum/lesson-schema.test.ts src/features/curriculum/child-trial.test.ts src/features/lessons/build-hint-state.test.ts src/features/lessons/remedial-routing.test.ts src/features/lessons/blockly/run-feedback.test.ts src/features/lessons/blockly/tq008-lesson-judging.test.ts src/features/lessons/blockly/observable-run.test.ts src/features/lessons/playable-stage/playable-stage-feedback.test.tsx src/content/curriculum/tq009-copy-alignment.test.ts src/content/curriculum/tq010-mistake-steps.test.ts src/features/lessons/playable-stage/playable-stage-mistake.test.tsx src/content/curriculum/tq011-practice-steps.test.ts src/features/lessons/playable-stage/playable-stage-practice.test.tsx src/content/curriculum/tq012-unit-projects.test.ts src/features/lessons/playable-stage/unit-project.test.tsx src/features/progress/project-snapshot.test.ts src/features/lessons/playable-stage/stage-walk.test.ts src/features/lessons/use-back-scroll-restore.test.ts src/app/api/guest/route.test.ts src/features/progress/guest-snapshot-payload.test.ts src/features/privacy/child-privacy-migration.test.ts src/features/progress/sync-guest-snapshot.test.ts src/features/lessons/guided-lesson-shell.test.tsx
+        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts src/features/progress/cloud-python-drafts.test.ts src/app/api/practice/drafts/route.test.ts src/features/scratch-vm/scratch-local-draft.test.ts src/features/scratch-vm/scratch-cloud-draft.test.ts src/app/api/practice/scratch/route.test.ts src/features/lessons/playable-stage/use-block-executor.test.ts src/features/lessons/playable-stage/duo-executor.test.ts src/features/lessons/playable-stage/duo-dialogue-executor.test.ts src/features/lessons/playable-stage/duo-graduation-executor.test.ts src/features/lessons/complete-launch-lesson.test.ts src/features/progress/local-progress-storage.test.ts src/features/projects/build-project-completion-copy.test.ts src/features/projects/project-complete-card.test.tsx src/content/curriculum/foundation-units.test.ts src/features/curriculum/teaching-review.test.ts src/content/curriculum/duo-lesson-hints.test.ts src/features/lessons/grid/grid-engine.test.ts src/features/lessons/grid/grid-stage.test.tsx src/features/curriculum/engine-capabilities.test.ts src/content/curriculum/g0-u1-grid-lessons.test.ts src/features/lessons/grid/grid-draft.test.ts src/features/lessons/grid/grid-lab-pointer.test.ts src/features/lessons/voice/read-aloud.test.tsx src/features/curriculum/lesson-maturity.test.ts src/features/curriculum/lesson-schema.test.ts src/features/curriculum/child-trial.test.ts src/features/lessons/build-hint-state.test.ts src/features/lessons/remedial-routing.test.ts src/features/lessons/blockly/run-feedback.test.ts src/features/lessons/blockly/tq008-lesson-judging.test.ts src/features/lessons/blockly/observable-run.test.ts src/features/lessons/playable-stage/playable-stage-feedback.test.tsx src/content/curriculum/tq009-copy-alignment.test.ts src/content/curriculum/tq010-mistake-steps.test.ts src/features/lessons/playable-stage/playable-stage-mistake.test.tsx src/content/curriculum/tq011-practice-steps.test.ts src/features/lessons/playable-stage/playable-stage-practice.test.tsx src/content/curriculum/tq012-unit-projects.test.ts src/features/lessons/playable-stage/unit-project.test.tsx src/features/progress/project-snapshot.test.ts src/features/lessons/playable-stage/stage-walk.test.ts src/features/lessons/use-back-scroll-restore.test.ts src/app/api/guest/route.test.ts src/features/progress/guest-snapshot-payload.test.ts src/features/privacy/child-privacy-migration.test.ts src/features/progress/sync-guest-snapshot.test.ts src/features/lessons/guided-lesson-shell.test.tsx src/features/scratch-g2/scratch-g2-program.test.ts src/features/scratch-g2/scratch-g2-draft.test.ts src/content/curriculum/g2-u1-scratch-lessons.test.ts
       - name: Production build
         run: npm run build
       - name: Frozen V2 tokens and recorded contrast limitations
@@ -186,6 +190,8 @@ jobs:
         run: python -m unittest discover -s examples/scratch/g3 -p 'test_*.py' -v
       - name: Package editable Scratch sb3 sample
         run: python examples/scratch/g3/build_scratch_project.py
+      - name: Validate original G2-U1 Scratch lesson projects and embedded sandbox models
+        run: python -m unittest discover -s examples/scratch/g2 -p 'test_*.py' -v
       - uses: actions/upload-artifact@v4
         with:
           name: original-scratch-meteor-clones
@@ -248,7 +254,7 @@ jobs:
       - name: Run UX-302 portfolio resume/export and UX-303 cloud isolation specs with real browser storage
         run: npx playwright test tests/e2e/portfolio-resume-export-ux302.spec.ts tests/e2e/portfolio-cloud-isolation-ux303.spec.ts --project=desktop
 
-# Independent real-Chrome gates: all 16 Scratch/Blockly desktop specs, 3 touch specs,
+# Independent real-Chrome gates: all 17 Scratch/Blockly desktop specs, 3 touch specs,
 # and 10 VISUAL-LOCK specs run in parallel. Never relax assertions or use VM mocks.
   scratch-real-vm-browser:
     timeout-minutes: 15
@@ -269,7 +275,7 @@ jobs:
           command -v google-chrome
           google-chrome --version
       - name: Run actual Scratch VM browser integration, no mocked VM
-        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-characters-ux402.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts --project=desktop --workers=2 --shard=1/2
+        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-characters-ux402.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts tests/e2e/scratch-g2-u1.spec.ts --project=desktop --workers=2 --shard=1/2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -295,7 +301,7 @@ jobs:
           command -v google-chrome
           google-chrome --version
       - name: Run actual Scratch VM browser integration, no mocked VM
-        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-characters-ux402.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts --project=desktop --workers=2 --shard=2/2
+        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-characters-ux402.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts tests/e2e/scratch-g2-u1.spec.ts --project=desktop --workers=2 --shard=2/2
       - uses: actions/upload-artifact@v4
         if: always()
         with:

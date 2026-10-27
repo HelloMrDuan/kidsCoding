@@ -19,8 +19,8 @@ describe('SYS-105 curriculum schema gate', () => {
   it('reads the real content, not an empty snapshot', () => {
     expect(real.catalogLessonIds.length).toBe(432)
     expect(real.detailedLessons.length).toBeGreaterThanOrEqual(192)
-    expect(real.trials.length).toBe(25)
-    expect(real.steps.length).toBe(25) // G0-U1-L01 gained its creative-remake step (Hark A)
+    expect(real.trials.length).toBe(26)
+    expect(real.steps.length).toBe(28) // G0-U1-L01 gained its creative-remake step (Hark A); +3 G2-U1-L01 steps (Hark B)
     expect(real.publicAssets).toContain('v2/hero-studio.webp')
   })
 

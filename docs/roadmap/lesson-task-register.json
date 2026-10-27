@@ -1351,7 +1351,7 @@
       "unitId": "G2-U1",
       "focusConcept": "精灵",
       "plannedLearningOutcome": "能使用精灵解释并完成「认识舞台与精灵」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [],
@@ -1362,13 +1362,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/160",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (7 tests; local Playwright Chromium 7/7 on PR head; CI real-Chrome result pending)",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Hark B：真实 Scratch VM（scratch-g2-sandbox.html）原创春日公园项目；练习A点精灵运行各自脚本、练习B改坐标让小鸟回鸟窝、舞台移动找错+三层提示、创意改台词；.sb3 自动保存/导出回读/导入/重开、沙箱拒非法工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L01.json，非独立），需独立人工教研复核；无儿童试学。不得标 completed。"
     },
     {
       "id": "G2-U1-L02",
