@@ -81,6 +81,7 @@ on:
       - 'apps/web/tests/e2e/python-error-recovery-ux412.spec.ts'
       - 'apps/web/tests/e2e/python-cross-device-ux413.spec.ts'
       - 'apps/web/tests/e2e/portfolio-resume-export-ux302.spec.ts'
+      - 'apps/web/tests/e2e/portfolio-cloud-isolation-ux303.spec.ts'
   push:
     branches:
       - main
@@ -244,8 +245,8 @@ jobs:
       - run: npm ci
       - name: Install real Chrome for browser E2E
         run: npx playwright install chrome --with-deps
-      - name: Run UX-302 portfolio resume/export specs with real browser storage
-        run: npx playwright test tests/e2e/portfolio-resume-export-ux302.spec.ts --project=desktop
+      - name: Run UX-302 portfolio resume/export and UX-303 cloud isolation specs with real browser storage
+        run: npx playwright test tests/e2e/portfolio-resume-export-ux302.spec.ts tests/e2e/portfolio-cloud-isolation-ux303.spec.ts --project=desktop
 
 # Independent real-Chrome gates: all 16 Scratch/Blockly desktop specs, 3 touch specs,
 # and 10 VISUAL-LOCK specs run in parallel. Never relax assertions or use VM mocks.

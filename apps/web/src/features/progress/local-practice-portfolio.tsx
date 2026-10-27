@@ -15,7 +15,7 @@ export function LocalPracticePortfolio() {
   const [items, setItems] = useState<LocalPractice[]>([])
   const [loaded, setLoaded] = useState(false)
   const [cloudBusy, setCloudBusy] = useState(false)
-  const [cloudMessage, setCloudMessage] = useState('需要登录账号并完成数据库迁移后才能使用。同步仅保存源码，不保存正式成绩。')
+  const [cloudMessage, setCloudMessage] = useState('需要登录账号后才能使用。同步仅保存源码，不保存正式成绩。')
   const [needsLogin, setNeedsLogin] = useState(false)
   const [cloudDrafts, setCloudDrafts] = useState<CloudPythonDraft[] | null>(null)
   const [filter, setFilter] = useState<'all' | WorkKind>('all')
@@ -108,7 +108,7 @@ export function LocalPracticePortfolio() {
           setNeedsLogin(true)
           throw new Error('请先登录账号，再尝试云端保存。')
         }
-        if (!response.ok) throw new Error('云端暂不可用，请确认数据库迁移已执行；本机草稿仍然保留。')
+        if (!response.ok) throw new Error('云端暂不可用，本机草稿仍然保留。')
       }
       setCloudDrafts(toUpload.map(d => ({ lessonId: d.lessonId, source: d.source, updatedAt: new Date().toISOString() })))
       const skipped = drafts.length - toUpload.length
