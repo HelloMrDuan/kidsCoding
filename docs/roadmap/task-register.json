@@ -2173,20 +2173,13 @@
       "title": "真实Supabase迁移与回滚确认",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "apps/web/supabase/migrations和部署记录",
       "acceptance": [
         "目标生产环境迁移版本、备份/回滚操作有可核验证据"
       ],
-      "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
-      },
-      "notes": ""
+      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/157", "mergeCommit": "2cd2620c022d72e1130036ff2788c7391919b891", "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40467148084", "tests": ["db: migration 10/11 + 011 partial; backup sha256 + isolated restore verified; guest answers 14->0 rows intact; purge systemd timer armed 2026-10-28 03:17 UTC; owner_all 7 policies removed with rollback file; RLS A/B + gateway re-run all green post-removal; test users cleaned, final auth.users 4 originals; PR CI 15/15 green; main CI curriculum 40467148084 + accountability 40467147989 green"], "reviewer": "duan 2026-10-27 decisions authorized scrub + owner_all removal; executed by kid小宝 via connector"}, "notes": ""
     },
     {
       "id": "CLOUD-102",
