@@ -23,12 +23,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/161",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L01 formal course: error lab, two practices, creative remake, review, saved and reopened（2026-10-27 本地桌面 Chrome 通过；以 PR CI 为准）",
+        "mergeCommit": "ddb9bc7f9782b2b2e533d9c878f547904943fa8e",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40481206300",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L01 formal course（PR CI curriculum-content 运行 https://github.com/HelloMrDuan/kidsCoding/actions/runs/40479828683 的 scratch-real-vm-browser 两分片 --project=desktop 通过；另 2026-10-27 本地桌面 Chrome 5/5 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L01 五关正式课程化（错误实验、引导、练习A边界、练习B调试、创意改造）+ 复盘卡 + 作品回放；证据 docs/roadmap/evidence/G0-U1-L01/，AI 参考教研 85/100（非独立）。全量目录仍为 outline_not_playable；未独立人工复核、未儿童试学、未发布。"
+      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L01 五关正式课程化（错误实验、引导、练习A边界、练习B调试、创意改造）+ 复盘卡 + 作品回放；PR #161 已合并（ddb9bc7）且 main CI 全绿；证据 docs/roadmap/evidence/G0-U1-L01/，AI 参考教研 85/100（实现者自评，非独立）。保持 in_review：等待独立人工教研复核后方可 completed；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U1-L02",
