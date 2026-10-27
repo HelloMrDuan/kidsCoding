@@ -1671,7 +1671,7 @@
       "title": "Python任务编辑输出三域布局",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-002"
       ],
@@ -1693,7 +1693,7 @@
       "title": "Python错误调试分层提示与源码保存",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-411"
       ],
@@ -1716,7 +1716,7 @@
       "title": "Python浏览器跨端完整回归",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-412"
       ],

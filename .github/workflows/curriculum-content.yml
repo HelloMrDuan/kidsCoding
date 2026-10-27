@@ -77,6 +77,9 @@ on:
       - 'apps/web/tests/e2e/scratch-workbench-ux401.spec.ts'
       - 'apps/web/tests/e2e/scratch-characters-ux402.spec.ts'
       - 'apps/web/tests/e2e/scratch-vm-regression-ux403.spec.ts'
+      - 'apps/web/tests/e2e/python-lab-layout-ux411.spec.ts'
+      - 'apps/web/tests/e2e/python-error-recovery-ux412.spec.ts'
+      - 'apps/web/tests/e2e/python-cross-device-ux413.spec.ts'
   push:
     branches:
       - main
@@ -205,6 +208,25 @@ jobs:
       - name: Run first lesson with actual Pyodide Python in a sandboxed browser
         run: npx playwright test tests/e2e/python-lab.spec.ts tests/e2e/python-multi.spec.ts --project=desktop
 
+  python-batch3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run Batch-3 Python specs with actual Pyodide in a sandboxed browser
+        run: npx playwright test tests/e2e/python-lab-layout-ux411.spec.ts tests/e2e/python-error-recovery-ux412.spec.ts tests/e2e/python-cross-device-ux413.spec.ts --project=desktop
+
 # Independent real-Chrome gates: all 16 Scratch/Blockly desktop specs, 3 touch specs,
 # and 10 VISUAL-LOCK specs run in parallel. Never relax assertions or use VM mocks.
   scratch-real-vm-browser:
@@ -221,14 +243,42 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Install actual Chrome
-        run: npx playwright install chrome --with-deps
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
       - name: Run actual Scratch VM browser integration, no mocked VM
-        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-characters-ux402.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts --project=desktop --workers=2
+        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-characters-ux402.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts --project=desktop --workers=2 --shard=1/2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: duo-chrome-evidence
+          path: apps/web/test-results/
+
+  scratch-real-vm-browser-part2:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
+      - name: Run actual Scratch VM browser integration, no mocked VM
+        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-forest-sequence.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-garden-click.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-duo.spec.ts tests/e2e/blockly-duo-dialogue.spec.ts tests/e2e/blockly-duo-graduation.spec.ts tests/e2e/guest-story.spec.ts tests/e2e/reward-idempotency.spec.ts tests/e2e/grid-lab.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-characters-ux402.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts --project=desktop --workers=2 --shard=2/2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: duo-chrome-evidence-shard2
           path: apps/web/test-results/
 
   scratch-touch-browser:
