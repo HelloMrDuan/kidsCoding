@@ -2173,7 +2173,7 @@
       "title": "真实Supabase迁移与回滚确认",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [],
       "scope": "apps/web/supabase/migrations和部署记录",
       "acceptance": [
