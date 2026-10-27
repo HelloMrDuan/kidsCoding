@@ -135,12 +135,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/182",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L05 formal course: locked-door error lab, two practices, a friend behind the door, review, saved and reopened（2026-10-27 本地桌面 Chrome 通过；以 PR CI 为准）",
+        "mergeCommit": "cdc7fe2252e745d96a7fc749e51b383cdc290abb",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40515497609",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L05 formal course: locked-door error lab, two practices, a friend behind the door, review, saved and reopened（PR #182 CI 的 scratch-real-vm-browser 两分片 --project=desktop 通过；另 2026-10-27 本地桌面 Chrome 7/7 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L05 五关正式课程化（错误实验·冲向锁着的门、引导钥匙不在路上、练习A绕远路拿钥匙、练习B修忘捡钥匙、创意改造·门后住着谁）+ 复盘卡 + 作品回放 + 原创钥匙挂钩牌场景；证据 docs/roadmap/evidence/G0-U1-L05/，AI 参考教研 85/100（非独立）。全量目录仍为 outline_not_playable；未独立人工复核、未儿童试学、未发布。"
+      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L05 五关正式课程化（错误实验·冲向锁着的门、引导钥匙不在路上、练习A绕远路拿钥匙、练习B修忘捡钥匙、创意改造·门后住着谁）+ 复盘卡 + 作品回放 + 原创钥匙挂钩牌场景；PR #182 已合并（cdc7fe2）。main CI：cdc7fe2 的 deploy 失败于既有偶发用例 playable-stage-feedback.test.tsx:67、curriculum 有 4 个作业在 scratch-touch-browser 超过 10 分钟后被取消；紧接的 main ccd17f3（含本课代码）deploy 8 个作业、task-ledger 全绿，curriculum 同样因 scratch-touch-browser 超时有 4 个作业被取消（见 TASK-CHANGELOG）。证据 docs/roadmap/evidence/G0-U1-L05/，AI 参考教研 85/100（实现者自评，非独立）。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U1-L06",
