@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U1-L01",
+  "reviewedCommit": "3b94eae99f5ae3056afc37dc726b13c94d511c8a",
+  "reviewedAt": "2026-10-27",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [],
+  "newConcepts": ["舞台与精灵：舞台是背景、没有 x/y；精灵有自己的位置和脚本"],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u1-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/163"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": ["g2-u1-scratch-lessons.ts conceptExplain 三条：舞台/精灵/各自脚本；nextLesson 指向 G2-U1-L02 角色换造型", "找错任务直接针对“误把背景当精灵”这一概念误区"],
+      "defects": ["本课没有前置课，未做入门前测；概念只覆盖位置与点击脚本，不涉及造型（留给 L02）"]
+    },
+    "story": {
+      "score": 12,
+      "evidence": ["春日公园情境：小鸟迷路要回鸟窝、小橘猫想打招呼", "预测题：点小鸟会是谁说话（VM 实测后对照预测）"],
+      "defects": ["预测只有一道二选一；无配音/朗读，低龄阅读负担未验证"]
+    },
+    "practice": {
+      "score": 21,
+      "evidence": ["练习 A：在舞台点两个精灵，VM 执行各自“当角色被点击”脚本（scratch-g2-u1.spec.ts 首用例）", "练习 B：改小鸟“移到 x y”后绿旗运行，VM 坐标进入鸟窝范围才算完成；两种不同坐标均通过（practice B 用例）", "未应用的积木不能运行（绿旗禁用）"],
+      "defects": ["只能改数字和台词，不能拖入新积木类型"]
+    },
+    "feedback": {
+      "score": 13,
+      "evidence": ["真实错误：选中舞台应用“移到 x y”，VM 报告舞台坐标移动前后相同（debug case 用例）", "三层提示：现象→原因→修复，逐层打开，与错因一致", "鸟窝外坐标运行后任务不通过（边界）"],
+      "defects": ["提示为固定文案，未按孩子输入的具体坐标个性化"]
+    },
+    "creation": {
+      "score": 10,
+      "evidence": ["创意任务：改小橘猫开场白并在 VM 中点击验证", "导出真 .sb3（含 3 个原创 SVG）并在独立 VM 重新载入校验；重新导入恢复；IndexedDB 刷新重开"],
+      "defects": ["不能新增精灵/造型；“加入小伙伴精灵”需完整 Scratch 编辑器", "无作品展示/分享环节"]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": ["任务状态只来自 VM 事件与坐标（evaluateG2U1L01 单测）", "页面明示实验课程、不保存正式成绩；复盘问题供讨论"],
+      "defects": ["无家长报告接入；无儿童试学，无独立人审"]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {"status": "pass", "note": "官方 scratch-vm@5.0.300 在沙箱 iframe 中执行；E2E 无 VM mock"},
+    "no-hands-on": {"status": "pass", "note": "两项亲手练习 + 找错 + 创意"},
+    "no-failure-test": {"status": "pass", "note": "舞台移动无效、鸟窝外边界、7 类非法工程拒收均有 E2E"},
+    "rigid-answer": {"status": "pass", "note": "鸟窝范围内任意坐标均通过；开场白自由（1～20 字）"},
+    "fake-project": {"status": "pass", "note": "作品为可导出、可重新导入的真 .sb3"},
+    "unlicensed-assets": {"status": "pass", "note": "SVG 为本项目原创，已登记 asset-licenses-v1.json；scratch-vm 运行库许可审查属 RELEASE-101"},
+    "minor-privacy-risk": {"status": "pass", "note": "本课不上传作品，只存本机 IndexedDB"},
+    "broken-or-false-success": {"status": "pass", "note": "保存失败会显示失败；非法导入不覆盖原作品"},
+    "id-status-mismatch": {"status": "pass", "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"}
+  },
+  "runEvidence": {
+    "normalRun": "G2-U1-L01：真 Scratch VM 加载原创公园项目，点小橘猫/小鸟各自说话，绿旗运行移动到脚本坐标（scratch-g2-u1.spec.ts 首用例）",
+    "failureCase": "选中舞台应用“移到 x y”→ VM 舞台坐标 (0,0)→(0,0) 未移动；鸟窝外坐标不通过；坏 zip/越界坐标/多余精灵/改名/多余积木/改 opcode/他课工程均被拒且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：舞台坐标前后一样，背景没有动",
+      "第二层（想原因）：舞台是背景不是精灵，只有精灵有 x、y",
+      "第三层（去修复）：选中小鸟改“移到 x y”（鸟窝约 x 80～150、y 45～95）后点绿旗"
+    ],
+    "practiceA": "练习 A：舞台上分别点两个精灵，VM 执行各自点击脚本",
+    "practiceB": "练习 B：改小鸟坐标让 VM 中的小鸟落进鸟窝",
+    "equivalentSolutions": ["小鸟移到 (110, 60)", "小鸟移到 (90, 80)", "小鸟移到 (120, 70)"],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3，刷新后恢复并可运行；导出 .sb3 经独立 VM 回读校验后可重新导入；恢复初始作品",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › catalog entry opens the lab; clicking each sprite runs its own click script in the VM (practice A + prediction)",
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › practice B: editing the bird go-to block moves the real VM sprite into the nest; two different positions both pass",
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › debug case: moving the stage is a real VM no-op; three hint layers lead to fixing it on the sprite",
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › creative change, real .sb3 export re-verified in a fresh VM, then re-import restores the edited project",
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › sandbox rejects corrupt and illegal projects and keeps the working project",
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › applied work auto-saves as a real .sb3 in IndexedDB, reopens after reload, and can be reset",
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › recovery: a failed sample download can be retried without losing the page"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需负责人或独立人工教研复核后才能作为结论",
+    "没有儿童试学",
+    "未接 Scratch WebGL 渲染器；本课无云端保存",
+    "只开放坐标与台词，不能新增精灵/积木"
+  ]
+}
