@@ -1351,7 +1351,7 @@
       "unitId": "G2-U1",
       "focusConcept": "精灵",
       "plannedLearningOutcome": "能使用精灵解释并完成「认识舞台与精灵」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [],
@@ -1363,12 +1363,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/163",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (7 tests; local Playwright Chromium 7/7 on PR head; CI real-Chrome result pending)",
+        "mergeCommit": "e948d5e637adab40df8715a7d11b6ad4f8946f09",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40483016220",
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts — G2-U1-L01 用例在 PR #163 与 main 真 Chrome CI（scratch-real-vm-browser 分片）通过",
         "lessonReview": null
       },
-      "notes": "Hark B：真实 Scratch VM（scratch-g2-sandbox.html）原创春日公园项目；练习A点精灵运行各自脚本、练习B改坐标让小鸟回鸟窝、舞台移动找错+三层提示、创意改台词；.sb3 自动保存/导出回读/导入/重开、沙箱拒非法工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L01.json，非独立），需独立人工教研复核；无儿童试学。不得标 completed。"
+      "notes": "Hark B：真实 Scratch VM（scratch-g2-sandbox.html）原创春日公园项目；练习A点精灵运行各自脚本、练习B改坐标让小鸟回鸟窝、舞台移动找错+三层提示、创意改台词；.sb3 自动保存/导出回读/导入/重开、沙箱拒非法工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L01.json，非独立），需独立人工教研复核；无儿童试学。已合并（#163，e948d5e）；main CI e948d5e：curriculum 40483016220（scratch-touch-browser 首次 10 分钟超时被取消，rerun 后 success）、task-ledger 40483016051、deploy 40483016271 全 success；PR #163 CI 全绿（curriculum 40481646143、deploy 40481646079、task-ledger 40481646127）。仍缺独立人工教研复核与儿童试学，保持 merged_waiting_ci，不得标 completed。"
     },
     {
       "id": "G2-U1-L02",
