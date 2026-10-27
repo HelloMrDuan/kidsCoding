@@ -107,12 +107,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/179",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L04 formal course: turn-in-place error lab, two practices, detour to a friend, review, saved and reopened（2026-10-27 本地桌面 Chrome 通过；以 PR CI 为准）",
+        "mergeCommit": "1e26cfc941be9d9c5aa2c57c90caa9fab36e3377",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40501306032",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L04 formal course: turn-in-place error lab, two practices, detour to a friend, review, saved and reopened（PR #179 CI 与 main 1e26cfc 的 curriculum 真浏览器分片 --project=desktop 通过；另 2026-10-27 本地桌面 Chrome 7/7 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L04 五关正式课程化（错误实验·转了身却没走、引导绕石头、练习A小桥过河、练习B修转反的弯、创意改造·绕到朋友家）+ 复盘卡 + 作品回放 + 原创转弯牌场景；证据 docs/roadmap/evidence/G0-U1-L04/，AI 参考教研 85/100（非独立）。全量目录仍为 outline_not_playable；未独立人工复核、未儿童试学、未发布。"
+      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L04 五关正式课程化（错误实验·转了身却没走、引导绕石头、练习A小桥过河、练习B修转反的弯、创意改造·绕到朋友家）+ 复盘卡 + 作品回放 + 原创转弯牌场景；PR #179 已合并（1e26cfc），main CI curriculum / deploy / task-ledger 全绿；证据 docs/roadmap/evidence/G0-U1-L04/，AI 参考教研 85/100（实现者自评，非独立）。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U1-L05",
