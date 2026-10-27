@@ -1695,7 +1695,7 @@
       "title": "Python错误调试分层提示与源码保存",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-411"
       ],
@@ -1705,11 +1705,13 @@
         "保存恢复与断线处理"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/151",
+        "mergeCommit": "6c6972bbd2e33b075a2181442fe42ada38e60350",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40435151052",
+        "tests": [
+          "e2e: python-error-recovery-ux412 4/4 in CI python-batch3 (16/16) + local 4/4; real TypeError three-layer hints, multi-case ERROR:TypeError hints + 0/3 count, wrong-output hints, offline engine hints + run-button recovery + draft reload after failure"
+        ],
+        "reviewer": "duan 2026-10-27 instruction authorized merge; executed by kid小宝 via connector"
       },
       "notes": ""
     },
