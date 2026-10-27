@@ -781,7 +781,7 @@ const BIG_MAP: GridLevel = {
 const L06: GridLesson = {
   id: 'G0-U1-L06',
   title: '做一张森林寻路卡',
-  story: '森林向导请你给新来的小伙伴做一张寻路卡：路上有石头、小河，还有一扇锁着的树洞门。你的程序就是寻路卡。',
+  story: '森林向导摊开一张手绘地图，请你给新来的小伙伴做一张寻路卡：路上有石头、小河，还有一扇锁着的树洞门。你的程序就是寻路卡。',
   concept: '方向、顺序、调试综合（单元作品）',
   objectives: [
     '会把石头、小河、钥匙门放在一起想，设计一条完整路线',
@@ -802,20 +802,33 @@ const L06: GridLesson = {
   },
   steps: [
     {
-      id: 'warmup-key',
-      kind: 'guided',
-      title: '热身：拿钥匙，从门边过',
-      instruction: '钥匙在路上，门在上面一排。捡钥匙后往上走一格到门边，开门再走到蘑菇屋。',
-      predict: '先猜一猜：开门时，小狐狸要站在哪一格？',
-      level: { cols: 5, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 4, y: 1 }, key: { x: 2, y: 2 }, door: { x: 3, y: 1 }, rocks: [{ x: 3, y: 0 }, { x: 3, y: 2 }] },
+      id: 'mixed-up-card',
+      kind: 'error-lab',
+      title: '错误实验：寻路卡排错了一块',
+      instruction: '这张寻路卡的积木都对，可是有一块排错了位置：小狐狸还没走到钥匙那一格，就先“向上走”了。这是一个故意的错误：先按原样运行，看看在哪一步出问题，再把顺序排对。',
+      predict: '先猜一猜：小狐狸会在哪一步出问题？',
+      predictChoices: [
+        { text: '一路顺利走到蘑菇屋', when: 'pass' },
+        { text: '在没有钥匙的地方“捡钥匙”', when: 'no_key_here' },
+      ],
+      errorLab: {
+        expect: 'no_key_here',
+        expected: '如果顺序对，小狐狸应该先捡到钥匙，再上去开门，走到蘑菇屋。',
+        actual: '小狐狸先往上走了一格，在没有钥匙的地方“捡钥匙”：积木一样，顺序错一块，结果就不一样。',
+      },
+      level: { cols: 5, rows: 3, start: { x: 0, y: 2, facing: 'right' }, goal: { x: 4, y: 1 }, key: { x: 2, y: 2 }, door: { x: 3, y: 1 }, rocks: [{ x: 3, y: 0 }, { x: 3, y: 2 }], scenery: 'guidemap' },
       allowedBlocks: ['when_start', u, d, l, r, k, o],
+      starterBlocks: [{ type: 'when_start' }, { type: r }, { type: r }, { type: u }, { type: k }, { type: o }, { type: r }, { type: r }],
       hints: [
-        '门没开，或者离门太远。',
-        '开门要站在门旁边那一格，并且手里已经有钥匙。',
-        '向右 2 → 捡起钥匙 → 向上 1 → 打开树洞门 → 向右 2。',
+        '小狐狸在“捡起钥匙”那一步停下了：它脚下没有钥匙。',
+        '钥匙在路上那一排。要先捡钥匙，再往上走到门边。',
+        '把“捡起钥匙”换到“向上走一格”前面：向右 2 → 捡起钥匙 → 向上 1 → 打开树洞门 → 向右 2。',
       ],
       solutions: [P(r, r, k, u, o, r, r)],
-      counterExamples: [{ program: P(r, r, u, o), failure: 'need_key' }],
+      counterExamples: [
+        { program: P(r, r, u, k, o, r, r), failure: 'no_key_here' },
+        { program: P(r, r, u, o), failure: 'need_key' },
+      ],
     },
     {
       id: 'warmup-obstacles',
@@ -823,7 +836,7 @@ const L06: GridLesson = {
       title: '热身：石头和小河',
       instruction: '上面一排有石头，下面一排有小河。从中间那一排走过去，再往上到蘑菇屋。',
       predict: '先猜一猜：哪一排既没有石头也没有小河？',
-      level: { cols: 5, rows: 3, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 4, y: 0 }, rocks: [{ x: 2, y: 0 }], water: [{ x: 2, y: 2 }] },
+      level: { cols: 5, rows: 3, start: { x: 0, y: 0, facing: 'right' }, goal: { x: 4, y: 0 }, rocks: [{ x: 2, y: 0 }], water: [{ x: 2, y: 2 }], scenery: 'guidemap' },
       allowedBlocks: ['when_start', u, d, l, r],
       hints: [
         '撞到石头或掉进小河，说明走的那一排不通。',
@@ -839,10 +852,10 @@ const L06: GridLesson = {
     {
       id: 'my-route-card',
       kind: 'practice-a',
-      title: '练习 A：设计我的寻路卡',
-      instruction: '大地图上有石头、小河和锁着的门。设计你自己的路线：拿到钥匙、开门、走到蘑菇屋。通过后，这条路线就是你的寻路卡作品。',
+      title: '练习 A：大地图上走一遍',
+      instruction: '大地图上有石头、小河和锁着的门。设计你自己的路线：拿到钥匙、开门、走到右上角的蘑菇屋。走法可以和别人不一样。',
       predict: '先猜一猜：你打算先往上走，还是先往右走？',
-      level: BIG_MAP,
+      level: { ...BIG_MAP, scenery: 'guidemap' },
       allowedBlocks: ['when_start', u, d, l, r, k, o],
       hints: [
         '被挡住了：看是石头、小河，还是门没开。',
@@ -861,7 +874,7 @@ const L06: GridLesson = {
       title: '练习 B：修好小伙伴的寻路卡',
       instruction: '新伙伴照着这张寻路卡走，门却打不开。先运行，找出少了哪一块，再改好（可以清空后重拼）。',
       predict: '先猜一猜：这张卡少了哪一块积木？',
-      level: BIG_MAP,
+      level: { ...BIG_MAP, scenery: 'guidemap' },
       allowedBlocks: ['when_start', u, d, l, r, k, o],
       starterBlocks: [{ type: 'when_start' }, { type: u }, { type: u }, { type: u }, { type: r }, { type: r }, { type: r }, { type: o }, { type: r }, { type: r }],
       hints: [
@@ -872,6 +885,31 @@ const L06: GridLesson = {
       solutions: [P(u, u, u, r, k, r, r, o, r, r)],
       counterExamples: [{ program: P(u, u, u, r, r, r, o, r, r), failure: 'need_key' }],
     },
+    {
+      id: 'my-forest-card',
+      kind: 'creative',
+      title: '单元作品：我的森林寻路卡',
+      instruction: '森林向导请你做一张寻路卡。先选一位住在门后面的新伙伴，蘑菇屋就搬到那一格；再拼出“绕开石头和小河 → 拿钥匙 → 开门 → 走到伙伴家”的完整路线。通过后，它就是你的单元作品“我的森林寻路卡”。',
+      predict: '先猜一猜：你的寻路卡里，要先去拿钥匙还是先去门边？过了门往哪边走？',
+      creative: {
+        prompt: '这张寻路卡给哪位新伙伴？',
+        goalChoices: [{ x: 5, y: 0 }, { x: 5, y: 1 }, { x: 5, y: 2 }, { x: 5, y: 3 }],
+        labels: ['小熊 · 门后第 1 排', '小兔 · 门后第 2 排', '小松鼠 · 门后第 3 排', '小刺猬 · 门后最下面'],
+      },
+      level: { ...BIG_MAP, scenery: 'guidemap' },
+      allowedBlocks: ['when_start', u, d, l, r, k, o],
+      hints: [
+        '被挡住了：看是石头、小河、门没开，还是停在了别的格子。',
+        '先去左上角拿钥匙，沿最上面一排走到门边开门；过了门，伙伴住第几排，就往下走几格。',
+        '例如给小熊：向上 3 → 向右 1 → 捡起钥匙 → 向右 2 → 打开树洞门 → 向右 2；给小刺猬还要再向下 3。',
+      ],
+      solutions: [P(u, u, u, r, k, r, r, o, r, r), P(r, u, u, u, k, r, r, o, r, r)],
+      counterExamples: [
+        { program: P(r, r), failure: 'hit_rock' },
+        { program: P(u, u, u, r, r, r, o), failure: 'need_key' },
+        { program: P(u, u, u, r, k, r, r, r), failure: 'door_locked' },
+      ],
+    },
   ],
   reflection: '说一说：你的寻路卡是怎么走的？修小伙伴的卡时，你改了哪一块？',
   reflectionCheck: {
@@ -879,8 +917,12 @@ const L06: GridLesson = {
     options: [{ text: '捡起钥匙', correct: true }, { text: '打开树洞门', correct: false }, { text: '开始时', correct: false }],
     why: '路过金钥匙时没有捡，门就打不开，所以要加上“捡起钥匙”。',
   },
-  parentQuestion: '请孩子播放自己的寻路卡，一边播放一边讲：哪里转弯、哪里捡钥匙、哪里开门。',
-  project: { stepId: 'my-route-card', title: '我的森林寻路卡' },
+  review: {
+    whatIf: '如果新伙伴搬到门后最下面一格，你的寻路卡要怎么改？',
+    answer: '前面拿钥匙、开门的部分不用改，过了门再接 3 块“向下走一格”。先想清楚每一段，再一段一段接起来。',
+  },
+  parentQuestion: '请孩子播放自己的寻路卡，一边播放一边讲：哪里绕开石头和小河、哪里捡钥匙、哪里开门、伙伴住在哪。',
+  project: { stepId: 'my-forest-card', title: '我的森林寻路卡' },
 }
 
 export const g0u1GridLessons: Record<string, GridLesson> = {

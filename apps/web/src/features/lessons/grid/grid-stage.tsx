@@ -193,6 +193,23 @@ export function KeyHook() {
   )
 }
 
+/** G0-U1-L06 story scenery: the forest guide's hand-drawn map with a dotted route (original art, V2 flat style). */
+export function GuideMap() {
+  return (
+    <g data-grid-item="guidemap">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="34" width="6" height="26" rx="2" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2" />
+      <path d="M3 6 L19 2 L37 6 L53 2 V34 L37 38 L19 34 L3 38 Z" fill="#fff3df" stroke="#a0704a" strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M19 2 V34 M37 6 V38" stroke="#a0704a" strokeWidth="1.5" opacity=".5" />
+      <path d="M8 30 Q14 22 22 24 T36 16 T48 10" stroke="#4c97ff" strokeWidth="2.2" fill="none" strokeDasharray="3 3" strokeLinecap="round" />
+      <circle cx="8" cy="30" r="2.6" fill="#ff8a3d" />
+      <path d="M45 7 l6 6 M51 7 l-6 6" stroke="#ff5d6c" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M26 14 q3 -4 6 0 Z" fill="#9aa3ad" stroke="#5f6b76" strokeWidth="1.2" />
+      <path d="M10 15 q3 2 6 0" stroke="#4c97ff" strokeWidth="1.8" fill="none" />
+    </g>
+  )
+}
+
 function Bump({ x, y }: Cell) {
   return (
     <g transform={`translate(${x * T + 32} ${y * T + 32})`} data-grid-item="bump">
@@ -225,7 +242,7 @@ export function GridStage({ level, state, trail = [], label }: { level: GridLeve
       data-fox-cell={`${state.x},${state.y}`}
       data-fox-facing={state.facing}
     >
-      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : <Treehouse />}</g> : null}
+      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : level.scenery === 'guidemap' ? <GuideMap /> : <Treehouse />}</g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}
