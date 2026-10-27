@@ -1405,7 +1405,7 @@
       "unitId": "G2-U1",
       "focusConcept": "造型",
       "plannedLearningOutcome": "能使用造型解释并完成「设置背景和声音」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1419,12 +1419,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/168",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U1-L03 block: 5 tests; local Playwright Chromium 17/17 for the spec; CI real-Chrome result pending)",
+        "mergeCommit": "1954c9a6476fd39c662ed845d8bdc563719947d6",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40488035034",
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts — G2-U1-L03 用例在 PR #168 与 main 真 Chrome CI（scratch-real-vm-browser 分片）通过",
         "lessonReview": null
       },
-      "notes": "Hark B：真实 Scratch VM 原创森林音乐会项目；练习A舞台换绿色草地背景、练习B小鸟换自己的声音、开幕铃在重复 3 次里 VM 计数 3 次的找错+三层提示、创意完整开场；.sb3（含合成 WAV）自动保存/导出回读/导入、沙箱拒非法工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L03.json，非独立），需独立人工教研复核；无儿童试学；未接音频引擎。不得标 completed。"
+      "notes": "Hark B：真实 Scratch VM 原创森林音乐会项目；练习A舞台换绿色草地背景、练习B小鸟换自己的声音、开幕铃在重复 3 次里 VM 计数 3 次的找错+三层提示、创意完整开场；.sb3（含合成 WAV）自动保存/导出回读/导入、沙箱拒非法工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L03.json，非独立），需独立人工教研复核；无儿童试学；未接音频引擎。已合并（#168，1954c9a）；main CI 1954c9a：curriculum 40488035034、deploy 40488035046、task-ledger 40488035002 全 success；PR #168 CI 全绿（curriculum 40484791028、deploy 40484791109、task-ledger 40484790901）。仍缺独立人工教研复核与儿童试学，保持 merged_waiting_ci，不得标 completed。"
     },
     {
       "id": "G2-U1-L04",
