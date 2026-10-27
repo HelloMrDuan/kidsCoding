@@ -1433,7 +1433,7 @@
       "unitId": "G2-U1",
       "focusConcept": "造型",
       "plannedLearningOutcome": "能使用造型解释并完成「运动积木初体验」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1446,13 +1446,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/174",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U1-L04 block: 5 tests; local Playwright Chromium 22/22 for the spec + G3 scratch-vm 10/10; CI real-Chrome result pending)",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Hark B：真实 Scratch VM 原创小河边项目；练习A调“移动 N 步”走到小鱼区（多解）、练习B风车重复×右转=90°（VM 累计转角，多解）、小橘猫面向 -90 往左走的找错+三层提示（须先见向左再见向右）、创意风车转一整圈+到达台词；.sb3 自动保存/导出回读/导入、沙箱拒非法工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L04.json，非独立），需独立人工教研复核；无儿童试学；未接 WebGL 渲染器（无舞台边缘拦截）。不得标 completed。"
     },
     {
       "id": "G2-U1-L05",
