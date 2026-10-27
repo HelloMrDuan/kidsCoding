@@ -19,8 +19,8 @@ describe('SYS-105 curriculum schema gate', () => {
   it('reads the real content, not an empty snapshot', () => {
     expect(real.catalogLessonIds.length).toBe(432)
     expect(real.detailedLessons.length).toBeGreaterThanOrEqual(192)
-    expect(real.trials.length).toBe(25)
-    expect(real.steps.length).toBe(24)
+    expect(real.trials.length).toBe(26)
+    expect(real.steps.length).toBe(27)
     expect(real.publicAssets).toContain('v2/hero-studio.webp')
   })
 
