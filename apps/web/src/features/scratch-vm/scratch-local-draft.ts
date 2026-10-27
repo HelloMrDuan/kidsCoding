@@ -39,6 +39,26 @@ export async function readScratchDraft():Promise<ArrayBuffer|null> {
   }finally{db.close()}
 }
 
+export type ScratchDraftMeta = { savedAt: string; bytes: number }
+
+export async function readScratchDraftMeta():Promise<ScratchDraftMeta|null> {
+  const db=await database()
+  try {
+    return await new Promise((resolve,reject)=>{
+      const tx=db.transaction(STORE,'readonly')
+      const req=tx.objectStore(STORE).get(SCRATCH_DRAFT_LESSON_ID)
+      req.onsuccess=()=>{
+        const record:unknown=req.result
+        if(!record||typeof record!=='object')return resolve(null)
+        const {archive,savedAt}=record as {archive?:unknown;savedAt?:unknown}
+        if(!isScratchArchive(archive)||typeof savedAt!=='string'||!Number.isFinite(Date.parse(savedAt)))return resolve(null)
+        resolve({savedAt,bytes:archive.byteLength})
+      }
+      req.onerror=()=>reject(req.error??new Error('草稿读取失败'))
+    })
+  }finally{db.close()}
+}
+
 export async function saveScratchDraft(archive:ArrayBuffer):Promise<void> {
   if(!isScratchArchive(archive))throw new Error('不是有效的 Scratch 项目文件')
   const db=await database()

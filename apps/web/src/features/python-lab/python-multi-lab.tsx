@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import {gradeMultiCases,pythonPracticeLessons,isCustomArgsDifferentFromCases,type MultiPythonLessonId} from './python-multi-grade'
 import {pythonHintLayers} from './python-error-hints'
+import {downloadPythonFile} from '@/features/progress/python-download'
 
 const PREFIX='kids-python-local-practice-v1:'
 type RunMsg={kind:'FRAME_READY'|'LOADED'|'RESULT';id?:number;error?:string|null;cases?:unknown;output?:string;custom?:unknown}
@@ -15,6 +16,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   const [busy,setBusy]=useState(false)
   const [hydrated,setHydrated]=useState(false)
   const [savedAt,setSavedAt]=useState<string|null>(null)
+  const [saveFailed,setSaveFailed]=useState(false)
   const [passed,setPassed]=useState(false)
   const [passedCount,setPassedCount]=useState(0)
   const [observed,setObserved]=useState<string[]>([])
@@ -56,7 +58,8 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
       const time=new Date().toISOString()
       window.localStorage.setItem(PREFIX+lessonId,JSON.stringify({source,passed,practiceB,savedAt:time}))
       window.setTimeout(()=>setSavedAt(time),0)
-    } catch { /* Browser privacy or storage limits may block saving. */ }
+      window.setTimeout(()=>setSaveFailed(false),0)
+    } catch { window.setTimeout(()=>setSaveFailed(true),0) /* Browser privacy or storage limits may block saving. */ }
   },[lessonId,source,passed,practiceB,hydrated])
 
   useEffect(()=>{
@@ -140,8 +143,9 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
               {busy?'运行中…':`▶ 运行${lesson.cases.length}组测试`}
             </button>
             <button type="button" onClick={()=>{setSource(lesson.startCode);setPassed(false);setObserved([]);setStatus('已重置编辑区。')}} className="rounded-full bg-slate-100 px-6 py-3 font-bold">恢复初始代码</button>
+            <button type="button" data-testid="python-multi-download" onClick={()=>downloadPythonFile(source,lessonId)} className="rounded-full bg-slate-100 px-6 py-3 font-bold">下载 .py 文件</button>
           </div>
-          <p data-testid="python-local-save" className="mt-3 text-xs text-slate-500">浏览器草稿：{savedAt?'已在本机保存':'尚未保存'} · 刷新页面后可继续编辑</p>
+          <p data-testid="python-local-save" className="mt-3 text-xs text-slate-500">浏览器草稿：{savedAt?'已在本机保存':saveFailed?'本机保存失败：请检查浏览器存储空间，代码仍在编辑区':'尚未保存'} · 刷新页面后可继续编辑</p>
         </section>
         <section className="rounded-[2rem] bg-white p-6 shadow-sm">
           <h2 className="text-xl font-black">2 · 真实 Python 测试反馈</h2>

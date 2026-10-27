@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { gradeFirstPythonLesson, PYTHON_TRIAL_EXPECTED_OUTPUT } from './python-lab-grade'
+import { gradeFirstPythonLesson, PYTHON_TRIAL_EXPECTED_OUTPUT, PYTHON_TRIAL_LESSON_ID } from './python-lab-grade'
 import { pythonHintLayers } from './python-error-hints'
+import { downloadPythonFile } from '@/features/progress/python-download'
 
 const TRIAL_DRAFT_KEY = 'kids-python-local-practice-v1:P0-U1-L01'
 const TRIAL_INITIAL_CODE = 'print("请把我改成正确的问候语")'
@@ -19,6 +20,7 @@ export function PythonTrialLab() {
   const [passed, setPassed] = useState(false)
   const [hydrated, setHydrated] = useState(false)
   const [savedAt, setSavedAt] = useState<string | null>(null)
+  const [saveFailed, setSaveFailed] = useState(false)
   const [practiceB, setPracticeB] = useState(false)
   const [hintLayers, setHintLayers] = useState<[string, string, string] | null>(null)
   const frame = useRef<HTMLIFrameElement>(null)
@@ -52,7 +54,8 @@ export function PythonTrialLab() {
       const time = new Date().toISOString()
       window.localStorage.setItem(TRIAL_DRAFT_KEY, JSON.stringify({ source, practiceB, savedAt: time }))
       window.setTimeout(() => setSavedAt(time), 0)
-    } catch { /* Browser privacy or storage limits may block saving. */ }
+      window.setTimeout(() => setSaveFailed(false), 0)
+    } catch { window.setTimeout(() => setSaveFailed(true), 0) /* Browser privacy or storage limits may block saving. */ }
   }, [source, practiceB, hydrated])
 
   useEffect(() => {
@@ -176,8 +179,9 @@ export function PythonTrialLab() {
                 className="rounded-full bg-emerald-700 px-7 py-3 font-bold text-white disabled:cursor-wait disabled:opacity-50"
               >{busy ? '运行中…' : '▶ 运行 Python'}</button>
               <button type="button" onClick={reset} className="rounded-full bg-slate-100 px-6 py-3 font-bold text-slate-700">重置</button>
+              <button type="button" data-testid="python-download" onClick={() => downloadPythonFile(source, PYTHON_TRIAL_LESSON_ID)} className="rounded-full bg-slate-100 px-6 py-3 font-bold text-slate-700">下载 .py 文件</button>
             </div>
-            <p data-testid="python-local-save" className="mt-3 text-xs text-slate-500">浏览器草稿：{savedAt ? '已在本机保存' : '尚未保存'} · 刷新页面后可继续编辑</p>
+            <p data-testid="python-local-save" className="mt-3 text-xs text-slate-500">浏览器草稿：{savedAt ? '已在本机保存' : saveFailed ? '本机保存失败：请检查浏览器存储空间，代码仍在编辑区' : '尚未保存'} · 刷新页面后可继续编辑</p>
           </section>
           <section className="rounded-[2rem] bg-white p-5 shadow-sm md:p-7">
             <h2 className="text-lg font-black">2 · 查看运行结果</h2>

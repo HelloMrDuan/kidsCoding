@@ -1558,7 +1558,7 @@
       "title": "作品继续编辑预览导出及恢复",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-301"
       ],

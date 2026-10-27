@@ -10,7 +10,7 @@ import { pythonPracticeLessons } from '@/features/python-lab/python-multi-grade'
  * scene + characters, a Python cover is the child's own code. Nothing saved -> empty state.
  */
 export type WorkSource = 'local' | 'local+cloud' | 'cloud'
-export type WorkKind = 'blockly' | 'python'
+export type WorkKind = 'blockly' | 'python' | 'scratch'
 
 export type PortfolioWork = {
   id: string
