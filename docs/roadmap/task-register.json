@@ -1671,7 +1671,7 @@
       "title": "Python任务编辑输出三域布局",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-002"
       ],
@@ -1680,11 +1680,13 @@
         "真Pyodide代码可编辑、运行结果/多用例可视且移动端可读"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/151",
+        "mergeCommit": "6c6972bbd2e33b075a2181442fe42ada38e60350",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40435151052",
+        "tests": [
+          "e2e: python-lab-layout-ux411 6/6 in CI python-batch3 (16/16) + local 6/6; three breakpoints x two lab editions, three domains visible, editor width >=280, zero horizontal overflow, mobile screenshots verified; layout itself defect-free, no product code change"
+        ],
+        "reviewer": "duan 2026-10-27 instruction authorized merge; executed by kid小宝 via connector"
       },
       "notes": ""
     },
