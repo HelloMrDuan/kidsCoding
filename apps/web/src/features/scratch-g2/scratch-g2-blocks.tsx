@@ -8,6 +8,7 @@ import {readG2Program, type G2Program, type G2Values} from './scratch-g2-program
 // Costume names of the target being edited. The editor is remounted for every
 // target, so the dropdown always lists the selected target's own costumes.
 let costumeOptions: string[] = ['造型1']
+let soundOptions: string[] = ['声音1']
 let installed = false
 function installG2Blocks() {
   if (installed) return
@@ -21,6 +22,28 @@ function installG2Blocks() {
       this.setNextStatement(true)
       this.setColour(265)
       this.setTooltip('对应 Scratch 的“换成……造型”外观积木')
+    },
+  }
+  Blockly.Blocks.kc2_switch_backdrop = {
+    init(this: Blockly.Block) {
+      this.appendDummyInput().appendField('换成')
+        .appendField(new Blockly.FieldDropdown(() => costumeOptions.map(name => [name, name] as [string, string])), 'BACKDROP')
+        .appendField('背景')
+      this.setPreviousStatement(true)
+      this.setNextStatement(true)
+      this.setColour(265)
+      this.setTooltip('对应 Scratch 的“换成……背景”外观积木（只有舞台有背景）')
+    },
+  }
+  Blockly.Blocks.kc2_play_sound = {
+    init(this: Blockly.Block) {
+      this.appendDummyInput().appendField('播放声音')
+        .appendField(new Blockly.FieldDropdown(() => soundOptions.map(name => [name, name] as [string, string])), 'SOUND_MENU')
+        .appendField('等待播完')
+      this.setPreviousStatement(true)
+      this.setNextStatement(true)
+      this.setColour(315)
+      this.setTooltip('对应 Scratch 的“播放声音……等待播完”声音积木')
     },
   }
   Blockly.defineBlocksWithJsonArray([
@@ -67,7 +90,17 @@ function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G
   }
 }
 
-const FIELD_TYPES: Record<string, string> = {X: 'kc2_goto', Y: 'kc2_goto', MESSAGE: 'kc2_say', COSTUME: 'kc2_switch_costume', TIMES: 'kc2_repeat', DURATION: 'kc2_wait'}
+const FIELD_TYPES: Record<string, string> = {
+  X: 'kc2_goto', Y: 'kc2_goto', MESSAGE: 'kc2_say', COSTUME: 'kc2_switch_costume', TIMES: 'kc2_repeat', DURATION: 'kc2_wait',
+  BACKDROP: 'kc2_switch_backdrop', SOUND_MENU: 'kc2_play_sound',
+}
+function findSlot(specs: G2BlockSpec[], field: G2Slot['field']): G2Slot | undefined {
+  for (const spec of specs) {
+    const slot = spec.slots.find(s => s.field === field) ?? (spec.children ? findSlot(spec.children, field) : undefined)
+    if (slot) return slot
+  }
+  return undefined
+}
 
 export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   target: G2TargetSpec
@@ -84,6 +117,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   useEffect(() => {
     installG2Blocks()
     costumeOptions = target.costumes?.length ? target.costumes : ['造型1']
+    soundOptions = target.sounds?.length ? target.sounds : ['声音1']
     if (!node.current) return
     const toolboxTypes = new Set<string>()
     const collect = (specs: G2BlockSpec[]) => { for (const b of specs) { toolboxTypes.add(b.type); if (b.children) collect(b.children) } }
@@ -139,7 +173,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
     if (!ws) return
     const block = ws.getAllBlocks(false).find(b => b.type === FIELD_TYPES[field])
     if (!block) return
-    block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' ? value : String(Number(value)), field)
+    block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' || field === 'BACKDROP' || field === 'SOUND_MENU' ? value : String(Number(value)), field)
   }
   const extra = target.extraToolbox?.[0]
   function attachStageExtra() {
@@ -155,12 +189,15 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   }
 
   const isStage = target.kind === 'stage'
+  const stageErrorOnly = isStage && !!extra
+  const allSpecs = target.scripts.flatMap(s => s.body)
+  const timesSlot = findSlot(allSpecs, 'TIMES')
   const hasGoto = fields.X !== undefined
   const hasSay = fields.MESSAGE !== undefined
   const extraLabel = extra === 'kc2_switch_costume' ? `换成（${costumeOptions[costumeOptions.length - 1]}）造型` : '移到 x y'
   return <section className="mt-6 rounded-[2rem] bg-white p-5 shadow-sm" data-testid="g2-block-editor">
     <h2 className="text-xl font-black">{isStage ? '舞台的积木区' : `${target.label}的积木脚本`}</h2>
-    <p className="mt-2 text-sm leading-7 text-slate-600">{isStage
+    <p className="mt-2 text-sm leading-7 text-slate-600">{stageErrorOnly
       ? `这是舞台（背景）自己的积木区。试试把“${extraLabel}”拼到绿旗下面，应用后看看 Scratch VM 里发生了什么。`
       : `这些积木只属于${target.label}。拖动、连接或删除积木；只有每个帽子积木下面都拼好原来的积木时才能应用。快捷输入框会同步修改积木里的数字、文字和造型。`}</p>
     <div ref={node} data-testid="g2-blockly-mount" className="mt-4 h-[300px] w-full overflow-hidden rounded-2xl border border-slate-200"/>
@@ -187,9 +224,25 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
           </select>
         </label>
       )}
+      {fields.BACKDROP !== undefined && (
+        <label className="text-sm font-bold text-slate-700">背景
+          <select data-testid="g2-edit-backdrop" value={fields.BACKDROP} onChange={e => update('BACKDROP', e.target.value)}
+            className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2">
+            {costumeOptions.map(name => <option key={name} value={name}>{name}</option>)}
+          </select>
+        </label>
+      )}
+      {fields.SOUND_MENU !== undefined && findSlot(allSpecs, 'SOUND_MENU') && (
+        <label className="text-sm font-bold text-slate-700">声音
+          <select data-testid="g2-edit-sound" value={fields.SOUND_MENU} onChange={e => update('SOUND_MENU', e.target.value)}
+            className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2">
+            {soundOptions.map(name => <option key={name} value={name}>{name}</option>)}
+          </select>
+        </label>
+      )}
       {fields.TIMES !== undefined && (
-        <label className="text-sm font-bold text-slate-700">重复次数（1～10）
-          <input data-testid="g2-edit-times" type="number" min={1} max={10} step={1} value={fields.TIMES}
+        <label className="text-sm font-bold text-slate-700">重复次数（{timesSlot?.min ?? 1}～{timesSlot?.max ?? 10}）
+          <input data-testid="g2-edit-times" type="number" min={timesSlot?.min ?? 1} max={timesSlot?.max ?? 10} step={1} value={fields.TIMES}
             onChange={e => update('TIMES', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
       )}

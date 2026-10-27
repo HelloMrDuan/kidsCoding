@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U1-L03",
+  "reviewedCommit": "feb48d8aca6298670d1e69ef0fa34f62ccaae24f",
+  "reviewedAt": "2026-10-27",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U1-L02"
+  ],
+  "newConcepts": [
+    "背景是舞台的造型（换成……背景）；声音属于各自对象；重复里的积木会运行 N 次（声音放进重复会响 N 次）"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u1-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/168"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "conceptExplain：背景属于舞台、声音属于对象、重复里积木运行 N 次",
+        "找错对应目录 FAIL-01“声音一直循环遮住旁白”"
+      ],
+      "defects": [
+        "没有覆盖“当背景换成……”事件与音量/停止所有声音"
+      ]
+    },
+    "story": {
+      "score": 12,
+      "evidence": [
+        "森林音乐会：开幕铃响个不停盖住主持词",
+        "预测开幕铃响几次，VM 计数对照"
+      ],
+      "defects": [
+        "预测二选一；无朗读"
+      ]
+    },
+    "practice": {
+      "score": 20,
+      "evidence": [
+        "练习 A：选中舞台换绿色草地背景，绿旗后 VM 背景为草地",
+        "练习 B：小鸟换成自己的“啾啾”，点击后 VM 记录播放啾啾"
+      ],
+      "defects": [
+        "练习 B 只需改一个下拉，难度偏低；不能拖动积木结构"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "真实错误：VM 记录一次绿旗执行舞台“播放声音”3 次",
+        "完成条件要求先看到重复播放、再看到恰好 1 次；2 次仍不通过",
+        "三层提示：现象→原因→修复（含完整 Scratch 中把声音拖出重复的做法）"
+      ],
+      "defects": [
+        "修复只能改次数，不能真正把积木拖出重复"
+      ]
+    },
+    "creation": {
+      "score": 10,
+      "evidence": [
+        "创意：改主持词 + 完整开场（草地+开幕铃一次）",
+        "导出真 .sb3（4 SVG + 3 WAV）独立 VM 回读，重新导入后仍只响一次"
+      ],
+      "defects": [
+        "不能录音或导入声音、不能新增背景"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U1L03 只读 VM 观察（绿旗轮次在线程结束后结算，单测覆盖）",
+        "页面明示未接音频引擎与不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 执行；播放次数来自 VM 对 sound_play/sound_playuntildone 原语的真实调用（仅观察后调用原原语），E2E 无 VM mock；未接音频引擎已在页面说明"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "重复 3 次播放 3 次、2 次不通过、重复 6 被拒、5 类非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "主持词自由（1～20 字）；完整开场任意满足草地+一次即可"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "新增 2 个 SVG 原创；3 段 WAV 由构建脚本程序合成（原创），均已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U1-L03：真 Scratch VM 加载原创森林音乐会项目；舞台换绿色草地，重复 1 次时一次绿旗 VM 只播放开幕铃 1 次",
+    "failureCase": "起始脚本声音在重复 3 次里 → VM 记录播放 3 次；改 2 次仍不通过；重复 6 编辑器判无效；舞台声音给小鸟/重复 9/forever/多余声音/他课工程均被拒且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：开幕铃一次绿旗响了不止一次，盖住主持词",
+      "第二层（想原因）：播放声音放在重复执行 3 次里面，重复几次就响几次",
+      "第三层（去修复）：选中舞台把重复改成 1 次（完整 Scratch 可把声音拖到重复外面）"
+    ],
+    "practiceA": "练习 A：舞台换绿色草地背景",
+    "practiceB": "练习 B：小鸟换成自己的声音“啾啾”",
+    "equivalentSolutions": [
+      "主持词任意 1～20 字 + 草地 + 重复 1 次",
+      "先改背景后修声音或反之均可"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3（含 WAV）；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U1-L03 设置背景和声音（5 个用例）"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 Scratch 音频引擎与 WebGL 渲染器；本课无云端保存",
+    "不能拖动积木结构、不能录音/导入声音"
+  ]
+}

@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
-import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, g2u1L01, g2u1L02, g2u1ScratchLessons, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
+import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -99,5 +99,42 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(stage.scripts[0].body).toEqual([])
     expect(g2u1L02.concept).not.toEqual(g2u1L01.concept)
     expect(g2u1L02.sample).not.toEqual(g2u1L01.sample)
+  })
+
+  it('L03 tasks come from VM green-flag runs (backdrop + stage sound count) and VM click sounds', () => {
+    const obs = emptyG2Observations()
+    expect(Object.values(evaluateG2U1L03(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u1L03.id, obs)).toBeNull()
+    obs.flagRuns = [{backdrop: '夜晚森林', stagePlays: 3}]
+    expect(observedPrediction(g2u1L03.id, obs)).toBe(g2u1L03.predict.correct)
+    expect(evaluateG2U1L03(obs).practiceA).toBe(false)
+    expect(evaluateG2U1L03(obs).debug).toBe(false)
+    obs.flagRuns.push({backdrop: '绿色草地', stagePlays: 3})
+    expect(evaluateG2U1L03(obs).practiceA).toBe(true)
+    expect(evaluateG2U1L03(obs).debug).toBe(false)
+    obs.flagRuns.push({backdrop: '绿色草地', stagePlays: 1})
+    expect(evaluateG2U1L03(obs).debug).toBe(true)
+    // A single quiet run without first seeing the repeat bug is not the debug task.
+    expect(evaluateG2U1L03({...obs, flagRuns: [{backdrop: '绿色草地', stagePlays: 1}]}).debug).toBe(false)
+    expect(observedPrediction(g2u1L03.id, {...obs, flagRuns: [{backdrop: '夜晚森林', stagePlays: 2}]})).toBeNull()
+    obs.clickSounds = {小鸟: ['叽叽']}
+    expect(evaluateG2U1L03(obs).practiceB).toBe(false)
+    obs.clickSounds = {小鸟: ['叽叽', '啾啾']}
+    expect(evaluateG2U1L03(obs).practiceB).toBe(true)
+    obs.lastSaid = {小橘猫: L03_WELCOME}
+    expect(evaluateG2U1L03(obs).create).toBe(false)
+    obs.lastSaid = {小橘猫: '音乐会开始啦'}
+    expect(evaluateG2U1L03(obs).create).toBe(true)
+    expect(evaluateG2U1L03({...obs, flagRuns: [{backdrop: '夜晚森林', stagePlays: 1}]}).create).toBe(false)
+  })
+
+  it('L03 gives the stage its backdrops and sound and the bird only its own sounds', () => {
+    const stage = g2u1L03.targets.find(t => t.kind === 'stage')!
+    const bird = g2u1L03.targets.find(t => t.name === '小鸟')!
+    expect(stage.costumes).toEqual(['夜晚森林', '绿色草地'])
+    expect(stage.sounds).toEqual(['开幕铃'])
+    expect(stage.scripts[0].body.length).toBeGreaterThan(0)
+    expect(bird.sounds).toEqual(['叽叽', '啾啾'])
+    expect(new Set(Object.values(g2u1ScratchLessons).map(l => l.concept)).size).toBe(Object.keys(g2u1ScratchLessons).length)
   })
 })

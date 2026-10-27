@@ -25,7 +25,7 @@ export function checkSlotValue(slot: G2Slot, raw: unknown): number | string | nu
     if (text.length < 1 || text.length > max || /[\u0000-\u001f\u007f<>]/.test(text)) return null
     return text
   }
-  if (slot.field === 'COSTUME') {
+  if (slot.field === 'COSTUME' || slot.field === 'BACKDROP' || slot.field === 'SOUND_MENU') {
     const name = String(raw ?? '')
     return slot.options?.includes(name) ? name : null
   }
@@ -82,7 +82,9 @@ function readSequence(blocks: BlockLike[], specs: G2BlockSpec[], values: G2Value
  */
 export function readG2Program(workspace: WorkspaceLike, target: G2TargetSpec): G2Program | null {
   const tops = workspace.getTopBlocks(false)
-  if (target.kind === 'stage') {
+  // A stage without lesson scripts only hosts the "wrong object" error cases;
+  // a stage with scripts (backdrops, sounds) is read like any sprite.
+  if (target.kind === 'stage' && target.scripts.every(s => s.body.length === 0)) {
     if (tops.length !== 1 || tops[0].type !== 'kc2_flag') return null
     const body = chain(tops[0])
     if (body.length === 0) return {kind: 'stage-empty'}

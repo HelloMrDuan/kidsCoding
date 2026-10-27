@@ -11,12 +11,12 @@ import {changedValues, valuesForTarget, type G2Program, type G2Values} from './s
 import {decodeSampleArchive, isG2Archive, readG2Draft, removeG2Draft, saveG2Draft} from './scratch-g2-draft'
 
 type CostumeAsset = {name: string; uri: string; w: number; h: number; cx: number; cy: number}
-type TargetAsset = {name: string; isStage: boolean; costumes: CostumeAsset[]; sounds: string[]}
+type TargetAsset = {name: string; isStage: boolean; costumes: CostumeAsset[]; sounds: string[]; soundUris?: Record<string, string>}
 type SpriteState = {id: string; name: string; x: number; y: number; visible: boolean; size: number; original: boolean; costume: string}
 type MoveResult = {requested: G2Point; before: G2Point; after: G2Point; moved: boolean}
 type CostumeResult = {requested: string; before: Array<{name: string; costume: string}>; after: Array<{name: string; costume: string}>; changed: boolean; stageCostumes: string[]}
 type LabMessage = {
-  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' |
+  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' |
     'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'
   id: number | null
   available?: boolean
@@ -36,6 +36,8 @@ type LabMessage = {
   moved?: boolean
   changed?: boolean
   stageCostumes?: string[]
+  sound?: string
+  activeThreads?: number
   archive?: ArrayBuffer
   error?: string
   phase?: 'load' | 'configure' | 'export'
@@ -75,6 +77,10 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const lastCostume = useRef<Map<string, string>>(new Map())
   const clickChanges = useRef<Map<string, number>>(new Map())
   const clickFrom = useRef<Map<string, string>>(new Map())
+  // The green-flag run in progress: how many times the stage's own sounds played in it.
+  const flagRun = useRef<{stagePlays: number} | null>(null)
+  const soundUris = useRef<Record<string, Record<string, string>>>({})
+  const [lastRunSounds, setLastRunSounds] = useState<{stagePlays: number; finished: boolean} | null>(null)
   const savedFailed = useRef(false)
   const loadedRef = useRef(false)
   useEffect(() => { loadedRef.current = loaded }, [loaded])
@@ -86,7 +92,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   // discards it (the editor remounts with what the VM runs). A sprite editor
   // whose blocks are disconnected (null) also blocks running stale code.
   const selectedDraft = programs[selected]
-  const allApplied = selectedTarget.kind === 'stage' || selectedDraft === undefined ||
+  const stageErrorOnly = selectedTarget.kind === 'stage' && selectedTarget.scripts.every(script => script.body.length === 0)
+  const allApplied = stageErrorOnly || selectedDraft === undefined ||
     (selectedDraft !== null && selectedDraft.kind === 'sprite' && Object.keys(changedValues(selectedDraft.values, params)).length === 0)
   const pendingForSelected = selectedProgram?.kind === 'sprite' ? changedValues(selectedProgram.values, params) : {}
   const busy = running || exporting || importing || saving
@@ -152,6 +159,9 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         lastCostume.current.clear()
         clickChanges.current.clear()
         clickFrom.current.clear()
+        flagRun.current = null
+        setLastRunSounds(null)
+        soundUris.current = Object.fromEntries((msg.assets ?? []).map(a => [a.name, a.soundUris ?? {}]))
         if (msg.source === 'file') {
           setSaving(true)
           post({kind: 'SAVE_DRAFT', id: id.current})
@@ -188,6 +198,12 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             return {...prev, clickCostumeChanges: nextChanges, firstClickTransition: nextFirst}
           })
         }
+        if (flagRun.current && msg.activeThreads === 0) {
+          const finished = {backdrop: msg.backdrop ?? '', stagePlays: flagRun.current.stagePlays}
+          flagRun.current = null
+          setLastRunSounds({stagePlays: finished.stagePlays, finished: true})
+          setObs(prev => ({...prev, flagRuns: [...prev.flagRuns, finished].slice(-20)}))
+        }
         if (runSeen.current) {
           const positions: Record<string, G2Point> = {}
           const costumes: Record<string, string> = {}
@@ -214,6 +230,19 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           lastSaid: {...prev.lastSaid, [target]: text},
           clickedSpeakers: fromClick && !prev.clickedSpeakers.includes(target) ? [...prev.clickedSpeakers, target] : prev.clickedSpeakers,
         }))
+      } else if (msg.kind === 'SOUND') {
+        const target = String(msg.target ?? '')
+        const sound = String(msg.sound ?? '')
+        const uri = soundUris.current[target]?.[sound]
+        if (uri) { try { void new Audio(uri).play().catch(() => {}) } catch { /* audio is optional */ } }
+        if (target === 'Stage') {
+          if (flagRun.current) {
+            flagRun.current.stagePlays += 1
+            setLastRunSounds({stagePlays: flagRun.current.stagePlays, finished: false})
+          }
+        } else if (target && sound) {
+          setObs(prev => ({...prev, clickSounds: {...prev.clickSounds, [target]: [...(prev.clickSounds[target] ?? []), sound].slice(-20)}}))
+        }
       } else if (msg.kind === 'COSTUME_RESULT') {
         if (typeof msg.requested === 'string' && Array.isArray(msg.before) && Array.isArray(msg.after)) {
           const result: CostumeResult = {requested: msg.requested, before: msg.before, after: msg.after, changed: !!msg.changed, stageCostumes: msg.stageCostumes ?? []}
@@ -271,6 +300,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'STARTED') {
         runSeen.current = true
         clickChanges.current.clear()
+        flagRun.current = {stagePlays: 0}
+        setLastRunSounds({stagePlays: 0, finished: false})
         setRunning(true)
         setStatus('Scratch VM 正在执行每个精灵的“当绿旗被点击”脚本。')
         window.setTimeout(() => { if (!destroyed) setRunning(false) }, 600)
@@ -312,11 +343,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
 
   function apply() {
     if (!loaded || busy) return
-    if (selectedTarget.kind === 'stage') {
-      if (selectedProgram?.kind === 'stage-move') post({kind: 'TRY_MOVE', id: id.current, target: 'Stage', x: selectedProgram.x, y: selectedProgram.y})
-      if (selectedProgram?.kind === 'stage-costume') post({kind: 'TRY_COSTUME', id: id.current, target: 'Stage', costume: selectedProgram.costume})
-      return
-    }
+    if (selectedProgram?.kind === 'stage-move') { post({kind: 'TRY_MOVE', id: id.current, target: 'Stage', x: selectedProgram.x, y: selectedProgram.y}); return }
+    if (selectedProgram?.kind === 'stage-costume') { post({kind: 'TRY_COSTUME', id: id.current, target: 'Stage', costume: selectedProgram.costume}); return }
     if (selectedProgram?.kind !== 'sprite' || !Object.keys(pendingForSelected).length) return
     post({kind: 'CONFIGURE', id: id.current, target: selected, values: pendingForSelected})
   }
@@ -422,7 +450,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             {stageClickNote && <p data-testid="g2-stage-note" className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{stageClickNote}</p>}
             <div className="mt-5 flex flex-wrap gap-3">
               <button data-testid="g2-apply-blocks" type="button"
-                disabled={!loaded || busy || (selectedTarget.kind === 'stage' ? selectedProgram?.kind !== 'stage-move' && selectedProgram?.kind !== 'stage-costume' : !Object.keys(pendingForSelected).length)}
+                disabled={!loaded || busy || (selectedProgram?.kind === 'stage-move' || selectedProgram?.kind === 'stage-costume' ? false : !Object.keys(pendingForSelected).length)}
                 className="rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:opacity-40" onClick={apply}>应用积木到 VM</button>
               {!loaded && loadFailed && (
                 <button data-testid="g2-retry-load" type="button" disabled={retrying}
@@ -466,6 +494,14 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             <p data-testid="g2-export-status" className="mt-5 text-sm text-indigo-700">{exportDetails}</p>
             <p data-testid="g2-local-save-status" className="mt-3 text-sm text-emerald-800">{draftStatus}</p>
             <p className="mt-5 text-sm">当前背景：<strong data-testid="g2-backdrop">{backdrop || '—'}</strong></p>
+            {(lesson.targets.some(t => t.sounds?.length)) && (
+              <p data-testid="g2-sound-log" data-plays={lastRunSounds?.stagePlays ?? ''} data-finished={lastRunSounds?.finished ? 'true' : 'false'} className="mt-2 text-sm">
+                {lastRunSounds === null
+                  ? '还没有点绿旗：舞台声音播放次数会显示在这里。'
+                  : `${lastRunSounds.finished ? '上一次绿旗' : '本次绿旗进行中'}：Scratch VM 执行舞台“播放声音”${lastRunSounds.stagePlays} 次。`}
+                {Object.entries(obs.clickSounds).map(([name, list]) => ` ${name}刚才播放“${list[list.length - 1]}”。`).join('')}
+              </p>
+            )}
             {spriteTargets.map(t => {
               const s = spriteOf(t.name)
               return <p key={t.name} data-testid="g2-sprite-state" data-name={t.name} className="mt-2 text-sm">

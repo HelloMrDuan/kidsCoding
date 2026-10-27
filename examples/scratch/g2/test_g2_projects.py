@@ -85,6 +85,29 @@ class G2ProjectTests(unittest.TestCase):
         self.assertEqual(kinds[("cat_wait", "DURATION")], "tenths")
         self.assertEqual(kinds[("cat_costume_menu", "COSTUME")], "choice")
 
+    def test_l03_stage_owns_two_backdrops_a_sound_and_a_sound_inside_a_repeat(self):
+        filename, project, files, _ = LESSONS["G2-U1-L03"]()
+        stage, cat, bird = project["targets"]
+        self.assertEqual([c["name"] for c in stage["costumes"]], ["夜晚森林", "绿色草地"])
+        self.assertEqual([s["name"] for s in stage["sounds"]], ["开幕铃"])
+        self.assertEqual([s["name"] for s in bird["sounds"]], ["叽叽", "啾啾"])
+        self.assertEqual(cat["sounds"], [])
+        blocks = stage["blocks"]
+        self.assertEqual(blocks["stage_switch"]["opcode"], "looks_switchbackdropto")
+        self.assertEqual(blocks["stage_backdrop_menu"]["fields"]["BACKDROP"][0], "夜晚森林")
+        self.assertEqual(blocks["stage_repeat"]["inputs"]["SUBSTACK"], [2, "stage_play"])
+        self.assertEqual(blocks["stage_play"]["opcode"], "sound_playuntildone")
+        # The bug the lesson starts with: the sound sits inside a 3x repeat.
+        self.assertEqual(blocks["stage_repeat"]["inputs"]["TIMES"], [1, [4, "3"]])
+        with zipfile.ZipFile(io.BytesIO(read_sample(filename))) as archive:
+            for target in project["targets"]:
+                for sound in target["sounds"]:
+                    data = archive.read(sound["md5ext"])
+                    self.assertTrue(data.startswith(b"RIFF") and data[8:12] == b"WAVE")
+                    self.assertEqual(hashlib.md5(data).hexdigest(), sound["assetId"])
+                    self.assertEqual((len(data) - 44) // 2, sound["sampleCount"])
+                    self.assertLess(len(data), 400_000)
+
 
 if __name__ == "__main__":
     unittest.main()
