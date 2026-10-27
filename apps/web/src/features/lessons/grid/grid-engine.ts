@@ -15,7 +15,8 @@ export type GridLevel = {
   key?: Cell
   door?: Cell
   /** Story decoration drawn under the start cell; never affects a run. */
-  scenery?: 'treehouse'
+  /** Original story art drawn beside the map (never a cell): L01 treehouse, L02 forest post signpost. */
+  scenery?: 'treehouse' | 'signpost'
 }
 
 export const GRID_BLOCK_TYPES = [

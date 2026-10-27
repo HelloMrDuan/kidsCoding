@@ -23,6 +23,7 @@
     { "path": "kc-scenes/meadow.svg", "license": "original", "source": "本项目手绘 SVG，UX-004 自 character-art.tsx 的 MeadowBackdrop 逐路径提取" },
     { "path": "kc-scenes/garden.svg", "license": "original", "source": "本项目手绘 SVG，UX-004 自 character-art.tsx 的 SceneBackdrop（garden 配色）逐路径提取" },
     { "path": "kc-scenes/graduation-island.svg", "license": "original", "source": "本项目新绘 SVG，UX-004 与上述资产同一扁平柔和风格" },
-    { "path": "kc-scenes/treehouse.svg", "license": "original", "source": "本项目新绘 SVG，G0-U1-L01 故事场景（小狐狸树屋与两块指令牌），与 grid-stage.tsx 内联 Treehouse 几何一致" }
+    { "path": "kc-scenes/treehouse.svg", "license": "original", "source": "本项目新绘 SVG，G0-U1-L01 故事场景（小狐狸树屋与两块指令牌），与 grid-stage.tsx 内联 Treehouse 几何一致" },
+    { "path": "kc-scenes/post-signpost.svg", "license": "original", "source": "本项目新绘 SVG，G0-U1-L02 故事场景（森林邮局与四向路牌），与 grid-stage.tsx 内联 Signpost 几何一致" }
   ]
 }

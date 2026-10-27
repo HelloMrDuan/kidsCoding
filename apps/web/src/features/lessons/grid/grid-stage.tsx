@@ -99,6 +99,32 @@ export function Treehouse() {
   )
 }
 
+/** G0-U1-L02 story scenery: the forest post office with its four-way signpost (original art, V2 flat style). */
+export function Signpost() {
+  return (
+    <g data-grid-item="signpost">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="4" y="34" width="22" height="24" rx="3" fill="#ffe2b8" stroke="#a0704a" strokeWidth="2.5" />
+      <path d="M1 36 L15 24 L29 36 Z" fill="#ff5d6c" stroke="#b5303e" strokeWidth="2.5" strokeLinejoin="round" />
+      <rect x="9" y="42" width="12" height="8" rx="1.5" fill="#fff" stroke="#a0704a" strokeWidth="1.5" />
+      <path d="M9 42 L15 47 L21 42" stroke="#a0704a" strokeWidth="1.5" fill="none" strokeLinejoin="round" />
+      <rect x="39" y="14" width="5" height="46" rx="2" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2" />
+      <g transform="translate(41.5 8)">
+        <circle r="7" fill="#4c97ff" stroke="#2f6fd1" strokeWidth="1.5" />
+        <path d="M0 4 V-4 M-3 -1 L0 -4 L3 -1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      </g>
+      <g transform="translate(41.5 24)">
+        <path d="M2 -5 h11 l5 5 -5 5 h-11 Z" fill="#4c97ff" stroke="#2f6fd1" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M-2 -5 h-11 l-5 5 5 5 h11 Z" fill="#4c97ff" stroke="#2f6fd1" strokeWidth="1.5" strokeLinejoin="round" />
+      </g>
+      <g transform="translate(41.5 40)">
+        <circle r="6" fill="#4c97ff" stroke="#2f6fd1" strokeWidth="1.5" />
+        <path d="M0 -3.5 V3.5 M-2.5 1 L0 3.5 L2.5 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      </g>
+    </g>
+  )
+}
+
 function Bump({ x, y }: Cell) {
   return (
     <g transform={`translate(${x * T + 32} ${y * T + 32})`} data-grid-item="bump">
@@ -112,8 +138,8 @@ export type GridStageState = { x: number; y: number; facing: Facing; hasKey: boo
 export function GridStage({ level, state, trail = [], label }: { level: GridLevel; state: GridStageState; trail?: Cell[]; label?: string }) {
   const w = level.cols * T
   const h = level.rows * T
-  // The treehouse sits just left of the map, so the fox visibly leaves home; it is never a cell.
-  const left = level.scenery === 'treehouse' ? 64 : 0
+  // Story scenery sits just left of the map, so the fox visibly leaves home or the post office; it is never a cell.
+  const left = level.scenery ? 64 : 0
   const tiles = []
   for (let y = 0; y < level.rows; y++) {
     for (let x = 0; x < level.cols; x++) {
@@ -131,7 +157,7 @@ export function GridStage({ level, state, trail = [], label }: { level: GridLeve
       data-fox-cell={`${state.x},${state.y}`}
       data-fox-facing={state.facing}
     >
-      {left ? <g transform={`translate(${-left - 2} 2)`}><Treehouse /></g> : null}
+      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : <Treehouse />}</g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}
