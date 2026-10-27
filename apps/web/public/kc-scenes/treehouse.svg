@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -14 64 80" role="img" aria-label="小狐狸的树屋与两块指令牌">
+<ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22"/>
+<path d="M20 60 V30 h16 V60 Z" fill="#9b6a3c" stroke="#5e3b1c" stroke-width="2.5"/>
+<path d="M24 44 q4 -3 8 0" stroke="#5e3b1c" stroke-width="2" fill="none" opacity=".6"/>
+<circle cx="28" cy="10" r="22" fill="#4fae55" stroke="#2f7d3a" stroke-width="2.5"/>
+<circle cx="10" cy="20" r="12" fill="#5cbf60" stroke="#2f7d3a" stroke-width="2"/>
+<circle cx="46" cy="20" r="12" fill="#5cbf60" stroke="#2f7d3a" stroke-width="2"/>
+<rect x="12" y="14" width="32" height="20" rx="4" fill="#ffe2b8" stroke="#a0704a" stroke-width="2.5"/>
+<path d="M8 16 L28 2 L48 16 Z" fill="#ff8a3d" stroke="#b5562a" stroke-width="2.5" stroke-linejoin="round"/>
+<rect x="23" y="21" width="10" height="13" rx="5" fill="#a0704a"/>
+<circle cx="17" cy="24" r="3" fill="#7fd0ff" stroke="#a0704a" stroke-width="1.5"/>
+<g transform="translate(-2 38)"><rect width="22" height="11" rx="3" fill="#ffbf00" stroke="#a87400" stroke-width="1.5"/><path d="M5 5.5 h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>
+<g transform="translate(34 38)"><rect width="22" height="11" rx="3" fill="#4c97ff" stroke="#2f6fd1" stroke-width="1.5"/><path d="M5 5.5 h10 M12 2.5 l3.5 3 -3.5 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+</svg>
