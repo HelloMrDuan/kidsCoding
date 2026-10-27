@@ -6,9 +6,9 @@
 // examples/scratch/g2/build_g2_projects.py. Nothing here is a published
 // course or a verified grade.
 
-export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION'
+export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU'
 export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
-export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait'
+export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait' | 'kc2_switch_backdrop' | 'kc2_play_sound'
 export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[] }
 export type G2ScriptSpec = { hat: 'kc2_flag' | 'kc2_clicked'; body: G2BlockSpec[] }
 export type G2TargetSpec = {
@@ -16,8 +16,10 @@ export type G2TargetSpec = {
   kind: 'stage' | 'sprite'
   label: string
   scripts: G2ScriptSpec[]
-  /** Costume names offered by this target's costume dropdowns. */
+  /** Costume (stage: backdrop) names offered by this target's costume/backdrop dropdowns. */
   costumes?: string[]
+  /** Sound names offered by this target's sound dropdowns. */
+  sounds?: string[]
   /** Blocks offered in the toolbox beyond the target's own scripts (used for the stage error cases). */
   extraToolbox?: Array<'kc2_goto' | 'kc2_switch_costume'>
 }
@@ -187,9 +189,79 @@ export const g2u1L02: G2Lesson = {
   nextLesson: 'G2-U1-L03 设置背景和声音',
 }
 
+export const L03_WELCOME = '欢迎来到森林音乐会！'
+
+export const g2u1L03: G2Lesson = {
+  id: 'G2-U1-L03',
+  title: '设置背景和声音',
+  concept: '背景与声音',
+  sample: '/scratch-samples/g2-u1-l03-forest-concert.sb3.b64',
+  exportName: 'KidsCoding-设置背景和声音.sb3',
+  story: '森林音乐会要开幕了！舞台要换上绿色草地背景，开幕铃响一次就请小橘猫主持；可现在点绿旗，开幕铃“叮咚叮咚叮咚”响个不停，把主持词都盖住了。',
+  conceptExplain: [
+    '背景是舞台的“造型”：舞台有“夜晚森林”和“绿色草地”两个背景，用“换成……背景”切换。背景只属于舞台，精灵没有背景。',
+    '声音也属于各自的对象：开幕铃是舞台的声音，“叽叽”“啾啾”是小鸟的声音；“播放声音”只能播放自己拥有的声音。',
+    '放在“重复执行 N 次”里面的积木会运行 N 次：声音积木在重复里面，就会响 N 次。开幕铃只要响一次。',
+  ],
+  predict: {
+    question: '舞台的绿旗脚本是“换成（夜晚森林）背景 → 重复执行 3 次：播放声音（开幕铃）”。点一次绿旗，开幕铃会响几次？',
+    options: ['1 次', '3 次'],
+    correct: '3 次',
+    explain: '“播放声音”在“重复执行 3 次”里面，Scratch VM 就把它执行 3 次。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '用“换成……背景”切换舞台背景', title: '练习 A：换上绿色草地', goal: '在角色区选中“舞台”，把绿旗下面“换成（ ）背景”改成“绿色草地”，应用后点绿旗，让 Scratch VM 里的舞台真的换成绿色草地。', how: '背景属于舞台，所以要先选中舞台；没应用的积木不会运行。' },
+    { id: 'practiceB', skill: '给精灵选择它自己的声音', title: '练习 B：小鸟唱新歌', goal: '选中小鸟，把“当角色被点击 → 播放声音（ ）”改成“啾啾”，应用后在舞台上点小鸟，让 VM 记录小鸟真的播放了“啾啾”。', how: '小鸟只有“叽叽”和“啾啾”两个声音，下拉框里只能选它自己的。' },
+    { id: 'debug', skill: '找出放在重复里的声音（调试）', title: '找错：开幕铃响个不停', goal: '先点一次绿旗，看 Scratch VM 记录开幕铃响了几次；再修好舞台脚本，让一次绿旗只响一次开幕铃。', how: '看看声音积木在不在“重复执行”里面，重复几次它就响几次。' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：完整的音乐会开场', goal: '改一句小橘猫的主持词（1～20 字），点小橘猫让它说出来；再点绿旗，做到“绿色草地 + 开幕铃只响一次”，保存为 .sb3。', how: '可以先演一遍再导出；导出的作品能在 Scratch 3 里继续改。' },
+  ],
+  hints: [
+    '看现象：点一次绿旗，Scratch VM 记录舞台的“开幕铃”播放了不止一次，声音一次接一次，盖住了主持词。',
+    '想原因：“播放声音（开幕铃）”放在“重复执行 3 次”里面，重复几次它就播放几次；在完整 Scratch 里也常见把声音误放进“重复执行”或“重复执行（无限）”。',
+    '去修复：选中“舞台”，把“重复执行（ ）次”改成 1 次（完整 Scratch 里也可以把声音积木拖到重复外面），应用后再点绿旗，确认只响一次。',
+  ],
+  reflection: [
+    '为什么换背景要选中舞台，而不是选中小鸟？',
+    '声音放在“重复执行”里面和外面，听起来有什么不同？',
+    '如果开幕铃想响两次，你会怎么改？',
+  ],
+  limitations: [
+    '本实验只能修改：舞台开幕背景（夜晚森林/绿色草地）、开幕铃所在“重复执行”的次数（1～5）、小鸟被点击时的声音（叽叽/啾啾）和小橘猫主持词（1～20 字）。',
+    '不能把积木拖出重复、不能录音或导入声音、不能新增背景或精灵（课程拓展“录一段自己的开场白”需要完整 Scratch 编辑器，可导出 .sb3 后继续改造）。',
+    '实验室没有接入 Scratch 音频引擎：播放次数来自 Scratch VM 真实执行“播放声音”积木的记录，页面用同一段原创 .wav 发声；舞台画面为原创 SVG，未接 WebGL 渲染器；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    {
+      name: 'Stage', kind: 'stage', label: '舞台', costumes: ['夜晚森林', '绿色草地'], sounds: ['开幕铃'],
+      scripts: [{ hat: 'kc2_flag', body: [
+        { type: 'kc2_switch_backdrop', vmBlock: 'stage_backdrop_menu', slots: [{ key: 'Stage|stage_backdrop_menu|BACKDROP', field: 'BACKDROP', label: '背景', options: ['夜晚森林', '绿色草地'] }] },
+        {
+          type: 'kc2_repeat', vmBlock: 'stage_repeat', slots: [{ key: 'Stage|stage_repeat|TIMES', field: 'TIMES', label: '次数', min: 1, max: 5 }],
+          children: [{ type: 'kc2_play_sound', vmBlock: 'stage_sound_menu', slots: [] }],
+        },
+      ] }],
+    },
+    {
+      name: '小橘猫', kind: 'sprite', label: '小橘猫',
+      scripts: [{ hat: 'kc2_clicked', body: [{ type: 'kc2_say', vmBlock: 'cat_say', slots: [{ key: '小橘猫|cat_say|MESSAGE', field: 'MESSAGE', label: '主持词', maxLength: 20 }] }] }],
+    },
+    {
+      name: '小鸟', kind: 'sprite', label: '小鸟', sounds: ['叽叽', '啾啾'],
+      scripts: [{ hat: 'kc2_clicked', body: [{ type: 'kc2_play_sound', vmBlock: 'bird_sound_menu', slots: [{ key: '小鸟|bird_sound_menu|SOUND_MENU', field: 'SOUND_MENU', label: '声音', options: ['叽叽', '啾啾'] }] }] }],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-meadow-backdrop', solutions: ['舞台绿旗下“换成绿色草地背景”→ 点绿旗后 VM 背景为绿色草地'], counterExamples: ['仍是“换成夜晚森林背景”→ 点绿旗后背景还是夜晚森林'] },
+    { id: 'practiceB-bird-own-sound', solutions: ['小鸟“播放声音（啾啾）”→ 点小鸟后 VM 记录小鸟播放啾啾'], counterExamples: ['仍是“叽叽”→ VM 记录的是叽叽', '导入把小鸟声音改成“开幕铃”的作品 → 不在小鸟的声音里被拒绝'] },
+    { id: 'debug-sound-inside-repeat', solutions: ['重复执行 1 次 → 一次绿旗 VM 只播放 1 次开幕铃'], counterExamples: ['重复执行 3 次 → 一次绿旗 VM 播放 3 次开幕铃', '重复执行 6 次 → 超出 1～5 被拒绝'] },
+  ],
+  nextLesson: 'G2-U1-L04 运动积木初体验',
+}
+
 export const g2u1ScratchLessons: Record<string, G2Lesson> = {
   [g2u1L01.id]: g2u1L01,
   [g2u1L02.id]: g2u1L02,
+  [g2u1L03.id]: g2u1L03,
 }
 
 export function getG2ScratchLesson(id: string): G2Lesson | null {
@@ -214,11 +286,16 @@ export type G2Observations = {
   firstClickTransition: Record<string, { from: string; to: string }>
   /** The VM ran "switch costume" on the stage and no target changed costume. */
   stageCostumeRejected: boolean
+  /** Backdrop after a finished green-flag run, and how many times the stage's own sounds played in it (in run order). */
+  flagRuns: Array<{ backdrop: string; stagePlays: number }>
+  /** Sounds each sprite played in the VM after being clicked. */
+  clickSounds: Record<string, string[]>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
+  flagRuns: [], clickSounds: {},
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
@@ -248,6 +325,19 @@ export function evaluateG2U1L02(obs: G2Observations): G2TaskState {
   }
 }
 
+export function evaluateG2U1L03(obs: G2Observations): G2TaskState {
+  const runs = obs.flagRuns
+  const firstRepeat = runs.findIndex(r => r.stagePlays >= 2)
+  const fixedAfter = firstRepeat >= 0 && runs.slice(firstRepeat + 1).some(r => r.stagePlays === 1)
+  const said = obs.lastSaid['小橘猫']
+  return {
+    practiceA: runs.some(r => r.backdrop === '绿色草地'),
+    practiceB: (obs.clickSounds['小鸟'] ?? []).includes('啾啾'),
+    debug: fixedAfter,
+    create: !!said && said !== L03_WELCOME && runs.some(r => r.backdrop === '绿色草地' && r.stagePlays === 1),
+  }
+}
+
 /** What the VM actually showed for the lesson's prediction question (null until observed). */
 export function observedPrediction(id: string, obs: G2Observations): string | null {
   if (id === g2u1L01.id) return obs.clickedSpeakers.includes('小鸟') ? '小鸟说话' : null
@@ -256,11 +346,17 @@ export function observedPrediction(id: string, obs: G2Observations): string | nu
     if (!first || first.from !== '站立') return null
     return first.to === '挥手' ? '变成挥手' : '保持站立'
   }
+  if (id === g2u1L03.id) {
+    const first = obs.flagRuns[0]
+    if (!first) return null
+    return first.stagePlays === 1 ? '1 次' : first.stagePlays === 3 ? '3 次' : null
+  }
   return null
 }
 
 export function evaluateG2Lesson(id: string, obs: G2Observations): G2TaskState | null {
   if (id === g2u1L01.id) return evaluateG2U1L01(obs)
   if (id === g2u1L02.id) return evaluateG2U1L02(obs)
+  if (id === g2u1L03.id) return evaluateG2U1L03(obs)
   return null
 }

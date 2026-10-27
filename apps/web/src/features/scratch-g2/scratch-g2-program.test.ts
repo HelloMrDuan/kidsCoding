@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u1L01, g2u1L02} from '@/content/curriculum/g2-u1-scratch-lessons'
+import {g2u1L01, g2u1L02, g2u1L03} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {changedValues, checkSlotValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
 function block(type: string, fields: Record<string, string> = {}, next: BlockLike | null = null, inner: BlockLike | null = null): BlockLike {
@@ -95,5 +95,27 @@ describe('G2 restricted Blockly adapter (G2-U1-L02 costumes)', () => {
     expect(checkSlotValue(wait, 'abc')).toBeNull()
     expect(checkSlotValue(costume, '挥手')).toBe('挥手')
     expect(checkSlotValue(costume, '<script>')).toBeNull()
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U1-L03 backdrops and sounds)', () => {
+  const stage3 = g2u1L03.targets.find(t => t.kind === 'stage')!
+  const bird3 = g2u1L03.targets.find(t => t.name === '小鸟')!
+  const stageFlag = (backdrop: string, times: string, inner: BlockLike | null = block('kc2_play_sound', {SOUND_MENU: '开幕铃'})) =>
+    block('kc2_flag', {}, block('kc2_switch_backdrop', {BACKDROP: backdrop}, block('kc2_repeat', {TIMES: times}, null, inner)))
+
+  it('reads a stage that has its own scripts like a sprite (backdrop choice + repeat count)', () => {
+    expect(readG2Program(ws(stageFlag('绿色草地', '1')), stage3)).toEqual({kind: 'sprite', values: {
+      'Stage|stage_backdrop_menu|BACKDROP': '绿色草地', 'Stage|stage_repeat|TIMES': 1,
+    }})
+    expect(readG2Program(ws(stageFlag('绿色草地', '6')), stage3)).toBeNull()
+    expect(readG2Program(ws(stageFlag('草原', '1')), stage3)).toBeNull()
+    expect(readG2Program(ws(stageFlag('绿色草地', '1', null)), stage3)).toBeNull()
+    expect(readG2Program(ws(block('kc2_flag')), stage3)).toBeNull()
+  })
+
+  it('accepts only the bird\'s own sounds', () => {
+    expect(readG2Program(ws(block('kc2_clicked', {}, block('kc2_play_sound', {SOUND_MENU: '啾啾'}))), bird3)).toEqual({kind: 'sprite', values: {'小鸟|bird_sound_menu|SOUND_MENU': '啾啾'}})
+    expect(readG2Program(ws(block('kc2_clicked', {}, block('kc2_play_sound', {SOUND_MENU: '开幕铃'}))), bird3)).toBeNull()
   })
 })

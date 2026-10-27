@@ -19,7 +19,9 @@ import base64
 import hashlib
 import io
 import json
+import math
 import re
+import struct
 import sys
 import zipfile
 from pathlib import Path
@@ -68,16 +70,16 @@ def greet_scripts(prefix, x, y, greeting):
     }
 
 
-def sprite(name, costumes, blocks, layer, x, y):
+def sprite(name, costumes, blocks, layer, x, y, sounds=None):
     return {"isStage": False, "name": name, "variables": {}, "lists": {}, "broadcasts": {}, "blocks": blocks,
-            "comments": {}, "currentCostume": 0, "costumes": costumes, "sounds": [], "volume": 100,
+            "comments": {}, "currentCostume": 0, "costumes": costumes, "sounds": sounds or [], "volume": 100,
             "layerOrder": layer, "visible": True, "x": x, "y": y, "size": 100, "direction": 90,
             "draggable": False, "rotationStyle": "all around"}
 
 
-def stage(costumes):
-    return {"isStage": True, "name": "Stage", "variables": {}, "lists": {}, "broadcasts": {}, "blocks": {},
-            "comments": {}, "currentCostume": 0, "costumes": costumes, "sounds": [], "volume": 100,
+def stage(costumes, blocks=None, sounds=None):
+    return {"isStage": True, "name": "Stage", "variables": {}, "lists": {}, "broadcasts": {}, "blocks": blocks or {},
+            "comments": {}, "currentCostume": 0, "costumes": costumes, "sounds": sounds or [], "volume": 100,
             "layerOrder": 0, "tempo": 60, "videoTransparency": 50, "videoState": "on",
             "textToSpeechLanguage": None}
 
@@ -159,9 +161,87 @@ def lesson_g2_u1_l02():
     return "g2-u1-l02-cat-costumes.sb3.b64", project, files, params
 
 
+SOUND_RATE = 22050
+
+
+def tone_wav(notes):
+    """Deterministic original sound: a list of (freq_start, freq_end, seconds) chirps/tones,
+    each with a soft attack/decay envelope, as 16-bit mono PCM WAV bytes."""
+    frames = bytearray()
+    count = 0
+    for f0, f1, secs in notes:
+        n = int(SOUND_RATE * secs)
+        phase = 0.0
+        for i in range(n):
+            t = i / n
+            freq = f0 + (f1 - f0) * t if f0 else 0.0
+            phase += 2 * math.pi * freq / SOUND_RATE
+            env = min(1.0, i / (SOUND_RATE * 0.005)) * (1 - t) ** 1.5
+            value = 0.0 if not f0 else 0.45 * env * (math.sin(phase) + 0.3 * math.sin(2 * phase))
+            frames += struct.pack("<h", int(max(-1.0, min(1.0, value)) * 32767))
+            count += 1
+    header = b"RIFF" + struct.pack("<I", 36 + len(frames)) + b"WAVEfmt " + struct.pack(
+        "<IHHIIHH", 16, 1, 1, SOUND_RATE, SOUND_RATE * 2, 2, 16) + b"data" + struct.pack("<I", len(frames))
+    return header + bytes(frames), count
+
+
+def wav_sound(name, notes):
+    data, samples = tone_wav(notes)
+    digest = hashlib.md5(data).hexdigest()
+    return {"assetId": digest, "name": name, "dataFormat": "wav", "format": "", "rate": SOUND_RATE,
+            "sampleCount": samples, "md5ext": digest + ".wav"}, data
+
+
+def lesson_g2_u1_l03():
+    """设置背景和声音: the stage owns backdrops and its own sound; a sound inside a repeat plays again and again."""
+    night, night_file = svg_costume("夜晚森林", "night-forest-backdrop.svg", 240, 180)
+    meadow, meadow_file = svg_costume("绿色草地", "meadow-backdrop.svg", 240, 180)
+    cat, cat_file = svg_costume("小橘猫", "orange-cat.svg", 48, 48)
+    bird, bird_file = svg_costume("小鸟", "blue-bird.svg", 32, 28)
+    bell, bell_data = wav_sound("开幕铃", [(880, 880, 0.35), (1320, 1320, 0.45)])
+    chirp, chirp_data = wav_sound("叽叽", [(2200, 3200, 0.09), (0, 0, 0.05), (2200, 3200, 0.09)])
+    tweet, tweet_data = wav_sound("啾啾", [(3400, 2000, 0.16), (0, 0, 0.04), (2600, 1800, 0.2)])
+    stage_blocks = {
+        "stage_flag": block("event_whenflagclicked", "stage_switch", top=True, x=40, y=40),
+        "stage_switch": block("looks_switchbackdropto", "stage_repeat", parent="stage_flag", inputs={"BACKDROP": [1, "stage_backdrop_menu"]}),
+        "stage_backdrop_menu": block("looks_backdrops", parent="stage_switch", fields={"BACKDROP": ["夜晚森林", None]}, shadow=True),
+        "stage_repeat": block("control_repeat", parent="stage_switch", inputs={"TIMES": num(3), "SUBSTACK": [2, "stage_play"]}),
+        "stage_play": block("sound_playuntildone", parent="stage_repeat", inputs={"SOUND_MENU": [1, "stage_sound_menu"]}),
+        "stage_sound_menu": block("sound_sounds_menu", parent="stage_play", fields={"SOUND_MENU": ["开幕铃", None]}, shadow=True),
+    }
+    cat_blocks = {
+        "cat_click": block("event_whenthisspriteclicked", "cat_say", top=True, x=40, y=40),
+        "cat_say": block("looks_sayforsecs", parent="cat_click", inputs={"MESSAGE": text("欢迎来到森林音乐会！"), "SECS": num(2)}),
+    }
+    bird_blocks = {
+        "bird_click": block("event_whenthisspriteclicked", "bird_play", top=True, x=40, y=40),
+        "bird_play": block("sound_playuntildone", parent="bird_click", inputs={"SOUND_MENU": [1, "bird_sound_menu"]}),
+        "bird_sound_menu": block("sound_sounds_menu", parent="bird_play", fields={"SOUND_MENU": ["叽叽", None]}, shadow=True),
+    }
+    project = {
+        "targets": [
+            stage([night, meadow], stage_blocks, [bell]),
+            sprite("小橘猫", [cat], cat_blocks, 1, -150, -70),
+            sprite("小鸟", [bird], bird_blocks, 2, 130, 60, [chirp, tweet]),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U1-L03"},
+    }
+    files = {night["md5ext"]: night_file, meadow["md5ext"]: meadow_file, cat["md5ext"]: cat_file, bird["md5ext"]: bird_file,
+             bell["md5ext"]: bell_data, chirp["md5ext"]: chirp_data, tweet["md5ext"]: tweet_data}
+    params = [
+        {"target": "Stage", "block": "stage_backdrop_menu", "slot": "BACKDROP", "kind": "choice", "options": ["夜晚森林", "绿色草地"]},
+        {"target": "Stage", "block": "stage_repeat", "slot": "TIMES", "kind": "int", "min": 1, "max": 5},
+        {"target": "小橘猫", "block": "cat_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "小鸟", "block": "bird_sound_menu", "slot": "SOUND_MENU", "kind": "choice", "options": ["叽叽", "啾啾"]},
+    ]
+    return "g2-u1-l03-forest-concert.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
+    "G2-U1-L03": lesson_g2_u1_l03,
 }
 
 
@@ -207,7 +287,7 @@ def sb3_bytes(project, files) -> bytes:
         for target_name, source in sorted(files.items()):
             info = zipfile.ZipInfo(target_name, date_time=(2026, 10, 27, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
-            archive.writestr(info, (HERE / source).read_bytes())
+            archive.writestr(info, source if isinstance(source, bytes) else (HERE / source).read_bytes())
     return buffer.getvalue()
 
 
