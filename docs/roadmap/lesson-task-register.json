@@ -79,12 +79,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/178",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L03 formal course: one-short error lab, two practices, place the house either side, review, saved and reopened（2026-10-27 本地桌面 Chrome 通过；以 PR CI 为准）",
+        "mergeCommit": "8d174d5bb8df785b2448afb985f48a6ad7391cb6",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40497398300",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U1-L03 formal course: one-short error lab, two practices, place the house either side, review, saved and reopened（PR #178 CI 的 scratch-real-vm-browser 两分片 --project=desktop 通过；main 上 99f1aab 的 curriculum 运行再次通过；另 2026-10-27 本地桌面 Chrome 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L03 五关正式课程化（错误实验·少数一步、引导五步、练习A反方向数格子、练习B撤回多走一步、创意改造·蘑菇屋放左边或右边）+ 复盘卡 + 作品回放 + 原创松鼠数数牌场景；证据 docs/roadmap/evidence/G0-U1-L03/，AI 参考教研 85/100（非独立）。全量目录仍为 outline_not_playable；未独立人工复核、未儿童试学、未发布。"
+      "notes": "Hark A 2026-10-27：/learn/grid-lab/G0-U1-L03 五关正式课程化（错误实验·少数一步、引导五步、练习A反方向数格子、练习B撤回多走一步、创意改造·蘑菇屋放左边或右边）+ 复盘卡 + 作品回放 + 原创松鼠数数牌场景；PR #178 已合并（8d174d5）；main CI：deploy 与 task-ledger 全绿，8d174d5 的 curriculum 运行被下一次 main 推送取消，紧接的 99f1aab（含本课代码）curriculum 15 个作业全绿；证据 docs/roadmap/evidence/G0-U1-L03/，AI 参考教研 85/100（实现者自评，非独立）。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U1-L04",
