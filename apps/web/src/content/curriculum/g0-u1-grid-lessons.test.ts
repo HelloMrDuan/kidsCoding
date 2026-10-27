@@ -6,7 +6,7 @@ import { g0u1GridLessons } from './g0-u1-grid-lessons'
 const toBlocks = (program: string[]) => program.map(type => ({ type }))
 const lessons = Object.values(g0u1GridLessons)
 /** Lessons that have had the Hark A formal-course pass (error lab + creative remake + review + work). */
-const FORMAL = ['G0-U1-L01', 'G0-U1-L02']
+const FORMAL = ['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03']
 const MOVES: Record<string, [number, number]> = { move_up: [0, -1], move_down: [0, 1], move_left: [-1, 0], move_right_cell: [1, 0] }
 
 /** Shortest dry route (BFS over the four direction blocks) — proves a goal is reachable with real blocks. */
@@ -30,7 +30,7 @@ function shortestRoute(level: GridLevel): string[] | null {
 }
 
 describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
-  it('covers L01–L06; formal-course lessons (L01, L02) have five steps, the rest four; L06 is the unit project', () => {
+  it('covers L01–L06; formal-course lessons (L01–L03) have five steps, the rest four; L06 is the unit project', () => {
     expect(lessons.map(l => l.id)).toEqual(['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05', 'G0-U1-L06'])
     const project = g0u1GridLessons['G0-U1-L06'].project!
     expect(g0u1GridLessons['G0-U1-L06'].steps.find(s => s.id === project.stepId)?.kind).toBe('practice-a')
@@ -190,6 +190,52 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
 
     it('every step shows the original post-office scenery', () => {
       for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('signpost')
+    })
+  })
+  describe('G0-U1-L03 formal-course pass (error lab, creative remake, review)', () => {
+    const lesson = g0u1GridLessons['G0-U1-L03']
+    const lab = lesson.steps.find(s => s.kind === 'error-lab')!
+    const creative = lesson.steps.find(s => s.kind === 'creative')!
+
+    it('keeps the five-step shape: error lab, guided, two different practices, creative', () => {
+      expect(lesson.steps.map(s => s.kind)).toEqual(['error-lab', 'guided', 'practice-a', 'practice-b', 'creative'])
+    })
+
+    it('the error lab is a one-step-short mistake: the starter really stops before the house; adding one block fixes it', () => {
+      expect(runGridProgram(lab.level, lab.starterBlocks!).failure).toBe('not_at_goal')
+      expect(lab.errorLab!.expect).toBe('not_at_goal')
+      const fixed = [...lab.starterBlocks!, { type: 'move_right_cell' }]
+      expect(runGridProgram(lab.level, fixed).passed).toBe(true)
+      const [a, b] = lab.predictChoices!
+      expect(a.when).not.toBe(b.when)
+      expect([a.when, b.when]).toContain(lab.errorLab!.expect)
+    })
+
+    it('the house may go on either side; each choice needs its own direction and count, off-by-one always fails', () => {
+      const choices = creative.creative!.goalChoices
+      expect(choices.length).toBeGreaterThanOrEqual(3)
+      const start = creative.level.start
+      expect(choices.some(c => c.x < start.x) && choices.some(c => c.x > start.x)).toBe(true)
+      const routes = choices.map(goal => {
+        const level = stepLevel(creative, { creative: { [creative.id]: { goal } } })
+        const dx = goal.x - start.x
+        const route = Array(Math.abs(dx)).fill(dx > 0 ? 'move_right_cell' : 'move_left')
+        expect(runGridProgram(level, toBlocks(['when_start', ...route])).passed, `goal ${goal.x}`).toBe(true)
+        expect(runGridProgram(level, toBlocks(['when_start', ...route.slice(0, -1)])).passed, `short ${goal.x}`).toBe(false)
+        expect(runGridProgram(level, toBlocks(['when_start', ...route, route[0]])).passed, `long ${goal.x}`).toBe(false)
+        return { level, route }
+      })
+      for (const [i, a] of routes.entries()) {
+        for (const [j, b] of routes.entries()) {
+          if (i !== j) expect(runGridProgram(b.level, toBlocks(['when_start', ...a.route])).passed, `${i}→${j}`).toBe(false)
+        }
+      }
+    })
+
+    it('the creative remake is the saved lesson work, review asks a what-if, and every step shows the counting board', () => {
+      expect(lesson.project?.stepId).toBe(creative.id)
+      expect(lesson.review?.answer).toContain('撤回最后一块')
+      for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('counting')
     })
   })
 })

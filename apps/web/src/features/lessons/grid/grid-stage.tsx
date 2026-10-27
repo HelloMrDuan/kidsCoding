@@ -125,6 +125,35 @@ export function Signpost() {
   )
 }
 
+/** G0-U1-L03 story scenery: the squirrel's counting board — one acorn per step (original art, V2 flat style). */
+export function CountingBoard() {
+  return (
+    <g data-grid-item="counting">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="26" width="6" height="34" rx="2" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2" />
+      <rect x="2" y="4" width="52" height="26" rx="5" fill="#ffe2b8" stroke="#a0704a" strokeWidth="2.5" />
+      <g transform="translate(13 13)">
+        <ellipse cx="0" cy="2" rx="5" ry="6" fill="#c9823e" stroke="#7a4a1c" strokeWidth="1.5" />
+        <path d="M-6 -2 Q0 -8 6 -2 Z" fill="#7a4a1c" />
+      </g>
+      <g transform="translate(28 13)">
+        <ellipse cx="0" cy="2" rx="5" ry="6" fill="#c9823e" stroke="#7a4a1c" strokeWidth="1.5" />
+        <path d="M-6 -2 Q0 -8 6 -2 Z" fill="#7a4a1c" />
+      </g>
+      <g transform="translate(43 13)">
+        <ellipse cx="0" cy="2" rx="5" ry="6" fill="#c9823e" stroke="#7a4a1c" strokeWidth="1.5" />
+        <path d="M-6 -2 Q0 -8 6 -2 Z" fill="#7a4a1c" />
+      </g>
+      <g fill="#5e3b1c" fontSize="7" fontWeight="700" textAnchor="middle" fontFamily="sans-serif">
+        <text x="13" y="28">1</text>
+        <text x="28" y="28">2</text>
+        <text x="43" y="28">3</text>
+      </g>
+      <path d="M6 58 q4 -8 10 -4 q4 -6 8 2" fill="#5cbf60" stroke="#2f7d3a" strokeWidth="1.5" />
+    </g>
+  )
+}
+
 function Bump({ x, y }: Cell) {
   return (
     <g transform={`translate(${x * T + 32} ${y * T + 32})`} data-grid-item="bump">
@@ -157,7 +186,7 @@ export function GridStage({ level, state, trail = [], label }: { level: GridLeve
       data-fox-cell={`${state.x},${state.y}`}
       data-fox-facing={state.facing}
     >
-      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : <Treehouse />}</g> : null}
+      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : <Treehouse />}</g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}

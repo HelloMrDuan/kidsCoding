@@ -217,14 +217,87 @@ test('G0-U1-L02 formal course: wrong-way error lab, two practices, pick a friend
   await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
-test('G0-U1-L03: one-step-too-far is diagnosed, then fixed', async ({ page }) => {
-  test.setTimeout(60_000)
+test('G0-U1-L03 formal course: one-short error lab, two practices, place the house either side, review, saved and reopened', async ({ page }) => {
+  test.setTimeout(150_000)
   await page.goto('/learn/grid-lab/G0-U1-L03')
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  // Original story scenery: the squirrel's counting board with three acorns.
+  await expect(page.locator('[data-grid-item="counting"]')).toBeVisible()
+
+  // Step 1 — error lab: two blocks for a three-cell walk. Predict, run as-is, compare, add the missing block.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('猜错也没关系')
+  await expect(page.getByTestId('grid-feedback')).toContainText('前面一格')
+  await add(page, 'move_right_cell')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Guided: five cells; one short is diagnosed, then fixed.
   await add(page, 'when_start')
   await add(page, 'move_right_cell', 4)
   await runAndExpect(page, 'error', '位置不对')
+  await add(page, 'move_forward')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: facing left, “向右” walks off the map; “向前” follows the face.
+  await add(page, 'when_start')
+  await add(page, 'move_right_cell')
+  await runAndExpect(page, 'error', '出了地图')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_forward', 2)
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice B: one step too far; undo the last block.
+  await runAndExpect(page, 'error', '位置不对')
   await page.getByTestId('lesson-remove-last').click()
   await runAndExpect(page, 'success')
+  await next(page)
+
+  // Creative remake: put the house on the LEFT; counting to the right lands on the wrong cell, counting left passes.
+  await page.getByTestId('grid-run').click()
+  await expect(page.getByTestId('grid-feedback')).toContainText('先选一格')
+  await page.getByTestId('grid-goal-choice-1').click() // 第 1 格（左边 3 格）
+  await expect(page.getByTestId('grid-goal-choice-1')).toHaveAttribute('aria-pressed', 'true')
+  await add(page, 'when_start')
+  await add(page, 'move_right_cell', 3)
+  await runAndExpect(page, 'error', '位置不对')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_left', 3)
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  // 复盘: the mistakes this child really met.
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('没走到目标')
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('走出了地图')
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('撤回最后一块')
+  await expect(page.getByTestId('grid-project-status')).toHaveText('真实运行能走到蘑菇屋')
+  await expect(page.getByTestId('grid-project-steps').locator('li')).toHaveCount(4)
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  // Close and reopen: the card replays for real to the child's own house.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await page.getByTestId('grid-project-play').click()
+  await expect(page.getByTestId('grid-project-card').getByTestId('grid-stage')).toHaveAttribute('data-fox-cell', '0,0', { timeout: 15_000 })
+
+  // Modify after reopening: move the house one cell closer; the old count is one too many.
+  await page.getByTestId('grid-replay-my-count-card').click()
+  await expect(page.getByTestId('grid-goal-choice-1')).toHaveAttribute('data-chosen', 'true')
+  await page.getByTestId('grid-goal-choice-3').click() // 第 2 格（左边 2 格）
+  await runAndExpect(page, 'error')
+  await page.getByTestId('lesson-remove-last').click()
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
 test('G0-U1-L04 and L05: turning and key-before-door are judged by real runs', async ({ page }) => {

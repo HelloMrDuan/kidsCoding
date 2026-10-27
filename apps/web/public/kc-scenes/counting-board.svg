@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 64 70" role="img" aria-label="松鼠的数数牌：三颗橡果，标着 1、2、3">
+<g >
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="26" width="6" height="34" rx="2" fill="#9b6a3c" stroke="#5e3b1c" stroke-width="2" />
+      <rect x="2" y="4" width="52" height="26" rx="5" fill="#ffe2b8" stroke="#a0704a" stroke-width="2.5" />
+      <g transform="translate(13 13)">
+        <ellipse cx="0" cy="2" rx="5" ry="6" fill="#c9823e" stroke="#7a4a1c" stroke-width="1.5" />
+        <path d="M-6 -2 Q0 -8 6 -2 Z" fill="#7a4a1c" />
+      </g>
+      <g transform="translate(28 13)">
+        <ellipse cx="0" cy="2" rx="5" ry="6" fill="#c9823e" stroke="#7a4a1c" stroke-width="1.5" />
+        <path d="M-6 -2 Q0 -8 6 -2 Z" fill="#7a4a1c" />
+      </g>
+      <g transform="translate(43 13)">
+        <ellipse cx="0" cy="2" rx="5" ry="6" fill="#c9823e" stroke="#7a4a1c" stroke-width="1.5" />
+        <path d="M-6 -2 Q0 -8 6 -2 Z" fill="#7a4a1c" />
+      </g>
+      <g fill="#5e3b1c" font-size="7" font-weight="700" text-anchor="middle" font-family="sans-serif">
+        <text x="13" y="28">1</text>
+        <text x="28" y="28">2</text>
+        <text x="43" y="28">3</text>
+      </g>
+      <path d="M6 58 q4 -8 10 -4 q4 -6 8 2" fill="#5cbf60" stroke="#2f7d3a" stroke-width="1.5" />
+    </g>
+</svg>
