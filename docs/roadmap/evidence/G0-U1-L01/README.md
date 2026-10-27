@@ -26,7 +26,7 @@ Task-ID：`G0-U1-L01`（lesson-task-register.json）。分支 `hark-a/g0-u1-l01`
   `G0-U1-L01 formal course: error lab, two practices, creative remake, review, saved and reopened`
   覆盖：错误实验先失败再修好 → 引导 → 练习 A 落水再修 → 练习 B 修掉队 → 创意关选目标、跑通、换目标后需重跑 → 复盘错误记录 → 刷新重开后作品仍在并可回放。
 - 同批 `unit-project.spec.ts` 有 3 项在本 sandbox 失败，原因是页面错误断言收到 `Failed to fetch`：Blockly 默认从 `https://blockly-demo.appspot.com/static/media/` 拉取 sprites/音效，sandbox 无法访问该域名。与本课改动无关（main 上 UX-203 引入，CI 环境可访问），已另行上报，不在本任务修。
-- 以 PR CI 结果为准。
+- 以 PR CI 结果为准：PR #161 首轮 CI 15 success / 2 skipped / 1 cancelled（scratch-touch-browser，与本课无关），已重新触发。
 
 ## 三断点截图（真实 Chrome）
 
