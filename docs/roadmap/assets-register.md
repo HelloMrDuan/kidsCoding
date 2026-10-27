@@ -20,8 +20,9 @@
 | apps/web/public/kc-scenes/counting-board.svg | 松鼠的数数牌（三颗橡果，标 1、2、3） | 本项目新绘（Hark A，G0-U1-L03），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `CountingBoard` 与本文件几何一致 | original | 1392 |
 | apps/web/public/kc-scenes/turn-sign.svg | 路口转弯牌（向左转、向右转两只弯箭头）与小石头 | 本项目新绘（Hark A，G0-U1-L04），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `TurnSign` 与本文件几何一致 | original | 1172 |
 | apps/web/public/kc-scenes/key-hook.svg | 钥匙挂钩牌（钥匙 → 箭头 → 小锁） | 本项目新绘（Hark A，G0-U1-L05），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `KeyHook` 与本文件几何一致 | original | 1225 |
+| apps/web/public/kc-scenes/guide-map.svg | 森林向导的手绘地图（虚线路线、起点、终点叉号） | 本项目新绘（Hark A，G0-U1-L06），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `GuideMap` 与本文件几何一致 | original | 1064 |
 
-机器可读登记：上表 12 个文件同时登记在
+机器可读登记：上表 13 个文件同时登记在
 `apps/web/src/content/curriculum/asset-licenses-v1.json`（SYS-105 课程 schema
 门禁会扫描 `public/` 全量文件并要求每文件都有 original/authorized 授权条目；
 只写本文档不够，门禁会报 `unlicensed_asset`）。

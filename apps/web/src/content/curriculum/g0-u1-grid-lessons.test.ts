@@ -6,7 +6,7 @@ import { g0u1GridLessons } from './g0-u1-grid-lessons'
 const toBlocks = (program: string[]) => program.map(type => ({ type }))
 const lessons = Object.values(g0u1GridLessons)
 /** Lessons that have had the Hark A formal-course pass (error lab + creative remake + review + work). */
-const FORMAL = ['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05']
+const FORMAL = ['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05', 'G0-U1-L06']
 const MOVES: Record<string, [number, number]> = { move_up: [0, -1], move_down: [0, 1], move_left: [-1, 0], move_right_cell: [1, 0] }
 
 /** Shortest dry route (BFS over the four direction blocks) — proves a goal is reachable with real blocks. */
@@ -83,10 +83,10 @@ function shortestKeyRoute(level: GridLevel): string[] | null {
 }
 
 describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
-  it('covers L01–L06; formal-course lessons (L01–L05) have five steps, the rest four; L06 is the unit project', () => {
+  it('covers L01–L06; all six lessons have the formal five steps; the L06 creative step is the unit project', () => {
     expect(lessons.map(l => l.id)).toEqual(['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05', 'G0-U1-L06'])
     const project = g0u1GridLessons['G0-U1-L06'].project!
-    expect(g0u1GridLessons['G0-U1-L06'].steps.find(s => s.id === project.stepId)?.kind).toBe('practice-a')
+    expect(g0u1GridLessons['G0-U1-L06'].steps.find(s => s.id === project.stepId)?.kind).toBe('creative')
     for (const lesson of lessons) expect(lesson.steps).toHaveLength(FORMAL.includes(lesson.id) ? 5 : 4)
   })
 
@@ -387,6 +387,49 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
       expect(lesson.project?.stepId).toBe(creative.id)
       expect(lesson.review?.answer).toContain('先捡钥匙')
       for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('keyhook')
+    })
+  })
+  describe('G0-U1-L06 unit project formal-course pass (error lab, creative unit work, review)', () => {
+    const lesson = g0u1GridLessons['G0-U1-L06']
+    const lab = lesson.steps.find(s => s.kind === 'error-lab')!
+    const creative = lesson.steps.find(s => s.kind === 'creative')!
+
+    it('keeps the five-step shape: error lab, guided, two different practices, creative unit work', () => {
+      expect(lesson.steps.map(s => s.kind)).toEqual(['error-lab', 'guided', 'practice-a', 'practice-b', 'creative'])
+    })
+
+    it('the error lab has the right blocks in the wrong order: the starter fails, and only moving one block fixes it', () => {
+      expect(runGridProgram(lab.level, lab.starterBlocks!).failure).toBe('no_key_here')
+      const types = lab.starterBlocks!.map(b => b.type).filter(t => t !== 'when_start')
+      expect([...types].sort()).toEqual([...lab.solutions[0].slice(1)].sort()) // same blocks, different order
+      const [a, b] = lab.predictChoices!
+      expect([a.when, b.when]).toContain(lab.errorLab!.expect)
+    })
+
+    it('the unit work combines rock, river, key and door: every new friend is reached only by key → open → walk, and one card never fits two friends', () => {
+      const choices = creative.creative!.goalChoices
+      expect(choices.length).toBeGreaterThanOrEqual(3)
+      expect(creative.level.rocks?.length).toBeGreaterThan(0)
+      expect(creative.level.water?.length).toBeGreaterThan(0)
+      const routes = choices.map(goal => {
+        const level = stepLevel(creative, { creative: { [creative.id]: { goal } } })
+        const route = shortestKeyRoute(level)
+        expect(route, `goal ${goal.x},${goal.y}`).not.toBeNull()
+        expect(runGridProgram(level, toBlocks(['when_start', ...route!])).passed).toBe(true)
+        expect(runGridProgram(level, toBlocks(['when_start', ...route!.filter(t => t !== 'pick_key')])).passed, 'no key').toBe(false)
+        return { level, route: route! }
+      })
+      for (const [i, a] of routes.entries()) {
+        for (const [j, b] of routes.entries()) {
+          if (i !== j) expect(runGridProgram(b.level, toBlocks(['when_start', ...a.route])).passed, `${i}→${j}`).toBe(false)
+        }
+      }
+    })
+
+    it('the unit work is the saved project, review asks a what-if, and every step shows the guide map', () => {
+      expect(lesson.project).toEqual({ stepId: creative.id, title: '我的森林寻路卡' })
+      expect(lesson.review?.answer).toContain('向下')
+      for (const step of lesson.steps) expect(step.level.scenery, step.id).toBe('guidemap')
     })
   })
 })

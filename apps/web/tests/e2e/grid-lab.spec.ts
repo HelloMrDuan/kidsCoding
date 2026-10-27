@@ -470,35 +470,85 @@ test('G0-U1-L05 formal course: locked-door error lab, two practices, a friend be
   await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
-test('G0-U1-L06 unit project: own route card is saved, reopened and replayed', async ({ page }) => {
-  test.setTimeout(120_000)
+test('G0-U1-L06 unit project formal course: wrong-order error lab, two practices, own forest card for a new friend, review, saved and reopened', async ({ page }) => {
+  test.setTimeout(200_000)
   await page.goto('/learn/grid-lab/G0-U1-L06')
-  // Warm-up 1
-  await add(page, 'when_start'); await add(page, 'move_right_cell', 2); await add(page, 'pick_key'); await add(page, 'move_up'); await add(page, 'open_door'); await add(page, 'move_right_cell', 2)
-  await runAndExpect(page, 'success'); await next(page)
-  // Warm-up 2
-  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_down'); await add(page, 'move_right_cell', 3); await add(page, 'move_up')
-  await runAndExpect(page, 'success'); await next(page)
-  // Practice A: the child's own route (forgetting the key first)
-  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_up', 3); await add(page, 'move_right_cell', 2); await add(page, 'open_door')
-  await runAndExpect(page, 'error', '捡起钥匙')
-  await page.getByTestId('lesson-clear-program').click()
-  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_up', 3); await add(page, 'pick_key'); await add(page, 'move_right_cell', 2); await add(page, 'open_door'); await add(page, 'move_right_cell', 2)
-  await runAndExpect(page, 'success'); await next(page)
-  // Practice B: fix the friend's card
-  await runAndExpect(page, 'error', '捡起钥匙')
-  await page.getByTestId('lesson-clear-program').click()
-  await add(page, 'when_start'); await add(page, 'move_up', 3); await add(page, 'move_right_cell'); await add(page, 'pick_key'); await add(page, 'move_right_cell', 2); await add(page, 'open_door'); await add(page, 'move_right_cell', 2)
-  await runAndExpect(page, 'success'); await next(page)
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  // Original story scenery: the forest guide's hand-drawn map.
+  await expect(page.locator('[data-grid-item="guidemap"]')).toBeVisible()
 
+  // Step 1 — error lab: the right blocks in the wrong order (“向上” before “捡起钥匙”).
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('猜错也没关系')
+  await expect(page.getByTestId('grid-feedback')).toContainText('顺序错一块')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'pick_key'); await add(page, 'move_up'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Guided: rock on top, river below — the middle row is the way.
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'error', '石头')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_down'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'move_up')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: the big map — forgetting the key is diagnosed, then the full route passes.
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'open_door')
+  await runAndExpect(page, 'error', '捡起钥匙')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_right_cell'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'pick_key'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice B: fix the friend's card (missing key).
+  await runAndExpect(page, 'error', '捡起钥匙')
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'move_right_cell'); await add(page, 'pick_key'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Unit work: a card for 小刺猬 at the bottom behind the door — the top-row card stops short, three more steps down pass.
+  await page.getByTestId('grid-run').click()
+  await expect(page.getByTestId('grid-feedback')).toContainText('先选一格')
+  await page.getByTestId('grid-goal-choice-3').click() // 小刺猬 · 门后最下面
+  await add(page, 'when_start'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'move_up'); await add(page, 'move_right_cell'); await add(page, 'pick_key'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell'); await add(page, 'open_door'); await add(page, 'move_right_cell'); await add(page, 'move_right_cell')
+  await runAndExpect(page, 'error', '还没到蘑菇屋')
+  await add(page, 'move_down', 3)
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  // 复盘: the mistakes this child really met.
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('这里没有钥匙')
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('撞到石头')
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('没拿钥匙就开门')
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('向下')
   const card = page.getByTestId('grid-project-card')
   await expect(card).toBeVisible()
   await expect(page.getByTestId('grid-project-status')).toContainText('真实运行能走到')
+  await expect(page.getByTestId('grid-project-steps').locator('li')).toHaveCount(14)
+
+  // Close and reopen: the unit work is still there and replays for real to 小刺猬's house.
   await page.reload()
   await expect(card).toBeVisible()
-  await expect(page.getByTestId('grid-project-steps').locator('li')).toHaveCount(11)
   await page.getByTestId('grid-project-play').click()
+  await expect(card.getByTestId('grid-stage')).toHaveAttribute('data-fox-cell', '5,3', { timeout: 30_000 })
   await expect(page.getByTestId('grid-project-play')).toHaveText('▶ 播放我的森林寻路卡', { timeout: 15_000 })
+
+  // Modify after reopening: give the card to 小熊 on the top row instead; drop the three “向下”.
+  await page.getByTestId('grid-replay-my-forest-card').click()
+  await expect(page.getByTestId('grid-goal-choice-3')).toHaveAttribute('data-chosen', 'true')
+  await page.getByTestId('grid-goal-choice-0').click()
+  await runAndExpect(page, 'error')
+  for (let i = 0; i < 3; i += 1) await page.getByTestId('lesson-remove-last').click()
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
 test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at the failing block', async ({ page }) => {
