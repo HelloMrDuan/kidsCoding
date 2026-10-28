@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U1-L06",
+  "reviewedCommit": "fad2d58cfd39321c846ef40ac2b0795e6744b59b",
+  "reviewedAt": "2026-10-28",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U1-L05"
+  ],
+  "newConcepts": [
+    "把说话、换造型、播放声音、移动、重复按时间顺序组合成一个作品；“等待 N 秒”让角色轮流说话；同一脚本里先换造型再播放声音；“将 y 坐标增加”配合重复让角色往上飘"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u1-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/205"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "conceptExplain：时间顺序、等待让角色轮流、脚本自上而下执行",
+        "找错针对“没等对方说完就开口”这一时序误解"
+      ],
+      "defects": [
+        "不能调换积木顺序，只能通过参数体会时序"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "给好朋友做会动的生日贺卡，单元收尾作品",
+        "预测“会同时出现/一个说完另一个才说”，VM 对照"
+      ],
+      "defects": [
+        "预测二选一；无朗读"
+      ]
+    },
+    "practice": {
+      "score": 20,
+      "evidence": [
+        "练习 A：蛋糕先换蜡烛点亮再唱生日歌，VM 记录开始播放时的造型",
+        "练习 B：重复×“将 y 坐标增加”让气球飘到彩带（升高 50～70 多解）"
+      ],
+      "defects": [
+        "不能新增积木或精灵"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "真实错误：VM 中气球等待 0 秒就开口，两个对话框同时出现（沙箱按 VM 说话状态计“抢话”次数）",
+        "等待 1 秒仍抢话、2 秒才轮流；1.5/6 秒编辑器判无效",
+        "三层提示：现象→原因→修复"
+      ],
+      "defects": [
+        "没有时间轴可视化"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意：自己的祝福 + 不抢话 + 气球到彩带 + 点亮蜡烛唱歌",
+        "导出真 .sb3（5 SVG + 1 WAV）独立 VM 回读，刷新后从本机恢复，重新导入恢复等待秒数"
+      ],
+      "defects": [
+        "不能新增角色或改歌曲"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U1L06 只读 VM 观察（绿旗轮次说话顺序与抢话次数、气球 y、唱歌时造型，单测覆盖）",
+        "页面明示未接渲染器与不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 执行；说话来自 VM SAY 事件与 looks 状态，声音来自 VM 对 sound_playuntildone 原语的真实调用（仅观察后调用原原语，附带当时造型），位置来自 VM 目标状态，E2E 无 VM mock"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "抢话真实错误、等待 1 秒仍抢话、1.5/6 秒与每次 40 被拒、6 类非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "等待 2～5 秒、气球升高 50～70 的多种次数×步长组合、祝福语 1～20 字均多解"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "新增 4 个 SVG（生日贺卡、蛋糕两造型、红气球）原创；生日歌为公有领域旋律前 6 个音的正弦合成 WAV，无采样；已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U1-L06：真 Scratch VM 加载原创生日贺卡项目；气球等待 2 秒后 VM 中小橘猫说完气球才开口（0 次抢话），重复 5 次×y 增加 10 后气球 y=-40 在彩带高度，蛋糕换蜡烛点亮后播放生日歌",
+    "failureCase": "等待 0 秒/1 秒 → VM 中两句话同时出现（抢话次数 >0）；1.5 秒、6 秒、每次 40 编辑器判无效；非整数等待/等待 9/换成改 x 积木/先唱歌后点蜡烛/小橘猫偷换声音/他课工程均被拒且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：两个对话框同时在舞台上",
+      "第二层（想原因）：小橘猫说 2 秒，气球只等待 0 秒",
+      "第三层（去修复）：把气球的等待改成 2 或更大的整数"
+    ],
+    "practiceA": "练习 A：点亮蜡烛再唱歌",
+    "practiceB": "练习 B：气球飘到彩带上（重复 × 将 y 坐标增加）",
+    "equivalentSolutions": [
+      "等待 2～5 秒",
+      "5×10、6×10、7×10、2×30、3×20、4×15 等",
+      "祝福语 1～20 字任意"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3，刷新后从本机草稿恢复；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U1-L06 制作生日贺卡（5 个用例）"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 WebGL 渲染器；VM 内不发声（页面播放同一 WAV）；本课无云端保存",
+    "不能调换积木顺序、新增积木或精灵"
+  ]
+}

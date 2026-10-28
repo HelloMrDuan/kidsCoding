@@ -147,5 +147,23 @@ class G2ProjectTests(unittest.TestCase):
         self.assertEqual(model["stage"]["broadcasts"], ["开场", "谢幕"])
         self.assertNotIn("broadcasts", build_models()["G2-U1-L04"]["stage"])
 
+    def test_l06_card_combines_lesson_blocks_and_the_balloon_starts_without_a_wait(self):
+        filename, project, files, _ = LESSONS["G2-U1-L06"]()
+        stage, cat, cake, balloon = project["targets"]
+        self.assertEqual([c["name"] for c in stage["costumes"]], ["生日贺卡"])
+        self.assertEqual([c["name"] for c in cake["costumes"]], ["蜡烛熄灭", "蜡烛点亮"])
+        self.assertEqual([s["name"] for s in cake["sounds"]], ["生日歌"])
+        b = balloon["blocks"]
+        self.assertEqual([b[k]["opcode"] for k in ("balloon_home", "balloon_wait", "balloon_say", "balloon_repeat", "balloon_rise")],
+                         ["motion_gotoxy", "control_wait", "looks_sayforsecs", "control_repeat", "motion_changeyby"])
+        # The bug the lesson starts with: the balloon waits 0 s and talks over the cat's 2 s greeting.
+        self.assertEqual(b["balloon_wait"]["inputs"]["DURATION"], [1, [4, "0"]])
+        self.assertEqual(cat["blocks"]["cat_say"]["inputs"]["SECS"], [1, [4, "2"]])
+        self.assertEqual(cake["blocks"]["cake_costume_menu"]["fields"]["COSTUME"][0], "蜡烛熄灭")
+        with zipfile.ZipFile(io.BytesIO(read_sample(filename))) as archive:
+            data = archive.read(cake["sounds"][0]["md5ext"])
+            self.assertTrue(data.startswith(b"RIFF") and data[8:12] == b"WAVE")
+
+
 if __name__ == "__main__":
     unittest.main()

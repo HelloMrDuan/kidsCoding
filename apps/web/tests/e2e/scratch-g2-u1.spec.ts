@@ -940,3 +940,196 @@ test.describe('G2-U1-L05 广播第一条消息', () => {
     await expect(broadcastLog(page)).toHaveAttribute('data-speakers', '小鸟')
   })
 })
+
+const L06 = 'G2-U1-L06'
+const L06_SAMPLE = 'public/scratch-samples/g2-u1-l06-birthday-card.sb3.b64'
+const speechLog = (page: import('@playwright/test').Page) => page.getByTestId('g2-speech-log')
+const bubbleOf = (page: import('@playwright/test').Page, name: string) => page.locator(`[data-testid="g2-bubble"][data-name="${name}"]`)
+/** Click the green flag and wait until the VM run has finished (balloon said its line and floated up). */
+async function flagCard(page: import('@playwright/test').Page) {
+  await page.getByTestId('g2-green-flag').click()
+  // A run lasts at least 2 s (the balloon's line), so the new run is seen in progress before it finishes.
+  await expect(speechLog(page)).toHaveAttribute('data-finished', 'false', {timeout: 5_000})
+  await expect(speechLog(page)).toHaveAttribute('data-speakers', '小橘猫,气球', {timeout: 15_000})
+  await expect(speechLog(page)).toHaveAttribute('data-finished', 'true', {timeout: 20_000})
+}
+
+test.describe('G2-U1-L06 制作生日贺卡', () => {
+  test('catalog entry opens the card lab; with “wait 0” the VM shows both lines at once (readable, not overlapping on screen); hints; wait 1 still talks over, wait 2 takes turns (debug)', async ({page}) => {
+    test.setTimeout(180_000)
+    await page.goto(`/learn/catalog/${L06}`)
+    await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+    await page.getByTestId('scratch-trial-entry').click()
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已加载项目', {timeout: 60_000})
+    await expect(page.getByRole('heading', {name: '制作生日贺卡'})).toBeVisible()
+    await expect(speechLog(page)).toContainText('还没有点绿旗')
+
+    await page.getByTestId('g2-predict-option').filter({hasText: '一个说完另一个才说'}).first().click()
+    await page.getByTestId('g2-green-flag').click()
+    // Both speech bubbles are on the stage at the same time in the VM…
+    await expect(bubbleOf(page, '小橘猫')).toHaveText('生日快乐！', {timeout: 10_000})
+    await expect(bubbleOf(page, '气球')).toHaveText('许个愿吧！', {timeout: 10_000})
+    // …and the page draws them apart, so a child can read both and see the real problem is timing.
+    const catBox = (await bubbleOf(page, '小橘猫').boundingBox())!
+    const balloonBox = (await bubbleOf(page, '气球').boundingBox())!
+    const intersects = catBox.x < balloonBox.x + balloonBox.width && balloonBox.x < catBox.x + catBox.width &&
+      catBox.y < balloonBox.y + balloonBox.height && balloonBox.y < catBox.y + catBox.height
+    expect(intersects).toBe(false)
+    await expect(speechLog(page)).toHaveAttribute('data-finished', 'true', {timeout: 20_000})
+    expect(Number(await speechLog(page).getAttribute('data-overlaps'))).toBeGreaterThan(0)
+    await expect(speechLog(page)).toContainText('抢话')
+    await expect(page.getByTestId('g2-predict-result')).toContainText('Scratch VM 实际：会同时出现')
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'false')
+
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-1')).toContainText('两个对话框同时')
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-2')).toContainText('等待 0 秒')
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-3')).toContainText('2 或更大的整数')
+
+    await selectTarget(page, '气球')
+    await expect(page.getByTestId('g2-edit-wait')).toHaveValue('0')
+    // Not a whole second, or more than 5: the restricted editor refuses it.
+    await page.getByTestId('g2-edit-wait').fill('1.5')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await page.getByTestId('g2-edit-wait').fill('6')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await page.getByTestId('g2-edit-wait').fill('1')
+    await applyAndWait(page)
+    await flagCard(page)
+    expect(Number(await speechLog(page).getAttribute('data-overlaps'))).toBeGreaterThan(0)
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'false')
+
+    await page.getByTestId('g2-edit-wait').fill('2')
+    await applyAndWait(page)
+    await flagCard(page)
+    await expect(speechLog(page)).toHaveAttribute('data-overlaps', '0')
+    await expect(speechLog(page)).toContainText('没有抢话')
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'true', {timeout: 8_000})
+  })
+
+  test('practice A: clicking the cake plays the song; the VM records the costume when the song starts; 蜡烛点亮 first passes and the green flag resets it', async ({page}) => {
+    test.setTimeout(150_000)
+    await openG2Lab(page, L06)
+    await stageSprite(page, '蛋糕').click()
+    await expect(page.getByTestId('g2-sound-log')).toContainText('蛋糕刚才播放“生日歌”（开始播放时造型：蜡烛熄灭）', {timeout: 10_000})
+    await expect(page.getByTestId('g2-task-practiceA')).toHaveAttribute('data-done', 'false')
+    await selectTarget(page, '蛋糕')
+    await expect(page.getByTestId('g2-edit-costume')).toHaveValue('蜡烛熄灭')
+    await expect(page.getByTestId('g2-edit-sound')).toHaveCount(0)
+    await page.getByTestId('g2-edit-costume').selectOption('蜡烛点亮')
+    await applyAndWait(page)
+    await stageSprite(page, '蛋糕').click()
+    await expect(page.getByTestId('g2-sound-log')).toContainText('（开始播放时造型：蜡烛点亮）', {timeout: 10_000})
+    await expect(stageSprite(page, '蛋糕')).toHaveAttribute('data-costume', '蜡烛点亮')
+    await expect(page.getByTestId('g2-task-practiceA')).toHaveAttribute('data-done', 'true')
+    await page.getByTestId('g2-green-flag').click()
+    await expect(stageSprite(page, '蛋糕')).toHaveAttribute('data-costume', '蜡烛熄灭', {timeout: 10_000})
+  })
+
+  test('practice B: repeat × change y floats the balloon; 2×10 is not enough, 40 per step is refused, 5×10 and 2×30 both reach the ribbon', async ({page}) => {
+    test.setTimeout(150_000)
+    await openG2Lab(page, L06)
+    await flagCard(page)
+    await expect(spriteState(page, '气球')).toContainText('x 160 · y -70')
+    await expect(page.getByTestId('g2-task-practiceB')).toHaveAttribute('data-done', 'false')
+    await selectTarget(page, '气球')
+    await page.getByTestId('g2-edit-dy').fill('40')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await page.getByTestId('g2-edit-dy').fill('10')
+    await page.getByTestId('g2-edit-times').fill('5')
+    await applyAndWait(page)
+    await flagCard(page)
+    await expect(spriteState(page, '气球')).toContainText('x 160 · y -40')
+    await expect(page.getByTestId('g2-task-practiceB')).toHaveAttribute('data-done', 'true')
+    await page.getByTestId('g2-edit-times').fill('2')
+    await page.getByTestId('g2-edit-dy').fill('30')
+    await applyAndWait(page)
+    await flagCard(page)
+    await expect(spriteState(page, '气球')).toContainText('x 160 · y -30')
+  })
+
+  test('creative card, real .sb3 export with 5 SVG + WAV re-verified in a fresh VM, re-import, and the saved card reopens after reload (recovery)', async ({page}) => {
+    test.setTimeout(200_000)
+    await openG2Lab(page, L06)
+    await selectTarget(page, '小橘猫')
+    await page.getByTestId('g2-edit-say').fill('祝你天天开心')
+    await applyAndWait(page)
+    await selectTarget(page, '气球')
+    await page.getByTestId('g2-edit-wait').fill('3')
+    await page.getByTestId('g2-edit-times').fill('6')
+    await page.getByTestId('g2-edit-dy').fill('10')
+    await applyAndWait(page)
+    await selectTarget(page, '蛋糕')
+    await page.getByTestId('g2-edit-costume').selectOption('蜡烛点亮')
+    await applyAndWait(page)
+    await expect(page.getByTestId('g2-local-save-status')).toContainText('已在本机自动保存', {timeout: 30_000})
+    // Recovery: closing and reopening the page brings back the saved card from this device.
+    await page.reload()
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已从本机草稿恢复', {timeout: 60_000})
+    await selectTarget(page, '小橘猫')
+    await expect(page.getByTestId('g2-edit-say')).toHaveValue('祝你天天开心')
+    await flagCard(page)
+    await expect(speechLog(page)).toHaveAttribute('data-overlaps', '0')
+    await expect(spriteState(page, '气球')).toContainText('y -30')
+    await stageSprite(page, '蛋糕').click()
+    await expect(page.getByTestId('g2-sound-log')).toContainText('蜡烛点亮', {timeout: 10_000})
+    await expect(page.getByTestId('g2-task-create')).toHaveAttribute('data-done', 'true')
+
+    const downloading = page.waitForEvent('download', {timeout: 60_000})
+    await page.getByTestId('g2-export-sb3').click()
+    const downloaded = await downloading
+    expect(downloaded.suggestedFilename()).toBe('KidsCoding-制作生日贺卡.sb3')
+    const file = await readFile((await downloaded.path())!)
+    const entries = unzip(file)
+    expect(entries.filter(entry => /^[0-9a-f]{32}\.svg$/.test(entry.name))).toHaveLength(5)
+    expect(entries.filter(entry => /^[0-9a-f]{32}\.wav$/.test(entry.name))).toHaveLength(1)
+    const project = JSON.parse(entries.find(entry => entry.name === 'project.json')!.data.toString('utf8'))
+    const balloon = project.targets.find((t: {name: string}) => t.name === '气球')
+    expect(balloon.blocks.balloon_wait.inputs.DURATION[1][1]).toBe('3')
+    expect(balloon.blocks.balloon_rise.opcode).toBe('motion_changeyby')
+    await expect(page.getByTestId('g2-export-status')).toContainText('独立 VM 中重新载入验证')
+    await expect(page.getByTestId('g2-export-status')).toContainText('气球 DURATION=3')
+    await expect(page.getByTestId('g2-export-status')).toContainText('蛋糕 COSTUME=蜡烛点亮')
+
+    await selectTarget(page, '气球')
+    await page.getByTestId('g2-edit-wait').fill('0')
+    await applyAndWait(page)
+    await page.getByTestId('g2-import-sb3').setInputFiles({name: 'my-card.sb3', mimeType: 'application/octet-stream', buffer: file})
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已重新导入作品', {timeout: 50_000})
+    await selectTarget(page, '气球')
+    await expect(page.getByTestId('g2-edit-wait')).toHaveValue('3')
+    await flagCard(page)
+    await expect(speechLog(page)).toHaveAttribute('data-overlaps', '0')
+  })
+
+  test('sandbox rejects card projects outside the lesson model and keeps the working project', async ({page}) => {
+    test.setTimeout(180_000)
+    const sample = Buffer.from(await readFile(L06_SAMPLE, 'utf8'), 'base64')
+    await openG2Lab(page, L06)
+    await selectTarget(page, '气球')
+    await page.getByTestId('g2-edit-wait').fill('2')
+    await applyAndWait(page)
+    const reject = async (name: string, buffer: Buffer, reason: string | RegExp) => {
+      await page.getByTestId('g2-import-sb3').setInputFiles({name, mimeType: 'application/octet-stream', buffer})
+      await expect(page.getByTestId('g2-vm-status')).toContainText(reason, {timeout: 50_000})
+      await selectTarget(page, '气球')
+      await expect(page.getByTestId('g2-edit-wait')).toHaveValue('2')
+      await expect(page.getByTestId('g2-green-flag')).toBeEnabled()
+    }
+    await reject('wait-1.5.sb3', mutateSb3(sample, p => { p.targets[3].blocks.balloon_wait.inputs = {DURATION: [1, [4, '1.5']]} }), '数字超出允许范围')
+    await reject('wait-9.sb3', mutateSb3(sample, p => { p.targets[3].blocks.balloon_wait.inputs = {DURATION: [1, [4, '9']]} }), '数字超出允许范围')
+    await reject('change-x.sb3', mutateSb3(sample, p => { p.targets[3].blocks.balloon_rise.opcode = 'motion_changexby' }), '不允许的积木类型')
+    await reject('song-before-candles.sb3', mutateSb3(sample, p => {
+      const b = p.targets[2].blocks as Record<string, {next: string | null; parent: string | null}>
+      b.cake_click.next = 'cake_play'; b.cake_play.parent = 'cake_click'; b.cake_play.next = 'cake_switch'
+      b.cake_switch.parent = 'cake_play'; b.cake_switch.next = null
+    }), '积木连接不符合课程模型')
+    await reject('cat-swaps-song.sb3', mutateSb3(sample, p => { p.targets[1].sounds = p.targets[2].sounds }), /声音|不符合课程模型/)
+    await reject('l05-file.sb3', Buffer.from(await readFile(L05_SAMPLE, 'utf8'), 'base64'), /导入 Scratch 项目失败/)
+
+    await flagCard(page)
+    await expect(speechLog(page)).toHaveAttribute('data-overlaps', '0')
+  })
+})

@@ -97,6 +97,14 @@ function installG2Blocks() {
     {type: 'kc2_turn_right', message0: '右转 ↻ %1 度', args0: [
       {type: 'field_number', name: 'DEGREES', value: 15, precision: 1},
     ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“右转……度”运动积木'},
+    // Whole-second wait (0 allowed) for lessons about taking turns. No min/max/precision: a
+    // fraction or an out-of-range value stays visible so the adapter refuses it instead of rounding.
+    {type: 'kc2_wait_whole', message0: '等待 %1 秒', args0: [
+      {type: 'field_number', name: 'DURATION', value: 0},
+    ], previousStatement: null, nextStatement: null, colour: 35, tooltip: '对应 Scratch 的“等待……秒”控制积木（本课用整数秒）'},
+    {type: 'kc2_change_y', message0: '将 y 坐标增加 %1', args0: [
+      {type: 'field_number', name: 'DY', value: 10, precision: 1},
+    ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“将 y 坐标增加……”运动积木（正数往上）'},
     {type: 'kc2_say', message0: '说 %1 2 秒', args0: [
       {type: 'field_input', name: 'MESSAGE', text: '你好！'},
     ], previousStatement: null, nextStatement: null, colour: 265, tooltip: '对应 Scratch 的“说……2 秒”外观积木'},
@@ -135,10 +143,10 @@ function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G
   }
 }
 
-const FIELD_TYPES: Record<string, string> = {
-  X: 'kc2_goto', Y: 'kc2_goto', MESSAGE: 'kc2_say', COSTUME: 'kc2_switch_costume', TIMES: 'kc2_repeat', DURATION: 'kc2_wait',
-  BACKDROP: 'kc2_switch_backdrop', SOUND_MENU: 'kc2_play_sound',
-  DIRECTION: 'kc2_point_direction', STEPS: 'kc2_move_steps', DEGREES: 'kc2_turn_right', BROADCAST_OPTION: 'kc2_when_receive',
+const FIELD_TYPES: Record<string, string[]> = {
+  X: ['kc2_goto'], Y: ['kc2_goto'], MESSAGE: ['kc2_say'], COSTUME: ['kc2_switch_costume'], TIMES: ['kc2_repeat'], DURATION: ['kc2_wait', 'kc2_wait_whole'],
+  BACKDROP: ['kc2_switch_backdrop'], SOUND_MENU: ['kc2_play_sound'],
+  DIRECTION: ['kc2_point_direction'], STEPS: ['kc2_move_steps'], DEGREES: ['kc2_turn_right'], BROADCAST_OPTION: ['kc2_when_receive'], DY: ['kc2_change_y'],
 }
 function findSlot(specs: G2BlockSpec[], field: G2Slot['field']): G2Slot | undefined {
   for (const spec of specs) {
@@ -195,8 +203,8 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
       setProgram(next)
       const snapshot: Record<string, string> = {}
       for (const block of ws.getAllBlocks(false)) {
-        for (const [field, type] of Object.entries(FIELD_TYPES)) {
-          if (block.type === type && snapshot[field] === undefined && fieldEnabled(block, field)) snapshot[field] = String(block.getFieldValue(field))
+        for (const [field, types] of Object.entries(FIELD_TYPES)) {
+          if (types.includes(block.type) && snapshot[field] === undefined && fieldEnabled(block, field)) snapshot[field] = String(block.getFieldValue(field))
         }
       }
       setFields(snapshot)
@@ -220,7 +228,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   function update(field: G2Slot['field'], value: string) {
     const ws = workspace.current
     if (!ws) return
-    const block = ws.getAllBlocks(false).find(b => b.type === FIELD_TYPES[field] && fieldEnabled(b, field))
+    const block = ws.getAllBlocks(false).find(b => FIELD_TYPES[field]?.includes(b.type) && fieldEnabled(b, field))
     if (!block) return
     block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' || field === 'BACKDROP' || field === 'SOUND_MENU' || field === 'DIRECTION' || field === 'BROADCAST_OPTION' ? value : String(Number(value)), field)
   }
@@ -243,6 +251,9 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   const timesSlot = findSlot(allSpecs, 'TIMES')
   const stepsSlot = findSlot(allSpecs, 'STEPS')
   const degreesSlot = findSlot(allSpecs, 'DEGREES')
+  const waitSlot = findSlot(allSpecs, 'DURATION')
+  const waitWhole = !!waitSlot && !waitSlot.tenths
+  const dySlot = findSlot(allSpecs, 'DY')
   const hasGoto = fields.X !== undefined
   const hasSay = fields.MESSAGE !== undefined
   const extraLabel = extra === 'kc2_switch_costume' ? `换成（${costumeOptions[costumeOptions.length - 1]}）造型` : '移到 x y'
@@ -326,9 +337,15 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
         </label>
       )}
       {fields.DURATION !== undefined && (
-        <label className="text-sm font-bold text-slate-700">等待秒数（0.2～1.0）
-          <input data-testid="g2-edit-wait" type="number" min={0.2} max={1} step={0.1} value={fields.DURATION}
+        <label className="text-sm font-bold text-slate-700">{waitWhole ? `等待秒数（${waitSlot?.min ?? 0}～${waitSlot?.max ?? 5} 的整数）` : '等待秒数（0.2～1.0）'}
+          <input data-testid="g2-edit-wait" type="number" min={waitWhole ? undefined : 0.2} max={waitWhole ? undefined : 1} step={waitWhole ? 1 : 0.1} value={fields.DURATION}
             onChange={e => update('DURATION', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
+        </label>
+      )}
+      {fields.DY !== undefined && (
+        <label className="text-sm font-bold text-slate-700">每次 y 增加（{dySlot?.min ?? 1}～{dySlot?.max ?? 30}）
+          <input data-testid="g2-edit-dy" type="number" step={1} value={fields.DY}
+            onChange={e => update('DY', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
       )}
       {hasSay && (

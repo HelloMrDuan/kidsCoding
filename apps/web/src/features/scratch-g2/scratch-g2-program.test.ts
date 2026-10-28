@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05} from '@/content/curriculum/g2-u1-scratch-lessons'
+import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05, g2u1L06} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {changedValues, checkSlotValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
 function block(type: string, fields: Record<string, string> = {}, next: BlockLike | null = null, inner: BlockLike | null = null): BlockLike {
@@ -168,5 +168,31 @@ describe('G2 restricted Blockly adapter (G2-U1-L05 broadcasts)', () => {
     expect(readG2Program(ws(flag, recv('0')), rabbit5)).toEqual({kind: 'sprite', values: {'小白兔|rabbit_goto|X': 0}})
     expect(readG2Program(ws(flag, recv('300')), rabbit5)).toBeNull()
     expect(readG2Program(ws(recv('0')), rabbit5)).toBeNull()
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U1-L06 birthday card)', () => {
+  const balloon6 = g2u1L06.targets.find(t => t.name === '气球')!
+  const cake6 = g2u1L06.targets.find(t => t.name === '蛋糕')!
+  const balloonFlag = (wait: string, times = '2', dy = '10') => block('kc2_flag', {}, block('kc2_goto_start', {X: '160', Y: '-90'},
+    block('kc2_wait_whole', {DURATION: wait}, block('kc2_say', {MESSAGE: '许个愿吧！'}, block('kc2_repeat', {TIMES: times}, null, block('kc2_change_y', {DY: dy}))))))
+
+  it('reads a whole-second wait (0 allowed, no tenths, at most 5) and the repeat × change-y rise', () => {
+    expect(readG2Program(ws(balloonFlag('2', '5', '10')), balloon6)).toEqual({kind: 'sprite', values: {
+      '气球|balloon_wait|DURATION': 2, '气球|balloon_say|MESSAGE': '许个愿吧！', '气球|balloon_repeat|TIMES': 5, '气球|balloon_rise|DY': 10,
+    }})
+    expect(readG2Program(ws(balloonFlag('0')), balloon6)).not.toBeNull()
+    expect(readG2Program(ws(balloonFlag('1.5')), balloon6)).toBeNull()
+    expect(readG2Program(ws(balloonFlag('6')), balloon6)).toBeNull()
+    expect(readG2Program(ws(balloonFlag('2', '2', '40')), balloon6)).toBeNull()
+    expect(readG2Program(ws(balloonFlag('2', '11')), balloon6)).toBeNull()
+  })
+
+  it('keeps the cake order: switch costume, then play the song; the order cannot be swapped', () => {
+    const flag = block('kc2_flag', {}, block('kc2_switch_costume', {COSTUME: '蜡烛熄灭'}))
+    const click = (costume: string) => block('kc2_clicked', {}, block('kc2_switch_costume', {COSTUME: costume}, block('kc2_play_sound', {SOUND_MENU: '生日歌'})))
+    expect(readG2Program(ws(flag, click('蜡烛点亮')), cake6)).toEqual({kind: 'sprite', values: {'蛋糕|cake_costume_menu|COSTUME': '蜡烛点亮'}})
+    const swapped = block('kc2_clicked', {}, block('kc2_play_sound', {SOUND_MENU: '生日歌'}, block('kc2_switch_costume', {COSTUME: '蜡烛点亮'})))
+    expect(readG2Program(ws(flag, swapped), cake6)).toBeNull()
   })
 })
