@@ -53,7 +53,8 @@ export type EventLesson = {
   reflectionCheck: { question: string; options: Array<{ text: string; correct: boolean }>; why: string }
   parentQuestion: string
   review: { whatIf: string; answer: string }
-  project: { stepId: string; title: string }
+  /** `passedText`: the work's status line once it really passes; `{target}` is the picked character's name. */
+  project: { stepId: string; title: string; passedText: string }
 }
 
 const fox = (over: Partial<EventActor> = {}): EventActor => ({ id: 'fox', name: '小狐狸', can: ['wake_up', 'say_hello', 'send_bell'], x: 32, y: 64, asleep: true, ...over })
@@ -235,10 +236,206 @@ const L01: EventLesson = {
     why: '“被点击时”等手指点到这个角色才运行；“开始时”一按开始旗就运行；没有事件，积木永远不运行。',
   },
   parentQuestion: '请孩子播放自己的“叫醒卡”：先按开始旗，看朋友们是不是都还在睡；再点自己选的朋友，看它醒来，说说用了哪个事件。',
-  project: { stepId: 'my-wake-card', title: '我的叫醒卡' },
+  project: { stepId: 'my-wake-card', title: '我的叫醒卡', passedText: '真实运行：点{target}才会醒' },
 }
 
-export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01 }
+
+// G0-U2-L02: the forest opening — the host speaks first, then the flag goes up.
+const host = (over: Partial<EventActor> = {}): EventActor => ({ id: 'fox', name: '小狐狸', can: ['say_hello', 'raise_flag'], x: 34, y: 58, line: '早上好，开幕啦！', ...over })
+const helper = (over: Partial<EventActor> = {}): EventActor => ({ id: 'rabbit', name: '小兔子', can: ['say_hello', 'raise_flag', 'show_surprise'], x: 66, y: 60, line: '早上好！', ...over })
+const guest = (over: Partial<EventActor> = {}): EventActor => ({ id: 'bird', name: '小鸟', can: ['say_hello', 'enter_stage'], x: 50, y: 30, offstage: true, line: '早上好，我来啦！', ...over })
+const OPENING: EventLevel = { actors: [host(), helper()], scenery: 'stage-flags' }
+const OPENING_GUEST: EventLevel = { actors: [host(), helper(), guest()], scenery: 'stage-flags' }
+// Practice B: the rabbit stands first on the stage, so its own start script runs before the host.
+const OPENING_RABBIT_FIRST: EventLevel = { actors: [helper(), host()], scenery: 'stage-flags' }
+const OPENING_ANY_HOST: EventLevel = {
+  // Three hosts in one row, so whoever speaks, the bubble never covers a friend.
+  actors: [
+    host({ x: 25 }),
+    helper({ x: 50, y: 58, line: '早上好，开幕啦！' }),
+    guest({ offstage: false, can: ['say_hello', 'raise_flag'], x: 76, y: 58, line: '早上好，开幕啦！' }),
+  ],
+  scenery: 'stage-flags',
+}
+const FLAG_BLOCKS = ['when_start', 'when_clicked', 'say_hello', 'raise_flag']
+const opening: EventGoal = { expectations: [{ interaction: { kind: 'start' }, effects: [['fox', 'say_hello'], ['fox', 'raise_flag']] }] }
+
+const L02: EventLesson = {
+  id: 'G0-U2-L02',
+  title: '开始旗帜响起',
+  story: '森林开幕式要开始了。主持人小狐狸先说“早上好，开幕啦！”，彩旗才升起来。按下开始旗，演出就照着积木从上往下进行。',
+  concept: '开始事件与表演顺序',
+  objectives: [
+    '把一场演出接在“开始时”下面：按开始旗，演出才开始',
+    '按先后排好表演：先说开幕词，再升彩旗',
+    '能找出“两个开始事件互相抢”的错误，只留一个真正的开场',
+  ],
+  diagnoses: {
+    wrong_order: '彩旗先升起来了：演出最先应该是主持人说开幕词。把“说早上好”放到“升起彩旗”上面。',
+    hat_not_on_top: '事件积木要放在最上面，演出才会在按开始旗时开始。',
+    no_hat: '这段演出没有接在事件下面，按开始旗也不会开始。先在最上面放“开始时”。',
+    disconnected: '有一块积木掉队了，没接在“开始时”下面，它不会运行。',
+    nothing_happened: '按了开始旗，舞台上什么都没发生：演出要接在“开始时”下面，还要拼在主持人名下。',
+    missing_effect: '演出还少一段：先说开幕词，再升彩旗，两块都要有。',
+    extra_effect: '多了不该有的表演：两个角色都接了“开始时”，会互相抢着演。只留主持人的开场。',
+    too_early: '还没到时候就先动了：小鸟要等被点到才入场，不能一按开始旗就进来。',
+    wrong_trigger: '点角色也触发了表演：开场只听开始旗，点角色时舞台不该变。',
+    wrong_actor: '做动作的不是主持人：看看积木拼在了谁的名下。',
+    cannot_do: '这个角色做不了这块积木的动作。',
+  },
+  steps: [
+    {
+      id: 'flag-before-hello',
+      kind: 'error-lab',
+      title: '错误实验：彩旗先升起来了',
+      instruction: '小兔子替主持人拼好了开场，可是“升起彩旗”放在了“说早上好”上面。这是一个故意的错误：先按原样运行检查，看看彩旗和开幕词谁先出现，再把顺序改对。',
+      predict: '先猜一猜：按下开始旗，彩旗和开幕词谁先出现？',
+      predictChoices: [
+        { text: '主持人先说开幕词，彩旗再升起', when: 'pass' },
+        { text: '彩旗先升起，主持人才说话', when: 'wrong_order' },
+      ],
+      errorLab: {
+        expect: 'wrong_order',
+        expected: '开幕式应该是：主持人先说“早上好，开幕啦！”，彩旗再升起来。',
+        actual: '彩旗先升起来了：积木从上往下运行，“升起彩旗”排在上面，就先做了。',
+      },
+      level: OPENING,
+      editable: ['fox'],
+      allowedBlocks: FLAG_BLOCKS,
+      starter: { fox: [{ type: 'when_start' }, { type: 'raise_flag' }, { type: 'say_hello' }] },
+      goal: opening,
+      hints: [
+        '看舞台：彩旗先升起，主持人后说话，和开幕式的顺序反了。',
+        '积木从上往下一块一块做，先发生的放上面。',
+        '清空后重拼：“开始时” → 说早上好 → 升起彩旗。',
+      ],
+      solutions: [{ fox: ['when_start', 'say_hello', 'raise_flag'] }],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'raise_flag', 'say_hello'] }, failure: 'wrong_order' },
+        { scripts: { fox: ['say_hello', 'raise_flag'] }, failure: 'no_hat' },
+      ],
+    },
+    {
+      id: 'host-then-flag',
+      kind: 'guided',
+      title: '按开始旗，开幕式开始',
+      instruction: '自己拼一遍开场：按下开始旗，主持人先说开幕词，再升彩旗。还没按开始旗、或者只是点一下主持人，彩旗都不能动。',
+      predict: '先猜一猜：用“被点击时”行不行？',
+      level: OPENING,
+      editable: ['fox'],
+      allowedBlocks: FLAG_BLOCKS,
+      goal: { ...opening, probes: [{ kind: 'click', actor: 'fox' }, { kind: 'click', actor: 'rabbit' }] },
+      hints: [
+        '按开始旗舞台没动，或者点主持人也能升旗：事件选错了。',
+        '开场听的是开始旗，所以要用“开始时”。',
+        '主持人名下：“开始时” → 说早上好 → 升起彩旗。',
+      ],
+      solutions: [{ fox: ['when_start', 'say_hello', 'raise_flag'] }],
+      counterExamples: [
+        { scripts: { fox: ['when_clicked', 'say_hello', 'raise_flag'] }, failure: 'nothing_happened' },
+        { scripts: { fox: ['when_start', 'say_hello'] }, failure: 'missing_effect' },
+        { scripts: { fox: ['when_start', 'say_hello', 'raise_flag'], rabbit: ['when_clicked', 'raise_flag'] }, failure: 'wrong_trigger' },
+      ],
+    },
+    {
+      id: 'invite-bird',
+      kind: 'practice-a',
+      title: '练习 A：开幕后请小鸟入场',
+      instruction: '开幕式照常：按开始旗，主持人说开幕词、升彩旗。小鸟是特别嘉宾，要等你点它，它才走上舞台说“我来啦！”。',
+      predict: '先猜一猜：小鸟的积木要用哪个事件？',
+      level: OPENING_GUEST,
+      editable: ['fox', 'bird'],
+      allowedBlocks: ['when_start', 'when_clicked', 'say_hello', 'raise_flag', 'enter_stage'],
+      goal: {
+        expectations: [
+          { interaction: { kind: 'start' }, effects: [['fox', 'say_hello'], ['fox', 'raise_flag']] },
+          { interaction: { kind: 'click', actor: 'bird' }, effects: [['bird', 'enter_stage'], ['bird', 'say_hello']] },
+        ],
+        probes: [{ kind: 'click', actor: 'fox' }],
+      },
+      hints: [
+        '小鸟一按开始旗就上台了，或者点它没反应：小鸟的事件选错了。',
+        '主持人听开始旗，小鸟听手指：两个角色各有自己的事件。',
+        '主持人：“开始时” → 说早上好 → 升起彩旗；小鸟：“被点击时” → 走上舞台 → 说早上好。',
+      ],
+      solutions: [{ fox: ['when_start', 'say_hello', 'raise_flag'], bird: ['when_clicked', 'enter_stage', 'say_hello'] }],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'say_hello', 'raise_flag'], bird: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'too_early' },
+        { scripts: { fox: ['when_start', 'say_hello', 'raise_flag'], bird: ['when_clicked', 'say_hello', 'enter_stage'] }, failure: 'wrong_order' },
+        { scripts: { fox: ['when_start', 'say_hello', 'raise_flag'] }, failure: 'nothing_happened' },
+      ],
+    },
+    {
+      id: 'two-start-hats',
+      kind: 'practice-b',
+      title: '练习 B：两个开场在抢',
+      instruction: '主持人的开场拼对了，可是小兔子名下也接了一个“开始时”，一按开始旗它就抢先升旗。先运行检查，看看是谁抢了，再改好：只留主持人的开场。',
+      predict: '先猜一猜：问题在主持人的积木，还是小兔子的积木？',
+      level: OPENING_RABBIT_FIRST,
+      editable: ['fox', 'rabbit'],
+      allowedBlocks: FLAG_BLOCKS,
+      starter: {
+        fox: [{ type: 'when_start' }, { type: 'say_hello' }, { type: 'raise_flag' }],
+        rabbit: [{ type: 'when_start' }, { type: 'raise_flag' }],
+      },
+      goal: opening,
+      hints: [
+        '按开始旗时，小兔子先把彩旗升起来了：有两个“开始时”在同时演。',
+        '一按开始旗，所有接了“开始时”的角色都会动。开场只要一个。',
+        '切到小兔子，点“清空积木重拼”，让它的积木区空着；主持人的不用改。',
+      ],
+      solutions: [{ fox: ['when_start', 'say_hello', 'raise_flag'] }],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'say_hello', 'raise_flag'], rabbit: ['when_start', 'raise_flag'] }, failure: 'extra_effect' },
+        { scripts: { rabbit: ['when_start', 'raise_flag'] }, failure: 'wrong_actor' },
+      ],
+    },
+    {
+      id: 'my-opening',
+      kind: 'creative',
+      title: '创意改造：谁来主持开幕式？',
+      instruction: '这次由你来决定：先选一位主持人，再给它拼开场——按下开始旗，它先说开幕词，再升彩旗；别的朋友不动，点谁都不会重来一遍。通过后，它就是你的“开幕式节目单”作品。',
+      predict: '先猜一猜：开场积木要拼在谁的名下？',
+      creative: { prompt: '你想请谁来主持开幕式？', choices: ['fox', 'rabbit', 'bird'], labels: ['小狐狸', '小兔子', '小鸟'] },
+      level: OPENING_ANY_HOST,
+      editable: ['fox', 'rabbit', 'bird'],
+      allowedBlocks: FLAG_BLOCKS,
+      goal: {
+        expectations: [{ interaction: { kind: 'start' }, effects: [['$target', 'say_hello'], ['$target', 'raise_flag']] }],
+        probes: [{ kind: 'click', actor: 'fox' }, { kind: 'click', actor: 'rabbit' }, { kind: 'click', actor: 'bird' }],
+      },
+      hints: [
+        '按开始旗没动静，或者升旗的不是你选的主持人：积木拼错了角色。',
+        '先在上面切到你选的主持人，在它名下拼；别的朋友名下空着。',
+        '例如选小鸟：切到“小鸟”，拼“开始时” → 说早上好 → 升起彩旗。',
+      ],
+      solutions: [{ fox: ['when_start', 'say_hello', 'raise_flag'] }],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'raise_flag', 'say_hello'] }, failure: 'wrong_order' },
+        { scripts: { rabbit: ['when_start', 'say_hello', 'raise_flag'] }, failure: 'wrong_actor' },
+        { scripts: { fox: ['when_clicked', 'say_hello', 'raise_flag'] }, failure: 'nothing_happened' },
+      ],
+    },
+  ],
+  review: {
+    whatIf: '如果在另一位朋友名下也接一个“开始时 → 升起彩旗”，开幕式会怎样？',
+    answer: '一按开始旗，两个开场同时演，彩旗可能在开幕词之前就升起来。开场只留一个“开始时”。',
+  },
+  reflection: '说一说：开幕式为什么要先说开幕词、再升彩旗？按下开始旗时，哪些角色会动？',
+  reflectionCheck: {
+    question: '按下开始旗时，哪些积木会运行？',
+    options: [
+      { text: '所有接在“开始时”下面的积木', correct: true },
+      { text: '只有主持人的积木', correct: false },
+      { text: '所有积木，不管接在哪个事件下面', correct: false },
+    ],
+    why: '开始旗一按，每个角色名下接了“开始时”的积木都会运行；接在“被点击时”下面的要等被点到。',
+  },
+  parentQuestion: '请孩子播放自己的“开幕式节目单”：按开始旗，看主持人是不是先说开幕词、彩旗再升起；再请孩子说说，如果彩旗先升起来，要挪哪一块积木。',
+  project: { stepId: 'my-opening', title: '我的开幕式节目单', passedText: '真实运行：{target}主持，先说开幕词再升彩旗' },
+}
+
+export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02 }
 
 export function getEventLesson(id: string): EventLesson | undefined {
   return g0u2EventLessons[id]

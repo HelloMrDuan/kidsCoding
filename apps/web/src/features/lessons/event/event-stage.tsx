@@ -25,6 +25,33 @@ export function MorningGlade() {
   )
 }
 
+/** G0-U2-L02 story scenery: the forest opening stage with bunting and a flagpole; the flag is down until someone raises it. */
+export function StageFlags({ flagUp }: { flagUp: boolean }) {
+  return (
+    <g data-grid-item="stage-flags" data-flag-up={flagUp ? 'true' : 'false'}>
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#e7f0ff" />
+      <path d="M0 44 Q30 38 60 42 T100 41 V60 H0 Z" fill="#9fdc7c" />
+      <rect x="18" y="46" width="64" height="8" rx="2" fill="#c9905a" stroke="#8a5a2e" strokeWidth=".6" />
+      <rect x="18" y="46" width="64" height="2" rx="1" fill="#e2b27c" />
+      <path d="M4 8 Q50 20 96 8" fill="none" stroke="#8a5a2e" strokeWidth=".6" />
+      <g strokeWidth=".3" stroke="#ffffff">
+        <path d="M12 10.2l2.2 4.6 2.2-3.9z" fill="#ff8a3d" />
+        <path d="M24 13.4l2.2 4.6 2.2-3.6z" fill="#4fae55" />
+        <path d="M36 15.4l2.2 4.6 2.2-4.4z" fill="#3b82f6" />
+        <path d="M48 15.9l2.2 4.6 2.2-4.6z" fill="#ffd23f" />
+        <path d="M60 15.2l2.2 4.6 2.2-4.3z" fill="#ff8a3d" />
+        <path d="M72 13.2l2.2 4.6 2.2-3.5z" fill="#4fae55" />
+        <path d="M84 10l2.2 4.6 2.2-3.8z" fill="#3b82f6" />
+      </g>
+      <rect x="89.4" y="18" width="1.4" height="30" rx=".6" fill="#6b7280" />
+      <circle cx="90.1" cy="17.6" r="1.2" fill="#ffd23f" />
+      <g style={{ transform: `translateY(${flagUp ? 0 : 20}px)`, transition: 'transform .45s ease-out' }} data-event-mark="flag">
+        <path d="M90.8 19 h8 l-2.2 3 2.2 3 h-8z" fill="#ef4444" stroke="#b91c1c" strokeWidth=".4" />
+      </g>
+    </g>
+  )
+}
+
 export type EventStageProps = {
   level: EventLevel
   effects: EventEffect[]
@@ -37,9 +64,9 @@ export type EventStageProps = {
 export function EventStage({ level, effects, onActorClick, label }: EventStageProps) {
   const state = stageStateAfter(level, effects)
   return (
-    <div className="relative w-full" data-testid="event-stage" aria-label={label ?? '林间空地舞台'}>
-      <svg viewBox="0 0 100 60" className="block w-full rounded-[14px]" role="img" aria-label={label ?? '林间空地舞台'}>
-        <MorningGlade />
+    <div className="relative w-full" data-testid="event-stage" aria-label={label ?? (level.scenery === 'stage-flags' ? '森林开幕舞台' : '林间空地舞台')}>
+      <svg viewBox="0 0 100 60" className="block w-full rounded-[14px]" role="img" aria-label={label ?? (level.scenery === 'stage-flags' ? '森林开幕舞台' : '林间空地舞台')}>
+        {level.scenery === 'stage-flags' ? <StageFlags flagUp={Object.values(state).some(x => x.flagUp)} /> : <MorningGlade />}
       </svg>
       {level.actors.map(actor => {
         const s = state[actor.id]
@@ -54,7 +81,7 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             data-awake={s.awake ? 'true' : 'false'}
             data-said={s.said ? 'true' : 'false'}
             data-surprised={s.surprised ? 'true' : 'false'}
-            aria-label={`${name}：${s.awake ? '醒着' : '睡着'}${s.said ? '，说了早上好' : ''}${onActorClick ? '。点一下它' : ''}`}
+            aria-label={`${name}：${s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${onActorClick ? '。点一下它' : ''}`}
             onClick={() => onActorClick?.(actor.id)}
           >
             <svg viewBox="0 0 100 110" className="block w-full" aria-hidden="true">
@@ -73,7 +100,7 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
               ) : null}
             </svg>
             {s.said ? (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-emerald-400 bg-white px-2 py-0.5 text-xs font-black text-emerald-700 shadow" data-event-mark="hello">早上好！</span>
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-emerald-400 bg-white px-2 py-0.5 text-xs font-black text-emerald-700 shadow" data-event-mark="hello">{actor.line ?? '早上好！'}</span>
             ) : null}
             <span className="mt-0.5 block text-center text-[11px] font-black text-slate-700">{name}</span>
           </button>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" role="img" aria-label="森林开幕舞台：木头舞台、彩旗串和旗杆">
+<g>
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#e7f0ff" />
+      <path d="M0 44 Q30 38 60 42 T100 41 V60 H0 Z" fill="#9fdc7c" />
+      <rect x="18" y="46" width="64" height="8" rx="2" fill="#c9905a" stroke="#8a5a2e" stroke-width=".6" />
+      <rect x="18" y="46" width="64" height="2" rx="1" fill="#e2b27c" />
+      <path d="M4 8 Q50 20 96 8" fill="none" stroke="#8a5a2e" stroke-width=".6" />
+      <g stroke-width=".3" stroke="#ffffff">
+        <path d="M12 10.2l2.2 4.6 2.2-3.9z" fill="#ff8a3d" />
+        <path d="M24 13.4l2.2 4.6 2.2-3.6z" fill="#4fae55" />
+        <path d="M36 15.4l2.2 4.6 2.2-4.4z" fill="#3b82f6" />
+        <path d="M48 15.9l2.2 4.6 2.2-4.6z" fill="#ffd23f" />
+        <path d="M60 15.2l2.2 4.6 2.2-4.3z" fill="#ff8a3d" />
+        <path d="M72 13.2l2.2 4.6 2.2-3.5z" fill="#4fae55" />
+        <path d="M84 10l2.2 4.6 2.2-3.8z" fill="#3b82f6" />
+      </g>
+      <rect x="89.4" y="18" width="1.4" height="30" rx=".6" fill="#6b7280" />
+      <circle cx="90.1" cy="17.6" r="1.2" fill="#ffd23f" />
+      <path d="M90.8 19 h8 l-2.2 3 2.2 3 h-8z" fill="#ef4444" stroke="#b91c1c" stroke-width=".4" />
+    </g>
+</svg>

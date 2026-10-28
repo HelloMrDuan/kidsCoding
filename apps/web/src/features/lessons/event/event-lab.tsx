@@ -350,7 +350,7 @@ function EventProjectCard({ lesson, draft }: { lesson: EventLesson; draft: Event
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-lg font-black">🌞 {project.title}</h3>
         <span className={`kc-chip ${verdict.passed ? 'kc-chip-success' : 'kc-chip-warning'}`} data-testid="grid-project-status">
-          {verdict.passed ? `真实运行：点${actorName(step, target)}才会醒` : '这张卡还不符合目标，回去改一改'}
+          {verdict.passed ? project.passedText.replace('{target}', actorName(step, target ?? step.creative?.choices[0])) : '这张卡还不符合目标，回去改一改'}
         </span>
       </div>
       <ul className="mt-3 space-y-2" data-testid="grid-project-steps">
