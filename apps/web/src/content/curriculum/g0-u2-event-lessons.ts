@@ -435,7 +435,195 @@ const L02: EventLesson = {
   project: { stepId: 'my-opening', title: '我的开幕式节目单', passedText: '真实运行：{target}主持，先说开幕词再升彩旗' },
 }
 
-export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02 }
+// G0-U2-L03: the squirrel rings the forest bell; whoever listens for the bell responds.
+const ringer = (over: Partial<EventActor> = {}): EventActor => ({ id: 'squirrel', name: '松鼠', can: ['send_bell', 'say_hello'], x: 24, y: 60, line: '早上好！', ...over })
+const listener = (over: Partial<EventActor> = {}): EventActor => ({ id: 'rabbit', name: '小兔子', can: ['show_surprise', 'say_hello', 'send_bell'], x: 54, y: 62, ...over })
+const sleeper = (over: Partial<EventActor> = {}): EventActor => ({ id: 'fox', name: '小狐狸', can: ['wake_up', 'say_hello', 'show_surprise', 'send_bell'], x: 80, y: 62, asleep: true, ...over })
+const BELL: EventLevel = { actors: [ringer(), listener()], scenery: 'bell-tree' }
+const BELL_FOX: EventLevel = { actors: [ringer(), listener(), sleeper()], scenery: 'bell-tree' }
+const BELL_ANY: EventLevel = {
+  actors: [ringer({ x: 20 }), listener({ x: 44 }), sleeper({ x: 66, asleep: false }), { id: 'bird', name: '小鸟', can: ['show_surprise', 'say_hello', 'send_bell'], x: 86, y: 58 }],
+  scenery: 'bell-tree',
+}
+const BELL_BLOCKS = ['when_start', 'when_clicked', 'when_bell', 'send_bell', 'show_surprise']
+const ringGoal: EventGoal = {
+  expectations: [
+    { interaction: { kind: 'start' }, effects: [] },
+    { interaction: { kind: 'click', actor: 'squirrel' }, effects: [['squirrel', 'send_bell'], ['rabbit', 'show_surprise']] },
+  ],
+  probes: [{ kind: 'click', actor: 'rabbit' }],
+}
+
+const L03: EventLesson = {
+  id: 'G0-U2-L03',
+  title: '兔子收到消息',
+  story: '铃铛树下，松鼠是送信员。点一下松鼠，它摇响森林铃铛；谁的积木挂在“听到铃铛时”下面，谁就会回应。小兔子听到铃铛，头顶冒出惊喜。',
+  concept: '消息触发与角色响应',
+  objectives: [
+    '分清发送者和接收者：松鼠“摇响铃铛”，小兔子“听到铃铛时”才回应',
+    '能先不发消息检验：没摇铃时小兔子不动，摇铃后才出现惊喜',
+    '知道一条消息可以让好几位朋友同时回应，没在听的不会动',
+  ],
+  diagnoses: {
+    nothing_happened: '点了松鼠，什么都没发生：松鼠要用“被点击时”来摇铃，小兔子要用“听到铃铛时”来接。看看是不是两人的事件弄反了。',
+    missing_effect: '铃铛响了，可是还有朋友没回应：要回应的朋友名下要接“听到铃铛时”。',
+    too_early: '还没摇铃，小兔子就先露出惊喜：它的事件选成了“开始时”。要等“听到铃铛时”才回应。',
+    wrong_trigger: '点小兔子也有反应：小兔子不该自己动，它只听铃铛。',
+    extra_effect: '多了不该有的动作：只有在听铃铛的朋友才回应，别人名下不要拼。',
+    wrong_actor: '回应的不是要回应的那位：看看“听到铃铛时”拼在了谁的名下。',
+    wrong_order: '顺序不对：先摇铃，听到铃铛的朋友才回应。',
+    no_hat: '这段积木上面没有事件，它不知道什么时候开始。',
+    hat_not_on_top: '事件积木要放在最上面。',
+    disconnected: '有一块积木掉队了，没接在事件下面。',
+    cannot_do: '这个角色做不了这块积木的动作。',
+    loop: '铃铛一直在响：听到铃铛的朋友又去摇铃，停不下来。听的人别再摇铃。',
+  },
+  steps: [
+    {
+      id: 'sender-receiver-swapped',
+      kind: 'error-lab',
+      title: '错误实验：送信员和收信人弄反了',
+      instruction: '小狐狸替大家拼了程序，可是把事件弄反了：松鼠用“听到铃铛时”，小兔子用“被点击时”。这是一个故意的错误：先按原样运行检查，看看点松鼠会发生什么，再把两人的事件换回来。',
+      predict: '先猜一猜：点一下松鼠，铃铛会响吗？',
+      predictChoices: [
+        { text: '铃铛响了，小兔子露出惊喜', when: 'pass' },
+        { text: '什么都没发生', when: 'nothing_happened' },
+      ],
+      errorLab: {
+        expect: 'nothing_happened',
+        expected: '点松鼠，它摇响铃铛；小兔子听到铃铛，头顶冒出惊喜。',
+        actual: '什么都没发生：松鼠在等铃铛，小兔子在等被点，没有人先摇铃。',
+      },
+      level: BELL,
+      editable: ['squirrel', 'rabbit'],
+      allowedBlocks: BELL_BLOCKS,
+      starter: { squirrel: [{ type: 'when_bell' }, { type: 'send_bell' }], rabbit: [{ type: 'when_clicked' }, { type: 'show_surprise' }] },
+      goal: ringGoal,
+      hints: [
+        '点松鼠没反应：松鼠的积木在等铃铛，可是铃铛还没人摇。',
+        '发消息的人用“被点击时”，收消息的人用“听到铃铛时”。',
+        '松鼠：清空后拼“被点击时” → 摇响铃铛；小兔子：清空后拼“听到铃铛时” → 露出惊喜。',
+      ],
+      solutions: [{ squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'] }],
+      counterExamples: [
+        { scripts: { squirrel: ['when_bell', 'send_bell'], rabbit: ['when_clicked', 'show_surprise'] }, failure: 'nothing_happened' },
+        { scripts: { squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_clicked', 'show_surprise'] }, failure: 'missing_effect' },
+      ],
+    },
+    {
+      id: 'rabbit-hears-bell',
+      kind: 'guided',
+      title: '摇铃，小兔子回应',
+      instruction: '自己拼一遍：点松鼠，它摇响铃铛；小兔子听到铃铛，露出惊喜。按开始旗、点小兔子，都不该有动静。',
+      predict: '先猜一猜：小兔子用“开始时”可以吗？',
+      level: BELL,
+      editable: ['squirrel', 'rabbit'],
+      allowedBlocks: BELL_BLOCKS,
+      goal: ringGoal,
+      hints: [
+        '铃铛响了小兔子没反应，或者一开始小兔子就惊喜了：小兔子的事件不对。',
+        '小兔子只听铃铛：用“听到铃铛时”，不用“开始时”或“被点击时”。',
+        '松鼠：“被点击时” → 摇响铃铛；小兔子：“听到铃铛时” → 露出惊喜。',
+      ],
+      solutions: [{ squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'] }],
+      counterExamples: [
+        { scripts: { squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_start', 'show_surprise'] }, failure: 'too_early' },
+        { scripts: { squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_clicked', 'show_surprise'] }, failure: 'missing_effect' },
+        { scripts: { squirrel: ['when_clicked', 'show_surprise'] }, failure: 'cannot_do' },
+      ],
+    },
+    {
+      id: 'one-bell-two-friends',
+      kind: 'practice-a',
+      title: '练习 A：一个铃铛，两位朋友',
+      instruction: '小狐狸也在铃铛树下睡觉。点松鼠摇一次铃：小兔子露出惊喜，小狐狸醒来说早上好。只摇一次铃，两位朋友都要听到。',
+      predict: '先猜一猜：要摇两次铃吗？',
+      level: BELL_FOX,
+      editable: ['squirrel', 'rabbit', 'fox'],
+      allowedBlocks: ['when_start', 'when_clicked', 'when_bell', 'send_bell', 'show_surprise', 'wake_up', 'say_hello'],
+      goal: {
+        expectations: [
+          { interaction: { kind: 'start' }, effects: [] },
+          { interaction: { kind: 'click', actor: 'squirrel' }, effects: [['squirrel', 'send_bell'], ['rabbit', 'show_surprise'], ['fox', 'wake_up'], ['fox', 'say_hello']] },
+        ],
+        probes: [{ kind: 'click', actor: 'rabbit' }, { kind: 'click', actor: 'fox' }],
+      },
+      hints: [
+        '铃铛响了，可是有一位朋友没动：它没在听铃铛。',
+        '一条消息，所有接了“听到铃铛时”的朋友都会回应。',
+        '松鼠：被点击时 → 摇响铃铛；小兔子：听到铃铛时 → 露出惊喜；小狐狸：听到铃铛时 → 睁开眼睛 → 说早上好。',
+      ],
+      solutions: [{ squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'], fox: ['when_bell', 'wake_up', 'say_hello'] }],
+      counterExamples: [
+        { scripts: { squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'], fox: ['when_clicked', 'wake_up', 'say_hello'] }, failure: 'missing_effect' },
+        { scripts: { squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'], fox: ['when_start', 'wake_up', 'say_hello'] }, failure: 'too_early' },
+        { scripts: { squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'], fox: ['when_bell', 'send_bell'] }, failure: 'loop' },
+      ],
+    },
+    {
+      id: 'surprise-too-early',
+      kind: 'practice-b',
+      title: '练习 B：还没摇铃就惊喜了',
+      instruction: '松鼠的积木没问题，可是小兔子一按开始旗就露出惊喜，根本没等铃铛。先运行检查，看看小兔子什么时候动的，再改好：等听到铃铛才惊喜。',
+      predict: '先猜一猜：要改松鼠，还是改小兔子？',
+      level: BELL,
+      editable: ['squirrel', 'rabbit'],
+      allowedBlocks: BELL_BLOCKS,
+      starter: { squirrel: [{ type: 'when_clicked' }, { type: 'send_bell' }], rabbit: [{ type: 'when_start' }, { type: 'show_surprise' }] },
+      goal: ringGoal,
+      hints: [
+        '按开始旗小兔子就惊喜了：它没等铃铛。',
+        '“开始时”一按开始旗就运行；要等消息，得换成“听到铃铛时”。',
+        '切到小兔子，清空后拼“听到铃铛时” → 露出惊喜；松鼠的不用改。',
+      ],
+      solutions: [{ squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'] }],
+      counterExamples: [{ scripts: { squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_start', 'show_surprise'] }, failure: 'too_early' }],
+    },
+    {
+      id: 'my-bell-card',
+      kind: 'creative',
+      title: '创意改造：铃铛响给谁听？',
+      instruction: '小鸟也飞来了。由你来决定：先选一位收信的朋友，让它听到铃铛就露出惊喜；松鼠负责摇铃，别的朋友不回应。通过后，它就是你的“铃铛传话卡”作品。',
+      predict: '先猜一猜：“听到铃铛时”要拼在谁的名下？',
+      creative: { prompt: '铃铛响了，你想让谁露出惊喜？', choices: ['rabbit', 'fox', 'bird'], labels: ['小兔子', '小狐狸', '小鸟'] },
+      level: BELL_ANY,
+      editable: ['squirrel', 'rabbit', 'fox', 'bird'],
+      allowedBlocks: BELL_BLOCKS,
+      goal: {
+        expectations: [
+          { interaction: { kind: 'start' }, effects: [] },
+          { interaction: { kind: 'click', actor: 'squirrel' }, effects: [['squirrel', 'send_bell'], ['$target', 'show_surprise']] },
+        ],
+        probes: [{ kind: 'click', actor: 'rabbit' }, { kind: 'click', actor: 'fox' }, { kind: 'click', actor: 'bird' }],
+      },
+      hints: [
+        '铃铛响了，可是露出惊喜的不是你选的朋友：积木拼错了名下。',
+        '松鼠负责摇铃；你选的朋友负责听铃铛，别的朋友名下空着。',
+        '例如选小鸟：松鼠拼“被点击时 → 摇响铃铛”，小鸟拼“听到铃铛时 → 露出惊喜”。',
+      ],
+      solutions: [{ squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'] }],
+      counterExamples: [
+        { scripts: { squirrel: ['when_clicked', 'send_bell'], fox: ['when_bell', 'show_surprise'] }, failure: 'wrong_actor' },
+        { scripts: { rabbit: ['when_bell', 'show_surprise'] }, failure: 'nothing_happened' },
+        { scripts: { squirrel: ['when_clicked', 'send_bell'], rabbit: ['when_bell', 'show_surprise'], bird: ['when_bell', 'show_surprise'] }, failure: 'extra_effect' },
+      ],
+    },
+  ],
+  review: {
+    whatIf: '如果小狐狸也接上“听到铃铛时 → 露出惊喜”，摇一次铃会怎样？',
+    answer: '一次铃声，小兔子和小狐狸都会露出惊喜：所有接了“听到铃铛时”的朋友都会回应。',
+  },
+  reflection: '说一说：谁是送信的，谁是收信的？为什么小兔子不能用“开始时”？',
+  reflectionCheck: {
+    question: '想让小兔子“收到消息才惊喜”，它的积木最上面放哪个事件？',
+    options: [{ text: '听到铃铛时', correct: true }, { text: '开始时', correct: false }, { text: '被点击时', correct: false }],
+    why: '“听到铃铛时”等别人摇铃才运行；“开始时”一按开始旗就动；“被点击时”要点它自己。',
+  },
+  parentQuestion: '请孩子播放自己的“铃铛传话卡”：先按开始旗，看朋友们都没动；再点松鼠摇铃，看选中的朋友露出惊喜，说说谁送信、谁收信。',
+  project: { stepId: 'my-bell-card', title: '我的铃铛传话卡', passedText: '真实运行：松鼠摇铃，{target}听到才惊喜' },
+}
+
+export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02, [L03.id]: L03 }
 
 export function getEventLesson(id: string): EventLesson | undefined {
   return g0u2EventLessons[id]

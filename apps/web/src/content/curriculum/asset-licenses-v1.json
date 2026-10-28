@@ -31,6 +31,7 @@
     { "path": "kc-scenes/key-hook.svg", "license": "original", "source": "本项目新绘 SVG，G0-U1-L05 故事场景（钥匙挂钩牌：钥匙、箭头、小锁），与 grid-stage.tsx 内联 KeyHook 几何一致" },
     { "path": "kc-scenes/guide-map.svg", "license": "original", "source": "本项目新绘 SVG，G0-U1-L06 故事场景（森林向导的手绘地图），与 grid-stage.tsx 内联 GuideMap 几何一致" },
     { "path": "kc-scenes/morning-glade.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2 事件舞台背景（清晨林间空地），与 event-stage.tsx 内联 MorningGlade 几何一致" },
-    { "path": "kc-scenes/stage-flags.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L02 森林开幕舞台背景（木头舞台、彩旗串、旗杆），与 event-stage.tsx 内联 StageFlags 几何一致（课堂内彩旗可升降）" }
+    { "path": "kc-scenes/stage-flags.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L02 森林开幕舞台背景（木头舞台、彩旗串、旗杆），与 event-stage.tsx 内联 StageFlags 几何一致（课堂内彩旗可升降）" },
+    { "path": "kc-scenes/bell-tree.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L03 铃铛树背景（老橡树、树枝上的森林铃铛），与 event-stage.tsx 内联 BellTree 几何一致（课堂内铃铛摇响时摆动）；同课松鼠角色为 event-stage.tsx 内联原创 SquirrelArt" }
   ]
 }

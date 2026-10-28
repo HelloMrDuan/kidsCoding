@@ -52,6 +52,56 @@ export function StageFlags({ flagUp }: { flagUp: boolean }) {
   )
 }
 
+/** G0-U2-L03 story scenery: the bell tree — an old oak with the forest bell; the bell swings when someone rings it. */
+export function BellTree({ rung }: { rung: boolean }) {
+  return (
+    <g data-grid-item="bell-tree" data-bell-rung={rung ? 'true' : 'false'}>
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#e3f4ff" />
+      <path d="M0 42 Q25 36 50 41 T100 40 V60 H0 Z" fill="#9fdc7c" />
+      <path d="M0 50 Q30 46 60 49 T100 48 V60 H0 Z" fill="#7cc35b" />
+      <rect x="9" y="18" width="4.2" height="26" rx="1.4" fill="#9b6a3c" />
+      <path d="M11 26 Q20 22 27 23" fill="none" stroke="#9b6a3c" strokeWidth="1.6" strokeLinecap="round" />
+      <g fill="#4fae55" stroke="#2f7d3a" strokeWidth=".6">
+        <circle cx="6" cy="16" r="7" />
+        <circle cx="15" cy="12" r="8" />
+        <circle cx="23" cy="18" r="6" />
+      </g>
+      <path d="M26 23 v3" stroke="#6b4a2a" strokeWidth=".6" />
+      <g style={{ transformOrigin: '26px 26px', transform: `rotate(${rung ? 18 : 0}deg)`, transition: 'transform .3s ease-out' }} data-event-mark="bell">
+        <path d="M23.2 32 Q23.4 26 26 26 Q28.6 26 28.8 32 Z" fill="#ffd23f" stroke="#c48a00" strokeWidth=".5" />
+        <circle cx="26" cy="32.6" r=".9" fill="#c48a00" />
+      </g>
+      {rung ? <path d="M31 25 q2 2 0 4 M33 23.5 q3.5 3.5 0 7" fill="none" stroke="#ff8a3d" strokeWidth=".7" strokeLinecap="round" /> : null}
+    </g>
+  )
+}
+
+/** G0-U2 squirrel (original art, same chibi style as CharacterArt): the bell ringer. */
+function SquirrelArt() {
+  const fur = '#c9874b', line = '#7a4a22', cream = '#fff1dc'
+  return (
+    <g>
+      <ellipse cx="50" cy="104" rx="30" ry="5" fill="#305a43" opacity=".22" />
+      <path d="M66 92 Q98 92 94 56 Q92 30 74 34 Q86 46 80 62 Q76 76 64 80Z" fill={fur} stroke={line} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M78 44 Q88 52 84 66" fill="none" stroke={cream} strokeWidth="4" strokeLinecap="round" opacity=".7" />
+      <ellipse cx="50" cy="84" rx="19" ry="16" fill={fur} stroke={line} strokeWidth="3" />
+      <ellipse cx="50" cy="87" rx="10" ry="9" fill={cream} />
+      <ellipse cx="40" cy="100" rx="7.5" ry="4.6" fill="#7a4a22" />
+      <ellipse cx="60" cy="100" rx="7.5" ry="4.6" fill="#7a4a22" />
+      <path d="M24 26 L26 8 40 22Z M76 26 L74 8 60 22Z" fill={fur} stroke={line} strokeWidth="3" strokeLinejoin="round" />
+      <ellipse cx="50" cy="48" rx="31" ry="28" fill={fur} stroke={line} strokeWidth="3" />
+      <ellipse cx="50" cy="58" rx="17" ry="13" fill={cream} />
+      <ellipse cx="38" cy="45" rx="5.4" ry="6.6" fill="#1a2739" />
+      <ellipse cx="62" cy="45" rx="5.4" ry="6.6" fill="#1a2739" />
+      <circle cx="39.8" cy="42.4" r="2.1" fill="#fff" />
+      <circle cx="63.8" cy="42.4" r="2.1" fill="#fff" />
+      <g fill="#ff8fa3" opacity=".55"><ellipse cx="28" cy="57" rx="5.4" ry="3.2" /><ellipse cx="72" cy="57" rx="5.4" ry="3.2" /></g>
+      <ellipse cx="50" cy="55" rx="3.8" ry="2.8" fill="#3a2016" />
+      <path d="M44 60 Q50 66 56 60" fill="#e86a5a" stroke="#5b2f22" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+  )
+}
+
 export type EventStageProps = {
   level: EventLevel
   effects: EventEffect[]
@@ -60,13 +110,18 @@ export type EventStageProps = {
   label?: string
 }
 
+const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台' }
+
 /** Draws the characters and what has happened to them so far; characters are tappable. */
 export function EventStage({ level, effects, onActorClick, label }: EventStageProps) {
   const state = stageStateAfter(level, effects)
+  const rang = new Set(effects.filter(e => e.action === 'send_bell').map(e => e.actor))
   return (
-    <div className="relative w-full" data-testid="event-stage" aria-label={label ?? (level.scenery === 'stage-flags' ? '森林开幕舞台' : '林间空地舞台')}>
-      <svg viewBox="0 0 100 60" className="block w-full rounded-[14px]" role="img" aria-label={label ?? (level.scenery === 'stage-flags' ? '森林开幕舞台' : '林间空地舞台')}>
-        {level.scenery === 'stage-flags' ? <StageFlags flagUp={Object.values(state).some(x => x.flagUp)} /> : <MorningGlade />}
+    <div className="relative w-full" data-testid="event-stage" aria-label={label ?? STAGE_LABELS[level.scenery ?? 'morning-glade'] ?? '林间空地舞台'}>
+      <svg viewBox="0 0 100 60" className="block w-full rounded-[14px]" role="img" aria-label={label ?? STAGE_LABELS[level.scenery ?? 'morning-glade'] ?? '林间空地舞台'}>
+        {level.scenery === 'stage-flags' ? <StageFlags flagUp={Object.values(state).some(x => x.flagUp)} />
+          : level.scenery === 'bell-tree' ? <BellTree rung={effects.some(e => e.action === 'send_bell')} />
+          : <MorningGlade />}
       </svg>
       {level.actors.map(actor => {
         const s = state[actor.id]
@@ -81,12 +136,13 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             data-awake={s.awake ? 'true' : 'false'}
             data-said={s.said ? 'true' : 'false'}
             data-surprised={s.surprised ? 'true' : 'false'}
-            aria-label={`${name}：${s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${onActorClick ? '。点一下它' : ''}`}
+            data-rang={rang.has(actor.id) ? 'true' : 'false'}
+            aria-label={`${name}：${s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${onActorClick ? '。点一下它' : ''}`}
             onClick={() => onActorClick?.(actor.id)}
           >
             <svg viewBox="0 0 100 110" className="block w-full" aria-hidden="true">
               <g style={{ filter: s.awake ? undefined : 'saturate(.55) brightness(.92)' }}>
-                <CharacterArt id={actor.id} />
+                {actor.id === 'squirrel' ? <SquirrelArt /> : <CharacterArt id={actor.id} />}
               </g>
               {!s.awake ? (
                 <g data-event-mark="asleep">
@@ -95,12 +151,15 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
                   <text x="84" y="10" fontSize="13" fontWeight="900" fill="#6f7d92">z</text>
                 </g>
               ) : null}
-              {s.surprised ? (
-                <path data-event-mark="surprise" d="M50 -6 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#ffd23f" stroke="#ff8a3d" strokeWidth="2" />
-              ) : null}
             </svg>
             {s.said ? (
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-emerald-400 bg-white px-2 py-0.5 text-xs font-black text-emerald-700 shadow" data-event-mark="hello">{actor.line ?? '早上好！'}</span>
+            ) : null}
+            {s.surprised && !s.said ? (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-amber-400 bg-amber-50 px-2 py-0.5 text-xs font-black text-amber-700 shadow" data-event-mark="surprise">✨ 哇！</span>
+            ) : null}
+            {rang.has(actor.id) && !s.said ? (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-orange-400 bg-white px-2 py-0.5 text-xs font-black text-orange-700 shadow" data-event-mark="bell">🔔 叮铃！</span>
             ) : null}
             <span className="mt-0.5 block text-center text-[11px] font-black text-slate-700">{name}</span>
           </button>
