@@ -25,7 +25,7 @@ export function checkSlotValue(slot: G2Slot, raw: unknown): number | string | nu
     if (text.length < 1 || text.length > max || /[\u0000-\u001f\u007f<>]/.test(text)) return null
     return text
   }
-  if (slot.field === 'COSTUME' || slot.field === 'BACKDROP' || slot.field === 'SOUND_MENU' || slot.field === 'DIRECTION') {
+  if (slot.field === 'COSTUME' || slot.field === 'BACKDROP' || slot.field === 'SOUND_MENU' || slot.field === 'DIRECTION' || slot.field === 'BROADCAST_OPTION') {
     const name = String(raw ?? '')
     return slot.options?.includes(name) ? name : null
   }
@@ -106,6 +106,11 @@ export function readG2Program(workspace: WorkspaceLike, target: G2TargetSpec): G
     const script = target.scripts.find(s => s.hat === top.type)
     if (!script || usedHats.has(top.type)) return null
     usedHats.add(top.type)
+    for (const slot of script.hatSlots ?? []) {
+      const value = checkSlotValue(slot, top.getFieldValue(slot.field))
+      if (value === null) return null
+      values[slot.key] = value
+    }
     if (!readSequence(chain(top), script.body, values)) return null
   }
   return {kind: 'sprite', values}

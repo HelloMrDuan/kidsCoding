@@ -16,7 +16,7 @@ type SpriteState = {id: string; name: string; x: number; y: number; visible: boo
 type MoveResult = {requested: G2Point; before: G2Point; after: G2Point; moved: boolean}
 type CostumeResult = {requested: string; before: Array<{name: string; costume: string}>; after: Array<{name: string; costume: string}>; changed: boolean; stageCostumes: string[]}
 type LabMessage = {
-  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' | 'TURN' |
+  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' | 'TURN' | 'BROADCAST' |
     'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'
   id: number | null
   available?: boolean
@@ -38,6 +38,7 @@ type LabMessage = {
   stageCostumes?: string[]
   sound?: string
   degrees?: number
+  message?: string
   activeThreads?: number
   archive?: ArrayBuffer
   error?: string
@@ -85,6 +86,9 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   // Degrees each sprite has really turned in the VM since it was last clicked (open click runs).
   const clickTurn = useRef<Map<string, number>>(new Map())
   const [lastTurns, setLastTurns] = useState<Record<string, {total: number; finished: boolean}>>({})
+  // The broadcast run in progress: the message the VM sent and who spoke after it.
+  const broadcastRun = useRef<{message: string; speakers: string[]} | null>(null)
+  const [lastBroadcast, setLastBroadcast] = useState<{message: string; speakers: string[]; finished: boolean} | null>(null)
   const savedFailed = useRef(false)
   const loadedRef = useRef(false)
   useEffect(() => { loadedRef.current = loaded }, [loaded])
@@ -167,6 +171,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         setLastRunSounds(null)
         clickTurn.current.clear()
         setLastTurns({})
+        broadcastRun.current = null
+        setLastBroadcast(null)
         soundUris.current = Object.fromEntries((msg.assets ?? []).map(a => [a.name, a.soundUris ?? {}]))
         if (msg.source === 'file') {
           setSaving(true)
@@ -218,6 +224,14 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             return {...prev, clickTurns: nextTurns}
           })
         }
+        if (broadcastRun.current && msg.activeThreads === 0) {
+          const positions: Record<string, G2Point> = {}
+          for (const t of current) if (t.original) positions[t.name] = {x: t.x, y: t.y}
+          const run = {...broadcastRun.current, backdrop: msg.backdrop ?? '', positions}
+          broadcastRun.current = null
+          setLastBroadcast({message: run.message, speakers: run.speakers, finished: true})
+          setObs(prev => ({...prev, broadcastRuns: [...prev.broadcastRuns, run].slice(-20)}))
+        }
         if (flagRun.current && msg.activeThreads === 0) {
           const runPositions: Record<string, G2Point> = {}
           for (const t of current) if (t.original) runPositions[t.name] = {x: t.x, y: t.y}
@@ -246,6 +260,10 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'SAID') {
         const target = msg.target ?? ''
         const text = msg.text ?? ''
+        if (broadcastRun.current && target && !broadcastRun.current.speakers.includes(target)) {
+          broadcastRun.current.speakers.push(target)
+          setLastBroadcast({message: broadcastRun.current.message, speakers: [...broadcastRun.current.speakers], finished: false})
+        }
         const clickedAt = recentClicks.current.get(target)
         const fromClick = clickedAt !== undefined && Date.now() - clickedAt < 3000
         setObs(prev => ({
@@ -265,6 +283,13 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           }
         } else if (target && sound) {
           setObs(prev => ({...prev, clickSounds: {...prev.clickSounds, [target]: [...(prev.clickSounds[target] ?? []), sound].slice(-20)}}))
+        }
+      } else if (msg.kind === 'BROADCAST') {
+        const message = String(msg.message ?? '')
+        if (message && !broadcastRun.current) {
+          broadcastRun.current = {message, speakers: []}
+          setLastBroadcast({message, speakers: [], finished: false})
+          setStatus(`Scratch VM：${msg.target === 'Stage' ? '舞台' : msg.target}广播了“${message}”，所有在听“${message}”的脚本一起开始。`)
         }
       } else if (msg.kind === 'TURN') {
         const target = String(msg.target ?? '')
@@ -542,6 +567,14 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                   ? '还没有点绿旗：舞台声音播放次数会显示在这里。'
                   : `${lastRunSounds.finished ? '上一次绿旗' : '本次绿旗进行中'}：Scratch VM 执行舞台“播放声音”${lastRunSounds.stagePlays} 次。`}
                 {Object.entries(obs.clickSounds).map(([name, list]) => ` ${name}刚才播放“${list[list.length - 1]}”。`).join('')}
+              </p>
+            )}
+            {lesson.targets.some(t => t.messages?.length) && (
+              <p data-testid="g2-broadcast-log" data-message={lastBroadcast?.message ?? ''} data-speakers={lastBroadcast?.speakers.join(',') ?? ''}
+                data-finished={lastBroadcast?.finished ? 'true' : 'false'} className="mt-2 text-sm">
+                {lastBroadcast === null
+                  ? '还没有广播：广播的消息和收到后说话的角色会显示在这里。'
+                  : `${lastBroadcast.finished ? '上一次广播' : '广播进行中'}：Scratch VM 发出“${lastBroadcast.message}”；之后说话的角色：${lastBroadcast.speakers.join('、') || '没有'}。`}
               </p>
             )}
             {Object.keys(lastTurns).length > 0 && (
