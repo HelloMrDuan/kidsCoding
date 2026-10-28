@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as Blockly from 'blockly'
-import type { KeyboardNavigation as KeyboardNavigationClass } from '@blockly/keyboard-navigation'
+import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 
 import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
 import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
@@ -44,9 +44,7 @@ class NavigationDeferringToolbox extends Blockly.Toolbox {
   }
 }
 
-function ensureKeyboardNavigationRegistered(
-  KeyboardNavigation: typeof KeyboardNavigationClass,
-) {
+function ensureKeyboardNavigationRegistered() {
   if (keyboardNavigationRegistered) return
   KeyboardNavigation.registerKeyboardNavigationStyles()
   Blockly.registry.register(
@@ -258,16 +256,12 @@ export function BlocklyWorkspace({
     return buildSnapshot(workspace)
   }
 
-  // Runs only in the browser (called from the effect below after the
-  // keyboard-navigation module is dynamically imported). Returns the
-  // workspace cleanup, or undefined when there is nothing to mount.
-  function startWorkspace(
-    KeyboardNavigation: typeof KeyboardNavigationClass,
-  ): (() => void) | undefined {
-    ensureKeyboardNavigationRegistered(KeyboardNavigation)
+  useEffect(() => {
+    registerKidsBlocks()
+    ensureKeyboardNavigationRegistered()
 
     if (!mountRef.current) {
-      return undefined
+      return
     }
 
     const workspace = Blockly.inject(mountRef.current, {
@@ -367,25 +361,6 @@ export function BlocklyWorkspace({
       workspace.dispose()
       workspaceRef.current = null
       lastSelectedBlockIdRef.current = null
-    }
-  }
-
-  useEffect(() => {
-    registerKidsBlocks()
-    // @blockly/keyboard-navigation reads `navigator` at module top level, so
-    // it must never be evaluated during SSR. Load it here, inside the
-    // effect, which only runs in the browser; the static import above is
-    // type-only and erased at compile time.
-    let cancelled = false
-    let disposeWorkspace: (() => void) | undefined
-    import('@blockly/keyboard-navigation')
-      .then(({ KeyboardNavigation }) => {
-        if (cancelled) return
-        disposeWorkspace = startWorkspace(KeyboardNavigation)
-      })
-    return () => {
-      cancelled = true
-      disposeWorkspace?.()
     }
     // choicesKey re-injects when the lesson's preset lines change (snapshotOf only reads refs).
   }, [allowedBlockKey, onSnapshotChange, stableAllowedBlocks, choicesKey, motionVerb])

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 
 import { getFoundationUnitByLessonId } from '@/content/curriculum/foundation-units'
 import { getMistakeStep, getMistakeStepAt } from '@/content/curriculum/mistake-steps'
@@ -10,7 +11,6 @@ import { asksClickPrediction, getPracticeStepAt, getPracticeStepFor, isPracticeA
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
-import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
 import { evaluateStep } from '@/features/lessons/blockly/evaluate-step'
 import { evaluateObservable } from '@/features/lessons/blockly/observable-run'
 import { motionVerbForTemplate } from '@/features/lessons/blockly/block-labels'
@@ -45,6 +45,17 @@ import {
 } from '@/features/progress/local-progress'
 import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
 import { awardLessonCompletion } from '@/features/rewards/award-lesson-completion'
+
+// BlocklyWorkspace is client-only: @blockly/keyboard-navigation reads
+// `navigator` at module top level, which throws during SSR. Loading it
+// with ssr:false keeps it out of the server bundle while keeping the
+// workspace inject synchronous, so a palette click can never land before
+// the workspace exists (the previous dynamic-import fix delayed inject
+// and early clicks were silently dropped by addBlock's !workspace guard).
+const BlocklyWorkspace = dynamic(
+  () => import('@/features/lessons/blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
+  { ssr: false },
+)
 
 export default function LessonPage() {
   const params = useParams<{ lessonId: string }>()
