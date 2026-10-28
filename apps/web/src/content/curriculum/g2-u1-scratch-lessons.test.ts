@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
-import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
+import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -177,5 +177,46 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(cat.scripts[0].body[0].slots).toEqual([])
     expect(wheel.scripts[0].body[0].children?.map(b => b.type)).toEqual(['kc2_turn_right', 'kc2_wait'])
     expect(g2u1L04.showDirection).toBe(true)
+  })
+
+  it('L05 tasks come from VM broadcast runs: the message sent, who spoke after it, backdrop and rabbit position', () => {
+    const obs = emptyG2Observations()
+    const run = (speakers: string[], backdrop = '幕布舞台', rabbitX = 110, message = '开场') =>
+      ({message, speakers, backdrop, positions: {小白兔: {x: rabbitX, y: -40}}})
+    expect(Object.values(evaluateG2U1L05(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u1L05.id, obs)).toBeNull()
+    obs.broadcastRuns = [run([])]
+    expect(observedPrediction(g2u1L05.id, obs)).toBe(g2u1L05.predict.correct)
+    expect(evaluateG2U1L05(obs).debug).toBe(false)
+    obs.broadcastRuns.push(run(['小鸟']))
+    expect(evaluateG2U1L05(obs).debug).toBe(true)
+    // A bird that speaks without first being seen silent is not the debug task; other messages do not count.
+    expect(evaluateG2U1L05({...obs, broadcastRuns: [run(['小鸟'])]}).debug).toBe(false)
+    expect(evaluateG2U1L05({...obs, broadcastRuns: [run([]), run(['小鸟'], '幕布舞台', 110, '谢幕')]}).debug).toBe(false)
+    expect(evaluateG2U1L05(obs).practiceA).toBe(false)
+    obs.broadcastRuns.push(run([], '灯光舞台'))
+    expect(evaluateG2U1L05(obs).practiceA).toBe(true)
+    expect(evaluateG2U1L05(obs).practiceB).toBe(false)
+    obs.broadcastRuns.push(run([], '幕布舞台', 30))
+    expect(evaluateG2U1L05(obs).practiceB).toBe(true)
+    expect(inCenterZone({x: -41, y: 0})).toBe(false)
+    expect(inCenterZone({x: 40, y: 0})).toBe(true)
+    obs.lastSaid = {小鸟: L05_BIRD_LINE}
+    obs.broadcastRuns.push(run(['小鸟'], '灯光舞台', 0))
+    expect(evaluateG2U1L05(obs).create).toBe(false)
+    obs.lastSaid = {小鸟: '欢迎来看表演'}
+    expect(evaluateG2U1L05(obs).create).toBe(true)
+    expect(evaluateG2U1L05({...obs, broadcastRuns: [run(['小鸟'], '灯光舞台', 110)]}).create).toBe(false)
+  })
+
+  it('L05 keeps the cat broadcast fixed and lets the bird choose which message it listens for', () => {
+    const cat = g2u1L05.targets.find(t => t.name === '小橘猫')!
+    const bird = g2u1L05.targets.find(t => t.name === '小鸟')!
+    const stage = g2u1L05.targets.find(t => t.kind === 'stage')!
+    expect(cat.scripts[0].body.map(b => b.type)).toEqual(['kc2_say', 'kc2_broadcast'])
+    expect(cat.scripts[0].body[1]).toMatchObject({slots: [], fixed: {BROADCAST_OPTION: '开场'}})
+    expect(bird.scripts[0].hat).toBe('kc2_when_receive')
+    expect(bird.scripts[0].hatSlots?.[0].options).toEqual(['开场', '谢幕'])
+    expect(stage.scripts.map(s => s.hat)).toEqual(['kc2_flag', 'kc2_when_receive'])
   })
 })

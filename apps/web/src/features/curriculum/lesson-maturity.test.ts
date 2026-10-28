@@ -5,9 +5,12 @@ import { describe, expect, it } from 'vitest'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { GET } from '@/app/api/curriculum/catalog/route'
 import { curriculumTracks, getLessonContentStage } from './full-catalog-access'
+import { g2u1ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { getLessonMaturity, maturityLevels, summarizeMaturity, trialIntegrations } from './lesson-maturity'
 
 const allCatalogIds = curriculumTracks.flatMap((t) => t.units.flatMap((u) => u.lessons.map((l) => l.id)))
+// G2 Scratch lab lessons are counted from their own registry (Hark B), so other teams' count edits never collide with them.
+const g2LabLessons = Object.keys(g2u1ScratchLessons).length
 const webRoot = path.resolve(__dirname, '../../..')
 
 describe('SYS-102 single L0–L5 maturity source', () => {
@@ -39,7 +42,7 @@ describe('SYS-102 single L0–L5 maturity source', () => {
   it('L3 trial lessons point at a real route and an existing e2e spec, and are not published', () => {
     const trials = [...allCatalogIds, ...launchLessons.map((l) => l.id)].filter((id) => getLessonMaturity(id)!.trialAvailable)
     expect(trials.sort()).toEqual(Object.keys(trialIntegrations).sort())
-    expect(trials).toHaveLength(32) // 7 lab pilots + 4 G2-U1 Scratch lab lessons + 6 G0-U1 grid lessons + 3 G0-U2 event lessons + 12 launch lessons
+    expect(trials).toHaveLength(28 + g2LabLessons) // 7 lab pilots + 6 G0-U1 grid lessons + G0-U2 event lessons + 12 launch lessons, plus every G2 Scratch lab lesson
     for (const id of trials) {
       const m = getLessonMaturity(id)!
       expect(m.level).toBe(3)

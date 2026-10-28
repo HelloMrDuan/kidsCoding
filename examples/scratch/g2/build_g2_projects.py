@@ -77,8 +77,8 @@ def sprite(name, costumes, blocks, layer, x, y, sounds=None, direction=90, rotat
             "draggable": False, "rotationStyle": rotation}
 
 
-def stage(costumes, blocks=None, sounds=None):
-    return {"isStage": True, "name": "Stage", "variables": {}, "lists": {}, "broadcasts": {}, "blocks": blocks or {},
+def stage(costumes, blocks=None, sounds=None, broadcasts=None):
+    return {"isStage": True, "name": "Stage", "variables": {}, "lists": {}, "broadcasts": broadcasts or {}, "blocks": blocks or {},
             "comments": {}, "currentCostume": 0, "costumes": costumes, "sounds": sounds or [], "volume": 100,
             "layerOrder": 0, "tempo": 60, "videoTransparency": 50, "videoState": "on",
             "textToSpeechLanguage": None}
@@ -286,11 +286,72 @@ def lesson_g2_u1_l04():
     return "g2-u1-l04-cat-walks.sb3.b64", project, files, params
 
 
+MSG_OPEN, MSG_BOW = "kc-msg-open", "kc-msg-bow"
+
+
+def broadcast_menu(name, msg_id):
+    """Scratch serialises the broadcast menu shadow as a compact primitive [11, name, id]."""
+    return [1, [11, name, msg_id]]
+
+
+def lesson_g2_u1_l05():
+    """广播第一条消息: one sprite broadcasts a message; every script that receives that exact message starts."""
+    curtain, curtain_file = svg_costume("幕布舞台", "curtain-stage-backdrop.svg", 240, 180)
+    lights, lights_file = svg_costume("灯光舞台", "show-stage-backdrop.svg", 240, 180)
+    cat, cat_file = svg_costume("小橘猫", "orange-cat.svg", 48, 48)
+    bird, bird_file = svg_costume("小鸟", "blue-bird.svg", 32, 28)
+    rabbit, rabbit_file = svg_costume("小白兔", "white-rabbit.svg", 36, 48)
+    stage_blocks = {
+        "stage_flag": block("event_whenflagclicked", "stage_reset", top=True, x=40, y=40),
+        "stage_reset": block("looks_switchbackdropto", parent="stage_flag", inputs={"BACKDROP": [1, "stage_reset_menu"]}),
+        "stage_reset_menu": block("looks_backdrops", parent="stage_reset", fields={"BACKDROP": ["幕布舞台", None]}, shadow=True),
+        "stage_recv": block("event_whenbroadcastreceived", "stage_switch", top=True, x=40, y=200, fields={"BROADCAST_OPTION": ["开场", MSG_OPEN]}),
+        "stage_switch": block("looks_switchbackdropto", parent="stage_recv", inputs={"BACKDROP": [1, "stage_backdrop_menu"]}),
+        "stage_backdrop_menu": block("looks_backdrops", parent="stage_switch", fields={"BACKDROP": ["幕布舞台", None]}, shadow=True),
+    }
+    cat_blocks = {
+        "cat_click": block("event_whenthisspriteclicked", "cat_say", top=True, x=40, y=40),
+        "cat_say": block("looks_sayforsecs", "cat_bcast", parent="cat_click", inputs={"MESSAGE": text("表演开始！"), "SECS": num(2)}),
+        "cat_bcast": block("event_broadcast", parent="cat_say", inputs={"BROADCAST_INPUT": broadcast_menu("开场", MSG_OPEN)}),
+    }
+    bird_blocks = {
+        # The bug the lesson starts with: the bird listens for 谢幕, but the cat broadcasts 开场.
+        "bird_recv": block("event_whenbroadcastreceived", "bird_say", top=True, x=40, y=40, fields={"BROADCAST_OPTION": ["谢幕", MSG_BOW]}),
+        "bird_say": block("looks_sayforsecs", parent="bird_recv", inputs={"MESSAGE": text("叽叽喳喳，欢迎大家！"), "SECS": num(2)}),
+    }
+    rabbit_blocks = {
+        "rabbit_flag": block("event_whenflagclicked", "rabbit_home", top=True, x=40, y=40),
+        "rabbit_home": block("motion_gotoxy", parent="rabbit_flag", inputs={"X": num(190), "Y": num(-40)}),
+        "rabbit_recv": block("event_whenbroadcastreceived", "rabbit_goto", top=True, x=40, y=200, fields={"BROADCAST_OPTION": ["开场", MSG_OPEN]}),
+        "rabbit_goto": block("motion_gotoxy", parent="rabbit_recv", inputs={"X": num(110), "Y": num(-40)}),
+    }
+    project = {
+        "targets": [
+            stage([curtain, lights], stage_blocks, broadcasts={MSG_OPEN: "开场", MSG_BOW: "谢幕"}),
+            sprite("小橘猫", [cat], cat_blocks, 1, -160, -50),
+            sprite("小鸟", [bird], bird_blocks, 2, 130, 75),
+            sprite("小白兔", [rabbit], rabbit_blocks, 3, 190, -40),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U1-L05"},
+    }
+    files = {c["md5ext"]: f for c, f in ((curtain, curtain_file), (lights, lights_file), (cat, cat_file), (bird, bird_file), (rabbit, rabbit_file))}
+    params = [
+        {"target": "Stage", "block": "stage_backdrop_menu", "slot": "BACKDROP", "kind": "choice", "options": ["幕布舞台", "灯光舞台"]},
+        {"target": "小橘猫", "block": "cat_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "小鸟", "block": "bird_recv", "slot": "BROADCAST_OPTION", "kind": "choice", "options": ["开场", "谢幕"]},
+        {"target": "小鸟", "block": "bird_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "小白兔", "block": "rabbit_goto", "slot": "X", "kind": "int", "min": -240, "max": 240},
+    ]
+    return "g2-u1-l05-broadcast-show.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
     "G2-U1-L03": lesson_g2_u1_l03,
     "G2-U1-L04": lesson_g2_u1_l04,
+    "G2-U1-L05": lesson_g2_u1_l05,
 }
 
 
@@ -301,7 +362,8 @@ def model_for(project, params):
     targets = project["targets"]
     return {
         "stage": {"costumes": [c["name"] for c in targets[0]["costumes"]],
-                  "sounds": [s["name"] for s in targets[0]["sounds"]], "blocks": strip(targets[0]["blocks"])},
+                  "sounds": [s["name"] for s in targets[0]["sounds"]], "blocks": strip(targets[0]["blocks"]),
+                  **({"broadcasts": sorted(targets[0]["broadcasts"].values())} if targets[0]["broadcasts"] else {})},
         "sprites": [{"name": t["name"], "costumes": [c["name"] for c in t["costumes"]],
                      "sounds": [s["name"] for s in t["sounds"]], "blocks": strip(t["blocks"])}
                     for t in targets[1:]],
