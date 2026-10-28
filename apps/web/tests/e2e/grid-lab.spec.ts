@@ -745,6 +745,104 @@ test('G0-U2-L02 formal course on the opening stage: flag-first error lab, start-
   await expect(card.getByTestId('event-actor-fox')).toHaveAttribute('data-said', 'false')
 })
 
+test('G0-U2-L03 formal course at the bell tree: swapped sender/receiver error lab, ring for the rabbit, one bell two friends, surprise too early, pick a listener, saved and reopened', async ({ page }) => {
+  test.setTimeout(200_000)
+  const q = async (...types: string[]) => { for (const t of types) await add(page, t) }
+  const bell = () => page.locator('[data-grid-item="bell-tree"]').first()
+  await page.goto('/learn/catalog/G0-U2-L03')
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+  await page.getByTestId('event-trial-entry').click()
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  await expect(bell()).toHaveAttribute('data-bell-rung', 'false')
+  const squirrel = page.getByTestId('event-actor-squirrel')
+  const rabbit = page.getByTestId('event-actor-rabbit')
+
+  // Step 1 — error lab: the squirrel waits for the bell and the rabbit waits for a tap, so nobody rings.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('没有人先摇铃')
+  await expect(bell()).toHaveAttribute('data-bell-rung', 'false')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_clicked', 'send_bell')
+  await page.getByTestId('event-edit-rabbit').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_bell', 'show_surprise')
+  await runAndExpect(page, 'success')
+  await expect(bell()).toHaveAttribute('data-bell-rung', 'true')
+  await expect(rabbit).toHaveAttribute('data-surprised', 'true')
+  await next(page)
+
+  // Guided: a start-hat rabbit is surprised before any bell.
+  await q('when_clicked', 'send_bell')
+  await page.getByTestId('event-edit-rabbit').click()
+  await q('when_start', 'show_surprise')
+  await runAndExpect(page, 'error', '还没摇铃')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_bell', 'show_surprise')
+  // Free play: tapping the rabbit does nothing; tapping the squirrel rings and the rabbit answers.
+  await rabbit.click()
+  await expect(rabbit).toHaveAttribute('data-surprised', 'false')
+  await squirrel.click()
+  await expect(rabbit).toHaveAttribute('data-surprised', 'true', { timeout: 10_000 })
+  await expect(squirrel).toHaveAttribute('data-rang', 'true')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: one bell, two listeners; the fox on a click hat misses the bell.
+  await q('when_clicked', 'send_bell')
+  await page.getByTestId('event-edit-rabbit').click()
+  await q('when_bell', 'show_surprise')
+  await page.getByTestId('event-edit-fox').click()
+  await q('when_clicked', 'wake_up', 'say_hello')
+  await runAndExpect(page, 'error', '还有朋友没回应')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_bell', 'wake_up', 'say_hello')
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('event-actor-fox')).toHaveAttribute('data-awake', 'true')
+  await next(page)
+
+  // Practice B: the rabbit is surprised at the start flag; give it the bell hat.
+  await runAndExpect(page, 'error', '还没摇铃')
+  await page.getByTestId('event-edit-rabbit').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_bell', 'show_surprise')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Creative remake: the fox listens; a second listener (the rabbit) is one too many.
+  await page.getByTestId('grid-goal-choice-1').click() // 小狐狸
+  await page.getByTestId('event-edit-squirrel').click()
+  await q('when_clicked', 'send_bell')
+  await page.getByTestId('event-edit-fox').click()
+  await q('when_bell', 'show_surprise')
+  await page.getByTestId('event-edit-rabbit').click()
+  await q('when_bell', 'show_surprise')
+  await runAndExpect(page, 'error', '多了不该有的动作')
+  await page.getByTestId('lesson-clear-program').click()
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  const mistakes = page.getByTestId('grid-review-mistakes')
+  for (const m of ['触发了却没反应', '还没触发就先动了', '少了一个动作', '多了不该有的动作']) await expect(mistakes).toContainText(m)
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('听到铃铛时')
+  await expect(page.getByTestId('grid-project-status')).toContainText('小狐狸听到才惊喜')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  // Close and reopen: the card replays for real — the bell rings and only the fox is surprised.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  const card = page.getByTestId('grid-project-card')
+  await page.getByTestId('grid-project-play').click()
+  await expect(card.getByTestId('event-actor-fox')).toHaveAttribute('data-surprised', 'true', { timeout: 15_000 })
+  await expect(card.locator('[data-grid-item="bell-tree"]')).toHaveAttribute('data-bell-rung', 'true')
+  await expect(card.getByTestId('event-actor-rabbit')).toHaveAttribute('data-surprised', 'false')
+})
+
 test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at the failing block', async ({ page }) => {
   test.setTimeout(60_000)
   await page.addInitScript(() => {

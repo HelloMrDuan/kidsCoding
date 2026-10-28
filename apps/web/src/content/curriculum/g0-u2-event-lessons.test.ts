@@ -63,8 +63,8 @@ describe('G0-U2 event lessons (Hark A formal course)', () => {
       it('the creative step works for every character the child may pick, and one card never fits another pick', () => {
         const step = lesson.steps.find(s => s.kind === 'creative')!
         // The reference card is the step's own solution for its first choice, moved onto each pick.
-        const ref = step.solutions[0][step.creative!.choices[0]]!
-        const cards = step.creative!.choices.map(target => ({ target, scripts: toEventScripts({ [target]: ref }) }))
+        const { [step.creative!.choices[0]]: ref, ...helpers } = step.solutions[0]
+        const cards = step.creative!.choices.map(target => ({ target, scripts: toEventScripts({ ...helpers, [target]: ref }) }))
         for (const card of cards) {
           for (const other of cards) {
             const { expectations, probes } = resolveEventGoal(step, other.target)

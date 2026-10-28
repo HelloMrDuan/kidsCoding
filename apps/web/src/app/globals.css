@@ -677,6 +677,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-block-chip:disabled { opacity: .55; }
 .kc-block-chip[data-block="when_start"] { --c: #ffab19; --d: #cf8b17; }
 .kc-block-chip[data-block="when_clicked"] { --c: #ff8c1a; --d: #d9700f; }
+.kc-block-chip[data-block="when_bell"] { --c: #ffbf00; --d: #cc9900; }
 .kc-block-chip[data-block="move_right"] { --c: #4c97ff; --d: #3373cc; }
 .kc-block-chip[data-block="say_line"] { --c: #3fbf6a; --d: #2b9a51; }
 .kc-block-chip[data-block="switch_scene"] { --c: #9966ff; --d: #774dcb; }

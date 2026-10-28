@@ -23,6 +23,7 @@
 | apps/web/public/kc-scenes/guide-map.svg | 森林向导的手绘地图（虚线路线、起点、终点叉号） | 本项目新绘（Hark A，G0-U1-L06），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `GuideMap` 与本文件几何一致 | original | 1064 |
 | apps/web/public/kc-scenes/morning-glade.svg | 清晨的林间空地（太阳、草坡、小树），G0-U2 事件舞台背景 | 本项目新绘（Hark A，G0-U2-L01），与上述资产同一扁平柔和风格；课堂 `event-stage.tsx` 的内联 `MorningGlade` 与本文件几何一致 | original | 864 |
 | apps/web/public/kc-scenes/stage-flags.svg | 森林开幕舞台（木头舞台、彩旗串、旗杆），G0-U2-L02 事件舞台背景 | 本项目新绘（Hark A，G0-U2-L02），与上述资产同一扁平柔和风格；课堂 `event-stage.tsx` 的内联 `StageFlags` 与本文件几何一致（课堂内彩旗随“升起彩旗”积木升起） | original | 1294 |
+| apps/web/public/kc-scenes/bell-tree.svg | 铃铛树（老橡树、树枝上挂着森林铃铛），G0-U2-L03 事件舞台背景 | 本项目新绘（Hark A，G0-U2-L03），与上述资产同一扁平柔和风格；课堂 `event-stage.tsx` 的内联 `BellTree` 与本文件几何一致（铃铛摇响时摆动）；同课松鼠为内联原创 `SquirrelArt` | original | 983 |
 
 机器可读登记：上表 14 个文件同时登记在
 `apps/web/src/content/curriculum/asset-licenses-v1.json`（SYS-105 课程 schema
