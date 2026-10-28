@@ -6,9 +6,10 @@
 // examples/scratch/g2/build_g2_projects.py. Nothing here is a published
 // course or a verified grade.
 
-export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU'
+export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES'
 export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
 export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait' | 'kc2_switch_backdrop' | 'kc2_play_sound'
+  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right'
 export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[] }
 export type G2ScriptSpec = { hat: 'kc2_flag' | 'kc2_clicked'; body: G2BlockSpec[] }
 export type G2TargetSpec = {
@@ -42,6 +43,8 @@ export type G2Lesson = {
   targets: G2TargetSpec[]
   steps: G2Step[]
   nextLesson: string
+  /** Show each sprite's VM direction in the observation panel (motion lessons). */
+  showDirection?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -258,10 +261,91 @@ export const g2u1L03: G2Lesson = {
   nextLesson: 'G2-U1-L04 运动积木初体验',
 }
 
+export const L04_CAT_START: G2Point = { x: -100, y: -70 }
+export const L04_FISH_ZONE = { minX: 100, maxX: 170, minY: -90, maxY: -50 } as const
+export const L04_ARRIVAL = '我走到这里啦！'
+export const L04_DIRECTIONS = ['90', '-90', '0', '180']
+
+export function inFishZone(point: G2Point | undefined | null): boolean {
+  if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return false
+  return point.x >= L04_FISH_ZONE.minX && point.x <= L04_FISH_ZONE.maxX && point.y >= L04_FISH_ZONE.minY && point.y <= L04_FISH_ZONE.maxY
+}
+
+export const g2u1L04: G2Lesson = {
+  id: 'G2-U1-L04',
+  title: '运动积木初体验',
+  concept: '移动步数与方向',
+  sample: '/scratch-samples/g2-u1-l04-cat-walks.sb3.b64',
+  exportName: 'KidsCoding-运动积木初体验.sb3',
+  story: '小河边，小橘猫站在起点，小鱼在右边的“小鱼区”等它；旁边的风车一点就转。可现在点绿旗，小橘猫“嗖”地往左走，离小鱼越来越远！',
+  conceptExplain: [
+    '“移动 N 步”让精灵朝它面向的方向走 N 步：面向右边（90）就往右走，面向左边（-90）就往左走。',
+    '“面向 N 方向”只改方向，不走路：90 向右、-90 向左、0 向上、180 向下。',
+    '“右转 N 度”让精灵在原地转一点：转 90 度是四分之一圈，转 360 度是一整圈。',
+  ],
+  predict: {
+    question: '小橘猫的绿旗脚本是“移到 x:-100 y:-70 → 面向（-90）方向 → 移动（100）步”。点绿旗后，它会往哪边走？',
+    options: ['向右走', '向左走'],
+    correct: '向左走',
+    explain: '-90 是向左；“移动 100 步”沿着面向的方向走，所以 Scratch VM 里它的 x 从 -100 变成了 -200。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '用“移动 N 步”控制走多远', title: '练习 A：走到小鱼区', goal: '选中小橘猫，改“移动（ ）步”的数字，应用后点绿旗，让 Scratch VM 里的小橘猫停在小鱼区（x 100～170）。', how: '起点 x 是 -100；面向右边时，走几步 x 就加几。200～270 步之间都能到，先估一估再试。' },
+    { id: 'practiceB', skill: '用“右转 N 度”和重复让风车转四分之一圈', title: '练习 B：风车转四分之一圈', goal: '选中风车，改“重复执行（ ）次”和“右转（ ）度”，应用后在舞台上点风车，让 VM 记录它这一次一共转了 90 度。', how: '次数 × 度数 = 90：1×90、2×45、3×30、6×15 都可以。' },
+    { id: 'debug', skill: '找出方向错误（调试）', title: '找错：小橘猫为什么往左走？', goal: '先点一次绿旗，看 Scratch VM 里小橘猫往哪边走；再改小橘猫的方向，让它点绿旗后往右走。', how: '“移动”没有错，是“面向”的方向错了。' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：风车转一整圈来庆祝', goal: '让风车点一下正好转一整圈（360 度），再给小橘猫换一句到达小鱼区时说的话（1～20 字），点绿旗验证后保存为 .sb3。', how: '一整圈有很多种组合：12×30、4×90、6×60……还可以改等待秒数让风车转得快或慢。' },
+  ],
+  hints: [
+    '看现象：点绿旗后，Scratch VM 里小橘猫的 x 从 -100 变成了 -200，它朝左边走了，离小鱼更远。',
+    '想原因：“移动 100 步”会沿着精灵面向的方向走；小橘猫“面向（-90）方向”，-90 是左边，所以它往左走。',
+    '去修复：选中小橘猫，把“面向（ ）方向”改成 90（向右），应用后再点绿旗；然后再调“移动”的步数走到小鱼区。',
+  ],
+  reflection: [
+    '“移动 100 步”为什么有时往左、有时往右？',
+    '风车转四分之一圈，你用了几次、每次几度？还有别的组合吗？',
+    '如果想让小橘猫往上走，“面向”要选几？',
+  ],
+  limitations: [
+    '本实验只能修改：小橘猫的方向（90/-90/0/180）、移动步数（10～300）和到达时说的话（1～20 字），风车的重复次数（1～12）、右转度数（1～180）和等待秒数（0.2～1.0）。',
+    '起点“移到 x:-100 y:-70”固定不改；不能新增积木、精灵或用键盘控制（“用方向键走路”需要完整 Scratch 编辑器，可导出 .sb3 后继续改造）。',
+    '舞台画面按 Scratch VM 的坐标和方向绘制原创 SVG，未接入 WebGL 渲染器，所以精灵走出舞台边缘时 VM 不会把它拦回来；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    { name: 'Stage', kind: 'stage', label: '舞台', scripts: [{ hat: 'kc2_flag', body: [] }] },
+    {
+      name: '小橘猫', kind: 'sprite', label: '小橘猫',
+      scripts: [{ hat: 'kc2_flag', body: [
+        { type: 'kc2_goto_start', vmBlock: 'cat_goto', slots: [] },
+        { type: 'kc2_point_direction', vmBlock: 'cat_point', slots: [{ key: '小橘猫|cat_point|DIRECTION', field: 'DIRECTION', label: '方向', options: L04_DIRECTIONS }] },
+        { type: 'kc2_move_steps', vmBlock: 'cat_move', slots: [{ key: '小橘猫|cat_move|STEPS', field: 'STEPS', label: '步数', min: 10, max: 300 }] },
+        { type: 'kc2_say', vmBlock: 'cat_say', slots: say('小橘猫', 'cat_say') },
+      ] }],
+    },
+    {
+      name: '风车', kind: 'sprite', label: '风车',
+      scripts: [{ hat: 'kc2_clicked', body: [{
+        type: 'kc2_repeat', vmBlock: 'wheel_repeat', slots: [{ key: '风车|wheel_repeat|TIMES', field: 'TIMES', label: '次数', min: 1, max: 12 }],
+        children: [
+          { type: 'kc2_turn_right', vmBlock: 'wheel_turn', slots: [{ key: '风车|wheel_turn|DEGREES', field: 'DEGREES', label: '度数', min: 1, max: 180 }] },
+          { type: 'kc2_wait', vmBlock: 'wheel_wait', slots: [{ key: '风车|wheel_wait|DURATION', field: 'DURATION', label: '等待秒数', min: 0.2, max: 1, tenths: true }] },
+        ],
+      }] }],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-walk-to-fish', solutions: ['面向 90、移动 240 步 → VM 中 x=140 在小鱼区', '面向 90、移动 210 步 → x=110 也在小鱼区'], counterExamples: ['面向 90、移动 100 步 → x=0 没走到', '移动 400 步 → 超出 10～300 被拒绝'] },
+    { id: 'practiceB-quarter-turn', solutions: ['重复 1 次、右转 90 度 → VM 记录一共转 90 度', '重复 6 次、右转 15 度 → 也是 90 度'], counterExamples: ['重复 1 次、右转 15 度 → 只转 15 度', '右转 200 度 → 超出 1～180 被拒绝'] },
+    { id: 'debug-facing-left', solutions: ['面向 90 后点绿旗 → VM 中小橘猫向右走（x 变大）'], counterExamples: ['面向 -90 → VM 中 x 从 -100 变成 -200，向左走'] },
+  ],
+  nextLesson: 'G2-U1-L05 广播第一条消息',
+  showDirection: true,
+}
+
 export const g2u1ScratchLessons: Record<string, G2Lesson> = {
   [g2u1L01.id]: g2u1L01,
   [g2u1L02.id]: g2u1L02,
   [g2u1L03.id]: g2u1L03,
+  [g2u1L04.id]: g2u1L04,
 }
 
 export function getG2ScratchLesson(id: string): G2Lesson | null {
@@ -287,15 +371,17 @@ export type G2Observations = {
   /** The VM ran "switch costume" on the stage and no target changed costume. */
   stageCostumeRejected: boolean
   /** Backdrop after a finished green-flag run, and how many times the stage's own sounds played in it (in run order). */
-  flagRuns: Array<{ backdrop: string; stagePlays: number }>
+  flagRuns: Array<{ backdrop: string; stagePlays: number; positions?: Record<string, G2Point> }>
   /** Sounds each sprite played in the VM after being clicked. */
   clickSounds: Record<string, string[]>
+  /** Total degrees each sprite really turned in the VM during each finished click run. */
+  clickTurns: Record<string, number[]>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
-  flagRuns: [], clickSounds: {},
+  flagRuns: [], clickSounds: {}, clickTurns: {},
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
@@ -338,6 +424,20 @@ export function evaluateG2U1L03(obs: G2Observations): G2TaskState {
   }
 }
 
+export function evaluateG2U1L04(obs: G2Observations): G2TaskState {
+  const catX = obs.flagRuns.map(r => r.positions?.['小橘猫']?.x).filter((x): x is number => typeof x === 'number')
+  const firstLeft = catX.findIndex(x => x < L04_CAT_START.x)
+  const turns = obs.clickTurns['风车'] ?? []
+  const said = obs.lastSaid['小橘猫']
+  const arrived = obs.flagRuns.some(r => inFishZone(r.positions?.['小橘猫']))
+  return {
+    practiceA: arrived,
+    practiceB: turns.includes(90),
+    debug: firstLeft >= 0 && catX.slice(firstLeft + 1).some(x => x > L04_CAT_START.x),
+    create: turns.includes(360) && arrived && !!said && said !== L04_ARRIVAL,
+  }
+}
+
 /** What the VM actually showed for the lesson's prediction question (null until observed). */
 export function observedPrediction(id: string, obs: G2Observations): string | null {
   if (id === g2u1L01.id) return obs.clickedSpeakers.includes('小鸟') ? '小鸟说话' : null
@@ -351,6 +451,11 @@ export function observedPrediction(id: string, obs: G2Observations): string | nu
     if (!first) return null
     return first.stagePlays === 1 ? '1 次' : first.stagePlays === 3 ? '3 次' : null
   }
+  if (id === g2u1L04.id) {
+    const x = obs.flagRuns[0]?.positions?.['小橘猫']?.x
+    if (typeof x !== 'number' || x === L04_CAT_START.x) return null
+    return x < L04_CAT_START.x ? '向左走' : '向右走'
+  }
   return null
 }
 
@@ -358,5 +463,6 @@ export function evaluateG2Lesson(id: string, obs: G2Observations): G2TaskState |
   if (id === g2u1L01.id) return evaluateG2U1L01(obs)
   if (id === g2u1L02.id) return evaluateG2U1L02(obs)
   if (id === g2u1L03.id) return evaluateG2U1L03(obs)
+  if (id === g2u1L04.id) return evaluateG2U1L04(obs)
   return null
 }

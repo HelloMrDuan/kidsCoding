@@ -49,7 +49,7 @@ function installG2Blocks() {
   }
   Blockly.defineBlocksWithJsonArray([
     {type: 'kc2_repeat', message0: '重复执行 %1 次', args0: [
-      {type: 'field_number', name: 'TIMES', value: 1, min: 1, max: 10, precision: 1},
+      {type: 'field_number', name: 'TIMES', value: 1, min: 1, max: 20, precision: 1},
     ], message1: '%1', args1: [{type: 'input_statement', name: 'DO'}],
     previousStatement: null, nextStatement: null, colour: 35, tooltip: '对应 Scratch 的“重复执行……次”控制积木'},
     {type: 'kc2_next_costume', message0: '下一个造型', previousStatement: null, nextStatement: null, colour: 265, tooltip: '对应 Scratch 的“下一个造型”外观积木'},
@@ -62,6 +62,18 @@ function installG2Blocks() {
       {type: 'field_number', name: 'X', value: 0, min: -240, max: 240, precision: 1},
       {type: 'field_number', name: 'Y', value: 0, min: -180, max: 180, precision: 1},
     ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“移到 x y”运动积木'},
+    {type: 'kc2_goto_start', message0: '移到 x: -100 y: -70（起点，固定）', previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“移到 x y”运动积木；本课起点固定不改'},
+    {type: 'kc2_point_direction', message0: '面向 %1 方向', args0: [
+      {type: 'field_dropdown', name: 'DIRECTION', options: [['90（向右）', '90'], ['-90（向左）', '-90'], ['0（向上）', '0'], ['180（向下）', '180']]},
+    ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“面向……方向”运动积木'},
+    // No min/max on these number fields: an out-of-range value must stay visible
+    // so the restricted adapter can refuse it instead of silently clamping it.
+    {type: 'kc2_move_steps', message0: '移动 %1 步', args0: [
+      {type: 'field_number', name: 'STEPS', value: 10, precision: 1},
+    ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“移动……步”运动积木'},
+    {type: 'kc2_turn_right', message0: '右转 ↻ %1 度', args0: [
+      {type: 'field_number', name: 'DEGREES', value: 15, precision: 1},
+    ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“右转……度”运动积木'},
     {type: 'kc2_say', message0: '说 %1 2 秒', args0: [
       {type: 'field_input', name: 'MESSAGE', text: '你好！'},
     ], previousStatement: null, nextStatement: null, colour: 265, tooltip: '对应 Scratch 的“说……2 秒”外观积木'},
@@ -94,6 +106,7 @@ function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G
 const FIELD_TYPES: Record<string, string> = {
   X: 'kc2_goto', Y: 'kc2_goto', MESSAGE: 'kc2_say', COSTUME: 'kc2_switch_costume', TIMES: 'kc2_repeat', DURATION: 'kc2_wait',
   BACKDROP: 'kc2_switch_backdrop', SOUND_MENU: 'kc2_play_sound',
+  DIRECTION: 'kc2_point_direction', STEPS: 'kc2_move_steps', DEGREES: 'kc2_turn_right',
 }
 function findSlot(specs: G2BlockSpec[], field: G2Slot['field']): G2Slot | undefined {
   for (const spec of specs) {
@@ -175,7 +188,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
     if (!ws) return
     const block = ws.getAllBlocks(false).find(b => b.type === FIELD_TYPES[field])
     if (!block) return
-    block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' || field === 'BACKDROP' || field === 'SOUND_MENU' ? value : String(Number(value)), field)
+    block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' || field === 'BACKDROP' || field === 'SOUND_MENU' || field === 'DIRECTION' ? value : String(Number(value)), field)
   }
   const extra = target.extraToolbox?.[0]
   function attachStageExtra() {
@@ -194,6 +207,8 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   const stageErrorOnly = isStage && !!extra
   const allSpecs = target.scripts.flatMap(s => s.body)
   const timesSlot = findSlot(allSpecs, 'TIMES')
+  const stepsSlot = findSlot(allSpecs, 'STEPS')
+  const degreesSlot = findSlot(allSpecs, 'DEGREES')
   const hasGoto = fields.X !== undefined
   const hasSay = fields.MESSAGE !== undefined
   const extraLabel = extra === 'kc2_switch_costume' ? `换成（${costumeOptions[costumeOptions.length - 1]}）造型` : '移到 x y'
@@ -240,6 +255,26 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
             className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2">
             {soundOptions.map(name => <option key={name} value={name}>{name}</option>)}
           </select>
+        </label>
+      )}
+      {fields.DIRECTION !== undefined && (
+        <label className="text-sm font-bold text-slate-700">面向方向
+          <select data-testid="g2-edit-direction" value={fields.DIRECTION} onChange={e => update('DIRECTION', e.target.value)}
+            className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2">
+            {[['90', '90（向右）'], ['-90', '-90（向左）'], ['0', '0（向上）'], ['180', '180（向下）']].map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </label>
+      )}
+      {fields.STEPS !== undefined && (
+        <label className="text-sm font-bold text-slate-700">移动步数（{stepsSlot?.min ?? 10}～{stepsSlot?.max ?? 300}）
+          <input data-testid="g2-edit-steps" type="number" step={1} value={fields.STEPS}
+            onChange={e => update('STEPS', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
+        </label>
+      )}
+      {fields.DEGREES !== undefined && (
+        <label className="text-sm font-bold text-slate-700">右转度数（{degreesSlot?.min ?? 1}～{degreesSlot?.max ?? 180}）
+          <input data-testid="g2-edit-degrees" type="number" step={1} value={fields.DEGREES}
+            onChange={e => update('DEGREES', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
       )}
       {fields.TIMES !== undefined && (
