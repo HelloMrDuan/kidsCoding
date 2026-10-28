@@ -92,3 +92,21 @@ export async function PUT(request:Request) {
   return NextResponse.json({synced:true,lessonId:SCRATCH_DRAFT_LESSON_ID,updatedAt,verifiedGrade:false},
     {headers:HEADERS})
 }
+
+// CLOUD-105: delete the account's own cloud draft for the single Scratch
+// lesson. The database already permits owner deletes
+// (scratch_delete_own); this route was the missing half. Same-origin,
+// authenticated mutation; the row filter always comes from the session,
+// never from caller-supplied ids.
+export async function DELETE(request:Request) {
+  if(!hasSupabaseEnv())return NextResponse.json({error:'cloud-sync-not-configured'},{status:503,headers:HEADERS})
+  if(request.headers.get('sec-fetch-site')==='cross-site'||
+    (request.headers.get('origin')&&request.headers.get('origin')!==new URL(request.url).origin))
+    return NextResponse.json({error:'cross-origin-request'},{status:403,headers:HEADERS})
+  const context=await authenticatedClient()
+  if(!context?.user)return NextResponse.json({error:'authentication-required'},{status:401,headers:HEADERS})
+  const {error}=await context.client.from('scratch_practice_drafts').delete()
+    .eq('user_id',context.user.id).eq('lesson_id',SCRATCH_DRAFT_LESSON_ID)
+  if(error)return NextResponse.json({error:'cloud-draft-storage-unavailable'},{status:503,headers:HEADERS})
+  return NextResponse.json({deleted:true,lessonId:SCRATCH_DRAFT_LESSON_ID},{headers:HEADERS})
+}

@@ -4,7 +4,7 @@ import {beforeEach,describe,expect,it,vi} from 'vitest'
 const mocks=vi.hoisted(()=>({env:vi.fn(),client:vi.fn()}))
 vi.mock('@/lib/env',()=>({hasSupabaseEnv:mocks.env}))
 vi.mock('@/lib/supabase/server',()=>({createServerSupabaseClient:mocks.client}))
-import {GET,PUT} from './route'
+import {DELETE,GET,PUT} from './route'
 
 function buildZip(entries:{name:string;data:Buffer;method?:number;declaredSize?:number}[]):Buffer{
   const parts:Buffer[]=[]
@@ -76,14 +76,16 @@ function fakeZip(){
   return bytes.toString('base64')
 }
 describe('Scratch authenticated project drafts',()=>{
-  const user=vi.fn(),from=vi.fn(),select=vi.fn(),eq=vi.fn(),maybeSingle=vi.fn(),upsert=vi.fn()
+  const user=vi.fn(),from=vi.fn(),select=vi.fn(),eq=vi.fn(),maybeSingle=vi.fn(),upsert=vi.fn(),deleteFn=vi.fn(),deleteEq=vi.fn()
   beforeEach(()=>{
     vi.clearAllMocks()
     mocks.env.mockReturnValue(true)
     user.mockResolvedValue({data:{user:{id:'user-a'}},error:null})
-    from.mockReturnValue({select,upsert})
+    from.mockReturnValue({select,upsert,delete:deleteFn})
     select.mockReturnValue({eq})
     eq.mockReturnValue({eq,maybeSingle})
+    deleteFn.mockReturnValue({eq:deleteEq})
+    deleteEq.mockReturnValue({eq:deleteEq})
     maybeSingle.mockResolvedValue({data:{lesson_id:'G3-U1-L02',archive_base64:zip(),updated_at:'2026-10-10T00:00:00Z'},error:null})
     upsert.mockResolvedValue({error:null})
     mocks.client.mockResolvedValue({auth:{getUser:user},from})
@@ -165,5 +167,32 @@ describe('Scratch authenticated project drafts',()=>{
     const response=await GET()
     expect(response.status).toBe(503)
     expect((await response.json()).error).toBe('invalid-saved-project')
+  })
+  it('deletes only the authenticated account single lesson draft',async()=>{
+    const response=await DELETE(new Request('http://localhost/api/practice/scratch',{method:'DELETE'}))
+    expect(response.status).toBe(200)
+    expect(from).toHaveBeenCalledWith('scratch_practice_drafts')
+    expect(deleteFn).toHaveBeenCalled()
+    expect(deleteEq).toHaveBeenCalledWith('user_id','user-a')
+    expect(deleteEq).toHaveBeenCalledWith('lesson_id','G3-U1-L02')
+    expect(await response.json()).toEqual({deleted:true,lessonId:'G3-U1-L02'})
+  })
+  it('fails closed on delete without Supabase, authentication, or same origin',async()=>{
+    mocks.env.mockReturnValue(false)
+    expect((await DELETE(new Request('http://localhost/api/practice/scratch',{method:'DELETE'}))).status).toBe(503)
+    mocks.env.mockReturnValue(true)
+    user.mockResolvedValue({data:{user:null},error:null})
+    expect((await DELETE(new Request('http://localhost/api/practice/scratch',{method:'DELETE'}))).status).toBe(401)
+    user.mockResolvedValue({data:{user:{id:'user-a'}},error:null})
+    expect((await DELETE(new Request('http://localhost/api/practice/scratch',{method:'DELETE',
+      headers:{Origin:'https://attacker.invalid'}}))).status).toBe(403)
+    expect(deleteFn).not.toHaveBeenCalled()
+  })
+  it('reports storage failure on delete instead of claiming success',async()=>{
+    deleteEq.mockReturnValueOnce({eq:deleteEq})
+    deleteEq.mockResolvedValueOnce({error:{message:'db-down'}})
+    const response=await DELETE(new Request('http://localhost/api/practice/scratch',{method:'DELETE'}))
+    expect(response.status).toBe(503)
+    expect((await response.json()).error).toBe('cloud-draft-storage-unavailable')
   })
 })

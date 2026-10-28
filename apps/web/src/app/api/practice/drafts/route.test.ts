@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/lib/env', () => ({ hasSupabaseEnv: mocks.hasSupabaseEnv }))
 vi.mock('@/lib/supabase/server', () => ({ createServerSupabaseClient: mocks.createServerSupabaseClient }))
 
-import { GET, PUT } from './route'
+import { DELETE, GET, PUT } from './route'
 
 describe('authenticated Python practice cloud draft API', () => {
   const getUser = vi.fn()
@@ -17,6 +17,8 @@ describe('authenticated Python practice cloud draft API', () => {
   const upsert = vi.fn()
   const select = vi.fn()
   const from = vi.fn()
+  const deleteFn = vi.fn()
+  const deleteEq = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -26,7 +28,9 @@ describe('authenticated Python practice cloud draft API', () => {
     eq.mockReturnValue({order})
     select.mockReturnValue({eq})
     upsert.mockResolvedValue({error:null})
-    from.mockReturnValue({select,upsert})
+    from.mockReturnValue({select,upsert,delete:deleteFn})
+    deleteFn.mockReturnValue({eq:deleteEq})
+    deleteEq.mockReturnValue({eq:deleteEq})
     mocks.createServerSupabaseClient.mockResolvedValue({auth:{getUser},from})
   })
 
@@ -110,5 +114,37 @@ describe('authenticated Python practice cloud draft API', () => {
       method:'PUT',body:'{not json',
     }))).status).toBe(400)
     expect(upsert).not.toHaveBeenCalled()
+  })
+
+  it('deletes only the authenticated account lesson draft', async () => {
+    const response = await DELETE(new Request('http://localhost/api/practice/drafts?lessonId=P0-U1-L02',{method:'DELETE'}))
+    expect(response.status).toBe(200)
+    expect(from).toHaveBeenCalledWith('python_practice_drafts')
+    expect(deleteFn).toHaveBeenCalled()
+    expect(deleteEq).toHaveBeenCalledWith('user_id','account-123')
+    expect(deleteEq).toHaveBeenCalledWith('lesson_id','P0-U1-L02')
+    await expect(response.json()).resolves.toEqual({deleted:true,lessonId:'P0-U1-L02'})
+  })
+
+  it('refuses delete without a lesson id, authentication, or same origin', async () => {
+    expect((await DELETE(new Request('http://localhost/api/practice/drafts',{method:'DELETE'}))).status).toBe(400)
+    expect(deleteFn).not.toHaveBeenCalled()
+    mocks.hasSupabaseEnv.mockReturnValue(false)
+    expect((await DELETE(new Request('http://localhost/api/practice/drafts?lessonId=P0-U1-L02',{method:'DELETE'}))).status).toBe(503)
+    mocks.hasSupabaseEnv.mockReturnValue(true)
+    getUser.mockResolvedValue({data:{user:null},error:null})
+    expect((await DELETE(new Request('http://localhost/api/practice/drafts?lessonId=P0-U1-L02',{method:'DELETE'}))).status).toBe(401)
+    getUser.mockResolvedValue({data:{user:{id:'account-123'}},error:null})
+    expect((await DELETE(new Request('http://localhost/api/practice/drafts?lessonId=P0-U1-L02',{method:'DELETE',
+      headers:{Origin:'https://evil.invalid'}}))).status).toBe(403)
+    expect(deleteFn).not.toHaveBeenCalled()
+  })
+
+  it('reports storage failure on delete instead of claiming success', async () => {
+    deleteEq.mockReturnValueOnce({eq:deleteEq})
+    deleteEq.mockResolvedValueOnce({error:{message:'db-down'}})
+    const response = await DELETE(new Request('http://localhost/api/practice/drafts?lessonId=P0-U1-L02',{method:'DELETE'}))
+    expect(response.status).toBe(503)
+    expect((await response.json()).error).toBe('cloud-draft-storage-unavailable')
   })
 })
