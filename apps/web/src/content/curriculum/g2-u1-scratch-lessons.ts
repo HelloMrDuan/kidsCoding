@@ -6,12 +6,19 @@
 // examples/scratch/g2/build_g2_projects.py. Nothing here is a published
 // course or a verified grade.
 
-export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES'
+export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION'
 export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
 export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait' | 'kc2_switch_backdrop' | 'kc2_play_sound'
-  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right'
-export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[] }
-export type G2ScriptSpec = { hat: 'kc2_flag' | 'kc2_clicked'; body: G2BlockSpec[] }
+  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast'
+/** `fixed` shows a value the lesson keeps fixed (its field is shown but locked in the editor). */
+export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[]; fixed?: Partial<Record<G2Field, string>> }
+export type G2ScriptSpec = {
+  hat: 'kc2_flag' | 'kc2_clicked' | 'kc2_when_receive'
+  body: G2BlockSpec[]
+  /** Editable fields on the hat itself (the message a "when I receive" hat listens for). */
+  hatSlots?: G2Slot[]
+  hatFixed?: Partial<Record<G2Field, string>>
+}
 export type G2TargetSpec = {
   name: string
   kind: 'stage' | 'sprite'
@@ -21,6 +28,8 @@ export type G2TargetSpec = {
   costumes?: string[]
   /** Sound names offered by this target's sound dropdowns. */
   sounds?: string[]
+  /** Broadcast message names offered by this target's message dropdowns. */
+  messages?: string[]
   /** Blocks offered in the toolbox beyond the target's own scripts (used for the stage error cases). */
   extraToolbox?: Array<'kc2_goto' | 'kc2_switch_costume'>
 }
@@ -315,7 +324,7 @@ export const g2u1L04: G2Lesson = {
     {
       name: '小橘猫', kind: 'sprite', label: '小橘猫',
       scripts: [{ hat: 'kc2_flag', body: [
-        { type: 'kc2_goto_start', vmBlock: 'cat_goto', slots: [] },
+        { type: 'kc2_goto_start', vmBlock: 'cat_goto', slots: [], fixed: { X: '-100', Y: '-70' } },
         { type: 'kc2_point_direction', vmBlock: 'cat_point', slots: [{ key: '小橘猫|cat_point|DIRECTION', field: 'DIRECTION', label: '方向', options: L04_DIRECTIONS }] },
         { type: 'kc2_move_steps', vmBlock: 'cat_move', slots: [{ key: '小橘猫|cat_move|STEPS', field: 'STEPS', label: '步数', min: 10, max: 300 }] },
         { type: 'kc2_say', vmBlock: 'cat_say', slots: say('小橘猫', 'cat_say') },
@@ -341,11 +350,98 @@ export const g2u1L04: G2Lesson = {
   showDirection: true,
 }
 
+export const L05_BIRD_LINE = '叽叽喳喳，欢迎大家！'
+export const L05_CENTER_ZONE = { minX: -40, maxX: 40 } as const
+export const L05_MESSAGES = ['开场', '谢幕']
+
+export const g2u1L05: G2Lesson = {
+  id: 'G2-U1-L05',
+  title: '广播第一条消息',
+  concept: '广播与接收消息',
+  sample: '/scratch-samples/g2-u1-l05-broadcast-show.sb3.b64',
+  exportName: 'KidsCoding-广播第一条消息.sb3',
+  story: '动物小剧场要开演了！主持人小橘猫一被点击就喊“表演开始！”，再广播一条“开场”消息：舞台该亮灯、小白兔该跳到舞台中间、小鸟该唱欢迎歌。可是现在小鸟一声不吭……',
+  conceptExplain: [
+    '“广播（开场）”像在全场喊一声：它只发出一条有名字的消息，自己不管谁来做什么。',
+    '“当接收到（开场）”是收听：每个对象（包括舞台）都可以有自己的收听脚本，收到同名消息就一起开始。',
+    '消息名字必须一模一样：在听“谢幕”的脚本，听不到“开场”。',
+  ],
+  predict: {
+    question: '小橘猫广播的是“开场”，小鸟的脚本是“当接收到（谢幕）→ 说……”。点一下小橘猫，小鸟会说话吗？',
+    options: ['会说话', '不会说话'],
+    correct: '不会说话',
+    explain: '小鸟在听“谢幕”，Scratch VM 广播的是“开场”，名字不一样，小鸟的脚本不会启动。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '让舞台用“当接收到”响应广播', title: '练习 A：收到“开场”就亮灯', goal: '选中舞台，把“当接收到（开场）→ 换成（ ）背景”改成“灯光舞台”，应用后点小橘猫，让 Scratch VM 收到广播后真的换成灯光舞台。', how: '舞台也能收听广播；绿旗会把舞台重置成幕布舞台。' },
+    { id: 'practiceB', skill: '在收听脚本里安排角色的动作', title: '练习 B：小白兔跳到舞台中间', goal: '选中小白兔，改“当接收到（开场）→ 移到 x（ ）”里的 x，应用后点小橘猫，让 VM 里的小白兔收到广播后停在舞台中间（x -40～40）。', how: '小白兔从右边后台出发，舞台正中间 x 是 0；-40～40 之间都算中间。点绿旗可以让小白兔回到后台。' },
+    { id: 'debug', skill: '找出消息名字不一致（调试）', title: '找错：小鸟为什么不唱？', goal: '先点小橘猫，看 Scratch VM 广播了什么、小鸟有没有说话；再修好小鸟的收听脚本，让广播后小鸟真的说话。', how: '对一对：广播的名字和小鸟在听的名字一样吗？' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：完整开场', goal: '给小鸟编一句自己的欢迎词（1～20 字），点一次小橘猫，做到“灯光舞台 + 小白兔在中间 + 小鸟说出新欢迎词”，再保存为 .sb3。', how: '也可以改小橘猫的开场白；一次广播让三个对象一起行动。' },
+  ],
+  hints: [
+    '看现象：点小橘猫后，Scratch VM 记录它广播了“开场”，舞台和小白兔都有反应，只有小鸟没说话。',
+    '想原因：小鸟的帽子积木是“当接收到（谢幕）”，它在等“谢幕”这条消息；名字不一样，广播“开场”叫不醒它。',
+    '去修复：选中小鸟，把“当接收到（ ）”改成“开场”，应用后再点小橘猫。',
+  ],
+  reflection: [
+    '一条“开场”广播，让哪几个对象开始了行动？',
+    '小鸟为什么一开始听不到？你是怎么发现的？',
+    '如果想在表演结束时让大家一起鞠躬，你会广播什么消息？',
+  ],
+  limitations: [
+    '本实验只能修改：舞台收到“开场”时换的背景（幕布舞台/灯光舞台）、小橘猫开场白和小鸟欢迎词（1～20 字）、小鸟在听的消息（开场/谢幕）、小白兔收到广播后去的 x（-240～240）。',
+    '小橘猫广播的消息固定为“开场”；不能新建消息、不能用“广播并等待”或新增积木/精灵（“谢幕鞠躬”需要完整 Scratch 编辑器，可导出 .sb3 后继续改造）。',
+    '舞台画面按 Scratch VM 的对象状态绘制原创 SVG，未接入 WebGL 渲染器；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    {
+      name: 'Stage', kind: 'stage', label: '舞台', costumes: ['幕布舞台', '灯光舞台'], messages: L05_MESSAGES,
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_switch_backdrop', vmBlock: 'stage_reset_menu', slots: [], fixed: { BACKDROP: '幕布舞台' } }] },
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '开场' }, body: [
+          { type: 'kc2_switch_backdrop', vmBlock: 'stage_backdrop_menu', slots: [{ key: 'Stage|stage_backdrop_menu|BACKDROP', field: 'BACKDROP', label: '背景', options: ['幕布舞台', '灯光舞台'] }] },
+        ] },
+      ],
+    },
+    {
+      name: '小橘猫', kind: 'sprite', label: '小橘猫', messages: L05_MESSAGES,
+      scripts: [{ hat: 'kc2_clicked', body: [
+        { type: 'kc2_say', vmBlock: 'cat_say', slots: say('小橘猫', 'cat_say') },
+        { type: 'kc2_broadcast', vmBlock: 'cat_bcast', slots: [], fixed: { BROADCAST_OPTION: '开场' } },
+      ] }],
+    },
+    {
+      name: '小鸟', kind: 'sprite', label: '小鸟', messages: L05_MESSAGES,
+      scripts: [{
+        hat: 'kc2_when_receive',
+        hatSlots: [{ key: '小鸟|bird_recv|BROADCAST_OPTION', field: 'BROADCAST_OPTION', label: '消息', options: L05_MESSAGES }],
+        body: [{ type: 'kc2_say', vmBlock: 'bird_say', slots: say('小鸟', 'bird_say') }],
+      }],
+    },
+    {
+      name: '小白兔', kind: 'sprite', label: '小白兔', messages: L05_MESSAGES,
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_goto_start', vmBlock: 'rabbit_home', slots: [], fixed: { X: '190', Y: '-40' } }] },
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '开场' }, body: [
+          { type: 'kc2_goto', vmBlock: 'rabbit_goto', slots: [{ key: '小白兔|rabbit_goto|X', field: 'X', label: 'x', min: -240, max: 240 }], fixed: { Y: '-40' } },
+        ] },
+      ],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-stage-receives', solutions: ['舞台“当接收到（开场）→ 换成灯光舞台”→ 点小橘猫后 VM 背景为灯光舞台'], counterExamples: ['仍是“换成幕布舞台”→ 广播后背景不变'] },
+    { id: 'practiceB-rabbit-to-center', solutions: ['小白兔收到开场后移到 x 0 → VM 中在舞台中间', 'x 30 → 也在中间'], counterExamples: ['x 110 → 还在右边后台', 'x 300 的作品文件 → 超出 -240～240 被沙箱拒绝'] },
+    { id: 'debug-message-name-mismatch', solutions: ['小鸟改成“当接收到（开场）”→ 广播后 VM 中小鸟说话'], counterExamples: ['小鸟听“谢幕”→ 广播“开场”后小鸟不说话'] },
+  ],
+  nextLesson: 'G2-U1-L06 制作生日贺卡',
+}
+
 export const g2u1ScratchLessons: Record<string, G2Lesson> = {
   [g2u1L01.id]: g2u1L01,
   [g2u1L02.id]: g2u1L02,
   [g2u1L03.id]: g2u1L03,
   [g2u1L04.id]: g2u1L04,
+  [g2u1L05.id]: g2u1L05,
 }
 
 export function getG2ScratchLesson(id: string): G2Lesson | null {
@@ -376,12 +472,14 @@ export type G2Observations = {
   clickSounds: Record<string, string[]>
   /** Total degrees each sprite really turned in the VM during each finished click run. */
   clickTurns: Record<string, number[]>
+  /** Finished broadcast runs: the message the VM really sent, who spoke during the run, and the end state. */
+  broadcastRuns: Array<{ message: string; speakers: string[]; backdrop: string; positions: Record<string, G2Point> }>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
-  flagRuns: [], clickSounds: {}, clickTurns: {},
+  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [],
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
@@ -438,6 +536,23 @@ export function evaluateG2U1L04(obs: G2Observations): G2TaskState {
   }
 }
 
+export function inCenterZone(point: G2Point | undefined | null): boolean {
+  return !!point && Number.isFinite(point.x) && point.x >= L05_CENTER_ZONE.minX && point.x <= L05_CENTER_ZONE.maxX
+}
+
+export function evaluateG2U1L05(obs: G2Observations): G2TaskState {
+  const runs = obs.broadcastRuns.filter(r => r.message === '开场')
+  const firstSilent = runs.findIndex(r => !r.speakers.includes('小鸟'))
+  const birdLine = obs.lastSaid['小鸟']
+  return {
+    practiceA: runs.some(r => r.backdrop === '灯光舞台'),
+    practiceB: runs.some(r => inCenterZone(r.positions['小白兔'])),
+    debug: firstSilent >= 0 && runs.slice(firstSilent + 1).some(r => r.speakers.includes('小鸟')),
+    create: !!birdLine && birdLine !== L05_BIRD_LINE &&
+      runs.some(r => r.speakers.includes('小鸟') && r.backdrop === '灯光舞台' && inCenterZone(r.positions['小白兔'])),
+  }
+}
+
 /** What the VM actually showed for the lesson's prediction question (null until observed). */
 export function observedPrediction(id: string, obs: G2Observations): string | null {
   if (id === g2u1L01.id) return obs.clickedSpeakers.includes('小鸟') ? '小鸟说话' : null
@@ -456,6 +571,11 @@ export function observedPrediction(id: string, obs: G2Observations): string | nu
     if (typeof x !== 'number' || x === L04_CAT_START.x) return null
     return x < L04_CAT_START.x ? '向左走' : '向右走'
   }
+  if (id === g2u1L05.id) {
+    const first = obs.broadcastRuns[0]
+    if (!first) return null
+    return first.speakers.includes('小鸟') ? '会说话' : '不会说话'
+  }
   return null
 }
 
@@ -464,5 +584,6 @@ export function evaluateG2Lesson(id: string, obs: G2Observations): G2TaskState |
   if (id === g2u1L02.id) return evaluateG2U1L02(obs)
   if (id === g2u1L03.id) return evaluateG2U1L03(obs)
   if (id === g2u1L04.id) return evaluateG2U1L04(obs)
+  if (id === g2u1L05.id) return evaluateG2U1L05(obs)
   return null
 }

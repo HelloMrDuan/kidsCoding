@@ -10,6 +10,7 @@ import {readG2Program, type G2Program, type G2Values} from './scratch-g2-program
 // target, so the dropdown always lists the selected target's own costumes.
 let costumeOptions: string[] = ['造型1']
 let soundOptions: string[] = ['声音1']
+let messageOptions: string[] = ['消息1']
 let installed = false
 function installG2Blocks() {
   if (installed) return
@@ -47,6 +48,25 @@ function installG2Blocks() {
       this.setTooltip('对应 Scratch 的“播放声音……等待播完”声音积木')
     },
   }
+  Blockly.Blocks.kc2_when_receive = {
+    init(this: Blockly.Block) {
+      this.appendDummyInput().appendField('当接收到')
+        .appendField(new Blockly.FieldDropdown(() => messageOptions.map(name => [name, name] as [string, string])), 'BROADCAST_OPTION')
+      this.setNextStatement(true)
+      this.setColour(45)
+      this.setTooltip('对应 Scratch 的“当接收到……”事件积木：收到同名广播时从这里开始')
+    },
+  }
+  Blockly.Blocks.kc2_broadcast = {
+    init(this: Blockly.Block) {
+      this.appendDummyInput().appendField('广播')
+        .appendField(new Blockly.FieldDropdown(() => messageOptions.map(name => [name, name] as [string, string])), 'BROADCAST_OPTION')
+      this.setPreviousStatement(true)
+      this.setNextStatement(true)
+      this.setColour(45)
+      this.setTooltip('对应 Scratch 的“广播……”事件积木')
+    },
+  }
   Blockly.defineBlocksWithJsonArray([
     {type: 'kc2_repeat', message0: '重复执行 %1 次', args0: [
       {type: 'field_number', name: 'TIMES', value: 1, min: 1, max: 20, precision: 1},
@@ -62,7 +82,10 @@ function installG2Blocks() {
       {type: 'field_number', name: 'X', value: 0, min: -240, max: 240, precision: 1},
       {type: 'field_number', name: 'Y', value: 0, min: -180, max: 180, precision: 1},
     ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“移到 x y”运动积木'},
-    {type: 'kc2_goto_start', message0: '移到 x: -100 y: -70（起点，固定）', previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“移到 x y”运动积木；本课起点固定不改'},
+    {type: 'kc2_goto_start', message0: '移到 x: %1 y: %2（起点，固定）', args0: [
+      {type: 'field_number', name: 'X', value: 0, precision: 1},
+      {type: 'field_number', name: 'Y', value: 0, precision: 1},
+    ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“移到 x y”运动积木；本课起点固定不改'},
     {type: 'kc2_point_direction', message0: '面向 %1 方向', args0: [
       {type: 'field_dropdown', name: 'DIRECTION', options: [['90（向右）', '90'], ['-90（向左）', '-90'], ['0（向上）', '0'], ['180（向下）', '180']]},
     ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“面向……方向”运动积木'},
@@ -80,19 +103,28 @@ function installG2Blocks() {
   ])
 }
 
-function setSlots(block: Blockly.Block, spec: G2BlockSpec, values: G2Values) {
-  for (const slot of spec.slots) {
+// Fields the lesson does not let the learner change are shown with their real
+// value but locked, so an edit can never be silently ignored.
+function setSlots(block: Blockly.Block, slots: G2Slot[], values: G2Values, fixed?: Partial<Record<string, string>>) {
+  for (const [field, value] of Object.entries(fixed ?? {})) if (value !== undefined) block.setFieldValue(value, field)
+  for (const slot of slots) {
     const value = values[slot.key]
     if (value !== undefined) block.setFieldValue(String(value), slot.field)
   }
+  for (const input of block.inputList) {
+    for (const field of input.fieldRow) {
+      if (field.name && field.EDITABLE && !slots.some(slot => slot.field === field.name)) field.setEnabled(false)
+    }
+  }
 }
+const fieldEnabled = (block: Blockly.Block, field: string) => block.getField(field)?.isEnabled() !== false
 
 function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G2Values, attach: (b: Blockly.Block) => void) {
   let previous: Blockly.Block | null = null
   for (const spec of specs) {
     const b = ws.newBlock(spec.type)
     b.initSvg(); b.render()
-    setSlots(b, spec, values)
+    setSlots(b, spec.slots, values, spec.fixed)
     if (previous) previous.nextConnection?.connect(b.previousConnection!)
     else attach(b)
     if (spec.children) {
@@ -106,7 +138,7 @@ function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G
 const FIELD_TYPES: Record<string, string> = {
   X: 'kc2_goto', Y: 'kc2_goto', MESSAGE: 'kc2_say', COSTUME: 'kc2_switch_costume', TIMES: 'kc2_repeat', DURATION: 'kc2_wait',
   BACKDROP: 'kc2_switch_backdrop', SOUND_MENU: 'kc2_play_sound',
-  DIRECTION: 'kc2_point_direction', STEPS: 'kc2_move_steps', DEGREES: 'kc2_turn_right',
+  DIRECTION: 'kc2_point_direction', STEPS: 'kc2_move_steps', DEGREES: 'kc2_turn_right', BROADCAST_OPTION: 'kc2_when_receive',
 }
 function findSlot(specs: G2BlockSpec[], field: G2Slot['field']): G2Slot | undefined {
   for (const spec of specs) {
@@ -132,6 +164,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
     installG2Blocks()
     costumeOptions = target.costumes?.length ? target.costumes : ['造型1']
     soundOptions = target.sounds?.length ? target.sounds : ['声音1']
+    messageOptions = target.messages?.length ? target.messages : ['消息1']
     if (!node.current) return
     const toolboxTypes = new Set<string>()
     const collect = (specs: G2BlockSpec[]) => { for (const b of specs) { toolboxTypes.add(b.type); if (b.children) collect(b.children) } }
@@ -153,6 +186,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
       const hat = ws.newBlock(script.hat)
       hat.initSvg(); hat.render()
       hat.moveBy(32, offsetY)
+      setSlots(hat, script.hatSlots ?? [], initialValues, script.hatFixed)
       buildSequence(ws, script.body, initialValues, b => hat.nextConnection?.connect(b.previousConnection!))
       offsetY += script.body.some(b => b.children) ? 170 : 110
     }
@@ -162,7 +196,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
       const snapshot: Record<string, string> = {}
       for (const block of ws.getAllBlocks(false)) {
         for (const [field, type] of Object.entries(FIELD_TYPES)) {
-          if (block.type === type && snapshot[field] === undefined) snapshot[field] = String(block.getFieldValue(field))
+          if (block.type === type && snapshot[field] === undefined && fieldEnabled(block, field)) snapshot[field] = String(block.getFieldValue(field))
         }
       }
       setFields(snapshot)
@@ -186,9 +220,9 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   function update(field: G2Slot['field'], value: string) {
     const ws = workspace.current
     if (!ws) return
-    const block = ws.getAllBlocks(false).find(b => b.type === FIELD_TYPES[field])
+    const block = ws.getAllBlocks(false).find(b => b.type === FIELD_TYPES[field] && fieldEnabled(b, field))
     if (!block) return
-    block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' || field === 'BACKDROP' || field === 'SOUND_MENU' || field === 'DIRECTION' ? value : String(Number(value)), field)
+    block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' || field === 'BACKDROP' || field === 'SOUND_MENU' || field === 'DIRECTION' || field === 'BROADCAST_OPTION' ? value : String(Number(value)), field)
   }
   const extra = target.extraToolbox?.[0]
   function attachStageExtra() {
@@ -228,10 +262,10 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
           <input data-testid="g2-edit-x" type="number" min={-240} max={240} step={1} value={fields.X}
             onChange={e => update('X', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
-        <label className="text-sm font-bold text-slate-700">y（-180～180）
+        {fields.Y !== undefined && <label className="text-sm font-bold text-slate-700">y（-180～180）
           <input data-testid="g2-edit-y" type="number" min={-180} max={180} step={1} value={fields.Y}
             onChange={e => update('Y', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
-        </label>
+        </label>}
       </>)}
       {fields.COSTUME !== undefined && (
         <label className="text-sm font-bold text-slate-700">造型
@@ -254,6 +288,14 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
           <select data-testid="g2-edit-sound" value={fields.SOUND_MENU} onChange={e => update('SOUND_MENU', e.target.value)}
             className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2">
             {soundOptions.map(name => <option key={name} value={name}>{name}</option>)}
+          </select>
+        </label>
+      )}
+      {fields.BROADCAST_OPTION !== undefined && (
+        <label className="text-sm font-bold text-slate-700">在听的消息
+          <select data-testid="g2-edit-message" value={fields.BROADCAST_OPTION} onChange={e => update('BROADCAST_OPTION', e.target.value)}
+            className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2">
+            {messageOptions.map(name => <option key={name} value={name}>{name}</option>)}
           </select>
         </label>
       )}
