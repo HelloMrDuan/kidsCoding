@@ -9,7 +9,7 @@
 // - `send_bell` rings the forest bell; after the running script ends, every
 //   script whose hat is `when_bell` runs (in stage order).
 
-export type EventActorId = 'fox' | 'rabbit' | 'bird' | 'squirrel' | 'apple' | 'flag'
+export type EventActorId = 'fox' | 'rabbit' | 'bird' | 'frog' | 'squirrel' | 'apple' | 'flag'
 
 export const EVENT_HATS = ['when_start', 'when_clicked', 'when_bell'] as const
 export type EventHat = (typeof EVENT_HATS)[number]

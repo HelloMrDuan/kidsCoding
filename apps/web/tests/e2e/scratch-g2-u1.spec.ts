@@ -946,6 +946,14 @@ const L06_SAMPLE = 'public/scratch-samples/g2-u1-l06-birthday-card.sb3.b64'
 const speechLog = (page: import('@playwright/test').Page) => page.getByTestId('g2-speech-log')
 const bubbleOf = (page: import('@playwright/test').Page, name: string) => page.locator(`[data-testid="g2-bubble"][data-name="${name}"]`)
 /** Click the green flag and wait until the VM run has finished (balloon said its line and floated up). */
+/** Quick-edit inputs are controlled by the Blockly workspace; re-fill until the box (and so the block) really holds the value before applying. */
+async function fillEdit(page: import('@playwright/test').Page, testId: string, value: string) {
+  const box = page.getByTestId(testId)
+  await expect(async () => {
+    if (await box.inputValue() !== value) await box.fill(value)
+    await expect(box).toHaveValue(value, {timeout: 1_000})
+  }).toPass({timeout: 10_000})
+}
 async function flagCard(page: import('@playwright/test').Page) {
   await page.getByTestId('g2-green-flag').click()
   // A run lasts at least 2 s (the balloon's line), so the new run is seen in progress before it finishes.
@@ -1035,16 +1043,19 @@ test.describe('G2-U1-L06 制作生日贺卡', () => {
     await expect(spriteState(page, '气球')).toContainText('x 160 · y -70')
     await expect(page.getByTestId('g2-task-practiceB')).toHaveAttribute('data-done', 'false')
     await selectTarget(page, '气球')
-    await page.getByTestId('g2-edit-dy').fill('40')
+    await fillEdit(page, 'g2-edit-dy', '40')
+    await expect(page.getByTestId('g2-editor-validity')).toContainText('积木没有拼好')
     await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
-    await page.getByTestId('g2-edit-dy').fill('10')
-    await page.getByTestId('g2-edit-times').fill('5')
+    await fillEdit(page, 'g2-edit-dy', '10')
+    await fillEdit(page, 'g2-edit-times', '5')
+    await expect(page.getByTestId('g2-editor-validity')).toContainText('积木连接正确')
     await applyAndWait(page)
     await flagCard(page)
     await expect(spriteState(page, '气球')).toContainText('x 160 · y -40')
     await expect(page.getByTestId('g2-task-practiceB')).toHaveAttribute('data-done', 'true')
-    await page.getByTestId('g2-edit-times').fill('2')
-    await page.getByTestId('g2-edit-dy').fill('30')
+    await fillEdit(page, 'g2-edit-times', '2')
+    await fillEdit(page, 'g2-edit-dy', '30')
+    await expect(page.getByTestId('g2-editor-validity')).toContainText('积木连接正确')
     await applyAndWait(page)
     await flagCard(page)
     await expect(spriteState(page, '气球')).toContainText('x 160 · y -30')

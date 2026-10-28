@@ -261,7 +261,7 @@
       "unitId": "G0-U2",
       "focusConcept": "角色",
       "plannedLearningOutcome": "能使用角色解释并完成「切换两位朋友」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -274,13 +274,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/206",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L04 formal course in the forest theatre: script on the wrong friend, fox first, two turns, nobody came, pick the second act, saved and reopened（2026-10-28 本地桌面 Chrome grid-lab 11/11 通过；以 PR #206 CI 为准）",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L04 五关正式课程化（错误实验·积木拼错了朋友、小狐狸先登台、练习A两次登台、练习B两段积木都没触发、创意·自选第二个节目）+ 复盘卡 + 作品回放 + 原创森林小剧场场景；复用事件舞台引擎。证据 docs/roadmap/evidence/G0-U2-L04/，AI 参考教研 83/100（实现者自评，非独立）。in_review：等待 PR CI、合并与 main CI；等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U2-L05",
@@ -1489,7 +1489,7 @@
       "unitId": "G2-U1",
       "focusConcept": "积木",
       "plannedLearningOutcome": "能使用积木解释并完成「制作生日贺卡」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1503,9 +1503,9 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/205",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U1-L06 block: 5 tests; local Playwright Chromium 32/32 for the spec; CI real-Chrome result pending)",
+        "mergeCommit": "675fe844bc029baf2b76e230d563b1a5ee5715ca",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40653118723",
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts — G2-U1-L06 用例在 PR #205 与 main 真 Chrome CI（scratch-real-vm-browser 分片）通过（main 首次运行 practice B 用例超时，失败任务重跑后全绿；本 PR 加固该用例）",
         "lessonReview": null
       },
       "notes": "Hark B：真实 Scratch VM 原创生日贺卡单元作品（说话/换造型/播放声音/等待/重复+将 y 坐标增加按时间顺序组合）；练习A蛋糕先换蜡烛点亮再唱生日歌（VM 记录唱歌时造型）、练习B重复×y 增加让气球飘到彩带（多解）、气球等待 0 秒抢话的找错+三层提示（须先见抢话再见轮流，等待 1 秒仍抢话）、创意自己的祝福+完整贺卡；.sb3（含合成 WAV）自动保存/刷新恢复/导出回读/导入、沙箱拒非整数等待/越界/换积木/调换顺序/偷换声音/他课工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L06.json，非独立），需独立人工教研复核；无儿童试学；未接 WebGL 渲染器。不得标 completed。"
