@@ -23,6 +23,7 @@ const ACCEPTANCE_SET = [
   'turn-sign.svg', // G0-U1-L04 story scenery
   'key-hook.svg', // G0-U1-L05 story scenery
   'guide-map.svg', // G0-U1-L06 story scenery
+  'morning-glade.svg', // G0-U2 event stage backdrop
 ]
 
 describe('kc-scenes asset register (UX-004)', () => {

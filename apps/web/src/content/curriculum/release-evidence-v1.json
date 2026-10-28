@@ -242,6 +242,46 @@
         "status": "unchecked"
       }
     },
+    "G0-U2-L01": {
+      "contentReviewed": {
+        "status": "unchecked",
+        "evidence": [
+          {
+            "kind": "review",
+            "ref": "docs/roadmap/teaching-reviews/G0-U2-L01.json"
+          }
+        ],
+        "note": "TQ-004/EDU-105 评分由实现者 AI 完成，仅供参考，需独立审阅"
+      },
+      "engineProductionReady": {
+        "status": "unchecked",
+        "note": "事件舞台引擎（event-engine.ts）仅在桌面 Chrome CI 与本地截图验证，未做目标浏览器和真实设备验收"
+      },
+      "assessmentE2EPassed": {
+        "status": "unchecked",
+        "evidence": [
+          {
+            "kind": "file",
+            "ref": "apps/web/tests/e2e/grid-lab.spec.ts"
+          }
+        ],
+        "note": "每关已有正确/错误示例和 E2E，但未经独立测评复核"
+      },
+      "licensedAssetsReady": {
+        "status": "unchecked",
+        "note": "public 素材已登记原创；配音为浏览器 TTS，正式素材清单未审"
+      },
+      "progressVerified": {
+        "status": "unchecked",
+        "note": "只验证了本机保存与刷新恢复，未验证正式登录和跨设备"
+      },
+      "minorPrivacyApproved": {
+        "status": "unchecked"
+      },
+      "humanApproved": {
+        "status": "unchecked"
+      }
+    },
     "G3-U1-L02": {
       "contentReviewed": {
         "status": "unchecked"

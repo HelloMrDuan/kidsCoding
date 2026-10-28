@@ -4,9 +4,10 @@
 
 export const blocklyEngineCapabilities: Record<string, string> = {
   when_start: 'playable-stage/use-block-executor.ts',
-  when_clicked: 'playable-stage/use-block-executor.ts',
+  when_clicked: 'playable-stage/use-block-executor.ts; event/event-engine.ts (G0-U2 click a character)',
   movement: 'playable-stage/use-block-executor.ts; grid/grid-engine.ts',
-  character_selection: 'playable-stage/use-block-executor.ts (lessons 10-12)',
+  character_selection: 'playable-stage/use-block-executor.ts (lessons 10-12); event/event-lab.tsx (one script per character)',
+  message_event: 'event/event-engine.ts (when_bell / send_bell broadcast between characters)',
   direction: 'grid/grid-engine.ts (up/down/left/right, forward, turn left/right)',
   path_obstacles: 'grid/grid-engine.ts (rocks, river, map edge, key and locked door)',
 }

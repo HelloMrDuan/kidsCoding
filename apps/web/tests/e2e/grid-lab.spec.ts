@@ -551,6 +551,112 @@ test('G0-U1-L06 unit project formal course: wrong-order error lab, two practices
   await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
+// G0-U2 event lessons run on the event stage (/learn/event-lab); their E2E lives here because this spec is in CI.
+test('G0-U2-L01 formal course on the event stage: hat-below error lab, order, click-only wake, debug the woken rabbit, pick a friend, saved and reopened', async ({ page }) => {
+  test.setTimeout(200_000)
+  const q = async (...types: string[]) => { for (const t of types) await add(page, t) }
+  await page.goto('/learn/catalog/G0-U2-L01')
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+  await page.getByTestId('event-trial-entry').click()
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  await expect(page.locator('[data-grid-item="morning-glade"]')).toBeVisible()
+  const fox = page.getByTestId('event-actor-fox')
+  await expect(fox).toHaveAttribute('data-awake', 'false')
+  // Characters stand inside the stage, never spilling onto the buttons below it.
+  const stageBox = (await page.getByTestId('event-stage').first().boundingBox())!
+  for (const id of ['fox', 'rabbit']) {
+    const box = (await page.getByTestId(`event-actor-${id}`).first().boundingBox())!
+    expect(box.y + box.height).toBeLessThanOrEqual(stageBox.y + stageBox.height + 1)
+  }
+
+  // Step 1 — error lab: “开始时” sits below the actions, so the start flag never reaches them.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('猜错也没关系')
+  await expect(page.getByTestId('grid-feedback')).toContainText('还在睡')
+  await expect(fox).toHaveAttribute('data-awake', 'false')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_start', 'wake_up', 'say_hello')
+  await runAndExpect(page, 'success')
+  await expect(fox).toHaveAttribute('data-awake', 'true')
+  await expect(fox).toHaveAttribute('data-said', 'true')
+  await next(page)
+
+  // Guided: speaking before waking is the wrong order.
+  await q('when_start', 'say_hello', 'wake_up')
+  await runAndExpect(page, 'error', '顺序反了')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_start', 'wake_up', 'say_hello')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: only a click wakes the fox; with “开始时” it wakes too early.
+  await q('when_start', 'wake_up', 'say_hello')
+  await runAndExpect(page, 'error', '还没点')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_clicked', 'wake_up', 'say_hello')
+  // Free play before checking: the start flag does nothing, tapping the fox wakes it.
+  await page.getByTestId('event-flag').click()
+  await expect(fox).toHaveAttribute('data-awake', 'false')
+  await fox.click()
+  await expect(fox).toHaveAttribute('data-awake', 'true')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice B: the rabbit's own script wakes it at the start flag; clear the rabbit's script.
+  await runAndExpect(page, 'error', '多了不该有的动作')
+  await expect(page.getByTestId('grid-feedback')).toContainText('小兔子')
+  await page.getByTestId('event-edit-rabbit').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Creative remake: pick the bird; blocks on the fox do nothing for the bird; blocks on the bird pass.
+  await page.getByTestId('grid-run').click()
+  await expect(page.getByTestId('grid-feedback')).toContainText('先在上面选好')
+  await page.getByTestId('grid-goal-choice-2').click() // 小鸟
+  await page.getByTestId('event-edit-fox').click()
+  await q('when_clicked', 'wake_up', 'say_hello')
+  await runAndExpect(page, 'error', '什么都没发生')
+  await page.getByTestId('lesson-clear-program').click()
+  await page.getByTestId('event-edit-bird').click()
+  await q('when_clicked', 'wake_up', 'say_hello')
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  // 复盘: the mistakes this child really met, and the what-if.
+  const mistakes = page.getByTestId('grid-review-mistakes')
+  for (const m of ['事件没放在最上面', '动作顺序反了', '还没触发就先动了', '多了不该有的动作', '触发了却没反应']) await expect(mistakes).toContainText(m)
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('开始旗')
+  await expect(page.getByTestId('grid-project-status')).toContainText('点小鸟才会醒')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  // Close and reopen: the card replays for real — only the bird wakes.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await page.getByTestId('grid-project-play').click()
+  const card = page.getByTestId('grid-project-card')
+  await expect(card.getByTestId('event-actor-bird')).toHaveAttribute('data-awake', 'true', { timeout: 15_000 })
+  await expect(card.getByTestId('event-actor-fox')).toHaveAttribute('data-awake', 'false')
+
+  // Modify after reopening: pick the rabbit instead; the bird card no longer counts until rebuilt.
+  await page.getByTestId('grid-replay-my-wake-card').click()
+  await expect(page.getByTestId('grid-goal-choice-2')).toHaveAttribute('data-chosen', 'true')
+  await page.getByTestId('grid-goal-choice-1').click() // 小兔子
+  await runAndExpect(page, 'error')
+  await page.getByTestId('event-edit-bird').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await page.getByTestId('event-edit-rabbit').click()
+  await q('when_clicked', 'wake_up', 'say_hello')
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
+})
+
 test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at the failing block', async ({ page }) => {
   test.setTimeout(60_000)
   await page.addInitScript(() => {
