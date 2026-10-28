@@ -2207,7 +2207,7 @@
       "title": "账号A/B的RLS越权及冲突保护",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "CLOUD-102"
       ],
@@ -2217,10 +2217,16 @@
         "并发冲突版本检查、错误态可观察"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/189",
+        "mergeCommit": "03be9d5eaee357bc86fd108721147b3267a70ed6",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40631070286",
+        "tests": [
+          "PR #189 CI on head 96be90136fe253efcdb1fc2368d3c25a0a2997e9: 22 success + 3 skipped",
+          "Main CI curriculum 40631070286 success on merge 03be9d5eaee357bc86fd108721147b3267a70ed6 (12 jobs all success; scratch-real-vm-browser-part2 attempt #2 job 122660373950 success after attempt #1 job 122627313964 failure, re-run failed jobs approved 2026-10-28 14:02 CST)",
+          "Main CI accountability 40631070281 success on merge 03be9d5eaee357bc86fd108721147b3267a70ed6",
+          "Main CI deploy-pipeline 40631070296 success on merge 03be9d5eaee357bc86fd108721147b3267a70ed6 (not counted in the curriculum + accountability closeout gate)",
+          "CLOUD-103 new spec tests/e2e/scratch-cloud-conflict-cloud103.spec.ts runs in portfolio-ux302 job, success on both PR CI and main CI"
+        ],
         "reviewer": null
       },
       "notes": ""
