@@ -247,12 +247,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/200",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L03 formal course at the bell tree: swapped sender/receiver error lab, ring for the rabbit, one bell two friends, surprise too early, pick a listener, saved and reopened（2026-10-28 本地桌面 Chrome grid-lab 10/10 通过；以 PR #200 CI 为准）",
+        "mergeCommit": "c52671abd608b99c2d62361a3eb1ff4332406e25",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40648232001",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L03 formal course at the bell tree: swapped sender/receiver error lab, ring for the rabbit, one bell two friends, surprise too early, pick a listener, saved and reopened（PR #200 CI 与 main c52671a 的 curriculum 真浏览器分片 --project=desktop 通过；另 2026-10-28 本地桌面 Chrome grid-lab 10/10 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L03 五关正式课程化（错误实验·送信员和收信人弄反、摇铃小兔子回应、练习A一个铃铛两位朋友、练习B还没摇铃就惊喜、创意·自选收信朋友）+ 复盘卡 + 作品回放 + 原创铃铛树场景与松鼠角色；首次在课堂使用铃铛广播（message_event）。证据 docs/roadmap/evidence/G0-U2-L03/，AI 参考教研 83/100（实现者自评，非独立）。in_review：等待 PR CI、合并与 main CI；等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
+      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L03 五关正式课程化（错误实验·送信员和收信人弄反、摇铃小兔子回应、练习A一个铃铛两位朋友、练习B还没摇铃就惊喜、创意·自选收信朋友）+ 复盘卡 + 作品回放 + 原创铃铛树场景与松鼠角色；首次在课堂使用铃铛广播（message_event）。证据 docs/roadmap/evidence/G0-U2-L03/，AI 参考教研 83/100（实现者自评，非独立）。PR #200（替代与 G2-U1-L04 计数冲突的 #197）已合并（c52671a）：合并时 PR CI 15 项成功、2 项跳过、scratch-real-vm-browser 仍在运行（轮询脚本超时后合并，已修复脚本），该 curriculum run 40646190992 随后 15 个作业全部成功；main c52671a 的 deploy（40648231924）、curriculum（40648232001，15 个作业）、task-tracking（40648231926）全绿。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U2-L04",
