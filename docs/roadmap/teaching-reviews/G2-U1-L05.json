@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "lessonId": "G2-U1-L05",
-  "reviewedCommit": "67df695dd172c5a4af10e6cbc1c99af5ed3e7311",
+  "reviewedCommit": "f939927c58143119d623aaac9ef83107029d800b",
   "reviewedAt": "2026-10-28",
   "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
   "reviewerKind": "ai",
@@ -17,7 +17,7 @@
     "apps/web/src/content/curriculum/g2-u1-scratch-lessons.ts",
     "apps/web/public/scratch-g2-sandbox.html",
     "examples/scratch/g2/build_g2_projects.py",
-    "https://github.com/HelloMrDuan/kidsCoding/pull/196"
+    "https://github.com/HelloMrDuan/kidsCoding/pull/199"
   ],
   "scores": {
     "knowledge": {
