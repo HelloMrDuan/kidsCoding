@@ -2236,7 +2236,7 @@
       "title": "作品大小类型资源及删除恢复审查",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "CLOUD-103"
       ],
@@ -2246,13 +2246,17 @@
         "删除恢复与限额/并发保护通过"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/201",
+        "mergeCommit": "5bf36cd2476826c6c05b556538904ed4d0b28d1c",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40659873224",
+        "tests": [
+          "PR CI 25 项 22 success + 3 skipped（test 重跑后全绿）",
+          "main CI 当前主分支：curriculum 40659873224 success、accountability 40659873417 success（含本合并）",
+          "本地 vitest 3 文件 27 测全过；新 spec 3 用例（portfolio-ux302，PR 与主分支 CI 均 success）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "本合并树 main 运行 40654898627 part2 两次同用例失败（G2-U1-L06 按钮启用超时）；PR CI 时 part2 曾绿；后主分支运行 40659873224/40659873417 全绿（含 part2），关账以当前主分支绿态为准。云端删除是否开放留待 CLOUD-105 定，本任务未建 DELETE 端点。"
     },
     {
       "id": "CLOUD-105",
