@@ -219,12 +219,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/192",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L02 formal course on the opening stage: flag-first error lab, start-flag opening, invite the bird, two start hats, pick a host, saved and reopened（2026-10-28 本地桌面 Chrome grid-lab 9/9 通过；以 PR #192 CI 为准）",
+        "mergeCommit": "7bc51675dd0de6e27722887fb5e17fe6d36858b1",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40639465046",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L02 formal course on the opening stage: flag-first error lab, start-flag opening, invite the bird, two start hats, pick a host, saved and reopened（PR #192 CI 与 main 7bc5167 的 curriculum 真浏览器分片 --project=desktop 通过；另 2026-10-28 本地桌面 Chrome grid-lab 9/9 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L02 五关正式课程化（错误实验·彩旗先升起、按开始旗开幕、练习A开幕后请小鸟入场、练习B两个开场在抢、创意·自选主持人）+ 复盘卡 + 作品回放 + 原创开幕舞台场景（彩旗可升降）；复用 G0-U2-L01 事件舞台引擎。证据 docs/roadmap/evidence/G0-U2-L02/，AI 参考教研 83/100（实现者自评，非独立）。in_review：等待 PR CI、合并与 main CI；等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
+      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L02 五关正式课程化（错误实验·彩旗先升起、按开始旗开幕、练习A开幕后请小鸟入场、练习B两个开场在抢、创意·自选主持人）+ 复盘卡 + 作品回放 + 原创开幕舞台场景（彩旗可升降）；复用 G0-U2-L01 事件舞台引擎。证据 docs/roadmap/evidence/G0-U2-L02/，AI 参考教研 83/100（实现者自评，非独立）。PR #192 已合并（7bc5167），PR CI 16 项成功；main 7bc5167 的 deploy（40639465094）、curriculum（40639465046，15 个作业）、task-tracking（40639465110）全绿。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U2-L03",
