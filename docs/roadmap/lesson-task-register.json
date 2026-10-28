@@ -275,7 +275,7 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/206",
-        "mergeCommit": "cd1cdd8",
+        "mergeCommit": "cd1cdd8b3f1ecdf202a2b89aa40f72f5d8a02245",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40656279623",
         "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L04 formal course in the forest theatre: script on the wrong friend, fox first, two turns, nobody came, pick the second act, saved and reopened（PR #206 CI 与 main cd1cdd8 的 curriculum 第 1 分片 scratch-real-vm-browser（含全部 grid-lab 用例）通过；另 2026-10-28 本地桌面 Chrome grid-lab 11/11 通过）",
         "lessonReview": null
