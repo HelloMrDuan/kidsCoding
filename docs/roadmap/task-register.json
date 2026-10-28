@@ -2179,7 +2179,7 @@
       "title": "跨设备A账号登录草稿恢复",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "CLOUD-101"
       ],
@@ -2189,10 +2189,15 @@
         "失败同步有可重试提示"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/167",
+        "mergeCommit": "0bd86727081e0dc93df6c88b28f7106516d34f29",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40626205370",
+        "tests": [
+          "PR #167 CI on head c74ad508871ee181022dcb4a3e5d0a2c414cad48: 22 success + 3 skipped",
+          "Main CI curriculum 40626205370 success on merge 0bd86727081e0dc93df6c88b28f7106516d34f29",
+          "Main CI accountability 40626205313 success on merge 0bd86727081e0dc93df6c88b28f7106516d34f29",
+          "Main CI deploy-pipeline 40626205351 on same merge SHA failed at test job 122611718361 step 5 Run unit tests (vitest); noted here, not counted in the curriculum + accountability closeout gate"
+        ],
         "reviewer": null
       },
       "notes": ""
