@@ -1792,7 +1792,7 @@
       "title": "家长端真实成长报告",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-303"
       ],

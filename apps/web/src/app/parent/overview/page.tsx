@@ -3,7 +3,9 @@ import { redirect } from 'next/navigation'
 
 import { launchCoursePack } from '@/features/billing/course-pack'
 import { loadLaunchCurriculum } from '@/features/curriculum/load-launch-curriculum'
+import { buildParentGrowthReport } from '@/features/parent/build-parent-growth-report'
 import { buildParentOverview } from '@/features/parent/build-parent-overview'
+import { GrowthKnowledgeSection } from '@/features/parent/growth-knowledge-section'
 import { GuardianConsentButton } from '@/features/parent/guardian-consent-button'
 import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
@@ -126,6 +128,15 @@ export default async function ParentOverviewPage() {
     hasLaunchPack: entitlement?.status === 'active',
   })
   const stageSummary = getStageSummary(summary.completedLessonCount)
+  const growthReport = buildParentGrowthReport({
+    progressRecords: progressRecords ?? [],
+    snapshotLessonIds: new Set(
+      (projectSnapshots ?? []).map((snapshot) => snapshot.lesson_id),
+    ),
+    lessonTitles: new Map(
+      curriculum.lessons.map((lesson) => [lesson.id, lesson.title]),
+    ),
+  })
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f5fbff_0%,#fff8ef_100%)] px-4 py-6 md:px-6 md:py-8">
@@ -377,6 +388,7 @@ export default async function ParentOverviewPage() {
             </section>
           </div>
         </section>
+        <GrowthKnowledgeSection report={growthReport} />
       </section>
     </main>
   )
