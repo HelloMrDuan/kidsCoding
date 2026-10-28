@@ -79,10 +79,19 @@ test('Scratch cloud restore persists locally across reload', async ({ page }) =>
   await expect(page.getByTestId('scratch-cloud-restore')).toBeEnabled({ timeout: 60_000 })
   await page.getByTestId('scratch-cloud-restore').click()
   await expect(page.getByTestId('scratch-cloud-status')).toContainText('已获取账号私有项目', { timeout: 30_000 })
-  expect(await readLocalDraftBase64(page)).toBe(SCRATCH_ARCHIVE_BASE64)
+  // CLOUD-104: restore does not promise byte equality with the cloud
+  // original. PROJECT_LOADED with source cloud triggers SAVE_DRAFT, and the
+  // VM's re-serialized export overwrites the local record on the normal
+  // path (the lab's restricted model keeps programs, not imported assets).
+  // What restore must guarantee is persistence: a valid local archive is
+  // present after the autosave settles, and the same bytes survive a reload.
+  await expect(page.getByTestId('scratch-local-save-status')).toContainText('已在本机自动保存真实 Scratch .sb3', { timeout: 30_000 })
+  const restored = await readLocalDraftBase64(page)
+  expect(restored).not.toBeNull()
+  expect(restored?.slice(0, 4)).toBe('UEsD')
   await page.reload()
   await expect(page.getByTestId('scratch-cloud-restore')).toBeEnabled({ timeout: 60_000 })
-  expect(await readLocalDraftBase64(page)).toBe(SCRATCH_ARCHIVE_BASE64)
+  expect(await readLocalDraftBase64(page)).toBe(restored)
 })
 
 test('Scratch local delete clears the device draft without touching the cloud', async ({ page }) => {

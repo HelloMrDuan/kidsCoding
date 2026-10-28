@@ -335,10 +335,11 @@ export function ScratchVMTrial() {
       const archive=parseScratchCloudResponse((payload as {draft:unknown}).draft)
       if(!archive)throw new Error('云端项目数据格式无效，原作品不变')
       if(!inspectScratchArchive(new Uint8Array(archive)).ok)throw new Error('云端项目数据格式无效，原作品不变')
-      // CLOUD-104: recovery must stick. Previously restore only loaded the
-      // cloud bytes into the VM session, so a refresh without an edit lost
-      // them back to the sample. Persist first; a save failure fails the
-      // restore instead of pretending it worked.
+      // CLOUD-104: land the cloud bytes locally before VM load, so recovery
+      // does not depend solely on the post-load autosave (PROJECT_LOADED
+      // with source cloud/file triggers SAVE_DRAFT, whose re-serialized
+      // export overwrites this record on the normal path). If that autosave
+      // fails, the cloud bytes are still here for the next start.
       await saveScratchDraft(archive)
       setImporting(true)
       id.current+=1
