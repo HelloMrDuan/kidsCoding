@@ -9,6 +9,7 @@
     { "path": "scratch-samples/g2-u1-l03-forest-concert.sb3.b64", "license": "original", "source": "本项目原创 G2-U1-L03 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（夜晚森林/绿色草地/小橘猫/小鸟）与程序合成的原创 WAV 音效（开幕铃/叽叽/啾啾），由 examples/scratch/g2/build_g2_projects.py 生成" },
     { "path": "scratch-samples/g2-u1-l04-cat-walks.sb3.b64", "license": "original", "source": "本项目原创 G2-U1-L04 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（小河边/小橘猫/风车），由 examples/scratch/g2/build_g2_projects.py 生成" },
     { "path": "scratch-samples/g2-u1-l05-broadcast-show.sb3.b64", "license": "original", "source": "本项目原创 G2-U1-L05 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（幕布舞台/灯光舞台/小橘猫/小鸟/小白兔），由 examples/scratch/g2/build_g2_projects.py 生成" },
+    { "path": "scratch-samples/g2-u1-l06-birthday-card.sb3.b64", "license": "original", "source": "本项目原创 G2-U1-L06 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（生日贺卡背景/小橘猫/蛋糕蜡烛熄灭与点亮/红气球）与程序合成的原创 WAV 音调（生日歌：公有领域旋律的前 6 个音，纯正弦合成，无采样），由 examples/scratch/g2/build_g2_projects.py 生成" },
     { "path": "v2/hero-studio.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601，commit fbc8b68）" },
     { "path": "v2/track-blockly.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
     { "path": "v2/track-python.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
