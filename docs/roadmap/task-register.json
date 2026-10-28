@@ -2491,7 +2491,7 @@
       "title": "积木区 Blockly 媒体资源自托管（垃圾桶/缩放图标、音效）",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "UX-203"
       ],
@@ -2502,10 +2502,12 @@
         "单元测试锁定三处配置与 predev/prebuild 钩子；UX-203 E2E 去掉 CDN route 补丁后仍全绿，并新增同源媒体断言；PR CI 全绿。"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/186",
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "local sandbox (appspot unreachable): vitest blockly-media.test.ts 6/6; next build pass; blockly-toolbox-ux203.spec.ts desktop 7/7 without the CDN route shim; eslint changed files 0 errors; PR CI pending"
+        ],
         "reviewer": null
       },
       "notes": "来源：UX-201 证据中记录的既有缺口——Blockly 默认从 blockly-demo.appspot.com 加载音效与精灵图，沙箱/国内网络 ERR_TUNNEL_CONNECTION_FAILED。"
