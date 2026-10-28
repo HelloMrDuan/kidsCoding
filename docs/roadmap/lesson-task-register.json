@@ -191,12 +191,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/190",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L01 formal course on the event stage: hat-below error lab, order, click-only wake, debug the woken rabbit, pick a friend, saved and reopened（2026-10-28 本地桌面 Chrome grid-lab 8/8 通过；以 PR #190 CI 为准）",
+        "mergeCommit": "23b72fbdaead5b51c1a2c30edb3bd89882da512b",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40634562184",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L01 formal course on the event stage: hat-below error lab, order, click-only wake, debug the woken rabbit, pick a friend, saved and reopened（PR #190 CI 与 main 23b72fb 的 curriculum 真浏览器分片 --project=desktop 通过；另 2026-10-28 本地桌面 Chrome grid-lab 8/8 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L01 五关正式课程化（错误实验·事件帽放在下面、先醒再打招呼、练习A点一下才醒、练习B修好被吵醒的小兔子、创意·自选叫醒朋友）+ 复盘卡 + 作品回放 + 原创林间空地场景；本 PR 同时带来事件舞台引擎（message_event）。证据 docs/roadmap/evidence/G0-U2-L01/，AI 参考教研 83/100（实现者自评，非独立）。in_review：等待 PR CI、合并与 main CI；等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
+      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L01 五关正式课程化（错误实验·事件帽放在下面、先醒再打招呼、练习A点一下才醒、练习B修好被吵醒的小兔子、创意·自选叫醒朋友）+ 复盘卡 + 作品回放 + 原创林间空地场景；本 PR 同时带来事件舞台引擎（message_event）。证据 docs/roadmap/evidence/G0-U2-L01/，AI 参考教研 83/100（实现者自评，非独立）。PR #190 已合并（23b72fb），PR CI 16 项成功；main 23b72fb 的 deploy（40634562214）、curriculum（40634562184，15 个作业）、task-tracking（40634562181）全绿。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U2-L02",
