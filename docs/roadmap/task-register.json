@@ -2236,7 +2236,7 @@
       "title": "作品大小类型资源及删除恢复审查",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "CLOUD-103"
       ],

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {ScratchMeteorBlocks} from './scratch-meteor-blocks'
 import {allProgramsApplied, formatProgram, iconForCharacter, liveClonesByCharacter, type MeteorProgram} from './scratch-character-stats'
 import {readScratchDraft,readScratchDraftMeta,saveScratchDraft,removeScratchDraft,isScratchArchive,SCRATCH_DRAFT_LESSON_ID} from './scratch-local-draft'
-import {checkScratchUploadConflict,encodeScratchDraft,parseScratchCloudResponse} from './scratch-cloud-draft'
+import {checkScratchUploadConflict,encodeScratchDraft,parseScratchCloudResponse,inspectScratchArchive} from './scratch-cloud-draft'
 
 type Sprite = { id: string; name: string; x: number; y: number; visible: boolean; original: boolean }
 type CharacterInfo = { name: string; costume: string }
@@ -91,11 +91,14 @@ export function ScratchVMTrial() {
         let saved:ArrayBuffer|null=null
         try{saved=await readScratchDraft()}catch{ /* Browsers can deny local IndexedDB; sample still loads. */ }
         if(destroyed)return
-        if(saved){
+        if(saved&&inspectScratchArchive(new Uint8Array(saved)).ok){
           loadingSaved=true
           setDraftStatus('正在从本机 IndexedDB 恢复以前保存的 Scratch .sb3……')
           id.current+=1
           frame.current?.contentWindow?.postMessage({kind:'LOAD',id:id.current,archive:saved,source:'saved'},'*',[saved])
+        }else if(saved){
+          setDraftStatus('本机草稿文件无效，正在恢复课程示例；原文件未自动上传。')
+          await loadOriginal()
         }else await loadOriginal()
       }catch(error){
         if(!destroyed){setLoadFailed(true);setStatus('项目加载失败：'+String(error))}
@@ -283,6 +286,7 @@ export function ScratchVMTrial() {
       const local=await readScratchDraft()
       const archiveBase64=local?encodeScratchDraft(local):null
       if(!archiveBase64)throw new Error('本机尚无有效项目，请先应用积木')
+      if(!local||!inspectScratchArchive(new Uint8Array(local)).ok)throw new Error('本机作品文件结构无效或过大，上传已取消，本机作品没有改变。')
       const meta=await readScratchDraftMeta()
       const precheck=await fetch('/api/practice/scratch',{cache:'no-store'})
       if(precheck.status===401)throw new Error('请先登录账号，再保存云端作品')
@@ -330,6 +334,13 @@ export function ScratchVMTrial() {
       }
       const archive=parseScratchCloudResponse((payload as {draft:unknown}).draft)
       if(!archive)throw new Error('云端项目数据格式无效，原作品不变')
+      if(!inspectScratchArchive(new Uint8Array(archive)).ok)throw new Error('云端项目数据格式无效，原作品不变')
+      // CLOUD-104: land the cloud bytes locally before VM load, so recovery
+      // does not depend solely on the post-load autosave (PROJECT_LOADED
+      // with source cloud/file triggers SAVE_DRAFT, whose re-serialized
+      // export overwrites this record on the normal path). If that autosave
+      // fails, the cloud bytes are still here for the next start.
+      await saveScratchDraft(archive)
       setImporting(true)
       id.current+=1
       frame.current.contentWindow.postMessage({kind:'LOAD',id:id.current,archive,source:'cloud'},'*',[archive])
@@ -348,11 +359,12 @@ export function ScratchVMTrial() {
     try{
       let saved:ArrayBuffer|null=null
       try{saved=await readScratchDraft()}catch{ /* Browsers can deny local IndexedDB; sample still loads. */ }
-      if(saved && !savedFailedRef.current){
+      if(saved!==null&&!savedFailedRef.current&&inspectScratchArchive(new Uint8Array(saved)).ok){
         retrySavedRef.current=true
         id.current+=1
         frame.current.contentWindow.postMessage({kind:'LOAD',id:id.current,archive:saved,source:'saved'},'*',[saved])
       }else{
+        if(saved!==null&&!savedFailedRef.current)setDraftStatus('本机草稿文件无效，正在恢复课程示例；原文件未自动上传。')
         const response=await fetch('/scratch-samples/meteor-clones.sb3',{cache:'no-store'})
         if(!response.ok)throw new Error('没有找到示例 .sb3')
         const archive=await response.arrayBuffer()
@@ -392,6 +404,10 @@ export function ScratchVMTrial() {
       const bytes=new Uint8Array(archive)
       if(bytes[0]!==0x50||bytes[1]!==0x4b){
         setStatus('导入失败：不是 Scratch ZIP 文件，原作品没有改变。')
+        return
+      }
+      if(!inspectScratchArchive(bytes).ok){
+        setStatus('导入失败：项目文件结构无效或过大，原作品没有改变。')
         return
       }
       setImporting(true)

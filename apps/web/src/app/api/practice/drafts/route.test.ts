@@ -91,4 +91,24 @@ describe('authenticated Python practice cloud draft API', () => {
     }))).status).toBe(403)
     expect(upsert).not.toHaveBeenCalled()
   })
+
+  it('rejects oversized declarations and bodies', async () => {
+    expect((await PUT(new Request('http://localhost/api/practice/drafts',{
+      method:'PUT',headers:{'Content-Length':'12001'},body:'{}',
+    }))).status).toBe(413)
+    expect((await PUT(new Request('http://localhost/api/practice/drafts',{
+      method:'PUT',body:'x'.repeat(12001),
+    }))).status).toBe(413)
+    expect(upsert).not.toHaveBeenCalled()
+  })
+
+  it('rejects overlong source and malformed JSON', async () => {
+    expect((await PUT(new Request('http://localhost/api/practice/drafts',{
+      method:'PUT',body:JSON.stringify({lessonId:'P0-U1-L02',source:'x'.repeat(5001)}),
+    }))).status).toBe(400)
+    expect((await PUT(new Request('http://localhost/api/practice/drafts',{
+      method:'PUT',body:'{not json',
+    }))).status).toBe(400)
+    expect(upsert).not.toHaveBeenCalled()
+  })
 })
