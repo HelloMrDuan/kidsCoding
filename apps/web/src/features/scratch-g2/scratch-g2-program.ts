@@ -25,7 +25,7 @@ export function checkSlotValue(slot: G2Slot, raw: unknown): number | string | nu
     if (text.length < 1 || text.length > max || /[\u0000-\u001f\u007f<>]/.test(text)) return null
     return text
   }
-  if (slot.field === 'COSTUME' || slot.field === 'BACKDROP' || slot.field === 'SOUND_MENU') {
+  if (slot.field === 'COSTUME' || slot.field === 'BACKDROP' || slot.field === 'SOUND_MENU' || slot.field === 'DIRECTION') {
     const name = String(raw ?? '')
     return slot.options?.includes(name) ? name : null
   }

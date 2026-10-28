@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import {useCallback, useEffect, useRef, useState} from 'react'
+import {useCallback, useEffect, useRef, useState, type CSSProperties} from 'react'
 import {
   emptyG2Observations, evaluateG2Lesson, observedPrediction,
   type G2Lesson, type G2Observations, type G2Point,
@@ -12,11 +12,11 @@ import {decodeSampleArchive, isG2Archive, readG2Draft, removeG2Draft, saveG2Draf
 
 type CostumeAsset = {name: string; uri: string; w: number; h: number; cx: number; cy: number}
 type TargetAsset = {name: string; isStage: boolean; costumes: CostumeAsset[]; sounds: string[]; soundUris?: Record<string, string>}
-type SpriteState = {id: string; name: string; x: number; y: number; visible: boolean; size: number; original: boolean; costume: string}
+type SpriteState = {id: string; name: string; x: number; y: number; visible: boolean; size: number; original: boolean; costume: string; direction?: number; rotationStyle?: string}
 type MoveResult = {requested: G2Point; before: G2Point; after: G2Point; moved: boolean}
 type CostumeResult = {requested: string; before: Array<{name: string; costume: string}>; after: Array<{name: string; costume: string}>; changed: boolean; stageCostumes: string[]}
 type LabMessage = {
-  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' |
+  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' | 'TURN' |
     'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'
   id: number | null
   available?: boolean
@@ -37,6 +37,7 @@ type LabMessage = {
   changed?: boolean
   stageCostumes?: string[]
   sound?: string
+  degrees?: number
   activeThreads?: number
   archive?: ArrayBuffer
   error?: string
@@ -81,6 +82,9 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const flagRun = useRef<{stagePlays: number} | null>(null)
   const soundUris = useRef<Record<string, Record<string, string>>>({})
   const [lastRunSounds, setLastRunSounds] = useState<{stagePlays: number; finished: boolean} | null>(null)
+  // Degrees each sprite has really turned in the VM since it was last clicked (open click runs).
+  const clickTurn = useRef<Map<string, number>>(new Map())
+  const [lastTurns, setLastTurns] = useState<Record<string, {total: number; finished: boolean}>>({})
   const savedFailed = useRef(false)
   const loadedRef = useRef(false)
   useEffect(() => { loadedRef.current = loaded }, [loaded])
@@ -161,6 +165,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         clickFrom.current.clear()
         flagRun.current = null
         setLastRunSounds(null)
+        clickTurn.current.clear()
+        setLastTurns({})
         soundUris.current = Object.fromEntries((msg.assets ?? []).map(a => [a.name, a.soundUris ?? {}]))
         if (msg.source === 'file') {
           setSaving(true)
@@ -198,8 +204,24 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             return {...prev, clickCostumeChanges: nextChanges, firstClickTransition: nextFirst}
           })
         }
+        if (clickTurn.current.size && msg.activeThreads === 0) {
+          const done = Object.fromEntries(clickTurn.current)
+          clickTurn.current.clear()
+          setLastTurns(prev => {
+            const next = {...prev}
+            for (const [name, total] of Object.entries(done)) next[name] = {total, finished: true}
+            return next
+          })
+          setObs(prev => {
+            const nextTurns = {...prev.clickTurns}
+            for (const [name, total] of Object.entries(done)) nextTurns[name] = [...(nextTurns[name] ?? []), total].slice(-20)
+            return {...prev, clickTurns: nextTurns}
+          })
+        }
         if (flagRun.current && msg.activeThreads === 0) {
-          const finished = {backdrop: msg.backdrop ?? '', stagePlays: flagRun.current.stagePlays}
+          const runPositions: Record<string, G2Point> = {}
+          for (const t of current) if (t.original) runPositions[t.name] = {x: t.x, y: t.y}
+          const finished = {backdrop: msg.backdrop ?? '', stagePlays: flagRun.current.stagePlays, positions: runPositions}
           flagRun.current = null
           setLastRunSounds({stagePlays: finished.stagePlays, finished: true})
           setObs(prev => ({...prev, flagRuns: [...prev.flagRuns, finished].slice(-20)}))
@@ -217,6 +239,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           recentClicks.current.set(msg.target, Date.now())
           clickChanges.current.set(msg.target, 0)
           clickFrom.current.set(msg.target, lastCostume.current.get(msg.target) ?? '')
+          clickTurn.current.set(msg.target, 0)
           setStageClickNote('')
           setStatus(`Scratch VM 正在执行${msg.target}自己的“当角色被点击”脚本。`)
         }
@@ -242,6 +265,14 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           }
         } else if (target && sound) {
           setObs(prev => ({...prev, clickSounds: {...prev.clickSounds, [target]: [...(prev.clickSounds[target] ?? []), sound].slice(-20)}}))
+        }
+      } else if (msg.kind === 'TURN') {
+        const target = String(msg.target ?? '')
+        const degrees = Number(msg.degrees)
+        if (target && Number.isFinite(degrees) && clickTurn.current.has(target)) {
+          const total = (clickTurn.current.get(target) ?? 0) + degrees
+          clickTurn.current.set(target, total)
+          setLastTurns(prev => ({...prev, [target]: {total, finished: false}}))
         }
       } else if (msg.kind === 'COSTUME_RESULT') {
         if (typeof msg.requested === 'string' && Array.isArray(msg.before) && Array.isArray(msg.after)) {
@@ -384,6 +415,16 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const stageAsset = assets.find(a => a.isStage)
   const backdropAsset = stageAsset?.costumes.find(c => c.name === backdrop) ?? stageAsset?.costumes[0]
   const spriteOf = (name: string) => sprites.find(s => s.original && s.name === name)
+  // Draw the VM direction like Scratch does: "all around" rotates the costume
+  // around its rotation centre, "left-right" only mirrors it when facing left.
+  function spriteTransform(sprite: SpriteState, asset: CostumeAsset): CSSProperties | undefined {
+    const direction = Number(sprite.direction)
+    if (!Number.isFinite(direction) || direction === 90) return undefined
+    const origin = `${asset.cx / asset.w * 100}% ${asset.cy / asset.h * 100}%`
+    if (sprite.rotationStyle === 'left-right') return direction < 0 ? {transform: 'scaleX(-1)', transformOrigin: origin} : undefined
+    if (sprite.rotationStyle === "don't rotate") return undefined
+    return {transform: `rotate(${direction - 90}deg)`, transformOrigin: origin}
+  }
 
   return (
     <main className="min-h-screen bg-[linear-gradient(155deg,#eaf8ff,#f5f4ff_60%,#fff3dd)] px-4 py-8 text-slate-900">
@@ -438,7 +479,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                     className="absolute p-0"
                     style={{left: `${(sprite.x + 240 - asset.cx * scale) / 480 * 100}%`, top: `${(180 - sprite.y - asset.cy * scale) / 360 * 100}%`, width: `${asset.w * scale / 480 * 100}%`}}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={asset.uri} alt={sprite.name} className="pointer-events-none block w-full select-none" draggable={false}/>
+                    <img src={asset.uri} alt={sprite.name} className="pointer-events-none block w-full select-none" draggable={false}
+                      style={spriteTransform(sprite, asset)}/>
                     {bubble && (
                       <span data-testid="g2-bubble" data-name={sprite.name}
                         className="absolute bottom-full left-1/2 mb-1 w-max max-w-[160px] -translate-x-1/2 rounded-xl border border-slate-300 bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm">{bubble.text}</span>
@@ -502,10 +544,19 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                 {Object.entries(obs.clickSounds).map(([name, list]) => ` ${name}刚才播放“${list[list.length - 1]}”。`).join('')}
               </p>
             )}
+            {Object.keys(lastTurns).length > 0 && (
+              <p data-testid="g2-turn-log" className="mt-2 text-sm">
+                {Object.entries(lastTurns).map(([name, turn]) => (
+                  <span key={name} data-testid="g2-turn-total" data-name={name} data-total={turn.total} data-finished={turn.finished ? 'true' : 'false'}>
+                    {`${name}${turn.finished ? '上一次被点击' : '正在转'}：Scratch VM 一共右转 ${turn.total} 度。`}
+                  </span>
+                ))}
+              </p>
+            )}
             {spriteTargets.map(t => {
               const s = spriteOf(t.name)
               return <p key={t.name} data-testid="g2-sprite-state" data-name={t.name} className="mt-2 text-sm">
-                {t.label}：x {s ? Math.round(s.x) : '—'} · y {s ? Math.round(s.y) : '—'}{t.costumes && t.costumes.length > 1 ? ` · 造型 ${s?.costume ?? '—'}` : ''}{obs.lastSaid[t.name] ? ` · 刚才说“${obs.lastSaid[t.name]}”` : ''}
+                {t.label}：x {s ? Math.round(s.x) : '—'} · y {s ? Math.round(s.y) : '—'}{lesson.showDirection ? ` · 方向 ${s && Number.isFinite(Number(s.direction)) ? Math.round(Number(s.direction)) : '—'}` : ''}{t.costumes && t.costumes.length > 1 ? ` · 造型 ${s?.costume ?? '—'}` : ''}{obs.lastSaid[t.name] ? ` · 刚才说“${obs.lastSaid[t.name]}”` : ''}
               </p>
             })}
             <p className="mt-5 text-xs leading-6 text-slate-500">位置、造型和说的话都来自 Scratch VM 的对象状态；画面用原创 SVG 按 VM 坐标绘制，未接入 Scratch WebGL 渲染器。项目不会上传。</p>

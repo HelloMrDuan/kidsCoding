@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u1L01, g2u1L02, g2u1L03} from '@/content/curriculum/g2-u1-scratch-lessons'
+import {g2u1L01, g2u1L02, g2u1L03, g2u1L04} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {changedValues, checkSlotValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
 function block(type: string, fields: Record<string, string> = {}, next: BlockLike | null = null, inner: BlockLike | null = null): BlockLike {
@@ -117,5 +117,35 @@ describe('G2 restricted Blockly adapter (G2-U1-L03 backdrops and sounds)', () =>
   it('accepts only the bird\'s own sounds', () => {
     expect(readG2Program(ws(block('kc2_clicked', {}, block('kc2_play_sound', {SOUND_MENU: '啾啾'}))), bird3)).toEqual({kind: 'sprite', values: {'小鸟|bird_sound_menu|SOUND_MENU': '啾啾'}})
     expect(readG2Program(ws(block('kc2_clicked', {}, block('kc2_play_sound', {SOUND_MENU: '开幕铃'}))), bird3)).toBeNull()
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U1-L04 motion)', () => {
+  const cat4 = g2u1L04.targets.find(t => t.name === '小橘猫')!
+  const wheel4 = g2u1L04.targets.find(t => t.name === '风车')!
+  const catFlag = (direction: string, steps: string, line = '到啦') =>
+    block('kc2_flag', {}, block('kc2_goto_start', {}, block('kc2_point_direction', {DIRECTION: direction}, block('kc2_move_steps', {STEPS: steps}, block('kc2_say', {MESSAGE: line})))))
+
+  it('reads direction, steps and line; refuses off-menu directions and out-of-range steps', () => {
+    expect(readG2Program(ws(catFlag('90', '240')), cat4)).toEqual({kind: 'sprite', values: {
+      '小橘猫|cat_point|DIRECTION': '90', '小橘猫|cat_move|STEPS': 240, '小橘猫|cat_say|MESSAGE': '到啦',
+    }})
+    expect(readG2Program(ws(catFlag('45', '240')), cat4)).toBeNull()
+    expect(readG2Program(ws(catFlag('90', '400')), cat4)).toBeNull()
+    expect(readG2Program(ws(catFlag('90', '0')), cat4)).toBeNull()
+    expect(readG2Program(ws(catFlag('90', '12.5')), cat4)).toBeNull()
+    // The fixed start block cannot be dropped.
+    expect(readG2Program(ws(block('kc2_flag', {}, block('kc2_point_direction', {DIRECTION: '90'}, block('kc2_move_steps', {STEPS: '240'}, block('kc2_say', {MESSAGE: '到啦'}))))), cat4)).toBeNull()
+  })
+
+  it('reads the pinwheel repeat + turn + wait loop and refuses turns over 180 degrees', () => {
+    const loop = (times: string, degrees: string, wait = '0.2') =>
+      block('kc2_clicked', {}, block('kc2_repeat', {TIMES: times}, null, block('kc2_turn_right', {DEGREES: degrees}, block('kc2_wait', {DURATION: wait}))))
+    expect(readG2Program(ws(loop('6', '15')), wheel4)).toEqual({kind: 'sprite', values: {
+      '风车|wheel_repeat|TIMES': 6, '风车|wheel_turn|DEGREES': 15, '风车|wheel_wait|DURATION': 0.2,
+    }})
+    expect(readG2Program(ws(loop('1', '200')), wheel4)).toBeNull()
+    expect(readG2Program(ws(loop('13', '30')), wheel4)).toBeNull()
+    expect(checkSlotValue({key: 'k', field: 'DIRECTION', label: '方向', options: ['90', '-90']}, '-90')).toBe('-90')
   })
 })
