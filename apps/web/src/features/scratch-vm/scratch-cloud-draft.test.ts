@@ -1,5 +1,5 @@
 import {describe,expect,it} from 'vitest'
-import {decodeScratchDraft,encodeScratchDraft,parseScratchCloudResponse} from './scratch-cloud-draft'
+import {checkScratchUploadConflict,decodeScratchDraft,encodeScratchDraft,parseScratchCloudResponse} from './scratch-cloud-draft'
 
 function zip(size=1024):ArrayBuffer{
   const bytes=new Uint8Array(size)
@@ -22,5 +22,21 @@ describe('Scratch private cloud transfer format',()=>{
     expect(decodeScratchDraft('garbage')).toBeNull()
     expect(encodeScratchDraft(new Uint8Array(10).buffer)).toBeNull()
     expect(decodeScratchDraft('A'.repeat(7_000_000))).toBeNull()
+  })
+})
+describe('Scratch upload conflict check',()=>{
+  it('flags strictly newer cloud, not equal or older',()=>{
+    expect(checkScratchUploadConflict('2026-10-28T10:00:00.000Z','2026-10-28T09:00:00.000Z')).toBe('newer')
+    expect(checkScratchUploadConflict('2026-10-28T09:00:00.000Z','2026-10-28T09:00:00.000Z')).toBe('none')
+    expect(checkScratchUploadConflict('2026-10-28T08:00:00.000Z','2026-10-28T09:00:00.000Z')).toBe('none')
+  })
+  it('treats missing cloud as no conflict',()=>{
+    expect(checkScratchUploadConflict(null,'2026-10-28T09:00:00.000Z')).toBe('none')
+    expect(checkScratchUploadConflict(undefined,'2026-10-28T09:00:00.000Z')).toBe('none')
+  })
+  it('treats unknown local age or unreadable cloud time as unknown-age',()=>{
+    expect(checkScratchUploadConflict('2026-10-28T10:00:00.000Z',null)).toBe('unknown-age')
+    expect(checkScratchUploadConflict('2026-10-28T10:00:00.000Z','not-a-date')).toBe('unknown-age')
+    expect(checkScratchUploadConflict('not-a-date','2026-10-28T09:00:00.000Z')).toBe('unknown-age')
   })
 })
