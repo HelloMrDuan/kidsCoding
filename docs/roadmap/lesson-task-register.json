@@ -303,12 +303,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/212",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L05 formal course in the apple orchard: event on the tree, only the apple, apple tells the rabbit, wrong spot drops, pick who is surprised, saved and reopened（2026-10-28 本地桌面 Chrome grid-lab 12/12 通过；以 PR #212 CI 为准）",
+        "mergeCommit": "968043e1ec15eab3b2f9f764f0aeebd13d4c760a",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40665883146",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L05 formal course in the apple orchard: event on the tree, only the apple, apple tells the rabbit, wrong spot drops, pick who is surprised, saved and reopened（PR #212 CI 与 main 968043e 的 curriculum 真浏览器分片 --project=desktop 通过；另 2026-10-28 本地桌面 Chrome grid-lab 12/12 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L05 五关正式课程化（错误实验·事件挂到了树上、只有点苹果才落、练习A苹果落下小兔子惊喜、练习B点小狐狸苹果也掉、创意·自选惊喜的朋友）+ 复盘卡 + 作品回放 + 原创苹果园场景与可点击苹果树/苹果；复用事件舞台引擎。证据 docs/roadmap/evidence/G0-U2-L05/，AI 参考教研 83/100（实现者自评，非独立）。in_review：等待 PR CI、合并与 main CI；等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
+      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L05 五关正式课程化（错误实验·事件挂到了树上、只有点苹果才落、练习A苹果落下小兔子惊喜、练习B点小狐狸苹果也掉、创意·自选惊喜的朋友）+ 复盘卡 + 作品回放 + 原创苹果园场景与可点击苹果树/苹果；复用事件舞台引擎。证据 docs/roadmap/evidence/G0-U2-L05/，AI 参考教研 83/100（实现者自评，非独立）。PR #212 已合并（968043e），PR CI 首轮 16 项成功；main 968043e 的 curriculum（40665883146，15 个作业，含 grid-lab）与 task-tracking（40665883098）全绿，deploy（40665883099）的 test 作业失败于既有偶发用例 bind-account-form.test.tsx:53（OTP 输入框出现前同步取 label，非本课文件，下游 e2e 被跳过），交 CI 修复线。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U2-L06",
