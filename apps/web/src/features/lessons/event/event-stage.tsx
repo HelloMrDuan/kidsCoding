@@ -76,6 +76,27 @@ export function BellTree({ rung }: { rung: boolean }) {
   )
 }
 
+/** G0-U2-L04 story scenery: the forest theatre — a wooden stage between two curtained doors; friends wait backstage until they come on. */
+export function TwoDoors() {
+  return (
+    <g data-grid-item="two-doors">
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#fdf1e3" />
+      <rect x="0" y="0" width="100" height="6" rx="3" fill="#b4473f" />
+      <path d="M0 6 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 4 0" fill="#d8574c" />
+      <g stroke="#8a5a2e" strokeWidth=".6">
+        <rect x="2" y="16" width="13" height="30" rx="6" fill="#6b3f8f" />
+        <rect x="85" y="16" width="13" height="30" rx="6" fill="#6b3f8f" />
+      </g>
+      <path d="M2.4 22 q6.1 -6 12.2 0 M85.4 22 q6.1 -6 12.2 0" fill="none" stroke="#ffd23f" strokeWidth=".8" />
+      <rect x="0" y="44" width="100" height="16" fill="#c9905a" />
+      <path d="M0 44 H100" stroke="#8a5a2e" strokeWidth=".8" />
+      <path d="M0 50 H100 M0 55 H100" stroke="#b07a45" strokeWidth=".4" />
+      <circle cx="50" cy="12" r="2.2" fill="#ffd23f" />
+      <path d="M50 14 L36 44 H64 Z" fill="#fff6c8" opacity=".45" />
+    </g>
+  )
+}
+
 /** G0-U2 squirrel (original art, same chibi style as CharacterArt): the bell ringer. */
 function SquirrelArt() {
   const fur = '#c9874b', line = '#7a4a22', cream = '#fff1dc'
@@ -110,7 +131,7 @@ export type EventStageProps = {
   label?: string
 }
 
-const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台' }
+const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台', 'two-doors': '森林小剧场' }
 
 /** Draws the characters and what has happened to them so far; characters are tappable. */
 export function EventStage({ level, effects, onActorClick, label }: EventStageProps) {
@@ -121,6 +142,7 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
       <svg viewBox="0 0 100 60" className="block w-full rounded-[14px]" role="img" aria-label={label ?? STAGE_LABELS[level.scenery ?? 'morning-glade'] ?? '林间空地舞台'}>
         {level.scenery === 'stage-flags' ? <StageFlags flagUp={Object.values(state).some(x => x.flagUp)} />
           : level.scenery === 'bell-tree' ? <BellTree rung={effects.some(e => e.action === 'send_bell')} />
+          : level.scenery === 'two-doors' ? <TwoDoors />
           : <MorningGlade />}
       </svg>
       {level.actors.map(actor => {
@@ -134,10 +156,11 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             style={{ left: `${actor.x}%`, top: `${actor.y}%`, width: '18%', opacity: s.onstage ? 1 : 0.25 }}
             data-testid={`event-actor-${actor.id}`}
             data-awake={s.awake ? 'true' : 'false'}
+            data-onstage={s.onstage ? 'true' : 'false'}
             data-said={s.said ? 'true' : 'false'}
             data-surprised={s.surprised ? 'true' : 'false'}
             data-rang={rang.has(actor.id) ? 'true' : 'false'}
-            aria-label={`${name}：${s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${onActorClick ? '。点一下它' : ''}`}
+            aria-label={`${name}：${s.onstage ? '' : '在后台，'}${s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${onActorClick ? '。点一下它' : ''}`}
             onClick={() => onActorClick?.(actor.id)}
           >
             <svg viewBox="0 0 100 110" className="block w-full" aria-hidden="true">

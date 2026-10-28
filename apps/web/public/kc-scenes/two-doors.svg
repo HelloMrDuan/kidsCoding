@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" role="img" aria-label="森林小剧场：红色幕帘、两扇后台门和木头舞台">
+<g>
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#fdf1e3" />
+      <rect x="0" y="0" width="100" height="6" rx="3" fill="#b4473f" />
+      <path d="M0 6 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 12 0 q6 5 4 0" fill="#d8574c" />
+      <g stroke="#8a5a2e" stroke-width=".6">
+        <rect x="2" y="16" width="13" height="30" rx="6" fill="#6b3f8f" />
+        <rect x="85" y="16" width="13" height="30" rx="6" fill="#6b3f8f" />
+      </g>
+      <path d="M2.4 22 q6.1 -6 12.2 0 M85.4 22 q6.1 -6 12.2 0" fill="none" stroke="#ffd23f" stroke-width=".8" />
+      <rect x="0" y="44" width="100" height="16" fill="#c9905a" />
+      <path d="M0 44 H100" stroke="#8a5a2e" stroke-width=".8" />
+      <path d="M0 50 H100 M0 55 H100" stroke="#b07a45" stroke-width=".4" />
+      <circle cx="50" cy="12" r="2.2" fill="#ffd23f" />
+      <path d="M50 14 L36 44 H64 Z" fill="#fff6c8" opacity=".45" />
+    </g>
+</svg>
