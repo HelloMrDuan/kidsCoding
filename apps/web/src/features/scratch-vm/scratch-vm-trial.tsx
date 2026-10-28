@@ -288,7 +288,7 @@ export function ScratchVMTrial() {
         body:JSON.stringify({lessonId:SCRATCH_DRAFT_LESSON_ID,archiveBase64}),
       })
       if(response.status===401)throw new Error('请先登录账号，再保存云端作品')
-      if(!response.ok)throw new Error('云端保存失败（HTTP '+response.status+'），本机作品仍然保留')
+      if(!response.ok)throw new Error('云端保存失败（HTTP '+response.status+'），本机作品仍然保留，可再次点击保存重试')
       setCloudStatus('作品已保存到当前登录账号；可在其他设备登录后点“恢复云端作品”。')
     }catch(error){setCloudStatus(String(error))}
     finally{setCloudBusy(false)}
@@ -300,7 +300,7 @@ export function ScratchVMTrial() {
     try {
       const response=await fetch('/api/practice/scratch',{cache:'no-store'})
       if(response.status===401)throw new Error('请先登录账号再恢复云端作品')
-      if(!response.ok)throw new Error('云端读取失败（HTTP '+response.status+'）')
+      if(!response.ok)throw new Error('云端读取失败（HTTP '+response.status+'），可再次点击恢复重试')
       const payload:unknown=await response.json()
       if(!payload||typeof payload!=='object'||!('draft' in payload)||!payload.draft) {
         setCloudStatus('当前账号还没有保存 Scratch 云端作品。')

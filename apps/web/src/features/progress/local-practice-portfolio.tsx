@@ -108,13 +108,13 @@ export function LocalPracticePortfolio() {
           setNeedsLogin(true)
           throw new Error('请先登录账号，再尝试云端保存。')
         }
-        if (!response.ok) throw new Error('云端暂不可用，本机草稿仍然保留。')
+        if (!response.ok) throw new Error('云端暂不可用，本机草稿仍然保留，可再次点击上传重试。')
       }
       setCloudDrafts(toUpload.map(d => ({ lessonId: d.lessonId, source: d.source, updatedAt: new Date().toISOString() })))
       const skipped = drafts.length - toUpload.length
       setCloudMessage('已把 '+toUpload.length+' 份代码草稿保存到当前账号。成绩与星星没有上传。'+(skipped > 0 ? `其中 ${skipped} 份因云端更新未上传，已保留云端版本。` : ''))
     } catch (error) {
-      setCloudMessage(error instanceof Error ? error.message : '同步失败，请稍后再试。')
+      setCloudMessage(error instanceof Error ? error.message : '同步失败，可再次点击上传重试。')
     } finally {
       setCloudBusy(false)
     }
@@ -130,7 +130,7 @@ export function LocalPracticePortfolio() {
         setNeedsLogin(true)
         throw new Error('请先登录账号，再尝试恢复草稿。')
       }
-      if (!response.ok) throw new Error('暂时无法读取云端草稿，当前本机数据未改变。')
+      if (!response.ok) throw new Error('暂时无法读取云端草稿，当前本机数据未改变，可再次点击恢复重试。')
       const payload: unknown = await response.json()
       const rows = payload && typeof payload === 'object' && 'drafts' in payload
         ? (payload as {drafts:unknown}).drafts : null
@@ -157,7 +157,7 @@ export function LocalPracticePortfolio() {
       refresh()
       setCloudMessage('已恢复 '+count+' 份较新的代码草稿；旧版本或本机更新的草稿没有被覆盖。请进入课程重新运行评测。')
     } catch (error) {
-      setCloudMessage(error instanceof Error ? error.message : '恢复失败，请稍后再试。')
+      setCloudMessage(error instanceof Error ? error.message : '恢复失败，可再次点击恢复重试。')
     } finally {
       setCloudBusy(false)
     }
