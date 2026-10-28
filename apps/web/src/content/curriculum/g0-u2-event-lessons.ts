@@ -623,7 +623,197 @@ const L03: EventLesson = {
   project: { stepId: 'my-bell-card', title: '我的铃铛传话卡', passedText: '真实运行：松鼠摇铃，{target}听到才惊喜' },
 }
 
-export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02, [L03.id]: L03 }
+// G0-U2-L04: two friends come on stage one after the other — each has its own script and its own trigger.
+const star = (over: Partial<EventActor> = {}): EventActor => ({ id: 'fox', name: '小狐狸', can: ['enter_stage', 'say_hello'], x: 34, y: 62, offstage: true, line: '大家好，我先来！', ...over })
+const second = (over: Partial<EventActor> = {}): EventActor => ({ id: 'bird', name: '小鸟', can: ['enter_stage', 'say_hello'], x: 66, y: 60, offstage: true, line: '轮到我啦！', ...over })
+const THEATRE: EventLevel = { actors: [star(), second()], scenery: 'two-doors' }
+const THEATRE_THREE: EventLevel = {
+  actors: [
+    star({ x: 22 }),
+    second({ x: 45 }),
+    { id: 'rabbit', name: '小兔子', can: ['enter_stage', 'say_hello'], x: 66, y: 62, offstage: true, line: '轮到我啦！' },
+    { id: 'frog', name: '小青蛙', can: ['enter_stage', 'say_hello'], x: 84, y: 64, offstage: true, line: '轮到我啦！' },
+  ],
+  scenery: 'two-doors',
+}
+const SHOW_BLOCKS = ['when_start', 'when_clicked', 'when_bell', 'enter_stage', 'say_hello']
+const twoTurns: EventGoal = {
+  expectations: [
+    { interaction: { kind: 'start' }, effects: [['fox', 'enter_stage'], ['fox', 'say_hello']] },
+    { interaction: { kind: 'click', actor: 'bird' }, effects: [['bird', 'enter_stage'], ['bird', 'say_hello']] },
+  ],
+  probes: [{ kind: 'click', actor: 'fox' }],
+}
+
+const L04: EventLesson = {
+  id: 'G0-U2-L04',
+  title: '切换两位朋友',
+  story: '森林小剧场里，小狐狸和小鸟要分两次登台。每位朋友有自己的一段积木：先切到谁，就是在给谁拼。按开始旗小狐狸先上台，点小鸟它才接着上台，两人不会撞在一起。',
+  concept: '角色身份与多事件',
+  objectives: [
+    '会切换角色：积木拼在谁的名下，就是谁在动',
+    '给两位朋友安排两个不同的事件：开始旗一个，点角色一个',
+    '能找出“小鸟抢在小狐狸前面”“两段积木都没触发”的原因并修好',
+  ],
+  diagnoses: {
+    too_early: '小鸟抢在小狐狸前面上台了：小鸟的积木用了“开始时”，或者本该是小狐狸的积木拼到了小鸟名下。小鸟要等被点到才上台。',
+    wrong_actor: '上台的不是该上台的那位：积木拼在了别的朋友名下。先切到要动的朋友，再拼。',
+    nothing_happened: '触发了，可是没人上台：检查积木是不是拼在了对的朋友名下，事件选得对不对。',
+    no_hat: '小狐狸的积木上面没有事件，永远不会开始。最上面先放“开始时”。',
+    missing_effect: '还少一个动作：上台以后还要打招呼。',
+    wrong_order: '顺序反了：先走上舞台，再打招呼。',
+    wrong_trigger: '点小狐狸也有反应：小狐狸只听开始旗，点它不该再上一次台。',
+    extra_effect: '多了不该有的动作：这一步只有一位朋友上台。',
+    hat_not_on_top: '事件积木要放在最上面。',
+    disconnected: '有一块积木掉队了，没接在事件下面。',
+    cannot_do: '这个角色做不了这块积木的动作。',
+  },
+  steps: [
+    {
+      id: 'script-on-wrong-friend',
+      kind: 'error-lab',
+      title: '错误实验：积木拼错了朋友',
+      instruction: '小兔子想让小狐狸先上台，可是没切换角色，把“开始时 → 走上舞台 → 说早上好”拼到了小鸟名下。这是一个故意的错误：先按原样运行检查，看看谁先上台，再把积木拼到对的朋友名下。',
+      predict: '先猜一猜：按下开始旗，谁会先上台？',
+      predictChoices: [
+        { text: '小狐狸先上台', when: 'pass' },
+        { text: '小鸟抢先上台', when: 'too_early' },
+      ],
+      errorLab: {
+        expect: 'too_early',
+        expected: '按开始旗，小狐狸先上台打招呼；点小鸟，小鸟再上台。',
+        actual: '小鸟抢先上台了：积木拼在小鸟名下，开始旗一按，动的就是小鸟。',
+      },
+      level: THEATRE,
+      editable: ['fox', 'bird'],
+      allowedBlocks: SHOW_BLOCKS,
+      starter: { bird: [{ type: 'when_start' }, { type: 'enter_stage' }, { type: 'say_hello' }] },
+      goal: twoTurns,
+      hints: [
+        '开始旗一按，上台的是小鸟：这段积木拼在了小鸟名下。',
+        '积木区上面的“给谁拼”就是在切换角色：切到谁，积木就属于谁。',
+        '切到小鸟，把积木改成“被点击时 → 走上舞台 → 说早上好”；再切到小狐狸，拼“开始时 → 走上舞台 → 说早上好”。',
+      ],
+      solutions: [{ fox: ['when_start', 'enter_stage', 'say_hello'], bird: ['when_clicked', 'enter_stage', 'say_hello'] }],
+      counterExamples: [
+        { scripts: { bird: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'too_early' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'nothing_happened' },
+      ],
+    },
+    {
+      id: 'fox-first',
+      kind: 'guided',
+      title: '小狐狸先登台',
+      instruction: '先只排第一个节目：按开始旗，小狐狸走上舞台说“大家好，我先来！”。小鸟这次留在后台，点它也不上台。',
+      predict: '先猜一猜：积木要拼在谁的名下？',
+      level: THEATRE,
+      editable: ['fox', 'bird'],
+      allowedBlocks: SHOW_BLOCKS,
+      goal: { expectations: [{ interaction: { kind: 'start' }, effects: [['fox', 'enter_stage'], ['fox', 'say_hello']] }], probes: [{ kind: 'click', actor: 'fox' }, { kind: 'click', actor: 'bird' }] },
+      hints: [
+        '上台的不是小狐狸，或者没人上台：看看积木在谁名下。',
+        '先切到“小狐狸”，再拼；小鸟名下这次空着。',
+        '小狐狸：“开始时” → 走上舞台 → 说早上好。',
+      ],
+      solutions: [{ fox: ['when_start', 'enter_stage', 'say_hello'] }],
+      counterExamples: [
+        { scripts: { bird: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'wrong_actor' },
+        { scripts: { fox: ['when_clicked', 'enter_stage', 'say_hello'] }, failure: 'nothing_happened' },
+        { scripts: { fox: ['when_start', 'say_hello', 'enter_stage'] }, failure: 'wrong_order' },
+      ],
+    },
+    {
+      id: 'bird-second',
+      kind: 'practice-a',
+      title: '练习 A：两次登台',
+      instruction: '把两个节目都排好：按开始旗，小狐狸先上台；点一下后台的小鸟，小鸟再上台说“轮到我啦！”。点小狐狸不会让它再上一次台。',
+      predict: '先猜一猜：小鸟要用哪个事件，才不会和小狐狸撞在一起？',
+      level: THEATRE,
+      editable: ['fox', 'bird'],
+      allowedBlocks: SHOW_BLOCKS,
+      goal: twoTurns,
+      hints: [
+        '小鸟和小狐狸一起冲上台，或者点小鸟没反应：小鸟的事件不对。',
+        '两位朋友用两个不同的事件：小狐狸听开始旗，小鸟听手指点它。',
+        '小狐狸：开始时 → 走上舞台 → 说早上好；切到小鸟：被点击时 → 走上舞台 → 说早上好。',
+      ],
+      solutions: [{ fox: ['when_start', 'enter_stage', 'say_hello'], bird: ['when_clicked', 'enter_stage', 'say_hello'] }],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], bird: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'too_early' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'nothing_happened' },
+        { scripts: { fox: ['when_clicked', 'enter_stage', 'say_hello'], bird: ['when_clicked', 'enter_stage', 'say_hello'] }, failure: 'nothing_happened' },
+      ],
+    },
+    {
+      id: 'nobody-came',
+      kind: 'practice-b',
+      title: '练习 B：两段积木都没触发',
+      instruction: '演出开始了，可是谁也没上台：小狐狸的积木忘了事件，小鸟在等一个没人摇的铃铛。先运行检查，再把两位朋友的事件都改好。',
+      predict: '先猜一猜：要改一位朋友，还是两位都要改？',
+      level: THEATRE,
+      editable: ['fox', 'bird'],
+      allowedBlocks: SHOW_BLOCKS,
+      starter: {
+        fox: [{ type: 'enter_stage' }, { type: 'say_hello' }],
+        bird: [{ type: 'when_bell' }, { type: 'enter_stage' }, { type: 'say_hello' }],
+      },
+      goal: twoTurns,
+      hints: [
+        '按开始旗没人上台：小狐狸的积木上面没有事件。',
+        '修好小狐狸后还要试点小鸟：它在等铃铛，可是没人摇铃，要换成“被点击时”。',
+        '小狐狸：清空后拼“开始时 → 走上舞台 → 说早上好”；小鸟：清空后拼“被点击时 → 走上舞台 → 说早上好”。',
+      ],
+      solutions: [{ fox: ['when_start', 'enter_stage', 'say_hello'], bird: ['when_clicked', 'enter_stage', 'say_hello'] }],
+      counterExamples: [
+        { scripts: { fox: ['enter_stage', 'say_hello'], bird: ['when_bell', 'enter_stage', 'say_hello'] }, failure: 'no_hat' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], bird: ['when_bell', 'enter_stage', 'say_hello'] }, failure: 'nothing_happened' },
+      ],
+    },
+    {
+      id: 'my-show-order',
+      kind: 'creative',
+      title: '创意改造：第二个节目请谁？',
+      instruction: '小兔子和小青蛙也在后台等着。小狐狸照样第一个上台；第二个节目由你来定：选一位朋友，点它，它才上台。没被选中的朋友留在后台。通过后，它就是你的“小剧场节目单”作品。',
+      predict: '先猜一猜：第二位朋友的积木用哪个事件？',
+      creative: { prompt: '第二个上台的是谁？', choices: ['bird', 'rabbit', 'frog'], labels: ['小鸟', '小兔子', '小青蛙'] },
+      level: THEATRE_THREE,
+      editable: ['fox', 'bird', 'rabbit', 'frog'],
+      allowedBlocks: SHOW_BLOCKS,
+      goal: {
+        expectations: [
+          { interaction: { kind: 'start' }, effects: [['fox', 'enter_stage'], ['fox', 'say_hello']] },
+          { interaction: { kind: 'click', actor: '$target' }, effects: [['$target', 'enter_stage'], ['$target', 'say_hello']] },
+        ],
+        probes: ['others'],
+      },
+      hints: [
+        '点你选的朋友没反应，或者别的朋友也上台了：积木拼错了名下。',
+        '小狐狸听开始旗；切到你选的朋友，用“被点击时”；其他朋友名下空着。',
+        '例如选小青蛙：小狐狸“开始时 → 走上舞台 → 说早上好”，小青蛙“被点击时 → 走上舞台 → 说早上好”。',
+      ],
+      solutions: [{ fox: ['when_start', 'enter_stage', 'say_hello'], bird: ['when_clicked', 'enter_stage', 'say_hello'] }],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'enter_stage', 'say_hello'] }, failure: 'nothing_happened' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], bird: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'too_early' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], bird: ['when_clicked', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'enter_stage', 'say_hello'] }, failure: 'wrong_trigger' },
+      ],
+    },
+  ],
+  review: {
+    whatIf: '如果把小鸟的“被点击时”换成“开始时”，演出会怎样？',
+    answer: '一按开始旗，小狐狸和小鸟一起冲上台，撞在一起。要分两次登台，就给两位朋友两个不同的事件。',
+  },
+  reflection: '说一说：怎么知道一段积木是谁的？为什么两位朋友要用不同的事件？',
+  reflectionCheck: {
+    question: '想让小鸟在小狐狸之后、被点到才上台，小鸟的积木最上面放什么？',
+    options: [{ text: '被点击时', correct: true }, { text: '开始时', correct: false }, { text: '听到铃铛时', correct: false }],
+    why: '“被点击时”等手指点到小鸟才运行；“开始时”会和小狐狸一起上台；“听到铃铛时”要有人摇铃。',
+  },
+  parentQuestion: '请孩子播放自己的“小剧场节目单”：按开始旗看小狐狸先上台，再点第二位朋友；问问孩子，这段积木是谁的、怎么看出来的。',
+  project: { stepId: 'my-show-order', title: '我的小剧场节目单', passedText: '真实运行：小狐狸先上台，点{target}它再上台' },
+}
+
+export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02, [L03.id]: L03, [L04.id]: L04 }
 
 export function getEventLesson(id: string): EventLesson | undefined {
   return g0u2EventLessons[id]

@@ -843,6 +843,106 @@ test('G0-U2-L03 formal course at the bell tree: swapped sender/receiver error la
   await expect(card.getByTestId('event-actor-rabbit')).toHaveAttribute('data-surprised', 'false')
 })
 
+test('G0-U2-L04 formal course in the forest theatre: script on the wrong friend, fox first, two turns, nobody came, pick the second act, saved and reopened', async ({ page }) => {
+  test.setTimeout(200_000)
+  const q = async (...types: string[]) => { for (const t of types) await add(page, t) }
+  await page.goto('/learn/catalog/G0-U2-L04')
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+  await page.getByTestId('event-trial-entry').click()
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  await expect(page.locator('[data-grid-item="two-doors"]').first()).toBeVisible()
+  const fox = page.getByTestId('event-actor-fox')
+  const bird = page.getByTestId('event-actor-bird')
+  await expect(fox).toHaveAttribute('data-onstage', 'false')
+
+  // Step 1 — error lab: the fox's opening was built under the bird, so the bird rushes on first.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('小鸟抢先上台')
+  await expect(bird).toHaveAttribute('data-onstage', 'true')
+  await expect(fox).toHaveAttribute('data-onstage', 'false')
+  await q('when_start', 'enter_stage', 'say_hello') // on the fox (selected first)
+  await page.getByTestId('event-edit-bird').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_clicked', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Guided: built under the bird, the wrong friend comes on.
+  await page.getByTestId('event-edit-bird').click()
+  await q('when_start', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'error', '上台的不是该上台的那位')
+  await page.getByTestId('lesson-clear-program').click()
+  await page.getByTestId('event-edit-fox').click()
+  await q('when_start', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'success')
+  await expect(fox).toHaveAttribute('data-onstage', 'true')
+  await expect(bird).toHaveAttribute('data-onstage', 'false')
+  await next(page)
+
+  // Practice A: two turns; a start-hat bird collides with the fox.
+  await q('when_start', 'enter_stage', 'say_hello')
+  await page.getByTestId('event-edit-bird').click()
+  await q('when_start', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'error', '小鸟抢在小狐狸前面')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_clicked', 'enter_stage', 'say_hello')
+  // Free play: the start flag brings only the fox; tapping the bird brings it on next.
+  await page.getByTestId('event-flag').click()
+  await expect(fox).toHaveAttribute('data-onstage', 'true', { timeout: 10_000 })
+  await expect(bird).toHaveAttribute('data-onstage', 'false')
+  await bird.click()
+  await expect(bird).toHaveAttribute('data-onstage', 'true', { timeout: 10_000 })
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice B: the fox has no hat and the bird waits for a bell nobody rings — both need fixing.
+  await runAndExpect(page, 'error', '没有事件')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_start', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'error', '没人上台')
+  await page.getByTestId('event-edit-bird').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_clicked', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Creative remake: the frog is the second act; the frog's blocks under the rabbit do nothing.
+  await page.getByTestId('grid-goal-choice-2').click() // 小青蛙 (picking a friend switches the editor to it)
+  await expect(page.getByTestId('event-edit-frog')).toHaveAttribute('aria-selected', 'true')
+  await page.getByTestId('event-edit-fox').click()
+  await q('when_start', 'enter_stage', 'say_hello')
+  await page.getByTestId('event-edit-rabbit').click()
+  await q('when_clicked', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'error')
+  await page.getByTestId('lesson-clear-program').click()
+  await page.getByTestId('event-edit-frog').click()
+  await q('when_clicked', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  const mistakes = page.getByTestId('grid-review-mistakes')
+  for (const m of ['还没触发就先动了', '动的不是要动的角色', '忘了事件积木', '触发了却没反应']) await expect(mistakes).toContainText(m)
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('两个不同的事件')
+  await expect(page.getByTestId('grid-project-status')).toContainText('点小青蛙它再上台')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  // Close and reopen: the programme replays — the fox, then the frog; the bird and rabbit stay backstage.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  const card = page.getByTestId('grid-project-card')
+  await page.getByTestId('grid-project-play').click()
+  await expect(card.getByTestId('event-actor-frog')).toHaveAttribute('data-onstage', 'true', { timeout: 15_000 })
+  await expect(card.getByTestId('event-actor-fox')).toHaveAttribute('data-onstage', 'true')
+  await expect(card.getByTestId('event-actor-bird')).toHaveAttribute('data-onstage', 'false')
+  await expect(card.getByTestId('event-actor-rabbit')).toHaveAttribute('data-onstage', 'false')
+})
+
 test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at the failing block', async ({ page }) => {
   test.setTimeout(60_000)
   await page.addInitScript(() => {
