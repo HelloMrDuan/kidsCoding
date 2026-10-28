@@ -29,6 +29,7 @@
     { "path": "kc-scenes/turn-sign.svg", "license": "original", "source": "本项目新绘 SVG，G0-U1-L04 故事场景（路口转弯牌与小石头），与 grid-stage.tsx 内联 TurnSign 几何一致" },
     { "path": "kc-scenes/key-hook.svg", "license": "original", "source": "本项目新绘 SVG，G0-U1-L05 故事场景（钥匙挂钩牌：钥匙、箭头、小锁），与 grid-stage.tsx 内联 KeyHook 几何一致" },
     { "path": "kc-scenes/guide-map.svg", "license": "original", "source": "本项目新绘 SVG，G0-U1-L06 故事场景（森林向导的手绘地图），与 grid-stage.tsx 内联 GuideMap 几何一致" },
-    { "path": "kc-scenes/morning-glade.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2 事件舞台背景（清晨林间空地），与 event-stage.tsx 内联 MorningGlade 几何一致" }
+    { "path": "kc-scenes/morning-glade.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2 事件舞台背景（清晨林间空地），与 event-stage.tsx 内联 MorningGlade 几何一致" },
+    { "path": "kc-scenes/stage-flags.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L02 森林开幕舞台背景（木头舞台、彩旗串、旗杆），与 event-stage.tsx 内联 StageFlags 几何一致（课堂内彩旗可升降）" }
   ]
 }

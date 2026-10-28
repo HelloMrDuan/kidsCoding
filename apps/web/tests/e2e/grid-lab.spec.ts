@@ -657,6 +657,94 @@ test('G0-U2-L01 formal course on the event stage: hat-below error lab, order, cl
   await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
 })
 
+test('G0-U2-L02 formal course on the opening stage: flag-first error lab, start-flag opening, invite the bird, two start hats, pick a host, saved and reopened', async ({ page }) => {
+  test.setTimeout(200_000)
+  const q = async (...types: string[]) => { for (const t of types) await add(page, t) }
+  const flag = () => page.locator('[data-grid-item="stage-flags"]').first()
+  await page.goto('/learn/catalog/G0-U2-L02')
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+  await page.getByTestId('event-trial-entry').click()
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  await expect(flag()).toHaveAttribute('data-flag-up', 'false')
+  const fox = page.getByTestId('event-actor-fox')
+
+  // Step 1 — error lab: “升起彩旗” sits above the opening words, so the flag goes up first.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('彩旗先升起')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_start', 'say_hello', 'raise_flag')
+  await runAndExpect(page, 'success')
+  await expect(flag()).toHaveAttribute('data-flag-up', 'true')
+  await expect(fox).toHaveAttribute('data-said', 'true')
+  await next(page)
+
+  // Guided: a click-hat opening never starts on the start flag.
+  await expect(flag()).toHaveAttribute('data-flag-up', 'false')
+  await q('when_clicked', 'say_hello', 'raise_flag')
+  await runAndExpect(page, 'error', '什么都没发生')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_start', 'say_hello', 'raise_flag')
+  // Free play: tapping the host changes nothing; the start flag runs the opening.
+  await fox.click()
+  await expect(flag()).toHaveAttribute('data-flag-up', 'false')
+  await page.getByTestId('event-flag').click()
+  await expect(flag()).toHaveAttribute('data-flag-up', 'true', { timeout: 10_000 })
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: the host opens on the start flag; the bird only comes on when tapped.
+  await q('when_start', 'say_hello', 'raise_flag')
+  await page.getByTestId('event-edit-bird').click()
+  await q('when_start', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'error', '还没到时候')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_clicked', 'enter_stage', 'say_hello')
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('event-actor-bird')).toHaveAttribute('data-said', 'true')
+  await next(page)
+
+  // Practice B: the rabbit's own start hat raises the flag before the host speaks; clear the rabbit.
+  await runAndExpect(page, 'error', '互相抢')
+  await expect(page.getByTestId('grid-feedback')).toContainText('小兔子')
+  await page.getByTestId('event-edit-rabbit').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Creative remake: the rabbit hosts; an opening on the fox does not count for the rabbit.
+  await page.getByTestId('grid-goal-choice-1').click() // 小兔子
+  await page.getByTestId('event-edit-fox').click()
+  await q('when_start', 'say_hello', 'raise_flag')
+  await runAndExpect(page, 'error')
+  await page.getByTestId('lesson-clear-program').click()
+  await page.getByTestId('event-edit-rabbit').click()
+  await q('when_start', 'say_hello', 'raise_flag')
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  const mistakes = page.getByTestId('grid-review-mistakes')
+  for (const m of ['动作顺序反了', '触发了却没反应', '还没触发就先动了', '多了不该有的动作']) await expect(mistakes).toContainText(m)
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('开始时')
+  await expect(page.getByTestId('grid-project-status')).toContainText('小兔子主持')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  // Close and reopen: the programme replays for real — the rabbit speaks, then the flag goes up.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  const card = page.getByTestId('grid-project-card')
+  await expect(card.locator('[data-grid-item="stage-flags"]')).toHaveAttribute('data-flag-up', 'false')
+  await page.getByTestId('grid-project-play').click()
+  await expect(card.locator('[data-grid-item="stage-flags"]')).toHaveAttribute('data-flag-up', 'true', { timeout: 15_000 })
+  await expect(card.getByTestId('event-actor-rabbit')).toHaveAttribute('data-said', 'true')
+  await expect(card.getByTestId('event-actor-fox')).toHaveAttribute('data-said', 'false')
+})
+
 test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at the failing block', async ({ page }) => {
   test.setTimeout(60_000)
   await page.addInitScript(() => {

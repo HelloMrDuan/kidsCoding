@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkEventGoal } from '@/features/lessons/event/event-engine'
+import { checkEventGoal, stageStateAfter } from '@/features/lessons/event/event-engine'
 import { g0u2EventLessons, resolveEventGoal, toEventScripts } from './g0-u2-event-lessons'
 
 const lessons = Object.values(g0u2EventLessons)
@@ -50,12 +50,21 @@ describe('G0-U2 event lessons (Hark A formal course)', () => {
       })
 
       it('nothing happens before any interaction: every goal starts with the stage still', () => {
-        for (const step of lesson.steps) for (const a of step.level.actors) expect(a.asleep ?? false, `${step.id} ${a.id}`).toBe(true)
+        for (const step of lesson.steps) {
+          for (const [id, st] of Object.entries(stageStateAfter(step.level, []))) {
+            expect(st.said || st.flagUp || st.surprised || st.fallen, `${step.id} ${id}`).toBe(false)
+          }
+          // The goal's own effects must change something a child can see (waking, speaking, a flag, entering).
+          const { expectations } = resolveEventGoal(step)
+          expect(expectations.some(e => e.effects.length > 0), step.id).toBe(true)
+        }
       })
 
       it('the creative step works for every character the child may pick, and one card never fits another pick', () => {
         const step = lesson.steps.find(s => s.kind === 'creative')!
-        const cards = step.creative!.choices.map(target => ({ target, scripts: toEventScripts({ [target]: ['when_clicked', 'wake_up', 'say_hello'] }) }))
+        // The reference card is the step's own solution for its first choice, moved onto each pick.
+        const ref = step.solutions[0][step.creative!.choices[0]]!
+        const cards = step.creative!.choices.map(target => ({ target, scripts: toEventScripts({ [target]: ref }) }))
         for (const card of cards) {
           for (const other of cards) {
             const { expectations, probes } = resolveEventGoal(step, other.target)

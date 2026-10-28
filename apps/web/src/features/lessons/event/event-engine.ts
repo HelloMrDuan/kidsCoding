@@ -37,6 +37,8 @@ export type EventActor = {
   offstage?: boolean
   /** Asleep (eyes shut) until `wake_up` runs. */
   asleep?: boolean
+  /** What its speech bubble says when `say_hello` runs (drawing only). */
+  line?: string
 }
 
 export type EventLevel = {
