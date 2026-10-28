@@ -2,6 +2,7 @@
 
 import {useEffect, useRef, useState} from 'react'
 import * as Blockly from 'blockly'
+import {BLOCKLY_MEDIA_PATH} from '@/features/lessons/blockly/blockly-media'
 import type {MeteorProgram} from './scratch-character-stats'
 
 export type {MeteorProgram}
@@ -50,6 +51,7 @@ export function ScratchMeteorBlocks({onProgramChange,initialProgram,characterNam
     installMeteorBlocks(characterName)
     if (!node.current) return
     const ws=Blockly.inject(node.current,{
+      media:BLOCKLY_MEDIA_PATH,
       toolbox:{kind:'flyoutToolbox',contents:[
         {kind:'block',type:'kc_meteor_start'},
         {kind:'block',type:'kc_meteor_count'},
