@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G0-U2-L06",
+  "reviewedCommit": "5681c52",
+  "reviewedAt": "2026-10-28",
+  "reviewer": "Hark A（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G0 启蒙（5～7 岁）",
+  "prerequisites": [
+    "G0-U2-L05"
+  ],
+  "newConcepts": [
+    "一个作品里用三种事件：开始旗、点角色、铃铛消息",
+    "每位伙伴有自己的事件，不跟着同一个事件乱动",
+    "每种触发都要亲手测一遍，只测一种会漏掉错误"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11 公开介绍）",
+    "西瓜创客 PBL https://www.xiguacity.cn/curriculum（2026-10-11 公开介绍）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 16,
+      "evidence": [
+        "g0-u2-event-lessons.ts G0-U2-L06（单元作品）：三条可观察目标",
+        "5 关递进：错误实验（大家都跟着开始旗乱动）→ 开场和观众互动 → 铃声请来小鸟 → 修好只测了开始旗漏掉的摇铃 → 单元作品自选嘉宾",
+        "覆盖详案三个常见错误：所有角色跟着同一个触发乱动、只测试一种触发；“事件说明不足”体现在运行检查前列出全部测试步骤"
+      ],
+      "defects": [
+        "“邀请同伴触发舞台”依赖线下家长/同伴配合，产品内无法验证"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "原创森林见面会舞台（kc-scenes/meeting-stage.svg，已登记授权），后台嘉宾半透明，上台后清晰",
+        "主持人“见面会开始啦！”、嘉宾“大家好！”气泡，小兔子惊喜与铃铛提示",
+        "错误实验两个可点选预测，猜错不阻塞"
+      ],
+      "defects": [
+        "朗读用浏览器自带声音；没有观众掌声等音效"
+      ]
+    },
+    "practice": {
+      "score": 21,
+      "evidence": [
+        "练习 A（三种事件串成整场）与练习 B（只测开始旗、漏掉摇铃，调试）目标不同，均由事件引擎真实运行判定",
+        "单元测试：每关正解通过、反例给出指定错误（含嘉宾再摇铃 loop）；单元作品 3 位嘉宾互不代替",
+        "舞台可自由试玩：按开始旗、点小兔子、点嘉宾"
+      ],
+      "defects": [
+        "嘉宾只能由铃声请上台，不能自定义更多环节"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "本课专属诊断：too_early 指出“跟着开始旗一起乱动”，missing_effect 指出“每种触发都要测一遍”",
+        "运行检查前列出全部测试步骤（按开始旗 → 点小兔子 → 点小狐狸 → 点嘉宾…）",
+        "三层提示：现象 → 规则 → 做法；复盘卡列出本节真实遇到的错误"
+      ],
+      "defects": [
+        "诊断指到角色，不指到具体某一块积木"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "单元作品：孩子选铃声请上台的嘉宾（小鸟/小青蛙/松鼠）；多请一位不算（单元测试）",
+        "作品“我的森林见面会”保存五位角色的积木，可真实回放三种触发"
+      ],
+      "defects": [
+        "开场和互动环节固定，孩子只决定嘉宾"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "通过只由事件引擎真实运行判定；伪造的完成状态在草稿读取时被过滤（event-draft.ts）",
+        "复盘卡：目标回顾 + 真实错误记录 + What-if；点选反思保存并重开仍在",
+        "三断点截图 docs/roadmap/evidence/G0-U2-L06/"
+      ],
+      "defects": [
+        "没有儿童试学；评分者是实现者，非独立"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "运行结果来自 event-engine.ts 真实执行五位角色名下的积木（含铃铛广播）；上台、惊喜、铃铛按效果逐个播放"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "/learn/event-lab/G0-U2-L06 可亲手拼块运行，舞台可自由点角色和开始旗（L3 实验可试玩）"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "第 1 关是错误实验：必须先真实运行三位都接“开始时”的起始程序、看到一起乱动才能完成；E2E 覆盖"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "单元作品 3 位嘉宾各自有效；判定看舞台效果和顺序，不比对固定积木序列"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "“我的森林见面会”只有在所选嘉宾真实检查通过后才出现，重开后可回放（E2E）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色为项目自绘 character-art 与内联原创松鼠，背景 meeting-stage.svg 为本项目新绘，已登记授权表；文字自写"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "只存本机 localStorage（kids-event-lesson-v1:G0-U2-L06），不含姓名，不上传"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "错误实验与练习 B 起始程序必失败；多请一位嘉宾、拼错名下、跟着开始旗乱动都不判通过（单元测试 + E2E）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 记为 L3 实验可试玩，目录不标正式发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "错误实验改好事件后，开始旗小狐狸开场、点小兔子惊喜摇铃、小鸟上台；单元作品选松鼠，回放只有松鼠被请上台（E2E）",
+    "failureCase": "错误实验 → too_early（大家跟着开始旗乱动）；引导关小兔子用“开始时” → too_early；练习A小鸟用“被点击时” → missing_effect；练习B → missing_effect（漏摇铃）；单元作品多请一位 → extra_effect（单元测试 + E2E）",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清这一课的规则（概念）",
+      "第三层：给出具体积木做法"
+    ],
+    "practiceA": "练习 A：开始旗开场、点小兔子摇铃、铃声请小鸟上台",
+    "practiceB": "练习 B：只测开始旗，漏掉小兔子摇铃；补上“摇响铃铛”（起始程序必失败）",
+    "equivalentSolutions": [
+      "单元作品 3 位嘉宾各有效（单元测试遍历）"
+    ],
+    "saveReopen": "五位角色的积木、关卡进度、错误实验观察、嘉宾选择、真实错误记录存 kids-event-lesson-v1:G0-U2-L06；刷新后回到完成页，作品可回放（E2E）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L06 unit project at the meet-and-greet: everyone on start, open and call, bell brings the guest, only tested start, pick a guest, saved and reopened"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G0-U2-L06/"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 参考评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学（需真实儿童与监护人同意，不得模拟）"
+  ],
+  "notes": "2026-10-28 Hark A 实现者参考评价（非独立人工评分）：G0-U2-L06 单元作品五关正式候选课程（事件、角色配合与作品编排），综合开始旗、点击、铃铛三种事件；复用事件舞台引擎；新增见面会舞台场景。"
+}

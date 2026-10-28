@@ -1007,7 +1007,207 @@ const L05: EventLesson = {
   project: { stepId: 'my-apple-catch', title: '我的苹果惊喜卡', passedText: '真实运行：点苹果才落下，{target}听到铃铛惊喜' },
 }
 
-export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02, [L03.id]: L03, [L04.id]: L04, [L05.id]: L05 }
+// G0-U2-L06 (unit project): the forest meet-and-greet — the start flag opens, a click calls, the bell brings the guest.
+const opener = (over: Partial<EventActor> = {}): EventActor => ({ id: 'fox', name: '小狐狸', can: ['enter_stage', 'say_hello', 'show_surprise', 'send_bell'], x: 24, y: 58, offstage: true, line: '开场啦！', ...over })
+const caller = (over: Partial<EventActor> = {}): EventActor => ({ id: 'rabbit', name: '小兔子', can: ['show_surprise', 'send_bell', 'say_hello', 'enter_stage'], x: 50, y: 58, ...over })
+const guestOf = (id: EventActorId, name: string, x: number, y = 56): EventActor => ({ id, name, can: ['enter_stage', 'say_hello', 'show_surprise', 'send_bell'], x, y, offstage: true, line: '大家好！' })
+const MEETING: EventLevel = { actors: [opener(), caller(), guestOf('bird', '小鸟', 74)], scenery: 'meeting-stage' }
+const MEETING_ANY: EventLevel = {
+  actors: [opener({ x: 14 }), caller({ x: 34 }), guestOf('bird', '小鸟', 54, 54), guestOf('frog', '小青蛙', 70), guestOf('squirrel', '松鼠', 86)],
+  scenery: 'meeting-stage',
+}
+const MEET_BLOCKS = ['when_start', 'when_clicked', 'when_bell', 'enter_stage', 'say_hello', 'show_surprise', 'send_bell']
+const meeting: EventGoal = {
+  expectations: [
+    { interaction: { kind: 'start' }, effects: [['fox', 'enter_stage'], ['fox', 'say_hello']] },
+    { interaction: { kind: 'click', actor: 'rabbit' }, effects: [['rabbit', 'show_surprise'], ['rabbit', 'send_bell'], ['bird', 'enter_stage'], ['bird', 'say_hello']] },
+  ],
+  probes: [{ kind: 'click', actor: 'fox' }, { kind: 'click', actor: 'bird' }],
+}
+const meetingSolution = { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'show_surprise', 'send_bell'], bird: ['when_bell', 'enter_stage', 'say_hello'] }
+
+const L06: EventLesson = {
+  id: 'G0-U2-L06',
+  title: '森林伙伴见面会',
+  story: '单元作品：森林伙伴见面会。按开始旗，主持人小狐狸上台开场；观众点一下小兔子，它露出惊喜并摇响铃铛；小鸟听到铃铛飞上台问好。三种事件、三位伙伴，各演各的一段。',
+  concept: '事件、角色配合与作品编排',
+  objectives: [
+    '在一个作品里用上三种事件：开始旗、点角色、铃铛消息',
+    '给每位伙伴安排自己的事件和动作，不让所有人跟着同一个事件乱动',
+    '每种触发都亲手测一遍：按开始旗、点小兔子、点别的伙伴',
+  ],
+  diagnoses: {
+    too_early: '还没轮到就先动了：小兔子或小鸟也接了“开始时”，跟着开始旗一起乱动。每位伙伴要有自己的事件。',
+    missing_effect: '有一段没演出来：比如小兔子惊喜后忘了摇铃，小鸟就等不到铃声。每种触发都要测一遍。',
+    nothing_happened: '触发了，可是没人动：检查这个触发对应的伙伴名下有没有积木、事件选得对不对。',
+    wrong_trigger: '点了别的伙伴也有反应：只有点小兔子才该叫小鸟。',
+    wrong_order: '顺序不对：先惊喜、再摇铃；小鸟先上台、再问好。',
+    wrong_actor: '动的不是该动的伙伴：看看积木拼在了谁名下。',
+    extra_effect: '多了不该有的表演：只请你选的那位嘉宾上台。',
+    no_hat: '这段积木上面没有事件，它不知道什么时候开始。',
+    hat_not_on_top: '事件积木要放在最上面。',
+    disconnected: '有一块积木掉队了，没接在事件下面。',
+    cannot_do: '这个角色做不了这块积木的动作。',
+    loop: '铃铛一直在响：听到铃铛的伙伴又去摇铃了。',
+  },
+  steps: [
+    {
+      id: 'everyone-on-start',
+      kind: 'error-lab',
+      title: '错误实验：大家都跟着开始旗乱动',
+      instruction: '小狐狸把三位伙伴的积木都接在了“开始时”下面。这是一个故意的错误：先按原样运行检查，看看按下开始旗会发生什么，再给小兔子和小鸟换上各自的事件。',
+      predict: '先猜一猜：三位都用“开始时”，按下开始旗会怎样？',
+      predictChoices: [
+        { text: '只有小狐狸上台开场', when: 'pass' },
+        { text: '三位一起乱动，小鸟没等就上台', when: 'too_early' },
+      ],
+      errorLab: {
+        expect: 'too_early',
+        expected: '按开始旗只有小狐狸开场；点小兔子才惊喜摇铃，小鸟听到铃铛才上台。',
+        actual: '三位一起动起来了：大家都接在“开始时”下面，开始旗一按就全上了。',
+      },
+      level: MEETING,
+      editable: ['fox', 'rabbit', 'bird'],
+      allowedBlocks: MEET_BLOCKS,
+      starter: {
+        fox: [{ type: 'when_start' }, { type: 'enter_stage' }, { type: 'say_hello' }],
+        rabbit: [{ type: 'when_start' }, { type: 'show_surprise' }, { type: 'send_bell' }],
+        bird: [{ type: 'when_start' }, { type: 'enter_stage' }, { type: 'say_hello' }],
+      },
+      goal: meeting,
+      hints: [
+        '开始旗一按，三位都动了：小兔子和小鸟不该听开始旗。',
+        '每位伙伴听自己的事件：小狐狸听开始旗，小兔子听手指，小鸟听铃铛。',
+        '小兔子：清空后拼“被点击时 → 露出惊喜 → 摇响铃铛”；小鸟：清空后拼“听到铃铛时 → 走上舞台 → 说早上好”。',
+      ],
+      solutions: [meetingSolution],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_start', 'show_surprise', 'send_bell'], bird: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'too_early' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'show_surprise', 'send_bell'], bird: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'too_early' },
+      ],
+    },
+    {
+      id: 'open-and-call',
+      kind: 'guided',
+      title: '开场和观众互动',
+      instruction: '先排两段：按开始旗，小狐狸走上舞台说“开场啦！”；点一下小兔子，它露出惊喜。小鸟这次先在后台休息。',
+      predict: '先猜一猜：这两段要用几个不同的事件？',
+      level: MEETING,
+      editable: ['fox', 'rabbit', 'bird'],
+      allowedBlocks: MEET_BLOCKS,
+      goal: {
+        expectations: [
+          { interaction: { kind: 'start' }, effects: [['fox', 'enter_stage'], ['fox', 'say_hello']] },
+          { interaction: { kind: 'click', actor: 'rabbit' }, effects: [['rabbit', 'show_surprise']] },
+        ],
+        probes: [{ kind: 'click', actor: 'fox' }, { kind: 'click', actor: 'bird' }],
+      },
+      hints: [
+        '开场时小兔子也惊喜了，或者点小兔子没反应：小兔子的事件不对。',
+        '开场听开始旗，观众互动听手指：两个不同的事件。',
+        '小狐狸：开始时 → 走上舞台 → 说早上好；小兔子：被点击时 → 露出惊喜。',
+      ],
+      solutions: [{ fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'show_surprise'] }],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_start', 'show_surprise'] }, failure: 'too_early' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'] }, failure: 'nothing_happened' },
+        { scripts: { fox: ['when_clicked', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'show_surprise'] }, failure: 'nothing_happened' },
+      ],
+    },
+    {
+      id: 'bell-brings-guest',
+      kind: 'practice-a',
+      title: '练习 A：铃声请来小鸟',
+      instruction: '把整场见面会排完：开始旗小狐狸开场；点小兔子，它惊喜并摇响铃铛；小鸟听到铃铛走上舞台问好。点小狐狸、点小鸟都不会重来。',
+      predict: '先猜一猜：小鸟怎么知道该上台了？',
+      level: MEETING,
+      editable: ['fox', 'rabbit', 'bird'],
+      allowedBlocks: MEET_BLOCKS,
+      goal: meeting,
+      hints: [
+        '点了小兔子，小鸟没来：要么小兔子没摇铃，要么小鸟没在听铃铛。',
+        '三种事件各管一段：开始旗、点小兔子、铃铛。',
+        '小狐狸：开始时 → 走上舞台 → 说早上好；小兔子：被点击时 → 露出惊喜 → 摇响铃铛；小鸟：听到铃铛时 → 走上舞台 → 说早上好。',
+      ],
+      solutions: [meetingSolution],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'show_surprise', 'send_bell'], bird: ['when_clicked', 'enter_stage', 'say_hello'] }, failure: 'missing_effect' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'send_bell', 'show_surprise'], bird: ['when_bell', 'enter_stage', 'say_hello'] }, failure: 'wrong_order' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'show_surprise', 'send_bell'], bird: ['when_bell', 'send_bell'] }, failure: 'loop' },
+      ],
+    },
+    {
+      id: 'only-tested-start',
+      kind: 'practice-b',
+      title: '练习 B：只测了开始旗',
+      instruction: '小狐狸做好作品后只按了开始旗，看到开场没问题就交了。可是观众点小兔子时，小鸟一直不来。先把三种触发都运行检查一遍，找到漏掉的那块积木补上。',
+      predict: '先猜一猜：只按开始旗，能发现小鸟不来吗？',
+      level: MEETING,
+      editable: ['fox', 'rabbit', 'bird'],
+      allowedBlocks: MEET_BLOCKS,
+      starter: {
+        fox: [{ type: 'when_start' }, { type: 'enter_stage' }, { type: 'say_hello' }],
+        rabbit: [{ type: 'when_clicked' }, { type: 'show_surprise' }],
+        bird: [{ type: 'when_bell' }, { type: 'enter_stage' }, { type: 'say_hello' }],
+      },
+      goal: meeting,
+      hints: [
+        '开场正常，可是点小兔子后小鸟没来：小兔子那一段少了东西。',
+        '小鸟听的是铃铛，所以小兔子惊喜之后要摇铃。',
+        '切到小兔子，在“露出惊喜”下面接上“摇响铃铛”。',
+      ],
+      solutions: [meetingSolution],
+      counterExamples: [{ scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'show_surprise'], bird: ['when_bell', 'enter_stage', 'say_hello'] }, failure: 'missing_effect' }],
+    },
+    {
+      id: 'my-meeting',
+      kind: 'creative',
+      title: '单元作品：请哪位嘉宾？',
+      instruction: '后台来了三位嘉宾：小鸟、小青蛙、松鼠。由你来决定铃声请谁上台：小狐狸开场、点小兔子摇铃，你选的嘉宾听到铃铛上台问好，其他嘉宾留在后台。通过后，它就是你的单元作品“我的森林见面会”。',
+      predict: '先猜一猜：“听到铃铛时”要拼在谁名下？',
+      creative: { prompt: '铃声响起时，请哪位嘉宾上台？', choices: ['bird', 'frog', 'squirrel'], labels: ['小鸟', '小青蛙', '松鼠'] },
+      level: MEETING_ANY,
+      editable: ['fox', 'rabbit', 'bird', 'frog', 'squirrel'],
+      allowedBlocks: MEET_BLOCKS,
+      goal: {
+        expectations: [
+          { interaction: { kind: 'start' }, effects: [['fox', 'enter_stage'], ['fox', 'say_hello']] },
+          { interaction: { kind: 'click', actor: 'rabbit' }, effects: [['rabbit', 'show_surprise'], ['rabbit', 'send_bell'], ['$target', 'enter_stage'], ['$target', 'say_hello']] },
+        ],
+        probes: [{ kind: 'click', actor: 'fox' }, { kind: 'click', actor: 'bird' }, { kind: 'click', actor: 'frog' }, { kind: 'click', actor: 'squirrel' }],
+      },
+      hints: [
+        '铃声响了，上台的不是你选的嘉宾，或者来了两位：积木拼错了名下。',
+        '小狐狸开场、小兔子摇铃不用变；只把“听到铃铛时”拼在你选的嘉宾名下。',
+        '例如选松鼠：松鼠“听到铃铛时 → 走上舞台 → 说早上好”，小鸟和小青蛙名下空着。',
+      ],
+      solutions: [meetingSolution],
+      counterExamples: [
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_clicked', 'show_surprise', 'send_bell'], frog: ['when_bell', 'enter_stage', 'say_hello'] }, failure: 'wrong_actor' },
+        { scripts: { ...meetingSolution, frog: ['when_bell', 'enter_stage', 'say_hello'] }, failure: 'extra_effect' },
+        { scripts: { fox: ['when_start', 'enter_stage', 'say_hello'], rabbit: ['when_start', 'show_surprise', 'send_bell'], bird: ['when_bell', 'enter_stage', 'say_hello'] }, failure: 'too_early' },
+      ],
+    },
+  ],
+  review: {
+    whatIf: '如果小兔子惊喜后忘了“摇响铃铛”，只按开始旗测试能发现吗？',
+    answer: '发现不了：开场照样正常，只有点小兔子时小鸟不来。每种触发都要亲手测一遍。',
+  },
+  reflection: '说一说：你的见面会用了哪几种事件？每位伙伴听的是哪一个？你是怎么测试的？',
+  reflectionCheck: {
+    question: '要确认整场见面会没问题，至少要测试哪些触发？',
+    options: [
+      { text: '按开始旗，再点小兔子', correct: true },
+      { text: '只按开始旗', correct: false },
+      { text: '只点小兔子', correct: false },
+    ],
+    why: '开始旗检查开场，点小兔子检查铃铛和嘉宾；只测一种，另一段出错也看不出来。',
+  },
+  parentQuestion: '请孩子当主持人演示“我的森林见面会”：先按开始旗，再请家长点小兔子，看嘉宾上台；请孩子说说三位伙伴各听哪个事件。',
+  project: { stepId: 'my-meeting', title: '我的森林见面会', passedText: '真实运行：小狐狸开场，点小兔子摇铃，{target}上台问好' },
+}
+
+export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02, [L03.id]: L03, [L04.id]: L04, [L05.id]: L05, [L06.id]: L06 }
 
 export function getEventLesson(id: string): EventLesson | undefined {
   return g0u2EventLessons[id]

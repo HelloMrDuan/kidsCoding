@@ -36,6 +36,7 @@
     { "path": "kc-scenes/stage-flags.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L02 森林开幕舞台背景（木头舞台、彩旗串、旗杆），与 event-stage.tsx 内联 StageFlags 几何一致（课堂内彩旗可升降）" },
     { "path": "kc-scenes/bell-tree.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L03 铃铛树背景（老橡树、树枝上的森林铃铛），与 event-stage.tsx 内联 BellTree 几何一致（课堂内铃铛摇响时摆动）；同课松鼠角色为 event-stage.tsx 内联原创 SquirrelArt" },
     { "path": "kc-scenes/two-doors.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L04 森林小剧场背景（红色幕帘、两扇后台门、木头舞台），与 event-stage.tsx 内联 TwoDoors 几何一致" },
-    { "path": "kc-scenes/apple-tree.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L05 苹果园背景（天空、草坡、苹果树与红苹果）；课堂内联 AppleOrchard 背景与可点击的 TreeArt、AppleArt 角色同一画法" }
+    { "path": "kc-scenes/apple-tree.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L05 苹果园背景（天空、草坡、苹果树与红苹果）；课堂内联 AppleOrchard 背景与可点击的 TreeArt、AppleArt 角色同一画法" },
+    { "path": "kc-scenes/meeting-stage.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L06 森林见面会舞台背景（彩旗、聚光灯、圆形木舞台、观众树桩），与 event-stage.tsx 内联 MeetingStage 几何一致" }
   ]
 }

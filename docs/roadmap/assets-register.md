@@ -26,6 +26,7 @@
 | apps/web/public/kc-scenes/bell-tree.svg | 铃铛树（老橡树、树枝上挂着森林铃铛），G0-U2-L03 事件舞台背景 | 本项目新绘（Hark A，G0-U2-L03），与上述资产同一扁平柔和风格；课堂 `event-stage.tsx` 的内联 `BellTree` 与本文件几何一致（铃铛摇响时摆动）；同课松鼠为内联原创 `SquirrelArt` | original | 983 |
 | apps/web/public/kc-scenes/two-doors.svg | 森林小剧场（红色幕帘、两扇后台门、木头舞台），G0-U2-L04 事件舞台背景 | 本项目新绘（Hark A，G0-U2-L04），与上述资产同一扁平柔和风格；课堂 `event-stage.tsx` 的内联 `TwoDoors` 与本文件几何一致 | original | 1095 |
 | apps/web/public/kc-scenes/apple-tree.svg | 苹果园（天空、草坡、苹果树与红苹果），G0-U2-L05 事件舞台背景 | 本项目新绘（Hark A，G0-U2-L05），与上述资产同一扁平柔和风格；课堂 `event-stage.tsx` 中苹果树、苹果为可点击的内联原创角色（TreeArt、AppleArt），背景为内联 `AppleOrchard` | original | 963 |
+| apps/web/public/kc-scenes/meeting-stage.svg | 森林见面会舞台（彩旗、聚光灯、圆形木舞台、观众树桩），G0-U2-L06 单元作品舞台背景 | 本项目新绘（Hark A，G0-U2-L06），与上述资产同一扁平柔和风格；课堂 `event-stage.tsx` 的内联 `MeetingStage` 与本文件几何一致 | original | 1293 |
 
 机器可读登记：上表 14 个文件同时登记在
 `apps/web/src/content/curriculum/asset-licenses-v1.json`（SYS-105 课程 schema
