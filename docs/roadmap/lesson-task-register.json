@@ -1461,7 +1461,7 @@
       "unitId": "G2-U1",
       "focusConcept": "积木",
       "plannedLearningOutcome": "能使用积木解释并完成「广播第一条消息」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1475,9 +1475,9 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/203",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U1-L05 block: 5 tests; local Playwright Chromium 27/27 for the spec; CI real-Chrome result pending)",
+        "mergeCommit": "878fb7a3a1e138922e1384a8e0c581ef830a4a15",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40650681053",
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts — G2-U1-L05 用例在 PR #203 与 main 真 Chrome CI（scratch-real-vm-browser 分片）通过",
         "lessonReview": null
       },
       "notes": "Hark B：真实 Scratch VM 原创动物小剧场项目；练习A舞台“当接收到（开场）”换灯光舞台、练习B小白兔收到广播移到舞台中间（x -40～40 多解）、小鸟听“谢幕”收不到“开场”的找错+三层提示（须先见不说话再见说话）、创意新欢迎词+完整开场；.sb3 自动保存/导出回读/导入、沙箱拒未知消息/多余变量/广播并等待/越界/他课工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U1-L05.json，非独立），需独立人工教研复核；无儿童试学；未接 WebGL 渲染器。不得标 completed。"
