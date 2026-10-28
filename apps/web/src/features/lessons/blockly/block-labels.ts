@@ -28,6 +28,15 @@ export const kidsBlockLabels: Record<string, string> = {
   turn_right: '向右转',
   pick_key: '捡起钥匙',
   open_door: '打开树洞门',
+  // G0-U2 event stage
+  when_bell: '听到铃铛时',
+  wake_up: '睁开眼睛',
+  say_hello: '说早上好',
+  show_surprise: '露出惊喜',
+  enter_stage: '走上舞台',
+  raise_flag: '升起彩旗',
+  fall_down: '掉到地上',
+  send_bell: '摇响铃铛',
 }
 
 /** Labels that change when the character flies instead of walks. */

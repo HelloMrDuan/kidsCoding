@@ -376,7 +376,7 @@ export function BlocklyWorkspace({
 
     const currentBlocks = snapshotOf(workspace)
     if (
-      (type === 'when_start' || type === 'when_clicked') &&
+      (type === 'when_start' || type === 'when_clicked' || type === 'when_bell') &&
       currentBlocks.some((block) => block.type === type)
     ) {
       onSnapshotChange(currentBlocks)

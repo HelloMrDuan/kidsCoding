@@ -54,7 +54,15 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
             <Link data-testid="scratch-trial-entry" href={trial} className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">体验 Scratch VM →</Link>
           </section>
         ) : null}
-        {trial && maturity.engine === 'blockly' ? (
+        {trial && maturity.engine === 'blockly' && trial.startsWith('/learn/event-lab/') ? (
+          <section className="rounded-[2rem] border-2 border-amber-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-bold text-amber-700">Blockly 真运行 · 事件舞台 · 浏览器草稿</p>
+            <h2 className="mt-2 text-xl font-black">给每个角色拼事件积木</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">按开始旗、点角色，事件真的发生了积木才运行；每关都由检查程序真实运行判定，错了会说清是哪个角色、哪一步。程序自动保存在本机，正式课程仍未发布。</p>
+            <Link href={trial} data-testid="event-trial-entry" className="mt-4 inline-flex rounded-full bg-amber-500 px-6 py-3 font-bold text-white">开始事件舞台 →</Link>
+          </section>
+        ) : null}
+        {trial && maturity.engine === 'blockly' && !trial.startsWith('/learn/event-lab/') ? (
           <section className="rounded-[2rem] border-2 border-amber-200 bg-white p-6 shadow-sm">
             <p className="text-xs font-bold text-amber-700">Blockly 真运行 · 森林网格 · 浏览器草稿</p>
             <h2 className="mt-2 text-xl font-black">用积木带小狐狸走格子</h2>

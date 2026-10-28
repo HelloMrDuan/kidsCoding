@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import g0 from '@/content/curriculum/track-g0-detailed-lessons-v1.json'
-import { missingEngineCapabilities } from './engine-capabilities'
+import { existsSync } from 'node:fs'
+import path from 'node:path'
+import { blocklyEngineCapabilities, missingEngineCapabilities } from './engine-capabilities'
 
 const lessons = (g0 as { lessons: Array<{ id: string; requiredEngineCapabilities?: string[]; playable?: boolean }> }).lessons
 
@@ -11,8 +13,19 @@ describe('engine capabilities (SYS-106)', () => {
     }
   })
 
+  it('G0-U2 needs are implemented by the event-stage engine (Hark A)', () => {
+    for (const lesson of lessons.filter(l => l.id.startsWith('G0-U2-'))) {
+      expect(missingEngineCapabilities(lesson.requiredEngineCapabilities), lesson.id).toEqual([])
+    }
+  })
+
+  it('message_event points at a real engine file', () => {
+    expect(blocklyEngineCapabilities.message_event).toContain('event/event-engine.ts')
+    expect(existsSync(path.resolve(__dirname, '../lessons/event/event-engine.ts'))).toBe(true)
+  })
+
   it('does not claim capabilities the engine lacks', () => {
-    expect(missingEngineCapabilities(['finite_repeat', 'if_else', 'sound', 'counter', 'message_event', 'state', 'visual_effect'])).toHaveLength(7)
+    expect(missingEngineCapabilities(['finite_repeat', 'if_else', 'sound', 'counter', 'state', 'visual_effect'])).toHaveLength(6)
   })
 
   it('the legacy L1 scripts stay non-playable; playability comes only from the grid trial integration', () => {
