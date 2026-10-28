@@ -275,12 +275,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/206",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L04 formal course in the forest theatre: script on the wrong friend, fox first, two turns, nobody came, pick the second act, saved and reopened（2026-10-28 本地桌面 Chrome grid-lab 11/11 通过；以 PR #206 CI 为准）",
+        "mergeCommit": "cd1cdd8b3f1ecdf202a2b89aa40f72f5d8a02245",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40656279623",
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L04 formal course in the forest theatre: script on the wrong friend, fox first, two turns, nobody came, pick the second act, saved and reopened（PR #206 CI 与 main cd1cdd8 的 curriculum 第 1 分片 scratch-real-vm-browser（含全部 grid-lab 用例）通过；另 2026-10-28 本地桌面 Chrome grid-lab 11/11 通过）",
         "lessonReview": null
       },
-      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L04 五关正式课程化（错误实验·积木拼错了朋友、小狐狸先登台、练习A两次登台、练习B两段积木都没触发、创意·自选第二个节目）+ 复盘卡 + 作品回放 + 原创森林小剧场场景；复用事件舞台引擎。证据 docs/roadmap/evidence/G0-U2-L04/，AI 参考教研 83/100（实现者自评，非独立）。in_review：等待 PR CI、合并与 main CI；等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
+      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L04 五关正式课程化（错误实验·积木拼错了朋友、小狐狸先登台、练习A两次登台、练习B两段积木都没触发、创意·自选第二个节目）+ 复盘卡 + 作品回放 + 原创森林小剧场场景；复用事件舞台引擎。证据 docs/roadmap/evidence/G0-U2-L04/，AI 参考教研 83/100（实现者自评，非独立）。PR #206 已合并（cd1cdd8）：首轮 deploy 的 bind-account-form.test.tsx:53 偶发失败、第二轮 scratch-real-vm-browser-part2 失败（均与本课无关文件），内容不变重跑后 16 项成功；main cd1cdd8 的 deploy（40656279623）、task-tracking（40656279577）全绿，curriculum（40656279390）11 成功 4 失败，失败在 scratch-real-vm-browser-part2（第 2 分片只含 scratch-g2-u1 / scratch-vm / unit-project 等用例，不含 grid-lab），同样失败已先出现在 main 29d09d9、5bf36cd（均非 Hark A 提交），交 CI 修复线。保持 in_review：等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U2-L05",
