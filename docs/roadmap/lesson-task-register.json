@@ -177,7 +177,7 @@
       "unitId": "G0-U2",
       "focusConcept": "事件",
       "plannedLearningOutcome": "能使用事件解释并完成「点击叫醒小狐狸」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -190,13 +190,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/190",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L01 formal course on the event stage: hat-below error lab, order, click-only wake, debug the woken rabbit, pick a friend, saved and reopened（2026-10-28 本地桌面 Chrome grid-lab 8/8 通过；以 PR #190 CI 为准）",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Hark A 2026-10-28：/learn/event-lab/G0-U2-L01 五关正式课程化（错误实验·事件帽放在下面、先醒再打招呼、练习A点一下才醒、练习B修好被吵醒的小兔子、创意·自选叫醒朋友）+ 复盘卡 + 作品回放 + 原创林间空地场景；本 PR 同时带来事件舞台引擎（message_event）。证据 docs/roadmap/evidence/G0-U2-L01/，AI 参考教研 83/100（实现者自评，非独立）。in_review：等待 PR CI、合并与 main CI；等待独立人工教研复核；未儿童试学、未发布，全量目录仍为 outline_not_playable。"
     },
     {
       "id": "G0-U2-L02",
