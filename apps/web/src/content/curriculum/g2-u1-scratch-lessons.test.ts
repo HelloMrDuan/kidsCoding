@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
-import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
+import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, evaluateG2U1L06, g2u1L06, L06_CAT_LINE, inRibbonZone, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -218,5 +218,50 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(bird.scripts[0].hat).toBe('kc2_when_receive')
     expect(bird.scripts[0].hatSlots?.[0].options).toEqual(['开场', '谢幕'])
     expect(stage.scripts.map(s => s.hat)).toEqual(['kc2_flag', 'kc2_when_receive'])
+  })
+  it('L06 tasks come from VM green-flag speech runs (order + talking over) and the costume the cake wore when its song started', () => {
+    const obs = emptyG2Observations()
+    const run = (speakers: string[], overlaps: number, balloonY = -70) => ({speakers, overlaps, positions: {气球: {x: 160, y: balloonY}}})
+    expect(Object.values(evaluateG2U1L06(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u1L06.id, obs)).toBeNull()
+    obs.speechRuns = [run(['小橘猫', '气球'], 1)]
+    expect(observedPrediction(g2u1L06.id, obs)).toBe(g2u1L06.predict.correct)
+    expect(evaluateG2U1L06(obs).debug).toBe(false)
+    obs.speechRuns.push(run(['小橘猫', '气球'], 0))
+    expect(evaluateG2U1L06(obs).debug).toBe(true)
+    // Turn-taking without first seeing the overlap is not the debug task; a run where only one sprite spoke does not count.
+    expect(evaluateG2U1L06({...obs, speechRuns: [run(['小橘猫', '气球'], 0)]}).debug).toBe(false)
+    expect(evaluateG2U1L06({...obs, speechRuns: [run(['小橘猫', '气球'], 2), run(['小橘猫'], 0)]}).debug).toBe(false)
+    expect(evaluateG2U1L06(obs).practiceB).toBe(false)
+    obs.speechRuns.push(run(['小橘猫', '气球'], 1, -30))
+    expect(evaluateG2U1L06(obs).practiceB).toBe(true)
+    expect(inRibbonZone({x: 0, y: -41})).toBe(false)
+    expect(inRibbonZone({x: 0, y: -20})).toBe(true)
+    expect(evaluateG2U1L06(obs).practiceA).toBe(false)
+    obs.soundCostumes = [{target: '蛋糕', sound: '生日歌', costume: '蜡烛熄灭'}]
+    expect(evaluateG2U1L06(obs).practiceA).toBe(false)
+    obs.soundCostumes.push({target: '蛋糕', sound: '生日歌', costume: '蜡烛点亮'})
+    expect(evaluateG2U1L06(obs).practiceA).toBe(true)
+    obs.lastSaid = {小橘猫: L06_CAT_LINE}
+    expect(evaluateG2U1L06(obs).create).toBe(false)
+    obs.lastSaid = {小橘猫: '祝你天天开心'}
+    // The ribbon run above still had an overlap, so the card is not finished yet.
+    expect(evaluateG2U1L06(obs).create).toBe(false)
+    obs.speechRuns.push(run(['小橘猫', '气球'], 0, -40))
+    expect(evaluateG2U1L06(obs).create).toBe(true)
+    expect(evaluateG2U1L06({...obs, soundCostumes: [{target: '蛋糕', sound: '生日歌', costume: '蜡烛熄灭'}]}).create).toBe(false)
+  })
+
+  it('L06 combines say, costume, sound, wait and repeat + change y; only the balloon wait, rise and lines are lesson values', () => {
+    const cake = g2u1L06.targets.find(t => t.name === '蛋糕')!
+    const balloon = g2u1L06.targets.find(t => t.name === '气球')!
+    expect(cake.scripts.map(s => s.hat)).toEqual(['kc2_flag', 'kc2_clicked'])
+    expect(cake.scripts[1].body.map(b => b.type)).toEqual(['kc2_switch_costume', 'kc2_play_sound'])
+    expect(cake.scripts[1].body[1]).toMatchObject({slots: [], fixed: {SOUND_MENU: '生日歌'}})
+    expect(balloon.scripts[0].body.map(b => b.type)).toEqual(['kc2_goto_start', 'kc2_wait_whole', 'kc2_say', 'kc2_repeat'])
+    expect(balloon.scripts[0].body[1].slots[0]).toMatchObject({min: 0, max: 5})
+    expect(balloon.scripts[0].body[1].slots[0].tenths).toBeUndefined()
+    expect(balloon.scripts[0].body[3].children?.map(b => b.type)).toEqual(['kc2_change_y'])
+    expect(g2u1L06.showSpeechOrder).toBe(true)
   })
 })

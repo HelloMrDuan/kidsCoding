@@ -6,10 +6,10 @@
 // examples/scratch/g2/build_g2_projects.py. Nothing here is a published
 // course or a verified grade.
 
-export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION'
+export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION' | 'DY'
 export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
 export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait' | 'kc2_switch_backdrop' | 'kc2_play_sound'
-  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast'
+  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast' | 'kc2_wait_whole' | 'kc2_change_y'
 /** `fixed` shows a value the lesson keeps fixed (its field is shown but locked in the editor). */
 export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[]; fixed?: Partial<Record<G2Field, string>> }
 export type G2ScriptSpec = {
@@ -54,6 +54,8 @@ export type G2Lesson = {
   nextLesson: string
   /** Show each sprite's VM direction in the observation panel (motion lessons). */
   showDirection?: boolean
+  /** Show who spoke in the last green-flag run and whether anyone talked over someone else (time-order lessons). */
+  showSpeechOrder?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -436,12 +438,100 @@ export const g2u1L05: G2Lesson = {
   nextLesson: 'G2-U1-L06 制作生日贺卡',
 }
 
+export const L06_CAT_LINE = '生日快乐！'
+export const L06_BALLOON_START = { x: 160, y: -90 } as const
+/** The ribbon on the card the balloon should float up to. */
+export const L06_RIBBON_ZONE = { minY: -40, maxY: -20 } as const
+
+export function inRibbonZone(point: G2Point | undefined | null): boolean {
+  if (!point || !Number.isFinite(point.y)) return false
+  return point.y >= L06_RIBBON_ZONE.minY && point.y <= L06_RIBBON_ZONE.maxY
+}
+
+export const g2u1L06: G2Lesson = {
+  id: 'G2-U1-L06',
+  title: '制作生日贺卡',
+  concept: '按时间顺序组合积木（等待让角色轮流）',
+  sample: '/scratch-samples/g2-u1-l06-birthday-card.sb3.b64',
+  exportName: 'KidsCoding-制作生日贺卡.sb3',
+  story: '小橘猫要给好朋友做一张会动的生日贺卡：点绿旗，小橘猫先说祝福，气球再说“许个愿吧！”并飘到彩带上；点蛋糕，蜡烛亮起来、生日歌响起来。可是现在气球一开场就抢着说话，蛋糕点了也不亮……',
+  conceptExplain: [
+    '一张贺卡用到了前几课的积木：说话、换造型、播放声音、移动，还有重复。把它们按时间顺序排好，作品就讲得清楚。',
+    '“说……2 秒”会让话显示 2 秒；另一个角色想等它说完再开口，就要先“等待 2 秒”（或更久）。等待 0 秒，两句话会同时出现，像抢话。',
+    '同一个脚本里积木从上到下一块接一块执行：先“换成蜡烛点亮造型”，再“播放生日歌”，唱歌时蜡烛就已经亮了。',
+  ],
+  predict: {
+    question: '点绿旗后，气球先“等待 0 秒”再说话，而小橘猫一开始就说“生日快乐！”2 秒。两句话会同时出现在舞台上吗？',
+    options: ['会同时出现', '一个说完另一个才说'],
+    correct: '会同时出现',
+    explain: '等待 0 秒等于没有等，Scratch VM 里气球几乎和小橘猫同时开口，两个对话框同时出现。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '按顺序先换造型再播放声音', title: '练习 A：点亮蜡烛再唱歌', goal: '选中蛋糕，把“当角色被点击 → 换成（ ）造型”改成“蜡烛点亮”，应用后在舞台上点蛋糕，让 Scratch VM 播放生日歌时蛋糕已经是蜡烛点亮的造型。', how: '这个脚本是先换造型、再播放声音；绿旗会把蛋糕重置成蜡烛熄灭。' },
+    { id: 'practiceB', skill: '用重复 + “将 y 坐标增加”让角色往上飘', title: '练习 B：气球飘到彩带上', goal: '选中气球，改“重复执行（ ）次”和“将 y 坐标增加（ ）”，应用后点绿旗，让 VM 里的气球最后停在彩带高度（y -40～-20）。', how: '气球从 y -90 出发，每次往上加几，重复几次，一共升高 = 次数 × 每次；升高 50～70 都可以，比如 5×10、2×30、3×20。' },
+    { id: 'debug', skill: '用等待安排说话顺序（调试）', title: '找错：气球为什么抢话？', goal: '先点一次绿旗，看 Scratch VM 里两句话是不是同时出现；再改气球的“等待（ ）秒”，让点绿旗后小橘猫说完、气球才开口。', how: '小橘猫的话显示 2 秒，气球至少要等几秒？' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：送出我的生日贺卡', goal: '把小橘猫的祝福换成你想说的话（1～20 字），点绿旗：小橘猫先说、气球后说并飘到彩带上；再点蛋糕点亮蜡烛唱生日歌，然后保存为 .sb3。', how: '还可以改气球的话和飘的方式；导出的贺卡能在 Scratch 3 里继续改。' },
+  ],
+  hints: [
+    '看现象：点绿旗后，Scratch VM 里小橘猫的“生日快乐！”还没说完，气球的“许个愿吧！”就出现了，两个对话框同时在舞台上。',
+    '想原因：小橘猫“说……2 秒”，而气球只“等待 0 秒”就开口；它没有等小橘猫说完。',
+    '去修复：选中气球，把“等待（ ）秒”改成 2 或更大的整数，应用后再点绿旗。',
+  ],
+  reflection: [
+    '这张贺卡用到了哪几种积木？它们分别让什么动起来、响起来？',
+    '气球要等几秒才不会抢话？为什么是这个数？',
+    '如果想让蛋糕先唱歌、唱完再点亮蜡烛，积木顺序要怎么排？',
+  ],
+  limitations: [
+    '本实验只能修改：小橘猫的祝福和气球的话（1～20 字）、蛋糕被点击时换的造型（蜡烛熄灭/蜡烛点亮）、气球等待秒数（0～5 的整数）、重复次数（1～10）和每次 y 增加多少（1～30）。',
+    '起点、蛋糕的绿旗重置和“播放生日歌”固定不改；不能调换积木顺序、新增积木或精灵（想加更多角色可导出 .sb3 后在完整 Scratch 编辑器里继续做）。',
+    '舞台画面按 Scratch VM 的对象状态绘制原创 SVG，未接入 WebGL 渲染器；生日歌是程序合成的原创音调，VM 内不发声、由页面播放同一段 WAV；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    { name: 'Stage', kind: 'stage', label: '舞台', scripts: [{ hat: 'kc2_flag', body: [] }] },
+    {
+      name: '小橘猫', kind: 'sprite', label: '小橘猫',
+      scripts: [{ hat: 'kc2_flag', body: [{ type: 'kc2_say', vmBlock: 'cat_say', slots: say('小橘猫', 'cat_say') }] }],
+    },
+    {
+      name: '蛋糕', kind: 'sprite', label: '蛋糕', costumes: ['蜡烛熄灭', '蜡烛点亮'], sounds: ['生日歌'],
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_switch_costume', vmBlock: 'cake_reset_menu', slots: [], fixed: { COSTUME: '蜡烛熄灭' } }] },
+        { hat: 'kc2_clicked', body: [
+          { type: 'kc2_switch_costume', vmBlock: 'cake_costume_menu', slots: [{ key: '蛋糕|cake_costume_menu|COSTUME', field: 'COSTUME', label: '造型', options: ['蜡烛熄灭', '蜡烛点亮'] }] },
+          { type: 'kc2_play_sound', vmBlock: 'cake_play', slots: [], fixed: { SOUND_MENU: '生日歌' } },
+        ] },
+      ],
+    },
+    {
+      name: '气球', kind: 'sprite', label: '气球',
+      scripts: [{ hat: 'kc2_flag', body: [
+        { type: 'kc2_goto_start', vmBlock: 'balloon_home', slots: [], fixed: { X: '160', Y: '-90' } },
+        { type: 'kc2_wait_whole', vmBlock: 'balloon_wait', slots: [{ key: '气球|balloon_wait|DURATION', field: 'DURATION', label: '等待秒数', min: 0, max: 5 }] },
+        { type: 'kc2_say', vmBlock: 'balloon_say', slots: say('气球', 'balloon_say') },
+        {
+          type: 'kc2_repeat', vmBlock: 'balloon_repeat', slots: [{ key: '气球|balloon_repeat|TIMES', field: 'TIMES', label: '次数', min: 1, max: 10 }],
+          children: [{ type: 'kc2_change_y', vmBlock: 'balloon_rise', slots: [{ key: '气球|balloon_rise|DY', field: 'DY', label: '每次 y 增加', min: 1, max: 30 }] }],
+        },
+      ] }],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-light-then-sing', solutions: ['蛋糕“换成蜡烛点亮造型”→ 点蛋糕后 VM 播放生日歌时造型是蜡烛点亮'], counterExamples: ['仍是“换成蜡烛熄灭造型”→ 唱歌时蜡烛没亮'] },
+    { id: 'practiceB-balloon-to-ribbon', solutions: ['重复 5 次、每次 y 增加 10 → VM 中气球 y -40', '重复 2 次、每次增加 30 → y -30'], counterExamples: ['重复 2 次、每次增加 10 → y -70 还没到', '每次增加 40 → 超出 1～30 被拒绝'] },
+    { id: 'debug-balloon-talks-over-cat', solutions: ['气球等待 2 秒 → VM 中小橘猫说完气球才开口', '等待 3 秒 → 也不抢话'], counterExamples: ['等待 0 秒 → 两句话同时出现', '等待 1 秒 → 小橘猫还没说完，仍然抢话'] },
+  ],
+  nextLesson: 'G2-U2-L01 让角色走路有帧动画',
+  showSpeechOrder: true,
+}
+
 export const g2u1ScratchLessons: Record<string, G2Lesson> = {
   [g2u1L01.id]: g2u1L01,
   [g2u1L02.id]: g2u1L02,
   [g2u1L03.id]: g2u1L03,
   [g2u1L04.id]: g2u1L04,
   [g2u1L05.id]: g2u1L05,
+  [g2u1L06.id]: g2u1L06,
 }
 
 export function getG2ScratchLesson(id: string): G2Lesson | null {
@@ -474,12 +564,16 @@ export type G2Observations = {
   clickTurns: Record<string, number[]>
   /** Finished broadcast runs: the message the VM really sent, who spoke during the run, and the end state. */
   broadcastRuns: Array<{ message: string; speakers: string[]; backdrop: string; positions: Record<string, G2Point> }>
+  /** Finished green-flag runs: who spoke, in order, and how many times a sprite started talking while another sprite's line was still showing. */
+  speechRuns: Array<{ speakers: string[]; overlaps: number; positions: Record<string, G2Point> }>
+  /** Every sound a sprite played in the VM, with the costume it was wearing when the sound started. */
+  soundCostumes: Array<{ target: string; sound: string; costume: string }>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
-  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [],
+  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [],
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
@@ -553,6 +647,20 @@ export function evaluateG2U1L05(obs: G2Observations): G2TaskState {
   }
 }
 
+export function evaluateG2U1L06(obs: G2Observations): G2TaskState {
+  const runs = obs.speechRuns.filter(r => r.speakers.includes('小橘猫') && r.speakers.includes('气球'))
+  const firstOverlap = runs.findIndex(r => r.overlaps > 0)
+  const turnTaking = (r: G2Observations['speechRuns'][number]) => r.overlaps === 0 && r.speakers.indexOf('小橘猫') < r.speakers.indexOf('气球')
+  const litSong = obs.soundCostumes.some(s => s.target === '蛋糕' && s.sound === '生日歌' && s.costume === '蜡烛点亮')
+  const catLine = obs.lastSaid['小橘猫']
+  return {
+    practiceA: litSong,
+    practiceB: obs.speechRuns.some(r => inRibbonZone(r.positions['气球'])),
+    debug: firstOverlap >= 0 && runs.slice(firstOverlap + 1).some(turnTaking),
+    create: !!catLine && catLine !== L06_CAT_LINE && litSong && runs.some(r => turnTaking(r) && inRibbonZone(r.positions['气球'])),
+  }
+}
+
 /** What the VM actually showed for the lesson's prediction question (null until observed). */
 export function observedPrediction(id: string, obs: G2Observations): string | null {
   if (id === g2u1L01.id) return obs.clickedSpeakers.includes('小鸟') ? '小鸟说话' : null
@@ -576,6 +684,11 @@ export function observedPrediction(id: string, obs: G2Observations): string | nu
     if (!first) return null
     return first.speakers.includes('小鸟') ? '会说话' : '不会说话'
   }
+  if (id === g2u1L06.id) {
+    const first = obs.speechRuns.find(r => r.speakers.includes('小橘猫') && r.speakers.includes('气球'))
+    if (!first) return null
+    return first.overlaps > 0 ? '会同时出现' : '一个说完另一个才说'
+  }
   return null
 }
 
@@ -585,5 +698,6 @@ export function evaluateG2Lesson(id: string, obs: G2Observations): G2TaskState |
   if (id === g2u1L03.id) return evaluateG2U1L03(obs)
   if (id === g2u1L04.id) return evaluateG2U1L04(obs)
   if (id === g2u1L05.id) return evaluateG2U1L05(obs)
+  if (id === g2u1L06.id) return evaluateG2U1L06(obs)
   return null
 }

@@ -39,6 +39,10 @@ type LabMessage = {
   sound?: string
   degrees?: number
   message?: string
+  /** Other sprites whose speech bubble was still showing when this sprite started talking. */
+  overlap?: string[]
+  /** Costume the sprite wore in the VM when its sound started. */
+  costume?: string
   activeThreads?: number
   archive?: ArrayBuffer
   error?: string
@@ -80,7 +84,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const clickChanges = useRef<Map<string, number>>(new Map())
   const clickFrom = useRef<Map<string, string>>(new Map())
   // The green-flag run in progress: how many times the stage's own sounds played in it.
-  const flagRun = useRef<{stagePlays: number} | null>(null)
+  const flagRun = useRef<{stagePlays: number; speakers: string[]; overlaps: number} | null>(null)
+  const [lastSpeech, setLastSpeech] = useState<{speakers: string[]; overlaps: number; finished: boolean} | null>(null)
   const soundUris = useRef<Record<string, Record<string, string>>>({})
   const [lastRunSounds, setLastRunSounds] = useState<{stagePlays: number; finished: boolean} | null>(null)
   // Degrees each sprite has really turned in the VM since it was last clicked (open click runs).
@@ -94,6 +99,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   useEffect(() => { loadedRef.current = loaded }, [loaded])
 
   const spriteTargets = lesson.targets.filter(t => t.kind === 'sprite')
+  const stageHasSounds = lesson.targets.some(t => t.kind === 'stage' && !!t.sounds?.length)
   const selectedTarget = lesson.targets.find(t => t.name === selected) ?? lesson.targets[0]
   const selectedProgram = programs[selected] ?? null
   // Only the selected target can hold an unapplied draft: switching targets
@@ -173,6 +179,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         setLastTurns({})
         broadcastRun.current = null
         setLastBroadcast(null)
+        setLastSpeech(null)
         soundUris.current = Object.fromEntries((msg.assets ?? []).map(a => [a.name, a.soundUris ?? {}]))
         if (msg.source === 'file') {
           setSaving(true)
@@ -236,9 +243,11 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           const runPositions: Record<string, G2Point> = {}
           for (const t of current) if (t.original) runPositions[t.name] = {x: t.x, y: t.y}
           const finished = {backdrop: msg.backdrop ?? '', stagePlays: flagRun.current.stagePlays, positions: runPositions}
+          const speech = {speakers: [...flagRun.current.speakers], overlaps: flagRun.current.overlaps, positions: runPositions}
           flagRun.current = null
           setLastRunSounds({stagePlays: finished.stagePlays, finished: true})
-          setObs(prev => ({...prev, flagRuns: [...prev.flagRuns, finished].slice(-20)}))
+          setLastSpeech({speakers: speech.speakers, overlaps: speech.overlaps, finished: true})
+          setObs(prev => ({...prev, flagRuns: [...prev.flagRuns, finished].slice(-20), speechRuns: [...prev.speechRuns, speech].slice(-20)}))
         }
         if (runSeen.current) {
           const positions: Record<string, G2Point> = {}
@@ -264,6 +273,11 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           broadcastRun.current.speakers.push(target)
           setLastBroadcast({message: broadcastRun.current.message, speakers: [...broadcastRun.current.speakers], finished: false})
         }
+        if (flagRun.current && target) {
+          if (!flagRun.current.speakers.includes(target)) flagRun.current.speakers.push(target)
+          if ((msg.overlap ?? []).length > 0) flagRun.current.overlaps += 1
+          setLastSpeech({speakers: [...flagRun.current.speakers], overlaps: flagRun.current.overlaps, finished: false})
+        }
         const clickedAt = recentClicks.current.get(target)
         const fromClick = clickedAt !== undefined && Date.now() - clickedAt < 3000
         setObs(prev => ({
@@ -282,7 +296,12 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             setLastRunSounds({stagePlays: flagRun.current.stagePlays, finished: false})
           }
         } else if (target && sound) {
-          setObs(prev => ({...prev, clickSounds: {...prev.clickSounds, [target]: [...(prev.clickSounds[target] ?? []), sound].slice(-20)}}))
+          const costume = String(msg.costume ?? '')
+          setObs(prev => ({
+            ...prev,
+            clickSounds: {...prev.clickSounds, [target]: [...(prev.clickSounds[target] ?? []), sound].slice(-20)},
+            soundCostumes: [...prev.soundCostumes, {target, sound, costume}].slice(-20),
+          }))
         }
       } else if (msg.kind === 'BROADCAST') {
         const message = String(msg.message ?? '')
@@ -356,7 +375,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'STARTED') {
         runSeen.current = true
         clickChanges.current.clear()
-        flagRun.current = {stagePlays: 0}
+        flagRun.current = {stagePlays: 0, speakers: [], overlaps: 0}
+        setLastSpeech(null)
         setLastRunSounds({stagePlays: 0, finished: false})
         setRunning(true)
         setStatus('Scratch VM 正在执行每个精灵的“当绿旗被点击”脚本。')
@@ -563,10 +583,22 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             <p className="mt-5 text-sm">当前背景：<strong data-testid="g2-backdrop">{backdrop || '—'}</strong></p>
             {(lesson.targets.some(t => t.sounds?.length)) && (
               <p data-testid="g2-sound-log" data-plays={lastRunSounds?.stagePlays ?? ''} data-finished={lastRunSounds?.finished ? 'true' : 'false'} className="mt-2 text-sm">
-                {lastRunSounds === null
+                {!stageHasSounds ? '' : lastRunSounds === null
                   ? '还没有点绿旗：舞台声音播放次数会显示在这里。'
                   : `${lastRunSounds.finished ? '上一次绿旗' : '本次绿旗进行中'}：Scratch VM 执行舞台“播放声音”${lastRunSounds.stagePlays} 次。`}
-                {Object.entries(obs.clickSounds).map(([name, list]) => ` ${name}刚才播放“${list[list.length - 1]}”。`).join('')}
+                {Object.entries(obs.clickSounds).map(([name, list]) => {
+                  const withCostume = [...obs.soundCostumes].reverse().find(s => s.target === name)
+                  const costumeNote = lesson.showSpeechOrder && withCostume?.costume ? `（开始播放时造型：${withCostume.costume}）` : ''
+                  return ` ${name}刚才播放“${list[list.length - 1]}”${costumeNote}。`
+                }).join('') || (stageHasSounds ? '' : '还没有播放声音：点角色后播放的声音会显示在这里。')}
+              </p>
+            )}
+            {lesson.showSpeechOrder && (
+              <p data-testid="g2-speech-log" data-speakers={lastSpeech?.speakers.join(',') ?? ''} data-overlaps={lastSpeech?.overlaps ?? ''}
+                data-finished={lastSpeech?.finished ? 'true' : 'false'} className="mt-2 text-sm">
+                {lastSpeech === null
+                  ? '还没有点绿旗：谁先说、谁后说，有没有抢话，会显示在这里。'
+                  : `${lastSpeech.finished ? '上一次绿旗' : '本次绿旗进行中'}：说话顺序 ${lastSpeech.speakers.join(' → ') || '还没人说话'}；${lastSpeech.overlaps > 0 ? `Scratch VM 里有 ${lastSpeech.overlaps} 次一个角色还在说、另一个就开口了（抢话）` : '没有抢话'}。`}
               </p>
             )}
             {lesson.targets.some(t => t.messages?.length) && (

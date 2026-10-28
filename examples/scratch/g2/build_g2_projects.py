@@ -346,12 +346,71 @@ def lesson_g2_u1_l05():
     return "g2-u1-l05-broadcast-show.sb3.b64", project, files, params
 
 
+# "Happy birthday" opening phrase as plain tones (C4 C4 D4 C4 F4 E4), synthesised here: original, no samples.
+BIRTHDAY_TUNE = [(262, 262, 0.22), (262, 262, 0.18), (294, 294, 0.4), (262, 262, 0.4), (349, 349, 0.4), (330, 330, 0.7)]
+
+
+def lesson_g2_u1_l06():
+    """制作生日贺卡: put the lesson blocks together in time order; a wait lets characters take turns."""
+    card, card_file = svg_costume("生日贺卡", "birthday-card-backdrop.svg", 240, 180)
+    cat, cat_file = svg_costume("小橘猫", "orange-cat.svg", 48, 48)
+    unlit, unlit_file = svg_costume("蜡烛熄灭", "cake-unlit.svg", 55, 50)
+    lit, lit_file = svg_costume("蜡烛点亮", "cake-lit.svg", 55, 50)
+    balloon, balloon_file = svg_costume("气球", "red-balloon.svg", 30, 40)
+    song, song_data = wav_sound("生日歌", BIRTHDAY_TUNE)
+    cat_blocks = {
+        "cat_flag": block("event_whenflagclicked", "cat_say", top=True, x=40, y=40),
+        "cat_say": block("looks_sayforsecs", parent="cat_flag", inputs={"MESSAGE": text("生日快乐！"), "SECS": num(2)}),
+    }
+    cake_blocks = {
+        "cake_flag": block("event_whenflagclicked", "cake_reset", top=True, x=40, y=40),
+        "cake_reset": block("looks_switchcostumeto", parent="cake_flag", inputs={"COSTUME": [1, "cake_reset_menu"]}),
+        "cake_reset_menu": block("looks_costume", parent="cake_reset", fields={"COSTUME": ["蜡烛熄灭", None]}, shadow=True),
+        "cake_click": block("event_whenthisspriteclicked", "cake_switch", top=True, x=40, y=200),
+        "cake_switch": block("looks_switchcostumeto", "cake_play", parent="cake_click", inputs={"COSTUME": [1, "cake_costume_menu"]}),
+        "cake_costume_menu": block("looks_costume", parent="cake_switch", fields={"COSTUME": ["蜡烛熄灭", None]}, shadow=True),
+        "cake_play": block("sound_playuntildone", parent="cake_switch", inputs={"SOUND_MENU": [1, "cake_sound_menu"]}),
+        "cake_sound_menu": block("sound_sounds_menu", parent="cake_play", fields={"SOUND_MENU": ["生日歌", None]}, shadow=True),
+    }
+    balloon_blocks = {
+        "balloon_flag": block("event_whenflagclicked", "balloon_home", top=True, x=40, y=40),
+        "balloon_home": block("motion_gotoxy", "balloon_wait", parent="balloon_flag", inputs={"X": num(160), "Y": num(-90)}),
+        # The bug the lesson starts with: no wait, so the balloon talks over the cat's greeting.
+        "balloon_wait": block("control_wait", "balloon_say", parent="balloon_home", inputs={"DURATION": num(0)}),
+        "balloon_say": block("looks_sayforsecs", "balloon_repeat", parent="balloon_wait", inputs={"MESSAGE": text("许个愿吧！"), "SECS": num(2)}),
+        "balloon_repeat": block("control_repeat", parent="balloon_say", inputs={"TIMES": num(2), "SUBSTACK": [2, "balloon_rise"]}),
+        "balloon_rise": block("motion_changeyby", parent="balloon_repeat", inputs={"DY": num(10)}),
+    }
+    project = {
+        "targets": [
+            stage([card]),
+            sprite("小橘猫", [cat], cat_blocks, 1, -150, -60),
+            sprite("蛋糕", [unlit, lit], cake_blocks, 2, 20, -75, [song]),
+            sprite("气球", [balloon], balloon_blocks, 3, 160, -90),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U1-L06"},
+    }
+    files = {c["md5ext"]: f for c, f in ((card, card_file), (cat, cat_file), (unlit, unlit_file), (lit, lit_file), (balloon, balloon_file))}
+    files[song["md5ext"]] = song_data
+    params = [
+        {"target": "小橘猫", "block": "cat_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "蛋糕", "block": "cake_costume_menu", "slot": "COSTUME", "kind": "choice", "options": ["蜡烛熄灭", "蜡烛点亮"]},
+        {"target": "气球", "block": "balloon_wait", "slot": "DURATION", "kind": "int", "min": 0, "max": 5},
+        {"target": "气球", "block": "balloon_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "气球", "block": "balloon_repeat", "slot": "TIMES", "kind": "int", "min": 1, "max": 10},
+        {"target": "气球", "block": "balloon_rise", "slot": "DY", "kind": "int", "min": 1, "max": 30},
+    ]
+    return "g2-u1-l06-birthday-card.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
     "G2-U1-L03": lesson_g2_u1_l03,
     "G2-U1-L04": lesson_g2_u1_l04,
     "G2-U1-L05": lesson_g2_u1_l05,
+    "G2-U1-L06": lesson_g2_u1_l06,
 }
 
 
