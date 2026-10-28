@@ -2,6 +2,7 @@
 
 import {useEffect, useRef, useState} from 'react'
 import * as Blockly from 'blockly'
+import {BLOCKLY_MEDIA_PATH} from '@/features/lessons/blockly/blockly-media'
 import type {G2BlockSpec, G2Slot, G2TargetSpec} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {readG2Program, type G2Program, type G2Values} from './scratch-g2-program'
 
@@ -127,6 +128,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
     }
     for (const extra of target.extraToolbox ?? []) toolboxTypes.add(extra)
     const ws = Blockly.inject(node.current, {
+      media: BLOCKLY_MEDIA_PATH,
       toolbox: {kind: 'flyoutToolbox', contents: [...toolboxTypes].map(type => ({kind: 'block', type}))},
       trashcan: true,
       move: {drag: true, wheel: true, scrollbars: true},

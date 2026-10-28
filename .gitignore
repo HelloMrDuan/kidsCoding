@@ -17,3 +17,4 @@ apps/web/supabase/.branches/
 apps/web/.npm-cache/
 .DS_Store
 Thumbs.db
+apps/web/public/blockly-media/

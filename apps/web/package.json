@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node ./scripts/copy-blockly-media.mjs",
     "dev": "next dev",
+    "prebuild": "node ./scripts/copy-blockly-media.mjs",
     "build": "next build --webpack",
     "start": "next start",
     "env:check": "node ./scripts/env-check.mjs",

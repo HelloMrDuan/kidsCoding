@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as Blockly from 'blockly'
 import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 
+import { BLOCKLY_MEDIA_PATH } from './blockly-media'
 import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
 import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
 import { restoreBlockSequence } from './restore-block-sequence'
@@ -265,6 +266,7 @@ export function BlocklyWorkspace({
     }
 
     const workspace = Blockly.inject(mountRef.current, {
+      media: BLOCKLY_MEDIA_PATH,
       renderer: 'zelos',
       theme: getKidsBlockTheme(),
       grid: { spacing: 18, length: 2, colour: '#dbe4f1', snap: false },

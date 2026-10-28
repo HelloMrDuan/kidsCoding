@@ -1,6 +1,3 @@
-import { readFile } from 'node:fs/promises'
-import path from 'node:path'
-
 import { expect, test, type Page } from '@playwright/test'
 import { clickLessonControl, showLessonPane } from './lesson-pane-helpers'
 
@@ -10,14 +7,18 @@ import { clickLessonControl, showLessonPane } from './lesson-pane-helpers'
  * toolbox shows exactly the 开始 / 移动 / 说话 categories without
  * progressing through steps first.
  */
+let externalBlocklyMedia: string[] = []
+
 test.beforeEach(async ({ page }) => {
+  externalBlocklyMedia = []
   test.setTimeout(180_000)
-  // Blockly's zoom/trash icons come from its CDN sprite sheet, which the
-  // sandbox cannot reach. Serve the exact same file from the installed
-  // blockly package so the controls paint (and receive clicks) locally.
-  await page.route('https://blockly-demo.appspot.com/static/media/sprites.png', async (route) => {
-    const body = await readFile(path.join(process.cwd(), 'node_modules/blockly/media/sprites.png'))
-    await route.fulfill({ contentType: 'image/png', body })
+  // Blockly media (zoom/trash sprites, sounds) is self-hosted under
+  // /blockly-media/. Any request to Blockly's appspot demo CDN is a
+  // regression: it is unreachable for children in mainland China.
+  page.on('request', (req) => {
+    if (req.url().includes('blockly-demo.appspot.com')) {
+      externalBlocklyMedia.push(req.url())
+    }
   })
   await page.goto('/learn/lesson/lesson-02-forest-greeting')
   await showLessonPane(page, 'code')
@@ -135,4 +136,17 @@ test('running an empty program is not reported as success', async ({ page }) => 
   await clickLessonControl(page, 'run-code-button')
   await expect(page.getByTestId('stage-run-reason')).toBeVisible({ timeout: 15_000 })
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('运行成功')
+})
+
+test('Blockly media loads from our own origin, never appspot', async ({ page }) => {
+  const sprite = await page.request.get('/blockly-media/sprites.png')
+  expect(sprite.ok()).toBe(true)
+  expect(sprite.headers()['content-type']).toContain('image/png')
+  const sound = await page.request.get('/blockly-media/delete.mp3')
+  expect(sound.ok()).toBe(true)
+  const trashSprite = await page.locator('.blocklyTrash image').first().evaluate(
+    (img) => img.getAttribute('href') ?? img.getAttributeNS('http://www.w3.org/1999/xlink', 'href'),
+  )
+  expect(trashSprite).toMatch(/\/blockly-media\/sprites\.png$/)
+  expect(externalBlocklyMedia).toEqual([])
 })
