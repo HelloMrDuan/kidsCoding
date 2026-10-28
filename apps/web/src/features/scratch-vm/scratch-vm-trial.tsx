@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {ScratchMeteorBlocks} from './scratch-meteor-blocks'
 import {allProgramsApplied, formatProgram, iconForCharacter, liveClonesByCharacter, type MeteorProgram} from './scratch-character-stats'
-import {readScratchDraft,saveScratchDraft,removeScratchDraft,isScratchArchive,SCRATCH_DRAFT_LESSON_ID} from './scratch-local-draft'
-import {encodeScratchDraft,parseScratchCloudResponse} from './scratch-cloud-draft'
+import {readScratchDraft,readScratchDraftMeta,saveScratchDraft,removeScratchDraft,isScratchArchive,SCRATCH_DRAFT_LESSON_ID} from './scratch-local-draft'
+import {checkScratchUploadConflict,encodeScratchDraft,parseScratchCloudResponse} from './scratch-cloud-draft'
 
 type Sprite = { id: string; name: string; x: number; y: number; visible: boolean; original: boolean }
 type CharacterInfo = { name: string; costume: string }
@@ -283,6 +283,28 @@ export function ScratchVMTrial() {
       const local=await readScratchDraft()
       const archiveBase64=local?encodeScratchDraft(local):null
       if(!archiveBase64)throw new Error('本机尚无有效项目，请先应用积木')
+      const meta=await readScratchDraftMeta()
+      const precheck=await fetch('/api/practice/scratch',{cache:'no-store'})
+      if(precheck.status===401)throw new Error('请先登录账号，再保存云端作品')
+      if(!precheck.ok)throw new Error('无法读取云端作品，上传已取消，本机作品没有改变。')
+      const prePayload:unknown=await precheck.json()
+      const preDraft=prePayload&&typeof prePayload==='object'&&'draft' in prePayload
+        ?(prePayload as {draft:unknown}).draft:null
+      const cloudUpdatedAt=preDraft&&typeof preDraft==='object'&&'updatedAt' in preDraft
+        &&typeof (preDraft as {updatedAt:unknown}).updatedAt==='string'
+        ?(preDraft as {updatedAt:string}).updatedAt:null
+      const conflict=checkScratchUploadConflict(cloudUpdatedAt,meta?.savedAt??null)
+      if(conflict==='newer'){
+        if(!window.confirm('云端有更新的作品，上传会覆盖云端版本。是否仍要上传？点取消则保留云端版本。')){
+          setCloudStatus('云端作品已保留，未上传。')
+          return
+        }
+      }else if(conflict==='unknown-age'){
+        if(!window.confirm('无法确认本机作品的保存时间，上传会覆盖云端版本。是否仍要上传？点取消则保留云端版本。')){
+          setCloudStatus('云端作品已保留，未上传。')
+          return
+        }
+      }
       const response=await fetch('/api/practice/scratch',{
         method:'PUT',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({lessonId:SCRATCH_DRAFT_LESSON_ID,archiveBase64}),

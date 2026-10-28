@@ -31,3 +31,24 @@ export function parseScratchCloudResponse(value:unknown):ArrayBuffer|null {
   if(row.lessonId!==SCRATCH_DRAFT_LESSON_ID)return null
   return decodeScratchDraft(row.archiveBase64)
 }
+
+export type ScratchUploadConflict='none'|'newer'|'unknown-age'
+
+/**
+ * CLOUD-103: Scratch save must never silently overwrite a cloud draft that is
+ * newer than the local one. Mirrors the Python portfolio guard
+ * (findUploadConflicts): a conflict exists exactly when the cloud copy is
+ * strictly newer than local. Equal timestamps are not conflicts. A missing or
+ * unparsable timestamp on either side cannot prove local-is-newer, so it is
+ * surfaced as unknown-age instead of silently uploading. No cloud draft at
+ * all means no conflict.
+ */
+export function checkScratchUploadConflict(
+  cloudUpdatedAt:string|null|undefined,
+  localSavedAt:string|null|undefined,
+):ScratchUploadConflict{
+  if(!cloudUpdatedAt)return 'none'
+  if(!Number.isFinite(Date.parse(cloudUpdatedAt)))return 'unknown-age'
+  if(!localSavedAt||!Number.isFinite(Date.parse(localSavedAt)))return 'unknown-age'
+  return Date.parse(cloudUpdatedAt)>Date.parse(localSavedAt)?'newer':'none'
+}
