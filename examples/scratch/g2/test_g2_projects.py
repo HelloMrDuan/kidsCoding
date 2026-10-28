@@ -130,6 +130,22 @@ class G2ProjectTests(unittest.TestCase):
         self.assertEqual((params[("cat_move", "STEPS")]["min"], params[("cat_move", "STEPS")]["max"]), (10, 300))
         self.assertNotIn(("cat_goto", "X"), params)
 
+    def test_l05_one_broadcast_many_receivers_and_the_bird_listens_for_the_wrong_message(self):
+        project = project_for("G2-U1-L05")
+        stage, cat, bird, rabbit = project["targets"]
+        self.assertEqual(stage["broadcasts"], {"kc-msg-open": "开场", "kc-msg-bow": "谢幕"})
+        self.assertEqual([c["name"] for c in stage["costumes"]], ["幕布舞台", "灯光舞台"])
+        self.assertEqual(cat["blocks"]["cat_bcast"]["opcode"], "event_broadcast")
+        self.assertEqual(cat["blocks"]["cat_bcast"]["inputs"]["BROADCAST_INPUT"], [1, [11, "开场", "kc-msg-open"]])
+        receivers = {t["name"]: b["fields"]["BROADCAST_OPTION"][0] for t in project["targets"] for b in t["blocks"].values()
+                     if b["opcode"] == "event_whenbroadcastreceived"}
+        # The bug the lesson starts with: only the bird listens for a message nobody sends.
+        self.assertEqual(receivers, {"Stage": "开场", "小鸟": "谢幕", "小白兔": "开场"})
+        for target in project["targets"]:
+            self.assertEqual(target["variables"], {})
+        model = build_models()["G2-U1-L05"]
+        self.assertEqual(model["stage"]["broadcasts"], ["开场", "谢幕"])
+        self.assertNotIn("broadcasts", build_models()["G2-U1-L04"]["stage"])
 
 if __name__ == "__main__":
     unittest.main()

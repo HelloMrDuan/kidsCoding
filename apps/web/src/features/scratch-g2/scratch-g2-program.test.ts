@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u1L01, g2u1L02, g2u1L03, g2u1L04} from '@/content/curriculum/g2-u1-scratch-lessons'
+import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {changedValues, checkSlotValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
 function block(type: string, fields: Record<string, string> = {}, next: BlockLike | null = null, inner: BlockLike | null = null): BlockLike {
@@ -147,5 +147,26 @@ describe('G2 restricted Blockly adapter (G2-U1-L04 motion)', () => {
     expect(readG2Program(ws(loop('1', '200')), wheel4)).toBeNull()
     expect(readG2Program(ws(loop('13', '30')), wheel4)).toBeNull()
     expect(checkSlotValue({key: 'k', field: 'DIRECTION', label: '方向', options: ['90', '-90']}, '-90')).toBe('-90')
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U1-L05 broadcasts)', () => {
+  const bird5 = g2u1L05.targets.find(t => t.name === '小鸟')!
+  const rabbit5 = g2u1L05.targets.find(t => t.name === '小白兔')!
+  const receive = (message: string, line = '叽叽') => block('kc2_when_receive', {BROADCAST_OPTION: message}, block('kc2_say', {MESSAGE: line}))
+
+  it('reads the message on the receive hat itself and refuses messages the lesson does not define', () => {
+    expect(readG2Program(ws(receive('开场')), bird5)).toEqual({kind: 'sprite', values: {'小鸟|bird_recv|BROADCAST_OPTION': '开场', '小鸟|bird_say|MESSAGE': '叽叽'}})
+    expect(readG2Program(ws(receive('开饭')), bird5)).toBeNull()
+    expect(readG2Program(ws(receive('开场'), receive('谢幕')), bird5)).toBeNull()
+    expect(readG2Program(ws(block('kc2_clicked', {}, block('kc2_say', {MESSAGE: '叽叽'}))), bird5)).toBeNull()
+  })
+
+  it('reads a sprite with a green-flag script and a receive script (only x is a lesson value)', () => {
+    const flag = block('kc2_flag', {}, block('kc2_goto_start', {X: '190', Y: '-40'}))
+    const recv = (x: string) => block('kc2_when_receive', {BROADCAST_OPTION: '开场'}, block('kc2_goto', {X: x, Y: '-40'}))
+    expect(readG2Program(ws(flag, recv('0')), rabbit5)).toEqual({kind: 'sprite', values: {'小白兔|rabbit_goto|X': 0}})
+    expect(readG2Program(ws(flag, recv('300')), rabbit5)).toBeNull()
+    expect(readG2Program(ws(recv('0')), rabbit5)).toBeNull()
   })
 })

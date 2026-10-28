@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U1-L05",
+  "reviewedCommit": "f939927c58143119d623aaac9ef83107029d800b",
+  "reviewedAt": "2026-10-28",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U1-L04"
+  ],
+  "newConcepts": [
+    "“广播（消息）”发出一条有名字的消息；“当接收到（消息）”收听，舞台和每个精灵都可以收听，同名消息让多个脚本一起开始；名字不一致就收不到"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u1-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/203"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "conceptExplain：广播只发消息、接收脚本各自开始、名字必须一致",
+        "找错直接针对“消息名不一致收不到”这一常见误解"
+      ],
+      "defects": [
+        "未覆盖“广播并等待”与新建消息"
+      ]
+    },
+    "story": {
+      "score": 12,
+      "evidence": [
+        "动物小剧场：主持人小橘猫广播“开场”，小鸟却不唱",
+        "预测二选一，VM 广播记录对照"
+      ],
+      "defects": [
+        "预测二选一；无朗读"
+      ]
+    },
+    "practice": {
+      "score": 20,
+      "evidence": [
+        "练习 A：舞台“当接收到（开场）”换成灯光舞台，VM 背景真实切换",
+        "练习 B：小白兔收到广播后移到舞台中间（x -40～40 多解），VM 坐标判定"
+      ],
+      "defects": [
+        "不能新建消息或拖动新积木改变结构"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "真实错误：VM 记录广播“开场”，小鸟听“谢幕”不说话",
+        "三层提示：现象→原因→修复；x 300 编辑器判无效"
+      ],
+      "defects": [
+        "没有可视化消息传递动画"
+      ]
+    },
+    "creation": {
+      "score": 10,
+      "evidence": [
+        "创意：新欢迎词 + 一次广播让舞台/小白兔/小鸟一起行动",
+        "导出真 .sb3（5 SVG、含 broadcasts）独立 VM 回读，重新导入保持小鸟听“开场”"
+      ],
+      "defects": [
+        "不能新增“谢幕”脚本或精灵"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U1L05 只读 VM 观察（广播记录、背景、小白兔 x、小鸟台词，单测覆盖）",
+        "页面明示未接渲染器与不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 执行；广播由 VM event_broadcast 原语真实触发（仅观察后调用原原语），接收脚本由 VM 启动，背景/位置/台词来自 VM 目标状态，E2E 无 VM mock"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "消息名不一致真实错误、x 越界被拒、6 类非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "小白兔 x -40～40、欢迎词/开场白（1～20 字）均多解"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "新增 2 个 SVG（幕布舞台、小白兔）原创，已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U1-L05：真 Scratch VM 加载原创动物小剧场项目；点小橘猫后 VM 广播“开场”，舞台换灯光舞台、小白兔到 x 0、修好后小鸟说出欢迎词",
+    "failureCase": "小鸟听“谢幕”→ 广播“开场”后不说话；x 300 编辑器判无效；未知消息/多余变量/猫改发谢幕/广播并等待/x 300/他课工程均被拒且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：VM 记录广播了“开场”，只有小鸟没说话",
+      "第二层（想原因）：小鸟在听“谢幕”，名字不一样",
+      "第三层（去修复）：把小鸟的“当接收到”改成“开场”"
+    ],
+    "practiceA": "练习 A：舞台收到“开场”换灯光舞台",
+    "practiceB": "练习 B：小白兔收到广播跳到舞台中间",
+    "equivalentSolutions": [
+      "小白兔 x -40～40 任一",
+      "欢迎词 1～20 字任意"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U1-L05 广播第一条消息（5 个用例）"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 WebGL 渲染器；本课无云端保存",
+    "不能新建消息/广播并等待、不能拖动积木结构"
+  ]
+}
