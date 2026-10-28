@@ -89,6 +89,7 @@ on:
       - 'apps/web/tests/e2e/draft-cross-device-cloud102.spec.ts'
       - 'apps/web/tests/e2e/scratch-cloud-restore-cloud102.spec.ts'
       - 'apps/web/tests/e2e/scratch-cloud-conflict-cloud103.spec.ts'
+      - 'apps/web/tests/e2e/scratch-cloud-delete-restore-cloud104.spec.ts'
       - 'apps/web/src/features/progress/local-practice-portfolio.tsx'
       - 'apps/web/src/features/scratch-vm/scratch-vm-trial.tsx'
   push:
@@ -256,8 +257,8 @@ jobs:
       - run: npm ci
       - name: Install real Chrome for browser E2E
         run: npx playwright install chrome --with-deps
-      - name: Run UX-302 portfolio resume/export, UX-303 cloud isolation, CLOUD-102 cross-device and CLOUD-103 conflict specs with real browser storage
-        run: npx playwright test tests/e2e/portfolio-resume-export-ux302.spec.ts tests/e2e/portfolio-cloud-isolation-ux303.spec.ts tests/e2e/draft-cross-device-cloud102.spec.ts tests/e2e/scratch-cloud-restore-cloud102.spec.ts tests/e2e/scratch-cloud-conflict-cloud103.spec.ts --project=desktop
+      - name: Run UX-302 portfolio resume/export, UX-303 cloud isolation, CLOUD-102 cross-device, CLOUD-103 conflict and CLOUD-104 delete-restore specs with real browser storage
+        run: npx playwright test tests/e2e/portfolio-resume-export-ux302.spec.ts tests/e2e/portfolio-cloud-isolation-ux303.spec.ts tests/e2e/draft-cross-device-cloud102.spec.ts tests/e2e/scratch-cloud-restore-cloud102.spec.ts tests/e2e/scratch-cloud-conflict-cloud103.spec.ts tests/e2e/scratch-cloud-delete-restore-cloud104.spec.ts --project=desktop
 
 # Independent real-Chrome gates: all 17 Scratch/Blockly desktop specs, 3 touch specs,
 # and 10 VISUAL-LOCK specs run in parallel. Never relax assertions or use VM mocks.

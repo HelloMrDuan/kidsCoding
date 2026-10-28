@@ -3,7 +3,7 @@ import {NextResponse} from 'next/server'
 import {hasSupabaseEnv} from '@/lib/env'
 import {createServerSupabaseClient} from '@/lib/supabase/server'
 import {SCRATCH_DRAFT_LESSON_ID} from '@/features/scratch-vm/scratch-local-draft'
-import {MAX_SCRATCH_ARCHIVE_BYTES,MAX_SCRATCH_BASE64_LENGTH,MAX_SCRATCH_REQUEST_BYTES} from '@/features/scratch-vm/scratch-cloud-draft'
+import {MAX_SCRATCH_ARCHIVE_BYTES,MAX_SCRATCH_BASE64_LENGTH,MAX_SCRATCH_REQUEST_BYTES,inspectScratchArchive} from '@/features/scratch-vm/scratch-cloud-draft'
 
 export const runtime='nodejs'
 const HEADERS={'Cache-Control':'private, no-store'}
@@ -13,7 +13,12 @@ function validBase64(raw:unknown):raw is string {
     raw.length%4!==0||!/^[A-Za-z0-9+/]*={0,2}$/.test(raw))return false
   const bytes=Buffer.from(raw,'base64')
   return bytes.length>=300&&bytes.length<=MAX_SCRATCH_ARCHIVE_BYTES&&
-    bytes[0]===0x50&&bytes[1]===0x4b&&bytes.toString('base64')===raw
+    bytes[0]===0x50&&bytes[1]===0x4b&&bytes.toString('base64')===raw&&
+    // CLOUD-104: the PK header alone is not a project. A file without a
+    // central directory, or one declaring more than the decompressed cap,
+    // is rejected here (PUT 400) and never served back (GET 503) instead
+    // of failing later, silently or otherwise, inside the VM.
+    inspectScratchArchive(bytes).ok
 }
 
 async function readLimitedBody(request:Request):Promise<string|null> {
