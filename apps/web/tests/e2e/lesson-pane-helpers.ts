@@ -12,6 +12,20 @@ export async function showLessonPane(
 ) {
   if (await page.getByTestId('lesson-mobile-tabs').isVisible()) {
     await page.getByTestId(`lesson-mobile-tab-${pane}`).click()
+    // The tab button is visible in SSR HTML before hydration attaches its
+    // handler, so a click can land with no effect and the pane stays put
+    // (CI run 40597421905: the code pane never became visible and the next
+    // click timed out on an existing-but-hidden button). Verify the pane
+    // really switched; if it did not, click again once handlers are live,
+    // then assert for real. No force, no sleep, no skipped assertion, no
+    // mock: a genuine regression still fails the final expect below.
+    const column = page.getByTestId(`lesson-${pane}-column`)
+    try {
+      await expect(column).toBeVisible({ timeout: 5_000 })
+    } catch {
+      await page.getByTestId(`lesson-mobile-tab-${pane}`).click()
+      await expect(column).toBeVisible()
+    }
   }
 }
 
