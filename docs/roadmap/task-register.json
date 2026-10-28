@@ -2263,7 +2263,7 @@
       "title": "儿童私有作品同意与保留策略",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "CLOUD-103"
       ],
@@ -2272,13 +2272,17 @@
         "最小采集、监护人同意、删除与分享审核流程实际验证"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/214",
+        "mergeCommit": "604a2aaf4eb7f542010eff47dc30bc1d0d809126",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40672304092",
+        "tests": [
+          "PR CI 22 success + 3 skipped",
+          "main CI：curriculum 40672304092 success、accountability 40672304173 success（含本合并）",
+          "本地 vitest 5 文件 36 项全绿，ESLint 与 tsc 改动文件 0 错"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "未决点：owner_user_id 为空的未绑定 guest 快照无 purge 覆盖，留待 duan 定，不擅自加删；迁移 012 需部署侧应用到线上 Supabase 后同意接口在预发布上才可用（与 011 同例）；方案 B（无同意记录阻断保存）未做，需负责人点头才做。"
     },
     {
       "id": "RELEASE-101",
