@@ -136,6 +136,27 @@ function AppleArt() {
   )
 }
 
+/** G0-U2-L06 story scenery: the forest meet-and-greet — a round stage under bunting, two spotlights and a row of audience stumps. */
+export function MeetingStage() {
+  return (
+    <g data-grid-item="meeting-stage">
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#eef3ff" />
+      <path d="M2 6 Q50 18 98 6" fill="none" stroke="#8a5a2e" strokeWidth=".6" />
+      <g strokeWidth=".3" stroke="#ffffff">
+        <path d="M14 8.6l2 4 2-3.4z" fill="#ff8a3d" /><path d="M28 11.6l2 4 2-3.3z" fill="#4fae55" /><path d="M42 13.2l2 4 2-3.8z" fill="#ffd23f" />
+        <path d="M56 13.3l2 4 2-3.9z" fill="#3b82f6" /><path d="M70 11.8l2 4 2-3.3z" fill="#ff8a3d" /><path d="M84 8.8l2 4 2-3.4z" fill="#4fae55" />
+      </g>
+      <path d="M22 4 L10 46 H34 Z M78 4 L66 46 H90 Z" fill="#fff6c8" opacity=".35" />
+      <path d="M0 42 Q50 36 100 42 V60 H0 Z" fill="#a8dd88" />
+      <ellipse cx="50" cy="48" rx="40" ry="7" fill="#c9905a" stroke="#8a5a2e" strokeWidth=".6" />
+      <ellipse cx="50" cy="47" rx="40" ry="5.6" fill="#e2b27c" />
+      <g fill="#9b6a3c" stroke="#6b4423" strokeWidth=".4">
+        <rect x="6" y="54" width="7" height="4" rx="1.5" /><rect x="24" y="55" width="7" height="4" rx="1.5" /><rect x="69" y="55" width="7" height="4" rx="1.5" /><rect x="87" y="54" width="7" height="4" rx="1.5" />
+      </g>
+    </g>
+  )
+}
+
 /** G0-U2 squirrel (original art, same chibi style as CharacterArt): the bell ringer. */
 function SquirrelArt() {
   const fur = '#c9874b', line = '#7a4a22', cream = '#fff1dc'
@@ -170,7 +191,7 @@ export type EventStageProps = {
   label?: string
 }
 
-const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台', 'two-doors': '森林小剧场', 'apple-tree': '苹果园' }
+const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台', 'two-doors': '森林小剧场', 'apple-tree': '苹果园', 'meeting-stage': '森林见面会舞台' }
 
 /** Draws the characters and what has happened to them so far; characters are tappable. */
 export function EventStage({ level, effects, onActorClick, label }: EventStageProps) {
@@ -183,6 +204,7 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
           : level.scenery === 'bell-tree' ? <BellTree rung={effects.some(e => e.action === 'send_bell')} />
           : level.scenery === 'two-doors' ? <TwoDoors />
           : level.scenery === 'apple-tree' ? <AppleOrchard />
+          : level.scenery === 'meeting-stage' ? <MeetingStage />
           : <MorningGlade />}
       </svg>
       {level.actors.map(actor => {
@@ -219,11 +241,11 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             {s.said ? (
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-emerald-400 bg-white px-2 py-0.5 text-xs font-black text-emerald-700 shadow" data-event-mark="hello">{actor.line ?? '早上好！'}</span>
             ) : null}
-            {s.surprised && !s.said ? (
+            {s.surprised && !s.said && !rang.has(actor.id) ? (
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-amber-400 bg-amber-50 px-2 py-0.5 text-xs font-black text-amber-700 shadow" data-event-mark="surprise">✨ 哇！</span>
             ) : null}
             {rang.has(actor.id) && !s.said ? (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-orange-400 bg-white px-2 py-0.5 text-xs font-black text-orange-700 shadow" data-event-mark="bell">🔔 叮铃！</span>
+              <span className="absolute -top-3 left-1/2 whitespace-nowrap rounded-[12px] border-2 border-orange-400 bg-white px-2 py-0.5 text-xs font-black text-orange-700 shadow" style={{ transform: 'translate(-50%, -210%)' }} data-event-mark="bell">{s.surprised ? '✨🔔 叮铃！' : '🔔 叮铃！'}</span>
             ) : null}
             <span className="mt-0.5 block text-center text-[11px] font-black text-slate-700">{name}</span>
           </button>
