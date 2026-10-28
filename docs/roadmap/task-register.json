@@ -2496,7 +2496,7 @@
       "title": "积木区 Blockly 媒体资源自托管（垃圾桶/缩放图标、音效）",
       "priority": "P1",
       "category": "UX",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "UX-203"
       ],
@@ -2508,12 +2508,13 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/186",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "a5cb812e22741f22ae7e6e37ed2f87f8337c9f49",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40627878525",
         "tests": [
-          "local sandbox (appspot unreachable): vitest blockly-media.test.ts 6/6; next build pass; blockly-toolbox-ux203.spec.ts desktop 7/7 without the CDN route shim; eslint changed files 0 errors; PR CI pending"
+          "local sandbox (appspot unreachable): vitest blockly-media.test.ts 6/6; next build pass; blockly-toolbox-ux203.spec.ts desktop 7/7 without the CDN route shim; eslint changed files 0 errors",
+          "PR CI 18 success + 2 skipped; main CI 18 checks all success: curriculum 40627878525, accountability 40627878557, deploy 40627878451"
         ],
-        "reviewer": null
+        "reviewer": "duan 2026-10-28 approved merge in chat; executed by Hark via connector"
       },
       "notes": "来源：UX-201 证据中记录的既有缺口——Blockly 默认从 blockly-demo.appspot.com 加载音效与精灵图，沙箱/国内网络 ERR_TUNNEL_CONNECTION_FAILED。"
     }
