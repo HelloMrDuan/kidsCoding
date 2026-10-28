@@ -102,6 +102,11 @@ function installG2Blocks() {
     {type: 'kc2_wait_whole', message0: '等待 %1 秒', args0: [
       {type: 'field_number', name: 'DURATION', value: 0},
     ], previousStatement: null, nextStatement: null, colour: 35, tooltip: '对应 Scratch 的“等待……秒”控制积木（本课用整数秒）'},
+    // Tenth-of-a-second wait that may be 0 (frame-rate lessons). No min/max/precision either:
+    // 0.25 or 1.5 stays visible so the adapter refuses it instead of rounding or clamping.
+    {type: 'kc2_wait_free', message0: '等待 %1 秒', args0: [
+      {type: 'field_number', name: 'DURATION', value: 0},
+    ], previousStatement: null, nextStatement: null, colour: 35, tooltip: '对应 Scratch 的“等待……秒”控制积木（0.1 秒一格，可以是 0）'},
     {type: 'kc2_change_y', message0: '将 y 坐标增加 %1', args0: [
       {type: 'field_number', name: 'DY', value: 10, precision: 1},
     ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“将 y 坐标增加……”运动积木（正数往上）'},
@@ -144,7 +149,7 @@ function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G
 }
 
 const FIELD_TYPES: Record<string, string[]> = {
-  X: ['kc2_goto'], Y: ['kc2_goto'], MESSAGE: ['kc2_say'], COSTUME: ['kc2_switch_costume'], TIMES: ['kc2_repeat'], DURATION: ['kc2_wait', 'kc2_wait_whole'],
+  X: ['kc2_goto'], Y: ['kc2_goto'], MESSAGE: ['kc2_say'], COSTUME: ['kc2_switch_costume'], TIMES: ['kc2_repeat'], DURATION: ['kc2_wait', 'kc2_wait_whole', 'kc2_wait_free'],
   BACKDROP: ['kc2_switch_backdrop'], SOUND_MENU: ['kc2_play_sound'],
   DIRECTION: ['kc2_point_direction'], STEPS: ['kc2_move_steps'], DEGREES: ['kc2_turn_right'], BROADCAST_OPTION: ['kc2_when_receive'], DY: ['kc2_change_y'],
 }
@@ -337,8 +342,8 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
         </label>
       )}
       {fields.DURATION !== undefined && (
-        <label className="text-sm font-bold text-slate-700">{waitWhole ? `等待秒数（${waitSlot?.min ?? 0}～${waitSlot?.max ?? 5} 的整数）` : '等待秒数（0.2～1.0）'}
-          <input data-testid="g2-edit-wait" type="number" min={waitWhole ? undefined : 0.2} max={waitWhole ? undefined : 1} step={waitWhole ? 1 : 0.1} value={fields.DURATION}
+        <label className="text-sm font-bold text-slate-700">{waitWhole ? `等待秒数（${waitSlot?.min ?? 0}～${waitSlot?.max ?? 5} 的整数）` : `等待秒数（${(waitSlot?.min ?? 0.2).toFixed(1)}～${(waitSlot?.max ?? 1).toFixed(1)}）`}
+          <input data-testid="g2-edit-wait" type="number" min={waitWhole ? undefined : waitSlot?.min ?? 0.2} max={waitWhole ? undefined : waitSlot?.max ?? 1} step={waitWhole ? 1 : 0.1} value={fields.DURATION}
             onChange={e => update('DURATION', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
       )}

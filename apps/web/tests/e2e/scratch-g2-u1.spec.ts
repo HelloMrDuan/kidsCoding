@@ -1133,3 +1133,187 @@ test.describe('G2-U1-L06 制作生日贺卡', () => {
     await expect(speechLog(page)).toHaveAttribute('data-overlaps', '0')
   })
 })
+
+// G2-U2 (animation unit) runs in the same G2 lab and shares this spec file with G2-U1.
+const U2L01 = 'G2-U2-L01'
+const U2L01_SAMPLE = 'public/scratch-samples/g2-u2-l01-cat-walk-home.sb3.b64'
+const frameLog = (page: import('@playwright/test').Page) => page.getByTestId('g2-frame-log')
+const framesOf = (page: import('@playwright/test').Page, name: string) => page.locator(`[data-testid="g2-frame-total"][data-name="${name}"]`)
+async function flagWalk(page: import('@playwright/test').Page) {
+  await page.getByTestId('g2-green-flag').click()
+  // The new run clears the last summary first; the bird demo alone lasts 2.4 s, so the run is seen before it finishes.
+  await expect(frameLog(page)).toHaveAttribute('data-finished', 'false', {timeout: 5_000})
+  await expect(frameLog(page)).toHaveAttribute('data-finished', 'true', {timeout: 40_000})
+}
+async function catAvgMs(page: import('@playwright/test').Page) {
+  return Number(await framesOf(page, '小橘猫').getAttribute('data-avg-ms'))
+}
+
+test.describe('G2-U2-L01 让角色走路有帧动画', () => {
+  test('catalog entry opens the walk lab; with “wait 0” the VM steps a frame every ~0.03 s (blur) while the bird shows 0.3 s; hints; 0.25/1.1 refused, 0.2 makes each frame visible (debug)', async ({page}) => {
+    test.setTimeout(180_000)
+    await page.goto(`/learn/catalog/${U2L01}`)
+    await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+    await page.getByTestId('scratch-trial-entry').click()
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已加载项目', {timeout: 60_000})
+    await expect(page.getByRole('heading', {name: '让角色走路有帧动画'})).toBeVisible()
+    await expect(page.getByTestId('g2-backdrop')).toHaveText('回家的小路')
+    await expect(stageSprite(page, '小橘猫')).toHaveAttribute('data-costume', '走路1')
+    await expect(frameLog(page)).toContainText('还没有点绿旗')
+
+    await page.getByTestId('g2-predict-option').filter({hasText: '看得清'}).first().click()
+    await flagWalk(page)
+    await expect(framesOf(page, '小橘猫')).toHaveAttribute('data-count', '6')
+    await expect(framesOf(page, '小橘猫')).toHaveAttribute('data-end', '走路3')
+    expect(await catAvgMs(page)).toBeLessThan(100)
+    await expect(framesOf(page, '小橘猫')).toContainText('太快，看不清')
+    await expect(framesOf(page, '小鸟')).toHaveAttribute('data-count', '8')
+    expect(Number(await framesOf(page, '小鸟').getAttribute('data-avg-ms'))).toBeGreaterThanOrEqual(290)
+    await expect(stageSprite(page, '小橘猫')).toHaveAttribute('data-costume', '走路3')
+    await expect(spriteState(page, '小橘猫')).toContainText('x -40 · y -80')
+    await expect(page.getByTestId('g2-predict-result')).toContainText('Scratch VM 实际：快得看不清')
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'false')
+
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-1')).toContainText('约 0.03 秒')
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-2')).toContainText('等待 0 秒')
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-3')).toContainText('0.2 或更大')
+
+    await selectTarget(page, '小橘猫')
+    await expect(page.getByTestId('g2-edit-wait')).toHaveValue('0')
+    // Off the 0.1 s grid or over 1 s: the restricted editor refuses it instead of rounding.
+    await page.getByTestId('g2-edit-wait').fill('0.25')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await page.getByTestId('g2-edit-wait').fill('1.1')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await page.getByTestId('g2-edit-wait').fill('0.2')
+    await applyAndWait(page)
+    await flagWalk(page)
+    expect(await catAvgMs(page)).toBeGreaterThanOrEqual(150)
+    await expect(framesOf(page, '小橘猫')).toContainText('看得清')
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'true', {timeout: 8_000})
+    await expect(page.getByTestId('g2-task-practiceA')).toHaveAttribute('data-done', 'false')
+  })
+
+  test('practice A: the costume wraps from 走路4 back to 走路1; 25 loops are refused, 8 loops end on 走路1 in the VM', async ({page}) => {
+    test.setTimeout(150_000)
+    await openG2Lab(page, U2L01)
+    await selectTarget(page, '小橘猫')
+    await page.getByTestId('g2-edit-times').fill('25')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await page.getByTestId('g2-edit-times').fill('8')
+    await applyAndWait(page)
+    await flagWalk(page)
+    await expect(framesOf(page, '小橘猫')).toHaveAttribute('data-count', '8')
+    await expect(framesOf(page, '小橘猫')).toHaveAttribute('data-end', '走路1')
+    await expect(stageSprite(page, '小橘猫')).toHaveAttribute('data-costume', '走路1')
+    await expect(page.getByTestId('g2-task-practiceA')).toHaveAttribute('data-done', 'true')
+    // The bird is a fixed demo: none of its values can be edited.
+    await selectTarget(page, '小鸟')
+    await expect(page.getByTestId('g2-edit-times')).toHaveCount(0)
+    await expect(page.getByTestId('g2-edit-wait')).toHaveCount(0)
+  })
+
+  test('practice B: loops × steps decide how far the cat walks; 6×20 stops at x -40, 50 steps are refused, 12×25 and 8×35 reach the door', async ({page}) => {
+    test.setTimeout(150_000)
+    await openG2Lab(page, U2L01)
+    await flagWalk(page)
+    await expect(spriteState(page, '小橘猫')).toContainText('x -40 · y -80')
+    await expect(page.getByTestId('g2-task-practiceB')).toHaveAttribute('data-done', 'false')
+    await selectTarget(page, '小橘猫')
+    await page.getByTestId('g2-edit-steps').fill('50')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await page.getByTestId('g2-edit-steps').fill('25')
+    await page.getByTestId('g2-edit-times').fill('12')
+    await applyAndWait(page)
+    await flagWalk(page)
+    await expect(spriteState(page, '小橘猫')).toContainText('x 140 · y -80')
+    await expect(page.getByTestId('g2-task-practiceB')).toHaveAttribute('data-done', 'true')
+    await page.getByTestId('g2-edit-steps').fill('35')
+    await page.getByTestId('g2-edit-times').fill('8')
+    await applyAndWait(page)
+    await flagWalk(page)
+    await expect(spriteState(page, '小橘猫')).toContainText('x 120 · y -80')
+  })
+
+  test('creative walk home, real .sb3 export with 7 SVG frames re-verified in a fresh VM, re-import, and the saved walk reopens after reload (recovery)', async ({page}) => {
+    test.setTimeout(200_000)
+    await openG2Lab(page, U2L01)
+    await selectTarget(page, '小橘猫')
+    await page.getByTestId('g2-edit-say').fill('回家吃鱼啦')
+    await page.getByTestId('g2-edit-times').fill('12')
+    await page.getByTestId('g2-edit-steps').fill('25')
+    await page.getByTestId('g2-edit-wait').fill('0.2')
+    await applyAndWait(page)
+    await expect(page.getByTestId('g2-local-save-status')).toContainText('已在本机自动保存', {timeout: 30_000})
+    await page.reload()
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已从本机草稿恢复', {timeout: 60_000})
+    await selectTarget(page, '小橘猫')
+    await expect(page.getByTestId('g2-edit-say')).toHaveValue('回家吃鱼啦')
+    await expect(page.getByTestId('g2-edit-wait')).toHaveValue('0.2')
+    await flagWalk(page)
+    await expect(framesOf(page, '小橘猫')).toHaveAttribute('data-end', '走路1')
+    expect(await catAvgMs(page)).toBeGreaterThanOrEqual(150)
+    await expect(spriteState(page, '小橘猫')).toContainText('x 140')
+    await expect(page.getByTestId('g2-task-create')).toHaveAttribute('data-done', 'true', {timeout: 8_000})
+
+    const downloading = page.waitForEvent('download', {timeout: 60_000})
+    await page.getByTestId('g2-export-sb3').click()
+    const downloaded = await downloading
+    expect(downloaded.suggestedFilename()).toBe('KidsCoding-让角色走路有帧动画.sb3')
+    const file = await readFile((await downloaded.path())!)
+    const entries = unzip(file)
+    expect(entries.filter(entry => /^[0-9a-f]{32}\.svg$/.test(entry.name))).toHaveLength(7)
+    const project = JSON.parse(entries.find(entry => entry.name === 'project.json')!.data.toString('utf8'))
+    const cat = project.targets.find((t: {name: string}) => t.name === '小橘猫')
+    expect(cat.costumes.map((c: {name: string}) => c.name)).toEqual(['走路1', '走路2', '走路3', '走路4'])
+    expect(cat.blocks.cat_wait.inputs.DURATION[1][1]).toBe('0.2')
+    expect(cat.blocks.cat_next.opcode).toBe('looks_nextcostume')
+    await expect(page.getByTestId('g2-export-status')).toContainText('独立 VM 中重新载入验证')
+    await expect(page.getByTestId('g2-export-status')).toContainText('小橘猫 DURATION=0.2')
+
+    await page.getByTestId('g2-edit-wait').fill('0')
+    await applyAndWait(page)
+    await page.getByTestId('g2-import-sb3').setInputFiles({name: 'my-walk.sb3', mimeType: 'application/octet-stream', buffer: file})
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已重新导入作品', {timeout: 50_000})
+    await selectTarget(page, '小橘猫')
+    await expect(page.getByTestId('g2-edit-wait')).toHaveValue('0.2')
+    await expect(page.getByTestId('g2-edit-times')).toHaveValue('12')
+  })
+
+  test('sandbox rejects walk projects outside the lesson model and keeps the working project', async ({page}) => {
+    test.setTimeout(180_000)
+    const sample = Buffer.from(await readFile(U2L01_SAMPLE, 'utf8'), 'base64')
+    await openG2Lab(page, U2L01)
+    await selectTarget(page, '小橘猫')
+    await page.getByTestId('g2-edit-wait').fill('0.3')
+    await applyAndWait(page)
+    const reject = async (name: string, buffer: Buffer, reason: string | RegExp) => {
+      await page.getByTestId('g2-import-sb3').setInputFiles({name, mimeType: 'application/octet-stream', buffer})
+      await expect(page.getByTestId('g2-vm-status')).toContainText(reason, {timeout: 50_000})
+      await selectTarget(page, '小橘猫')
+      await expect(page.getByTestId('g2-edit-wait')).toHaveValue('0.3')
+      await expect(page.getByTestId('g2-green-flag')).toBeEnabled()
+    }
+    await reject('wait-0.25.sb3', mutateSb3(sample, p => { p.targets[1].blocks.cat_wait.inputs = {DURATION: [1, [4, '0.25']]} }), '0.1 秒为一格')
+    await reject('wait-2.sb3', mutateSb3(sample, p => { p.targets[1].blocks.cat_wait.inputs = {DURATION: [1, [4, '2']]} }), '0.1 秒为一格')
+    await reject('loops-30.sb3', mutateSb3(sample, p => { p.targets[1].blocks.cat_repeat.inputs = {TIMES: [1, [4, '30']], SUBSTACK: [2, 'cat_move']} }), '数字超出允许范围')
+    await reject('bird-faster.sb3', mutateSb3(sample, p => { p.targets[2].blocks.bird_wait.inputs = {DURATION: [1, [4, '0.1']]} }), '积木数值被改动')
+    await reject('frame-before-move.sb3', mutateSb3(sample, p => {
+      const b = p.targets[1].blocks as Record<string, {next: string | null; parent: string | null; inputs?: unknown}>
+      b.cat_repeat.inputs = {TIMES: [1, [4, '6']], SUBSTACK: [2, 'cat_next']}
+      b.cat_next.parent = 'cat_repeat'; b.cat_next.next = 'cat_move'
+      b.cat_move.parent = 'cat_next'; b.cat_move.next = 'cat_wait'; b.cat_wait.parent = 'cat_move'
+    }),/积木(连接|嵌套)不符合课程模型/)
+    await reject('fifth-frame.sb3', mutateSb3(sample, p => {
+      const costumes = p.targets[1].costumes as unknown[]
+      p.targets[1].costumes = [...costumes, {...(costumes[0] as object), name: '走路5'}]
+    }), '造型不符合课程模型')
+    await reject('l06-file.sb3', Buffer.from(await readFile(L06_SAMPLE, 'utf8'), 'base64'), /导入 Scratch 项目失败/)
+
+    await flagWalk(page)
+    expect(await catAvgMs(page)).toBeGreaterThanOrEqual(150)
+  })
+})

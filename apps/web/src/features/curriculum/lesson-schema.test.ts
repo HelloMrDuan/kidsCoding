@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { EXAMPLE_DEBT_BASELINE, validateCurriculumSnapshot, type CurriculumSnapshot, type SchemaErrorCode } from './lesson-schema'
 import { readCurriculumSnapshot } from './lesson-schema-snapshot'
-import { g2u1ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
+import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 
 const real = readCurriculumSnapshot()
 // G2 Scratch lab lessons are counted from their own registry (Hark B), so other teams' count edits never collide with them.
-const g2LabLessons = Object.keys(g2u1ScratchLessons).length
-const g2LabSteps = Object.values(g2u1ScratchLessons).reduce((n, lesson) => n + lesson.steps.length, 0)
+const g2LabLessons = Object.keys(g2ScratchLessons).length
+const g2LabSteps = Object.values(g2ScratchLessons).reduce((n, lesson) => n + lesson.steps.length, 0)
 const clone = (): CurriculumSnapshot => structuredClone(real)
 const codes = (s: CurriculumSnapshot) => validateCurriculumSnapshot(s).map(e => e.code)
 function expectOnly(s: CurriculumSnapshot, code: SchemaErrorCode) {

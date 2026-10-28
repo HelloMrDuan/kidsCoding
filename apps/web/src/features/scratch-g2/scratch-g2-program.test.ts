@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest'
+import {g2u2L01} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05, g2u1L06} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {changedValues, checkSlotValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
@@ -194,5 +195,40 @@ describe('G2 restricted Blockly adapter (G2-U1-L06 birthday card)', () => {
     expect(readG2Program(ws(flag, click('蜡烛点亮')), cake6)).toEqual({kind: 'sprite', values: {'蛋糕|cake_costume_menu|COSTUME': '蜡烛点亮'}})
     const swapped = block('kc2_clicked', {}, block('kc2_play_sound', {SOUND_MENU: '生日歌'}, block('kc2_switch_costume', {COSTUME: '蜡烛点亮'})))
     expect(readG2Program(ws(flag, swapped), cake6)).toBeNull()
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U2-L01 walk cycle)', () => {
+  const cat = g2u2L01.targets.find(t => t.name === '小橘猫')!
+  const bird = g2u2L01.targets.find(t => t.name === '小鸟')!
+  const walk = (times: string, steps: string, wait: string, line = '我到家啦！', order: 'ok' | 'swapped' = 'ok') => {
+    const inner = order === 'ok'
+      ? block('kc2_move_steps', {STEPS: steps}, block('kc2_next_costume', {}, block('kc2_wait_free', {DURATION: wait})))
+      : block('kc2_next_costume', {}, block('kc2_move_steps', {STEPS: steps}, block('kc2_wait_free', {DURATION: wait})))
+    const say = block('kc2_say', {MESSAGE: line})
+    const repeat = block('kc2_repeat', {TIMES: times}, say, inner)
+    return ws(block('kc2_flag', {}, block('kc2_goto_start', {X: '-160', Y: '-80'}, block('kc2_switch_costume', {COSTUME: '走路1'}, repeat))))
+  }
+
+  it('reads repeat × steps and a tenths wait that may be 0', () => {
+    expect(readG2Program(walk('12', '25', '0.2'), cat)).toEqual({kind: 'sprite', values: {
+      '小橘猫|cat_repeat|TIMES': 12, '小橘猫|cat_move|STEPS': 25, '小橘猫|cat_wait|DURATION': 0.2, '小橘猫|cat_say|MESSAGE': '我到家啦！'}})
+    expect(readG2Program(walk('6', '20', '0'), cat)).not.toBeNull()
+    expect(readG2Program(walk('6', '20', '1'), cat)).not.toBeNull()
+  })
+
+  it('refuses a wait off the 0.1 s grid or over 1 s, out-of-range loops/steps and a swapped loop body', () => {
+    expect(readG2Program(walk('6', '20', '0.25'), cat)).toBeNull()
+    expect(readG2Program(walk('6', '20', '1.1'), cat)).toBeNull()
+    expect(readG2Program(walk('6', '20', '-0.1'), cat)).toBeNull()
+    expect(readG2Program(walk('21', '20', '0.2'), cat)).toBeNull()
+    expect(readG2Program(walk('6', '41', '0.2'), cat)).toBeNull()
+    expect(readG2Program(walk('6', '20', '0.2', '我到家啦！', 'swapped'), cat)).toBeNull()
+  })
+
+  it('reads the fixed bird demo without lesson values', () => {
+    const birdWs = ws(block('kc2_flag', {}, block('kc2_switch_costume', {COSTUME: '收翅'},
+      block('kc2_repeat', {TIMES: '8'}, null, block('kc2_next_costume', {}, block('kc2_wait', {DURATION: '0.3'}))))))
+    expect(readG2Program(birdWs, bird)).toEqual({kind: 'sprite', values: {}})
   })
 })

@@ -6,10 +6,12 @@
 // examples/scratch/g2/build_g2_projects.py. Nothing here is a published
 // course or a verified grade.
 
+import {evaluateG2U2Lesson, g2u2ScratchLessons, observedPredictionG2U2} from './g2-u2-scratch-lessons'
+
 export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION' | 'DY'
 export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
 export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait' | 'kc2_switch_backdrop' | 'kc2_play_sound'
-  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast' | 'kc2_wait_whole' | 'kc2_change_y'
+  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast' | 'kc2_wait_whole' | 'kc2_change_y' | 'kc2_wait_free'
 /** `fixed` shows a value the lesson keeps fixed (its field is shown but locked in the editor). */
 export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[]; fixed?: Partial<Record<G2Field, string>> }
 export type G2ScriptSpec = {
@@ -56,6 +58,8 @@ export type G2Lesson = {
   showDirection?: boolean
   /** Show who spoke in the last green-flag run and whether anyone talked over someone else (time-order lessons). */
   showSpeechOrder?: boolean
+  /** Show how many costume frames each sprite stepped through in the last green-flag run and the VM-measured time per frame (animation lessons). */
+  showFrames?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -534,8 +538,11 @@ export const g2u1ScratchLessons: Record<string, G2Lesson> = {
   [g2u1L06.id]: g2u1L06,
 }
 
+/** Every G2 lesson on the scratch-g2 lab (U1 basics + U2 animation). */
+export const g2ScratchLessons: Record<string, G2Lesson> = {...g2u1ScratchLessons, ...g2u2ScratchLessons}
+
 export function getG2ScratchLesson(id: string): G2Lesson | null {
-  return g2u1ScratchLessons[id] ?? null
+  return g2ScratchLessons[id] ?? null
 }
 
 /** What the lab observed from the real VM (never from the editor alone). */
@@ -568,12 +575,14 @@ export type G2Observations = {
   speechRuns: Array<{ speakers: string[]; overlaps: number; positions: Record<string, G2Point> }>
   /** Every sound a sprite played in the VM, with the costume it was wearing when the sound started. */
   soundCostumes: Array<{ target: string; sound: string; costume: string }>
+  /** Finished green-flag runs: per sprite, how many times the VM ran "next costume", the average VM time between two frames (null below 2 frames) and the frame it ended on. */
+  frameRuns: Array<{ frames: Record<string, { count: number; avgMs: number | null; end: string }>; positions: Record<string, G2Point> }>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
-  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [],
+  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [],
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
@@ -689,7 +698,7 @@ export function observedPrediction(id: string, obs: G2Observations): string | nu
     if (!first) return null
     return first.overlaps > 0 ? '会同时出现' : '一个说完另一个才说'
   }
-  return null
+  return observedPredictionG2U2(id, obs)
 }
 
 export function evaluateG2Lesson(id: string, obs: G2Observations): G2TaskState | null {
@@ -699,5 +708,5 @@ export function evaluateG2Lesson(id: string, obs: G2Observations): G2TaskState |
   if (id === g2u1L04.id) return evaluateG2U1L04(obs)
   if (id === g2u1L05.id) return evaluateG2U1L05(obs)
   if (id === g2u1L06.id) return evaluateG2U1L06(obs)
-  return null
+  return evaluateG2U2Lesson(id, obs)
 }

@@ -1,6 +1,6 @@
 import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { g0u2EventLessons } from '@/content/curriculum/g0-u2-event-lessons'
-import { g2u1ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
+import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
 import { validTrialsFor } from './child-trial'
@@ -42,9 +42,9 @@ export type TrialIntegration = {
 /** Auditable engine evidence: only lessons with a real runner + routed trial + e2e spec. */
 export const trialIntegrations: Record<string, TrialIntegration> = {
   'G3-U1-L02': { engine: 'scratch-vm', route: '/learn/scratch-lab/G3-U1-L02', e2eSpec: 'tests/e2e/scratch-vm.spec.ts' },
-  // G2-U1 lessons on the restricted G2 Scratch VM lab (scratch-g2-sandbox.html).
+  // G2 lessons (U1 + U2; one shared spec file) on the restricted G2 Scratch VM lab (scratch-g2-sandbox.html).
   ...Object.fromEntries(
-    Object.keys(g2u1ScratchLessons).map((id) => [
+    Object.keys(g2ScratchLessons).map((id) => [
       id,
       { engine: 'scratch-vm', route: `/learn/scratch-lab/${id}`, e2eSpec: 'tests/e2e/scratch-g2-u1.spec.ts' } satisfies TrialIntegration,
     ]),
