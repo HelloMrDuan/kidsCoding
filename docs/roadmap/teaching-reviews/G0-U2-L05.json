@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G0-U2-L05",
+  "reviewedCommit": "ad08596",
+  "reviewedAt": "2026-10-28",
+  "reviewer": "Hark A（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G0 启蒙（5～7 岁）",
+  "prerequisites": [
+    "G0-U2-L04"
+  ],
+  "newConcepts": [
+    "谁被点、谁动，“被点击时”就拼在谁名下（苹果，不是树）",
+    "用点别处来检验：点树、点朋友、按开始旗，苹果都不该落",
+    "用铃铛把“苹果落下”和朋友的反应连起来"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-11 公开介绍）",
+    "西瓜创客 PBL https://www.xiguacity.cn/curriculum（2026-10-11 公开介绍）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 16,
+      "evidence": [
+        "g0-u2-event-lessons.ts G0-U2-L05：三条可观察目标",
+        "5 关递进：错误实验（事件挂到树上）→ 只有点苹果才落 → 苹果落下小兔子惊喜 → 修好点小狐狸苹果也掉 → 自选惊喜的朋友",
+        "覆盖详案三个常见错误：把事件挂到树上、苹果自动掉落、点击错误位置也使苹果落下"
+      ],
+      "defects": [
+        "“点空白地面”用点树、点朋友代替（舞台只有角色可点）"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "原创苹果园背景（kc-scenes/apple-tree.svg，已登记授权），苹果树与苹果是可点击的原创内联角色，苹果落下有下落动画（data-fallen）",
+        "错误实验两个可点选预测，猜错不阻塞"
+      ],
+      "defects": [
+        "朗读用浏览器自带声音，没有落地音效"
+      ]
+    },
+    "practice": {
+      "score": 21,
+      "evidence": [
+        "练习 A（苹果落下后摇铃，小兔子惊喜）与练习 B（苹果在等铃铛、小狐狸摇铃导致点错位置苹果也掉，两处都修）目标不同，均由事件引擎真实运行判定",
+        "单元测试：每关正解通过、反例给出指定错误；创意关 3 位朋友互不代替",
+        "舞台可自由试玩：点树、点朋友、点苹果"
+      ],
+      "defects": [
+        "树名下“做不了的动作”只在它是目标角色时报错；拼在树上的积木不会运行，判定上等同空"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "本课专属诊断：nothing_happened 提示“看看积木是不是拼到了树上”，too_early 指出“苹果自己掉下来”，wrong_trigger 指出“点了别的地方也有反应”",
+        "三层提示：现象 → 规则 → 做法；复盘卡列出本节真实遇到的错误"
+      ],
+      "defects": [
+        "诊断指到角色，不指到具体某一块积木"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意改造：孩子选苹果落下时惊喜的朋友（小狐狸/小兔子/小鸟）；多一位朋友惊喜不算（单元测试）",
+        "作品“我的苹果惊喜卡”保存每个角色的积木，可真实回放"
+      ],
+      "defects": [
+        "只有一个苹果、一种反应，可创作空间小"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "通过只由事件引擎真实运行判定；伪造的完成状态在草稿读取时被过滤（event-draft.ts）",
+        "复盘卡：目标回顾 + 真实错误记录 + What-if；点选反思保存并重开仍在",
+        "三断点截图 docs/roadmap/evidence/G0-U2-L05/"
+      ],
+      "defects": [
+        "没有儿童试学；评分者是实现者，非独立"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "运行结果来自 event-engine.ts 真实执行每个角色名下的积木；苹果下落、铃铛、气泡按效果逐个播放"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "/learn/event-lab/G0-U2-L05 可亲手拼块运行，舞台可自由点苹果、树、朋友和开始旗（L3 实验可试玩）"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "第 1 关是错误实验：必须先真实运行拼在树上的起始程序、看到点苹果不动才能完成；E2E 覆盖"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "创意关 3 位朋友各自有效；判定看舞台效果和顺序，不比对固定积木序列"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "“我的苹果惊喜卡”只有在所选朋友真实检查通过后才出现，重开后可回放（E2E）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色为项目自绘 character-art 与内联原创苹果树、苹果，背景 apple-tree.svg 为本项目新绘，已登记授权表；文字自写"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "只存本机 localStorage（kids-event-lesson-v1:G0-U2-L05），不含姓名，不上传"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "错误实验与练习 B 起始程序必失败；苹果自己掉、点别处也掉、多一位朋友惊喜都不判通过（单元测试 + E2E）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 记为 L3 实验可试玩，目录不标正式发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "错误实验把积木拼到苹果名下后，点苹果它落到地上；创意关选小鸟，回放苹果落下、摇铃、只有小鸟惊喜（E2E）",
+    "failureCase": "错误实验 → nothing_happened（积木在树上）；引导关用“开始时” → too_early；练习A小兔子用“被点击时” → missing_effect；练习B → nothing_happened、wrong_trigger；创意关多一位朋友 → extra_effect（单元测试 + E2E）",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清这一课的规则（概念）",
+      "第三层：给出具体积木做法"
+    ],
+    "practiceA": "练习 A：点苹果落下并摇铃，小兔子听到铃铛惊喜",
+    "practiceB": "练习 B：苹果在等铃铛、小狐狸摇铃，点小狐狸苹果也掉；两处都改好（起始程序必失败）",
+    "equivalentSolutions": [
+      "创意关 3 位朋友各有效（单元测试遍历）"
+    ],
+    "saveReopen": "每个角色的积木、关卡进度、错误实验观察、朋友选择、真实错误记录存 kids-event-lesson-v1:G0-U2-L05；刷新后回到完成页，作品可回放（E2E）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U2-L05 formal course in the apple orchard: event on the tree, only the apple, apple tells the rabbit, wrong spot drops, pick who is surprised, saved and reopened"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G0-U2-L05/"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 参考评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学（需真实儿童与监护人同意，不得模拟）"
+  ],
+  "notes": "2026-10-28 Hark A 实现者参考评价（非独立人工评分）：G0-U2-L05 五关正式候选课程（点击事件与对象识别），复用事件舞台引擎（新增角色 id tree，绘图字段 size/fallY）；新增苹果园场景与可点击的苹果树、苹果。"
+}

@@ -943,6 +943,102 @@ test('G0-U2-L04 formal course in the forest theatre: script on the wrong friend,
   await expect(card.getByTestId('event-actor-rabbit')).toHaveAttribute('data-onstage', 'false')
 })
 
+test('G0-U2-L05 formal course in the apple orchard: event on the tree, only the apple, apple tells the rabbit, wrong spot drops, pick who is surprised, saved and reopened', async ({ page }) => {
+  test.setTimeout(200_000)
+  const q = async (...types: string[]) => { for (const t of types) await add(page, t) }
+  await page.goto('/learn/catalog/G0-U2-L05')
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+  await page.getByTestId('event-trial-entry').click()
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  await expect(page.locator('[data-grid-item="apple-tree"]').first()).toBeVisible()
+  const apple = page.getByTestId('event-actor-apple')
+  const tree = page.getByTestId('event-actor-tree')
+  const fox = page.getByTestId('event-actor-fox')
+  await expect(apple).toHaveAttribute('data-fallen', 'false')
+
+  // Step 1 — error lab: the click event sits on the tree, so tapping the apple does nothing.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(page.getByTestId('grid-feedback')).toContainText('苹果一动不动')
+  await expect(apple).toHaveAttribute('data-fallen', 'false')
+  await page.getByTestId('lesson-clear-program').click() // the tree's blocks
+  await page.getByTestId('event-edit-apple').click()
+  await q('when_clicked', 'fall_down')
+  await runAndExpect(page, 'success')
+  await expect(apple).toHaveAttribute('data-fallen', 'true')
+  await next(page)
+
+  // Guided: a start-hat apple falls by itself.
+  await page.getByTestId('event-edit-apple').click()
+  await q('when_start', 'fall_down')
+  await runAndExpect(page, 'error', '苹果就自己掉下来了')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_clicked', 'fall_down')
+  // Free play: tapping the tree or the fox leaves the apple hanging; tapping the apple drops it.
+  await tree.click({ position: { x: 20, y: 60 } })
+  await fox.click()
+  await expect(apple).toHaveAttribute('data-fallen', 'false')
+  await apple.click()
+  await expect(apple).toHaveAttribute('data-fallen', 'true', { timeout: 10_000 })
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: the apple falls and rings; the rabbit answers the bell (a click hat misses it).
+  await q('when_clicked', 'fall_down', 'send_bell')
+  await page.getByTestId('event-edit-rabbit').click()
+  await q('when_clicked', 'show_surprise')
+  await runAndExpect(page, 'error', '还少一步')
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_bell', 'show_surprise')
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('event-actor-rabbit')).toHaveAttribute('data-surprised', 'true')
+  await next(page)
+
+  // Practice B: the apple waits for a bell the fox rings — fix the apple, then the fox.
+  await runAndExpect(page, 'error', '没有落下')
+  await page.getByTestId('event-edit-apple').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await q('when_clicked', 'fall_down')
+  await runAndExpect(page, 'error', '点了别的地方也有反应')
+  await page.getByTestId('event-edit-fox').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Creative remake: the bird is surprised; a second surprised friend is one too many.
+  await page.getByTestId('grid-goal-choice-2').click() // 小鸟
+  await page.getByTestId('event-edit-apple').click()
+  await q('when_clicked', 'fall_down', 'send_bell')
+  await page.getByTestId('event-edit-bird').click()
+  await q('when_bell', 'show_surprise')
+  await page.getByTestId('event-edit-fox').click()
+  await q('when_bell', 'show_surprise')
+  await runAndExpect(page, 'error', '多了不该有的动作')
+  await page.getByTestId('lesson-clear-program').click()
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+
+  const mistakes = page.getByTestId('grid-review-mistakes')
+  for (const m of ['触发了却没反应', '还没触发就先动了', '少了一个动作', '点错角色也有反应', '多了不该有的动作']) await expect(mistakes).toContainText(m)
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('拼在谁名下')
+  await expect(page.getByTestId('grid-project-status')).toContainText('小鸟听到铃铛惊喜')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  // Close and reopen: the card replays — the apple falls and only the bird is surprised.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  const card = page.getByTestId('grid-project-card')
+  await page.getByTestId('grid-project-play').click()
+  await expect(card.getByTestId('event-actor-bird')).toHaveAttribute('data-surprised', 'true', { timeout: 15_000 })
+  await expect(card.getByTestId('event-actor-apple')).toHaveAttribute('data-fallen', 'true')
+  await expect(card.getByTestId('event-actor-fox')).toHaveAttribute('data-surprised', 'false')
+})
+
 test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at the failing block', async ({ page }) => {
   test.setTimeout(60_000)
   await page.addInitScript(() => {

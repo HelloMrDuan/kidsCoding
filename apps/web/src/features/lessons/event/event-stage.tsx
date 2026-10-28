@@ -97,6 +97,45 @@ export function TwoDoors() {
   )
 }
 
+/** G0-U2-L05 story scenery: the apple orchard — open sky, a soft hill and grass where the apple lands. */
+export function AppleOrchard() {
+  return (
+    <g data-grid-item="apple-tree">
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#e6f6ff" />
+      <circle cx="86" cy="11" r="6" fill="#ffe27a" />
+      <path d="M0 40 Q30 33 62 39 T100 37 V60 H0 Z" fill="#a8dd88" />
+      <path d="M0 48 Q28 44 56 47 T100 46 V60 H0 Z" fill="#86c968" />
+      <g fill="#6fb85a"><circle cx="70" cy="52" r="1.2" /><circle cx="78" cy="55" r="1" /><circle cx="18" cy="54" r="1.1" /></g>
+    </g>
+  )
+}
+
+/** G0-U2-L05 apple tree (original art): the tree itself is a character the child can (wrongly) build on. */
+function TreeArt() {
+  return (
+    <g>
+      <ellipse cx="50" cy="106" rx="26" ry="4" fill="#305a43" opacity=".2" />
+      <path d="M44 106 L46 62 Q50 58 54 62 L56 106 Z" fill="#9b6a3c" stroke="#6b4423" strokeWidth="2" />
+      <path d="M50 74 Q62 66 70 60" fill="none" stroke="#9b6a3c" strokeWidth="5" strokeLinecap="round" />
+      <g fill="#4fae55" stroke="#2f7d3a" strokeWidth="2">
+        <circle cx="30" cy="42" r="22" /><circle cx="70" cy="40" r="22" /><circle cx="50" cy="26" r="24" /><circle cx="50" cy="52" r="18" />
+      </g>
+    </g>
+  )
+}
+
+/** G0-U2-L05 apple (original art). */
+function AppleArt() {
+  return (
+    <g>
+      <path d="M50 30 Q49 20 56 14" fill="none" stroke="#6b4423" strokeWidth="4" strokeLinecap="round" />
+      <path d="M54 22 Q66 12 74 20 Q64 28 54 22Z" fill="#6fcf5a" stroke="#2f7d3a" strokeWidth="2" />
+      <path d="M50 34 Q30 22 18 40 Q8 62 24 86 Q36 102 50 92 Q64 102 76 86 Q92 62 82 40 Q70 22 50 34Z" fill="#ef4444" stroke="#a61b1b" strokeWidth="3" />
+      <ellipse cx="34" cy="50" rx="6" ry="10" fill="#fff" opacity=".45" />
+    </g>
+  )
+}
+
 /** G0-U2 squirrel (original art, same chibi style as CharacterArt): the bell ringer. */
 function SquirrelArt() {
   const fur = '#c9874b', line = '#7a4a22', cream = '#fff1dc'
@@ -131,7 +170,7 @@ export type EventStageProps = {
   label?: string
 }
 
-const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台', 'two-doors': '森林小剧场' }
+const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台', 'two-doors': '森林小剧场', 'apple-tree': '苹果园' }
 
 /** Draws the characters and what has happened to them so far; characters are tappable. */
 export function EventStage({ level, effects, onActorClick, label }: EventStageProps) {
@@ -143,6 +182,7 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
         {level.scenery === 'stage-flags' ? <StageFlags flagUp={Object.values(state).some(x => x.flagUp)} />
           : level.scenery === 'bell-tree' ? <BellTree rung={effects.some(e => e.action === 'send_bell')} />
           : level.scenery === 'two-doors' ? <TwoDoors />
+          : level.scenery === 'apple-tree' ? <AppleOrchard />
           : <MorningGlade />}
       </svg>
       {level.actors.map(actor => {
@@ -153,19 +193,20 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             key={actor.id}
             type="button"
             className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full focus-visible:outline focus-visible:outline-4 focus-visible:outline-sky-400"
-            style={{ left: `${actor.x}%`, top: `${actor.y}%`, width: '18%', opacity: s.onstage ? 1 : 0.25 }}
+            style={{ left: `${actor.x}%`, top: `${s.fallen && actor.fallY !== undefined ? actor.fallY : actor.y}%`, width: `${actor.size ?? 18}%`, opacity: s.onstage ? 1 : 0.25, transition: 'top .5s ease-in' }}
             data-testid={`event-actor-${actor.id}`}
             data-awake={s.awake ? 'true' : 'false'}
             data-onstage={s.onstage ? 'true' : 'false'}
+            data-fallen={s.fallen ? 'true' : 'false'}
             data-said={s.said ? 'true' : 'false'}
             data-surprised={s.surprised ? 'true' : 'false'}
             data-rang={rang.has(actor.id) ? 'true' : 'false'}
-            aria-label={`${name}：${s.onstage ? '' : '在后台，'}${s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${onActorClick ? '。点一下它' : ''}`}
+            aria-label={`${name}：${s.onstage ? '' : '在后台，'}${actor.id === 'apple' || actor.id === 'tree' ? '' : s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${s.fallen ? '，落到了地上' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${onActorClick ? '。点一下它' : ''}`}
             onClick={() => onActorClick?.(actor.id)}
           >
             <svg viewBox="0 0 100 110" className="block w-full" aria-hidden="true">
               <g style={{ filter: s.awake ? undefined : 'saturate(.55) brightness(.92)' }}>
-                {actor.id === 'squirrel' ? <SquirrelArt /> : <CharacterArt id={actor.id} />}
+                {actor.id === 'squirrel' ? <SquirrelArt /> : actor.id === 'tree' ? <TreeArt /> : actor.id === 'apple' ? <AppleArt /> : <CharacterArt id={actor.id} />}
               </g>
               {!s.awake ? (
                 <g data-event-mark="asleep">

@@ -813,7 +813,201 @@ const L04: EventLesson = {
   project: { stepId: 'my-show-order', title: '我的小剧场节目单', passedText: '真实运行：小狐狸先上台，点{target}它再上台' },
 }
 
-export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02, [L03.id]: L03, [L04.id]: L04 }
+// G0-U2-L05: only clicking the apple makes it fall — the event belongs to the object that reacts.
+const apple = (over: Partial<EventActor> = {}): EventActor => ({ id: 'apple', name: '苹果', can: ['fall_down', 'send_bell'], x: 50, y: 22, size: 9, fallY: 80, ...over })
+const tree = (over: Partial<EventActor> = {}): EventActor => ({ id: 'tree', name: '苹果树', can: [], x: 40, y: 44, size: 34, ...over })
+const watcher = (over: Partial<EventActor> = {}): EventActor => ({ id: 'fox', name: '小狐狸', can: ['show_surprise', 'send_bell'], x: 74, y: 64, ...over })
+const catcher = (over: Partial<EventActor> = {}): EventActor => ({ id: 'rabbit', name: '小兔子', can: ['show_surprise', 'send_bell'], x: 90, y: 66, size: 16, ...over })
+const ORCHARD: EventLevel = { actors: [tree(), apple(), watcher()], scenery: 'apple-tree' }
+const ORCHARD_TWO: EventLevel = { actors: [tree(), apple(), watcher(), catcher()], scenery: 'apple-tree' }
+const ORCHARD_ANY: EventLevel = {
+  actors: [tree({ x: 26 }), apple({ x: 37 }), watcher({ x: 58 }), catcher({ x: 74, size: 16 }), { id: 'bird', name: '小鸟', can: ['show_surprise', 'send_bell'], x: 90, y: 40, size: 16 }],
+  scenery: 'apple-tree',
+}
+const APPLE_BLOCKS = ['when_start', 'when_clicked', 'when_bell', 'fall_down', 'send_bell', 'show_surprise']
+const clickApple: EventGoal = {
+  expectations: [
+    { interaction: { kind: 'start' }, effects: [] },
+    { interaction: { kind: 'click', actor: 'apple' }, effects: [['apple', 'fall_down']] },
+  ],
+  probes: [{ kind: 'click', actor: 'tree' }, { kind: 'click', actor: 'fox' }],
+}
+
+const L05: EventLesson = {
+  id: 'G0-U2-L05',
+  title: '点击苹果让它落下',
+  story: '苹果园里，一个红苹果挂在树上。只有点到苹果，它才落到地上；点树、点小狐狸、按开始旗，苹果都不动。事件要拼在会动的那个东西名下。',
+  concept: '点击事件与对象识别',
+  objectives: [
+    '找准对象：“被点击时”要拼在被点的苹果名下，不是树上',
+    '能用“点别处”来检验：点树、点小狐狸、按开始旗，苹果都不该落',
+    '会用铃铛把“苹果落下”和朋友的反应连起来',
+  ],
+  diagnoses: {
+    nothing_happened: '点了苹果，它没有落下：事件和“掉到地上”要拼在苹果名下。看看积木是不是拼到了树上，或者苹果在等铃铛。',
+    too_early: '还没点，苹果就自己掉下来了：苹果的事件选成了“开始时”。要等被点击时才落。',
+    wrong_trigger: '点了别的地方也有反应：只有点苹果才该有动静。看看是谁名下多了“被点击时”。',
+    missing_effect: '苹果落了，可是还少一步：要回应的朋友名下接“听到铃铛时”，苹果落下后还要摇铃。',
+    wrong_order: '顺序不对：苹果先落下，再摇铃告诉朋友。',
+    extra_effect: '多了不该有的动作：只有你选的朋友回应。',
+    wrong_actor: '动的不是要动的那位：看看积木拼在了谁名下。',
+    cannot_do: '这个角色做不了这块积木的动作：苹果树不会落下，要拼在苹果名下。',
+    no_hat: '这段积木上面没有事件，它不知道什么时候开始。',
+    hat_not_on_top: '事件积木要放在最上面。',
+    disconnected: '有一块积木掉队了，没接在事件下面。',
+    loop: '铃铛一直在响：听到铃铛的朋友又去摇铃了。',
+  },
+  steps: [
+    {
+      id: 'event-on-tree',
+      kind: 'error-lab',
+      title: '错误实验：事件挂到了树上',
+      instruction: '小狐狸想让苹果掉下来，可是把“被点击时 → 掉到地上”拼在了苹果树名下。这是一个故意的错误：先按原样运行检查，看看点苹果会怎样，再把积木拼到苹果名下。',
+      predict: '先猜一猜：积木在树上，点苹果它会落下吗？',
+      predictChoices: [
+        { text: '苹果落到地上', when: 'pass' },
+        { text: '苹果一动不动', when: 'nothing_happened' },
+      ],
+      errorLab: {
+        expect: 'nothing_happened',
+        expected: '点一下苹果，它从树上落到地面。',
+        actual: '苹果一动不动：积木在树的名下，而树也不会落下。点苹果时，苹果名下什么都没有。',
+      },
+      level: ORCHARD,
+      editable: ['tree', 'apple'],
+      allowedBlocks: APPLE_BLOCKS,
+      starter: { tree: [{ type: 'when_clicked' }, { type: 'fall_down' }] },
+      goal: clickApple,
+      hints: [
+        '点苹果没反应：苹果名下没有积木。',
+        '谁被点、谁动，积木就拼在谁名下：这里是苹果。',
+        '切到苹果树清空积木，再切到苹果，拼“被点击时 → 掉到地上”。',
+      ],
+      solutions: [{ apple: ['when_clicked', 'fall_down'] }],
+      counterExamples: [
+        { scripts: { tree: ['when_clicked', 'fall_down'] }, failure: 'nothing_happened' },
+        { scripts: { apple: ['when_start', 'fall_down'] }, failure: 'too_early' },
+      ],
+    },
+    {
+      id: 'only-the-apple',
+      kind: 'guided',
+      title: '只有点苹果才落',
+      instruction: '给苹果拼积木：点苹果，它落到地上。检查时还会按开始旗、点树、点小狐狸，这些时候苹果都要好好挂在树上。',
+      predict: '先猜一猜：用“开始时”会怎样？',
+      level: ORCHARD,
+      editable: ['tree', 'apple', 'fox'],
+      allowedBlocks: APPLE_BLOCKS,
+      goal: clickApple,
+      hints: [
+        '苹果自己掉了，或者点别处也掉：事件或位置不对。',
+        '“被点击时”只听点到它自己；“开始时”一按开始旗就动。',
+        '苹果名下：“被点击时” → 掉到地上；树和小狐狸名下空着。',
+      ],
+      solutions: [{ apple: ['when_clicked', 'fall_down'] }],
+      counterExamples: [
+        { scripts: { apple: ['when_start', 'fall_down'] }, failure: 'too_early' },
+        { scripts: { apple: ['when_clicked', 'fall_down'], fox: ['when_clicked', 'show_surprise'] }, failure: 'wrong_trigger' },
+      ],
+    },
+    {
+      id: 'apple-tells-rabbit',
+      kind: 'practice-a',
+      title: '练习 A：苹果落下，小兔子惊喜',
+      instruction: '小兔子在树下等苹果。点苹果：苹果落下，再摇响铃铛；小兔子听到铃铛，露出惊喜。点小兔子、点树都不该有动静。',
+      predict: '先猜一猜：小兔子怎么知道苹果落下了？',
+      level: ORCHARD_TWO,
+      editable: ['apple', 'fox', 'rabbit'],
+      allowedBlocks: APPLE_BLOCKS,
+      goal: {
+        expectations: [
+          { interaction: { kind: 'start' }, effects: [] },
+          { interaction: { kind: 'click', actor: 'apple' }, effects: [['apple', 'fall_down'], ['apple', 'send_bell'], ['rabbit', 'show_surprise']] },
+        ],
+        probes: [{ kind: 'click', actor: 'tree' }, { kind: 'click', actor: 'rabbit' }, { kind: 'click', actor: 'fox' }],
+      },
+      hints: [
+        '苹果落了，小兔子没反应：小兔子没收到消息。',
+        '苹果落下后摇铃，小兔子用“听到铃铛时”来接。',
+        '苹果：被点击时 → 掉到地上 → 摇响铃铛；小兔子：听到铃铛时 → 露出惊喜。',
+      ],
+      solutions: [{ apple: ['when_clicked', 'fall_down', 'send_bell'], rabbit: ['when_bell', 'show_surprise'] }],
+      counterExamples: [
+        { scripts: { apple: ['when_clicked', 'fall_down', 'send_bell'], rabbit: ['when_clicked', 'show_surprise'] }, failure: 'missing_effect' },
+        { scripts: { apple: ['when_clicked', 'send_bell', 'fall_down'], rabbit: ['when_bell', 'show_surprise'] }, failure: 'wrong_order' },
+        { scripts: { apple: ['when_clicked', 'fall_down'], rabbit: ['when_bell', 'show_surprise'] }, failure: 'missing_effect' },
+      ],
+    },
+    {
+      id: 'wrong-spot-drops',
+      kind: 'practice-b',
+      title: '练习 B：点小狐狸苹果也掉',
+      instruction: '小兔子拼的程序出了怪事：点苹果没反应，点小狐狸苹果却掉了（小狐狸摇铃，苹果在等铃铛）。先运行检查，再改好：只有点苹果才落。',
+      predict: '先猜一猜：要改苹果，还是改小狐狸？',
+      level: ORCHARD,
+      editable: ['tree', 'apple', 'fox'],
+      allowedBlocks: APPLE_BLOCKS,
+      starter: {
+        apple: [{ type: 'when_bell' }, { type: 'fall_down' }],
+        fox: [{ type: 'when_clicked' }, { type: 'send_bell' }],
+      },
+      goal: clickApple,
+      hints: [
+        '点苹果没反应：苹果在等铃铛，不听手指。',
+        '把苹果的事件换成“被点击时”；再试点小狐狸，它不该再让苹果掉。',
+        '苹果：清空后拼“被点击时 → 掉到地上”；小狐狸：清空积木。',
+      ],
+      solutions: [{ apple: ['when_clicked', 'fall_down'] }],
+      counterExamples: [
+        { scripts: { apple: ['when_bell', 'fall_down'], fox: ['when_clicked', 'send_bell'] }, failure: 'nothing_happened' },
+        { scripts: { apple: ['when_clicked', 'fall_down'], fox: ['when_clicked', 'send_bell'] }, failure: 'wrong_trigger' },
+      ],
+    },
+    {
+      id: 'my-apple-catch',
+      kind: 'creative',
+      title: '创意改造：苹果落下给谁惊喜？',
+      instruction: '小鸟也飞来了。由你来决定：苹果被点、落下、摇铃后，哪位朋友露出惊喜？别的朋友不动，点朋友、点树都没有动静。通过后，它就是你的“苹果惊喜卡”作品。',
+      predict: '先猜一猜：“听到铃铛时”要拼在谁名下？',
+      creative: { prompt: '苹果落下时，你想让谁惊喜？', choices: ['fox', 'rabbit', 'bird'], labels: ['小狐狸', '小兔子', '小鸟'] },
+      level: ORCHARD_ANY,
+      editable: ['tree', 'apple', 'fox', 'rabbit', 'bird'],
+      allowedBlocks: APPLE_BLOCKS,
+      goal: {
+        expectations: [
+          { interaction: { kind: 'start' }, effects: [] },
+          { interaction: { kind: 'click', actor: 'apple' }, effects: [['apple', 'fall_down'], ['apple', 'send_bell'], ['$target', 'show_surprise']] },
+        ],
+        probes: [{ kind: 'click', actor: 'tree' }, { kind: 'click', actor: 'fox' }, { kind: 'click', actor: 'rabbit' }, { kind: 'click', actor: 'bird' }],
+      },
+      hints: [
+        '苹果落了，可是惊喜的不是你选的朋友：积木拼错了名下。',
+        '苹果负责“落下 → 摇铃”；你选的朋友负责“听到铃铛时 → 惊喜”。',
+        '例如选小鸟：苹果“被点击时 → 掉到地上 → 摇响铃铛”，小鸟“听到铃铛时 → 露出惊喜”。',
+      ],
+      solutions: [{ apple: ['when_clicked', 'fall_down', 'send_bell'], fox: ['when_bell', 'show_surprise'] }],
+      counterExamples: [
+        { scripts: { apple: ['when_clicked', 'fall_down', 'send_bell'], rabbit: ['when_bell', 'show_surprise'] }, failure: 'wrong_actor' },
+        { scripts: { apple: ['when_start', 'fall_down', 'send_bell'], fox: ['when_bell', 'show_surprise'] }, failure: 'too_early' },
+        { scripts: { apple: ['when_clicked', 'fall_down', 'send_bell'], fox: ['when_bell', 'show_surprise'], bird: ['when_bell', 'show_surprise'] }, failure: 'extra_effect' },
+      ],
+    },
+  ],
+  review: {
+    whatIf: '如果把“被点击时 → 掉到地上”拼在苹果树名下，点苹果会怎样？',
+    answer: '苹果不动：被点的是苹果，可积木在树的名下。谁被点、谁动，积木就拼在谁名下。',
+  },
+  reflection: '说一说：怎么检验“只有点苹果才落”？要试哪些别的地方？',
+  reflectionCheck: {
+    question: '想让苹果“点一下才落下”，积木拼在谁名下？',
+    options: [{ text: '苹果', correct: true }, { text: '苹果树', correct: false }, { text: '小狐狸', correct: false }],
+    why: '被点的是苹果、落下的也是苹果，所以“被点击时 → 掉到地上”拼在苹果名下；树不会落，小狐狸被点时苹果不该动。',
+  },
+  parentQuestion: '请孩子播放自己的“苹果惊喜卡”：先按开始旗、点树，看苹果还挂着；再点苹果，看它落下、朋友惊喜，请孩子说说积木拼在了谁名下。',
+  project: { stepId: 'my-apple-catch', title: '我的苹果惊喜卡', passedText: '真实运行：点苹果才落下，{target}听到铃铛惊喜' },
+}
+
+export const g0u2EventLessons: Record<string, EventLesson> = { [L01.id]: L01, [L02.id]: L02, [L03.id]: L03, [L04.id]: L04, [L05.id]: L05 }
 
 export function getEventLesson(id: string): EventLesson | undefined {
   return g0u2EventLessons[id]
