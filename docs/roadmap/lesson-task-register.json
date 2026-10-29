@@ -359,8 +359,8 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/246",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "464d5b4677b6679eb63ade71217a1508c47de562",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40858603060",
         "realE2E": "apps/web/tests/e2e/grid-lab.spec.ts › G0-U3-L01 mushroom path pattern: only two pairs, find the unit, repeat four pairs, swapped colours, my rhythm path saved and reopened",
         "lessonReview": null
       },
