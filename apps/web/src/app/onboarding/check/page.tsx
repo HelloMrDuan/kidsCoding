@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { assessmentQuestions } from '@/content/assessment/questions'
 import { AssessmentForm } from '@/features/onboarding/assessment-form'
 import {
+  defaultOnboardingSession,
   readOnboardingSession,
+  subscribeOnboardingSession,
   writeOnboardingSession,
 } from '@/features/onboarding/onboarding-session'
 import { readGuestProgress } from '@/features/progress/local-progress'
@@ -14,7 +16,19 @@ import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
 
 export default function AssessmentPage() {
   const router = useRouter()
-  const session = readOnboardingSession()
+  // Hydration fix (HYDRATION-418): the session lives in localStorage, which
+  // the server cannot see. Reading it during render made SSR (null) disagree
+  // with the first client render (full form) and React reported error #418.
+  // useSyncExternalStore renders the default session both on the server and
+  // during hydration (same pattern the learn map already uses), and only
+  // then delivers the real session. Because the page returns null while
+  // ageBand is unset, the form first mounts with the real answers, which
+  // also keeps the refresh-restore initializer correct.
+  const session = useSyncExternalStore(
+    subscribeOnboardingSession,
+    readOnboardingSession,
+    () => defaultOnboardingSession,
+  )
 
   useEffect(() => {
     if (!session.ageBand) {
