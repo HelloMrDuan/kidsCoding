@@ -1974,7 +1974,7 @@
       "title": "修复年龄能力检查页 React #418 水合不一致",
       "priority": "P1",
       "category": "UX",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "UX-602"
       ],
@@ -1988,15 +1988,18 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/226",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "2a162d0aea9f6944455b8010c6a9b26d3e00e8f7",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40857658129",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40857658118",
         "tests": [
           "apps/web/src/app/onboarding/check/page.test.tsx 2 项全绿（预置会话恢复到原题、无会话重定向到年龄页）",
-          "旧机生产构建真实 Chrome 三端 E2E 全过（头 58048d74；首次进入、答题、刷新恢复、返回前进、直接加载，pageerror 为空，#418 消失；5e641ff8 仅改注释行不改行为，最终头合并前重跑）"
+          "旧机生产构建真实 Chrome 三端 E2E 全过（最终头 947956a3；首次进入、答题、刷新恢复、返回前进、直接加载，pageerror 为空，#418 消失）",
+          "PR #226 CI 19 success + 2 skipped，gate pass",
+          "合并后主分支 curriculum https://github.com/HelloMrDuan/kidsCoding/actions/runs/40857658129 与 task accountability https://github.com/HelloMrDuan/kidsCoding/actions/runs/40857658118 均 success（头 2a162d0a）"
         ],
         "reviewer": null
       },
-      "notes": "ESLint 根因（2026-10-29）：首版 disable 注释写成两行，disable-next-line 只压住第二行注释，未压住 setSession 行，致 curriculum-web 报 react-hooks/set-state-in-effect；已改为紧贴 setSession 的单行注释并在机上新鲜依赖验证通过。9 个既有 warning 与本 PR 无关，不作新增缺陷处理。"
+      "notes": "ESLint 根因（2026-10-29）：首版 disable 注释写成两行，disable-next-line 只压住第二行注释，未压住 setSession 行，致 curriculum-web 报 react-hooks/set-state-in-effect；已改为紧贴 setSession 的单行注释并在机上新鲜依赖验证通过。9 个既有 warning 与本 PR 无关，不作新增缺陷处理。独立修复，不扩大 UX-602 范围；台账条目经 duan 2026-10-29 裁定正式新增。"
     },
     {
       "id": "UX-603",
