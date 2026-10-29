@@ -168,4 +168,94 @@ describe('BindAccountForm', () => {
     expect(clearGuestProgress).not.toHaveBeenCalled()
     expect(push).not.toHaveBeenCalled()
   })
+
+  it('asks for an address before requesting a code', async () => {
+    const requestOtp = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('fetch', vi.fn())
+
+    render(
+      <BindAccountForm
+        requestOtp={requestOtp}
+        verifyOtp={vi.fn().mockResolvedValue(undefined)}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: '发送验证码' }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('bind-account-error')).toHaveTextContent(
+        '请先输入邮箱地址',
+      )
+    })
+    expect(requestOtp).not.toHaveBeenCalled()
+  })
+
+  it('asks for a code before verifying', async () => {
+    const verifyOtp = vi.fn().mockResolvedValue(undefined)
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(
+      <BindAccountForm
+        requestOtp={vi.fn().mockResolvedValue(undefined)}
+        verifyOtp={verifyOtp}
+      />,
+    )
+
+    fireEvent.change(screen.getByLabelText('邮箱或手机号'), {
+      target: { value: 'family@example.com' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '发送验证码' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('验证码')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: '保存我的进度' }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('bind-account-error')).toHaveTextContent(
+        '请先输入验证码',
+      )
+    })
+    expect(verifyOtp).not.toHaveBeenCalled()
+  })
+
+  it('resets the sent state when the channel changes after sending', async () => {
+    const fetchMock = vi.fn()
+    const { submitOtp } = setupForm({ fetchImpl: fetchMock })
+
+    await submitOtp('family@example.com', '123456')
+
+    // Let the save attempt settle first: the stubbed fetch resolves to
+    // undefined, so the form reports a save failure and stops submitting.
+    await waitFor(() => {
+      expect(screen.getByTestId('bind-account-error')).toHaveTextContent(
+        '保存失败',
+      )
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: '手机号' }))
+
+    expect(
+      screen.getByRole('button', { name: '发送验证码' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByLabelText('验证码')).not.toBeInTheDocument()
+  })
+
+  it('reports a network failure as a save failure, not a code failure', async () => {
+    vi.clearAllMocks()
+    const fetchMock = vi.fn().mockRejectedValue(new Error('network down'))
+
+    const { submitOtp } = setupForm({ fetchImpl: fetchMock })
+
+    await submitOtp('family@example.com', '123456')
+
+    await waitFor(() => {
+      expect(screen.getByTestId('bind-account-error')).toHaveTextContent(
+        '保存失败，请检查网络后重试',
+      )
+    })
+    expect(push).not.toHaveBeenCalled()
+  })
 })

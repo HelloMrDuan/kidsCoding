@@ -27,6 +27,13 @@ export function BindAccountForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleRequestOtp() {
+    if (!value.trim()) {
+      setError(
+        channel === 'email' ? '请先输入邮箱地址。' : '请先输入手机号码。',
+      )
+      return
+    }
+
     setError('')
     setIsSubmitting(true)
 
@@ -42,12 +49,23 @@ export function BindAccountForm({
   }
 
   async function handleVerify() {
+    if (!token.trim()) {
+      setError('请先输入验证码。')
+      return
+    }
+
     setError('')
     setIsSubmitting(true)
 
     try {
       await verifyOtp(channel, value, token)
+    } catch {
+      setError('验证码校验失败，请确认验证码后重试。')
+      setIsSubmitting(false)
+      return
+    }
 
+    try {
       const response = await fetch('/api/bind-account', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -68,9 +86,28 @@ export function BindAccountForm({
       clearOnboardingSession()
       router.push('/parent/overview')
     } catch {
-      setError('验证码校验失败，请确认验证码后重试。')
+      setError('保存失败，请检查网络后重试。')
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  function switchChannel(next: 'email' | 'phone') {
+    setChannel(next)
+    // A code sent for one channel must never be verified against another.
+    if (codeSent) {
+      setCodeSent(false)
+      setStatus('')
+      setToken('')
+    }
+  }
+
+  function changeValue(next: string) {
+    setValue(next)
+    if (codeSent) {
+      setCodeSent(false)
+      setStatus('')
+      setToken('')
     }
   }
 
@@ -89,7 +126,7 @@ export function BindAccountForm({
               ? 'bg-slate-900 text-white'
               : 'bg-slate-100 text-slate-700'
           }`}
-          onClick={() => setChannel('email')}
+          onClick={() => switchChannel('email')}
           type="button"
         >
           邮箱
@@ -100,7 +137,7 @@ export function BindAccountForm({
               ? 'bg-slate-900 text-white'
               : 'bg-slate-100 text-slate-700'
           }`}
-          onClick={() => setChannel('phone')}
+          onClick={() => switchChannel('phone')}
           type="button"
         >
           手机号
@@ -110,7 +147,10 @@ export function BindAccountForm({
         邮箱或手机号
         <input
           className="rounded-2xl border border-slate-200 px-4 py-3"
-          onChange={(event) => setValue(event.target.value)}
+          type={channel === 'email' ? 'email' : 'tel'}
+          inputMode={channel === 'email' ? 'email' : 'tel'}
+          autoComplete={channel === 'email' ? 'email' : 'tel'}
+          onChange={(event) => changeValue(event.target.value)}
           value={value}
         />
       </label>
@@ -142,6 +182,8 @@ export function BindAccountForm({
             验证码
             <input
               className="rounded-2xl border border-slate-200 px-4 py-3"
+              inputMode="numeric"
+              autoComplete="one-time-code"
               onChange={(event) => setToken(event.target.value)}
               value={token}
             />

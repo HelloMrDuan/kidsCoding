@@ -13,6 +13,8 @@ import { recommendStartLevel } from './recommend-start-level'
 type AssessmentFormProps = {
   ageBand: AgeBand
   questions: AssessmentQuestion[]
+  initialAnswers?: AssessmentAnswer[]
+  onProgress?: (answers: AssessmentAnswer[]) => void
   onComplete: (payload: {
     answers: AssessmentAnswer[]
     recommendedLevel: 'starter' | 'foundation' | 'advanced'
@@ -22,10 +24,28 @@ type AssessmentFormProps = {
 export function AssessmentForm({
   ageBand,
   questions,
+  initialAnswers = [],
+  onProgress,
   onComplete,
 }: AssessmentFormProps) {
-  const [index, setIndex] = useState(0)
-  const [answers, setAnswers] = useState<AssessmentAnswer[]>([])
+  // Restore an in-progress assessment after a refresh: only the prefix that
+  // still matches the questions in order is kept, so a stale or reordered
+  // session can never jump the user to an unrelated question.
+  const restoredAnswers = initialAnswers.filter((answer, i) => {
+    const question = questions[i]
+    return (
+      question &&
+      answer.questionId === question.id &&
+      question.options.some((option) => option.id === answer.optionId)
+    )
+  })
+  const restoredIndex = Math.min(
+    restoredAnswers.length,
+    questions.length - 1,
+  )
+
+  const [index, setIndex] = useState(restoredIndex)
+  const [answers, setAnswers] = useState<AssessmentAnswer[]>(restoredAnswers)
 
   const question = questions[index]
 
@@ -45,6 +65,7 @@ export function AssessmentForm({
 
     setAnswers(nextAnswers)
     setIndex(index + 1)
+    onProgress?.(nextAnswers)
   }
 
   return (
