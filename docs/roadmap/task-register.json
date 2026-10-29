@@ -2609,7 +2609,7 @@
       "title": "真循环引擎：C 形“重复 N 次”积木、嵌套程序快照/恢复、网格引擎展开执行",
       "priority": "P0",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "SYS-106",
         "AUD-101"
@@ -2622,7 +2622,9 @@
         "旧的平铺草稿与 G0-U1/U2 课程行为不变；伪造的循环次数被夹到可选值，未知积木被丢弃（单测）",
         "PR CI 全绿"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/237"
+      },
       "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
     }
   ]
