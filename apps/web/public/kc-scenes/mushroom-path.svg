@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 64 70" role="img" aria-label="小熊的蘑菇路牌：红、蓝、红、蓝四个脚印">
+<g>
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="30" width="6" height="30" rx="2" fill="#9b6a3c" stroke="#5e3b1c" stroke-width="2" />
+      <path d="M4 30 Q28 4 52 30 Z" fill="#ff5d6c" stroke="#b5303e" stroke-width="2.5" stroke-linejoin="round" />
+      <circle cx="18" cy="20" r="3" fill="#fff" />
+      <circle cx="34" cy="15" r="2.6" fill="#fff" />
+      <circle cx="42" cy="24" r="2.4" fill="#fff" />
+      <rect x="6" y="32" width="44" height="14" rx="4" fill="#ffe2b8" stroke="#a0704a" stroke-width="2" />
+      <g transform="translate(12 39)"><ellipse cx="0" cy="1.5" rx="3" ry="2.6" fill="#e5484d" /><circle cx="-2.4" cy="-2.2" r="1.2" fill="#e5484d" /><circle cx="0" cy="-3.2" r="1.2" fill="#e5484d" /><circle cx="2.4" cy="-2.2" r="1.2" fill="#e5484d" /></g><g transform="translate(22 39)"><ellipse cx="0" cy="1.5" rx="3" ry="2.6" fill="#3e7bfa" /><circle cx="-2.4" cy="-2.2" r="1.2" fill="#3e7bfa" /><circle cx="0" cy="-3.2" r="1.2" fill="#3e7bfa" /><circle cx="2.4" cy="-2.2" r="1.2" fill="#3e7bfa" /></g><g transform="translate(32 39)"><ellipse cx="0" cy="1.5" rx="3" ry="2.6" fill="#e5484d" /><circle cx="-2.4" cy="-2.2" r="1.2" fill="#e5484d" /><circle cx="0" cy="-3.2" r="1.2" fill="#e5484d" /><circle cx="2.4" cy="-2.2" r="1.2" fill="#e5484d" /></g><g transform="translate(42 39)"><ellipse cx="0" cy="1.5" rx="3" ry="2.6" fill="#3e7bfa" /><circle cx="-2.4" cy="-2.2" r="1.2" fill="#3e7bfa" /><circle cx="0" cy="-3.2" r="1.2" fill="#3e7bfa" /><circle cx="2.4" cy="-2.2" r="1.2" fill="#3e7bfa" /></g>
+    </g>
+</svg>

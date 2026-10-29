@@ -30,6 +30,8 @@ const ICONS: Record<string, string> = {
   bell: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M6%2017V11a6%206%200%200%201%2012%200v6l2%202H4z%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2220.5%22%20r%3D%222%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M12%203v2%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E',
   star: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%203l2.6%205.6%206%20.7-4.5%204.1%201.2%206L12%2016.4%206.7%2019.4l1.2-6L3.4%209.3l6-.7z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E',
   door: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%2021V10a7%207%200%200%201%2014%200v11z%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2215%22%20cy%3D%2215%22%20r%3D%221.6%22%20fill%3D%22%23b06a2b%22%2F%3E%3C%2Fsvg%3E',
+  pawRed: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cellipse%20cx%3D%2212%22%20cy%3D%2215.5%22%20rx%3D%225%22%20ry%3D%224.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%226%22%20cy%3D%229%22%20r%3D%222.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2210%22%20cy%3D%225.6%22%20r%3D%222.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%225.6%22%20r%3D%222.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2218%22%20cy%3D%229%22%20r%3D%222.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3C%2Fsvg%3E',
+  pawBlue: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cellipse%20cx%3D%2212%22%20cy%3D%2215.5%22%20rx%3D%225%22%20ry%3D%224.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%226%22%20cy%3D%229%22%20r%3D%222.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2210%22%20cy%3D%225.6%22%20r%3D%222.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%225.6%22%20r%3D%222.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2218%22%20cy%3D%229%22%20r%3D%222.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3C%2Fsvg%3E',
 }
 
 /**
@@ -200,6 +202,23 @@ const KIDS_BLOCK_DEFINITIONS = [
       previousStatement: null,
       nextStatement: null,
       style: 'kc_motion',
+    },
+    {
+      // G0-U3: leave a red / blue footprint on the fox's cell.
+      type: 'stamp_red',
+      message0: '%1 ' + kidsBlockLabels.stamp_red,
+      args0: [{ type: 'field_image', src: ICONS.pawRed, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_item',
+    },
+    {
+      type: 'stamp_blue',
+      message0: '%1 ' + kidsBlockLabels.stamp_blue,
+      args0: [{ type: 'field_image', src: ICONS.pawBlue, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_item',
     },
     {
       type: 'pick_key',

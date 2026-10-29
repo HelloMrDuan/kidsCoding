@@ -21,7 +21,7 @@ export type GridDraft = {
   mistakes?: GridFailure[]
 }
 
-const FAILURES = new Set<string>(['no_start', 'disconnected', 'empty_repeat', 'too_deep', 'unknown_block', 'too_many', 'out_of_bounds', 'hit_rock', 'fell_in_water', 'door_locked', 'no_key_here', 'not_at_door', 'need_key', 'not_at_goal'])
+const FAILURES = new Set<string>(['no_start', 'disconnected', 'empty_repeat', 'too_deep', 'stamp_twice', 'wrong_pattern', 'pattern_short', 'unknown_block', 'too_many', 'out_of_bounds', 'hit_rock', 'fell_in_water', 'door_locked', 'no_key_here', 'not_at_door', 'need_key', 'not_at_goal'])
 
 const KNOWN = new Set<string>(['when_start', REPEAT_BLOCK, ...GRID_BLOCK_TYPES])
 

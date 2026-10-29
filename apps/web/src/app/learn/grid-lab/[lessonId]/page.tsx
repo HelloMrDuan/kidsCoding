@@ -2,18 +2,19 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { getGridLesson } from '@/content/curriculum/g0-u1-grid-lessons'
+import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { GridLab } from '@/features/lessons/grid/grid-lab'
 
 export default async function GridLabPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params
-  const lesson = getGridLesson(lessonId)
+  const lesson = getGridLesson(lessonId) ?? g0u3LoopLessons[lessonId] ?? null
   if (!lesson) notFound()
   return (
     <main className="min-h-screen bg-[var(--kc-canvas)]">
       <section className="kc-page-main">
         <header className="kc-title-row" data-testid="grid-lab-title-row">
           <div className="min-w-0">
-            <div className="kc-eyebrow">G0 森林寻路 · 实验课</div>
+            <div className="kc-eyebrow">{lesson.id.startsWith('G0-U3') ? 'G0 循环与规律' : 'G0 森林寻路'} · 实验课</div>
             <h1>编程课堂 · {lesson.title}</h1>
             <p className="kc-subtitle">{lesson.story}</p>
           </div>

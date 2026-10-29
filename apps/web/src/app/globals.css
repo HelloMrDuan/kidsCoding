@@ -683,6 +683,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-block-chip[data-block="switch_scene"] { --c: #9966ff; --d: #774dcb; }
 .kc-block-chip[data-block="switch_character"] { --c: #ff6680; --d: #d94a63; }
 .kc-block-chip[data-block="repeat_twice"] { --c: #0fbdbd; --d: #0b9696; }
+/* SYS-107 / G0-U3: the C-shaped repeat is a control block; footprints are items (same colours as the Blockly theme). */
+.kc-block-chip[data-block="repeat_times"] { --c: #0fbdbd; --d: #0b9696; }
+.kc-block-chip[data-block="stamp_red"], .kc-block-chip[data-block="stamp_blue"] { --c: #cf63cf; --d: #a63fa6; }
+.kc-repeat-choice { border-color: #5cd6d6; color: #0b7f7f; box-shadow: 0 2px 0 #c2eeee; }
+.kc-repeat-choice.kc-say-choice-on { background: #0fbdbd; border-color: #0b9696; color: #fff; box-shadow: 0 3px 0 #0b9696; }
 /* TQ-008: preset dialogue choice for the say block (lesson-02); same cartoon chip family. */
 .kc-say-choice { border: 2px solid #74d494; border-radius: 999px; padding: 7px 14px; background: #fff; color: #2b9a51; font-weight: 800; font-size: 13px; box-shadow: 0 2px 0 #c9ecd5; transition: transform .12s, box-shadow .12s; }
 .kc-say-choice:hover { transform: translateY(-1px); }
