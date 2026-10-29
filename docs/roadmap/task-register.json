@@ -2580,7 +2580,7 @@
       "title": "Hark A 负责路线 144 节全量课程审定（G0、G1、M0、D0、S0、R0）",
       "priority": "P0",
       "category": "AUD",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "TQ-007"
       ],
@@ -2592,7 +2592,9 @@
         "八大领域每项给出覆盖判定、缺口、优先级、所需引擎、综合项目目标与验收方法",
         "PR CI 全绿；不修改任何课程状态"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/230"
+      },
       "notes": "Hark A 2026-10-29：审定基线 main 300c6dd；AI 审定不能替代独立人工教研。"
     }
   ]
