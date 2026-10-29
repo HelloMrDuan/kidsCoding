@@ -5,12 +5,12 @@ import { describe, expect, it } from 'vitest'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { GET } from '@/app/api/curriculum/catalog/route'
 import { curriculumTracks, getLessonContentStage } from './full-catalog-access'
-import { g2u1ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
+import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { getLessonMaturity, maturityLevels, summarizeMaturity, trialIntegrations } from './lesson-maturity'
 
 const allCatalogIds = curriculumTracks.flatMap((t) => t.units.flatMap((u) => u.lessons.map((l) => l.id)))
 // G2 Scratch lab lessons are counted from their own registry (Hark B), so other teams' count edits never collide with them.
-const g2LabLessons = Object.keys(g2u1ScratchLessons).length
+const g2LabLessons = Object.keys(g2ScratchLessons).length
 const webRoot = path.resolve(__dirname, '../../..')
 
 describe('SYS-102 single L0–L5 maturity source', () => {

@@ -1,7 +1,8 @@
 import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
-import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, evaluateG2U1L06, g2u1L06, L06_CAT_LINE, inRibbonZone, inBirdNest, observedPrediction} from './g2-u1-scratch-lessons'
+import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, evaluateG2U1L06, g2u1L06, L06_CAT_LINE, inRibbonZone, inBirdNest, observedPrediction, g2ScratchLessons, getG2ScratchLesson} from './g2-u1-scratch-lessons'
+import {atDoor, evaluateG2U2L01, g2u2L01, L07_CAT_LINE} from './g2-u2-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -9,14 +10,14 @@ const catalogIds = new Set(fullCatalog.tracks.flatMap(t => t.units.flatMap(u => 
 
 describe('G2-U1 Scratch VM lessons: teaching contract', () => {
   it('every lesson is a real catalog lesson with its own sample .sb3 on disk', () => {
-    for (const lesson of Object.values(g2u1ScratchLessons)) {
+    for (const lesson of Object.values(g2ScratchLessons)) {
       expect(catalogIds.has(lesson.id)).toBe(true)
       expect(existsSync(path.join(web, 'public', lesson.sample))).toBe(true)
     }
   })
 
   it('has two hands-on practices with different skills, one debug case, three hint layers and a creative task', () => {
-    for (const lesson of Object.values(g2u1ScratchLessons)) {
+    for (const lesson of Object.values(g2ScratchLessons)) {
       const a = lesson.tasks.find(t => t.id === 'practiceA')!
       const b = lesson.tasks.find(t => t.id === 'practiceB')!
       expect(a.skill).not.toEqual(b.skill)
@@ -135,7 +136,7 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(stage.sounds).toEqual(['开幕铃'])
     expect(stage.scripts[0].body.length).toBeGreaterThan(0)
     expect(bird.sounds).toEqual(['叽叽', '啾啾'])
-    expect(new Set(Object.values(g2u1ScratchLessons).map(l => l.concept)).size).toBe(Object.keys(g2u1ScratchLessons).length)
+    expect(new Set(Object.values(g2ScratchLessons).map(l => l.concept)).size).toBe(Object.keys(g2ScratchLessons).length)
   })
 
   it('L04 tasks come from VM flag-run positions (which way the cat walked) and VM-counted pinwheel turns', () => {
@@ -263,5 +264,50 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(balloon.scripts[0].body[1].slots[0].tenths).toBeUndefined()
     expect(balloon.scripts[0].body[3].children?.map(b => b.type)).toEqual(['kc2_change_y'])
     expect(g2u1L06.showSpeechOrder).toBe(true)
+  })
+
+  it('U2-L01 is registered with U1 and its tasks come from VM-measured frame runs (count, end frame, time per frame) and position', () => {
+    expect(Object.keys(g2u1ScratchLessons)).not.toContain(g2u2L01.id)
+    expect(getG2ScratchLesson(g2u2L01.id)).toBe(g2u2L01)
+    const obs = emptyG2Observations()
+    const run = (count: number, avgMs: number | null, end: string, x = -40) =>
+      ({frames: {小橘猫: {count, avgMs, end}, 小鸟: {count: 8, avgMs: 300, end: '收翅'}}, positions: {小橘猫: {x, y: -80}}})
+    expect(Object.values(evaluateG2U2L01(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u2L01.id, obs)).toBeNull()
+    obs.frameRuns = [run(6, 34, '走路3')]
+    expect(observedPrediction(g2u2L01.id, obs)).toBe(g2u2L01.predict.correct)
+    expect(evaluateG2U2L01(obs).practiceA).toBe(false)
+    expect(evaluateG2U2L01(obs).debug).toBe(false)
+    // A visible run without first seeing the blur is not the debug task; 120 ms is neither blur nor visible.
+    expect(evaluateG2U2L01({...obs, frameRuns: [run(6, 200, '走路3')]}).debug).toBe(false)
+    expect(evaluateG2U2L01({...obs, frameRuns: [run(6, 34, '走路3'), run(6, 120, '走路3')]}).debug).toBe(false)
+    obs.frameRuns.push(run(8, 205, '走路1'))
+    expect(evaluateG2U2L01(obs)).toMatchObject({practiceA: true, practiceB: false, debug: true, create: false})
+    // Only the bird's frames (cat never stepped) do not count for the cat.
+    expect(evaluateG2U2L01({...obs, frameRuns: [{frames: {小鸟: {count: 8, avgMs: 300, end: '收翅'}}, positions: {}}]}).practiceA).toBe(false)
+    expect(atDoor({x: 99, y: 0})).toBe(false)
+    expect(atDoor({x: 170, y: 0})).toBe(true)
+    obs.frameRuns.push(run(12, 40, '走路1', 140))
+    expect(evaluateG2U2L01(obs).practiceB).toBe(true)
+    obs.lastSaid = {小橘猫: L07_CAT_LINE}
+    expect(evaluateG2U2L01(obs).create).toBe(false)
+    obs.lastSaid = {小橘猫: '回家吃鱼啦'}
+    // The door run was still a blur, so the walk home is not finished yet.
+    expect(evaluateG2U2L01(obs).create).toBe(false)
+    obs.frameRuns.push(run(12, 210, '走路1', 140))
+    expect(evaluateG2U2L01(obs).create).toBe(true)
+    expect(evaluateG2U2L01({...obs, frameRuns: [run(12, 34, '走路1'), run(10, 210, '走路3', 140)]}).create).toBe(false)
+  })
+
+  it('U2-L01 loops move + next costume + a 0-allowed tenths wait; the bird is a fixed demo without lesson values', () => {
+    const cat = g2u2L01.targets.find(t => t.name === '小橘猫')!
+    const bird = g2u2L01.targets.find(t => t.name === '小鸟')!
+    expect(cat.costumes).toEqual(['走路1', '走路2', '走路3', '走路4'])
+    expect(cat.scripts[0].body.map(b => b.type)).toEqual(['kc2_goto_start', 'kc2_switch_costume', 'kc2_repeat', 'kc2_say'])
+    expect(cat.scripts[0].body[2].children?.map(b => b.type)).toEqual(['kc2_move_steps', 'kc2_next_costume', 'kc2_wait_free'])
+    expect(cat.scripts[0].body[2].children?.[2].slots[0]).toMatchObject({min: 0, max: 1, tenths: true})
+    const birdSlots = (specs: typeof bird.scripts[0]['body']): number => specs.reduce((n, b) => n + b.slots.length + (b.children ? birdSlots(b.children) : 0), 0)
+    expect(birdSlots(bird.scripts[0].body)).toBe(0)
+    expect(g2u2L01.showFrames).toBe(true)
   })
 })

@@ -164,6 +164,26 @@ class G2ProjectTests(unittest.TestCase):
             data = archive.read(cake["sounds"][0]["md5ext"])
             self.assertTrue(data.startswith(b"RIFF") and data[8:12] == b"WAVE")
 
+    def test_u2_l01_walk_cycle_has_four_frames_and_starts_with_no_wait(self):
+        filename, project, files, params = LESSONS["G2-U2-L01"]()
+        stage, cat, bird = project["targets"]
+        self.assertEqual([c["name"] for c in stage["costumes"]], ["回家的小路"])
+        self.assertEqual([c["name"] for c in cat["costumes"]], ["走路1", "走路2", "走路3", "走路4"])
+        self.assertEqual(len({c["assetId"] for c in cat["costumes"]}), 4, "four distinct original frames")
+        b = cat["blocks"]
+        self.assertEqual(b["cat_repeat"]["inputs"]["SUBSTACK"], [2, "cat_move"])
+        self.assertEqual([b[k]["opcode"] for k in ("cat_move", "cat_next", "cat_wait")],
+                         ["motion_movesteps", "looks_nextcostume", "control_wait"])
+        self.assertEqual(b["cat_next"]["parent"], "cat_move")
+        # The bugs the lesson starts with: no wait inside the loop and 6 loops (not a whole 4-frame cycle).
+        self.assertEqual(b["cat_wait"]["inputs"]["DURATION"], [1, [4, "0"]])
+        self.assertEqual(b["cat_repeat"]["inputs"]["TIMES"], [1, [4, "6"]])
+        self.assertEqual(b["cat_first_menu"]["fields"]["COSTUME"][0], "走路1")
+        self.assertEqual(bird["blocks"]["bird_wait"]["inputs"]["DURATION"], [1, [4, "0.3"]])
+        wait = next(p for p in params if p["block"] == "cat_wait")
+        self.assertEqual((wait["kind"], wait["min"], wait["max"]), ("tenths", 0, 1.0))
+        self.assertEqual({p["target"] for p in params}, {"小橘猫"}, "the bird is a fixed demo")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -404,6 +404,51 @@ def lesson_g2_u1_l06():
     return "g2-u1-l06-birthday-card.sb3.b64", project, files, params
 
 
+def lesson_g2_u2_l01():
+    """让角色走路有帧动画: a 4-frame walk cycle played in a loop (move + next costume + wait)."""
+    road, road_file = svg_costume("回家的小路", "walk-home-backdrop.svg", 240, 180)
+    frames = [svg_costume(f"走路{i}", f"cat-walk-{i}.svg", 56, 52) for i in range(1, 5)]
+    folded, folded_file = svg_costume("收翅", "blue-bird.svg", 32, 28)
+    spread, spread_file = svg_costume("展翅", "blue-bird-flap.svg", 32, 30)
+    cat_blocks = {
+        "cat_flag": block("event_whenflagclicked", "cat_home", top=True, x=40, y=40),
+        "cat_home": block("motion_gotoxy", "cat_first", parent="cat_flag", inputs={"X": num(-160), "Y": num(-80)}),
+        "cat_first": block("looks_switchcostumeto", "cat_repeat", parent="cat_home", inputs={"COSTUME": [1, "cat_first_menu"]}),
+        "cat_first_menu": block("looks_costume", parent="cat_first", fields={"COSTUME": ["走路1", None]}, shadow=True),
+        # Starting bugs: 6 loops (not a whole 4-frame cycle, too short for the door) and no wait (frames blur).
+        "cat_repeat": block("control_repeat", "cat_say", parent="cat_first", inputs={"TIMES": num(6), "SUBSTACK": [2, "cat_move"]}),
+        "cat_move": block("motion_movesteps", "cat_next", parent="cat_repeat", inputs={"STEPS": num(20)}),
+        "cat_next": block("looks_nextcostume", "cat_wait", parent="cat_move"),
+        "cat_wait": block("control_wait", parent="cat_next", inputs={"DURATION": num(0)}),
+        "cat_say": block("looks_sayforsecs", parent="cat_repeat", inputs={"MESSAGE": text("我到家啦！"), "SECS": num(2)}),
+    }
+    bird_blocks = {
+        "bird_flag": block("event_whenflagclicked", "bird_first", top=True, x=40, y=40),
+        "bird_first": block("looks_switchcostumeto", "bird_repeat", parent="bird_flag", inputs={"COSTUME": [1, "bird_first_menu"]}),
+        "bird_first_menu": block("looks_costume", parent="bird_first", fields={"COSTUME": ["收翅", None]}, shadow=True),
+        "bird_repeat": block("control_repeat", parent="bird_first", inputs={"TIMES": num(8), "SUBSTACK": [2, "bird_next"]}),
+        "bird_next": block("looks_nextcostume", "bird_wait", parent="bird_repeat"),
+        "bird_wait": block("control_wait", parent="bird_next", inputs={"DURATION": num(0.3)}),
+    }
+    project = {
+        "targets": [
+            stage([road]),
+            sprite("小橘猫", [c for c, _ in frames], cat_blocks, 1, -160, -80),
+            sprite("小鸟", [folded, spread], bird_blocks, 2, -40, 110),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U2-L01"},
+    }
+    files = {c["md5ext"]: f for c, f in [(road, road_file), *frames, (folded, folded_file), (spread, spread_file)]}
+    params = [
+        {"target": "小橘猫", "block": "cat_repeat", "slot": "TIMES", "kind": "int", "min": 1, "max": 20},
+        {"target": "小橘猫", "block": "cat_move", "slot": "STEPS", "kind": "int", "min": 1, "max": 40},
+        {"target": "小橘猫", "block": "cat_wait", "slot": "DURATION", "kind": "tenths", "min": 0, "max": 1.0},
+        {"target": "小橘猫", "block": "cat_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+    ]
+    return "g2-u2-l01-cat-walk-home.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
@@ -411,6 +456,7 @@ LESSONS = {
     "G2-U1-L04": lesson_g2_u1_l04,
     "G2-U1-L05": lesson_g2_u1_l05,
     "G2-U1-L06": lesson_g2_u1_l06,
+    "G2-U2-L01": lesson_g2_u2_l01,
 }
 
 

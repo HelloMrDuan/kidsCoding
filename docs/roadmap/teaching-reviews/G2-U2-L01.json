@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U2-L01",
+  "reviewedCommit": "7b42b119afe3a894b14de67e7f0bffce9dbe82ff",
+  "reviewedAt": "2026-10-28",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U1-L06"
+  ],
+  "newConcepts": [
+    "帧动画：在“重复执行”里“移动 + 下一个造型 + 等待”；4 帧一圈，“下一个造型”到最后一帧后回到第一帧；等待决定每帧停留多久（帧速）；走多远 = 次数 × 步数"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u2-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/208"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "conceptExplain：一帧=一个造型、循环换帧、末帧回首帧、等待=帧速",
+        "找错针对“等待 0 秒腿糊成一团”的帧速误解"
+      ],
+      "defects": [
+        "不能自己画新帧或调换循环体顺序"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "小橘猫沿小路走回小屋，4 帧走路造型",
+        "预测“看得清/快得看不清”，VM 实测每帧秒数对照；小鸟 0.3 秒/帧作对比示范"
+      ],
+      "defects": [
+        "预测二选一；无朗读"
+      ]
+    },
+    "practice": {
+      "score": 20,
+      "evidence": [
+        "练习 A：重复次数让走路停在走路1（4 的倍数，VM 计帧数与末帧）",
+        "练习 B：次数 × 步数让小橘猫走到小屋门口（x 100～170，多解）"
+      ],
+      "defects": [
+        "不能新增造型或积木"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "真实错误：等待 0 秒时 VM 每帧约 0.03 秒（looks_nextcostume 原语观察后调用，记录沙箱时钟）",
+        "0.25/1.1 秒编辑器判无效，25 次/50 步被拒",
+        "三层提示：现象→原因→修复"
+      ],
+      "defects": [
+        "没有逐帧慢放"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意：自己的到家台词 + 看得清 + 停在走路1 + 到门口",
+        "导出真 .sb3（7 SVG）独立 VM 回读，刷新后从本机恢复，重新导入恢复等待/次数"
+      ],
+      "defects": [
+        "不能画更多帧"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U2L01 只读 VM 观察（每次绿旗的帧数、平均每帧毫秒、末帧、位置，单测覆盖）",
+        "页面明示未接渲染器与不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 执行；帧数与每帧时间来自 VM 对 looks_nextcostume 原语的真实调用（仅观察后调用原原语），位置来自 VM 目标状态，E2E 无 VM mock"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "等待 0 秒帧太快真实错误、0.25/1.1 秒与 25 次/50 步被拒、7 类非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "4/8/12/16/20 次均可回到走路1；12×25、8×35、16×20 等多种组合到门口；等待 0.2～1.0 秒、台词 1～20 字均多解"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "新增 5 个 SVG（回家的小路背景、小橘猫走路 4 帧）原创，示范小鸟复用 G2-U1 原创图；已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U2-L01：真 Scratch VM 加载原创回家小路项目；重复 12 次 × 25 步、等待 0.2 秒 → VM 中小橘猫换 12 帧、每帧约 0.2 秒、停在走路1、x=140 在小屋门口",
+    "failureCase": "等待 0 秒 → VM 每帧约 0.03 秒（看不清）；重复 6 次停在走路3、x=-40 未到门口；0.25/1.1 秒、25 次、50 步编辑器判无效；等待 0.25/2、重复 30、改小鸟等待、调换循环体顺序、第 5 帧造型、他课工程均被拒且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：VM 平均每帧约 0.03 秒，腿糊成一团；小鸟每帧 0.3 秒很清楚",
+      "第二层（想原因）：循环里“等待 0 秒”等于不等",
+      "第三层（去修复）：把等待改成 0.2 或更大（最多 1.0）"
+    ],
+    "practiceA": "练习 A：走完整圈步伐（停在走路1）",
+    "practiceB": "练习 B：走到小屋门口（次数 × 步数）",
+    "equivalentSolutions": [
+      "重复 4/8/12/16/20 次",
+      "12×25、8×35、16×20、20×15 等",
+      "等待 0.2～1.0 秒",
+      "台词 1～20 字任意"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3，刷新后从本机草稿恢复；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U2-L01 让角色走路有帧动画（5 个用例）"
+    ],
+    "screenshots": []
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 WebGL 渲染器（舞台每 0.1 秒按 VM 状态重绘）；本课无云端保存",
+    "不能新增帧、调换积木顺序或新增精灵"
+  ]
+}
