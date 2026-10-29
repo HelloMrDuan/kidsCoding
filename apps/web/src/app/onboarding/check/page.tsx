@@ -24,26 +24,20 @@ export default function AssessmentPage() {
   // render both see the default session (null), and the form first mounts
   // only after the real session is loaded, which also keeps the
   // refresh-restore initializer correct.
-  //
-  // Why not useSyncExternalStore (tried first): on a full document load the
-  // redirect effect below ran with the default snapshot before the store
-  // delivered the real session, so session users were bounced to the age
-  // page on reload — proven by production-build E2E. The `loaded` gate
-  // below is what prevents that race, and it needs the synchronous initial
-  // load that react-hooks/set-state-in-effect discourages; deriving the
-  // value during render is impossible for client-only localStorage state,
-  // so this one line carries a scoped, justified exception instead of a
-  // behavior-breaking workaround. The guard for correctness is the
-  // production-build E2E (reload/back/forward/direct load, zero pageerrors),
-  // not the lint rule.
   const [session, setSession] =
     useState<OnboardingSession>(defaultOnboardingSession)
   const [loaded, setLoaded] = useState(false)
 
+  // Why the synchronous initial load below is required (not derivable
+  // during render): the session is client-only localStorage state, so the
+  // value cannot be read while rendering without reintroducing the SSR /
+  // hydration mismatch. The store-hook alternative was tried and proven by
+  // production-build E2E to bounce session users to the age page on reload,
+  // because the redirect effect ran on the default snapshot first. The
+  // `loaded` gate is what prevents that race. Correctness is guarded by
+  // the production-build E2E, not by the lint heuristic.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- see the
-    // comment above: the synchronous initial load is required to keep the
-    // hydration render identical to SSR and to gate the redirect below.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see above.
     setSession(readOnboardingSession())
     setLoaded(true)
     return subscribeOnboardingSession(() => {
