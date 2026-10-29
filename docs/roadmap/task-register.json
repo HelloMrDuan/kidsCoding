@@ -754,6 +754,30 @@
       }
     },
     {
+      "id": "TQ-022",
+      "title": "Hark B 课程审定 v1 归档（G2/G3/W0/W1/A0 120 节，AI 实现者自审）",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_progress",
+      "dependencies": [
+        "TQ-007"
+      ],
+      "scope": "docs/curriculum-audit/hark-b/{README.md,hark-b-audit-v1.md,hark-b-lessons.csv}；docs-only，基线 origin/main 300c6dd。不改课程、代码、full-catalog、lesson-task-register 或任何课程状态。",
+      "acceptance": [
+        "报告与逐课 CSV 覆盖 Hark B 范围 120 节（G2/G3/W0/W1/A0 各 24 节），每课 12 项审查附理由与建议可测目标草案。",
+        "文件头明确标注为 AI 实现者自审、非独立教研评审，不得作为 completed/试学/发布依据，并写明基线 SHA。",
+        "PR 只新增审定文档并登记本条；task-ledger CI 绿后合并。"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "AI 自审不是独立教研；结论需负责人/独立人工教研复核。三端视觉截图不在本任务范围。"
+    },
+    {
       "id": "UX-001",
       "title": "设计Tokens规范化",
       "priority": "P0",
