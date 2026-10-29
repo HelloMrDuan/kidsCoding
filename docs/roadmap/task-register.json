@@ -1818,7 +1818,7 @@
       "title": "管理员课程发布审阅后台",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-501"
       ],
@@ -1827,13 +1827,17 @@
         "引擎/内容/版权/隐私/人审证据可追溯，无权限不能发布"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/220",
+        "mergeCommit": "39ce1663af4daf0c8ae1ec9a4ee063716371fb35",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40801476519",
+        "tests": [
+          "PR CI 23 success + 3 skipped",
+          "main CI：curriculum 40801476519 success、accountability 40801476412 success（含本合并）",
+          "本地 vitest 新测试 2 项全绿，ESLint 与 tsc 改动文件 0 错；旧机真实浏览器三端实测 1440/768/375 全过（证据链接展示、截图 3 张）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "说明：本任务只补审阅页证据展示，不新增发布行为、不改发布路径；试玩课 L5 仍由 7 门禁派生，门禁证据仍以仓库 JSON 为准。"
     },
     {
       "id": "UX-601",
