@@ -18,9 +18,11 @@ export type GridLevel = {
   door?: Cell
   /** Story decoration drawn under the start cell; never affects a run. */
   /** Original story art drawn beside the map (never a cell): L01 treehouse, L02 forest post signpost, L03 squirrel's acorn counting board, L04 turn sign, L05 key hook board, L06 forest guide's map. */
-  scenery?: 'treehouse' | 'signpost' | 'counting' | 'turnsign' | 'keyhook' | 'guidemap' | 'mushroompath' | 'puddlesign'
+  scenery?: 'treehouse' | 'signpost' | 'counting' | 'turnsign' | 'keyhook' | 'guidemap' | 'mushroompath' | 'puddlesign' | 'wateringplan'
   /** G0-U3-L02: who walks the grid (default the fox). */
-  actor?: 'fox' | 'rabbit'
+  actor?: 'fox' | 'rabbit' | 'robot'
+  /** G0-U3-L03: flower pots that each need exactly one watering. */
+  pots?: Cell[]
   /** G0-U3: footprints the program must leave, in path order (colour on each cell). */
   footprints?: Footprint[]
 }
@@ -43,6 +45,7 @@ export const GRID_BLOCK_TYPES = [
   'stamp_red',
   'stamp_blue',
   'jump_forward',
+  'water_plant',
 ] as const
 
 export type GridBlockType = (typeof GRID_BLOCK_TYPES)[number]
@@ -66,6 +69,9 @@ export type GridFailure =
   | 'empty_repeat'
   | 'too_deep'
   | 'stamp_twice'
+  | 'no_pot_here'
+  | 'watered_twice'
+  | 'pots_missed'
   | 'wrong_pattern'
   | 'pattern_short'
 
@@ -82,6 +88,8 @@ export type GridFrame = {
   rounds?: number[]
   /** G0-U3: the footprint this action left. */
   stamp?: Footprint
+  /** G0-U3-L03: the pot this frame watered. */
+  water?: Cell
 }
 
 export type GridRun = {
@@ -145,6 +153,19 @@ export function runGridProgram(level: GridLevel, blocks: ProgramBlock[]): GridRu
         return result(false, 'stamp_twice', '这一格已经有脚印了。放好一个脚印后，先往前走一格再放下一个。', frames, state, steps)
       }
       frames.push({ blockIndex: topIndex + 1, action: type, ...state, stamp: { x: state.x, y: state.y, color }, ...(rounds.length ? { rounds } : {}) })
+      continue
+    }
+    if (type === 'water_plant') {
+      // G0-U3-L03: water the pot on the current cell; each pot exactly once.
+      if (!has(level.pots, state)) {
+        push()
+        return result(false, 'no_pot_here', '这里没有花盆，水洒在地上了。先走到花盆那一格，再浇水。', frames, state, steps)
+      }
+      if (frames.some(fr => fr.water && same(fr.water, state))) {
+        push()
+        return result(false, 'watered_twice', '这盆花已经浇过了，再浇会淹坏它。浇完一盆，就往前走到下一盆。', frames, state, steps)
+      }
+      frames.push({ blockIndex: topIndex + 1, action: type, ...state, water: { x: state.x, y: state.y }, ...(rounds.length ? { rounds } : {}) })
       continue
     }
     if (type === 'pick_key') {
@@ -222,6 +243,11 @@ export function runGridProgram(level: GridLevel, blocks: ProgramBlock[]): GridRu
     }
     push()
   }
+  if (level.pots) {
+    // G0-U3-L03: every pot gets its one watering.
+    const done = frames.filter(fr => fr.water).length
+    if (done < level.pots.length) return result(false, 'pots_missed', `只浇了 ${done} 盆花，还有 ${level.pots.length - done} 盆没喝到水。数一数重复了几次、重复里有没有“浇水”。`, frames, state, steps)
+  }
   if (level.footprints) {
     // G0-U3: the footprints must follow the pattern in path order.
     const trail = frames.flatMap(fr => (fr.stamp ? [fr.stamp] : []))
@@ -249,6 +275,9 @@ export const GRID_FAILURE_LABELS: Record<GridFailure, string> = {
   empty_repeat: '重复里是空的',
   too_deep: '重复套得太深',
   stamp_twice: '同一格放两个脚印',
+  no_pot_here: '在没有花盆的地方浇水',
+  watered_twice: '同一盆花浇了两次',
+  pots_missed: '有花盆漏浇了',
   wrong_pattern: '脚印规律不对',
   pattern_short: '脚印不够',
   unknown_block: '积木不能用',

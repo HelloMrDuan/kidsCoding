@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 64 70" role="img" aria-label="浇水机器人的巡回计划：四盆花各浇一份水">
+<g>
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="34" width="6" height="26" rx="2" fill="#9b6a3c" stroke="#5e3b1c" stroke-width="2" />
+      <rect x="2" y="4" width="52" height="34" rx="5" fill="#eaf8ff" stroke="#2f6d8f" stroke-width="2.5" />
+      <path d="M8 30 H50" stroke="#2f6d8f" stroke-width="1.5" stroke-dasharray="3 3" />
+      <path d="M46 27 l4 3 -4 3" fill="none" stroke="#2f6d8f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      <g fill="#d9774b" stroke="#9c4a26" stroke-width="1.2">
+        <path d="M7 22 h8 l-1 6 h-6 z" /><path d="M18 22 h8 l-1 6 h-6 z" /><path d="M29 22 h8 l-1 6 h-6 z" /><path d="M40 22 h8 l-1 6 h-6 z" />
+      </g>
+      <g fill="#6cc8ff" stroke="#3a9ad9" stroke-width="1">
+        <path d="M11 9 q3 5 0 7 q-3 -2 0 -7" /><path d="M22 9 q3 5 0 7 q-3 -2 0 -7" /><path d="M33 9 q3 5 0 7 q-3 -2 0 -7" /><path d="M44 9 q3 5 0 7 q-3 -2 0 -7" />
+      </g>
+      <path d="M6 58 q4 -8 10 -4 q4 -6 8 2" fill="#5cbf60" stroke="#2f7d3a" stroke-width="1.5" />
+    </g>
+</svg>

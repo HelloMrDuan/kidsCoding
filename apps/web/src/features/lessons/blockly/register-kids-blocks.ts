@@ -30,6 +30,7 @@ const ICONS: Record<string, string> = {
   bell: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M6%2017V11a6%206%200%200%201%2012%200v6l2%202H4z%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2220.5%22%20r%3D%222%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M12%203v2%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E',
   star: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%203l2.6%205.6%206%20.7-4.5%204.1%201.2%206L12%2016.4%206.7%2019.4l1.2-6L3.4%209.3l6-.7z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E',
   door: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%2021V10a7%207%200%200%201%2014%200v11z%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2215%22%20cy%3D%2215%22%20r%3D%221.6%22%20fill%3D%22%23b06a2b%22%2F%3E%3C%2Fsvg%3E',
+  water: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4%209%20h11%20v9%20a2%202%200%200%201-2%202%20H6%20a2%202%200%200%201-2-2%20z%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M15%2011%20l5-4%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M6%209%20a4%204%200%200%201%207%200%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M21%2012%20q1.5%202.5%200%203.5%20q-1.5-1%200-3.5%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E',
   jump: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%2018%20Q12%201%2021%2018%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M17%2015%20l4%203%201-5%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Ccircle%20cx%3D%223%22%20cy%3D%2219%22%20r%3D%221.8%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E',
   pawRed: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cellipse%20cx%3D%2212%22%20cy%3D%2215.5%22%20rx%3D%225%22%20ry%3D%224.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%226%22%20cy%3D%229%22%20r%3D%222.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2210%22%20cy%3D%225.6%22%20r%3D%222.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%225.6%22%20r%3D%222.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2218%22%20cy%3D%229%22%20r%3D%222.2%22%20fill%3D%22%23e5484d%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3C%2Fsvg%3E',
   pawBlue: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cellipse%20cx%3D%2212%22%20cy%3D%2215.5%22%20rx%3D%225%22%20ry%3D%224.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%226%22%20cy%3D%229%22%20r%3D%222.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2210%22%20cy%3D%225.6%22%20r%3D%222.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%225.6%22%20r%3D%222.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3Ccircle%20cx%3D%2218%22%20cy%3D%229%22%20r%3D%222.2%22%20fill%3D%22%233e7bfa%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%2F%3E%3C%2Fsvg%3E',
@@ -203,6 +204,15 @@ const KIDS_BLOCK_DEFINITIONS = [
       previousStatement: null,
       nextStatement: null,
       style: 'kc_motion',
+    },
+    {
+      // G0-U3-L03: water the flower pot on the current cell.
+      type: 'water_plant',
+      message0: '%1 ' + kidsBlockLabels.water_plant,
+      args0: [{ type: 'field_image', src: ICONS.water, width: 22, height: 22, alt: '' }],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_looks',
     },
     {
       // G0-U3-L02: hop two cells forward, over a puddle.

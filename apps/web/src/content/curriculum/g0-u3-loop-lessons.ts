@@ -335,4 +335,160 @@ const L02: GridLesson = {
   project: { stepId: 'my-puddle-road', title: '我的水坑小路' },
 }
 
-export const g0u3LoopLessons: Record<string, GridLesson> = { 'G0-U3-L01': L01, 'G0-U3-L02': L02 }
+const W = 'water_plant'
+const pots = (...xs: number[]) => xs.map(x => ({ x, y: 1 }))
+
+const L03: GridLesson = {
+  id: 'G0-U3-L03',
+  title: '花园浇水机器',
+  story: '花园里排着一行小花盆，浇水机器人每天要巡一遍：走到一盆花前，浇一次水，再走到下一盆。每盆只要一份水，漏了会渴，多了会淹。',
+  concept: '循环与批量任务：把“走过去 + 做一件事”组合起来，重复给每一个对象做一次',
+  objectives: [
+    '能把“向前走一格、给这盆花浇水”组合成一轮，再用“重复”做给每一盆',
+    '能让重复的次数等于花盆的个数，既不漏浇也不多浇',
+    '花盆之间隔着空地时，能改重复里面的步数，而不是只改次数',
+  ],
+  diagnoses: {
+    pots_missed: '还有花盆没喝到水。是重复的次数少了，还是重复里面忘了放“给这盆花浇水”？',
+    no_pot_here: '水洒在了没有花盆的地上。浇水前要先走到花盆那一格：看看重复里面是不是先浇水、后走路，或者少走了一步。',
+    watered_twice: '同一盆花浇了两次，会淹坏的。浇完一盆，就先往前走，再浇下一盆。',
+    out_of_bounds: '最后一盆浇完，机器人又往前走出了花园。重复的次数比花盆多了，改小一点。',
+    empty_repeat: '“重复”积木的大嘴巴里是空的：把“向前走一格”和“给这盆花浇水”放进去。',
+    no_start: '程序没有“开始时”：“重复”要接在“开始时”下面才会运行。',
+  },
+  steps: [
+    {
+      id: 'only-three-rounds',
+      kind: 'error-lab',
+      title: '错误实验：重复了三次',
+      instruction: '机器人的程序是“重复 3 次（向前走一格、给这盆花浇水）”，可是花园里有四盆花。这是一个故意的错误：先按原样运行，数一数有几盆开了花，再修好它。',
+      predict: '先猜一猜：重复 3 次，四盆花都能浇到吗？',
+      predictChoices: [
+        { text: '四盆都浇到了', when: 'pass' },
+        { text: '最后一盆没浇到', when: 'pots_missed' },
+      ],
+      errorLab: {
+        expect: 'pots_missed',
+        expected: '如果次数对，四盆花都该喝到一份水、开出花来。',
+        actual: '只重复了 3 轮，浇了 3 盆，最后一盆还是花苞，没喝到水。',
+      },
+      level: { cols: 5, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 4, y: 1 }, pots: pots(1, 2, 3, 4), actor: 'robot', scenery: 'wateringplan' },
+      allowedBlocks: ['when_start', f, W, 'repeat_times'],
+      starterBlocks: [{ type: 'when_start' }, rep(3, f, W)],
+      hints: [
+        '数一数：开花的有 3 盆，还有 1 盆是花苞。',
+        '一轮浇一盆：四盆花，就要四轮。',
+        '只把“重复”的次数从 3 改成 4，里面不用动。',
+      ],
+      solutions: [P(rep(4, f, W)), P(f, W, f, W, f, W, f, W)],
+      counterExamples: [
+        { program: P(rep(3, f, W)), failure: 'pots_missed' },
+        { program: P(rep(5, f, W)), failure: 'out_of_bounds' },
+      ],
+    },
+    {
+      id: 'one-pot',
+      kind: 'guided',
+      title: '先浇一盆',
+      instruction: '只有一盆花。机器人要先走到花盆那一格，再“给这盆花浇水”。顺序反了，水会洒在地上。',
+      predict: '先猜一猜：先浇水再走过去，会怎样？',
+      level: { cols: 3, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 1, y: 1 }, pots: pots(1), actor: 'robot', scenery: 'wateringplan' },
+      allowedBlocks: ['when_start', f, W],
+      hints: [
+        '水洒在地上，是因为机器人还没走到花盆那一格。',
+        '先走过去，再浇水；一盆花只浇一次。',
+        '接“开始时”，下面放“向前走一格”，再放“给这盆花浇水”。',
+      ],
+      solutions: [P(f, W)],
+      counterExamples: [
+        { program: P(W, f), failure: 'no_pot_here' },
+        { program: P(f, W, W), failure: 'watered_twice' },
+        { program: P(f), failure: 'pots_missed' },
+      ],
+    },
+    {
+      id: 'four-pots',
+      kind: 'practice-a',
+      title: '练习 A：一轮一盆，浇四盆',
+      instruction: '四盆花挨在一起。把“向前走一格、给这盆花浇水”放进“重复”，次数设成花盆的个数。只重复走路可不行：每一轮都要浇水。',
+      predict: '先猜一猜：重复里面只放“向前走一格”，花会开吗？',
+      level: { cols: 5, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 4, y: 1 }, pots: pots(1, 2, 3, 4), actor: 'robot', scenery: 'wateringplan' },
+      allowedBlocks: ['when_start', f, W, 'repeat_times'],
+      hints: [
+        '走到了头花还没开，是因为重复里面没有浇水。',
+        '一轮要做两件事：走过去、浇水。四盆就四轮。',
+        '“重复 4 次”里面放：向前走一格、给这盆花浇水。',
+      ],
+      solutions: [P(rep(4, f, W)), P(f, W, f, W, f, W, f, W)],
+      counterExamples: [
+        { program: P(rep(4, f)), failure: 'pots_missed' },
+        { program: P(rep(4, W, f)), failure: 'no_pot_here' },
+        { program: P(rep(5, f, W)), failure: 'out_of_bounds' },
+      ],
+    },
+    {
+      id: 'spaced-pots',
+      kind: 'practice-b',
+      title: '练习 B：花盆隔开了',
+      instruction: '这次每两盆花之间空着一格。小松鼠照搬了上一关的“重复 4 次（向前走一格、给这盆花浇水）”，结果第一次就浇在了空地上。先运行看看，再改重复里面要走几步。',
+      predict: '先猜一猜：这次每一轮要走几格才到下一盆？',
+      level: { cols: 9, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 8, y: 1 }, pots: pots(2, 4, 6, 8), actor: 'robot', scenery: 'wateringplan' },
+      allowedBlocks: ['when_start', f, W, 'repeat_times'],
+      starterBlocks: [{ type: 'when_start' }, rep(4, f, W)],
+      hints: [
+        '第一次浇水的那一格是空地，花盆还在前面一格。',
+        '花盆隔一格放：每一轮要先走两格，再浇水。次数还是四盆四轮。',
+        '“重复 4 次”里面放：向前走一格、向前走一格、给这盆花浇水。',
+      ],
+      solutions: [P(rep(4, f, f, W)), P(f, f, W, f, f, W, f, f, W, f, f, W)],
+      counterExamples: [
+        { program: P(rep(4, f, W)), failure: 'no_pot_here' },
+        { program: P(rep(4, f, f)), failure: 'pots_missed' },
+        { program: P(rep(5, f, f, W)), failure: 'out_of_bounds' },
+      ],
+    },
+    {
+      id: 'my-garden',
+      kind: 'creative',
+      title: '创意改造：我的小花园',
+      instruction: '自己选一种花园：3 盆挨着、5 盆挨着，或者 3 盆隔开放。想好每一轮做什么、要几轮，帮机器人把花都浇好。通过后，它就是你的“我的小花园”作品。',
+      predict: '先猜一猜：花盆多两盆，程序里哪个数字要变？',
+      creative: {
+        prompt: '要浇哪一种花园？',
+        goalChoices: [{ x: 3, y: 1 }, { x: 5, y: 1 }, { x: 6, y: 1 }],
+        labels: ['3 盆挨着', '5 盆挨着', '3 盆隔开'],
+        pots: [pots(1, 2, 3), pots(1, 2, 3, 4, 5), pots(2, 4, 6)],
+      },
+      level: { cols: 7, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 3, y: 1 }, pots: pots(1, 2, 3), actor: 'robot', scenery: 'wateringplan' },
+      allowedBlocks: ['when_start', f, W, 'repeat_times'],
+      hints: [
+        '有花苞就是次数少了；水洒在地上就是这一轮走的步数不对。',
+        '几盆花就重复几次；花盆挨着走一格，隔开走两格。',
+        '例如 5 盆挨着：“重复 5 次（向前走一格、给这盆花浇水）”。',
+      ],
+      solutions: [P(rep(3, f, W)), P(f, W, f, W, f, W)],
+      counterExamples: [
+        { program: P(rep(2, f, W)), failure: 'pots_missed' },
+        { program: P(rep(3, W, f)), failure: 'no_pot_here' },
+      ],
+    },
+  ],
+  review: {
+    whatIf: '如果花园里有 6 盆挨着的花，程序要怎么改？',
+    answer: '重复里面还是“向前走一格、给这盆花浇水”，只把次数改成 6：一轮浇一盆，几盆就几轮。',
+  },
+  reflection: '说一说：为什么“浇水”也要放进重复里面，而不是放在重复后面？',
+  reflectionCheck: {
+    question: '四盆花挨着放，下面哪个程序能每盆刚好浇一次？',
+    options: [
+      { text: '重复 4 次（向前走一格、给这盆花浇水）', correct: true },
+      { text: '重复 4 次（向前走一格），然后给这盆花浇水', correct: false },
+      { text: '重复 3 次（向前走一格、给这盆花浇水）', correct: false },
+    ],
+    why: '浇水放在重复里面，每一轮都会浇一盆；放在后面只浇最后一盆。四盆花要四轮。',
+  },
+  parentQuestion: '请孩子展示“我的小花园”，问：家里有几盆花？如果让机器人来浇，要重复几次？',
+  project: { stepId: 'my-garden', title: '我的小花园' },
+}
+
+export const g0u3LoopLessons: Record<string, GridLesson> = { 'G0-U3-L01': L01, 'G0-U3-L02': L02, 'G0-U3-L03': L03 }

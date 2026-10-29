@@ -686,6 +686,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* SYS-107 / G0-U3: the C-shaped repeat is a control block; footprints are items (same colours as the Blockly theme). */
 .kc-block-chip[data-block="repeat_times"] { --c: #0fbdbd; --d: #0b9696; }
 .kc-block-chip[data-block="stamp_red"], .kc-block-chip[data-block="stamp_blue"] { --c: #cf63cf; --d: #a63fa6; }
+.kc-block-chip[data-block="water_plant"] { --c: #3fbf6a; --d: #2b9a51; }
 .kc-repeat-choice { border-color: #5cd6d6; color: #0b7f7f; box-shadow: 0 2px 0 #c2eeee; }
 .kc-repeat-choice.kc-say-choice-on { background: #0fbdbd; border-color: #0b9696; color: #fff; box-shadow: 0 3px 0 #0b9696; }
 /* TQ-008: preset dialogue choice for the say block (lesson-02); same cartoon chip family. */

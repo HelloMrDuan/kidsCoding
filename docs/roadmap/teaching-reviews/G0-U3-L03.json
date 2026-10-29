@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G0-U3-L03",
+  "reviewedCommit": "e6cb74a",
+  "reviewedAt": "2026-10-30",
+  "reviewer": "Hark A（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G0 启蒙（5～7 岁）",
+  "prerequisites": [
+    "G0-U3-L02"
+  ],
+  "newConcepts": [
+    "一轮 = 走过去 + 做一件事",
+    "重复次数等于要处理的对象个数",
+    "对象间距变了，改的是重复里面的步数"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-29 重新访问官方页面）",
+    "核桃编程“一学九练” https://official.hetao101.com/curriculum（2026-10-29 访问）",
+    "CSTA 2026 PK–12 标准 https://csteachers.org/pk12standards/（2026-10-29 访问）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "G0-U3-L03 三条可观察目标（组合一轮再重复、次数=花盆数、间距变化改循环体）",
+        "5 关递进：错误实验（重复 3 次漏一盆）→ 先浇一盆 → 四盆一轮一盆 → 花盆隔开改循环体 → 自选花园",
+        "详案三条常见错误全部可真实触发：重复次数为三（pots_missed）、只重复移动没浇水（pots_missed）、最后一盆后越界（out_of_bounds）"
+      ],
+      "defects": [
+        "“直到四盆都完成”在本课用固定次数表达，条件循环留到 G0-U4"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "原创浇水机器人巡回计划路牌（kc-scenes/watering-plan.svg，已登记）",
+        "新增项目自绘浇水机器人角色；花盆浇水后由花苞变成开花并带水滴",
+        "错误实验两个可点选预测"
+      ],
+      "defects": [
+        "浇水没有音效动画，仅静态状态切换"
+      ]
+    },
+    "practice": {
+      "score": 22,
+      "evidence": [
+        "练习 A（一轮走一格+浇水，四轮）与练习 B（花盆隔开，循环体改为走两格+浇水）目标不同，均真实运行判定",
+        "单元测试：创意关 3 种花园各自只接受自己的循环（3×3 遍历）",
+        "重复解与平铺解均通过"
+      ],
+      "defects": [
+        "花园只有一行，没有转弯巡回"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "本课专属诊断：pots_missed 区分“次数少”与“忘了浇水”，no_pot_here 指出先浇后走或少走一步，watered_twice、out_of_bounds 各有说明",
+        "三层提示：现象 → 规则 → 做法",
+        "复盘卡列出真实遇到的错误"
+      ],
+      "defects": [
+        "诊断不高亮具体积木"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意改造：选 3 盆挨着 / 5 盆挨着 / 3 盆隔开，作品“我的小花园”保存并可回放"
+      ],
+      "defects": [
+        "不能自己摆放花盆"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "通过只由网格引擎真实判定（每盆恰好一次 + 到达最后一盆）",
+        "复盘卡 + 点选反思（浇水放在重复里面还是后面）保存重开仍在",
+        "三断点截图 docs/roadmap/evidence/G0-U3-L03/"
+      ],
+      "defects": [
+        "没有儿童试学；评分者是实现者，非独立"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "浇水与开花来自 grid-engine.ts 真实展开执行“重复 N 次”的帧（frame.water），舞台逐帧回放"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "/learn/grid-lab/G0-U3-L03 可亲手拼块、改次数与循环体并运行（L3 实验可试玩）"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "第 1 关错误实验必须先真实运行“重复 3 次”、看到最后一盆没开花才能完成；E2E 覆盖"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "判定看每盆浇水次数与落点，不比对固定积木序列；重复解、平铺解与三种花园都有效"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "“我的小花园”只有在所选花园真实运行通过后才出现，重开可回放（E2E）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "浇水机器人与花盆为项目自绘 SVG（character-art Robot、grid-stage Pot），路牌 watering-plan.svg 已登记授权表；文字自写"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "只存本机 localStorage（kids-grid-lesson-v1:G0-U3-L03），不含姓名，不上传"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "漏浇、多浇、先浇后走、多一轮越界都不判通过（单元测试 + E2E）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 记为 L3 实验可试玩，目录不标正式发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "错误实验把 3 改成 4 后四盆都开花；创意关选 5 盆挨着，重复 5 次通过并保存为作品（E2E）",
+    "failureCase": "错误实验 → pots_missed；引导关先浇后走 → no_pot_here；练习 A 只重复走路 → pots_missed；练习 B 照搬上一关 → no_pot_here",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清这一课的规则（概念）",
+      "第三层：给出具体积木做法"
+    ],
+    "practiceA": "练习 A：四盆挨着，“重复 4 次（向前走一格、给这盆花浇水）”",
+    "practiceB": "练习 B：花盆隔开，循环体改为走两格再浇水（起始程序必失败）",
+    "equivalentSolutions": [
+      "练习 A：重复 4 次或 8 块平铺",
+      "创意关 3 种花园各自有效（单元测试遍历）"
+    ],
+    "saveReopen": "每关程序（含重复积木）、进度、错误实验观察、花园选择、真实错误记录存 kids-grid-lesson-v1:G0-U3-L03；刷新后回到完成页，作品可回放（E2E）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U3-L03 garden watering: three rounds, one pot, four pots, spaced pots, my garden saved and reopened"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G0-U3-L03/"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 参考评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学（需真实儿童与监护人同意，不得模拟）"
+  ],
+  "notes": "2026-10-30 Hark A 实现者参考评价（非独立人工评分）：G0-U3-L03 五关正式候选课程（循环与批量任务），网格引擎新增“给这盆花浇水”（batch_action）、浇水机器人角色与巡回计划场景。"
+}

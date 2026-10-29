@@ -115,3 +115,18 @@ describe('grid engine: jump over one cell (G0-U3-L02)', () => {
     expect(runGridProgram({ ...road, water: [], rocks: [{ x: 1, y: 0 }] }, [{ type: 'when_start' }, { type: 'jump_forward' }]).failure).toBe('hit_rock')
   })
 })
+
+describe('grid engine: water each pot once (G0-U3-L03)', () => {
+  const garden = { cols: 4, rows: 1, start: { x: 0, y: 0, facing: 'right' as const }, goal: { x: 2, y: 0 }, pots: [{ x: 1, y: 0 }, { x: 2, y: 0 }] }
+  const go = (...types: string[]) => runGridProgram(garden, [{ type: 'when_start' }, ...types.map(type => ({ type }))])
+  it('passes only when every pot got exactly one watering', () => {
+    const r = go('move_forward', 'water_plant', 'move_forward', 'water_plant')
+    expect(r.passed).toBe(true)
+    expect(r.frames.filter(f => f.water)).toHaveLength(2)
+  })
+  it('names watering bare ground, watering twice and missing a pot', () => {
+    expect(go('water_plant').failure).toBe('no_pot_here')
+    expect(go('move_forward', 'water_plant', 'water_plant').failure).toBe('watered_twice')
+    expect(go('move_forward', 'water_plant', 'move_forward').failure).toBe('pots_missed')
+  })
+})

@@ -37,10 +37,12 @@ export function stepLevel(step: GridLessonStep, draft: Pick<GridDraft, 'creative
     return goal && i >= 0 ? { ...step.level, goal, footprints: patterns[i] } : { ...step.level, footprints: undefined }
   }
   const waters = step.creative?.waters
-  if (waters) {
-    // G0-U3-L02: each goal choice comes with its own puddles.
+  const pots = step.creative?.pots
+  if (waters || pots) {
+    // G0-U3-L02 / L03: each goal choice comes with its own puddles or flower pots.
     const i = goal ? step.creative!.goalChoices.findIndex(c => c.x === goal.x && c.y === goal.y) : -1
-    return goal && i >= 0 ? { ...step.level, goal, water: waters[i] } : step.level
+    if (!goal || i < 0) return step.level
+    return { ...step.level, goal, ...(waters ? { water: waters[i] } : {}), ...(pots ? { pots: pots[i] } : {}) }
   }
   return goal ? { ...step.level, goal } : step.level
 }
@@ -52,6 +54,9 @@ export const MISTAKE_LABELS: Record<GridFailure, string> = {
   empty_repeat: '重复里面是空的',
   too_deep: '重复套了太多层',
   stamp_twice: '同一格放了两个脚印',
+  no_pot_here: '在没有花盆的地方浇水',
+  watered_twice: '同一盆花浇了两次',
+  pots_missed: '有花盆漏浇了',
   wrong_pattern: '脚印规律乱了',
   pattern_short: '脚印放得不够',
   unknown_block: '用了这关没有的积木',
@@ -88,7 +93,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
   const level = stepLevel(step, draft)
   const needsGoal = !!step.creative && !draft.creative?.[step.id]
   const observedHere = !step.errorLab || !!draft.observed?.includes(step.id)
-  const { state, trail, stamps, done } = useGridPlayback(level, run)
+  const { state, trail, stamps, watered, done } = useGridPlayback(level, run)
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -135,7 +140,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   function handleRun() {
     if (needsGoal) {
-      setNotice(step.creative?.patterns ? '先选一种脚印节奏，再运行。' : step.creative?.waters ? '先选有几个水坑，再运行。' : '先选一格，把蘑菇屋搬过去，再运行。')
+      setNotice(step.creative?.patterns ? '先选一种脚印节奏，再运行。' : step.creative?.waters ? '先选有几个水坑，再运行。' : step.creative?.pots ? '先选要浇哪一种花园，再运行。' : '先选一格，把蘑菇屋搬过去，再运行。')
       return
     }
     const result = runGridProgram(level, blocks)
@@ -187,7 +192,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   function handleComplete() {
     if (!passedHere) {
-      setNotice(needsGoal ? (step.creative?.patterns ? '先选一种脚印节奏，再拼程序运行。' : step.creative?.waters ? '先选有几个水坑，再拼程序运行。' : '先选一格，把蘑菇屋搬过去，再拼程序运行。') : !observedHere ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。' : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
+      setNotice(needsGoal ? (step.creative?.patterns ? '先选一种脚印节奏，再拼程序运行。' : step.creative?.waters ? '先选有几个水坑，再拼程序运行。' : step.creative?.pots ? '先选要浇哪一种花园，再拼程序运行。' : '先选一格，把蘑菇屋搬过去，再拼程序运行。') : !observedHere ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。' : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
       return
     }
     if (draft.stepIndex < lesson.steps.length - 1) goToStep(draft.stepIndex + 1)
@@ -290,7 +295,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
             ) : null}
           </div>
           <div className="kc-stage-panel">
-            <GridStage level={level} state={state} trail={run ? trail : []} stamps={run ? stamps : []} />
+            <GridStage level={level} state={state} trail={run ? trail : []} stamps={run ? stamps : []} watered={run ? watered : []} />
           </div>
           <div className="kc-stage-panel space-y-3 pt-0">
             <div aria-live="polite" data-testid="grid-feedback" data-tone={feedback.tone}
@@ -338,7 +343,7 @@ function ProjectCard({ lesson, draft }: { lesson: GridLesson; draft: GridDraft }
   const blocks = useMemo(() => draft.programs[project.stepId] ?? [], [draft.programs, project.stepId])
   const level = useMemo(() => stepLevel(step, draft), [step, draft])
   const [run, setRun] = useState<GridRun | null>(null)
-  const { state, trail, stamps, done } = useGridPlayback(level, run)
+  const { state, trail, stamps, watered, done } = useGridPlayback(level, run)
   const verdict = useMemo(() => runGridProgram(level, blocks), [level, blocks])
   return (
     <section className="kc-surface-3d mt-4 rounded-[18px] p-5" data-testid="grid-project-card">
@@ -354,7 +359,7 @@ function ProjectCard({ lesson, draft }: { lesson: GridLesson; draft: GridDraft }
         ))}
       </ol>
       <div className="mt-4 max-w-[420px]">
-        <GridStage level={level} state={state} trail={run ? trail : []} stamps={run ? stamps : []} />
+        <GridStage level={level} state={state} trail={run ? trail : []} stamps={run ? stamps : []} watered={run ? watered : []} />
       </div>
       <button type="button" className="kc-action-surface mt-3" data-testid="grid-project-play" disabled={!!run && !done}
         onClick={() => setRun(runGridProgram(level, blocks))}>
