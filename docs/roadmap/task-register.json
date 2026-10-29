@@ -754,11 +754,34 @@
       }
     },
     {
+      "id": "TQ-023",
+      "title": "G2 Scratch 实验快捷输入框与 Blockly 异步回写竞态修复（快速连续编辑被改乱）",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "apps/web/src/features/scratch-g2/{scratch-g2-blocks.tsx,scratch-g2-program.ts}（产品修复）+ scratch-g2-program.test.ts + tests/e2e/scratch-g2-u1.spec.ts（回归用例）。不改课程内容、VM 沙箱、课程状态与发布门禁。",
+      "acceptance": [
+        "根因：Blockly 数字字段（重复次数 1～20、等待 0.2～1.0、x/y）在 setFieldValue 时同步夹取/取整，但变更事件异步回报；快捷输入框先显示键入值，异步快照稍后把它改写成夹取值，正在进行的下一次编辑选区丢失，被拼成 \"208\"/\"1.102\"/\"0.305\"。",
+        "修复：update() 写入后同步读回 Blockly 实存值，在同一次渲染中显示（同一数字保留键入写法，如 1.0）；异步快照用同一规则计算，不再晚到改写输入框；数字框清空时不改积木、失焦后与积木同步。",
+        "回归：单测覆盖夹取/取整、同值保留、清空、文本字段；E2E 在 G2-U2-L01 练习 A 连续不等待地输入 25/8/0/30/3/25/8，每次立刻读取输入框必须已是夹取值（20/8/1/20/3/20/8），旧实现此处必然读到 25。",
+        "PR CI 全绿（curriculum 含真 Chrome Scratch VM 分片、deploy、task-ledger）后合并；合并后 main CI 双绿再关账。"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/235",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "Hark B 发现于 G2-U2-L01/L03 测试（#208、L03 本地）；#209 的“乐观显示键入值”只修了受控输入回退，未覆盖夹取/取整字段。本地：本地真 Chromium 生产构建 scratch-g2-u1+scratch-vm 47/47（rebase 前）、vitest scratch-g2 29/29、旧组件下新回归用例失败（Expected 1, Received 0）"
+    },
+    {
       "id": "TQ-022",
       "title": "Hark B 课程审定 v1 归档（G2/G3/W0/W1/A0 120 节，AI 实现者自审）",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "TQ-007"
       ],
@@ -770,12 +793,19 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/227",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "prNumber": 227,
+        "mergeCommit": "f45b5833e8d83d5102c7d8236e9cf9fbe4688e02",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835253319",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835253246",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835066054",
+        "reviewer": "仓库负责人常设授权 Hark B 在 CI 全绿后自行合并（2026-10-27 起）；PR #227 于 2026-10-29 15:24 CST 按该授权合并。仅批准文档归档，审定结论本身为 AI 实现者自审，未经负责人或独立人工教研复核",
+        "tests": [
+          "docs-only：PR #227 只新增 docs/curriculum-audit/hark-b/{README.md,hark-b-audit-v1.md,hark-b-lessons.csv} 并登记本条（4 文件，+1330 行），不改代码、课程、full-catalog、lesson-task-register 或任何课程状态",
+          "覆盖核对（读 origin/main 原文件）：hark-b-lessons.csv 120 行，G2/G3/W0/W1/A0 各 24 节；报告文件头标注“AI 实现者自审，不是独立教研评审”、不得作为 completed/试学/发布依据，并写明基线 300c6ddd429be01c81eb719e59fcd815bb6ed683",
+          "PR CI：mandatory task accountability https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835066054 成功（curriculum 工作流按路径过滤未在 PR 触发）；合并后 main：curriculum content checks https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835253319 与 mandatory task accountability https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835253246 均成功"
+        ]
       },
-      "notes": "AI 自审不是独立教研；结论需负责人/独立人工教研复核。三端视觉截图不在本任务范围。"
+      "notes": "AI 自审不是独立教研；结论需负责人/独立人工教研复核。三端视觉截图不在本任务范围。completed 仅表示审定文档归档交付，不代表任何课程通过审定、试学或发布。"
     },
     {
       "id": "UX-001",
@@ -2574,6 +2604,51 @@
         "reviewer": "duan 2026-10-28 approved merge in chat; executed by Hark via connector"
       },
       "notes": "来源：UX-201 证据中记录的既有缺口——Blockly 默认从 blockly-demo.appspot.com 加载音效与精灵图，沙箱/国内网络 ERR_TUNNEL_CONNECTION_FAILED。"
+    },
+    {
+      "id": "AUD-101",
+      "title": "Hark A 负责路线 144 节全量课程审定（G0、G1、M0、D0、S0、R0）",
+      "priority": "P0",
+      "category": "AUD",
+      "status": "in_review",
+      "dependencies": [
+        "TQ-007"
+      ],
+      "scope": "按 2026-10-29 四账号总指令与 §13 八大领域要求，对 Hark A 负责的 6 条路线 144 节逐课审定：docs/curriculum-audit/hark-a/README.md、docs/curriculum-audit/hark-a/hark-a-144-audit.json（每课 12 项检查、可观察学习成果建议、优先级与整改动作）、docs/curriculum-audit/hark-a/HARK-A-144-AUDIT.md（覆盖矩阵、24 单元递进图、逐课清单、焦点错配、重复清单、八大领域专项、扩展建议、对标来源、整改 PR 计划）、apps/web/src/features/curriculum/hark-a-audit.test.ts。不改 lesson-task-register.json 与 full-catalog-v1.json 任何字段，不改其他账号路线。",
+      "acceptance": [
+        "144 个课程 ID 与 lesson-task-register 中六条路线完全一致，各出现一次（单测锁定）",
+        "每课给出不同于模板句的可观察学习成果建议、P0/P1/P2 优先级与整改动作",
+        "审定标明实现者 AI、independent=false，不声称儿童试学或发布证据；无运行实现的课不打质量分",
+        "八大领域每项给出覆盖判定、缺口、优先级、所需引擎、综合项目目标与验收方法",
+        "PR CI 全绿；不修改任何课程状态"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/230"
+      },
+      "notes": "Hark A 2026-10-29：审定基线 main 300c6dd；AI 审定不能替代独立人工教研。"
+    },
+    {
+      "id": "SYS-107",
+      "title": "真循环引擎：C 形“重复 N 次”积木、嵌套程序快照/恢复、网格引擎展开执行",
+      "priority": "P0",
+      "category": "SYS",
+      "status": "in_review",
+      "dependencies": [
+        "SYS-106",
+        "AUD-101"
+      ],
+      "scope": "apps/web/src/features/lessons/blockly/program-tree.ts（程序树类型、展开、深度/空循环/步数上限、草稿防伪解析）、register-kids-blocks.ts 新增 repeat_times（TIMES 下拉 2/3/4/5/6/8 + DO 语句口）、block-labels.ts、blockly-workspace.tsx（快照递归收集 times/body，恢复递归重建并接入 DO）、restore-block-sequence.ts（递归过滤）、grid/grid-engine.ts（展开执行、empty_repeat/too_deep/too_many、帧带 rounds）、grid-draft.ts、grid-lab.tsx 复盘标签及对应单测。不改任何课程内容、台账课程条目或旧 repeat_twice 行为；G0-U3 课程在后续独立 PR。",
+      "acceptance": [
+        "真实 Blockly 无头工作区中 repeat_times 的次数与口内积木进入程序快照（单测）",
+        "重复 3 次前进与三块前进结果一致；只改次数会改变结果；重复 4 次(前进,前进,右转)围成方形，转错方向或少一轮失败（单测）",
+        "空循环、超过两层嵌套、展开超过 80 步给出儿童可读的具体失败而不是卡死（单测）",
+        "旧的平铺草稿与 G0-U1/U2 课程行为不变；伪造的循环次数被夹到可选值，未知积木被丢弃（单测）",
+        "PR CI 全绿"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/237"
+      },
+      "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
     }
   ]
 }
