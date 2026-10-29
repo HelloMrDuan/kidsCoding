@@ -190,6 +190,132 @@ export const g2u2L02: G2Lesson = {
   showCycle: true,
 }
 
+export const L09_CAT_LINE = '一起打节拍！'
+export const L09_DRUM = '小鼓'
+export const L09_BEAT = '咚'
+export const L09_ACCENTS = ['嗒', '啪']
+/** The beat is steady when the average VM gap after the bar's accent is within this of the average gap between beats inside a bar (ms). */
+export const L09_STEADY_MS = 60
+
+type BeatRun = G2Observations['beatRuns'][number]
+export type BeatSummary = { bars: number; beats: number; dongs: number; beatsPerBar: number[]; innerMs: number | null; gapMs: number | null; steady: boolean; accents: string[] }
+const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null)
+
+/** Read one green-flag run of the drum from the VM's own sound starts: each accent closes a bar. */
+export function beatSummary(run: BeatRun | undefined): BeatSummary {
+  const hits = (run?.hits ?? []).filter(h => h.target === L09_DRUM)
+  const beatsPerBar: number[] = []
+  const accents: string[] = []
+  const inner: number[] = []
+  const gaps: number[] = []
+  let inBar = 0
+  for (let i = 0; i < hits.length; i += 1) {
+    const h = hits[i]
+    inBar += 1
+    const isAccent = h.sound !== L09_BEAT
+    if (isAccent) { beatsPerBar.push(inBar); accents.push(h.sound); inBar = 0 }
+    const next = hits[i + 1]
+    if (next) (isAccent ? gaps : inner).push(next.ms - h.ms)
+  }
+  const innerMs = mean(inner)
+  const gapMs = mean(gaps)
+  return {
+    bars: beatsPerBar.length, beats: hits.length, dongs: hits.filter(h => h.sound === L09_BEAT).length, beatsPerBar, innerMs, gapMs, accents,
+    steady: inner.length >= 2 && gaps.length >= 1 && innerMs !== null && gapMs !== null && Math.abs(gapMs - innerMs) <= L09_STEADY_MS,
+  }
+}
+
+const drumWait = (key: string, label: string): G2Slot => ({key: `小鼓|${key}|DURATION`, field: 'DURATION', label, min: 0.2, max: 1, tenths: true})
+
+export const g2u2L03: G2Lesson = {
+  id: 'G2-U2-L03',
+  title: '音乐节奏舞台',
+  concept: '嵌套循环：外层数小节，里层数拍子',
+  sample: '/scratch-samples/g2-u2-l03-rhythm-stage.sb3.b64',
+  exportName: 'KidsCoding-音乐节奏舞台.sb3',
+  story: '音乐舞台上，小鼓要为小橘猫打节拍。乐队用的是“4 拍一小节”：咚、咚、咚、嗒，再从头来。可小鼓每小节敲成了 5 下，重音后面还停得特别久，节奏一拖一拖的……',
+  conceptExplain: [
+    '一个“重复执行”里面再放一个“重复执行”，叫嵌套循环。里面的循环每走完一整圈，外面的循环才走一次。',
+    '小鼓的里层循环敲“咚”（每小节敲几下），里层后面的“嗒”是这一小节的重音；外层循环决定一共几小节。“咚”一共响 外层次数 × 里层次数 下。',
+    '一小节的拍数 = 里层“咚”的次数 + 1 个重音。每拍之间的等待都一样长，节奏才稳；两个等待不一样，节拍就忽快忽慢。',
+  ],
+  predict: {
+    question: '小鼓的外层循环重复 2 次，里层循环重复 4 次。点绿旗后，“咚”一共会响几下？',
+    options: ['4 下', '6 下', '8 下'],
+    correct: '8 下',
+    explain: '里层每圈敲 4 下“咚”，外层让里层整圈走 2 遍：4 × 2 = 8 下（另外每小节最后还有 1 下重音）。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '用外层循环控制重复几小节', title: '练习 A：打满 4 小节', goal: '选中小鼓，改外层“重复执行（ ）次”，应用后点绿旗：Scratch VM 里重音一共响 4 下，也就是正好 4 小节。', how: '每小节最后有 1 个重音，外层循环重复几次就有几小节。' },
+    { id: 'practiceB', skill: '让每拍的间隔一样长', title: '练习 B：让节奏稳下来', goal: '改两个“等待（ ）秒”，应用后点绿旗：VM 测到的“咚之间”和“重音之后”的平均间隔差不到 0.06 秒，节拍稳稳的。', how: '现在“咚”后等 0.3 秒、重音后等 0.6 秒，所以每小节最后一拍拖长了。两个都改成 0.5 秒试试，别的相同数字也可以。' },
+    { id: 'debug', skill: '数清嵌套循环里每小节几拍（调试）', title: '找错：为什么一小节有 5 拍？', goal: '先点一次绿旗，看观察区里每小节几拍；再改里层“重复执行（ ）次”，让 VM 里每小节正好 4 拍（咚咚咚 + 重音）。', how: '里层敲 4 下“咚”，后面又有 1 下重音，一共 5 拍。' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：我的节奏表演', goal: '把重音换成“啪”，再给小橘猫换一句自己的开场白（1～20 字），点绿旗：4 小节、每小节 4 拍、节奏稳，最后保存为 .sb3。', how: '速度你定：两个等待一样长就稳，0.2 秒很快，1.0 秒很慢。' },
+  ],
+  hints: [
+    '看现象：点绿旗后，观察区显示 Scratch VM 里每小节都是 5 拍：咚咚咚咚 + 嗒，比“4 拍一小节”多了 1 拍。',
+    '想原因：里层“重复执行 4 次”敲了 4 下“咚”，里层结束后还有 1 下重音，所以每小节 4 + 1 = 5 拍。',
+    '去修复：选中小鼓，把里层“重复执行（ ）次”改成 3，应用后再点绿旗：咚咚咚嗒，正好 4 拍。',
+  ],
+  reflection: [
+    '外层 4 次、里层 3 次，“咚”一共响几下？重音响几下？',
+    '如果想要“3 拍一小节”（咚咚嗒），里层应该重复几次？',
+    '为什么两个等待一样长，节奏听起来就稳了？',
+  ],
+  limitations: [
+    '本实验只能修改小鼓的：外层重复次数（1～8 小节）、里层重复次数（1～8 下“咚”）、“咚”后和重音后的等待秒数（0.2～1.0，0.1 秒一格）、重音选“嗒”或“啪”，以及小橘猫的开场白（1～20 字）。',
+    '“咚”的声音、积木顺序和嵌套结构固定不改；不能新增声音、积木或精灵（可导出 .sb3 后在完整 Scratch 编辑器里继续做）。',
+    '本沙箱的 Scratch VM 没有接音频引擎：“播放声音等待播完”在 VM 里不会真的等声音播完，所以节拍间隔完全由等待积木决定；页面另外播放同一个原创 .wav 给你听。拍数和间隔来自 VM 里每次真正开始播放声音的时间；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    { name: 'Stage', kind: 'stage', label: '舞台', scripts: [{ hat: 'kc2_flag', body: [] }] },
+    {
+      name: '小鼓', kind: 'sprite', label: '小鼓', sounds: [L09_BEAT, ...L09_ACCENTS],
+      scripts: [{ hat: 'kc2_flag', body: [
+        {
+          type: 'kc2_repeat', vmBlock: 'drum_bars', slots: [{ key: '小鼓|drum_bars|TIMES', field: 'TIMES', label: '外层：几小节', min: 1, max: 8 }],
+          children: [
+            {
+              type: 'kc2_repeat', vmBlock: 'drum_beats', slots: [{ key: '小鼓|drum_beats|TIMES', field: 'TIMES', label: '里层：每小节几下“咚”', min: 1, max: 8 }],
+              children: [
+                { type: 'kc2_play_sound', vmBlock: 'drum_dong', slots: [], fixed: { SOUND_MENU: L09_BEAT } },
+                { type: 'kc2_wait_free', vmBlock: 'drum_wait1', slots: [drumWait('drum_wait1', '“咚”后等待秒数')] },
+              ],
+            },
+            { type: 'kc2_play_sound', vmBlock: 'drum_accent_menu', slots: [{ key: '小鼓|drum_accent_menu|SOUND_MENU', field: 'SOUND_MENU', label: '重音', options: L09_ACCENTS }] },
+            { type: 'kc2_wait_free', vmBlock: 'drum_wait2', slots: [drumWait('drum_wait2', '重音后等待秒数')] },
+          ],
+        },
+      ] }],
+    },
+    {
+      name: '小橘猫', kind: 'sprite', label: '小橘猫',
+      scripts: [{ hat: 'kc2_flag', body: [{ type: 'kc2_say', vmBlock: 'cat_say', slots: [{ key: '小橘猫|cat_say|MESSAGE', field: 'MESSAGE', label: '说的话', maxLength: 20 }] }] }],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-four-bars', solutions: ['外层重复 4 次 → VM 里重音响 4 下，正好 4 小节'], counterExamples: ['外层 2 次 → 只有 2 小节', '外层 9 次 → 超出 1～8 被拒绝'] },
+    { id: 'practiceB-steady-beat', solutions: ['两个等待都 0.5 秒 → VM 测得“咚之间”和“重音之后”都约 0.5 秒', '两个都 0.3 秒 → 快而稳'], counterExamples: ['0.3 秒和 0.6 秒 → 重音后拖长', '等待 0.25 秒 → 不是 0.1 秒一格，被拒绝'] },
+    { id: 'debug-five-beat-bar', solutions: ['里层重复 3 次 → 每小节咚咚咚 + 嗒 = 4 拍'], counterExamples: ['里层 4 次 → 每小节 5 拍', '里层 0 次 → 超出 1～8 被拒绝'] },
+  ],
+  nextLesson: 'G2-U2-L04 循环飞舞的蝴蝶',
+  showBeats: true,
+}
+
+const fourFour = (b: BeatSummary) => b.bars >= 2 && b.beatsPerBar.every(n => n === 4)
+const fiveBeat = (b: BeatSummary) => b.bars >= 1 && b.beatsPerBar.every(n => n === 5)
+
+export function evaluateG2U2L03(obs: G2Observations): G2TaskState {
+  const runs = obs.beatRuns.filter(r => r.finished).map(beatSummary).filter(b => b.beats > 0)
+  const firstFive = runs.findIndex(fiveBeat)
+  const line = obs.lastSaid['小橘猫']
+  return {
+    practiceA: runs.some(b => b.bars === 4),
+    practiceB: runs.some(b => b.steady),
+    debug: firstFive >= 0 && runs.slice(firstFive + 1).some(fourFour),
+    create: !!line && line !== L09_CAT_LINE && runs.some(b => b.bars === 4 && fourFour(b) && b.steady && b.accents.every(a => a === '啪')),
+  }
+}
+
 type CycleRun = G2Observations['cycleRuns'][number]
 const spokeOn = (run: CycleRun, target: string, backdrop: string) => run.speech.some(s => s.target === target && s.backdrop === backdrop)
 const longPhases = (run: CycleRun) => run.switches >= 2 && run.avgMs !== null && run.avgMs >= L08_LONG_PHASE_MS
@@ -232,6 +358,12 @@ export function observedPredictionG2U2(id: string, obs: G2Observations): string 
     const ms = catFrames(first)!.avgMs!
     return ms < L07_TOO_FAST_MS ? '快得看不清' : ms >= L07_VISIBLE_MS ? '看得清' : null
   }
+  if (id === g2u2L03.id) {
+    const first = obs.beatRuns.find(r => r.finished && r.hits.some(h => h.target === L09_DRUM))
+    if (!first) return null
+    const said = `${beatSummary(first).dongs} 下`
+    return g2u2L03.predict.options.includes(said) ? said : null
+  }
   if (id === g2u2L02.id) {
     const first = obs.cycleRuns[0]
     if (!first) return null
@@ -244,10 +376,12 @@ export function observedPredictionG2U2(id: string, obs: G2Observations): string 
 export function evaluateG2U2Lesson(id: string, obs: G2Observations): G2TaskState | null {
   if (id === g2u2L01.id) return evaluateG2U2L01(obs)
   if (id === g2u2L02.id) return evaluateG2U2L02(obs)
+  if (id === g2u2L03.id) return evaluateG2U2L03(obs)
   return null
 }
 
 export const g2u2ScratchLessons: Record<string, G2Lesson> = {
   [g2u2L01.id]: g2u2L01,
   [g2u2L02.id]: g2u2L02,
+  [g2u2L03.id]: g2u2L03,
 }

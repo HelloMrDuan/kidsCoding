@@ -1507,3 +1507,186 @@ test.describe('G2-U2-L02 制作昼夜交替', () => {
     await stopCycle(page)
   })
 })
+
+const U2L03 = 'G2-U2-L03'
+const U2L03_SAMPLE = 'public/scratch-samples/g2-u2-l03-rhythm-stage.sb3.b64'
+const beatLog = (page: import('@playwright/test').Page) => page.getByTestId('g2-beat-log')
+async function flagBeats(page: import('@playwright/test').Page, timeout = 25_000) {
+  await page.getByTestId('g2-green-flag').click()
+  await expect(beatLog(page)).toContainText('本次绿旗进行中', {timeout: 8_000})
+  await expect(beatLog(page)).toHaveAttribute('data-finished', 'true', {timeout})
+}
+
+test.describe('G2-U2-L03 音乐节奏舞台', () => {
+  test('catalog entry opens the rhythm lab; the VM drum plays 2 × 4 咚 for the prediction but 5-beat bars; hints; inner loop 3 gives 4/4 bars (debug)', async ({page}) => {
+    test.setTimeout(180_000)
+    await page.goto(`/learn/catalog/${U2L03}`)
+    await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+    await page.getByTestId('scratch-trial-entry').click()
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已加载项目', {timeout: 60_000})
+    await expect(page.getByRole('heading', {name: '音乐节奏舞台'})).toBeVisible()
+    await expect(beatLog(page)).toContainText('还没有点绿旗')
+
+    await page.getByTestId('g2-predict-option').filter({hasText: '4 下'}).click()
+    await flagBeats(page)
+    await expect(beatLog(page)).toHaveAttribute('data-dongs', '8')
+    await expect(beatLog(page)).toHaveAttribute('data-bars', '2')
+    await expect(beatLog(page)).toHaveAttribute('data-bar-beats', '5,5')
+    await expect(beatLog(page)).toHaveAttribute('data-steady', 'false')
+    // VM-timed gaps: 0.3 s after each 咚, 0.6 s after the accent.
+    const inner = Number(await beatLog(page).getAttribute('data-inner-ms'))
+    const gap = Number(await beatLog(page).getAttribute('data-gap-ms'))
+    expect(inner).toBeGreaterThanOrEqual(280)
+    expect(gap - inner).toBeGreaterThan(150)
+    await expect(page.getByTestId('g2-predict-result')).toContainText('Scratch VM 实际：8 下')
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'false')
+
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-1')).toContainText('每小节都是 5 拍')
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-2')).toContainText('4 + 1 = 5 拍')
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-3')).toContainText('改成 3')
+
+    await selectTarget(page, '小鼓')
+    await expect(page.getByTestId('g2-edit-times')).toHaveValue('2')
+    await expect(page.getByTestId('g2-edit-times-2')).toHaveValue('4')
+    await page.getByTestId('g2-edit-times-2').fill('3')
+    await applyAndWait(page)
+    await flagBeats(page)
+    await expect(beatLog(page)).toHaveAttribute('data-bar-beats', '4,4')
+    await expect(beatLog(page)).toHaveAttribute('data-dongs', '6')
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'true')
+  })
+
+  test('practice A: the outer loop sets the bars (9 bars or 9 beats refused); 4 bars → 4 accents in the VM', async ({page}) => {
+    test.setTimeout(150_000)
+    await openG2Lab(page, U2L03)
+    await selectTarget(page, '小鼓')
+    // The repeat block keeps whole numbers ≤ 20 visible; the lesson allows 1～8 per loop, so 9 is refused rather than clamped.
+    await page.getByTestId('g2-edit-times').fill('9')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await expect(page.getByTestId('g2-editor-validity')).toContainText('积木没有拼好')
+    await page.getByTestId('g2-edit-times').fill('2')
+    await page.getByTestId('g2-edit-times-2').fill('9')
+    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    await page.getByTestId('g2-edit-times-2').fill('4')
+    await page.getByTestId('g2-edit-times').fill('4')
+    await applyAndWait(page)
+    await flagBeats(page)
+    await expect(beatLog(page)).toHaveAttribute('data-bars', '4')
+    await expect(beatLog(page)).toHaveAttribute('data-accents', '嗒,嗒,嗒,嗒')
+    await expect(beatLog(page)).toHaveAttribute('data-dongs', '16')
+    await expect(page.getByTestId('g2-task-practiceA')).toHaveAttribute('data-done', 'true')
+  })
+
+  test('practice B: equal waits make a steady beat (0.25 and 1.5 refused; the second wait has its own input)', async ({page}) => {
+    test.setTimeout(150_000)
+    await openG2Lab(page, U2L03)
+    await selectTarget(page, '小鼓')
+    await expect(page.getByTestId('g2-edit-wait')).toHaveValue('0.3')
+    await expect(page.getByTestId('g2-edit-wait-2')).toHaveValue('0.6')
+    for (const bad of ['0.25', '1.5', '0.1']) {
+      await page.getByTestId('g2-edit-wait-2').fill(bad)
+      await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    }
+    // Blockly reports the refused values asynchronously; re-type until each input settles (same race as #209).
+    await fillEdit(page, 'g2-edit-wait', '0.5')
+    await fillEdit(page, 'g2-edit-wait-2', '0.5')
+    await applyAndWait(page)
+    await flagBeats(page)
+    await expect(beatLog(page)).toHaveAttribute('data-steady', 'true')
+    expect(Number(await beatLog(page).getAttribute('data-inner-ms'))).toBeGreaterThanOrEqual(480)
+    await expect(beatLog(page)).toContainText('节奏稳')
+    await expect(page.getByTestId('g2-task-practiceB')).toHaveAttribute('data-done', 'true')
+  })
+
+  test('creative rhythm show, real .sb3 export re-verified in a fresh VM, re-import, and the saved work reopens after reload (recovery)', async ({page}) => {
+    test.setTimeout(200_000)
+    await openG2Lab(page, U2L03)
+    await selectTarget(page, '小鼓')
+    await page.getByTestId('g2-edit-times').fill('4')
+    await page.getByTestId('g2-edit-times-2').fill('3')
+    await page.getByTestId('g2-edit-wait').fill('0.3')
+    await page.getByTestId('g2-edit-wait-2').fill('0.3')
+    await page.getByTestId('g2-edit-sound').selectOption('啪')
+    await applyAndWait(page)
+    await selectTarget(page, '小橘猫')
+    await page.getByTestId('g2-edit-say').fill('节奏表演开始')
+    await applyAndWait(page)
+    await expect(page.getByTestId('g2-local-save-status')).toContainText('已在本机自动保存', {timeout: 30_000})
+    await page.reload()
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已从本机草稿恢复', {timeout: 60_000})
+    await selectTarget(page, '小鼓')
+    await expect(page.getByTestId('g2-edit-times-2')).toHaveValue('3')
+    await expect(page.getByTestId('g2-edit-sound')).toHaveValue('啪')
+    await flagBeats(page)
+    await expect(beatLog(page)).toHaveAttribute('data-bar-beats', '4,4,4,4')
+    await expect(beatLog(page)).toHaveAttribute('data-accents', '啪,啪,啪,啪')
+    await expect(beatLog(page)).toHaveAttribute('data-steady', 'true')
+    await expect(page.getByTestId('g2-task-create')).toHaveAttribute('data-done', 'true', {timeout: 8_000})
+
+    const downloading = page.waitForEvent('download', {timeout: 60_000})
+    await page.getByTestId('g2-export-sb3').click()
+    const downloaded = await downloading
+    expect(downloaded.suggestedFilename()).toBe('KidsCoding-音乐节奏舞台.sb3')
+    const file = await readFile((await downloaded.path())!)
+    const entries = unzip(file)
+    expect(entries.filter(entry => /^[0-9a-f]{32}\.svg$/.test(entry.name))).toHaveLength(3)
+    expect(entries.filter(entry => /^[0-9a-f]{32}\.wav$/.test(entry.name))).toHaveLength(3)
+    const project = JSON.parse(entries.find(entry => entry.name === 'project.json')!.data.toString('utf8'))
+    const drum = project.targets.find((t: {name: string}) => t.name === '小鼓')
+    expect(drum.blocks.drum_beats.parent).toBe('drum_bars')
+    expect(drum.blocks.drum_bars.inputs.TIMES[1][1]).toBe('4')
+    expect(drum.blocks.drum_beats.inputs.TIMES[1][1]).toBe('3')
+    expect(drum.blocks.drum_accent_menu.fields.SOUND_MENU[0]).toBe('啪')
+    await expect(page.getByTestId('g2-export-status')).toContainText('独立 VM 中重新载入验证')
+    await expect(page.getByTestId('g2-export-status')).toContainText('小鼓 SOUND_MENU=啪')
+
+    await selectTarget(page, '小鼓')
+    await page.getByTestId('g2-edit-times-2').fill('4')
+    await applyAndWait(page)
+    await page.getByTestId('g2-import-sb3').setInputFiles({name: 'my-rhythm.sb3', mimeType: 'application/octet-stream', buffer: file})
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已重新导入作品', {timeout: 50_000})
+    await selectTarget(page, '小鼓')
+    await expect(page.getByTestId('g2-edit-times-2')).toHaveValue('3')
+  })
+
+  test('sandbox rejects rhythm projects outside the lesson model and keeps the working project', async ({page}) => {
+    test.setTimeout(180_000)
+    const sample = Buffer.from(await readFile(U2L03_SAMPLE, 'utf8'), 'base64')
+    await openG2Lab(page, U2L03)
+    await selectTarget(page, '小鼓')
+    await page.getByTestId('g2-edit-times-2').fill('3')
+    await applyAndWait(page)
+    const reject = async (name: string, buffer: Buffer, reason: string | RegExp) => {
+      await page.getByTestId('g2-import-sb3').setInputFiles({name, mimeType: 'application/octet-stream', buffer})
+      await expect(page.getByTestId('g2-vm-status')).toContainText(reason, {timeout: 50_000})
+      await selectTarget(page, '小鼓')
+      await expect(page.getByTestId('g2-edit-times-2')).toHaveValue('3')
+      await expect(page.getByTestId('g2-green-flag')).toBeEnabled()
+    }
+    type Sound = Record<string, unknown>
+    await reject('bars-9.sb3', mutateSb3(sample, p => { p.targets[1].blocks.drum_bars.inputs = {TIMES: [1, [4, '9']], SUBSTACK: [2, 'drum_beats']} }), '数字超出允许范围')
+    await reject('wait-0.25.sb3', mutateSb3(sample, p => { p.targets[1].blocks.drum_wait2.inputs = {DURATION: [1, [4, '0.25']]} }), '0.1 秒为一格')
+    await reject('accent-dong.sb3', mutateSb3(sample, p => { (p.targets[1].blocks.drum_accent_menu.fields as Record<string, unknown>).SOUND_MENU = ['咚', null] }), '选项不在课程允许范围')
+    await reject('beat-sound-changed.sb3', mutateSb3(sample, p => { (p.targets[1].blocks.drum_dong_menu.fields as Record<string, unknown>).SOUND_MENU = ['啪', null] }), /积木(数值|选项)被改动|积木选项不符合课程模型/)
+    await reject('unnested.sb3', mutateSb3(sample, p => {
+      // Inner loop pulled out of the bar loop: bars loop holds the accent, the beat loop follows it.
+      const b = p.targets[1].blocks as Record<string, {next: string | null; parent: string | null; inputs?: unknown}>
+      b.drum_bars.inputs = {TIMES: [1, [4, '2']], SUBSTACK: [2, 'drum_accent']}
+      b.drum_bars.next = 'drum_beats'
+      b.drum_accent.parent = 'drum_bars'
+      b.drum_beats.parent = 'drum_bars'; b.drum_beats.next = null
+      b.drum_wait2.next = null
+    }), /积木(连接|嵌套|输入)不符合课程模型/)
+    await reject('extra-sound.sb3', mutateSb3(sample, p => {
+      const sounds = p.targets[1].sounds as Sound[]
+      p.targets[1].sounds = [...sounds, {...sounds[0], name: '偷偷加的声音'}]
+    }), '声音不符合课程模型')
+    await reject('u2-l02-file.sb3', Buffer.from(await readFile(U2L02_SAMPLE, 'utf8'), 'base64'), /导入 Scratch 项目失败/)
+
+    await flagBeats(page)
+    await expect(beatLog(page)).toHaveAttribute('data-bar-beats', '4,4')
+  })
+})
