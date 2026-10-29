@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u2L01, g2u2L02} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {g2u2L01, g2u2L02, g2u2L03} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05, g2u1L06} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {G2_TEXT_FIELDS, changedValues, checkSlotValue, quickEditValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
@@ -277,5 +277,35 @@ describe('G2 quick-edit box value (TQ-023: no late re-render garbling the next e
     expect(quickEditValue('你好', '你好', false)).toBe('你好')
     expect(quickEditValue('站立', '挥手', false)).toBe('挥手')
     expect(G2_TEXT_FIELDS.has('MESSAGE') && G2_TEXT_FIELDS.has('DIRECTION') && !G2_TEXT_FIELDS.has('TIMES')).toBe(true)
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U2-L03 nested loops)', () => {
+  const drum = g2u2L03.targets.find(t => t.name === '小鼓')!
+  const drumWs = (bars: string, beats: string, w1: string, accent: string, w2: string, nested = true) => {
+    const inner = block('kc2_repeat', {TIMES: beats}, null, block('kc2_play_sound', {SOUND_MENU: '咚'}, block('kc2_wait_free', {DURATION: w1})))
+    const tail = block('kc2_play_sound', {SOUND_MENU: accent}, block('kc2_wait_free', {DURATION: w2}))
+    if (nested) {
+      inner.getNextBlock = () => tail
+      return ws(block('kc2_flag', {}, block('kc2_repeat', {TIMES: bars}, null, inner)))
+    }
+    // Inner loop placed after the outer loop instead of inside it.
+    const outer = block('kc2_repeat', {TIMES: bars}, inner, tail)
+    return ws(block('kc2_flag', {}, outer))
+  }
+
+  it('reads both loop counts, both waits and the accent', () => {
+    expect(readG2Program(drumWs('4', '3', '0.5', '啪', '0.5'), drum)).toEqual({kind: 'sprite', values: {
+      '小鼓|drum_bars|TIMES': 4, '小鼓|drum_beats|TIMES': 3, '小鼓|drum_wait1|DURATION': 0.5,
+      '小鼓|drum_accent_menu|SOUND_MENU': '啪', '小鼓|drum_wait2|DURATION': 0.5,
+    }})
+  })
+
+  it('refuses 9 bars, 0 beats, waits off the 0.1 s grid or outside 0.2～1.0, other sounds and an un-nested inner loop', () => {
+    expect(readG2Program(drumWs('9', '3', '0.5', '嗒', '0.5'), drum)).toBeNull()
+    expect(readG2Program(drumWs('4', '0', '0.5', '嗒', '0.5'), drum)).toBeNull()
+    for (const bad of ['0.25', '0.1', '1.5', '0']) expect(readG2Program(drumWs('4', '3', bad, '嗒', '0.5'), drum)).toBeNull()
+    expect(readG2Program(drumWs('4', '3', '0.5', '咚', '0.5'), drum)).toBeNull()
+    expect(readG2Program(drumWs('4', '3', '0.5', '嗒', '0.5', false), drum)).toBeNull()
   })
 })

@@ -167,6 +167,23 @@ const FIELD_TYPES: Record<string, string[]> = {
   BACKDROP: ['kc2_switch_backdrop', 'kc2_when_backdrop'], SOUND_MENU: ['kc2_play_sound'],
   DIRECTION: ['kc2_point_direction'], STEPS: ['kc2_move_steps'], DEGREES: ['kc2_turn_right'], BROADCAST_OPTION: ['kc2_when_receive'], DY: ['kc2_change_y'],
 }
+/** Script blocks in program order: each block, then what is inside its C-mouth, then the block below it (same order as the lesson specs). */
+function blocksInOrder(ws: Blockly.WorkspaceSvg): Blockly.Block[] {
+  const out: Blockly.Block[] = []
+  const visit = (b: Blockly.Block | null) => {
+    while (b && out.length < 200) {
+      out.push(b)
+      visit(b.getInputTargetBlock('DO'))
+      b = b.getNextBlock()
+    }
+  }
+  for (const top of ws.getTopBlocks(false)) visit(top)
+  return out
+}
+/** Every slot of one field kind, in program order (a lesson may have two loops or two waits). */
+function findSlots(specs: G2BlockSpec[], field: G2Slot['field']): G2Slot[] {
+  return specs.flatMap(spec => [...spec.slots.filter(s => s.field === field), ...(spec.children ? findSlots(spec.children, field) : [])])
+}
 function findSlot(specs: G2BlockSpec[], field: G2Slot['field']): G2Slot | undefined {
   for (const spec of specs) {
     const slot = spec.slots.find(s => s.field === field) ?? (spec.children ? findSlot(spec.children, field) : undefined)
@@ -222,12 +239,13 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
       offsetY += script.body.some(b => b.children) ? 170 : 110
     }
     readFields.current = () => {
+      // First editable block of each field kind is `FIELD`; a second one (nested loops, two waits) is `FIELD#2`.
       const snapshot: Record<string, string> = {}
-      for (const block of ws.getAllBlocks(false)) {
+      for (const block of blocksInOrder(ws)) {
         for (const [field, types] of Object.entries(FIELD_TYPES)) {
-          if (types.includes(block.type) && snapshot[field] === undefined && fieldEnabled(block, field)) {
-            snapshot[field] = quickEditValue(typed.current[field], String(block.getFieldValue(field)), !G2_TEXT_FIELDS.has(field))
-          }
+          if (!types.includes(block.type) || !fieldEnabled(block, field)) continue
+          const key = snapshot[field] === undefined ? field : snapshot[`${field}#2`] === undefined ? `${field}#2` : null
+          if (key) snapshot[key] = quickEditValue(typed.current[key], String(block.getFieldValue(field)), !G2_TEXT_FIELDS.has(field))
         }
       }
       return snapshot
@@ -253,19 +271,21 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function update(field: G2Slot['field'], value: string) {
+  function update(field: G2Slot['field'], value: string, nth = 0) {
     const ws = workspace.current
     if (!ws) return
-    const block = ws.getAllBlocks(false).find(b => FIELD_TYPES[field]?.includes(b.type) && fieldEnabled(b, field))
+    const block = blocksInOrder(ws).filter(b => FIELD_TYPES[field]?.includes(b.type) && fieldEnabled(b, field))[nth]
     if (!block) return
     const numeric = !G2_TEXT_FIELDS.has(field)
-    typed.current[field] = value
+    // The second box of a field kind (nested loops, two waits) has its own key, as in readFields.
+    const key = nth ? `${field}#${nth + 1}` : field
+    typed.current[key] = value
     // An emptied number box is a learner mid-edit: leave the block's last number alone.
     if (!numeric || value.trim() !== '') block.setFieldValue(numeric ? String(Number(value)) : value, field)
     // Show the value Blockly stored (clamped/rounded synchronously) in this same render. Blockly reports
     // the change asynchronously; waiting for that report would re-render the box later, while the next
     // edit is already being typed, which moves the caret and garbles it.
-    setFields(prev => ({...prev, [field]: quickEditValue(value, String(block.getFieldValue(field)), numeric)}))
+    setFields(prev => ({...prev, [key]: quickEditValue(value, String(block.getFieldValue(field)), numeric)}))
   }
   /** Leaving a box: forget what was typed and show exactly what the blocks hold. */
   function settle() {
@@ -289,6 +309,8 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   const stageErrorOnly = isStage && !!extra
   const allSpecs = target.scripts.flatMap(s => s.body)
   const timesSlot = findSlot(allSpecs, 'TIMES')
+  const timesSlots = findSlots(allSpecs, 'TIMES')
+  const waitSlots = findSlots(allSpecs, 'DURATION')
   const stepsSlot = findSlot(allSpecs, 'STEPS')
   const degreesSlot = findSlot(allSpecs, 'DEGREES')
   const waitSlot = findSlot(allSpecs, 'DURATION')
@@ -371,15 +393,27 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
         </label>
       )}
       {fields.TIMES !== undefined && (
-        <label className="text-sm font-bold text-slate-700">重复次数（{timesSlot?.min ?? 1}～{timesSlot?.max ?? 10}）
+        <label className="text-sm font-bold text-slate-700">{timesSlots.length > 1 ? timesSlots[0].label : '重复次数'}（{timesSlot?.min ?? 1}～{timesSlot?.max ?? 10}）
           <input data-testid="g2-edit-times" type="number" min={timesSlot?.min ?? 1} max={timesSlot?.max ?? 10} step={1} value={fields.TIMES}
             onChange={e => update('TIMES', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
       )}
+      {fields['TIMES#2'] !== undefined && timesSlots[1] && (
+        <label className="text-sm font-bold text-slate-700">{timesSlots[1].label}（{timesSlots[1].min ?? 1}～{timesSlots[1].max ?? 10}）
+          <input data-testid="g2-edit-times-2" type="number" min={timesSlots[1].min ?? 1} max={timesSlots[1].max ?? 10} step={1} value={fields['TIMES#2']}
+            onChange={e => update('TIMES', e.target.value, 1)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
+        </label>
+      )}
       {fields.DURATION !== undefined && (
-        <label className="text-sm font-bold text-slate-700">{waitWhole ? `等待秒数（${waitSlot?.min ?? 0}～${waitSlot?.max ?? 5} 的整数）` : `等待秒数（${(waitSlot?.min ?? 0.2).toFixed(1)}～${(waitSlot?.max ?? 1).toFixed(1)}）`}
+        <label className="text-sm font-bold text-slate-700">{waitSlots.length > 1 ? waitSlots[0].label : '等待秒数'}{waitWhole ? `（${waitSlot?.min ?? 0}～${waitSlot?.max ?? 5} 的整数）` : `（${(waitSlot?.min ?? 0.2).toFixed(1)}～${(waitSlot?.max ?? 1).toFixed(1)}）`}
           <input data-testid="g2-edit-wait" type="number" min={waitWhole ? undefined : waitSlot?.min ?? 0.2} max={waitWhole ? undefined : waitSlot?.max ?? 1} step={waitWhole ? 1 : 0.1} value={fields.DURATION}
             onChange={e => update('DURATION', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
+        </label>
+      )}
+      {fields['DURATION#2'] !== undefined && waitSlots[1] && (
+        <label className="text-sm font-bold text-slate-700">{waitSlots[1].label}（{(waitSlots[1].min ?? 0.2).toFixed(1)}～{(waitSlots[1].max ?? 1).toFixed(1)}）
+          <input data-testid="g2-edit-wait-2" type="number" min={waitSlots[1].min ?? 0.2} max={waitSlots[1].max ?? 1} step={0.1} value={fields['DURATION#2']}
+            onChange={e => update('DURATION', e.target.value, 1)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
       )}
       {fields.DY !== undefined && (

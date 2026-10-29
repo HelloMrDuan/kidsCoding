@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
 import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, evaluateG2U1L06, g2u1L06, L06_CAT_LINE, inRibbonZone, inBirdNest, observedPrediction, g2ScratchLessons, getG2ScratchLesson} from './g2-u1-scratch-lessons'
-import {atDoor, evaluateG2U2L01, evaluateG2U2L02, g2u2L01, g2u2L02, L07_CAT_LINE, L08_OWL_LINE} from './g2-u2-scratch-lessons'
+import {atDoor, beatSummary, evaluateG2U2L01, evaluateG2U2L02, evaluateG2U2L03, g2u2L01, g2u2L02, g2u2L03, L07_CAT_LINE, L08_OWL_LINE, L09_CAT_LINE} from './g2-u2-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -351,5 +351,65 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(owlT.scripts[1].hatSlots?.[0]).toMatchObject({field: 'BACKDROP', options: ['白天', '夜晚']})
     expect(owlT.backdrops).toEqual(['白天', '夜晚'])
     expect(g2u2L02.showCycle).toBe(true)
+  })
+  it('U2-L03 reads bars, beats per bar and VM beat gaps from the drum\'s own sound starts (nested loops)', () => {
+    // A VM-timed drum run: `bars` × (`dongs` 咚 + accent), `w1` ms after each 咚 and `w2` ms after each accent (+ jitter).
+    const drum = (bars: number, dongs: number, w1: number, w2: number, accent = '嗒', finished = true) => {
+      const hits: Array<{target: string; sound: string; ms: number}> = []
+      let t = 0
+      for (let b = 0; b < bars; b += 1) {
+        for (let i = 0; i < dongs; i += 1) { hits.push({target: '小鼓', sound: '咚', ms: t}); t += w1 + ((i * 7) % 20) }
+        hits.push({target: '小鼓', sound: accent, ms: t}); t += w2 + ((b * 11) % 20)
+      }
+      return {hits, finished}
+    }
+    const first = beatSummary(drum(2, 4, 300, 600))
+    expect(first).toMatchObject({bars: 2, dongs: 8, beats: 10, beatsPerBar: [5, 5], steady: false, accents: ['嗒', '嗒']})
+    expect(Math.round(first.innerMs!)).toBeGreaterThanOrEqual(300)
+    expect(first.gapMs! - first.innerMs!).toBeGreaterThan(200)
+    expect(beatSummary(drum(4, 3, 500, 500)).steady).toBe(true)
+    expect(beatSummary(drum(4, 3, 400, 500)).steady).toBe(false)
+    expect(beatSummary(undefined)).toMatchObject({bars: 0, beats: 0, steady: false})
+    // Hits from other sprites never count as drum beats.
+    expect(beatSummary({hits: [{target: '小橘猫', sound: '咚', ms: 0}], finished: true}).beats).toBe(0)
+
+    const obs = emptyG2Observations()
+    expect(Object.values(evaluateG2U2L03(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u2L03.id, obs)).toBeNull()
+    obs.beatRuns = [drum(2, 4, 300, 600, '嗒', false)]
+    expect(observedPrediction(g2u2L03.id, obs)).toBeNull()
+    expect(evaluateG2U2L03(obs).practiceB).toBe(false)
+    obs.beatRuns = [drum(2, 4, 300, 600)]
+    expect(observedPrediction(g2u2L03.id, obs)).toBe(g2u2L03.predict.correct)
+    expect(evaluateG2U2L03(obs)).toMatchObject({practiceA: false, practiceB: false, debug: false, create: false})
+    // 4 bars (4 accents) is practice A whatever the beats per bar; equal waits are practice B.
+    expect(evaluateG2U2L03({...obs, beatRuns: [drum(4, 4, 300, 600)]}).practiceA).toBe(true)
+    expect(evaluateG2U2L03({...obs, beatRuns: [drum(3, 3, 300, 600)]}).practiceA).toBe(false)
+    expect(evaluateG2U2L03({...obs, beatRuns: [drum(2, 4, 500, 500)]}).practiceB).toBe(true)
+    // Debug: a 4/4 run counts only after first seeing 5-beat bars.
+    expect(evaluateG2U2L03({...obs, beatRuns: [drum(2, 3, 300, 600)]}).debug).toBe(false)
+    expect(evaluateG2U2L03({...obs, beatRuns: [drum(2, 4, 300, 600), drum(2, 2, 300, 600)]}).debug).toBe(false)
+    obs.beatRuns.push(drum(2, 3, 300, 600))
+    expect(evaluateG2U2L03(obs).debug).toBe(true)
+    // Create: own cat line + 啪 accents + 4 bars of 4 beats + steady.
+    obs.beatRuns.push(drum(4, 3, 400, 400, '啪'))
+    obs.lastSaid = {小橘猫: L09_CAT_LINE}
+    expect(evaluateG2U2L03(obs).create).toBe(false)
+    obs.lastSaid = {小橘猫: '节奏表演开始'}
+    expect(evaluateG2U2L03(obs).create).toBe(true)
+    expect(evaluateG2U2L03({...obs, beatRuns: [drum(4, 3, 400, 400, '嗒')]}).create).toBe(false)
+    expect(evaluateG2U2L03({...obs, beatRuns: [drum(4, 3, 300, 600, '啪')]}).create).toBe(false)
+  })
+
+  it('U2-L03 nests the beat loop inside the bar loop; only counts, waits and the accent are editable', () => {
+    const drumT = g2u2L03.targets.find(t => t.name === '小鼓')!
+    const outer = drumT.scripts[0].body[0]
+    expect(outer.type).toBe('kc2_repeat')
+    expect(outer.children?.map(b => b.type)).toEqual(['kc2_repeat', 'kc2_play_sound', 'kc2_wait_free'])
+    expect(outer.children?.[0].children?.map(b => b.type)).toEqual(['kc2_play_sound', 'kc2_wait_free'])
+    expect(outer.children?.[0].children?.[0].fixed).toEqual({SOUND_MENU: '咚'})
+    expect(outer.children?.[1].slots[0]).toMatchObject({field: 'SOUND_MENU', options: ['嗒', '啪']})
+    expect(drumT.sounds).toEqual(['咚', '嗒', '啪'])
+    expect(g2u2L03.showBeats).toBe(true)
   })
 })

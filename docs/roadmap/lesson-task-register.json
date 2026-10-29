@@ -1573,7 +1573,7 @@
       "unitId": "G2-U2",
       "focusConcept": "时间",
       "plannedLearningOutcome": "能使用时间解释并完成「音乐节奏舞台」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1586,13 +1586,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/234",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U2-L03 block: 5 tests; 本地真 Chromium E2E G2-U2 15 用例 14 通过（L03 5/5；L01 练习 A 既有竞态断言失败，由 #232 修）; CI real-Chrome result pending)",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Hark B：真实 Scratch VM 原创音乐舞台项目（小鼓嵌套循环：外层=小节、里层=咚，里层后重音嗒/啪；小橘猫开场白）；练习A外层次数让重音响 4 下（VM 计小节）、练习B两个等待相等让节拍稳（VM 实测平均间隔差 ≤0.06 秒，多解）、每小节 5 拍的找错+三层提示（须先见 5 拍再见 4 拍）、创意重音啪+自己的开场白+4×4 拍稳节奏；.sb3 自动保存/刷新恢复/导出回读/导入、沙箱拒越界次数/非 0.1 秒格等待/重音选咚/改咚的声音/拆开嵌套/多余声音/他课工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U2-L03.json，非独立），需独立人工教研复核；无儿童试学；沙箱 VM 无音频引擎、未接 WebGL 渲染器。不得标 completed。"
     },
     {
       "id": "G2-U2-L04",

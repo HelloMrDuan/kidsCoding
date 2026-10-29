@@ -6,7 +6,7 @@ import {
   emptyG2Observations, evaluateG2Lesson, observedPrediction,
   type G2Lesson, type G2Observations, type G2Point,
 } from '@/content/curriculum/g2-u1-scratch-lessons'
-import {L07_TOO_FAST_MS, L07_VISIBLE_MS} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {beatSummary, L07_TOO_FAST_MS, L07_VISIBLE_MS} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {ScratchG2Blocks} from './scratch-g2-blocks'
 import {changedValues, valuesForTarget, type G2Program, type G2Values} from './scratch-g2-program'
 import {decodeSampleArchive, isG2Archive, readG2Draft, removeG2Draft, saveG2Draft} from './scratch-g2-draft'
@@ -59,6 +59,13 @@ function updateLastCycle(prev: G2Observations, change: (run: G2Observations['cyc
   return {...prev, cycleRuns: prev.cycleRuns.map((run, i) => (i === last ? change(run) : run))}
 }
 
+/** Update the green-flag run in progress (the last beat run). */
+function updateLastBeat(prev: G2Observations, change: (run: G2Observations['beatRuns'][number]) => G2Observations['beatRuns'][number]): G2Observations {
+  if (!prev.beatRuns.length) return prev
+  const last = prev.beatRuns.length - 1
+  return {...prev, beatRuns: prev.beatRuns.map((run, i) => (i === last ? change(run) : run))}
+}
+
 /** Frames each sprite stepped through in one green-flag run; the average gap needs at least two frames. */
 function summarizeFrames(frames: Record<string, {count: number; first: number; last: number; end: string}>) {
   return Object.fromEntries(Object.entries(frames).map(([name, f]) => [name, {
@@ -102,7 +109,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const clickFrom = useRef<Map<string, string>>(new Map())
   // The green-flag run in progress: how many times the stage's own sounds played in it.
   type FrameTrack = {count: number; first: number; last: number; end: string}
-  const flagRun = useRef<{stagePlays: number; speakers: string[]; overlaps: number; frames: Record<string, FrameTrack>; switches: number[]; stopRequested: boolean} | null>(null)
+  const flagRun = useRef<{stagePlays: number; speakers: string[]; overlaps: number; frames: Record<string, FrameTrack>; switches: number[]; stopRequested: boolean; beatT0: number | null} | null>(null)
   const [lastFrames, setLastFrames] = useState<{frames: Record<string, {count: number; avgMs: number | null; end: string}>; finished: boolean} | null>(null)
   const [lastSpeech, setLastSpeech] = useState<{speakers: string[]; overlaps: number; finished: boolean} | null>(null)
   const soundUris = useRef<Record<string, Record<string, string>>>({})
@@ -267,7 +274,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           const frameRun = {frames: summarizeFrames(flagRun.current.frames), positions: runPositions}
           const stopped = flagRun.current.stopRequested
           flagRun.current = null
-          setObs(prev => updateLastCycle(prev, r => ({...r, finished: true, stopped})))
+          setObs(prev => updateLastBeat(updateLastCycle(prev, r => ({...r, finished: true, stopped})), r => ({...r, finished: true})))
           setLastFrames({frames: frameRun.frames, finished: true})
           setLastRunSounds({stagePlays: finished.stagePlays, finished: true})
           setLastSpeech({speakers: speech.speakers, overlaps: speech.overlaps, finished: true})
@@ -323,6 +330,13 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           }
         } else if (target && sound) {
           const costume = String(msg.costume ?? '')
+          // Rhythm lessons: time every sound the VM starts during the green-flag run (sandbox clock, ms since the run's first sound).
+          const t = Number(msg.t)
+          if (flagRun.current && Number.isFinite(t)) {
+            if (flagRun.current.beatT0 === null) flagRun.current.beatT0 = t
+            const ms = Math.round(t - flagRun.current.beatT0)
+            setObs(prev => updateLastBeat(prev, r => ({...r, hits: [...r.hits, {target, sound, ms}].slice(-120)})))
+          }
           setObs(prev => ({
             ...prev,
             clickSounds: {...prev.clickSounds, [target]: [...(prev.clickSounds[target] ?? []), sound].slice(-20)},
@@ -419,8 +433,9 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'STARTED') {
         runSeen.current = true
         clickChanges.current.clear()
-        flagRun.current = {stagePlays: 0, speakers: [], overlaps: 0, frames: {}, switches: [], stopRequested: false}
-        setObs(prev => ({...prev, cycleRuns: [...prev.cycleRuns, {switches: 0, avgMs: null, speech: [], finished: false, stopped: false}].slice(-20)}))
+        flagRun.current = {stagePlays: 0, speakers: [], overlaps: 0, frames: {}, switches: [], stopRequested: false, beatT0: null}
+        setObs(prev => ({...prev, cycleRuns: [...prev.cycleRuns, {switches: 0, avgMs: null, speech: [], finished: false, stopped: false}].slice(-20),
+          beatRuns: [...prev.beatRuns, {hits: [], finished: false}].slice(-20)}))
         setLastSpeech(null)
         setLastFrames(null)
         setLastRunSounds({stagePlays: 0, finished: false})
@@ -658,6 +673,22 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                   {run?.speech.slice(-6).map((line, i) => (
                     <span key={i} data-testid="g2-cycle-speech" data-name={line.target} data-backdrop={line.backdrop} className="block">{`${line.target}在“${line.backdrop}”时开口。`}</span>
                   ))}
+                </p>
+              )
+            })()}
+            {lesson.showBeats && (() => {
+              const run = obs.beatRuns[obs.beatRuns.length - 1]
+              const b = beatSummary(run)
+              const sec = (ms: number | null) => (ms === null ? '—' : `${(ms / 1000).toFixed(2)} 秒`)
+              return (
+                <p data-testid="g2-beat-log" data-finished={run?.finished ? 'true' : 'false'} data-bars={run ? b.bars : ''} data-dongs={run ? b.dongs : ''}
+                  data-bar-beats={b.beatsPerBar.join(',')} data-accents={b.accents.join(',')} data-inner-ms={b.innerMs === null ? '' : Math.round(b.innerMs)}
+                  data-gap-ms={b.gapMs === null ? '' : Math.round(b.gapMs)} data-steady={b.steady ? 'true' : 'false'} className="mt-2 text-sm">
+                  {!run
+                    ? '还没有点绿旗：小鼓敲了几小节、每小节几拍、拍子之间隔多久，会显示在这里。'
+                    : `${run.finished ? '上一次绿旗' : '本次绿旗进行中'}：Scratch VM 里小鼓“咚”响了 ${b.dongs} 下，重音 ${b.bars} 下（${b.bars} 小节）`
+                      + `${b.beatsPerBar.length ? `，每小节拍数 ${b.beatsPerBar.join(' / ')}` : ''}；“咚”之间平均 ${sec(b.innerMs)}，重音之后平均 ${sec(b.gapMs)}`
+                      + `${b.innerMs !== null && b.gapMs !== null ? (b.steady ? '（节奏稳）' : '（忽快忽慢）') : ''}。`}
                 </p>
               )
             })()}

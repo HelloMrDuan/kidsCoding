@@ -501,6 +501,53 @@ def lesson_g2_u2_l02():
     return "g2-u2-l02-day-night.sb3.b64", project, files, params
 
 
+def lesson_g2_u2_l03():
+    """音乐节奏舞台: nested loops - the outer repeat counts bars, the inner repeat counts the beats inside one bar."""
+    backdrop, backdrop_file = svg_costume("音乐舞台", "music-stage-backdrop.svg", 240, 180)
+    drum_costume, drum_file = svg_costume("小鼓", "drum.svg", 50, 48)
+    cat, cat_file = svg_costume("小橘猫", "orange-cat.svg", 48, 48)
+    # Original sine-synthesised hits (tone_wav, no samples): a low drum beat and two short accents.
+    dong, dong_data = wav_sound("咚", [(150, 70, 0.18)])
+    da, da_data = wav_sound("嗒", [(1800, 1500, 0.06)])
+    pa, pa_data = wav_sound("啪", [(2600, 900, 0.08)])
+    drum_blocks = {
+        "drum_flag": block("event_whenflagclicked", "drum_bars", top=True, x=40, y=40),
+        "drum_bars": block("control_repeat", parent="drum_flag", inputs={"TIMES": num(2), "SUBSTACK": [2, "drum_beats"]}),
+        # The bug the lesson starts with: 4 "咚" + 1 accent = 5 beats in every bar (a 4/4 bar is 咚咚咚 + accent).
+        "drum_beats": block("control_repeat", "drum_accent", parent="drum_bars", inputs={"TIMES": num(4), "SUBSTACK": [2, "drum_dong"]}),
+        "drum_dong": block("sound_playuntildone", "drum_wait1", parent="drum_beats", inputs={"SOUND_MENU": [1, "drum_dong_menu"]}),
+        "drum_dong_menu": block("sound_sounds_menu", parent="drum_dong", fields={"SOUND_MENU": ["咚", None]}, shadow=True),
+        "drum_wait1": block("control_wait", parent="drum_dong", inputs={"DURATION": num(0.3)}),
+        "drum_accent": block("sound_playuntildone", "drum_wait2", parent="drum_beats", inputs={"SOUND_MENU": [1, "drum_accent_menu"]}),
+        "drum_accent_menu": block("sound_sounds_menu", parent="drum_accent", fields={"SOUND_MENU": ["嗒", None]}, shadow=True),
+        "drum_wait2": block("control_wait", parent="drum_accent", inputs={"DURATION": num(0.6)}),
+    }
+    cat_blocks = {
+        "cat_flag": block("event_whenflagclicked", "cat_say", top=True, x=40, y=40),
+        "cat_say": block("looks_sayforsecs", parent="cat_flag", inputs={"MESSAGE": text("一起打节拍！"), "SECS": num(2)}),
+    }
+    project = {
+        "targets": [
+            stage([backdrop]),
+            sprite("小鼓", [drum_costume], drum_blocks, 1, 40, -60, [dong, da, pa]),
+            sprite("小橘猫", [cat], cat_blocks, 2, -150, -60),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U2-L03"},
+    }
+    files = {c["md5ext"]: f for c, f in ((backdrop, backdrop_file), (drum_costume, drum_file), (cat, cat_file))}
+    files.update({dong["md5ext"]: dong_data, da["md5ext"]: da_data, pa["md5ext"]: pa_data})
+    params = [
+        {"target": "小鼓", "block": "drum_bars", "slot": "TIMES", "kind": "int", "min": 1, "max": 8},
+        {"target": "小鼓", "block": "drum_beats", "slot": "TIMES", "kind": "int", "min": 1, "max": 8},
+        {"target": "小鼓", "block": "drum_wait1", "slot": "DURATION", "kind": "tenths", "min": 0.2, "max": 1.0},
+        {"target": "小鼓", "block": "drum_accent_menu", "slot": "SOUND_MENU", "kind": "choice", "options": ["嗒", "啪"]},
+        {"target": "小鼓", "block": "drum_wait2", "slot": "DURATION", "kind": "tenths", "min": 0.2, "max": 1.0},
+        {"target": "小橘猫", "block": "cat_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+    ]
+    return "g2-u2-l03-rhythm-stage.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
@@ -510,6 +557,7 @@ LESSONS = {
     "G2-U1-L06": lesson_g2_u1_l06,
     "G2-U2-L01": lesson_g2_u2_l01,
     "G2-U2-L02": lesson_g2_u2_l02,
+    "G2-U2-L03": lesson_g2_u2_l03,
 }
 
 

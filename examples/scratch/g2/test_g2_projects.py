@@ -199,5 +199,24 @@ class G2ProjectTests(unittest.TestCase):
         self.assertEqual({(p["target"], p["block"]) for p in params if p["slot"] == "BACKDROP"}, {("猫头鹰", "owl_hat"), ("小橘猫", "cat_hat")})
 
 
+    def test_u2_l03_nested_loops_bars_and_beats(self):
+        _, project, files, params = LESSONS["G2-U2-L03"]()
+        stage, drum, cat = project["targets"]
+        self.assertEqual([s["name"] for s in drum["sounds"]], ["咚", "嗒", "啪"])
+        b = drum["blocks"]
+        self.assertEqual(b["drum_bars"]["opcode"], "control_repeat")
+        self.assertEqual(b["drum_bars"]["inputs"]["SUBSTACK"], [2, "drum_beats"], "the beat loop sits inside the bar loop")
+        self.assertEqual(b["drum_beats"]["inputs"]["SUBSTACK"], [2, "drum_dong"])
+        self.assertEqual(b["drum_beats"]["next"], "drum_accent", "the accent ends each bar, after the inner loop")
+        self.assertEqual([b[k]["opcode"] for k in ("drum_dong", "drum_wait1", "drum_accent", "drum_wait2")],
+                         ["sound_playuntildone", "control_wait", "sound_playuntildone", "control_wait"])
+        # The bug the lesson starts with: 4 咚 + accent = 5 beats per bar; uneven waits.
+        self.assertEqual(b["drum_beats"]["inputs"]["TIMES"], [1, [4, "4"]])
+        self.assertEqual(b["drum_bars"]["inputs"]["TIMES"], [1, [4, "2"]])
+        self.assertNotEqual(b["drum_wait1"]["inputs"]["DURATION"], b["drum_wait2"]["inputs"]["DURATION"])
+        self.assertEqual(len([f for f in files if f.endswith(".wav")]), 3)
+        self.assertEqual([p["block"] for p in params if p["target"] == "小鼓" and p["slot"] == "TIMES"], ["drum_bars", "drum_beats"])
+        self.assertEqual({p["block"] for p in params if p["slot"] == "SOUND_MENU"}, {"drum_accent_menu"}, "the 咚 beat sound is fixed")
+
 if __name__ == "__main__":
     unittest.main()

@@ -64,6 +64,8 @@ export type G2Lesson = {
   showFrames?: boolean
   /** Show the stage's forever day/night loop: switches, VM time per phase, who spoke on which backdrop, and whether the run was stopped. */
   showCycle?: boolean
+  /** Show the drum's beats in the last green-flag run: bars, beats per bar and the VM time between beats (rhythm lessons). */
+  showBeats?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -584,12 +586,14 @@ export type G2Observations = {
   /** Green-flag runs, updated while they run (a forever loop never ends by itself): VM "next backdrop" switches, the average VM time between them,
    * each line a sprite started with the backdrop showing at that moment, whether the run has ended and whether the learner stopped it. */
   cycleRuns: Array<{ switches: number; avgMs: number | null; speech: Array<{ target: string; backdrop: string }>; finished: boolean; stopped: boolean }>
+  /** Green-flag runs: every sprite sound the VM started, in order, with the VM time since the run's first sound (ms), and whether the run has ended. */
+  beatRuns: Array<{ hits: Array<{ target: string; sound: string; ms: number }>; finished: boolean }>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
-  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [], cycleRuns: [],
+  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [], cycleRuns: [], beatRuns: [],
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
