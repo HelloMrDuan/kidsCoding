@@ -6,7 +6,7 @@ import {
   emptyG2Observations, evaluateG2Lesson, observedPrediction,
   type G2Lesson, type G2Observations, type G2Point,
 } from '@/content/curriculum/g2-u1-scratch-lessons'
-import {beatSummary, L07_TOO_FAST_MS, L07_VISIBLE_MS} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {beatSummary, flightSummary, L07_TOO_FAST_MS, L07_VISIBLE_MS} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {ScratchG2Blocks} from './scratch-g2-blocks'
 import {changedValues, valuesForTarget, type G2Program, type G2Values} from './scratch-g2-program'
 import {decodeSampleArchive, isG2Archive, readG2Draft, removeG2Draft, saveG2Draft} from './scratch-g2-draft'
@@ -109,7 +109,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const clickFrom = useRef<Map<string, string>>(new Map())
   // The green-flag run in progress: how many times the stage's own sounds played in it.
   type FrameTrack = {count: number; first: number; last: number; end: string}
-  const flagRun = useRef<{stagePlays: number; speakers: string[]; overlaps: number; frames: Record<string, FrameTrack>; switches: number[]; stopRequested: boolean; beatT0: number | null} | null>(null)
+  const flagRun = useRef<{stagePlays: number; speakers: string[]; overlaps: number; frames: Record<string, FrameTrack>; switches: number[]; stopRequested: boolean; beatT0: number | null; turns: Record<string, number>} | null>(null)
   const [lastFrames, setLastFrames] = useState<{frames: Record<string, {count: number; avgMs: number | null; end: string}>; finished: boolean} | null>(null)
   const [lastSpeech, setLastSpeech] = useState<{speakers: string[]; overlaps: number; finished: boolean} | null>(null)
   const soundUris = useRef<Record<string, Record<string, string>>>({})
@@ -271,7 +271,9 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           for (const t of current) if (t.original) runPositions[t.name] = {x: t.x, y: t.y}
           const finished = {backdrop: msg.backdrop ?? '', stagePlays: flagRun.current.stagePlays, positions: runPositions}
           const speech = {speakers: [...flagRun.current.speakers], overlaps: flagRun.current.overlaps, positions: runPositions}
-          const frameRun = {frames: summarizeFrames(flagRun.current.frames), positions: runPositions}
+          const runDirections: Record<string, number> = {}
+          for (const t of current) if (t.original && typeof t.direction === 'number') runDirections[t.name] = t.direction
+          const frameRun = {frames: summarizeFrames(flagRun.current.frames), positions: runPositions, turns: {...flagRun.current.turns}, directions: runDirections}
           const stopped = flagRun.current.stopRequested
           flagRun.current = null
           setObs(prev => updateLastBeat(updateLastCycle(prev, r => ({...r, finished: true, stopped})), r => ({...r, finished: true})))
@@ -371,6 +373,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'TURN') {
         const target = String(msg.target ?? '')
         const degrees = Number(msg.degrees)
+        // Green-flag runs: total degrees each sprite turned (flight-path lessons).
+        if (target && Number.isFinite(degrees) && flagRun.current) flagRun.current.turns[target] = (flagRun.current.turns[target] ?? 0) + degrees
         if (target && Number.isFinite(degrees) && clickTurn.current.has(target)) {
           const total = (clickTurn.current.get(target) ?? 0) + degrees
           clickTurn.current.set(target, total)
@@ -433,7 +437,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'STARTED') {
         runSeen.current = true
         clickChanges.current.clear()
-        flagRun.current = {stagePlays: 0, speakers: [], overlaps: 0, frames: {}, switches: [], stopRequested: false, beatT0: null}
+        flagRun.current = {stagePlays: 0, speakers: [], overlaps: 0, frames: {}, switches: [], stopRequested: false, beatT0: null, turns: {}}
         setObs(prev => ({...prev, cycleRuns: [...prev.cycleRuns, {switches: 0, avgMs: null, speech: [], finished: false, stopped: false}].slice(-20),
           beatRuns: [...prev.beatRuns, {hits: [], finished: false}].slice(-20)}))
         setLastSpeech(null)
@@ -689,6 +693,19 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                     : `${run.finished ? '上一次绿旗' : '本次绿旗进行中'}：Scratch VM 里小鼓“咚”响了 ${b.dongs} 下，重音 ${b.bars} 下（${b.bars} 小节）`
                       + `${b.beatsPerBar.length ? `，每小节拍数 ${b.beatsPerBar.join(' / ')}` : ''}；“咚”之间平均 ${sec(b.innerMs)}，重音之后平均 ${sec(b.gapMs)}`
                       + `${b.innerMs !== null && b.gapMs !== null ? (b.steady ? '（节奏稳）' : '（忽快忽慢）') : ''}。`}
+                </p>
+              )
+            })()}
+            {lesson.showFlight && (() => {
+              const f = flightSummary(obs.frameRuns[obs.frameRuns.length - 1])
+              return (
+                <p data-testid="g2-flight-log" data-runs={obs.frameRuns.length} data-turn={f ? f.turn : ''} data-laps={f ? f.laps : ''}
+                  data-end-x={f?.end ? Math.round(f.end.x) : ''} data-end-y={f?.end ? Math.round(f.end.y) : ''} data-distance={f?.distance === null || !f ? '' : Math.round(f.distance)}
+                  data-direction={f?.direction ?? ''} data-closed={f?.closed ? 'true' : 'false'} data-frames={f ? f.frames : ''} className="mt-2 text-sm">
+                  {!f
+                    ? '还没有点绿旗：蝴蝶一共转了多少度、飞了几圈、最后离起点多远，会显示在这里。'
+                    : `上一次绿旗：Scratch VM 里蝴蝶一共右转 ${f.turn} 度${f.turn % 360 === 0 && f.turn > 0 ? `（正好 ${f.laps} 圈）` : `（${(f.turn / 360).toFixed(2)} 圈，不是整圈）`}，扇了 ${f.frames} 下翅膀；`
+                      + `最后在 x ${f.end ? Math.round(f.end.x) : '—'} · y ${f.end ? Math.round(f.end.y) : '—'}，离起点 ${f.distance === null ? '—' : Math.round(f.distance)} 步，面向 ${f.direction ?? '—'} 度。${f.closed ? '回到起点了！' : '没有回到起点。'}`}
                 </p>
               )
             })()}

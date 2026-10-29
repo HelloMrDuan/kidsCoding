@@ -218,5 +218,20 @@ class G2ProjectTests(unittest.TestCase):
         self.assertEqual([p["block"] for p in params if p["target"] == "小鼓" and p["slot"] == "TIMES"], ["drum_bars", "drum_beats"])
         self.assertEqual({p["block"] for p in params if p["slot"] == "SOUND_MENU"}, {"drum_accent_menu"}, "the 咚 beat sound is fixed")
 
+    def test_u2_l04_flight_loop_move_turn(self):
+        _, project, _, params = LESSONS["G2-U2-L04"]()
+        stage, fly, flower = project["targets"]
+        b = fly["blocks"]
+        self.assertEqual(b["fly_repeat"]["inputs"]["SUBSTACK"], [2, "fly_move"])
+        self.assertEqual([b[k]["opcode"] for k in ("fly_move", "fly_turn", "fly_next", "fly_wait")],
+                         ["motion_movesteps", "motion_turnright", "looks_nextcostume", "control_wait"])
+        # The bug the lesson starts with: 6 × 45 = 270, not a whole turn.
+        times = int(b["fly_repeat"]["inputs"]["TIMES"][1][1])
+        degrees = int(b["fly_turn"]["inputs"]["DEGREES"][1][1])
+        self.assertNotEqual((times * degrees) % 360, 0)
+        self.assertEqual([c["name"] for c in fly["costumes"]], ["展翅", "合翅"])
+        self.assertEqual({p["block"] for p in params}, {"fly_repeat", "fly_move", "fly_turn", "fly_say"}, "start, direction and wait stay fixed")
+        self.assertEqual(flower["name"], "花朵")
+
 if __name__ == "__main__":
     unittest.main()

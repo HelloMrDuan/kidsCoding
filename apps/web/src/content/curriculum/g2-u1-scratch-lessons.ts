@@ -66,6 +66,8 @@ export type G2Lesson = {
   showCycle?: boolean
   /** Show the drum's beats in the last green-flag run: bars, beats per bar and the VM time between beats (rhythm lessons). */
   showBeats?: boolean
+  /** Show the flight path of the last green-flag run: total degrees turned, laps, end position and distance from the start (move + turn loops). */
+  showFlight?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -582,7 +584,9 @@ export type G2Observations = {
   /** Every sound a sprite played in the VM, with the costume it was wearing when the sound started. */
   soundCostumes: Array<{ target: string; sound: string; costume: string }>
   /** Finished green-flag runs: per sprite, how many times the VM ran "next costume", the average VM time between two frames (null below 2 frames) and the frame it ended on. */
-  frameRuns: Array<{ frames: Record<string, { count: number; avgMs: number | null; end: string }>; positions: Record<string, G2Point> }>
+  frameRuns: Array<{ frames: Record<string, { count: number; avgMs: number | null; end: string }>; positions: Record<string, G2Point>
+    /** Degrees each sprite really turned (VM turn right/left primitives) in the run, and the direction it faces at the end. */
+    turns?: Record<string, number>; directions?: Record<string, number> }>
   /** Green-flag runs, updated while they run (a forever loop never ends by itself): VM "next backdrop" switches, the average VM time between them,
    * each line a sprite started with the backdrop showing at that moment, whether the run has ended and whether the learner stopped it. */
   cycleRuns: Array<{ switches: number; avgMs: number | null; speech: Array<{ target: string; backdrop: string }>; finished: boolean; stopped: boolean }>

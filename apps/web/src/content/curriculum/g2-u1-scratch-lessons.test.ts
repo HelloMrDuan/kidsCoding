@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
 import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, evaluateG2U1L06, g2u1L06, L06_CAT_LINE, inRibbonZone, inBirdNest, observedPrediction, g2ScratchLessons, getG2ScratchLesson} from './g2-u1-scratch-lessons'
-import {atDoor, beatSummary, evaluateG2U2L01, evaluateG2U2L02, evaluateG2U2L03, g2u2L01, g2u2L02, g2u2L03, L07_CAT_LINE, L08_OWL_LINE, L09_CAT_LINE} from './g2-u2-scratch-lessons'
+import {atDoor, beatSummary, evaluateG2U2L01, evaluateG2U2L02, evaluateG2U2L03, evaluateG2U2L04, flightSummary, g2u2L01, g2u2L02, g2u2L03, g2u2L04, L07_CAT_LINE, L08_OWL_LINE, L09_CAT_LINE, L10_FLY_LINE} from './g2-u2-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -411,5 +411,50 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(outer.children?.[1].slots[0]).toMatchObject({field: 'SOUND_MENU', options: ['嗒', '啪']})
     expect(drumT.sounds).toEqual(['咚', '嗒', '啪'])
     expect(g2u2L03.showBeats).toBe(true)
+  })
+  it('U2-L04 reads the flight from VM turn totals and end state: whole turns that end at the start ring close the loop', () => {
+    // A finished flag run of the butterfly: `times` × right turn `deg`, ending at `end`.
+    const flight = (times: number, deg: number, end: {x: number; y: number}, direction = 90) => ({
+      frames: {蝴蝶: {count: times, avgMs: 200, end: times % 2 ? '合翅' : '展翅'}}, positions: {蝴蝶: end, 花朵: {x: -110, y: 30}},
+      turns: {蝴蝶: times * deg}, directions: {蝴蝶: direction},
+    })
+    const start = {x: -60, y: 60}
+    const away = {x: -2, y: 2}
+    expect(flightSummary(undefined)).toBeNull()
+    expect(flightSummary(flight(6, 45, away, 0))).toMatchObject({turn: 270, laps: 0, closed: false, direction: 0, frames: 6})
+    expect(flightSummary(flight(8, 45, {x: -60.000001, y: 59.99999}))).toMatchObject({turn: 360, laps: 1, closed: true})
+    // A whole turn that still ends far away (e.g. a stale run position) is not closed; nor is a near miss of 350°.
+    expect(flightSummary(flight(8, 45, away))!.closed).toBe(false)
+    expect(flightSummary(flight(7, 50, start))!.closed).toBe(false)
+
+    const obs = emptyG2Observations()
+    expect(Object.values(evaluateG2U2L04(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u2L04.id, obs)).toBeNull()
+    obs.frameRuns = [flight(6, 45, away, 0)]
+    expect(observedPrediction(g2u2L04.id, obs)).toBe(g2u2L04.predict.correct)
+    expect(evaluateG2U2L04(obs)).toMatchObject({practiceA: false, practiceB: false, debug: false, create: false})
+    expect(evaluateG2U2L04({...obs, frameRuns: [flight(6, 60, start)]})).toMatchObject({practiceA: true, practiceB: false, debug: false})
+    expect(evaluateG2U2L04({...obs, frameRuns: [flight(8, 90, start)]})).toMatchObject({practiceA: true, practiceB: true})
+    // Runs without any turn (other lessons' frame runs) are ignored.
+    expect(evaluateG2U2L04({...obs, frameRuns: [{frames: {}, positions: {}}]}).practiceA).toBe(false)
+    obs.frameRuns.push(flight(8, 45, start))
+    expect(evaluateG2U2L04(obs).debug).toBe(true)
+    obs.lastSaid = {蝴蝶: L10_FLY_LINE}
+    obs.frameRuns.push(flight(12, 30, start))
+    expect(evaluateG2U2L04(obs).create).toBe(false)
+    obs.lastSaid = {蝴蝶: '花园真美'}
+    expect(evaluateG2U2L04(obs).create).toBe(true)
+    expect(evaluateG2U2L04({...obs, frameRuns: [flight(8, 45, start)]}).create).toBe(false)
+  })
+
+  it('U2-L04 loops move + turn right + next costume with a fixed start, direction and wait; the flower is decoration', () => {
+    const fly = g2u2L04.targets.find(t => t.name === '蝴蝶')!
+    const body = fly.scripts[0].body
+    expect(body.map(b => b.type)).toEqual(['kc2_goto_start', 'kc2_point_direction', 'kc2_switch_costume', 'kc2_repeat', 'kc2_say'])
+    expect(body[3].children?.map(b => b.type)).toEqual(['kc2_move_steps', 'kc2_turn_right', 'kc2_next_costume', 'kc2_wait'])
+    expect(body[3].children?.[3].fixed).toEqual({DURATION: '0.2'})
+    const flower = g2u2L04.targets.find(t => t.name === '花朵')!
+    expect(flower.scripts[0].body.every(b => b.slots.length === 0)).toBe(true)
+    expect(g2u2L04.showFlight).toBe(true)
   })
 })

@@ -548,6 +548,49 @@ def lesson_g2_u2_l03():
     return "g2-u2-l03-rhythm-stage.sb3.b64", project, files, params
 
 
+def lesson_g2_u2_l04():
+    """循环飞舞的蝴蝶: move + turn inside a repeat draws a flight path; it closes when repeats × degrees is a whole number of turns (360)."""
+    garden, garden_file = svg_costume("花园", "garden-backdrop.svg", 240, 180)
+    wings_open, open_file = svg_costume("展翅", "butterfly-open.svg", 32, 32)
+    wings_closed, closed_file = svg_costume("合翅", "butterfly-closed.svg", 32, 32)
+    flower, flower_file = svg_costume("花朵", "pink-flower.svg", 24, 56)
+    fly_blocks = {
+        "fly_flag": block("event_whenflagclicked", "fly_home", top=True, x=40, y=40),
+        "fly_home": block("motion_gotoxy", "fly_point", parent="fly_flag", inputs={"X": num(-60), "Y": num(60)}),
+        "fly_point": block("motion_pointindirection", "fly_first", parent="fly_home", inputs={"DIRECTION": angle(90)}),
+        "fly_first": block("looks_switchcostumeto", "fly_repeat", parent="fly_point", inputs={"COSTUME": [1, "fly_first_menu"]}),
+        "fly_first_menu": block("looks_costume", parent="fly_first", fields={"COSTUME": ["展翅", None]}, shadow=True),
+        # The bug the lesson starts with: 6 × 45 = 270 degrees, so the flight stops three quarters of the way round.
+        "fly_repeat": block("control_repeat", "fly_say", parent="fly_first", inputs={"TIMES": num(6), "SUBSTACK": [2, "fly_move"]}),
+        "fly_move": block("motion_movesteps", "fly_turn", parent="fly_repeat", inputs={"STEPS": num(40)}),
+        "fly_turn": block("motion_turnright", "fly_next", parent="fly_move", inputs={"DEGREES": num(45)}),
+        "fly_next": block("looks_nextcostume", "fly_wait", parent="fly_turn"),
+        "fly_wait": block("control_wait", parent="fly_next", inputs={"DURATION": num(0.2)}),
+        "fly_say": block("looks_sayforsecs", parent="fly_repeat", inputs={"MESSAGE": text("我飞回花朵啦！"), "SECS": num(2)}),
+    }
+    flower_blocks = {
+        "flower_flag": block("event_whenflagclicked", "flower_home", top=True, x=40, y=40),
+        "flower_home": block("motion_gotoxy", parent="flower_flag", inputs={"X": num(-110), "Y": num(30)}),
+    }
+    project = {
+        "targets": [
+            stage([garden]),
+            sprite("蝴蝶", [wings_open, wings_closed], fly_blocks, 2, -60, 60),
+            sprite("花朵", [flower], flower_blocks, 1, -110, 30),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U2-L04"},
+    }
+    files = {c["md5ext"]: f for c, f in ((garden, garden_file), (wings_open, open_file), (wings_closed, closed_file), (flower, flower_file))}
+    params = [
+        {"target": "蝴蝶", "block": "fly_repeat", "slot": "TIMES", "kind": "int", "min": 1, "max": 20},
+        {"target": "蝴蝶", "block": "fly_move", "slot": "STEPS", "kind": "int", "min": 5, "max": 60},
+        {"target": "蝴蝶", "block": "fly_turn", "slot": "DEGREES", "kind": "int", "min": 5, "max": 120},
+        {"target": "蝴蝶", "block": "fly_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+    ]
+    return "g2-u2-l04-butterfly-loop.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
@@ -558,6 +601,7 @@ LESSONS = {
     "G2-U2-L01": lesson_g2_u2_l01,
     "G2-U2-L02": lesson_g2_u2_l02,
     "G2-U2-L03": lesson_g2_u2_l03,
+    "G2-U2-L04": lesson_g2_u2_l04,
 }
 
 
