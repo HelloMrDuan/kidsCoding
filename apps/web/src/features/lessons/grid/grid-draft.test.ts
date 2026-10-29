@@ -15,6 +15,14 @@ describe('EDU-104 grid lesson local draft', () => {
     expect(parseGridDraft(lesson, '{oops')).toBeNull()
     expect(parseGridDraft(lesson, null)).toBeNull()
   })
+  it('SYS-107: restores a program with a repeat body and clamps a forged count', () => {
+    const raw = JSON.stringify({ stepIndex: 0, programs: { 'leave-treehouse': [{ type: 'when_start' }, { type: 'repeat_times', times: 3, body: [{ type: 'move_forward' }, { type: 'rm_rf' }] }, { type: 'repeat_times', times: 999, body: [{ type: 'turn_right' }] }] } })
+    expect(parseGridDraft(lesson, raw)?.programs['leave-treehouse']).toEqual([
+      { type: 'when_start' },
+      { type: 'repeat_times', times: 3, body: [{ type: 'move_forward' }] },
+      { type: 'repeat_times', times: 2, body: [{ type: 'turn_right' }] },
+    ])
+  })
   it('keeps a valid reflection choice and drops an out-of-range one', () => {
     expect(parseGridDraft(lesson, JSON.stringify({ stepIndex: 0, reflection: 1 }))?.reflection).toBe(1)
     expect(parseGridDraft(lesson, JSON.stringify({ stepIndex: 0, reflection: 9 }))?.reflection).toBeUndefined()

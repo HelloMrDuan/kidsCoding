@@ -7,17 +7,16 @@ import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 import { BLOCKLY_MEDIA_PATH } from './blockly-media'
 import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
 import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
+import { DEFAULT_REPEAT_TIMES, REPEAT_BLOCK, type ProgramBlock } from './program-tree'
 import { restoreBlockSequence } from './restore-block-sequence'
 import type { SayLinePreset } from './say-line-presets'
 
-type BlockSnapshot = {
-  type: string
-  disconnected?: boolean
-  /** TQ-008: preset line id chosen on a say block (only when the lesson offers choices). */
-  line?: string
-}
+/** SYS-107: snapshots are program trees; a repeat block carries `times` and `body`. */
+type BlockSnapshot = ProgramBlock
 
 const LINE_FIELD = 'LINE'
+const REPEAT_TIMES_FIELD = 'TIMES'
+const REPEAT_BODY_INPUT = 'DO'
 const BASE_SCALE = 0.9
 /** Lowest scale the fit may shrink to: still readable for kids on a 375px phone. */
 const MIN_FIT_SCALE = 0.6
@@ -150,9 +149,42 @@ function collectSequence(block: Blockly.Block | null, result: BlockSnapshot[]) {
 
   while (current) {
     const line = current.getField(LINE_FIELD)?.getValue()
-    result.push(typeof line === 'string' && line ? { type: current.type, line } : { type: current.type })
+    const item: BlockSnapshot = typeof line === 'string' && line ? { type: current.type, line } : { type: current.type }
+    if (current.type === REPEAT_BLOCK) {
+      // SYS-107: the count and the blocks inside the repeat's mouth.
+      item.times = Number(current.getFieldValue(REPEAT_TIMES_FIELD)) || DEFAULT_REPEAT_TIMES
+      const body: BlockSnapshot[] = []
+      collectSequence(current.getInputTargetBlock(REPEAT_BODY_INPUT), body)
+      item.body = body
+    }
+    result.push(item)
     current = current.getNextBlock()
   }
+}
+
+/** SYS-107: build a restored block (and, for a repeat, everything inside it). */
+function createRestoredBlock(
+  workspace: Blockly.WorkspaceSvg,
+  snapshot: BlockSnapshot,
+  decorate: (block: Blockly.BlockSvg, snapshot: BlockSnapshot) => void,
+): Blockly.BlockSvg {
+  const block = workspace.newBlock(snapshot.type)
+  if (snapshot.type === REPEAT_BLOCK) {
+    block.setFieldValue(String(snapshot.times ?? DEFAULT_REPEAT_TIMES), REPEAT_TIMES_FIELD)
+  }
+  decorate(block, snapshot)
+  block.initSvg()
+  block.render()
+  if (snapshot.type === REPEAT_BLOCK && snapshot.body?.length) {
+    let previous: Blockly.BlockSvg | null = null
+    for (const child of snapshot.body) {
+      const childBlock = createRestoredBlock(workspace, child, decorate)
+      const target = previous ? previous.nextConnection : block.getInput(REPEAT_BODY_INPUT)?.connection
+      if (target && childBlock.previousConnection) target.connect(childBlock.previousConnection)
+      previous = childBlock
+    }
+  }
+  return block
 }
 
 /**
@@ -168,7 +200,8 @@ function ensureLineField(block: Blockly.Block, choices: readonly SayLinePreset[]
   block.setInputsInline(false)
 }
 
-function buildSnapshot(workspace: Blockly.WorkspaceSvg) {
+/** SYS-107: exported for the headless serialisation test. */
+export function buildSnapshot(workspace: Blockly.Workspace) {
   const snapshot: BlockSnapshot[] = []
 
   workspace.getTopBlocks(true).forEach((block, index) => {
@@ -294,13 +327,12 @@ export function BlocklyWorkspace({
     )
 
     restoredBlocks.forEach((snapshot) => {
-      const block = workspace.newBlock(snapshot.type)
-      applyMotionLabel(block, motionVerb)
-      if (choicesRef.current && choicesRef.current.length > 0) {
-        ensureLineField(block, choicesRef.current, snapshot.line ?? lastChosenLineRef.current ?? choicesRef.current[0].id)
-      }
-      block.initSvg()
-      block.render()
+      const block = createRestoredBlock(workspace, snapshot, (created, item) => {
+        applyMotionLabel(created, motionVerb)
+        if (choicesRef.current && choicesRef.current.length > 0) {
+          ensureLineField(created, choicesRef.current, item.line ?? lastChosenLineRef.current ?? choicesRef.current[0].id)
+        }
+      })
       if ((snapshot as BlockSnapshot).disconnected) block.moveBy(28, 230)
       else positionOrConnectBlock(workspace, block)
     })

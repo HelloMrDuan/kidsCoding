@@ -18,3 +18,20 @@ describe('restoreBlockSequence', () => {
     ).toEqual([{ type: 'when_start' }])
   })
 })
+
+describe('restoreBlockSequence with repeat bodies (SYS-107)', () => {
+  it('keeps a repeat and filters the blocks inside its body', () => {
+    expect(
+      restoreBlockSequence(
+        [{ type: 'when_start' }, { type: 'repeat_times', times: 4, body: [{ type: 'move_forward' }, { type: 'say_line' }] }] as Array<{ type: string; times?: number; body?: Array<{ type: string }> }>,
+        ['when_start', 'repeat_times', 'move_forward'],
+      ),
+    ).toEqual([{ type: 'when_start' }, { type: 'repeat_times', times: 4, body: [{ type: 'move_forward' }] }])
+  })
+
+  it('drops a repeat (with its body) when the step does not offer it', () => {
+    expect(
+      restoreBlockSequence([{ type: 'when_start' }, { type: 'repeat_times', body: [{ type: 'move_forward' }] }], ['when_start', 'move_forward']),
+    ).toEqual([{ type: 'when_start' }])
+  })
+})

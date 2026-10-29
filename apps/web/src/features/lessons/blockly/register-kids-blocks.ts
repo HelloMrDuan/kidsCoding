@@ -1,6 +1,7 @@
 import * as Blockly from 'blockly'
 
 import { getKidsBlockLabel, kidsBlockLabels } from './block-labels'
+import { REPEAT_TIMES_OPTIONS } from './program-tree'
 
 export { getKidsBlockLabel, kidsBlockLabels }
 
@@ -124,6 +125,21 @@ const KIDS_BLOCK_DEFINITIONS = [
         { type: 'field_image', src: ICONS.repeat, width: 22, height: 22, alt: '' },
         { type: 'field_label_serializable', name: BLOCK_LABEL_FIELD, text: kidsBlockLabels.repeat_twice },
       ],
+      previousStatement: null,
+      nextStatement: null,
+      style: 'kc_control',
+    },
+    {
+      // SYS-107: a real loop — the blocks inside its mouth run N times.
+      type: 'repeat_times',
+      message0: '%1 %2 %3 次',
+      args0: [
+        { type: 'field_image', src: ICONS.repeat, width: 22, height: 22, alt: '' },
+        { type: 'field_label_serializable', name: BLOCK_LABEL_FIELD, text: kidsBlockLabels.repeat_times },
+        { type: 'field_dropdown', name: 'TIMES', options: REPEAT_TIMES_OPTIONS.map(n => [String(n), String(n)]) },
+      ],
+      message1: '%1',
+      args1: [{ type: 'input_statement', name: 'DO' }],
       previousStatement: null,
       nextStatement: null,
       style: 'kc_control',
