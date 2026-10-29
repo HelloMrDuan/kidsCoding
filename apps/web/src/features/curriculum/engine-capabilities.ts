@@ -11,6 +11,7 @@ export const blocklyEngineCapabilities: Record<string, string> = {
   direction: 'grid/grid-engine.ts (up/down/left/right, forward, turn left/right)',
   path_obstacles: 'grid/grid-engine.ts (rocks, river, map edge, key and locked door)',
   finite_repeat: 'blockly/program-tree.ts + grid/grid-engine.ts (SYS-107 “重复 N 次” C-block, nested bodies unrolled by the engine)',
+  jump_over: 'grid/grid-engine.ts (G0-U3-L02 jump_forward hops over one cell: puddles yes, rocks / locked doors no)',
   pattern_stamp: 'grid/grid-engine.ts (G0-U3 stamp_red / stamp_blue footprints judged against the level pattern)',
 }
 

@@ -18,7 +18,9 @@ export type GridLevel = {
   door?: Cell
   /** Story decoration drawn under the start cell; never affects a run. */
   /** Original story art drawn beside the map (never a cell): L01 treehouse, L02 forest post signpost, L03 squirrel's acorn counting board, L04 turn sign, L05 key hook board, L06 forest guide's map. */
-  scenery?: 'treehouse' | 'signpost' | 'counting' | 'turnsign' | 'keyhook' | 'guidemap' | 'mushroompath'
+  scenery?: 'treehouse' | 'signpost' | 'counting' | 'turnsign' | 'keyhook' | 'guidemap' | 'mushroompath' | 'puddlesign'
+  /** G0-U3-L02: who walks the grid (default the fox). */
+  actor?: 'fox' | 'rabbit'
   /** G0-U3: footprints the program must leave, in path order (colour on each cell). */
   footprints?: Footprint[]
 }
@@ -40,6 +42,7 @@ export const GRID_BLOCK_TYPES = [
   'open_door',
   'stamp_red',
   'stamp_blue',
+  'jump_forward',
 ] as const
 
 export type GridBlockType = (typeof GRID_BLOCK_TYPES)[number]
@@ -165,6 +168,33 @@ export function runGridProgram(level: GridLevel, blocks: ProgramBlock[]): GridRu
         return result(false, 'need_key', '门锁着，小狐狸手里还没有钥匙。先去捡钥匙再回来开门。', frames, state, steps)
       }
       state.doorOpen = true
+      push()
+      continue
+    }
+    if (type === 'jump_forward') {
+      // G0-U3-L02: hop two cells forward, over the middle one (a puddle is fine, a rock or a locked door is not).
+      const d = DELTA[state.facing]
+      const mid = { x: state.x + d.x, y: state.y + d.y }
+      const land = { x: state.x + 2 * d.x, y: state.y + 2 * d.y }
+      if (land.x < 0 || land.y < 0 || land.x >= level.cols || land.y >= level.rows) {
+        push(land)
+        return result(false, 'out_of_bounds', `再跳就跳出森林地图了。数一数还要跳几下。`, frames, state, steps)
+      }
+      if (has(level.rocks, mid) || has(level.rocks, land)) {
+        push(has(level.rocks, mid) ? mid : land)
+        return result(false, 'hit_rock', '石头太高，跳不过去。', frames, state, steps)
+      }
+      if ((same(level.door, mid) || same(level.door, land)) && !state.doorOpen) {
+        push(same(level.door, mid) ? mid : land)
+        return result(false, 'door_locked', '树洞门还关着，跳不过去。', frames, state, steps)
+      }
+      state.x = land.x
+      state.y = land.y
+      steps += 2
+      if (has(level.water, land)) {
+        push()
+        return result(false, 'fell_in_water', '扑通！这一跳落进了水坑里。看看落脚的地方是不是干的。', frames, state, steps)
+      }
       push()
       continue
     }

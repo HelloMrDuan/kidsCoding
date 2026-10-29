@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 64 70" role="img" aria-label="小兔子的水坑路牌：跳两下越过两个水坑">
+<g>
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="30" width="6" height="30" rx="2" fill="#9b6a3c" stroke="#5e3b1c" stroke-width="2" />
+      <rect x="2" y="6" width="52" height="28" rx="5" fill="#ffe2b8" stroke="#a0704a" stroke-width="2.5" />
+      <ellipse cx="16" cy="27" rx="7" ry="3" fill="#6cc8ff" stroke="#3a9ad9" stroke-width="1.5" />
+      <ellipse cx="40" cy="27" rx="7" ry="3" fill="#6cc8ff" stroke="#3a9ad9" stroke-width="1.5" />
+      <path d="M5 26 Q16 6 27 24 M29 24 Q40 6 51 24" fill="none" stroke="#ff8a3d" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 3" />
+      <path d="M48 20 l3 4 2-5" fill="none" stroke="#ff8a3d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M6 58 q4 -8 10 -4 q4 -6 8 2" fill="#5cbf60" stroke="#2f7d3a" stroke-width="1.5" />
+    </g>
+</svg>

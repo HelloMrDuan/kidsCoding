@@ -113,6 +113,22 @@ export function MushroomPath() {
   )
 }
 
+/** G0-U3-L02 story scenery: the rabbit's puddle sign — two hops over two puddles (original art, V2 flat style). */
+export function PuddleSign() {
+  return (
+    <g data-grid-item="puddlesign">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="30" width="6" height="30" rx="2" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2" />
+      <rect x="2" y="6" width="52" height="28" rx="5" fill="#ffe2b8" stroke="#a0704a" strokeWidth="2.5" />
+      <ellipse cx="16" cy="27" rx="7" ry="3" fill="#6cc8ff" stroke="#3a9ad9" strokeWidth="1.5" />
+      <ellipse cx="40" cy="27" rx="7" ry="3" fill="#6cc8ff" stroke="#3a9ad9" strokeWidth="1.5" />
+      <path d="M5 26 Q16 6 27 24 M29 24 Q40 6 51 24" fill="none" stroke="#ff8a3d" strokeWidth="2.4" strokeLinecap="round" strokeDasharray="3 3" />
+      <path d="M48 20 l3 4 2-5" fill="none" stroke="#ff8a3d" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 58 q4 -8 10 -4 q4 -6 8 2" fill="#5cbf60" stroke="#2f7d3a" strokeWidth="1.5" />
+    </g>
+  )
+}
+
 /** G0-U1-L01 story scenery: the fox's treehouse with its two command signs (original art, V2 flat style). */
 export function Treehouse() {
   return (
@@ -258,7 +274,16 @@ function Bump({ x, y }: Cell) {
   )
 }
 
-export type GridStageState = { x: number; y: number; facing: Facing; hasKey: boolean; doorOpen: boolean; bump?: Cell }
+const HOP_BACK: Record<Facing, Cell> = { up: { x: 0, y: 2 }, right: { x: -2, y: 0 }, down: { x: 0, y: -2 }, left: { x: 2, y: 0 } }
+/** G0-U3-L02: a dashed arc from where the hop started to where it landed. */
+function HopArc({ x, y, facing }: { x: number; y: number; facing: Facing }) {
+  const from = { x: x + HOP_BACK[facing].x, y: y + HOP_BACK[facing].y }
+  const ax = from.x * T + 32, ay = from.y * T + 40, bx = x * T + 32, by = y * T + 40
+  const mx = (ax + bx) / 2, my = Math.min(ay, by) - 46
+  return <path data-grid-item="hop" d={`M${ax} ${ay} Q${mx} ${my} ${bx} ${by}`} fill="none" stroke="#ff8a3d" strokeWidth="4" strokeLinecap="round" strokeDasharray="6 6" />
+}
+
+export type GridStageState = { x: number; y: number; facing: Facing; hasKey: boolean; doorOpen: boolean; bump?: Cell; /** the block that produced this frame (G0-U3-L02 draws the hop arc). */ action?: string }
 
 export function GridStage({ level, state, trail = [], stamps = [], label }: { level: GridLevel; state: GridStageState; trail?: Cell[]; /** G0-U3: footprints already stamped. */ stamps?: Footprint[]; label?: string }) {
   const w = level.cols * T
@@ -283,7 +308,7 @@ export function GridStage({ level, state, trail = [], stamps = [], label }: { le
       data-fox-facing={state.facing}
       data-stamps={stamps.map(p => p.color[0]).join('')}
     >
-      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : level.scenery === 'guidemap' ? <GuideMap /> : level.scenery === 'mushroompath' ? <MushroomPath /> : <Treehouse />}</g> : null}
+      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : level.scenery === 'guidemap' ? <GuideMap /> : level.scenery === 'mushroompath' ? <MushroomPath /> : level.scenery === 'puddlesign' ? <PuddleSign /> : <Treehouse />}</g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}
@@ -294,10 +319,11 @@ export function GridStage({ level, state, trail = [], stamps = [], label }: { le
       {level.rocks?.map(c => <Rock key={`r${c.x}-${c.y}`} {...c} />)}
       {level.key && !state.hasKey ? <Key {...level.key} /> : null}
       {level.door ? <Door {...level.door} open={state.doorOpen} /> : null}
+      {state.action === 'jump_forward' ? <HopArc {...state} /> : null}
       <g transform={`translate(${state.x * T} ${state.y * T})`} data-grid-item="fox" style={{ transition: 'transform 260ms ease' }}>
         <svg x="2" y="-4" width="60" height="66" viewBox="0 0 100 110">
           <g transform={state.facing === 'left' ? 'translate(100 0) scale(-1 1)' : undefined}>
-            <CharacterArt id="fox" />
+            <CharacterArt id={level.actor ?? 'fox'} />
           </g>
         </svg>
         <g transform={`translate(52 12) rotate(${ARROW_ROT[state.facing]})`}>

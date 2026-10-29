@@ -19,9 +19,10 @@ describe('engine capabilities (SYS-106)', () => {
     }
   })
 
-  it('G0-U3-L01 needs are implemented: the SYS-107 repeat and grid footprints (Hark A)', () => {
+  it('G0-U3-L01/L02 needs are implemented: the SYS-107 repeat, grid footprints and hops (Hark A)', () => {
     const l01 = lessons.find(l => l.id === 'G0-U3-L01')!
     expect(missingEngineCapabilities(l01.requiredEngineCapabilities)).toEqual([])
+    expect(missingEngineCapabilities(lessons.find(l => l.id === 'G0-U3-L02')!.requiredEngineCapabilities)).toEqual([])
     expect(blocklyEngineCapabilities.finite_repeat).toContain('program-tree.ts')
     expect(existsSync(path.resolve(__dirname, '../lessons/blockly/program-tree.ts'))).toBe(true)
   })
