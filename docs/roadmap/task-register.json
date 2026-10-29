@@ -1880,7 +1880,7 @@
       "title": "年龄评估与账号流程适龄界面",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-002"
       ],
