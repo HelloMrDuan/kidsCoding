@@ -1601,7 +1601,7 @@
       "unitId": "G2-U2",
       "focusConcept": "时间",
       "plannedLearningOutcome": "能使用时间解释并完成「循环飞舞的蝴蝶」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1615,9 +1615,9 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/240",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U2-L04 block: 4 tests; local E2E scratch-g2-u1+scratch-vm 61/61 (6.7m); 3-viewport screenshots; CI real-Chrome result pending)",
+        "mergeCommit": "dd7353059b49c81d4cf999eb5135b49f56274d4c",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40853531377",
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts — G2-U2-L04 用例在 PR #240 与 main 真 Chrome CI（scratch-real-vm-browser 分片）通过",
         "lessonReview": null
       },
       "notes": "Hark B：真实 Scratch VM 原创花园项目（蝴蝶在重复里“移动+右转+下一个造型+等待 0.2 秒”画飞行路线；花朵固定装饰）；练习A改次数/度数让总转角为 360 整数倍并回到起点圈（VM 累计 motion_turnright 与终点位置，多解）、练习B两圈 720 度回到起点（多解）、6×45=270 停在半路的找错+三层提示（须先见不满一圈再见回到起点）、创意自己的台词+至少 10 次的更圆一圈；.sb3 自动保存/刷新恢复/导出回读/导入、沙箱拒越界次数/步数/度数、改固定积木、多余造型、他课工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U2-L04.json，非独立），需独立人工教研复核；无儿童试学；未接 WebGL 渲染器。不得标 completed。"
