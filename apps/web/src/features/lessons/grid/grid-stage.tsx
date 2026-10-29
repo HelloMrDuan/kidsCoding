@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { CharacterArt } from '../playable-stage/character-art'
-import type { Cell, Facing, GridLevel, GridRun } from './grid-engine'
+import type { Cell, Facing, FootColor, Footprint, GridLevel, GridRun } from './grid-engine'
 
 // SYS-106 cartoon forest grid stage. Draws the level and the fox at one
 // frame of a real engine run; no answer animation is pre-recorded.
@@ -69,6 +69,46 @@ function Goal({ x, y }: Cell) {
       <circle cx="38" cy="18" r="3" fill="#fff" />
       <circle cx="44" cy="28" r="2.6" fill="#fff" />
       <rect x="27" y="40" width="10" height="14" rx="5" fill="#a0704a" />
+    </g>
+  )
+}
+
+const PAW_FILL: Record<FootColor, string> = { red: '#e5484d', blue: '#3e7bfa' }
+/** G0-U3: a footprint on a cell — solid when the fox stamped it, a faded dashed outline for the bear's old trail. */
+function Paw({ x, y, color, ghost }: Footprint & { ghost?: boolean }) {
+  const fill = ghost ? 'none' : PAW_FILL[color]
+  const stroke = ghost ? PAW_FILL[color] : '#fff'
+  const dash = ghost ? '3 3' : undefined
+  const op = ghost ? 0.55 : 1
+  return (
+    <g transform={`translate(${x * T + 16} ${y * T + 14})`} data-grid-item={ghost ? 'ghost-paw' : 'paw'} data-color={color} opacity={op}>
+      <ellipse cx="16" cy="24" rx="9" ry="7.5" fill={fill} stroke={stroke} strokeWidth="2.4" strokeDasharray={dash} />
+      {[[5, 12], [12, 6], [20, 6], [27, 12]].map(([cx, cy]) => (
+        <circle key={`${cx}`} cx={cx} cy={cy} r="3.8" fill={fill} stroke={stroke} strokeWidth="2" strokeDasharray={dash} />
+      ))}
+    </g>
+  )
+}
+
+/** G0-U3-L01 story scenery: the bear's mushroom signpost — red, blue, red, blue paws (original art, V2 flat style). */
+export function MushroomPath() {
+  return (
+    <g data-grid-item="mushroompath">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="30" width="6" height="30" rx="2" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2" />
+      <path d="M4 30 Q28 4 52 30 Z" fill="#ff5d6c" stroke="#b5303e" strokeWidth="2.5" strokeLinejoin="round" />
+      <circle cx="18" cy="20" r="3" fill="#fff" />
+      <circle cx="34" cy="15" r="2.6" fill="#fff" />
+      <circle cx="42" cy="24" r="2.4" fill="#fff" />
+      <rect x="6" y="32" width="44" height="14" rx="4" fill="#ffe2b8" stroke="#a0704a" strokeWidth="2" />
+      {(['#e5484d', '#3e7bfa', '#e5484d', '#3e7bfa'] as const).map((c, i) => (
+        <g key={i} transform={`translate(${12 + i * 10} 39)`}>
+          <ellipse cx="0" cy="1.5" rx="3" ry="2.6" fill={c} />
+          <circle cx="-2.4" cy="-2.2" r="1.2" fill={c} />
+          <circle cx="0" cy="-3.2" r="1.2" fill={c} />
+          <circle cx="2.4" cy="-2.2" r="1.2" fill={c} />
+        </g>
+      ))}
     </g>
   )
 }
@@ -220,7 +260,7 @@ function Bump({ x, y }: Cell) {
 
 export type GridStageState = { x: number; y: number; facing: Facing; hasKey: boolean; doorOpen: boolean; bump?: Cell }
 
-export function GridStage({ level, state, trail = [], label }: { level: GridLevel; state: GridStageState; trail?: Cell[]; label?: string }) {
+export function GridStage({ level, state, trail = [], stamps = [], label }: { level: GridLevel; state: GridStageState; trail?: Cell[]; /** G0-U3: footprints already stamped. */ stamps?: Footprint[]; label?: string }) {
   const w = level.cols * T
   const h = level.rows * T
   // Story scenery sits just left of the map, so the fox visibly leaves home or the post office; it is never a cell.
@@ -241,12 +281,15 @@ export function GridStage({ level, state, trail = [], label }: { level: GridLeve
       data-testid="grid-stage"
       data-fox-cell={`${state.x},${state.y}`}
       data-fox-facing={state.facing}
+      data-stamps={stamps.map(p => p.color[0]).join('')}
     >
-      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : level.scenery === 'guidemap' ? <GuideMap /> : <Treehouse />}</g> : null}
+      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : level.scenery === 'guidemap' ? <GuideMap /> : level.scenery === 'mushroompath' ? <MushroomPath /> : <Treehouse />}</g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}
       {trail.map((c, i) => <circle key={`t${i}`} cx={c.x * T + 32} cy={c.y * T + 32} r="5" fill="#fff" opacity=".7" />)}
+      {level.footprints?.map((p, i) => <Paw key={`g${i}`} {...p} ghost />)}
+      {stamps.map((p, i) => <Paw key={`p${i}`} {...p} />)}
       <Goal {...level.goal} />
       {level.rocks?.map(c => <Rock key={`r${c.x}-${c.y}`} {...c} />)}
       {level.key && !state.hasKey ? <Key {...level.key} /> : null}
@@ -292,6 +335,7 @@ export function useGridPlayback(level: GridLevel, run: GridRun | null, intervalM
   const frames = run?.frames ?? []
   const state: GridStageState = index >= 0 ? frames[index] : start
   const trail = [{ x: level.start.x, y: level.start.y }, ...frames.slice(0, index + 1).map(f => ({ x: f.x, y: f.y }))]
+  const stamps = frames.slice(0, index + 1).flatMap(f => (f.stamp ? [f.stamp] : []))
   const done = !!run && index >= frames.length - 1
-  return { state, trail, done }
+  return { state, trail, stamps, done }
 }

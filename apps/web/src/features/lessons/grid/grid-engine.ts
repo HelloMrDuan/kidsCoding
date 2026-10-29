@@ -18,8 +18,15 @@ export type GridLevel = {
   door?: Cell
   /** Story decoration drawn under the start cell; never affects a run. */
   /** Original story art drawn beside the map (never a cell): L01 treehouse, L02 forest post signpost, L03 squirrel's acorn counting board, L04 turn sign, L05 key hook board, L06 forest guide's map. */
-  scenery?: 'treehouse' | 'signpost' | 'counting' | 'turnsign' | 'keyhook' | 'guidemap'
+  scenery?: 'treehouse' | 'signpost' | 'counting' | 'turnsign' | 'keyhook' | 'guidemap' | 'mushroompath'
+  /** G0-U3: footprints the program must leave, in path order (colour on each cell). */
+  footprints?: Footprint[]
 }
+
+/** G0-U3 pattern lessons: a coloured footprint the fox leaves on its current cell. */
+export type FootColor = 'red' | 'blue'
+export type Footprint = Cell & { color: FootColor }
+const FOOT_WORD: Record<FootColor, string> = { red: '红', blue: '蓝' }
 
 export const GRID_BLOCK_TYPES = [
   'move_up',
@@ -31,6 +38,8 @@ export const GRID_BLOCK_TYPES = [
   'turn_right',
   'pick_key',
   'open_door',
+  'stamp_red',
+  'stamp_blue',
 ] as const
 
 export type GridBlockType = (typeof GRID_BLOCK_TYPES)[number]
@@ -53,6 +62,9 @@ export type GridFailure =
   | 'not_at_goal'
   | 'empty_repeat'
   | 'too_deep'
+  | 'stamp_twice'
+  | 'wrong_pattern'
+  | 'pattern_short'
 
 export type GridFrame = {
   blockIndex: number
@@ -65,6 +77,8 @@ export type GridFrame = {
   bump?: Cell
   /** SYS-107: which round of each enclosing repeat this action ran in (outermost first). */
   rounds?: number[]
+  /** G0-U3: the footprint this action left. */
+  stamp?: Footprint
 }
 
 export type GridRun = {
@@ -74,6 +88,8 @@ export type GridRun = {
   frames: GridFrame[]
   final: { x: number; y: number; facing: Facing; hasKey: boolean; doorOpen: boolean }
   steps: number
+  /** G0-U3: every footprint left, in the order they were stamped. */
+  trail: Footprint[]
 }
 
 const ORDER: Facing[] = ['up', 'right', 'down', 'left']
@@ -90,7 +106,7 @@ export function turn(facing: Facing, dir: 'left' | 'right'): Facing {
 }
 
 function result(passed: boolean, failure: GridFailure | undefined, message: string, frames: GridFrame[], state: GridRun['final'], steps: number): GridRun {
-  return { passed, failure, message, frames, final: { ...state }, steps }
+  return { passed, failure, message, frames, final: { ...state }, steps, trail: frames.flatMap(f => (f.stamp ? [f.stamp] : [])) }
 }
 
 /** Run a connected program (first block must be when_start) on a level. */
@@ -116,6 +132,16 @@ export function runGridProgram(level: GridLevel, blocks: ProgramBlock[]): GridRu
     if (type === 'turn_left' || type === 'turn_right') {
       state.facing = turn(state.facing, type === 'turn_left' ? 'left' : 'right')
       push()
+      continue
+    }
+    if (type === 'stamp_red' || type === 'stamp_blue') {
+      // G0-U3: leave a footprint on the current cell; one footprint per cell.
+      const color: FootColor = type === 'stamp_red' ? 'red' : 'blue'
+      if (frames.some(fr => fr.stamp && fr.stamp.x === state.x && fr.stamp.y === state.y)) {
+        push()
+        return result(false, 'stamp_twice', '这一格已经有脚印了。放好一个脚印后，先往前走一格再放下一个。', frames, state, steps)
+      }
+      frames.push({ blockIndex: topIndex + 1, action: type, ...state, stamp: { x: state.x, y: state.y, color }, ...(rounds.length ? { rounds } : {}) })
       continue
     }
     if (type === 'pick_key') {
@@ -166,6 +192,18 @@ export function runGridProgram(level: GridLevel, blocks: ProgramBlock[]): GridRu
     }
     push()
   }
+  if (level.footprints) {
+    // G0-U3: the footprints must follow the pattern in path order.
+    const trail = frames.flatMap(fr => (fr.stamp ? [fr.stamp] : []))
+    const want = level.footprints
+    for (let i = 0; i < trail.length; i++) {
+      const w = want[i]
+      if (!w) return result(false, 'wrong_pattern', `脚印多放了：规律只要 ${want.length} 个脚印，现在放了 ${trail.length} 个。`, frames, state, steps)
+      if (w.color !== trail[i].color) return result(false, 'wrong_pattern', `第 ${i + 1} 个脚印应该是${FOOT_WORD[w.color]}色，放成了${FOOT_WORD[trail[i].color]}色。找一找规律从哪里乱了。`, frames, state, steps)
+      if (w.x !== trail[i].x || w.y !== trail[i].y) return result(false, 'wrong_pattern', `第 ${i + 1} 个脚印放错了格子：每放一个脚印，要往前走一格。`, frames, state, steps)
+    }
+    if (trail.length < want.length) return result(false, 'pattern_short', `只放了 ${trail.length} 个脚印，规律要 ${want.length} 个，还差 ${want.length - trail.length} 个。数一数重复了几次。`, frames, state, steps)
+  }
   if (!same(level.goal, state)) {
     const dx = level.goal.x - state.x
     const dy = level.goal.y - state.y
@@ -180,6 +218,9 @@ export const GRID_FAILURE_LABELS: Record<GridFailure, string> = {
   disconnected: '积木没连上',
   empty_repeat: '重复里是空的',
   too_deep: '重复套得太深',
+  stamp_twice: '同一格放两个脚印',
+  wrong_pattern: '脚印规律不对',
+  pattern_short: '脚印不够',
   unknown_block: '积木不能用',
   too_many: '积木太多',
   out_of_bounds: '走出地图',

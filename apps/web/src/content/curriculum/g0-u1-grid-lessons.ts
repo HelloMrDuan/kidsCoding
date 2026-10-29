@@ -1,4 +1,9 @@
-import type { Cell, GridFailure, GridLevel } from '@/features/lessons/grid/grid-engine'
+import type { Cell, Footprint, GridFailure, GridLevel } from '@/features/lessons/grid/grid-engine'
+import type { ProgramBlock } from '@/features/lessons/blockly/program-tree'
+
+/** A program as lessons write it: block types, or (G0-U3) blocks with repeat bodies. */
+export type GridProgram = Array<string | ProgramBlock>
+export const toGridBlocks = (program: GridProgram): ProgramBlock[] => program.map(b => (typeof b === 'string' ? { type: b } : b))
 
 /**
  * EDU-104 — G0-U1 rewritten per the TQ-001 review sheet and made playable on
@@ -28,19 +33,19 @@ export type GridLessonStep = {
   level: GridLevel
   allowedBlocks: string[]
   /** Program already in the workspace (debug practice); disconnected = loose block. */
-  starterBlocks?: Array<{ type: string; disconnected?: boolean }>
+  starterBlocks?: ProgramBlock[]
   /** Three layers: what you see → the idea → exactly what to do. */
   hints: [string, string, string]
   /** Full programs (when_start first) that must pass. */
-  solutions: string[][]
+  solutions: GridProgram[]
   /** Programs that must fail, with the engine failure they must produce. */
-  counterExamples: Array<{ program: string[]; failure: GridFailure }>
+  counterExamples: Array<{ program: GridProgram; failure: GridFailure }>
   /** Two concrete outcomes to choose between before running; a wrong guess never blocks. */
   predictChoices?: [GridPrediction, GridPrediction]
   /** error-lab: the starter program must be run and produce this failure before a fix counts. */
   errorLab?: { expect: GridFailure; expected: string; actual: string }
   /** creative: the child places the goal on one of these cells, then programs a route to it. */
-  creative?: { prompt: string; goalChoices: Cell[]; /** Story names for the choices, same order (e.g. who the letter goes to). */ labels?: string[] }
+  creative?: { prompt: string; goalChoices: Cell[]; /** Story names for the choices, same order (e.g. who the letter goes to). */ labels?: string[]; /** G0-U3: the footprint pattern each choice asks for (same order as goalChoices). */ patterns?: Footprint[][] }
 }
 
 export type GridLesson = {

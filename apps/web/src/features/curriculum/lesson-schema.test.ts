@@ -23,8 +23,8 @@ describe('SYS-105 curriculum schema gate', () => {
   it('reads the real content, not an empty snapshot', () => {
     expect(real.catalogLessonIds.length).toBe(432)
     expect(real.detailedLessons.length).toBeGreaterThanOrEqual(192)
-    expect(real.trials.length).toBe(31 + g2LabLessons)
-    expect(real.steps.length).toBe(60 + g2LabSteps) // G0-U1-L01 to L06 each gained a creative-remake step, +5 steps each for G0-U2-L01..L06 event lessons (Hark A); G2 Scratch lab steps counted from their registry
+    expect(real.trials.length).toBe(32 + g2LabLessons)
+    expect(real.steps.length).toBe(65 + g2LabSteps) // G0-U1-L01 to L06 each gained a creative-remake step, +5 steps each for G0-U2-L01..L06 event lessons and G0-U3-L01 loop lesson (Hark A); G2 Scratch lab steps counted from their registry
     expect(g2LabSteps).toBe(3 * g2LabLessons) // every G2 Scratch lab lesson has exactly 3 judged steps (Hark B)
     expect(real.publicAssets).toContain('v2/hero-studio.webp')
   })
@@ -41,7 +41,7 @@ describe('SYS-105 curriculum schema gate', () => {
   })
 
   it('fails when a lesson is playable without a runner, route, e2e or engine capability', () => {
-    const a = clone(); a.detailedLessons.find(l => l.id === 'G0-U3-L01')!.playable = true; expectOnly(a, 'no_runner')
+    const a = clone(); a.detailedLessons.find(l => l.id === 'G0-U3-L02')!.playable = true; expectOnly(a, 'no_runner')
     const b = clone(); b.trials[0] = { ...b.trials[0], route: '/learn/ghost-lab/x' }; expectOnly(b, 'missing_route')
     const c = clone(); c.trials[0] = { ...c.trials[0], e2eSpec: 'tests/e2e/ghost.spec.ts' }; expectOnly(c, 'missing_e2e')
     const d = clone(); d.engineCapabilities = d.engineCapabilities.filter(cap => cap !== 'path_obstacles'); expectOnly(d, 'missing_engine_capability')
@@ -58,12 +58,12 @@ describe('SYS-105 curriculum schema gate', () => {
   it('fails when a step lacks a right or a wrong example, or a new trial has none', () => {
     const a = clone(); a.steps[3] = { ...a.steps[3], negativeExamples: 0 }; expectOnly(a, 'missing_examples')
     const b = clone(); b.steps[7] = { ...b.steps[7], positiveExamples: 0 }; expectOnly(b, 'missing_examples')
-    const c = clone(); c.trials.push({ id: 'G0-U3-L01', engine: 'blockly', route: '/learn/grid-lab/G0-U3-L01', e2eSpec: 'tests/e2e/grid-lab.spec.ts' })
+    const c = clone(); c.trials.push({ id: 'G0-U3-L02', engine: 'blockly', route: '/learn/grid-lab/G0-U3-L02', e2eSpec: 'tests/e2e/grid-lab.spec.ts' })
     expect(codes(c)).toContain('missing_examples')
   })
 
   it('the example-debt list can only shrink', () => {
-    const s = clone(); s.trials.push({ id: 'G0-U3-L01', engine: 'blockly', route: '/learn/grid-lab/G0-U3-L01', e2eSpec: 'tests/e2e/grid-lab.spec.ts' }); s.exampleDebt.push('G0-U3-L01')
+    const s = clone(); s.trials.push({ id: 'G0-U3-L02', engine: 'blockly', route: '/learn/grid-lab/G0-U3-L02', e2eSpec: 'tests/e2e/grid-lab.spec.ts' }); s.exampleDebt.push('G0-U3-L02')
     expect(codes(s)).toContain('example_debt_changed')
     expect(EXAMPLE_DEBT_BASELINE.length).toBeLessThanOrEqual(19)
     const p = clone(); p.publishedLessonIds.push('P0-U1-L01'); expect(validateCurriculumSnapshot(p)).toContainEqual(expect.objectContaining({ code: 'missing_examples', id: 'P0-U1-L01' }))

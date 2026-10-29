@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G0-U3-L01",
+  "reviewedCommit": "6897f51",
+  "reviewedAt": "2026-10-29",
+  "reviewer": "Hark A（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G0 启蒙（5～7 岁）",
+  "prerequisites": [
+    "G0-U2-L06"
+  ],
+  "newConcepts": [
+    "找出最小的重复单元（红、蓝）",
+    "“重复 N 次”把大嘴巴里的积木原样做 N 遍",
+    "长度变了只改次数，单元不变"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-29 重新访问官方页面）",
+    "核桃编程“一学九练” https://official.hetao101.com/curriculum（2026-10-29 访问）",
+    "CSTA 2026 PK–12 标准 https://csteachers.org/pk12standards/（2026-10-29 访问）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "g0-u3-loop-lessons.ts G0-U3-L01：三条可观察目标（指出单元、用重复做多遍、对照舞台说出第几个脚印乱了）",
+        "5 关递进：错误实验（只重复 2 次）→ 找最小单元 → 重复四对 → 修颜色颠倒 → 自选节奏",
+        "覆盖详案三个常见错误：红红蓝当规律（反例）、只画一对就停（错误实验/pattern_short）、蓝红次序互换（练习 B）"
+      ],
+      "defects": [
+        "“重复 N 次”的次数只能从 2/3/4/5/6/8 中选，不能输入任意数"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "原创小熊蘑菇路牌（kc-scenes/mushroom-path.svg，已登记授权），每关舞台左侧可见",
+        "淡淡的虚线脚印是“雨快冲掉的小熊脚印”，孩子照着印上实心脚印",
+        "错误实验两个可点选预测，猜错不阻塞"
+      ],
+      "defects": [
+        "没有脚步音效；朗读用浏览器自带声音"
+      ]
+    },
+    "practice": {
+      "score": 22,
+      "evidence": [
+        "练习 A（选对重复次数铺满 8 个脚印）与练习 B（修颜色颠倒的循环体）目标不同，均由网格引擎真实运行判定",
+        "单元测试：循环解与展开解的脚印和终点完全一致；3/5 次、空循环、同格两脚印等反例给出指定失败",
+        "练习 A 接受重复 4 次、两段重复 2 次、16 块平铺三种正确写法"
+      ],
+      "defects": [
+        "平铺 16 块也算通过，未强制使用循环（有意保留等价解）"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "本课专属诊断：wrong_pattern 指出“第几个脚印应该是什么颜色”，pattern_short 指出“放了几个、还差几个”，stamp_twice 指出“先向前走再放”",
+        "三层提示：现象 → 规则 → 做法",
+        "复盘卡列出本节真实遇到的错误"
+      ],
+      "defects": [
+        "诊断指到第几个脚印，不高亮循环里对应的那一块积木"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意改造：孩子从三种节奏（红蓝、红红蓝、红蓝蓝）中选一种，小路长度和次数随之变化；一个程序只适合自己选的节奏（单元测试）",
+        "作品“我的节奏小路”保存节奏选择与程序，可真实回放"
+      ],
+      "defects": [
+        "只能三选一，不能自己设计任意颜色序列"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "通过只由网格引擎真实运行判定；伪造的循环次数在草稿读取时被夹到可选值（grid-draft.ts / program-tree.ts）",
+        "复盘卡：目标回顾 + 真实错误记录 + What-if；点选反思保存并重开仍在",
+        "三断点截图 docs/roadmap/evidence/G0-U3-L01/"
+      ],
+      "defects": [
+        "没有儿童试学；评分者是实现者，非独立"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "脚印和终点来自 grid-engine.ts 真实展开执行“重复 N 次”的结果，舞台逐帧回放"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "/learn/grid-lab/G0-U3-L01 可亲手拼块、改重复次数并运行（L3 实验可试玩）"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "第 1 关是错误实验：必须先真实运行“重复 2 次”看到脚印不够才能完成；E2E 覆盖"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "判定看脚印颜色、位置和终点，不比对固定积木序列；练习 A 三种写法、创意关三种节奏都有效"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "“我的节奏小路”只有在所选节奏真实运行通过后才出现，重开后可回放（E2E）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色为项目自绘 character-art，脚印与路牌为本项目新绘 SVG（mushroom-path.svg 已登记授权表）；文字自写"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "只存本机 localStorage（kids-grid-lesson-v1:G0-U3-L01），不含姓名，不上传"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "错误实验与练习 B 起始程序必失败；少一轮、多一轮、颜色颠倒、同格两脚印都不判通过（单元测试 + E2E）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 记为 L3 实验可试玩，目录不标正式发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "错误实验把次数改成 4 后印出 8 个红蓝脚印走到蘑菇屋；创意关选红红蓝，重复 2 次（红、走、红、走、蓝、走）通过并保存为作品（E2E）",
+    "failureCase": "错误实验 → pattern_short（只有 4 个脚印）；引导关先蓝后红 → wrong_pattern；红蓝之间不走 → stamp_twice；练习 A 重复 3 次 → pattern_short、5 次 → out_of_bounds；练习 B → wrong_pattern（第 1 个应为红色）",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清这一课的规则（概念）",
+      "第三层：给出具体积木做法"
+    ],
+    "practiceA": "练习 A：一对红蓝放进“重复 4 次”铺满 8 个脚印",
+    "practiceB": "练习 B：循环体里先蓝后红，交换两块积木（起始程序必失败）",
+    "equivalentSolutions": [
+      "练习 A：重复 4 次 / 两段重复 2 次 / 16 块平铺",
+      "创意关 3 种节奏各自有效（单元测试遍历）"
+    ],
+    "saveReopen": "每关程序（含重复积木的次数与口内积木）、关卡进度、错误实验观察、节奏选择、真实错误记录存 kids-grid-lesson-v1:G0-U3-L01；刷新后回到完成页，作品可回放（E2E）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U3-L01 mushroom path pattern: only two pairs, find the unit, repeat four pairs, swapped colours, my rhythm path saved and reopened"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G0-U3-L01/"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 参考评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学（需真实儿童与监护人同意，不得模拟）"
+  ],
+  "notes": "2026-10-29 Hark A 实现者参考评价（非独立人工评分）：G0-U3-L01 五关正式候选课程（模式识别与“重复 N 次”），首个使用 SYS-107 真循环积木的课程；新增网格脚印能力（pattern_stamp）与蘑菇路牌场景。"
+}

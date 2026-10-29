@@ -29,6 +29,7 @@ const ACCEPTANCE_SET = [
   'two-doors.svg', // G0-U2-L04 forest theatre backdrop
   'apple-tree.svg', // G0-U2-L05 apple orchard backdrop
   'meeting-stage.svg', // G0-U2-L06 meet-and-greet stage backdrop
+  'mushroom-path.svg', // G0-U3-L01 story scenery
 ]
 
 describe('kc-scenes asset register (UX-004)', () => {

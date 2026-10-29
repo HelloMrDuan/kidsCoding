@@ -30,6 +30,9 @@ export const kidsBlockLabels: Record<string, string> = {
   turn_right: '向右转',
   pick_key: '捡起钥匙',
   open_door: '打开树洞门',
+  // G0-U3 pattern path
+  stamp_red: '放红脚印',
+  stamp_blue: '放蓝脚印',
   // G0-U2 event stage
   when_bell: '听到铃铛时',
   wake_up: '睁开眼睛',

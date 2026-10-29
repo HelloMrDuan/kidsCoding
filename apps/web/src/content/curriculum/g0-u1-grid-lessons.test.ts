@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { runGridProgram, type GridLevel } from '@/features/lessons/grid/grid-engine'
 import { stepLevel } from '@/features/lessons/grid/grid-lab'
-import { g0u1GridLessons } from './g0-u1-grid-lessons'
+import { g0u1GridLessons, toGridBlocks } from './g0-u1-grid-lessons'
 
-const toBlocks = (program: string[]) => program.map(type => ({ type }))
+const toBlocks = toGridBlocks
 const lessons = Object.values(g0u1GridLessons)
 /** Lessons that have had the Hark A formal-course pass (error lab + creative remake + review + work). */
 const FORMAL = ['G0-U1-L01', 'G0-U1-L02', 'G0-U1-L03', 'G0-U1-L04', 'G0-U1-L05', 'G0-U1-L06']
@@ -97,7 +97,7 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
           expect(step.solutions.length, step.id).toBeGreaterThan(0)
           for (const program of step.solutions) {
             expect(runGridProgram(step.level, toBlocks(program)).passed, `${step.id} ${program}`).toBe(true)
-            for (const type of program) expect(step.allowedBlocks, `${step.id} ${type}`).toContain(type)
+            for (const type of program) expect(step.allowedBlocks, `${step.id} ${type}`).toContain(typeof type === 'string' ? type : type.type)
           }
         }
       })
@@ -110,7 +110,7 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
       })
 
       it('accepts at least two different correct programs (not one fixed answer)', () => {
-        expect(lesson.steps.some(s => new Set(s.solutions.map(p => p.join())).size >= 2)).toBe(true)
+        expect(lesson.steps.some(s => new Set(s.solutions.map(p => JSON.stringify(p))).size >= 2)).toBe(true)
       })
 
       it('has two hands-on practices with different goals', () => {

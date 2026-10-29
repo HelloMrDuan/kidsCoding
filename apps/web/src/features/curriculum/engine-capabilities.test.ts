@@ -19,13 +19,20 @@ describe('engine capabilities (SYS-106)', () => {
     }
   })
 
+  it('G0-U3-L01 needs are implemented: the SYS-107 repeat and grid footprints (Hark A)', () => {
+    const l01 = lessons.find(l => l.id === 'G0-U3-L01')!
+    expect(missingEngineCapabilities(l01.requiredEngineCapabilities)).toEqual([])
+    expect(blocklyEngineCapabilities.finite_repeat).toContain('program-tree.ts')
+    expect(existsSync(path.resolve(__dirname, '../lessons/blockly/program-tree.ts'))).toBe(true)
+  })
+
   it('message_event points at a real engine file', () => {
     expect(blocklyEngineCapabilities.message_event).toContain('event/event-engine.ts')
     expect(existsSync(path.resolve(__dirname, '../lessons/event/event-engine.ts'))).toBe(true)
   })
 
   it('does not claim capabilities the engine lacks', () => {
-    expect(missingEngineCapabilities(['finite_repeat', 'if_else', 'sound', 'counter', 'state', 'visual_effect'])).toHaveLength(6)
+    expect(missingEngineCapabilities(['if_else', 'sound', 'counter', 'state', 'visual_effect'])).toHaveLength(5)
   })
 
   it('the legacy L1 scripts stay non-playable; playability comes only from the grid trial integration', () => {

@@ -7,7 +7,7 @@ import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 import { BLOCKLY_MEDIA_PATH } from './blockly-media'
 import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
 import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
-import { DEFAULT_REPEAT_TIMES, REPEAT_BLOCK, type ProgramBlock } from './program-tree'
+import { DEFAULT_REPEAT_TIMES, REPEAT_BLOCK, REPEAT_TIMES_OPTIONS, type ProgramBlock } from './program-tree'
 import { restoreBlockSequence } from './restore-block-sequence'
 import type { SayLinePreset } from './say-line-presets'
 
@@ -213,6 +213,33 @@ export function buildSnapshot(workspace: Blockly.Workspace) {
   return snapshot
 }
 
+/** SYS-107: the last block of the main stack (the first top block), or null. */
+function mainTail(workspace: Blockly.WorkspaceSvg, exceptId?: string): Blockly.Block | null {
+  const anchor = workspace.getTopBlocks(true).filter((item) => item.id !== exceptId)[0]
+  if (!anchor) return null
+  let tail: Blockly.Block = anchor
+  while (tail.getNextBlock()) tail = tail.getNextBlock() as Blockly.Block
+  return tail
+}
+
+/** SYS-107: put a tapped-in block at the end of a repeat's mouth. */
+function connectIntoRepeat(repeat: Blockly.Block, block: Blockly.BlockSvg) {
+  const input = repeat.getInput(REPEAT_BODY_INPUT)?.connection
+  if (!input || !block.previousConnection) return false
+  let last = repeat.getInputTargetBlock(REPEAT_BODY_INPUT)
+  try {
+    if (!last) {
+      input.connect(block.previousConnection)
+      return true
+    }
+    while (last.getNextBlock()) last = last.getNextBlock() as Blockly.Block
+    last.nextConnection?.connect(block.previousConnection)
+    return true
+  } catch {
+    return false
+  }
+}
+
 function positionOrConnectBlock(
   workspace: Blockly.WorkspaceSvg,
   block: Blockly.BlockSvg,
@@ -268,6 +295,10 @@ export function BlocklyWorkspace({
   const choicesRef = useRef(sayLineChoices)
   const lastChosenLineRef = useRef<string | undefined>(sayLineChoices?.[0]?.id)
   const [pickedLine, setPickedLine] = useState<string | undefined>(undefined)
+  /** SYS-107: where tapped-in blocks go while the program ends with a repeat. */
+  const [repeatTarget, setRepeatTarget] = useState<'inside' | 'after'>('inside')
+  const connectedTop = blocks.filter((block) => !block.disconnected)
+  const tailRepeat = connectedTop[connectedTop.length - 1]?.type === REPEAT_BLOCK ? connectedTop[connectedTop.length - 1] : null
   const sayBlockLine = blocks.find((block) => block.type === 'say_line' && block.line)?.line
   const chosenLine = sayBlockLine ?? pickedLine ?? sayLineChoices?.[0]?.id
   const allowedBlockKey = useMemo(() => allowedBlocks.join('|'), [allowedBlocks])
@@ -433,11 +464,25 @@ export function BlocklyWorkspace({
         positionOrConnectBlock(workspace, block)
       }
     } else {
-      positionOrConnectBlock(workspace, block)
+      const tail = mainTail(workspace, block.id)
+      const intoRepeat = repeatTarget === 'inside' && tail?.type === REPEAT_BLOCK && connectIntoRepeat(tail, block)
+      if (!intoRepeat) positionOrConnectBlock(workspace, block)
     }
+    // A new repeat opens its mouth: the next tapped blocks go inside it.
+    if (type === REPEAT_BLOCK) setRepeatTarget('inside')
 
     onSnapshotChange(snapshotOf(workspace))
     showFromTopRef.current?.()
+  }
+
+  /** SYS-107: tap a number to set how many times the last repeat runs. */
+  function setTailRepeatTimes(times: number) {
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    const tail = mainTail(workspace)
+    if (tail?.type !== REPEAT_BLOCK) return
+    tail.setFieldValue(String(times), REPEAT_TIMES_FIELD)
+    onSnapshotChange(snapshotOf(workspace))
   }
 
   function chooseLine(lineId: string) {
@@ -456,6 +501,12 @@ export function BlocklyWorkspace({
     let tail = tops[tops.length - 1]
     if (!tail) return
     while (tail.getNextBlock()) tail = tail.getNextBlock() as Blockly.BlockSvg
+    // SYS-107: while filling a repeat, undo takes back the last block inside it.
+    let inner = repeatTarget === 'inside' && tail.type === REPEAT_BLOCK ? tail.getInputTargetBlock(REPEAT_BODY_INPUT) : null
+    if (inner) {
+      while (inner.getNextBlock()) inner = inner.getNextBlock() as Blockly.BlockSvg
+      tail = inner as Blockly.BlockSvg
+    }
     tail.dispose(false)
     onSnapshotChange(snapshotOf(workspace))
     showFromTopRef.current?.()
@@ -522,6 +573,46 @@ export function BlocklyWorkspace({
             </button>
           ))}
         </div>
+        {tailRepeat && stableAllowedBlocks.includes(REPEAT_BLOCK) ? (
+          <div className="mt-3 flex flex-col gap-2" data-testid="lesson-repeat-tools">
+            <div className="flex flex-wrap items-center gap-2" role="group" aria-labelledby="lesson-repeat-times-label">
+              <b className="text-[12px]" id="lesson-repeat-times-label">🔁 重复几次？</b>
+              {REPEAT_TIMES_OPTIONS.map((n) => (
+                <button
+                  aria-pressed={(tailRepeat.times ?? DEFAULT_REPEAT_TIMES) === n}
+                  className={`kc-say-choice kc-repeat-choice ${(tailRepeat.times ?? DEFAULT_REPEAT_TIMES) === n ? 'kc-say-choice-on' : ''}`}
+                  data-testid={`lesson-repeat-times-${n}`}
+                  key={n}
+                  onClick={() => setTailRepeatTimes(n)}
+                  type="button"
+                >
+                  {n} 次
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2" role="group" aria-labelledby="lesson-repeat-target-label">
+              <b className="text-[12px]" id="lesson-repeat-target-label">点按钮加的积木放到：</b>
+              <button
+                aria-pressed={repeatTarget === 'inside'}
+                className={`kc-say-choice kc-repeat-choice ${repeatTarget === 'inside' ? 'kc-say-choice-on' : ''}`}
+                data-testid="lesson-repeat-target-inside"
+                onClick={() => setRepeatTarget('inside')}
+                type="button"
+              >
+                重复里面
+              </button>
+              <button
+                aria-pressed={repeatTarget === 'after'}
+                className={`kc-say-choice kc-repeat-choice ${repeatTarget === 'after' ? 'kc-say-choice-on' : ''}`}
+                data-testid="lesson-repeat-target-after"
+                onClick={() => setRepeatTarget('after')}
+                type="button"
+              >
+                重复后面
+              </button>
+            </div>
+          </div>
+        ) : null}
         {sayLineChoices && sayLineChoices.length > 0 && stableAllowedBlocks.includes('say_line') ? (
           <div className="mt-3" data-testid="lesson-say-line-choices">
             <b className="text-[12px]" id="lesson-say-line-choices-label">💬 选一句对白（“说一句话”会说这句）</b>

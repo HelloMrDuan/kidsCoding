@@ -1,5 +1,6 @@
 import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { g0u2EventLessons } from '@/content/curriculum/g0-u2-event-lessons'
+import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
@@ -58,6 +59,13 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
   // EDU-104: G0-U1 rewritten lessons on the SYS-106 grid engine.
   ...Object.fromEntries(
     Object.keys(g0u1GridLessons).map((id) => [
+      id,
+      { engine: 'blockly', route: `/learn/grid-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
+    ]),
+  ),
+  // G0-U3 (Hark A): loop lessons on the grid engine with the SYS-107 repeat block; E2E in grid-lab.spec.ts.
+  ...Object.fromEntries(
+    Object.keys(g0u3LoopLessons).map((id) => [
       id,
       { engine: 'blockly', route: `/learn/grid-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
     ]),

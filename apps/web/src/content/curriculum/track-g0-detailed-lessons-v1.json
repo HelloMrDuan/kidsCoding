@@ -2022,8 +2022,7 @@
       "requiredEngineCapabilities": [
         "finite_repeat",
         "movement",
-        "visual_effect",
-        "sound"
+        "pattern_stamp"
       ],
       "prerequisiteLessonIds": [
         "G0-U2-L06"
