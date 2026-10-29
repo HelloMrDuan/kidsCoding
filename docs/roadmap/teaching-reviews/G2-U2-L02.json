@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U2-L02",
+  "reviewedCommit": "da220f5",
+  "reviewedAt": "2026-10-29",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U2-L01"
+  ],
+  "newConcepts": [
+    "永远循环（重复执行不填次数）一直运行、只能按停止结束；舞台循环“等待 N 秒、下一个背景”控制昼夜节奏；精灵用“当背景换成（ ）”响应舞台背景"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u2-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/228"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "conceptExplain：永远循环不自停、等待=每段时长、“当背景换成”听舞台背景",
+        "找错针对“角色听错背景”的事件误解"
+      ],
+      "defects": [
+        "不能新增背景或第二段“当背景换成”脚本"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "森林昼夜交替：猫头鹰天黑才醒、小橘猫天黑说晚安",
+        "预测“换 1 次就停/一直换直到按停止”，VM 对照"
+      ],
+      "defects": [
+        "预测二选一；无朗读"
+      ]
+    },
+    "practice": {
+      "score": 20,
+      "evidence": [
+        "练习 A：舞台等待 ≥3 秒，VM 实测每段约 3 秒，看 2 次切换后按停止",
+        "练习 B：小橘猫改听白天，VM 背景换成白天时开口说早安"
+      ],
+      "defects": [
+        "不能新增积木或精灵"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "真实错误：猫头鹰听“白天”，点绿旗舞台换成白天时就醒来叫（沙箱在 SAY 时记录 VM 当前背景）",
+        "等待 0/6/2.5 编辑器判无效，黄昏等非课程背景被拒",
+        "三层提示：现象→原因→修复"
+      ],
+      "defects": [
+        "没有时间轴可视化"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意：猫头鹰夜里的新台词 + 每段 ≥3 秒 + 只在夜晚叫 + 小橘猫白天开口",
+        "导出真 .sb3（5 SVG）独立 VM 回读，刷新后从本机恢复，重新导入恢复等待秒数"
+      ],
+      "defects": [
+        "不能加新背景或角色"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U2L02 只读 VM 观察（每次运行的换背景次数、平均每段毫秒、谁在哪个背景开口、是否按停止，单测覆盖）",
+        "页面明示未接渲染器与不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 执行；换背景时间来自 VM 对 looks_nextbackdrop 原语的真实调用（仅观察后调用原原语），开口时的背景来自 VM SAY 事件时的舞台造型，“当背景换成”由 VM 自己的帽子派发触发，E2E 无 VM mock"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "猫头鹰白天叫真实错误、永远循环不自停、0/6/2.5 秒被拒、6 类非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "舞台等待 3～5 秒、两只角色台词 1～20 字均多解"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "新增 2 个 SVG（猫头鹰睡觉/醒来）原创，白天/夜晚背景与小橘猫复用 G2-U1 原创图；已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U2-L02：真 Scratch VM 加载原创昼夜项目；舞台等待 3 秒 → VM 每段约 3 秒，猫头鹰“当背景换成夜晚”只在夜晚醒来叫，小橘猫“当背景换成白天”在白天开口；按停止后 VM 停下全部脚本",
+    "failureCase": "猫头鹰听白天 → 点绿旗舞台换成白天时就开口；等待 1 秒每段约 1 秒；等待 0/6/2.5 编辑器判无效；等待 0/9、黄昏背景、永远换成重复、第三个背景、他课工程均被拒且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：猫头鹰开口时 VM 背景是白天",
+      "第二层（想原因）：帽子积木是“当背景换成（白天）”，绿旗先换成白天叫醒了它",
+      "第三层（去修复）：改成“夜晚”后再点绿旗"
+    ],
+    "practiceA": "练习 A：让白天和黑夜长一点（并按停止结束永远循环）",
+    "practiceB": "练习 B：小橘猫说早上好（当背景换成白天）",
+    "equivalentSolutions": [
+      "舞台等待 3、4、5 秒",
+      "台词 1～20 字任意"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3，刷新后从本机草稿恢复；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U2-L02 制作昼夜交替（5 个用例）"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G2-U2-L02/lab-1440.svg",
+      "docs/roadmap/evidence/G2-U2-L02/lab-375-full.svg",
+      "docs/roadmap/evidence/G2-U2-L02/lab-375.svg",
+      "docs/roadmap/evidence/G2-U2-L02/lab-768.svg"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 WebGL 渲染器；本课无云端保存",
+    "不能新增背景、积木或精灵"
+  ]
+}
