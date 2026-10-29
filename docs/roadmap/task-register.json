@@ -2015,7 +2015,7 @@
       "title": "课程审核发布状态前后台同步",
       "priority": "P1",
       "category": "SYS",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "SYS-102"
       ],
