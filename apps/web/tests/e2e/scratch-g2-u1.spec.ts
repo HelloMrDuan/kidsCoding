@@ -1208,14 +1208,20 @@ test.describe('G2-U2-L01 让角色走路有帧动画', () => {
     await expect(page.getByTestId('g2-task-practiceA')).toHaveAttribute('data-done', 'false')
   })
 
-  test('practice A: the costume wraps from 走路4 back to 走路1; 25 loops are refused, 8 loops end on 走路1 in the VM', async ({page}) => {
+  test('practice A: the costume wraps from 走路4 back to 走路1; 25 loops are clamped to 20 at once, 8 loops end on 走路1 in the VM', async ({page}) => {
     test.setTimeout(150_000)
     await openG2Lab(page, U2L01)
     await selectTarget(page, '小橘猫')
-    await page.getByTestId('g2-edit-times').fill('25')
-    await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
-    // Blockly reports the refused 25 asynchronously; re-type 8 until the input settles on it.
-    await fillEdit(page, 'g2-edit-times', '8')
+    // TQ-023 regression: the repeat block clamps to 1..20. The box must show the clamped value as soon as
+    // the edit lands (read straight away, no retrying), so a late re-render can never garble the next fast
+    // edit ("20" + "8" → "208"). Back-to-back edits without waiting, as a quick child or a test types them.
+    const times = page.getByTestId('g2-edit-times')
+    for (const [typed, shown] of [['25', '20'], ['8', '8'], ['0', '1'], ['30', '20'], ['3', '3'], ['25', '20'], ['8', '8']]) {
+      await times.fill(typed)
+      expect(await times.inputValue()).toBe(shown)
+    }
+    await page.waitForTimeout(300)
+    await expect(times).toHaveValue('8')
     await applyAndWait(page)
     await flagWalk(page)
     await expect(framesOf(page, '小橘猫')).toHaveAttribute('data-count', '8')

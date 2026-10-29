@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {g2u2L01, g2u2L02} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05, g2u1L06} from '@/content/curriculum/g2-u1-scratch-lessons'
-import {changedValues, checkSlotValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
+import {G2_TEXT_FIELDS, changedValues, checkSlotValue, quickEditValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
 function block(type: string, fields: Record<string, string> = {}, next: BlockLike | null = null, inner: BlockLike | null = null): BlockLike {
   return {type, getNextBlock: () => next, getFieldValue: (name: string) => fields[name] ?? '', getInputTargetBlock: (name: string) => (name === 'DO' ? inner : null)}
@@ -253,5 +253,29 @@ describe('G2 restricted Blockly adapter (G2-U2-L02 day/night)', () => {
   it('reads the backdrop a hat listens for and refuses backdrops the stage does not have', () => {
     expect(readG2Program(owlWs('夜晚'), owl)).toEqual({kind: 'sprite', values: {'猫头鹰|owl_hat|BACKDROP': '夜晚', '猫头鹰|owl_say|MESSAGE': '咕咕，天黑啦！'}})
     expect(readG2Program(owlWs('黄昏'), owl)).toBeNull()
+  })
+})
+
+describe('G2 quick-edit box value (TQ-023: no late re-render garbling the next edit)', () => {
+  it('shows the value Blockly stored when it clamped or rounded what was typed', () => {
+    expect(quickEditValue('25', '20', true)).toBe('20')
+    expect(quickEditValue('300', '240', true)).toBe('240')
+    expect(quickEditValue('0.25', '0.3', true)).toBe('0.3')
+    expect(quickEditValue('1.1', '1', true)).toBe('1')
+  })
+  it('keeps what was typed while it is the same number, so a box never rewrites itself mid-typing', () => {
+    expect(quickEditValue('8', '8', true)).toBe('8')
+    expect(quickEditValue('1.0', '1', true)).toBe('1.0')
+    expect(quickEditValue('0.50', '0.5', true)).toBe('0.50')
+  })
+  it('lets a number box stay empty while the learner retypes (the block keeps its last number)', () => {
+    expect(quickEditValue('', '6', true)).toBe('')
+    expect(quickEditValue('  ', '6', true)).toBe('  ')
+  })
+  it('shows the stored value when nothing was typed, and text/menu fields exactly as stored', () => {
+    expect(quickEditValue(undefined, '20', true)).toBe('20')
+    expect(quickEditValue('你好', '你好', false)).toBe('你好')
+    expect(quickEditValue('站立', '挥手', false)).toBe('挥手')
+    expect(G2_TEXT_FIELDS.has('MESSAGE') && G2_TEXT_FIELDS.has('DIRECTION') && !G2_TEXT_FIELDS.has('TIMES')).toBe(true)
   })
 })

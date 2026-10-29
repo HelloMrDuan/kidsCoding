@@ -128,3 +128,22 @@ export function valuesForTarget(all: G2Values, target: string): G2Values {
   for (const [key, value] of Object.entries(all)) if (key.startsWith(`${target}|`)) out[key] = value
   return out
 }
+
+/** Quick-edit fields that hold text or a menu choice; every other quick-edit field is a number. */
+export const G2_TEXT_FIELDS = new Set(['MESSAGE', 'COSTUME', 'BACKDROP', 'SOUND_MENU', 'DIRECTION', 'BROADCAST_OPTION'])
+
+/**
+ * What a quick-edit box shows for one field, given what the learner typed (if they are editing it)
+ * and the value Blockly actually stored. Blockly clamps and rounds number fields synchronously
+ * (repeat 25 → 20, wait 0.25 → 0.3) but reports the change asynchronously; the box must show the
+ * stored value in the same render as the keystroke, never later, or the late re-render rewrites the
+ * box while the next edit is being typed and garbles it ("20" + "8" → "208", "0.3" + "0.5" → "0.305").
+ * Text the learner typed is kept while it means the same number ("1.0", "0.50"), and an emptied
+ * number box stays empty (Blockly keeps the last number) until the box loses focus.
+ */
+export function quickEditValue(typed: string | undefined, stored: string, numeric: boolean): string {
+  if (typed === undefined) return stored
+  if (!numeric) return typed === stored ? typed : stored
+  if (typed.trim() === '') return typed
+  return Number(typed) === Number(stored) ? typed : stored
+}
