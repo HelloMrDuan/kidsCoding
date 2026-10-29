@@ -6,7 +6,7 @@ import {
   emptyG2Observations, evaluateG2Lesson, observedPrediction,
   type G2Lesson, type G2Observations, type G2Point,
 } from '@/content/curriculum/g2-u1-scratch-lessons'
-import {beatSummary, flightSummary, syncSummary, L07_TOO_FAST_MS, L07_VISIBLE_MS} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {beatSummary, filmSummary, flightSummary, syncSummary, L12_FILM_MIN_MS, L12_FILM_MAX_MS, L07_TOO_FAST_MS, L07_VISIBLE_MS} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {ScratchG2Blocks} from './scratch-g2-blocks'
 import {changedValues, valuesForTarget, type G2Program, type G2Values} from './scratch-g2-program'
 import {decodeSampleArchive, isG2Archive, readG2Draft, removeG2Draft, saveG2Draft} from './scratch-g2-draft'
@@ -17,7 +17,7 @@ type SpriteState = {id: string; name: string; x: number; y: number; visible: boo
 type MoveResult = {requested: G2Point; before: G2Point; after: G2Point; moved: boolean}
 type CostumeResult = {requested: string; before: Array<{name: string; costume: string}>; after: Array<{name: string; costume: string}>; changed: boolean; stageCostumes: string[]}
 type LabMessage = {
-  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' | 'TURN' | 'BROADCAST' | 'FRAME' | 'BACKDROP_SWITCH' |
+  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' | 'TURN' | 'BROADCAST' | 'FRAME' | 'BACKDROP_SWITCH' | 'STOP_BLOCK' |
     'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'
   id: number | null
   available?: boolean
@@ -47,6 +47,8 @@ type LabMessage = {
   /** Sandbox clock (ms) when the VM ran "next costume". */
   t?: number
   activeThreads?: number
+  /** The option Scratch's "stop" block really ran with ("all", "this script"). */
+  option?: string
   archive?: ArrayBuffer
   error?: string
   phase?: 'load' | 'configure' | 'export'
@@ -64,6 +66,13 @@ function updateLastBeat(prev: G2Observations, change: (run: G2Observations['beat
   if (!prev.beatRuns.length) return prev
   const last = prev.beatRuns.length - 1
   return {...prev, beatRuns: prev.beatRuns.map((run, i) => (i === last ? change(run) : run))}
+}
+
+/** Update the green-flag film in progress (the last film run, unit project lessons). */
+function updateLastFilm(prev: G2Observations, change: (run: G2Observations['filmRuns'][number]) => G2Observations['filmRuns'][number]): G2Observations {
+  if (!prev.filmRuns.length) return prev
+  const last = prev.filmRuns.length - 1
+  return {...prev, filmRuns: prev.filmRuns.map((run, i) => (i === last ? change(run) : run))}
 }
 
 /** Frames each sprite stepped through in one green-flag run; the average gap needs at least two frames. */
@@ -120,6 +129,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   // The broadcast run in progress: the message the VM sent and who spoke after it.
   const broadcastRun = useRef<{message: string; speakers: string[]; t0: number | null; saidAt: Record<string, number>} | null>(null)
   const [lastBroadcast, setLastBroadcast] = useState<{message: string; speakers: string[]; finished: boolean} | null>(null)
+  // Film lessons: the ending's stop block ran and the VM has not yet been seen with no script running.
+  const filmStopPending = useRef(false)
   const savedFailed = useRef(false)
   const loadedRef = useRef(false)
   useEffect(() => { loadedRef.current = loaded }, [loaded])
@@ -204,6 +215,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         clickTurn.current.clear()
         setLastTurns({})
         broadcastRun.current = null
+        filmStopPending.current = false
         setLastBroadcast(null)
         setLastSpeech(null)
         setLastFrames(null)
@@ -258,6 +270,10 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             return {...prev, clickTurns: nextTurns}
           })
         }
+        if (filmStopPending.current && msg.activeThreads === 0) {
+          filmStopPending.current = false
+          setObs(prev => updateLastFilm(prev, r => ({...r, ended: true})))
+        }
         if (broadcastRun.current && msg.activeThreads === 0) {
           const positions: Record<string, G2Point> = {}
           for (const t of current) if (t.original) positions[t.name] = {x: t.x, y: t.y}
@@ -310,6 +326,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           if (broadcastRun.current.t0 !== null && Number.isFinite(t)) broadcastRun.current.saidAt[target] = Math.round(t - broadcastRun.current.t0)
           setLastBroadcast({message: broadcastRun.current.message, speakers: [...broadcastRun.current.speakers], finished: false})
         }
+        if (lesson.showFilm && target === '小橘猫' && text) setObs(prev => updateLastFilm(prev, r => ({...r, lines: [...r.lines, text].slice(-10)})))
         if (flagRun.current && target) {
           const spokenOn = String(msg.backdrop ?? '')
           setObs(prev => updateLastCycle(prev, r => ({...r, speech: [...r.speech, {target, backdrop: spokenOn}].slice(-40)})))
@@ -336,6 +353,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           }
         } else if (target && sound) {
           const costume = String(msg.costume ?? '')
+          const st = Number(msg.t)
+          if (lesson.showFilm && Number.isFinite(st)) setObs(prev => updateLastFilm(prev, r => ({...r, sounds: [...r.sounds, st].slice(-400)})))
           // Rhythm lessons: time every sound the VM starts during the green-flag run (sandbox clock, ms since the run's first sound).
           const t = Number(msg.t)
           if (flagRun.current && Number.isFinite(t)) {
@@ -360,6 +379,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'FRAME') {
         const target = String(msg.target ?? '')
         const t = Number(msg.t)
+        if (lesson.showFilm && target && Number.isFinite(t)) setObs(prev => updateLastFilm(prev, r => ({...r, frames: [...r.frames, t].slice(-400)})))
         if (flagRun.current && target && Number.isFinite(t)) {
           const prev = flagRun.current.frames[target]
           flagRun.current.frames[target] = prev
@@ -367,8 +387,20 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             : {count: 1, first: t, last: t, end: String(msg.costume ?? '')}
           setLastFrames({frames: summarizeFrames(flagRun.current.frames), finished: false})
         }
+      } else if (msg.kind === 'STOP_BLOCK') {
+        const option = String(msg.option ?? '')
+        const t = Number(msg.t)
+        if (lesson.showFilm && option && Number.isFinite(t)) {
+          filmStopPending.current = true
+          setObs(prev => updateLastFilm(prev, r => (r.stop ? r : {...r, stop: {option, t}})))
+          setStatus(option === 'all'
+            ? 'Scratch VM：小橘猫执行了“停止 全部脚本”，整个作品的脚本都停下了。'
+            : 'Scratch VM：小橘猫执行了“停止 这个脚本”，只结束了它收到“结尾”的那一条脚本。')
+        }
       } else if (msg.kind === 'BROADCAST') {
         const message = String(msg.message ?? '')
+        const bt = Number(msg.t)
+        if (lesson.showFilm && message && Number.isFinite(bt)) setObs(prev => updateLastFilm(prev, r => ({...r, broadcasts: [...r.broadcasts, {message, t: bt}].slice(-10)})))
         if (message && !broadcastRun.current) {
           const t = Number(msg.t)
           broadcastRun.current = {message, speakers: [], t0: Number.isFinite(t) ? t : null, saidAt: {}}
@@ -444,7 +476,9 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         clickChanges.current.clear()
         flagRun.current = {stagePlays: 0, speakers: [], overlaps: 0, frames: {}, switches: [], stopRequested: false, beatT0: null, turns: {}}
         setObs(prev => ({...prev, cycleRuns: [...prev.cycleRuns, {switches: 0, avgMs: null, speech: [], finished: false, stopped: false}].slice(-20),
-          beatRuns: [...prev.beatRuns, {hits: [], finished: false}].slice(-20)}))
+          beatRuns: [...prev.beatRuns, {hits: [], finished: false}].slice(-20),
+          filmRuns: lesson.showFilm ? [...prev.filmRuns, {broadcasts: [], frames: [], sounds: [], lines: [], stop: null, ended: false}].slice(-10) : prev.filmRuns}))
+        filmStopPending.current = false
         setLastSpeech(null)
         setLastFrames(null)
         setLastRunSounds({stagePlays: 0, finished: false})
@@ -476,7 +510,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       window.removeEventListener('message', listener)
       iframe?.contentWindow?.postMessage({kind: 'STOP', id: id.current}, '*')
     }
-  }, [lesson.id, lesson.exportName, loadArchive, loadSample, post])
+  }, [lesson.id, lesson.exportName, lesson.showFilm, loadArchive, loadSample, post])
 
   function select(name: string) {
     if (name === selected) return
@@ -698,6 +732,31 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                     : `${run.finished ? '上一次绿旗' : '本次绿旗进行中'}：Scratch VM 里小鼓“咚”响了 ${b.dongs} 下，重音 ${b.bars} 下（${b.bars} 小节）`
                       + `${b.beatsPerBar.length ? `，每小节拍数 ${b.beatsPerBar.join(' / ')}` : ''}；“咚”之间平均 ${sec(b.innerMs)}，重音之后平均 ${sec(b.gapMs)}`
                       + `${b.innerMs !== null && b.gapMs !== null ? (b.steady ? '（节奏稳）' : '（忽快忽慢）') : ''}。`}
+                </p>
+              )
+            })()}
+            {lesson.showFilm && (() => {
+              const run = obs.filmRuns[obs.filmRuns.length - 1]
+              const f = filmSummary(run)
+              const sec = (ms: number | null) => (ms === null ? '—' : `${(ms / 1000).toFixed(1)} 秒`)
+              const ending = !f.stop
+                ? '结尾的停止积木还没有执行'
+                : f.keptRunning
+                  ? `结尾执行了“停止 ${f.stop === 'all' ? '全部脚本' : '这个脚本'}”，之后 VM 里还换了 ${f.tailFrames} 帧、响了 ${f.tailBeats} 下鼓（有循环没停）`
+                  : f.stoppedAll
+                    ? '结尾执行了“停止 全部脚本”，之后 VM 里没有任何脚本在运行'
+                    : `结尾执行了“停止 ${f.stop === 'all' ? '全部脚本' : '这个脚本'}”，正在看之后还有没有循环在跑……`
+              return (
+                <p data-testid="g2-film-log" data-runs={obs.filmRuns.length} data-scenes={f.scenes.join(',')} data-total-ms={f.totalMs ?? ''}
+                  data-frames={f.frames} data-beats={f.beats} data-on-beat={f.onBeat} data-synced={f.synced ? '1' : '0'}
+                  data-stop={f.stop ?? ''} data-tail={f.tailFrames + f.tailBeats} data-ended={run?.ended ? '1' : '0'} className="mt-2 text-sm">
+                  {!run
+                    ? '还没有点绿旗：舞台的三条广播（开头/中段/结尾）各在第几秒发出、中段的舞步有没有踩在鼓点上、结尾后还有没有循环在跑，会显示在这里。'
+                    : `上一次绿旗：Scratch VM 依次广播了 ${f.scenes.length ? f.scenes.map(m => `“${m}”`).join(' → ') : '（还没有）'}。`
+                      + `开头那幕 ${sec(f.openMs)}，中段那幕 ${sec(f.middleMs)}，全片 ${sec(f.totalMs)}`
+                      + `${f.totalMs === null ? '' : f.totalMs >= L12_FILM_MIN_MS && f.totalMs <= L12_FILM_MAX_MS ? '（在 30～60 秒内）' : '（不在 30～60 秒内）'}。`
+                      + `中段小橘猫换了 ${f.frames} 帧、小鼓敲了 ${f.beats} 下，其中 ${f.onBeat} 帧和鼓声相差不超过 0.1 秒${f.synced ? '（音画同步）' : ''}。`
+                      + `${ending}。`}
                 </p>
               )
             })()}

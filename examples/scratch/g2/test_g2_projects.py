@@ -248,5 +248,28 @@ class G2ProjectTests(unittest.TestCase):
         self.assertEqual({p["block"] for p in params}, {"fox_say", "rabbit_recv", "rabbit_wait", "rabbit_say"},
                          "the broadcast, the fox's receive and both entrance positions stay fixed")
 
+    def test_u2_l06_three_scenes_and_a_stop_that_ends_every_loop(self):
+        _, project, _, params = LESSONS["G2-U2-L06"]()
+        stage, cat, drum = project["targets"]
+        self.assertEqual(stage["broadcasts"], {"kc-msg-open": "开头", "kc-msg-middle": "中段", "kc-msg-end": "结尾"})
+        chain, current = [], stage["blocks"]["stage_flag"]["next"]
+        while current:
+            b = stage["blocks"][current]
+            chain.append(b["opcode"] if b["opcode"] != "event_broadcast" else "broadcast:" + b["inputs"]["BROADCAST_INPUT"][1][1])
+            current = b["next"]
+        # One green-flag script chains the three scenes: 开头 → wait T1 → 中段 → wait T2 → 结尾.
+        self.assertEqual(chain, ["looks_switchbackdropto", "broadcast:开头", "control_wait", "broadcast:中段", "control_wait", "broadcast:结尾"])
+        self.assertEqual([c["name"] for c in stage["costumes"]], ["开场", "音乐舞台", "谢幕"])
+        self.assertEqual([c["name"] for c in cat["costumes"]], ["站好", "挥手"])
+        self.assertEqual(cat["blocks"]["cat_dance"]["opcode"], "control_forever")
+        self.assertEqual(drum["blocks"]["drum_loop"]["opcode"], "control_forever")
+        self.assertEqual(drum["blocks"]["drum_dong"]["opcode"], "sound_play", "the beat does not wait for the sound to finish")
+        # Out of step at the start (0.3 vs 0.5); the bug: 停止 [这个脚本] leaves both forever loops running.
+        self.assertEqual((cat["blocks"]["cat_wait"]["inputs"]["DURATION"][1][1], drum["blocks"]["drum_wait"]["inputs"]["DURATION"][1][1]), ("0.3", "0.5"))
+        self.assertEqual(cat["blocks"]["cat_stop"]["fields"]["STOP_OPTION"][0], "this script")
+        self.assertEqual({p["block"] for p in params}, {"stage_wait1", "stage_wait2", "cat_hello", "cat_wait", "cat_bye", "cat_stop", "drum_wait"},
+                         "broadcast names, receivers, backdrops and sounds stay fixed")
+        self.assertEqual(next(p for p in params if p["block"] == "cat_stop")["options"], ["this script", "all"])
+
 if __name__ == "__main__":
     unittest.main()

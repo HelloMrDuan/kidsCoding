@@ -8,10 +8,11 @@
 
 import {evaluateG2U2Lesson, g2u2ScratchLessons, observedPredictionG2U2} from './g2-u2-scratch-lessons'
 
-export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION' | 'DY'
+export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION' | 'DY' | 'STOP_OPTION'
 export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
 export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait' | 'kc2_switch_backdrop' | 'kc2_play_sound'
   | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast' | 'kc2_wait_whole' | 'kc2_change_y' | 'kc2_wait_free' | 'kc2_forever' | 'kc2_next_backdrop'
+  | 'kc2_start_sound' | 'kc2_stop'
 /** `fixed` shows a value the lesson keeps fixed (its field is shown but locked in the editor). */
 export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[]; fixed?: Partial<Record<G2Field, string>> }
 export type G2ScriptSpec = {
@@ -70,6 +71,8 @@ export type G2Lesson = {
   showFlight?: boolean
   /** Show the last broadcast run: which receivers spoke and how long after the broadcast, and the gap between the two performers (sync lessons). */
   showSync?: boolean
+  /** Show the last green-flag film: when each scene's broadcast went out, how many costume frames landed on a drum beat, and whether anything kept running after the ending's stop block (unit project). */
+  showFilm?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -596,12 +599,16 @@ export type G2Observations = {
   cycleRuns: Array<{ switches: number; avgMs: number | null; speech: Array<{ target: string; backdrop: string }>; finished: boolean; stopped: boolean }>
   /** Green-flag runs: every sprite sound the VM started, in order, with the VM time since the run's first sound (ms), and whether the run has ended. */
   beatRuns: Array<{ hits: Array<{ target: string; sound: string; ms: number }>; finished: boolean }>
+  /** Green-flag films (sandbox clock, ms): every broadcast, costume frame and sprite sound the VM ran, the cat's lines,
+   * the stop block's option and time, and whether the VM had no script left running after it. */
+  filmRuns: Array<{ broadcasts: Array<{ message: string; t: number }>; frames: number[]; sounds: number[]; lines: string[]
+    stop: { option: string; t: number } | null; ended: boolean }>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
-  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [], cycleRuns: [], beatRuns: [],
+  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [], cycleRuns: [], beatRuns: [], filmRuns: [],
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {

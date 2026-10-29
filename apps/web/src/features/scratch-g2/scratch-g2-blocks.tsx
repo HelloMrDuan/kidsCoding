@@ -49,6 +49,16 @@ function installG2Blocks() {
       this.setTooltip('对应 Scratch 的“播放声音……等待播完”声音积木')
     },
   }
+  Blockly.Blocks.kc2_start_sound = {
+    init(this: Blockly.Block) {
+      this.appendDummyInput().appendField('播放声音')
+        .appendField(new Blockly.FieldDropdown(() => soundOptions.map(name => [name, name] as [string, string])), 'SOUND_MENU')
+      this.setPreviousStatement(true)
+      this.setNextStatement(true)
+      this.setColour(315)
+      this.setTooltip('对应 Scratch 的“播放声音……”声音积木：声音一开始就接着往下执行，不等它播完')
+    },
+  }
   Blockly.Blocks.kc2_when_receive = {
     init(this: Blockly.Block) {
       this.appendDummyInput().appendField('当接收到')
@@ -85,6 +95,10 @@ function installG2Blocks() {
     // Scratch's forever loop: no count and no block can follow it (it never ends by itself).
     {type: 'kc2_forever', message0: '重复执行（永远）', message1: '%1', args1: [{type: 'input_statement', name: 'DO'}],
       previousStatement: null, colour: 35, tooltip: '对应 Scratch 的“重复执行”（永远）控制积木：一直循环，直到按停止'},
+    // Scratch's "stop [all / this script]": a cap block, nothing can follow it.
+    {type: 'kc2_stop', message0: '停止 %1', args0: [
+      {type: 'field_dropdown', name: 'STOP_OPTION', options: [['全部脚本', 'all'], ['这个脚本', 'this script']]},
+    ], previousStatement: null, colour: 35, tooltip: '对应 Scratch 的“停止……”控制积木：全部脚本 = 整个作品都停下；这个脚本 = 只停它所在的这一条脚本'},
     {type: 'kc2_next_backdrop', message0: '下一个背景', previousStatement: null, nextStatement: null, colour: 265, tooltip: '对应 Scratch 的“下一个背景”外观积木（只有舞台有背景）'},
     {type: 'kc2_next_costume', message0: '下一个造型', previousStatement: null, nextStatement: null, colour: 265, tooltip: '对应 Scratch 的“下一个造型”外观积木'},
     {type: 'kc2_wait', message0: '等待 %1 秒', args0: [
@@ -164,8 +178,9 @@ function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G
 
 const FIELD_TYPES: Record<string, string[]> = {
   X: ['kc2_goto'], Y: ['kc2_goto'], MESSAGE: ['kc2_say'], COSTUME: ['kc2_switch_costume'], TIMES: ['kc2_repeat'], DURATION: ['kc2_wait', 'kc2_wait_whole', 'kc2_wait_free'],
-  BACKDROP: ['kc2_switch_backdrop', 'kc2_when_backdrop'], SOUND_MENU: ['kc2_play_sound'],
+  BACKDROP: ['kc2_switch_backdrop', 'kc2_when_backdrop'], SOUND_MENU: ['kc2_play_sound', 'kc2_start_sound'],
   DIRECTION: ['kc2_point_direction'], STEPS: ['kc2_move_steps'], DEGREES: ['kc2_turn_right'], BROADCAST_OPTION: ['kc2_when_receive'], DY: ['kc2_change_y'],
+  STOP_OPTION: ['kc2_stop'],
 }
 /** Script blocks in program order: each block, then what is inside its C-mouth, then the block below it (same order as the lesson specs). */
 function blocksInOrder(ws: Blockly.WorkspaceSvg): Blockly.Block[] {
@@ -316,6 +331,8 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   const waitSlot = findSlot(allSpecs, 'DURATION')
   const waitWhole = !!waitSlot && !waitSlot.tenths
   const dySlot = findSlot(allSpecs, 'DY')
+  const saySlots = findSlots(allSpecs, 'MESSAGE')
+  const wait2Whole = !!waitSlots[1] && !waitSlots[1].tenths
   const hasGoto = fields.X !== undefined
   const hasSay = fields.MESSAGE !== undefined
   const extraLabel = extra === 'kc2_switch_costume' ? `换成（${costumeOptions[costumeOptions.length - 1]}）造型` : '移到 x y'
@@ -411,8 +428,8 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
         </label>
       )}
       {fields['DURATION#2'] !== undefined && waitSlots[1] && (
-        <label className="text-sm font-bold text-slate-700">{waitSlots[1].label}（{(waitSlots[1].min ?? 0.2).toFixed(1)}～{(waitSlots[1].max ?? 1).toFixed(1)}）
-          <input data-testid="g2-edit-wait-2" type="number" min={waitSlots[1].min ?? 0.2} max={waitSlots[1].max ?? 1} step={0.1} value={fields['DURATION#2']}
+        <label className="text-sm font-bold text-slate-700">{waitSlots[1].label}{wait2Whole ? `（${waitSlots[1].min ?? 0}～${waitSlots[1].max ?? 5} 的整数）` : `（${(waitSlots[1].min ?? 0.2).toFixed(1)}～${(waitSlots[1].max ?? 1).toFixed(1)}）`}
+          <input data-testid="g2-edit-wait-2" type="number" min={wait2Whole ? undefined : waitSlots[1].min ?? 0.2} max={wait2Whole ? undefined : waitSlots[1].max ?? 1} step={wait2Whole ? 1 : 0.1} value={fields['DURATION#2']}
             onChange={e => update('DURATION', e.target.value, 1)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
       )}
@@ -423,9 +440,24 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
         </label>
       )}
       {hasSay && (
-        <label className="text-sm font-bold text-slate-700">说的话（1～20 个字）
+        <label className="text-sm font-bold text-slate-700">{saySlots.length > 1 ? saySlots[0].label : '说的话'}（1～20 个字）
           <input data-testid="g2-edit-say" type="text" maxLength={20} value={fields.MESSAGE}
             onChange={e => update('MESSAGE', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
+        </label>
+      )}
+      {fields['MESSAGE#2'] !== undefined && saySlots[1] && (
+        <label className="text-sm font-bold text-slate-700">{saySlots[1].label}（1～20 个字）
+          <input data-testid="g2-edit-say-2" type="text" maxLength={20} value={fields['MESSAGE#2']}
+            onChange={e => update('MESSAGE', e.target.value, 1)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
+        </label>
+      )}
+      {fields.STOP_OPTION !== undefined && (
+        <label className="text-sm font-bold text-slate-700">停止
+          <select data-testid="g2-edit-stop" value={fields.STOP_OPTION} onChange={e => update('STOP_OPTION', e.target.value)}
+            className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2">
+            <option value="all">全部脚本</option>
+            <option value="this script">这个脚本</option>
+          </select>
         </label>
       )}
     </div>
