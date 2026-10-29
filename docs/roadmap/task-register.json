@@ -758,7 +758,7 @@
       "title": "Hark B 课程审定 v1 归档（G2/G3/W0/W1/A0 120 节，AI 实现者自审）",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "TQ-007"
       ],
@@ -770,12 +770,19 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/227",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "prNumber": 227,
+        "mergeCommit": "f45b5833e8d83d5102c7d8236e9cf9fbe4688e02",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835253319",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835253246",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835066054",
+        "reviewer": "仓库负责人常设授权 Hark B 在 CI 全绿后自行合并（2026-10-27 起）；PR #227 于 2026-10-29 15:24 CST 按该授权合并。仅批准文档归档，审定结论本身为 AI 实现者自审，未经负责人或独立人工教研复核",
+        "tests": [
+          "docs-only：PR #227 只新增 docs/curriculum-audit/hark-b/{README.md,hark-b-audit-v1.md,hark-b-lessons.csv} 并登记本条（4 文件，+1330 行），不改代码、课程、full-catalog、lesson-task-register 或任何课程状态",
+          "覆盖核对（读 origin/main 原文件）：hark-b-lessons.csv 120 行，G2/G3/W0/W1/A0 各 24 节；报告文件头标注“AI 实现者自审，不是独立教研评审”、不得作为 completed/试学/发布依据，并写明基线 300c6ddd429be01c81eb719e59fcd815bb6ed683",
+          "PR CI：mandatory task accountability https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835066054 成功（curriculum 工作流按路径过滤未在 PR 触发）；合并后 main：curriculum content checks https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835253319 与 mandatory task accountability https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835253246 均成功"
+        ]
       },
-      "notes": "AI 自审不是独立教研；结论需负责人/独立人工教研复核。三端视觉截图不在本任务范围。"
+      "notes": "AI 自审不是独立教研；结论需负责人/独立人工教研复核。三端视觉截图不在本任务范围。completed 仅表示审定文档归档交付，不代表任何课程通过审定、试学或发布。"
     },
     {
       "id": "UX-001",
