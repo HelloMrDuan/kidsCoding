@@ -4,7 +4,7 @@ import {useEffect, useRef, useState} from 'react'
 import * as Blockly from 'blockly'
 import {BLOCKLY_MEDIA_PATH} from '@/features/lessons/blockly/blockly-media'
 import type {G2BlockSpec, G2Slot, G2TargetSpec} from '@/content/curriculum/g2-u1-scratch-lessons'
-import {readG2Program, type G2Program, type G2Values} from './scratch-g2-program'
+import {G2_TEXT_FIELDS, quickEditValue, readG2Program, type G2Program, type G2Values} from './scratch-g2-program'
 
 // Costume names of the target being edited. The editor is remounted for every
 // target, so the dropdown always lists the selected target's own costumes.
@@ -171,6 +171,9 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   const notify = useRef(onProgramChange)
   const [program, setProgram] = useState<G2Program | null>(null)
   const [fields, setFields] = useState<Record<string, string>>({})
+  // What the learner typed into each quick-edit box since it was focused (see quickEditValue).
+  const typed = useRef<Record<string, string>>({})
+  const readFields = useRef<() => Record<string, string>>(() => ({}))
   useEffect(() => { notify.current = onProgramChange }, [onProgramChange])
 
   useEffect(() => {
@@ -203,16 +206,21 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
       buildSequence(ws, script.body, initialValues, b => hat.nextConnection?.connect(b.previousConnection!))
       offsetY += script.body.some(b => b.children) ? 170 : 110
     }
-    const changed = () => {
-      const next = readG2Program(ws, target)
-      setProgram(next)
+    readFields.current = () => {
       const snapshot: Record<string, string> = {}
       for (const block of ws.getAllBlocks(false)) {
         for (const [field, types] of Object.entries(FIELD_TYPES)) {
-          if (types.includes(block.type) && snapshot[field] === undefined && fieldEnabled(block, field)) snapshot[field] = String(block.getFieldValue(field))
+          if (types.includes(block.type) && snapshot[field] === undefined && fieldEnabled(block, field)) {
+            snapshot[field] = quickEditValue(typed.current[field], String(block.getFieldValue(field)), !G2_TEXT_FIELDS.has(field))
+          }
         }
       }
-      setFields(snapshot)
+      return snapshot
+    }
+    const changed = () => {
+      const next = readG2Program(ws, target)
+      setProgram(next)
+      setFields(readFields.current())
       notify.current(next)
     }
     ws.addChangeListener(changed)
@@ -235,10 +243,19 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
     if (!ws) return
     const block = ws.getAllBlocks(false).find(b => FIELD_TYPES[field]?.includes(b.type) && fieldEnabled(b, field))
     if (!block) return
-    block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' || field === 'BACKDROP' || field === 'SOUND_MENU' || field === 'DIRECTION' || field === 'BROADCAST_OPTION' ? value : String(Number(value)), field)
-    // Show what was typed right away: Blockly reports the change asynchronously, and re-rendering the
-    // controlled input with the stale value in between would move the caret and garble the next edit.
-    setFields(prev => ({...prev, [field]: value}))
+    const numeric = !G2_TEXT_FIELDS.has(field)
+    typed.current[field] = value
+    // An emptied number box is a learner mid-edit: leave the block's last number alone.
+    if (!numeric || value.trim() !== '') block.setFieldValue(numeric ? String(Number(value)) : value, field)
+    // Show the value Blockly stored (clamped/rounded synchronously) in this same render. Blockly reports
+    // the change asynchronously; waiting for that report would re-render the box later, while the next
+    // edit is already being typed, which moves the caret and garbles it.
+    setFields(prev => ({...prev, [field]: quickEditValue(value, String(block.getFieldValue(field)), numeric)}))
+  }
+  /** Leaving a box: forget what was typed and show exactly what the blocks hold. */
+  function settle() {
+    typed.current = {}
+    setFields(readFields.current())
   }
   const extra = target.extraToolbox?.[0]
   function attachStageExtra() {
@@ -275,7 +292,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
       <button data-testid="g2-stage-attach-extra" type="button" onClick={attachStageExtra}
         className="mt-4 rounded-full bg-indigo-100 px-5 py-2 text-sm font-bold text-indigo-900">把“{extraLabel}”拼到舞台的绿旗下面</button>
     )}
-    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+    <div className="mt-4 grid gap-3 sm:grid-cols-3" onBlur={settle}>
       {hasGoto && (<>
         <label className="text-sm font-bold text-slate-700">x（-240～240）
           <input data-testid="g2-edit-x" type="number" min={-240} max={240} step={1} value={fields.X}
