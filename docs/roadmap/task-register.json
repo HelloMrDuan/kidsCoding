@@ -2015,7 +2015,7 @@
       "title": "课程审核发布状态前后台同步",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "SYS-102"
       ],
@@ -2024,13 +2024,18 @@
         "实验/详案/可试玩/正式发布标记一致，缺证据不开放"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/222",
+        "mergeCommit": "89b46230b73e3bc640216600dce1df5c885cc49f",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40813169235",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40813169238",
+        "tests": [
+          "vitest status-sync-sys104.test.tsx 3 项全绿（后台审阅页+前台目录页+前台详情页+公开 API 同课同标记；444 课全量不变量）",
+          "PR #222 CI 23 success + 3 skipped",
+          "合并后主分支 curriculum #581 success、task accountability success"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "本任务只补跨表面一致性测试与 workflow 名单，不改产品代码、不改成熟度模型语义、不动发布路径；无视觉改动故无旧机三端实测。合并后主分支 deploy-pipeline #307 failure（e2e-blockly mobile gate）不在关账门禁内，与 UX-503/504 同口径。"
     },
     {
       "id": "SYS-105",
