@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u2L01, g2u2L02, g2u2L03} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {g2u2L01, g2u2L02, g2u2L03, g2u2L04} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05, g2u1L06} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {G2_TEXT_FIELDS, changedValues, checkSlotValue, quickEditValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
@@ -307,5 +307,31 @@ describe('G2 restricted Blockly adapter (G2-U2-L03 nested loops)', () => {
     for (const bad of ['0.25', '0.1', '1.5', '0']) expect(readG2Program(drumWs('4', '3', bad, '嗒', '0.5'), drum)).toBeNull()
     expect(readG2Program(drumWs('4', '3', '0.5', '咚', '0.5'), drum)).toBeNull()
     expect(readG2Program(drumWs('4', '3', '0.5', '嗒', '0.5', false), drum)).toBeNull()
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U2-L04 flight loop)', () => {
+  const fly = g2u2L04.targets.find(t => t.name === '蝴蝶')!
+  const flyWs = (times: string, steps: string, degrees: string, order: 'ok' | 'turn-first' = 'ok') => {
+    const wait = block('kc2_wait', {DURATION: '0.2'})
+    const next = block('kc2_next_costume', {}, wait)
+    const inner = order === 'ok'
+      ? block('kc2_move_steps', {STEPS: steps}, block('kc2_turn_right', {DEGREES: degrees}, next))
+      : block('kc2_turn_right', {DEGREES: degrees}, block('kc2_move_steps', {STEPS: steps}, next))
+    return ws(block('kc2_flag', {}, block('kc2_goto_start', {X: '-60', Y: '60'}, block('kc2_point_direction', {DIRECTION: '90'},
+      block('kc2_switch_costume', {COSTUME: '展翅'}, block('kc2_repeat', {TIMES: times}, block('kc2_say', {MESSAGE: '我飞回花朵啦！'}), inner))))))
+  }
+  it('reads repeats, steps and degrees', () => {
+    expect(readG2Program(flyWs('8', '40', '45'), fly)).toEqual({kind: 'sprite', values: {
+      '蝴蝶|fly_repeat|TIMES': 8, '蝴蝶|fly_move|STEPS': 40, '蝴蝶|fly_turn|DEGREES': 45, '蝴蝶|fly_say|MESSAGE': '我飞回花朵啦！',
+    }})
+  })
+  it('refuses 150°, 4°, 80 steps, 21 repeats, fractions and turning before moving', () => {
+    expect(readG2Program(flyWs('8', '40', '150'), fly)).toBeNull()
+    expect(readG2Program(flyWs('8', '40', '4'), fly)).toBeNull()
+    expect(readG2Program(flyWs('8', '80', '45'), fly)).toBeNull()
+    expect(readG2Program(flyWs('21', '40', '45'), fly)).toBeNull()
+    expect(readG2Program(flyWs('8', '40', '22.5'), fly)).toBeNull()
+    expect(readG2Program(flyWs('8', '40', '45', 'turn-first'), fly)).toBeNull()
   })
 })

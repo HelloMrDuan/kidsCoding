@@ -13,6 +13,7 @@
     { "path": "scratch-samples/g2-u2-l01-cat-walk-home.sb3.b64", "license": "original", "source": "本项目原创 G2-U2-L01 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（回家的小路背景/小橘猫走路 4 帧/小鸟收翅与展翅），由 examples/scratch/g2/build_g2_projects.py 生成" },
     { "path": "scratch-samples/g2-u2-l02-day-night.sb3.b64", "license": "original", "source": "本项目原创 G2-U2-L02 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（白天/夜晚背景复用 G2-U1 原创森林图、猫头鹰睡觉与醒来、小橘猫），由 examples/scratch/g2/build_g2_projects.py 生成" },
     { "path": "scratch-samples/g2-u2-l03-rhythm-stage.sb3.b64", "license": "original", "source": "本项目原创 G2-U2-L03 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（音乐舞台背景/小鼓，小橘猫复用 G2-U1 原创图）与程序合成的原创 WAV 音效（咚/嗒/啪，纯正弦合成，无采样），由 examples/scratch/g2/build_g2_projects.py 生成" },
+    { "path": "scratch-samples/g2-u2-l04-butterfly-loop.sb3.b64", "license": "original", "source": "本项目原创 G2-U2-L04 Scratch 示例作品（.sb3 的 base64 文本），原创 SVG（花园背景含起点圈、蝴蝶展翅与合翅、粉色花朵），由 examples/scratch/g2/build_g2_projects.py 生成" },
     { "path": "v2/hero-studio.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601，commit fbc8b68）" },
     { "path": "v2/track-blockly.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },
     { "path": "v2/track-python.webp", "license": "original", "source": "本项目为 V2 设计生成的原创插画（UX-601）" },

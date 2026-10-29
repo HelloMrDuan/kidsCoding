@@ -316,6 +316,113 @@ export function evaluateG2U2L03(obs: G2Observations): G2TaskState {
   }
 }
 
+export const L10_START: G2Point = {x: -60, y: 60}
+export const L10_FLY_LINE = '我飞回花朵啦！'
+/** The flight counts as back at the start ring when the VM end position is this close (steps). */
+export const L10_CLOSE_STEPS = 12
+
+type FlightRun = G2Observations['frameRuns'][number]
+export type FlightSummary = { turn: number; laps: number; frames: number; end: G2Point | null; distance: number | null; direction: number | null; closed: boolean }
+
+/** The butterfly's flight in one finished green-flag run, from VM turn totals, frames and its end state. */
+export function flightSummary(run: FlightRun | undefined): FlightSummary | null {
+  if (!run) return null
+  const turn = Math.round(run.turns?.['蝴蝶'] ?? 0)
+  const end = run.positions['蝴蝶'] ?? null
+  const distance = end ? Math.hypot(end.x - L10_START.x, end.y - L10_START.y) : null
+  const direction = run.directions?.['蝴蝶']
+  return {
+    turn, laps: Math.floor(turn / 360), frames: run.frames['蝴蝶']?.count ?? 0, end, distance,
+    direction: typeof direction === 'number' ? Math.round(direction) : null,
+    closed: turn > 0 && turn % 360 === 0 && distance !== null && distance <= L10_CLOSE_STEPS,
+  }
+}
+
+export const g2u2L04: G2Lesson = {
+  id: 'G2-U2-L04',
+  title: '循环飞舞的蝴蝶',
+  concept: '循环里“移动 + 右转”画出飞行路线：重复次数 × 每次转的度数 = 360 才转满一圈',
+  sample: '/scratch-samples/g2-u2-l04-butterfly-loop.sb3.b64',
+  exportName: 'KidsCoding-循环飞舞的蝴蝶.sb3',
+  story: '花园里，蝴蝶从花朵旁边的起点圈出发，想绕着花园飞一圈再回到起点。它每次飞一段、转个弯、扇一下翅膀。可现在它飞了 6 段就停在半路，头还朝着上面……',
+  conceptExplain: [
+    '在“重复执行”里放“移动 N 步”和“右转 D 度”，角色每次走一段再拐个弯，连起来就是一条飞行路线（像画多边形）。',
+    '转满一圈是 360 度。所有拐弯加起来 = 重复次数 × 每次的度数；正好是 360，角色就回到起点、面朝出发的方向；720 就是两圈。',
+    '每次转得越小、重复次数越多，路线越像一个圆；每段走得越长，圈就越大。循环里的“下一个造型”让蝴蝶边飞边扇翅膀。',
+  ],
+  predict: {
+    question: '蝴蝶重复 6 次，每次移动 40 步、右转 45 度。点绿旗后，它能回到起点圈吗？',
+    options: ['能回到起点', '回不到起点'],
+    correct: '回不到起点',
+    explain: '6 × 45 = 270 度，只转了四分之三圈，所以蝴蝶停在半路、面朝上方；要转满 360 度才回得来。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '让循环转满一圈回到起点', title: '练习 A：飞回起点', goal: '选中蝴蝶，改“重复执行（ ）次”或“右转（ ）度”，应用后点绿旗：Scratch VM 里蝴蝶一共右转 360 度的整数倍，最后回到起点圈（离起点不超过 12 步）。', how: '6 × 45 = 270，还差 90 度。试试重复 8 次 × 45 度，或者 6 次 × 60 度、4 次 × 90 度……' },
+    { id: 'practiceB', skill: '用重复次数 × 度数控制飞几圈', title: '练习 B：绕两圈', goal: '让蝴蝶一共右转 720 度（两圈），最后还要回到起点圈。', how: '两圈 = 2 × 360。比如 8 次 × 90 度、12 次 × 60 度、16 次 × 45 度。' },
+    { id: 'debug', skill: '算出循环一共转了多少度（调试）', title: '找错：蝴蝶为什么停在半路？', goal: '先点一次绿旗，看观察区里 VM 测到蝴蝶一共转了多少度；再改次数或度数，让它转满整圈、回到起点。', how: '一共转的度数 = 重复次数 × 每次右转的度数。' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：画一个更圆的圈', goal: '把蝴蝶回来说的话换成你自己的一句（1～20 字），再让它飞一个更圆的圈：至少重复 10 次，转满整圈并回到起点，最后保存为 .sb3。', how: '重复次数多、每次转得少，圈就更圆：10 × 36、12 × 30、18 × 20、20 × 18 都行，步数自己定。' },
+  ],
+  hints: [
+    '看现象：点绿旗后，观察区显示 Scratch VM 里蝴蝶一共只右转了 270 度，最后面朝 0 度（上方），离起点很远。',
+    '想原因：重复 6 次 × 每次右转 45 度 = 270 度，不到 360 度的一整圈，所以飞不回起点。',
+    '去修复：选中蝴蝶，把“重复执行”改成 8 次（8 × 45 = 360），或者把“右转”改成 60 度（6 × 60 = 360），应用后再点绿旗。',
+  ],
+  reflection: [
+    '重复 4 次 × 90 度和重复 8 次 × 45 度，飞出来的路线有什么不同？',
+    '如果想飞三圈，可以怎么搭配次数和度数？',
+    '把“移动”的步数改大，路线会变成什么样？为什么还是能回到起点？',
+  ],
+  limitations: [
+    '本实验只能修改蝴蝶的：重复次数（1～20）、每次移动步数（5～60）、每次右转度数（5～120 的整数）和回来说的话（1～20 字）。',
+    '起点（x -60 · y 60）、出发方向（90 度，向右）、先换成展翅、每次等待 0.2 秒和积木顺序固定不改；花朵是固定装饰。不能新增积木或精灵（可导出 .sb3 后在完整 Scratch 编辑器里继续做）。',
+    '舞台画面按 Scratch VM 的对象状态绘制原创 SVG，未接入 WebGL 渲染器，所以不提供“碰到边缘就反弹”；转过的度数来自 VM 里每次“右转”真正执行的记录，位置和方向来自 VM 目标状态；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    { name: 'Stage', kind: 'stage', label: '舞台', scripts: [{ hat: 'kc2_flag', body: [] }] },
+    {
+      name: '蝴蝶', kind: 'sprite', label: '蝴蝶', costumes: ['展翅', '合翅'],
+      scripts: [{ hat: 'kc2_flag', body: [
+        { type: 'kc2_goto_start', vmBlock: 'fly_home', slots: [], fixed: { X: '-60', Y: '60' } },
+        { type: 'kc2_point_direction', vmBlock: 'fly_point', slots: [], fixed: { DIRECTION: '90' } },
+        { type: 'kc2_switch_costume', vmBlock: 'fly_first_menu', slots: [], fixed: { COSTUME: '展翅' } },
+        {
+          type: 'kc2_repeat', vmBlock: 'fly_repeat', slots: [{ key: '蝴蝶|fly_repeat|TIMES', field: 'TIMES', label: '次数', min: 1, max: 20 }],
+          children: [
+            { type: 'kc2_move_steps', vmBlock: 'fly_move', slots: [{ key: '蝴蝶|fly_move|STEPS', field: 'STEPS', label: '步数', min: 5, max: 60 }] },
+            { type: 'kc2_turn_right', vmBlock: 'fly_turn', slots: [{ key: '蝴蝶|fly_turn|DEGREES', field: 'DEGREES', label: '度数', min: 5, max: 120 }] },
+            { type: 'kc2_next_costume', vmBlock: 'fly_next', slots: [] },
+            { type: 'kc2_wait', vmBlock: 'fly_wait', slots: [], fixed: { DURATION: '0.2' } },
+          ],
+        },
+        { type: 'kc2_say', vmBlock: 'fly_say', slots: [{ key: '蝴蝶|fly_say|MESSAGE', field: 'MESSAGE', label: '说的话', maxLength: 20 }] },
+      ] }],
+    },
+    {
+      name: '花朵', kind: 'sprite', label: '花朵（装饰）',
+      scripts: [{ hat: 'kc2_flag', body: [{ type: 'kc2_goto_start', vmBlock: 'flower_home', slots: [], fixed: { X: '-110', Y: '30' } }] }],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-back-to-start', solutions: ['重复 8 次 × 右转 45 度 → VM 一共转 360 度，回到起点', '6 次 × 60 度、4 次 × 90 度也行'], counterExamples: ['6 次 × 45 度 → 270 度，停在半路', '右转 150 度 → 超出 5～120 被拒绝'] },
+    { id: 'practiceB-two-laps', solutions: ['8 次 × 90 度 → 720 度，两圈后回到起点', '12 次 × 60 度、16 次 × 45 度'], counterExamples: ['8 次 × 45 度 → 只有一圈', '移动 80 步 → 超出 5～60 被拒绝'] },
+    { id: 'debug-not-a-whole-turn', solutions: ['把次数改成 8（8 × 45 = 360）或度数改成 60（6 × 60 = 360）'], counterExamples: ['6 × 45 = 270 → 回不到起点', '7 × 45 = 315 → 还差一点'] },
+  ],
+  nextLesson: 'G2-U2-L05 两只精灵同步表演',
+  showFlight: true,
+}
+
+export function evaluateG2U2L04(obs: G2Observations): G2TaskState {
+  const flights = obs.frameRuns.map(flightSummary).filter((f): f is FlightSummary => !!f && f.turn > 0)
+  const firstOpen = flights.findIndex(f => f.turn % 360 !== 0)
+  const line = obs.lastSaid['蝴蝶']
+  return {
+    practiceA: flights.some(f => f.closed),
+    practiceB: flights.some(f => f.closed && f.turn === 720),
+    debug: firstOpen >= 0 && flights.slice(firstOpen + 1).some(f => f.closed),
+    create: !!line && line !== L10_FLY_LINE && flights.some(f => f.closed && f.frames >= 10),
+  }
+}
+
 type CycleRun = G2Observations['cycleRuns'][number]
 const spokeOn = (run: CycleRun, target: string, backdrop: string) => run.speech.some(s => s.target === target && s.backdrop === backdrop)
 const longPhases = (run: CycleRun) => run.switches >= 2 && run.avgMs !== null && run.avgMs >= L08_LONG_PHASE_MS
@@ -358,6 +465,11 @@ export function observedPredictionG2U2(id: string, obs: G2Observations): string 
     const ms = catFrames(first)!.avgMs!
     return ms < L07_TOO_FAST_MS ? '快得看不清' : ms >= L07_VISIBLE_MS ? '看得清' : null
   }
+  if (id === g2u2L04.id) {
+    const first = flightSummary(obs.frameRuns.find(r => (r.turns?.['蝴蝶'] ?? 0) > 0))
+    if (!first) return null
+    return first.closed ? '能回到起点' : '回不到起点'
+  }
   if (id === g2u2L03.id) {
     const first = obs.beatRuns.find(r => r.finished && r.hits.some(h => h.target === L09_DRUM))
     if (!first) return null
@@ -377,6 +489,7 @@ export function evaluateG2U2Lesson(id: string, obs: G2Observations): G2TaskState
   if (id === g2u2L01.id) return evaluateG2U2L01(obs)
   if (id === g2u2L02.id) return evaluateG2U2L02(obs)
   if (id === g2u2L03.id) return evaluateG2U2L03(obs)
+  if (id === g2u2L04.id) return evaluateG2U2L04(obs)
   return null
 }
 
@@ -384,4 +497,5 @@ export const g2u2ScratchLessons: Record<string, G2Lesson> = {
   [g2u2L01.id]: g2u2L01,
   [g2u2L02.id]: g2u2L02,
   [g2u2L03.id]: g2u2L03,
+  [g2u2L04.id]: g2u2L04,
 }
