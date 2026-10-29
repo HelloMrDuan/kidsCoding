@@ -2649,7 +2649,7 @@
       "title": "真循环引擎：C 形“重复 N 次”积木、嵌套程序快照/恢复、网格引擎展开执行",
       "priority": "P0",
       "category": "SYS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "SYS-106",
         "AUD-101"
@@ -2663,7 +2663,13 @@
         "PR CI 全绿"
       ],
       "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/237"
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/237",
+        "mergeCommit": "6897f5145507bb2b3e5c8d199e264d8e44f61714",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846202124",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846202117",
+        "mainDeployCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846202313",
+        "tests": ["apps/web/src/features/lessons/blockly/program-tree.test.ts（9 例：展开与 rounds、只改次数改变动作数、平铺兼容、循环后积木只跑一次、两层嵌套与第三层拒绝、空循环与 80 步上限、次数夹值、计数、草稿防伪解析）", "apps/web/src/features/lessons/blockly/repeat-block-serialize.test.ts（3 例，真实 Blockly 无头工作区：次数与口内积木进入快照、空循环、只提供 2/3/4/5/6/8）", "grid-engine.test.ts 循环 5 例；grid-draft / restore-block-sequence 嵌套用例", "本地 lessons+curriculum 49 files / 536 tests；PR CI 19 success + 2 skipped；main 6897f51 课程/追踪/部署三条工作流全绿"],
+        "reviewer": "实现者 AI（Hark A）；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
     }
