@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
 import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, evaluateG2U1L06, g2u1L06, L06_CAT_LINE, inRibbonZone, inBirdNest, observedPrediction, g2ScratchLessons, getG2ScratchLesson} from './g2-u1-scratch-lessons'
-import {atDoor, evaluateG2U2L01, g2u2L01, L07_CAT_LINE} from './g2-u2-scratch-lessons'
+import {atDoor, evaluateG2U2L01, evaluateG2U2L02, g2u2L01, g2u2L02, L07_CAT_LINE, L08_OWL_LINE} from './g2-u2-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -309,5 +309,47 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     const birdSlots = (specs: typeof bird.scripts[0]['body']): number => specs.reduce((n, b) => n + b.slots.length + (b.children ? birdSlots(b.children) : 0), 0)
     expect(birdSlots(bird.scripts[0].body)).toBe(0)
     expect(g2u2L01.showFrames).toBe(true)
+  })
+
+  it('U2-L02 tasks come from VM day/night runs (switch count, time per phase, stop) and the backdrop showing when each sprite spoke', () => {
+    const obs = emptyG2Observations()
+    type Line = {target: string; backdrop: string}
+    const run = (switches: number, avgMs: number | null, speech: Line[], finished = false, stopped = false) => ({switches, avgMs, speech, finished, stopped})
+    const owl = (backdrop: string): Line => ({target: '猫头鹰', backdrop})
+    const cat = (backdrop: string): Line => ({target: '小橘猫', backdrop})
+    expect(Object.values(evaluateG2U2L02(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u2L02.id, obs)).toBeNull()
+    obs.cycleRuns = [run(1, null, [owl('白天')])]
+    expect(observedPrediction(g2u2L02.id, obs)).toBeNull()
+    obs.cycleRuns = [run(4, 1010, [owl('白天'), cat('夜晚')])]
+    expect(observedPrediction(g2u2L02.id, obs)).toBe(g2u2L02.predict.correct)
+    expect(evaluateG2U2L02(obs)).toMatchObject({practiceA: false, practiceB: false, debug: false})
+    // Long phases still running, or ended by applying blocks rather than the stop button, are not practice A.
+    expect(evaluateG2U2L02({...obs, cycleRuns: [run(3, 3020, [])]}).practiceA).toBe(false)
+    expect(evaluateG2U2L02({...obs, cycleRuns: [run(3, 3020, [], true, false)]}).practiceA).toBe(false)
+    expect(evaluateG2U2L02({...obs, cycleRuns: [run(2, 1500, [], true, true)]}).practiceA).toBe(false)
+    expect(evaluateG2U2L02({...obs, cycleRuns: [run(2, 3010, [], true, true)]}).practiceA).toBe(true)
+    // Owl at night only after first hooting in the day is the debug fix; a night-only run alone is not.
+    expect(evaluateG2U2L02({...obs, cycleRuns: [run(2, 1000, [owl('夜晚')])]}).debug).toBe(false)
+    expect(evaluateG2U2L02({...obs, cycleRuns: [run(4, 1000, [owl('白天')]), run(4, 1000, [owl('夜晚'), owl('白天')])]}).debug).toBe(false)
+    obs.cycleRuns.push(run(4, 1000, [owl('夜晚'), cat('白天')]))
+    expect(evaluateG2U2L02(obs)).toMatchObject({practiceB: true, debug: true, create: false})
+    obs.lastSaid = {猫头鹰: L08_OWL_LINE}
+    obs.cycleRuns.push(run(3, 3005, [owl('夜晚'), cat('白天')]))
+    expect(evaluateG2U2L02(obs).create).toBe(false)
+    obs.lastSaid = {猫头鹰: '月亮出来啦'}
+    expect(evaluateG2U2L02(obs).create).toBe(true)
+    expect(evaluateG2U2L02({...obs, cycleRuns: [run(3, 3005, [owl('夜晚'), cat('夜晚')])]}).create).toBe(false)
+  })
+
+  it('U2-L02 puts a forever loop on the stage and lets each sprite pick the backdrop its hat listens for', () => {
+    const stage = g2u2L02.targets.find(t => t.kind === 'stage')!
+    const owlT = g2u2L02.targets.find(t => t.name === '猫头鹰')!
+    expect(stage.scripts[0].body.map(b => b.type)).toEqual(['kc2_switch_backdrop', 'kc2_forever'])
+    expect(stage.scripts[0].body[1].children?.map(b => b.type)).toEqual(['kc2_wait_whole', 'kc2_next_backdrop'])
+    expect(owlT.scripts.map(s => s.hat)).toEqual(['kc2_flag', 'kc2_when_backdrop'])
+    expect(owlT.scripts[1].hatSlots?.[0]).toMatchObject({field: 'BACKDROP', options: ['白天', '夜晚']})
+    expect(owlT.backdrops).toEqual(['白天', '夜晚'])
+    expect(g2u2L02.showCycle).toBe(true)
   })
 })

@@ -17,7 +17,7 @@ type SpriteState = {id: string; name: string; x: number; y: number; visible: boo
 type MoveResult = {requested: G2Point; before: G2Point; after: G2Point; moved: boolean}
 type CostumeResult = {requested: string; before: Array<{name: string; costume: string}>; after: Array<{name: string; costume: string}>; changed: boolean; stageCostumes: string[]}
 type LabMessage = {
-  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' | 'TURN' | 'BROADCAST' | 'FRAME' |
+  kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' | 'TURN' | 'BROADCAST' | 'FRAME' | 'BACKDROP_SWITCH' |
     'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'
   id: number | null
   available?: boolean
@@ -50,6 +50,13 @@ type LabMessage = {
   archive?: ArrayBuffer
   error?: string
   phase?: 'load' | 'configure' | 'export'
+}
+
+/** Update the green-flag run in progress (the last cycle run). */
+function updateLastCycle(prev: G2Observations, change: (run: G2Observations['cycleRuns'][number]) => G2Observations['cycleRuns'][number]): G2Observations {
+  if (!prev.cycleRuns.length) return prev
+  const last = prev.cycleRuns.length - 1
+  return {...prev, cycleRuns: prev.cycleRuns.map((run, i) => (i === last ? change(run) : run))}
 }
 
 /** Frames each sprite stepped through in one green-flag run; the average gap needs at least two frames. */
@@ -95,7 +102,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const clickFrom = useRef<Map<string, string>>(new Map())
   // The green-flag run in progress: how many times the stage's own sounds played in it.
   type FrameTrack = {count: number; first: number; last: number; end: string}
-  const flagRun = useRef<{stagePlays: number; speakers: string[]; overlaps: number; frames: Record<string, FrameTrack>} | null>(null)
+  const flagRun = useRef<{stagePlays: number; speakers: string[]; overlaps: number; frames: Record<string, FrameTrack>; switches: number[]; stopRequested: boolean} | null>(null)
   const [lastFrames, setLastFrames] = useState<{frames: Record<string, {count: number; avgMs: number | null; end: string}>; finished: boolean} | null>(null)
   const [lastSpeech, setLastSpeech] = useState<{speakers: string[]; overlaps: number; finished: boolean} | null>(null)
   const soundUris = useRef<Record<string, Record<string, string>>>({})
@@ -258,7 +265,9 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           const finished = {backdrop: msg.backdrop ?? '', stagePlays: flagRun.current.stagePlays, positions: runPositions}
           const speech = {speakers: [...flagRun.current.speakers], overlaps: flagRun.current.overlaps, positions: runPositions}
           const frameRun = {frames: summarizeFrames(flagRun.current.frames), positions: runPositions}
+          const stopped = flagRun.current.stopRequested
           flagRun.current = null
+          setObs(prev => updateLastCycle(prev, r => ({...r, finished: true, stopped})))
           setLastFrames({frames: frameRun.frames, finished: true})
           setLastRunSounds({stagePlays: finished.stagePlays, finished: true})
           setLastSpeech({speakers: speech.speakers, overlaps: speech.overlaps, finished: true})
@@ -289,6 +298,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
           setLastBroadcast({message: broadcastRun.current.message, speakers: [...broadcastRun.current.speakers], finished: false})
         }
         if (flagRun.current && target) {
+          const spokenOn = String(msg.backdrop ?? '')
+          setObs(prev => updateLastCycle(prev, r => ({...r, speech: [...r.speech, {target, backdrop: spokenOn}].slice(-40)})))
           if (!flagRun.current.speakers.includes(target)) flagRun.current.speakers.push(target)
           if ((msg.overlap ?? []).length > 0) flagRun.current.overlaps += 1
           setLastSpeech({speakers: [...flagRun.current.speakers], overlaps: flagRun.current.overlaps, finished: false})
@@ -317,6 +328,14 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             clickSounds: {...prev.clickSounds, [target]: [...(prev.clickSounds[target] ?? []), sound].slice(-20)},
             soundCostumes: [...prev.soundCostumes, {target, sound, costume}].slice(-20),
           }))
+        }
+      } else if (msg.kind === 'BACKDROP_SWITCH') {
+        const t = Number(msg.t)
+        if (flagRun.current && Number.isFinite(t)) {
+          flagRun.current.switches.push(t)
+          const times = [...flagRun.current.switches]
+          setObs(prev => updateLastCycle(prev, r => ({...r, switches: times.length,
+            avgMs: times.length >= 2 ? (times[times.length - 1] - times[0]) / (times.length - 1) : null})))
         }
       } else if (msg.kind === 'FRAME') {
         const target = String(msg.target ?? '')
@@ -400,7 +419,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'STARTED') {
         runSeen.current = true
         clickChanges.current.clear()
-        flagRun.current = {stagePlays: 0, speakers: [], overlaps: 0, frames: {}}
+        flagRun.current = {stagePlays: 0, speakers: [], overlaps: 0, frames: {}, switches: [], stopRequested: false}
+        setObs(prev => ({...prev, cycleRuns: [...prev.cycleRuns, {switches: 0, avgMs: null, speech: [], finished: false, stopped: false}].slice(-20)}))
         setLastSpeech(null)
         setLastFrames(null)
         setLastRunSounds({stagePlays: 0, finished: false})
@@ -588,7 +608,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                 onClick={() => void resetOriginal()}>恢复课程初始作品</button>
               <button data-testid="g2-stop" type="button" disabled={!loaded}
                 className="rounded-full bg-rose-100 px-6 py-3 font-bold text-rose-800 disabled:opacity-40"
-                onClick={() => post({kind: 'STOP', id: id.current})}>■ 停止</button>
+                onClick={() => { if (flagRun.current) flagRun.current.stopRequested = true; post({kind: 'STOP', id: id.current}) }}>■ 停止</button>
             </div>
           </section>
           <section className="rounded-[2rem] bg-white p-6 shadow-sm">
@@ -627,6 +647,20 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                   : `${lastSpeech.finished ? '上一次绿旗' : '本次绿旗进行中'}：说话顺序 ${lastSpeech.speakers.join(' → ') || '还没人说话'}；${lastSpeech.overlaps > 0 ? `Scratch VM 里有 ${lastSpeech.overlaps} 次一个角色还在说、另一个就开口了（抢话）` : '没有抢话'}。`}
               </p>
             )}
+            {lesson.showCycle && (() => {
+              const run = obs.cycleRuns[obs.cycleRuns.length - 1]
+              return (
+                <p data-testid="g2-cycle-log" data-switches={run?.switches ?? ''} data-avg-ms={run?.avgMs === null || !run ? '' : Math.round(run.avgMs)}
+                  data-finished={run?.finished ? 'true' : 'false'} data-stopped={run?.stopped ? 'true' : 'false'} className="mt-2 text-sm">
+                  {!run
+                    ? '还没有点绿旗：舞台换了几次背景、每段多少秒、谁在哪个背景下说话，会显示在这里。'
+                    : `${run.finished ? (run.stopped ? '已按停止，Scratch VM 停下了全部脚本' : '这次运行已结束') : '运行中（永远循环不会自己停，看够了按停止）'}：舞台换背景 ${run.switches} 次${run.avgMs === null ? '' : `，平均每段 ${(run.avgMs / 1000).toFixed(1)} 秒`}。`}
+                  {run?.speech.slice(-6).map((line, i) => (
+                    <span key={i} data-testid="g2-cycle-speech" data-name={line.target} data-backdrop={line.backdrop} className="block">{`${line.target}在“${line.backdrop}”时开口。`}</span>
+                  ))}
+                </p>
+              )
+            })()}
             {lesson.showFrames && (
               <p data-testid="g2-frame-log" data-finished={lastFrames?.finished ? 'true' : 'false'} className="mt-2 text-sm">
                 {lastFrames === null

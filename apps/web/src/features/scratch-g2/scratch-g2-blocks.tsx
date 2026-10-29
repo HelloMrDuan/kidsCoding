@@ -11,6 +11,7 @@ import {readG2Program, type G2Program, type G2Values} from './scratch-g2-program
 let costumeOptions: string[] = ['造型1']
 let soundOptions: string[] = ['声音1']
 let messageOptions: string[] = ['消息1']
+let backdropOptions: string[] = ['背景1']
 let installed = false
 function installG2Blocks() {
   if (installed) return
@@ -57,6 +58,15 @@ function installG2Blocks() {
       this.setTooltip('对应 Scratch 的“当接收到……”事件积木：收到同名广播时从这里开始')
     },
   }
+  Blockly.Blocks.kc2_when_backdrop = {
+    init(this: Blockly.Block) {
+      this.appendDummyInput().appendField('当背景换成')
+        .appendField(new Blockly.FieldDropdown(() => backdropOptions.map(name => [name, name] as [string, string])), 'BACKDROP')
+      this.setNextStatement(true)
+      this.setColour(45)
+      this.setTooltip('对应 Scratch 的“当背景换成……”事件积木：舞台换成这个背景时从这里开始')
+    },
+  }
   Blockly.Blocks.kc2_broadcast = {
     init(this: Blockly.Block) {
       this.appendDummyInput().appendField('广播')
@@ -72,6 +82,10 @@ function installG2Blocks() {
       {type: 'field_number', name: 'TIMES', value: 1, min: 1, max: 20, precision: 1},
     ], message1: '%1', args1: [{type: 'input_statement', name: 'DO'}],
     previousStatement: null, nextStatement: null, colour: 35, tooltip: '对应 Scratch 的“重复执行……次”控制积木'},
+    // Scratch's forever loop: no count and no block can follow it (it never ends by itself).
+    {type: 'kc2_forever', message0: '重复执行（永远）', message1: '%1', args1: [{type: 'input_statement', name: 'DO'}],
+      previousStatement: null, colour: 35, tooltip: '对应 Scratch 的“重复执行”（永远）控制积木：一直循环，直到按停止'},
+    {type: 'kc2_next_backdrop', message0: '下一个背景', previousStatement: null, nextStatement: null, colour: 265, tooltip: '对应 Scratch 的“下一个背景”外观积木（只有舞台有背景）'},
     {type: 'kc2_next_costume', message0: '下一个造型', previousStatement: null, nextStatement: null, colour: 265, tooltip: '对应 Scratch 的“下一个造型”外观积木'},
     {type: 'kc2_wait', message0: '等待 %1 秒', args0: [
       {type: 'field_number', name: 'DURATION', value: 0.5, min: 0.2, max: 1.0, precision: 0.1},
@@ -150,7 +164,7 @@ function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G
 
 const FIELD_TYPES: Record<string, string[]> = {
   X: ['kc2_goto'], Y: ['kc2_goto'], MESSAGE: ['kc2_say'], COSTUME: ['kc2_switch_costume'], TIMES: ['kc2_repeat'], DURATION: ['kc2_wait', 'kc2_wait_whole', 'kc2_wait_free'],
-  BACKDROP: ['kc2_switch_backdrop'], SOUND_MENU: ['kc2_play_sound'],
+  BACKDROP: ['kc2_switch_backdrop', 'kc2_when_backdrop'], SOUND_MENU: ['kc2_play_sound'],
   DIRECTION: ['kc2_point_direction'], STEPS: ['kc2_move_steps'], DEGREES: ['kc2_turn_right'], BROADCAST_OPTION: ['kc2_when_receive'], DY: ['kc2_change_y'],
 }
 function findSlot(specs: G2BlockSpec[], field: G2Slot['field']): G2Slot | undefined {
@@ -178,6 +192,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
     costumeOptions = target.costumes?.length ? target.costumes : ['造型1']
     soundOptions = target.sounds?.length ? target.sounds : ['声音1']
     messageOptions = target.messages?.length ? target.messages : ['消息1']
+    backdropOptions = target.backdrops?.length ? target.backdrops : ['背景1']
     if (!node.current) return
     const toolboxTypes = new Set<string>()
     const collect = (specs: G2BlockSpec[]) => { for (const b of specs) { toolboxTypes.add(b.type); if (b.children) collect(b.children) } }
@@ -295,10 +310,10 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
         </label>
       )}
       {fields.BACKDROP !== undefined && (
-        <label className="text-sm font-bold text-slate-700">背景
+        <label className="text-sm font-bold text-slate-700">{isStage ? '背景' : '当背景换成'}
           <select data-testid="g2-edit-backdrop" value={fields.BACKDROP} onChange={e => update('BACKDROP', e.target.value)}
             className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2">
-            {costumeOptions.map(name => <option key={name} value={name}>{name}</option>)}
+            {(isStage ? costumeOptions : backdropOptions).map(name => <option key={name} value={name}>{name}</option>)}
           </select>
         </label>
       )}

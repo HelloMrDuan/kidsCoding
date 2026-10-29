@@ -101,6 +101,112 @@ export const g2u2L01: G2Lesson = {
   showFrames: true,
 }
 
+export const L08_OWL_LINE = '咕咕，天黑啦！'
+export const L08_DAY_NIGHT = ['白天', '夜晚']
+/** A day or a night counts as "long enough" (≥ 3 s wait) when VM switches are at least this far apart on average (ms). */
+export const L08_LONG_PHASE_MS = 2900
+
+export const g2u2L02: G2Lesson = {
+  id: 'G2-U2-L02',
+  title: '制作昼夜交替',
+  concept: '永远循环与“当背景换成”事件',
+  sample: '/scratch-samples/g2-u2-l02-day-night.sb3.b64',
+  exportName: 'KidsCoding-制作昼夜交替.sb3',
+  story: '森林里白天过去是夜晚，夜晚过去又是白天，一直轮下去。舞台要不停地换背景；猫头鹰应该天黑才醒来“咕咕”叫，小橘猫天黑说晚安。可现在猫头鹰大白天就醒了，而且一天短得只有 1 秒……',
+  conceptExplain: [
+    '“重复执行”不填次数（永远循环）会一直转下去，不会自己停：昼夜会一直交替，直到按“停止”。',
+    '舞台的循环里“等待 N 秒，下一个背景”：等待几秒，白天或夜晚就持续几秒。',
+    '精灵用“当背景换成（夜晚）”积木听舞台的背景：背景一换成夜晚，这段脚本就开始。听错了背景，角色就会在不对的时候出场。',
+  ],
+  predict: {
+    question: '舞台的“重复执行”没有填次数。点绿旗后，昼夜会怎样？',
+    options: ['换 1 次就停', '一直换，直到按停止'],
+    correct: '一直换，直到按停止',
+    explain: '永远循环没有次数，Scratch VM 会一直执行“等待、下一个背景”，只有按停止（stopAll）才会停下。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '控制永远循环的节奏并停止它', title: '练习 A：让白天和黑夜长一点', goal: '选中舞台，把循环里的“等待（ ）秒”改成 3 或更大，应用后点绿旗：看 VM 至少换 2 次背景、每段约 3 秒以上，然后按“停止”让全部脚本停下。', how: '等待 1 秒时一天一夜只有 2 秒；永远循环不会自己停，看够了要按停止。' },
+    { id: 'practiceB', skill: '用“当背景换成”让角色迎接白天', title: '练习 B：小橘猫说早上好', goal: '选中小橘猫，把“当背景换成（ ）”改成白天，再把它的话改成早安的话，应用后点绿旗：VM 里背景换成白天时小橘猫开口。', how: '小橘猫现在听的是“夜晚”，所以只在天黑时说晚安。' },
+    { id: 'debug', skill: '分辨角色听的是哪个背景（调试）', title: '找错：猫头鹰为什么白天叫？', goal: '先点绿旗，看观察区：猫头鹰是在哪个背景下开口的？再改猫头鹰“当背景换成（ ）”，让它只在夜晚醒来叫。', how: '猫头鹰现在听的是“白天”，点绿旗时舞台一换成白天它就醒了。' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：我的森林一昼夜', goal: '给猫头鹰换一句夜里的话（1～20 字），点绿旗：每段至少 3 秒，猫头鹰只在夜晚叫、小橘猫在白天开口；按停止后保存为 .sb3。', how: '导出的作品可以在 Scratch 3 里继续加角色和背景。' },
+  ],
+  hints: [
+    '看现象：点绿旗后，观察区显示猫头鹰开口时 Scratch VM 的背景是“白天”，舞台上大白天它就醒来叫了。',
+    '想原因：猫头鹰的帽子积木是“当背景换成（白天）”，它听错了背景；点绿旗时舞台先换成白天，正好叫醒了它。',
+    '去修复：选中猫头鹰，把“当背景换成（ ）”改成“夜晚”，应用后再点绿旗。',
+  ],
+  reflection: [
+    '“重复执行 10 次”和“重复执行（永远）”有什么不同？什么时候用永远？',
+    '舞台的等待改成 3 秒以后，猫头鹰的“咕咕”能在天亮前说完吗？为什么？',
+    '如果想让小橘猫白天说早上好、晚上说晚安，需要几段“当背景换成”脚本？',
+  ],
+  limitations: [
+    '本实验只能修改：舞台循环里的等待秒数（1～5 的整数）、猫头鹰和小橘猫各自“当背景换成（白天/夜晚）”以及它们说的话（1～20 字）。',
+    '舞台绿旗先换成白天、永远循环“等待、下一个背景”的结构固定；猫头鹰醒来/睡觉的造型顺序固定；不能新增背景、精灵或积木（可导出 .sb3 后在完整 Scratch 编辑器里继续做）。',
+    '舞台画面按 Scratch VM 的对象状态绘制原创 SVG（白天/夜晚背景复用本课程 G2-U1 的原创森林图），未接入 WebGL 渲染器；“每段秒数”来自 VM 里每次“下一个背景”真正执行的时间；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    {
+      name: 'Stage', kind: 'stage', label: '舞台', costumes: L08_DAY_NIGHT,
+      scripts: [{ hat: 'kc2_flag', body: [
+        { type: 'kc2_switch_backdrop', vmBlock: 'stage_reset_menu', slots: [], fixed: { BACKDROP: '白天' } },
+        {
+          type: 'kc2_forever', vmBlock: 'stage_forever', slots: [],
+          children: [
+            { type: 'kc2_wait_whole', vmBlock: 'stage_wait', slots: [{ key: 'Stage|stage_wait|DURATION', field: 'DURATION', label: '等待秒数', min: 1, max: 5 }] },
+            { type: 'kc2_next_backdrop', vmBlock: 'stage_next', slots: [] },
+          ],
+        },
+      ] }],
+    },
+    {
+      name: '猫头鹰', kind: 'sprite', label: '猫头鹰', costumes: ['睡觉', '醒来'], backdrops: L08_DAY_NIGHT,
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_switch_costume', vmBlock: 'owl_rest_menu', slots: [], fixed: { COSTUME: '睡觉' } }] },
+        {
+          hat: 'kc2_when_backdrop', hatSlots: [{ key: '猫头鹰|owl_hat|BACKDROP', field: 'BACKDROP', label: '背景', options: L08_DAY_NIGHT }],
+          body: [
+            { type: 'kc2_switch_costume', vmBlock: 'owl_wake_menu', slots: [], fixed: { COSTUME: '醒来' } },
+            { type: 'kc2_say', vmBlock: 'owl_say', slots: [{ key: '猫头鹰|owl_say|MESSAGE', field: 'MESSAGE', label: '说的话', maxLength: 20 }] },
+            { type: 'kc2_switch_costume', vmBlock: 'owl_sleep_menu', slots: [], fixed: { COSTUME: '睡觉' } },
+          ],
+        },
+      ],
+    },
+    {
+      name: '小橘猫', kind: 'sprite', label: '小橘猫', backdrops: L08_DAY_NIGHT,
+      scripts: [{
+        hat: 'kc2_when_backdrop', hatSlots: [{ key: '小橘猫|cat_hat|BACKDROP', field: 'BACKDROP', label: '背景', options: L08_DAY_NIGHT }],
+        body: [{ type: 'kc2_say', vmBlock: 'cat_say', slots: [{ key: '小橘猫|cat_say|MESSAGE', field: 'MESSAGE', label: '说的话', maxLength: 20 }] }],
+      }],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-longer-phases-then-stop', solutions: ['舞台等待 3 秒 → VM 每段约 3 秒，看 2 次切换后按停止，全部脚本停下', '等待 4 秒 → 每段约 4 秒'], counterExamples: ['等待 1 秒 → 每段约 1 秒，太短', '等待 6 秒 → 超出 1～5 被拒绝', '不按停止 → 永远循环一直运行'] },
+    { id: 'practiceB-cat-greets-morning', solutions: ['小橘猫“当背景换成白天”+“早上好！”→ VM 背景换成白天时开口'], counterExamples: ['仍是“当背景换成夜晚”→ 只在天黑说话'] },
+    { id: 'debug-owl-listens-to-day', solutions: ['猫头鹰“当背景换成夜晚”→ VM 中只在夜晚开口'], counterExamples: ['“当背景换成白天”→ 点绿旗舞台换成白天时就醒来叫'] },
+  ],
+  nextLesson: 'G2-U2-L03 音乐节奏舞台',
+  showCycle: true,
+}
+
+type CycleRun = G2Observations['cycleRuns'][number]
+const spokeOn = (run: CycleRun, target: string, backdrop: string) => run.speech.some(s => s.target === target && s.backdrop === backdrop)
+const longPhases = (run: CycleRun) => run.switches >= 2 && run.avgMs !== null && run.avgMs >= L08_LONG_PHASE_MS
+const owlOnlyAtNight = (run: CycleRun) => spokeOn(run, '猫头鹰', '夜晚') && !spokeOn(run, '猫头鹰', '白天')
+
+export function evaluateG2U2L02(obs: G2Observations): G2TaskState {
+  const runs = obs.cycleRuns
+  const firstDayHoot = runs.findIndex(r => spokeOn(r, '猫头鹰', '白天'))
+  const line = obs.lastSaid['猫头鹰']
+  return {
+    practiceA: runs.some(r => longPhases(r) && r.finished && r.stopped),
+    practiceB: runs.some(r => spokeOn(r, '小橘猫', '白天')),
+    debug: firstDayHoot >= 0 && runs.slice(firstDayHoot + 1).some(owlOnlyAtNight),
+    create: !!line && line !== L08_OWL_LINE && runs.some(r => owlOnlyAtNight(r) && longPhases(r) && spokeOn(r, '小橘猫', '白天')),
+  }
+}
+
 type FrameRun = G2Observations['frameRuns'][number]
 const catFrames = (run: FrameRun) => run.frames['小橘猫']
 const fullCycle = (run: FrameRun) => { const f = catFrames(run); return !!f && f.count >= 4 && f.end === '走路1' }
@@ -126,14 +232,22 @@ export function observedPredictionG2U2(id: string, obs: G2Observations): string 
     const ms = catFrames(first)!.avgMs!
     return ms < L07_TOO_FAST_MS ? '快得看不清' : ms >= L07_VISIBLE_MS ? '看得清' : null
   }
+  if (id === g2u2L02.id) {
+    const first = obs.cycleRuns[0]
+    if (!first) return null
+    if (first.switches >= 3) return '一直换，直到按停止'
+    return first.finished && !first.stopped ? '换 1 次就停' : null
+  }
   return null
 }
 
 export function evaluateG2U2Lesson(id: string, obs: G2Observations): G2TaskState | null {
   if (id === g2u2L01.id) return evaluateG2U2L01(obs)
+  if (id === g2u2L02.id) return evaluateG2U2L02(obs)
   return null
 }
 
 export const g2u2ScratchLessons: Record<string, G2Lesson> = {
   [g2u2L01.id]: g2u2L01,
+  [g2u2L02.id]: g2u2L02,
 }
