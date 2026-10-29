@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'diary_entry'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,19 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U1-L01': {
+    title: '第1课 · 读写日记文本',
+    prompt: '编写 diary_entry(csv_text, date) 函数。先用 csv.DictReader 读出表头为日期、心情、日记的 CSV，找到指定日期的一行，再用 csv.DictWriter 把表头和这一行写回成新的 CSV 文本并返回。找不到日期或 CSV 为空时抛出 ValueError。日记里含英文逗号时，csv 必须自动加引号，手工拼字符串不算通过。数据全部是虚构示例，不含真实个人信息。',
+    argLabels: ['日记 CSV 文本', '日期'],
+    startCode: 'import csv\nimport io\n\ndef diary_entry(csv_text, date):\n    # 先用 csv.DictReader 读，再用 csv.DictWriter 写回表头和找到的一行\n    return "待完成"',
+    cases: [
+      { function: 'diary_entry', args: ['日期,心情,日记\n2026-10-01,开心,今天学会了CSV\n2026-10-02,平静,"复习了昨天的笔记, 还画了图"\n', '2026-10-01'], expected: '日期,心情,日记\n2026-10-01,开心,今天学会了CSV\n' },
+      { function: 'diary_entry', args: ['日期,心情,日记\n2026-10-01,开心,今天学会了CSV\n2026-10-02,平静,"复习了昨天的笔记, 还画了图"\n', '2026-10-02'], expected: '日期,心情,日记\n2026-10-02,平静,"复习了昨天的笔记, 还画了图"\n' },
+      { function: 'diary_entry', args: ['日期,心情,日记\n2026-10-01,开心,今天学会了CSV\n', '2026-10-03'], expected: 'ERROR:ValueError' },
+      { function: 'diary_entry', args: ['', '2026-10-01'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：用 csv.DictReader(io.StringIO(csv_text)) 读行，日期相等就用 csv.DictWriter 写回表头和这一行，找不到就 raise ValueError("没有找到这一天的日记")。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
