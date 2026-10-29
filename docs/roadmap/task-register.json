@@ -1880,7 +1880,7 @@
       "title": "年龄评估与账号流程适龄界面",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-002"
       ],
@@ -1890,13 +1890,19 @@
         "认证错误正确提示、移动端可操作"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/224",
+        "mergeCommit": "99df4791ff8d8c79b2b629912fcfac8777bbef44",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40829250348",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40829250355",
+        "tests": [
+          "vitest 相关 3 文件 13 项全绿（评估恢复、绑定空输入、切换重置、网络失败文案）",
+          "PR #224 CI 23 success + 3 skipped",
+          "合并后主分支 curriculum #583 success、task accountability #543 success",
+          "旧机生产构建真实 Chrome 三断点实测全过（年龄页、评估刷新恢复、绑定空输入报错，截图 9 张）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "无布局、无颜色改动，只改行为、文案与输入属性；标签文案不动。dev 服务下水合失效属环境问题（已查明，改走生产构建实测）；生产构建三端各 1 次 React #418 水合日志，属检查页服务端恒渲染空的主分支原有结构，未在本任务扩范围修。"
     },
     {
       "id": "UX-603",
