@@ -184,6 +184,20 @@ class G2ProjectTests(unittest.TestCase):
         self.assertEqual((wait["kind"], wait["min"], wait["max"]), ("tenths", 0, 1.0))
         self.assertEqual({p["target"] for p in params}, {"小橘猫"}, "the bird is a fixed demo")
 
+    def test_u2_l02_stage_forever_loop_and_backdrop_hats(self):
+        _, project, _, params = LESSONS["G2-U2-L02"]()
+        stage, owl, cat = project["targets"]
+        self.assertEqual([c["name"] for c in stage["costumes"]], ["白天", "夜晚"])
+        b = stage["blocks"]
+        self.assertEqual(b["stage_forever"]["opcode"], "control_forever")
+        self.assertIsNone(b["stage_forever"]["next"], "nothing can follow a forever loop")
+        self.assertEqual([b[k]["opcode"] for k in ("stage_wait", "stage_next")], ["control_wait", "looks_nextbackdrop"])
+        # The bugs the lesson starts with: 1 s phases and an owl that wakes for 白天.
+        self.assertEqual(b["stage_wait"]["inputs"]["DURATION"], [1, [4, "1"]])
+        self.assertEqual(owl["blocks"]["owl_hat"]["fields"]["BACKDROP"], ["白天", None])
+        self.assertEqual(cat["blocks"]["cat_hat"]["fields"]["BACKDROP"], ["夜晚", None])
+        self.assertEqual({(p["target"], p["block"]) for p in params if p["slot"] == "BACKDROP"}, {("猫头鹰", "owl_hat"), ("小橘猫", "cat_hat")})
+
 
 if __name__ == "__main__":
     unittest.main()

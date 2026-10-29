@@ -449,6 +449,58 @@ def lesson_g2_u2_l01():
     return "g2-u2-l01-cat-walk-home.sb3.b64", project, files, params
 
 
+def lesson_g2_u2_l02():
+    """制作昼夜交替: a forever loop on the stage switches day/night; sprites react with "when backdrop switches to"."""
+    day, day_file = svg_costume("白天", "meadow-backdrop.svg", 240, 180)
+    night, night_file = svg_costume("夜晚", "night-forest-backdrop.svg", 240, 180)
+    asleep, asleep_file = svg_costume("睡觉", "owl-asleep.svg", 40, 46)
+    awake, awake_file = svg_costume("醒来", "owl-awake.svg", 40, 46)
+    cat, cat_file = svg_costume("小橘猫", "orange-cat.svg", 48, 48)
+    stage_blocks = {
+        "stage_flag": block("event_whenflagclicked", "stage_reset", top=True, x=40, y=40),
+        "stage_reset": block("looks_switchbackdropto", "stage_forever", parent="stage_flag", inputs={"BACKDROP": [1, "stage_reset_menu"]}),
+        "stage_reset_menu": block("looks_backdrops", parent="stage_reset", fields={"BACKDROP": ["白天", None]}, shadow=True),
+        # Starting value: each day or night lasts only 1 s (too short for the owl's 2 s hoot).
+        "stage_forever": block("control_forever", parent="stage_reset", inputs={"SUBSTACK": [2, "stage_wait"]}),
+        "stage_wait": block("control_wait", "stage_next", parent="stage_forever", inputs={"DURATION": num(1)}),
+        "stage_next": block("looks_nextbackdrop", parent="stage_wait"),
+    }
+    owl_blocks = {
+        "owl_flag": block("event_whenflagclicked", "owl_rest", top=True, x=40, y=40),
+        "owl_rest": block("looks_switchcostumeto", parent="owl_flag", inputs={"COSTUME": [1, "owl_rest_menu"]}),
+        "owl_rest_menu": block("looks_costume", parent="owl_rest", fields={"COSTUME": ["睡觉", None]}, shadow=True),
+        # The bug the lesson starts with: the owl wakes up when the backdrop switches to 白天.
+        "owl_hat": block("event_whenbackdropswitchesto", "owl_wake", top=True, x=40, y=200, fields={"BACKDROP": ["白天", None]}),
+        "owl_wake": block("looks_switchcostumeto", "owl_say", parent="owl_hat", inputs={"COSTUME": [1, "owl_wake_menu"]}),
+        "owl_wake_menu": block("looks_costume", parent="owl_wake", fields={"COSTUME": ["醒来", None]}, shadow=True),
+        "owl_say": block("looks_sayforsecs", "owl_sleep", parent="owl_wake", inputs={"MESSAGE": text("咕咕，天黑啦！"), "SECS": num(2)}),
+        "owl_sleep": block("looks_switchcostumeto", parent="owl_say", inputs={"COSTUME": [1, "owl_sleep_menu"]}),
+        "owl_sleep_menu": block("looks_costume", parent="owl_sleep", fields={"COSTUME": ["睡觉", None]}, shadow=True),
+    }
+    cat_blocks = {
+        "cat_hat": block("event_whenbackdropswitchesto", "cat_say", top=True, x=40, y=40, fields={"BACKDROP": ["夜晚", None]}),
+        "cat_say": block("looks_sayforsecs", parent="cat_hat", inputs={"MESSAGE": text("晚安！"), "SECS": num(2)}),
+    }
+    project = {
+        "targets": [
+            stage([day, night], stage_blocks),
+            sprite("猫头鹰", [asleep, awake], owl_blocks, 1, 150, 30),
+            sprite("小橘猫", [cat], cat_blocks, 2, -120, -80),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U2-L02"},
+    }
+    files = {c["md5ext"]: f for c, f in ((day, day_file), (night, night_file), (asleep, asleep_file), (awake, awake_file), (cat, cat_file))}
+    params = [
+        {"target": "Stage", "block": "stage_wait", "slot": "DURATION", "kind": "int", "min": 1, "max": 5},
+        {"target": "猫头鹰", "block": "owl_hat", "slot": "BACKDROP", "kind": "choice", "options": ["白天", "夜晚"]},
+        {"target": "猫头鹰", "block": "owl_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "小橘猫", "block": "cat_hat", "slot": "BACKDROP", "kind": "choice", "options": ["白天", "夜晚"]},
+        {"target": "小橘猫", "block": "cat_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+    ]
+    return "g2-u2-l02-day-night.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
@@ -457,6 +509,7 @@ LESSONS = {
     "G2-U1-L05": lesson_g2_u1_l05,
     "G2-U1-L06": lesson_g2_u1_l06,
     "G2-U2-L01": lesson_g2_u2_l01,
+    "G2-U2-L02": lesson_g2_u2_l02,
 }
 
 

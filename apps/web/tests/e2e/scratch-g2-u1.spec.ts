@@ -1214,7 +1214,8 @@ test.describe('G2-U2-L01 让角色走路有帧动画', () => {
     await selectTarget(page, '小橘猫')
     await page.getByTestId('g2-edit-times').fill('25')
     await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
-    await page.getByTestId('g2-edit-times').fill('8')
+    // Blockly reports the refused 25 asynchronously; re-type 8 until the input settles on it.
+    await fillEdit(page, 'g2-edit-times', '8')
     await applyAndWait(page)
     await flagWalk(page)
     await expect(framesOf(page, '小橘猫')).toHaveAttribute('data-count', '8')
@@ -1326,5 +1327,183 @@ test.describe('G2-U2-L01 让角色走路有帧动画', () => {
 
     await flagWalk(page)
     expect(await catAvgMs(page)).toBeGreaterThanOrEqual(150)
+  })
+})
+
+const U2L02 = 'G2-U2-L02'
+const U2L02_SAMPLE = 'public/scratch-samples/g2-u2-l02-day-night.sb3.b64'
+const cycleLog = (page: import('@playwright/test').Page) => page.getByTestId('g2-cycle-log')
+const spokeOn = (page: import('@playwright/test').Page, name: string, backdrop: string) =>
+  page.locator(`[data-testid="g2-cycle-speech"][data-name="${name}"][data-backdrop="${backdrop}"]`)
+async function switchesAtLeast(page: import('@playwright/test').Page, n: number, timeout = 25_000) {
+  await expect.poll(async () => Number(await cycleLog(page).getAttribute('data-switches')), {timeout}).toBeGreaterThanOrEqual(n)
+}
+async function startCycle(page: import('@playwright/test').Page) {
+  await page.getByTestId('g2-green-flag').click()
+  await expect(cycleLog(page)).toContainText('运行中', {timeout: 5_000})
+}
+async function stopCycle(page: import('@playwright/test').Page) {
+  await page.getByTestId('g2-stop').click()
+  await expect(cycleLog(page)).toHaveAttribute('data-stopped', 'true', {timeout: 10_000})
+  await expect(cycleLog(page)).toHaveAttribute('data-finished', 'true')
+}
+
+test.describe('G2-U2-L02 制作昼夜交替', () => {
+  test('catalog entry opens the day/night lab; the forever loop keeps switching; the owl listening for 白天 hoots in daylight; hints; 夜晚 fixes it (debug)', async ({page}) => {
+    test.setTimeout(180_000)
+    await page.goto(`/learn/catalog/${U2L02}`)
+    await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+    await page.getByTestId('scratch-trial-entry').click()
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已加载项目', {timeout: 60_000})
+    await expect(page.getByRole('heading', {name: '制作昼夜交替'})).toBeVisible()
+    await expect(cycleLog(page)).toContainText('还没有点绿旗')
+
+    await page.getByTestId('g2-predict-option').filter({hasText: '换 1 次就停'}).click()
+    await startCycle(page)
+    await expect(spokeOn(page, '猫头鹰', '白天').first()).toBeVisible({timeout: 10_000})
+    await switchesAtLeast(page, 3)
+    // A forever loop does not end by itself.
+    await expect(cycleLog(page)).toHaveAttribute('data-finished', 'false')
+    expect(Number(await cycleLog(page).getAttribute('data-avg-ms'))).toBeLessThan(1500)
+    await expect(page.getByTestId('g2-predict-result')).toContainText('Scratch VM 实际：一直换，直到按停止')
+    await expect(spokeOn(page, '小橘猫', '夜晚').first()).toBeVisible()
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'false')
+
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-1')).toContainText('背景是“白天”')
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-2')).toContainText('当背景换成（白天）')
+    await page.getByTestId('g2-next-hint').click()
+    await expect(page.getByTestId('g2-hint-3')).toContainText('改成“夜晚”')
+
+    await selectTarget(page, '猫头鹰')
+    await expect(page.getByTestId('g2-edit-backdrop')).toHaveValue('白天')
+    await page.getByTestId('g2-edit-backdrop').selectOption('夜晚')
+    await applyAndWait(page)
+    await startCycle(page)
+    await expect(spokeOn(page, '猫头鹰', '夜晚').first()).toBeVisible({timeout: 10_000})
+    await expect(stageSprite(page, '猫头鹰')).toHaveAttribute('data-costume', '醒来', {timeout: 5_000})
+    await switchesAtLeast(page, 3)
+    await expect(spokeOn(page, '猫头鹰', '白天')).toHaveCount(0)
+    await expect(page.getByTestId('g2-task-debug')).toHaveAttribute('data-done', 'true')
+    await stopCycle(page)
+  })
+
+  test('practice A: the stage wait sets each phase (6 and 0 refused); 3 s phases are VM-timed, and only the stop button ends the forever loop', async ({page}) => {
+    test.setTimeout(150_000)
+    await openG2Lab(page, U2L02)
+    await selectTarget(page, 'Stage')
+    await expect(page.getByTestId('g2-edit-wait')).toHaveValue('1')
+    for (const bad of ['6', '0', '2.5']) {
+      await page.getByTestId('g2-edit-wait').fill(bad)
+      await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
+    }
+    await page.getByTestId('g2-edit-wait').fill('3')
+    await applyAndWait(page)
+    await startCycle(page)
+    await switchesAtLeast(page, 2, 20_000)
+    expect(Number(await cycleLog(page).getAttribute('data-avg-ms'))).toBeGreaterThanOrEqual(2900)
+    await expect(cycleLog(page)).toHaveAttribute('data-finished', 'false')
+    await expect(page.getByTestId('g2-task-practiceA')).toHaveAttribute('data-done', 'false')
+    await stopCycle(page)
+    await expect(cycleLog(page)).toContainText('已按停止')
+    await expect(page.getByTestId('g2-task-practiceA')).toHaveAttribute('data-done', 'true')
+  })
+
+  test('practice B: the cat’s hat listens for 白天 and greets the morning in the VM', async ({page}) => {
+    test.setTimeout(150_000)
+    await openG2Lab(page, U2L02)
+    await selectTarget(page, '小橘猫')
+    await expect(page.getByTestId('g2-edit-backdrop')).toHaveValue('夜晚')
+    await page.getByTestId('g2-edit-backdrop').selectOption('白天')
+    await page.getByTestId('g2-edit-say').fill('早上好！')
+    await applyAndWait(page)
+    await startCycle(page)
+    await expect(spokeOn(page, '小橘猫', '白天').first()).toBeVisible({timeout: 10_000})
+    await expect(bubbleOf(page, '小橘猫')).toHaveText('早上好！')
+    await expect(page.getByTestId('g2-task-practiceB')).toHaveAttribute('data-done', 'true')
+    await switchesAtLeast(page, 2)
+    await expect(spokeOn(page, '小橘猫', '夜晚')).toHaveCount(0)
+    await stopCycle(page)
+  })
+
+  test('creative day/night, real .sb3 export re-verified in a fresh VM, re-import, and the saved work reopens after reload (recovery)', async ({page}) => {
+    test.setTimeout(200_000)
+    await openG2Lab(page, U2L02)
+    await selectTarget(page, '猫头鹰')
+    await page.getByTestId('g2-edit-backdrop').selectOption('夜晚')
+    await page.getByTestId('g2-edit-say').fill('月亮出来啦')
+    await applyAndWait(page)
+    await selectTarget(page, '小橘猫')
+    await page.getByTestId('g2-edit-backdrop').selectOption('白天')
+    await applyAndWait(page)
+    await selectTarget(page, 'Stage')
+    await page.getByTestId('g2-edit-wait').fill('3')
+    await applyAndWait(page)
+    await expect(page.getByTestId('g2-local-save-status')).toContainText('已在本机自动保存', {timeout: 30_000})
+    await page.reload()
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已从本机草稿恢复', {timeout: 60_000})
+    await selectTarget(page, '猫头鹰')
+    await expect(page.getByTestId('g2-edit-backdrop')).toHaveValue('夜晚')
+    await expect(page.getByTestId('g2-edit-say')).toHaveValue('月亮出来啦')
+    await startCycle(page)
+    await switchesAtLeast(page, 2, 20_000)
+    await expect(spokeOn(page, '猫头鹰', '夜晚').first()).toBeVisible()
+    await expect(spokeOn(page, '小橘猫', '白天').first()).toBeVisible()
+    await expect(page.getByTestId('g2-task-create')).toHaveAttribute('data-done', 'true', {timeout: 8_000})
+    await stopCycle(page)
+
+    const downloading = page.waitForEvent('download', {timeout: 60_000})
+    await page.getByTestId('g2-export-sb3').click()
+    const downloaded = await downloading
+    expect(downloaded.suggestedFilename()).toBe('KidsCoding-制作昼夜交替.sb3')
+    const file = await readFile((await downloaded.path())!)
+    const entries = unzip(file)
+    expect(entries.filter(entry => /^[0-9a-f]{32}\.svg$/.test(entry.name))).toHaveLength(5)
+    const project = JSON.parse(entries.find(entry => entry.name === 'project.json')!.data.toString('utf8'))
+    const stage = project.targets.find((t: {isStage: boolean}) => t.isStage)
+    const owl = project.targets.find((t: {name: string}) => t.name === '猫头鹰')
+    expect(stage.blocks.stage_forever.opcode).toBe('control_forever')
+    expect(stage.blocks.stage_wait.inputs.DURATION[1][1]).toBe('3')
+    expect(owl.blocks.owl_hat.fields.BACKDROP[0]).toBe('夜晚')
+    await expect(page.getByTestId('g2-export-status')).toContainText('独立 VM 中重新载入验证')
+    await expect(page.getByTestId('g2-export-status')).toContainText('猫头鹰 BACKDROP=夜晚')
+
+    await selectTarget(page, 'Stage')
+    await page.getByTestId('g2-edit-wait').fill('1')
+    await applyAndWait(page)
+    await page.getByTestId('g2-import-sb3').setInputFiles({name: 'my-day-night.sb3', mimeType: 'application/octet-stream', buffer: file})
+    await expect(page.getByTestId('g2-vm-status')).toContainText('已重新导入作品', {timeout: 50_000})
+    await selectTarget(page, 'Stage')
+    await expect(page.getByTestId('g2-edit-wait')).toHaveValue('3')
+  })
+
+  test('sandbox rejects day/night projects outside the lesson model and keeps the working project', async ({page}) => {
+    test.setTimeout(180_000)
+    const sample = Buffer.from(await readFile(U2L02_SAMPLE, 'utf8'), 'base64')
+    await openG2Lab(page, U2L02)
+    await selectTarget(page, '猫头鹰')
+    await page.getByTestId('g2-edit-backdrop').selectOption('夜晚')
+    await applyAndWait(page)
+    const reject = async (name: string, buffer: Buffer, reason: string | RegExp) => {
+      await page.getByTestId('g2-import-sb3').setInputFiles({name, mimeType: 'application/octet-stream', buffer})
+      await expect(page.getByTestId('g2-vm-status')).toContainText(reason, {timeout: 50_000})
+      await selectTarget(page, '猫头鹰')
+      await expect(page.getByTestId('g2-edit-backdrop')).toHaveValue('夜晚')
+      await expect(page.getByTestId('g2-green-flag')).toBeEnabled()
+    }
+    await reject('wait-0.sb3', mutateSb3(sample, p => { p.targets[0].blocks.stage_wait.inputs = {DURATION: [1, [4, '0']]} }), '数字超出允许范围')
+    await reject('wait-9.sb3', mutateSb3(sample, p => { p.targets[0].blocks.stage_wait.inputs = {DURATION: [1, [4, '9']]} }), '数字超出允许范围')
+    await reject('dusk.sb3', mutateSb3(sample, p => { p.targets[1].blocks.owl_hat.fields = {BACKDROP: ['黄昏', null]} }), '选项不在课程允许范围')
+    await reject('repeat-10.sb3', mutateSb3(sample, p => { p.targets[0].blocks.stage_forever.opcode = 'control_repeat' }), /不允许的积木类型|积木输入不符合课程模型/)
+    await reject('third-backdrop.sb3', mutateSb3(sample, p => {
+      const costumes = p.targets[0].costumes as unknown[]
+      p.targets[0].costumes = [...costumes, {...(costumes[0] as object), name: '黄昏'}]
+    }), '舞台的造型不符合课程模型')
+    await reject('u2-l01-file.sb3', Buffer.from(await readFile(U2L01_SAMPLE, 'utf8'), 'base64'), /导入 Scratch 项目失败/)
+
+    await startCycle(page)
+    await expect(spokeOn(page, '猫头鹰', '夜晚').first()).toBeVisible({timeout: 10_000})
+    await stopCycle(page)
   })
 })
