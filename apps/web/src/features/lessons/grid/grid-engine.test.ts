@@ -63,3 +63,41 @@ describe('grid engine (SYS-106)', () => {
     ])
   })
 })
+
+describe('grid engine: repeat N times (SYS-107)', () => {
+  const rep = (times: number, ...body: string[]) => ({ type: 'repeat_times', times, body: body.map(type => ({ type })) })
+  const square = { cols: 5, rows: 5, start: { x: 1, y: 3, facing: 'up' as const }, goal: { x: 1, y: 3 } }
+
+  it('repeat 3 × forward reaches the same goal as three forward blocks', () => {
+    const looped = runGridProgram(L.straight, [{ type: 'when_start' }, rep(3, 'move_forward')])
+    expect(looped.passed).toBe(true)
+    expect(looped.frames.map(f => f.rounds?.[0])).toEqual([1, 2, 3])
+    expect(looped.frames.every(f => f.blockIndex === 1)).toBe(true)
+  })
+
+  it('changing only the count changes the outcome (2 too short, 4 too far)', () => {
+    expect(runGridProgram(L.straight, [{ type: 'when_start' }, rep(2, 'move_forward')]).failure).toBe('not_at_goal')
+    expect(runGridProgram(L.straight, [{ type: 'when_start' }, rep(4, 'move_forward')]).passed).toBe(false)
+  })
+
+  it('a square fence: repeat 4 × (forward, forward, right turn) returns to the start', () => {
+    const r = runGridProgram(square, [{ type: 'when_start' }, rep(4, 'move_forward', 'move_forward', 'turn_right')])
+    expect(r.passed).toBe(true)
+    expect(r.steps).toBe(8)
+    expect(r.final.facing).toBe('up')
+    // turning the wrong way inside the loop leaves the map
+    expect(runGridProgram(square, [{ type: 'when_start' }, rep(4, 'move_forward', 'move_forward', 'turn_left')]).failure).toBe('out_of_bounds')
+    // 3 rounds does not close the fence
+    expect(runGridProgram(square, [{ type: 'when_start' }, rep(3, 'move_forward', 'move_forward', 'turn_right')]).failure).toBe('not_at_goal')
+  })
+
+  it('an empty repeat and an unknown block inside a repeat are real failures', () => {
+    expect(runGridProgram(L.straight, [{ type: 'when_start' }, { type: 'repeat_times', times: 3, body: [] }]).failure).toBe('empty_repeat')
+    expect(runGridProgram(L.straight, [{ type: 'when_start' }, rep(3, 'say_line')]).failure).toBe('unknown_block')
+  })
+
+  it('stops a runaway loop instead of freezing the stage', () => {
+    const big = { type: 'repeat_times', times: 8, body: [rep(8, 'turn_left', 'turn_right')] }
+    expect(runGridProgram(L.straight, [{ type: 'when_start' }, big]).failure).toBe('too_many')
+  })
+})

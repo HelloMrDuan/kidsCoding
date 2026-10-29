@@ -19,6 +19,8 @@ export const kidsBlockLabels: Record<string, string> = {
   switch_scene: '切换场景',
   switch_character: '切换到另一位朋友',
   repeat_twice: '重复：再走 100 步',
+  // SYS-107: C-shaped repeat with its own body (“重复 [N] 次”)
+  repeat_times: '重复',
   move_up: '向上走一格',
   move_down: '向下走一格',
   move_left: '向左走一格',

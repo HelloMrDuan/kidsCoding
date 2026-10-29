@@ -2,6 +2,8 @@
 // Pure and deterministic: the stage animates the trace, and lesson checks
 // judge the observed outcome, never a pre-recorded answer animation.
 
+import { countBlocks, expandProgram, type ProgramBlock } from '../blockly/program-tree'
+
 export type Facing = 'up' | 'right' | 'down' | 'left'
 export type Cell = { x: number; y: number }
 
@@ -33,6 +35,8 @@ export const GRID_BLOCK_TYPES = [
 
 export type GridBlockType = (typeof GRID_BLOCK_TYPES)[number]
 export const GRID_MAX_ACTIONS = 40
+/** SYS-107: most actions an unrolled program may run (a loop can multiply blocks). */
+export const GRID_MAX_STEPS = 80
 
 export type GridFailure =
   | 'no_start'
@@ -47,6 +51,8 @@ export type GridFailure =
   | 'not_at_door'
   | 'need_key'
   | 'not_at_goal'
+  | 'empty_repeat'
+  | 'too_deep'
 
 export type GridFrame = {
   blockIndex: number
@@ -57,6 +63,8 @@ export type GridFrame = {
   hasKey: boolean
   doorOpen: boolean
   bump?: Cell
+  /** SYS-107: which round of each enclosing repeat this action ran in (outermost first). */
+  rounds?: number[]
 }
 
 export type GridRun = {
@@ -86,18 +94,25 @@ function result(passed: boolean, failure: GridFailure | undefined, message: stri
 }
 
 /** Run a connected program (first block must be when_start) on a level. */
-export function runGridProgram(level: GridLevel, blocks: Array<{ type: string; disconnected?: boolean }>): GridRun {
+export function runGridProgram(level: GridLevel, blocks: ProgramBlock[]): GridRun {
   const state = { x: level.start.x, y: level.start.y, facing: level.start.facing, hasKey: false, doorOpen: !level.door }
   const frames: GridFrame[] = []
   if (blocks[0]?.type !== 'when_start') return result(false, 'no_start', '先放“开始时”，小狐狸才知道什么时候出发。', frames, state, 0)
   if (blocks.some(b => b.disconnected)) return result(false, 'disconnected', '有积木没接在“开始时”下面，掉队的积木不会运行。', frames, state, 0)
   const program = blocks.slice(1)
-  if (program.length > GRID_MAX_ACTIONS) return result(false, 'too_many', `一次最多 ${GRID_MAX_ACTIONS} 块积木。`, frames, state, 0)
+  if (countBlocks(program) > GRID_MAX_ACTIONS) return result(false, 'too_many', `一次最多 ${GRID_MAX_ACTIONS} 块积木。`, frames, state, 0)
+  // SYS-107: unroll “重复 N 次” into the actions that really run.
+  const expanded = expandProgram(program, GRID_MAX_STEPS)
+  if (!expanded.ok) {
+    if (expanded.reason === 'empty_repeat') return result(false, 'empty_repeat', '“重复”积木里面是空的：把要重复的动作放进它的大嘴巴里。', frames, state, 0)
+    if (expanded.reason === 'too_deep') return result(false, 'too_deep', '重复里面最多再放一层重复。', frames, state, 0)
+    return result(false, 'too_many', `重复的次数太多啦，一次最多走 ${GRID_MAX_STEPS} 步。`, frames, state, 0)
+  }
   let steps = 0
-  for (let i = 0; i < program.length; i++) {
-    const type = program[i].type as GridBlockType
+  for (const { block, topIndex, rounds } of expanded.steps) {
+    const type = block.type as GridBlockType
     if (!GRID_BLOCK_TYPES.includes(type)) return result(false, 'unknown_block', '这块积木不能在网格森林里用。', frames, state, steps)
-    const push = (bump?: Cell) => frames.push({ blockIndex: i + 1, action: type, ...state, bump })
+    const push = (bump?: Cell) => frames.push({ blockIndex: topIndex + 1, action: type, ...state, bump, ...(rounds.length ? { rounds } : {}) })
     if (type === 'turn_left' || type === 'turn_right') {
       state.facing = turn(state.facing, type === 'turn_left' ? 'left' : 'right')
       push()
@@ -163,6 +178,8 @@ export function runGridProgram(level: GridLevel, blocks: Array<{ type: string; d
 export const GRID_FAILURE_LABELS: Record<GridFailure, string> = {
   no_start: '缺少开始',
   disconnected: '积木没连上',
+  empty_repeat: '重复里是空的',
+  too_deep: '重复套得太深',
   unknown_block: '积木不能用',
   too_many: '积木太多',
   out_of_bounds: '走出地图',

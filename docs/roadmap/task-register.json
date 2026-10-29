@@ -2603,6 +2603,27 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/230"
       },
       "notes": "Hark A 2026-10-29：审定基线 main 300c6dd；AI 审定不能替代独立人工教研。"
+    },
+    {
+      "id": "SYS-107",
+      "title": "真循环引擎：C 形“重复 N 次”积木、嵌套程序快照/恢复、网格引擎展开执行",
+      "priority": "P0",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [
+        "SYS-106",
+        "AUD-101"
+      ],
+      "scope": "apps/web/src/features/lessons/blockly/program-tree.ts（程序树类型、展开、深度/空循环/步数上限、草稿防伪解析）、register-kids-blocks.ts 新增 repeat_times（TIMES 下拉 2/3/4/5/6/8 + DO 语句口）、block-labels.ts、blockly-workspace.tsx（快照递归收集 times/body，恢复递归重建并接入 DO）、restore-block-sequence.ts（递归过滤）、grid/grid-engine.ts（展开执行、empty_repeat/too_deep/too_many、帧带 rounds）、grid-draft.ts、grid-lab.tsx 复盘标签及对应单测。不改任何课程内容、台账课程条目或旧 repeat_twice 行为；G0-U3 课程在后续独立 PR。",
+      "acceptance": [
+        "真实 Blockly 无头工作区中 repeat_times 的次数与口内积木进入程序快照（单测）",
+        "重复 3 次前进与三块前进结果一致；只改次数会改变结果；重复 4 次(前进,前进,右转)围成方形，转错方向或少一轮失败（单测）",
+        "空循环、超过两层嵌套、展开超过 80 步给出儿童可读的具体失败而不是卡死（单测）",
+        "旧的平铺草稿与 G0-U1/U2 课程行为不变；伪造的循环次数被夹到可选值，未知积木被丢弃（单测）",
+        "PR CI 全绿"
+      ],
+      "evidence": {},
+      "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
     }
   ]
 }

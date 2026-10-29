@@ -1,4 +1,5 @@
 import type { GridLesson } from '@/content/curriculum/g0-u1-grid-lessons'
+import { REPEAT_BLOCK, sanitizeProgram, type ProgramBlock } from '@/features/lessons/blockly/program-tree'
 import { GRID_BLOCK_TYPES, GRID_MAX_ACTIONS, type Cell, type GridFailure } from './grid-engine'
 
 export const GRID_DRAFT_PREFIX = 'kids-grid-lesson-v1:'
@@ -6,7 +7,7 @@ export const gridDraftKey = (lessonId: string) => GRID_DRAFT_PREFIX + lessonId
 
 export type GridDraft = {
   stepIndex: number
-  programs: Record<string, Array<{ type: string; disconnected?: boolean }>>
+  programs: Record<string, ProgramBlock[]>
   /** Steps that really ran to the goal on this device. Editable in storage: not a trusted grade. */
   passed: string[]
   savedAt: string | null
@@ -20,9 +21,9 @@ export type GridDraft = {
   mistakes?: GridFailure[]
 }
 
-const FAILURES = new Set<string>(['no_start', 'disconnected', 'unknown_block', 'too_many', 'out_of_bounds', 'hit_rock', 'fell_in_water', 'door_locked', 'no_key_here', 'not_at_door', 'need_key', 'not_at_goal'])
+const FAILURES = new Set<string>(['no_start', 'disconnected', 'empty_repeat', 'too_deep', 'unknown_block', 'too_many', 'out_of_bounds', 'hit_rock', 'fell_in_water', 'door_locked', 'no_key_here', 'not_at_door', 'need_key', 'not_at_goal'])
 
-const KNOWN = new Set<string>(['when_start', ...GRID_BLOCK_TYPES])
+const KNOWN = new Set<string>(['when_start', REPEAT_BLOCK, ...GRID_BLOCK_TYPES])
 
 /** Parse a saved draft defensively; anything malformed is dropped, never trusted. */
 export function parseGridDraft(lesson: GridLesson, raw: string | null): GridDraft | null {
@@ -36,8 +37,8 @@ export function parseGridDraft(lesson: GridLesson, raw: string | null): GridDraf
     if (value.programs && typeof value.programs === 'object') {
       for (const [id, list] of Object.entries(value.programs as Record<string, unknown>)) {
         if (!stepIds.includes(id) || !Array.isArray(list) || list.length > GRID_MAX_ACTIONS + 1) continue
-        const blocks = list.filter((b): b is { type: string; disconnected?: boolean } => !!b && typeof (b as { type?: unknown }).type === 'string' && KNOWN.has((b as { type: string }).type))
-        programs[id] = blocks.map(b => (b.disconnected ? { type: b.type, disconnected: true } : { type: b.type }))
+        // SYS-107: programs may nest blocks inside “重复 N 次”.
+        programs[id] = sanitizeProgram(list, KNOWN, GRID_MAX_ACTIONS + 1)
       }
     }
     const passed = Array.isArray(value.passed) ? (value.passed as unknown[]).filter((id): id is string => typeof id === 'string' && stepIds.includes(id)) : []

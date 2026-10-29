@@ -36,6 +36,8 @@ export function stepLevel(step: GridLessonStep, draft: Pick<GridDraft, 'creative
 export const MISTAKE_LABELS: Record<GridFailure, string> = {
   no_start: '忘了“开始时”',
   disconnected: '有积木掉队',
+  empty_repeat: '重复里面是空的',
+  too_deep: '重复套了太多层',
   unknown_block: '用了这关没有的积木',
   too_many: '积木太多',
   out_of_bounds: '走出了地图',
