@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { assessmentQuestions } from '@/content/assessment/questions'
@@ -10,6 +10,7 @@ import {
   readOnboardingSession,
   subscribeOnboardingSession,
   writeOnboardingSession,
+  type OnboardingSession,
 } from '@/features/onboarding/onboarding-session'
 import { readGuestProgress } from '@/features/progress/local-progress'
 import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
@@ -19,24 +20,44 @@ export default function AssessmentPage() {
   // Hydration fix (HYDRATION-418): the session lives in localStorage, which
   // the server cannot see. Reading it during render made SSR (null) disagree
   // with the first client render (full form) and React reported error #418.
-  // useSyncExternalStore renders the default session both on the server and
-  // during hydration (same pattern the learn map already uses), and only
-  // then delivers the real session. Because the page returns null while
-  // ageBand is unset, the form first mounts with the real answers, which
-  // also keeps the refresh-restore initializer correct.
-  const session = useSyncExternalStore(
-    subscribeOnboardingSession,
-    readOnboardingSession,
-    () => defaultOnboardingSession,
-  )
+  // The session is therefore loaded in an effect: SSR and the hydration
+  // render both see the default session (null), and the form first mounts
+  // only after the real session is loaded, which also keeps the
+  // refresh-restore initializer correct.
+  //
+  // Why not useSyncExternalStore (tried first): on a full document load the
+  // redirect effect below ran with the default snapshot before the store
+  // delivered the real session, so session users were bounced to the age
+  // page on reload — proven by production-build E2E. The `loaded` gate
+  // below is what prevents that race, and it needs the synchronous initial
+  // load that react-hooks/set-state-in-effect discourages; deriving the
+  // value during render is impossible for client-only localStorage state,
+  // so this one line carries a scoped, justified exception instead of a
+  // behavior-breaking workaround. The guard for correctness is the
+  // production-build E2E (reload/back/forward/direct load, zero pageerrors),
+  // not the lint rule.
+  const [session, setSession] =
+    useState<OnboardingSession>(defaultOnboardingSession)
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    if (!session.ageBand) {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see the
+    // comment above: the synchronous initial load is required to keep the
+    // hydration render identical to SSR and to gate the redirect below.
+    setSession(readOnboardingSession())
+    setLoaded(true)
+    return subscribeOnboardingSession(() => {
+      setSession(readOnboardingSession())
+    })
+  }, [])
+
+  useEffect(() => {
+    if (loaded && !session.ageBand) {
       router.replace('/onboarding/age')
     }
-  }, [router, session.ageBand])
+  }, [router, loaded, session.ageBand])
 
-  if (!session.ageBand) {
+  if (!loaded || !session.ageBand) {
     return null
   }
 

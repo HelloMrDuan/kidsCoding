@@ -15,10 +15,11 @@ vi.mock('next/navigation', () => ({
 
 // HYDRATION-418: the check page used to read the localStorage session during
 // render, so SSR (no session) disagreed with the hydrated render (session)
-// and React reported error #418. The session now arrives through
-// useSyncExternalStore (default snapshot on the server and during hydration),
-// so these tests assert the load path itself: a seeded session reaches the form
-// with its progress restored, and an empty session redirects to the age page.
+// and React reported error #418. The session is now loaded in an effect
+// behind a `loaded` gate (see page.tsx for why the store hook alone bounced
+// session users to the age page on reload), so these tests assert the load
+// path itself: a seeded session reaches the form with its progress restored,
+// and an empty session redirects to the age page.
 // jsdom cannot reproduce React's hydration error, so the absence of #418 is
 // proven by the production-build Chrome E2E, not by this file.
 describe('AssessmentPage session load', () => {
