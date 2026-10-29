@@ -2581,6 +2581,28 @@
         "reviewer": "duan 2026-10-28 approved merge in chat; executed by Hark via connector"
       },
       "notes": "来源：UX-201 证据中记录的既有缺口——Blockly 默认从 blockly-demo.appspot.com 加载音效与精灵图，沙箱/国内网络 ERR_TUNNEL_CONNECTION_FAILED。"
+    },
+    {
+      "id": "AUD-101",
+      "title": "Hark A 负责路线 144 节全量课程审定（G0、G1、M0、D0、S0、R0）",
+      "priority": "P0",
+      "category": "AUD",
+      "status": "in_review",
+      "dependencies": [
+        "TQ-007"
+      ],
+      "scope": "按 2026-10-29 四账号总指令与 §13 八大领域要求，对 Hark A 负责的 6 条路线 144 节逐课审定：docs/curriculum-audit/hark-a/README.md、docs/curriculum-audit/hark-a/hark-a-144-audit.json（每课 12 项检查、可观察学习成果建议、优先级与整改动作）、docs/curriculum-audit/hark-a/HARK-A-144-AUDIT.md（覆盖矩阵、24 单元递进图、逐课清单、焦点错配、重复清单、八大领域专项、扩展建议、对标来源、整改 PR 计划）、apps/web/src/features/curriculum/hark-a-audit.test.ts。不改 lesson-task-register.json 与 full-catalog-v1.json 任何字段，不改其他账号路线。",
+      "acceptance": [
+        "144 个课程 ID 与 lesson-task-register 中六条路线完全一致，各出现一次（单测锁定）",
+        "每课给出不同于模板句的可观察学习成果建议、P0/P1/P2 优先级与整改动作",
+        "审定标明实现者 AI、independent=false，不声称儿童试学或发布证据；无运行实现的课不打质量分",
+        "八大领域每项给出覆盖判定、缺口、优先级、所需引擎、综合项目目标与验收方法",
+        "PR CI 全绿；不修改任何课程状态"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/230"
+      },
+      "notes": "Hark A 2026-10-29：审定基线 main 300c6dd；AI 审定不能替代独立人工教研。"
     }
   ]
 }
