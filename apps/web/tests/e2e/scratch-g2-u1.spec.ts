@@ -1586,13 +1586,21 @@ test.describe('G2-U2-L03 音乐节奏舞台', () => {
     await selectTarget(page, '小鼓')
     await expect(page.getByTestId('g2-edit-wait')).toHaveValue('0.3')
     await expect(page.getByTestId('g2-edit-wait-2')).toHaveValue('0.6')
+    // Each box edits only its own wait block: typing into the second box never shows up in the first one
+    // (read straight after each fill, no retrying — a stale box here is what garbled fast edits to "0.305").
+    const wait1 = page.getByTestId('g2-edit-wait')
+    const wait2 = page.getByTestId('g2-edit-wait-2')
     for (const bad of ['0.25', '1.5', '0.1']) {
-      await page.getByTestId('g2-edit-wait-2').fill(bad)
+      await wait2.fill(bad)
+      expect(await wait2.inputValue()).toBe(bad)
+      expect(await wait1.inputValue()).toBe('0.3')
       await expect(page.getByTestId('g2-apply-blocks')).toBeDisabled()
     }
-    // Blockly reports the refused values asynchronously; re-type until each input settles (same race as #209).
-    await fillEdit(page, 'g2-edit-wait', '0.5')
-    await fillEdit(page, 'g2-edit-wait-2', '0.5')
+    await wait1.fill('0.5')
+    expect(await wait1.inputValue()).toBe('0.5')
+    await wait2.fill('0.5')
+    expect(await wait2.inputValue()).toBe('0.5')
+    expect(await wait1.inputValue()).toBe('0.5')
     await applyAndWait(page)
     await flagBeats(page)
     await expect(beatLog(page)).toHaveAttribute('data-steady', 'true')

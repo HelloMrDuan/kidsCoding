@@ -273,7 +273,7 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
     block.setFieldValue(field === 'MESSAGE' || field === 'COSTUME' || field === 'BACKDROP' || field === 'SOUND_MENU' || field === 'DIRECTION' || field === 'BROADCAST_OPTION' ? value : String(Number(value)), field)
     // Show what was typed right away: Blockly reports the change asynchronously, and re-rendering the
     // controlled input with the stale value in between would move the caret and garble the next edit.
-    setFields(prev => ({...prev, [field]: value}))
+    setFields(prev => ({...prev, [nth ? `${field}#${nth + 1}` : field]: value}))
   }
   const extra = target.extraToolbox?.[0]
   function attachStageExtra() {
