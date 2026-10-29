@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u2L01} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {g2u2L01, g2u2L02} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05, g2u1L06} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {changedValues, checkSlotValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
@@ -230,5 +230,28 @@ describe('G2 restricted Blockly adapter (G2-U2-L01 walk cycle)', () => {
     const birdWs = ws(block('kc2_flag', {}, block('kc2_switch_costume', {COSTUME: '收翅'},
       block('kc2_repeat', {TIMES: '8'}, null, block('kc2_next_costume', {}, block('kc2_wait', {DURATION: '0.3'}))))))
     expect(readG2Program(birdWs, bird)).toEqual({kind: 'sprite', values: {}})
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U2-L02 day/night)', () => {
+  const stage = g2u2L02.targets.find(t => t.kind === 'stage')!
+  const owl = g2u2L02.targets.find(t => t.name === '猫头鹰')!
+  const stageWs = (wait: string, inner: 'ok' | 'swapped' = 'ok') => ws(block('kc2_flag', {}, block('kc2_switch_backdrop', {BACKDROP: '白天'},
+    block('kc2_forever', {}, null, inner === 'ok'
+      ? block('kc2_wait_whole', {DURATION: wait}, block('kc2_next_backdrop'))
+      : block('kc2_next_backdrop', {}, block('kc2_wait_whole', {DURATION: wait}))))))
+  const owlWs = (backdrop: string, line = '咕咕，天黑啦！') => ws(
+    block('kc2_flag', {}, block('kc2_switch_costume', {COSTUME: '睡觉'})),
+    block('kc2_when_backdrop', {BACKDROP: backdrop}, block('kc2_switch_costume', {COSTUME: '醒来'}, block('kc2_say', {MESSAGE: line}, block('kc2_switch_costume', {COSTUME: '睡觉'})))))
+
+  it('reads the stage forever loop (whole-second wait 1～5) and refuses 0, 6, fractions or a swapped loop body', () => {
+    expect(readG2Program(stageWs('3'), stage)).toEqual({kind: 'sprite', values: {'Stage|stage_wait|DURATION': 3}})
+    for (const bad of ['0', '6', '2.5']) expect(readG2Program(stageWs(bad), stage)).toBeNull()
+    expect(readG2Program(stageWs('3', 'swapped'), stage)).toBeNull()
+  })
+
+  it('reads the backdrop a hat listens for and refuses backdrops the stage does not have', () => {
+    expect(readG2Program(owlWs('夜晚'), owl)).toEqual({kind: 'sprite', values: {'猫头鹰|owl_hat|BACKDROP': '夜晚', '猫头鹰|owl_say|MESSAGE': '咕咕，天黑啦！'}})
+    expect(readG2Program(owlWs('黄昏'), owl)).toBeNull()
   })
 })

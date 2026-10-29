@@ -11,11 +11,11 @@ import {evaluateG2U2Lesson, g2u2ScratchLessons, observedPredictionG2U2} from './
 export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION' | 'DY'
 export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
 export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait' | 'kc2_switch_backdrop' | 'kc2_play_sound'
-  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast' | 'kc2_wait_whole' | 'kc2_change_y' | 'kc2_wait_free'
+  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast' | 'kc2_wait_whole' | 'kc2_change_y' | 'kc2_wait_free' | 'kc2_forever' | 'kc2_next_backdrop'
 /** `fixed` shows a value the lesson keeps fixed (its field is shown but locked in the editor). */
 export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[]; fixed?: Partial<Record<G2Field, string>> }
 export type G2ScriptSpec = {
-  hat: 'kc2_flag' | 'kc2_clicked' | 'kc2_when_receive'
+  hat: 'kc2_flag' | 'kc2_clicked' | 'kc2_when_receive' | 'kc2_when_backdrop'
   body: G2BlockSpec[]
   /** Editable fields on the hat itself (the message a "when I receive" hat listens for). */
   hatSlots?: G2Slot[]
@@ -32,6 +32,8 @@ export type G2TargetSpec = {
   sounds?: string[]
   /** Broadcast message names offered by this target's message dropdowns. */
   messages?: string[]
+  /** Stage backdrop names offered by a sprite's "when backdrop switches to" hat. */
+  backdrops?: string[]
   /** Blocks offered in the toolbox beyond the target's own scripts (used for the stage error cases). */
   extraToolbox?: Array<'kc2_goto' | 'kc2_switch_costume'>
 }
@@ -60,6 +62,8 @@ export type G2Lesson = {
   showSpeechOrder?: boolean
   /** Show how many costume frames each sprite stepped through in the last green-flag run and the VM-measured time per frame (animation lessons). */
   showFrames?: boolean
+  /** Show the stage's forever day/night loop: switches, VM time per phase, who spoke on which backdrop, and whether the run was stopped. */
+  showCycle?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -577,12 +581,15 @@ export type G2Observations = {
   soundCostumes: Array<{ target: string; sound: string; costume: string }>
   /** Finished green-flag runs: per sprite, how many times the VM ran "next costume", the average VM time between two frames (null below 2 frames) and the frame it ended on. */
   frameRuns: Array<{ frames: Record<string, { count: number; avgMs: number | null; end: string }>; positions: Record<string, G2Point> }>
+  /** Green-flag runs, updated while they run (a forever loop never ends by itself): VM "next backdrop" switches, the average VM time between them,
+   * each line a sprite started with the backdrop showing at that moment, whether the run has ended and whether the learner stopped it. */
+  cycleRuns: Array<{ switches: number; avgMs: number | null; speech: Array<{ target: string; backdrop: string }>; finished: boolean; stopped: boolean }>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
-  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [],
+  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [], cycleRuns: [],
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
