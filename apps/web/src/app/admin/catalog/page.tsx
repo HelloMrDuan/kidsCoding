@@ -55,9 +55,23 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
                 <p className="mt-1 text-amber-900">已通过 {result.passedCount}/7 · 剩余 {result.missing.length} 项 · <span data-testid={`child-trials-${id}`}>有效试学 {getReleaseContext(id).validChildTrials ?? 0} 次</span></p>
                 <ul className="mt-2 space-y-1.5">
                   {result.gates.map((g) => (
-                    <li key={g.key} className="flex min-w-0 gap-2" data-testid={`release-gate-${id}-${g.key}`} data-passed={g.passed ? 'true' : 'false'}>
-                      <span className={`shrink-0 self-start rounded-md px-1.5 text-xs font-black ${g.passed ? 'bg-emerald-600 text-white' : g.status === 'fail' ? 'bg-rose-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{g.short}</span>
-                      <span className="min-w-0 break-words text-xs leading-5 text-slate-700">{g.passed ? `${g.reviewer} · ${g.date}` : g.reasons[0]}{g.evidence.length ? ` · 已附证据 ${g.evidence.length}` : ''}{!g.passed && g.note ? <span className="hidden sm:inline">（{g.note}）</span> : null}</span>
+                    <li key={g.key} className="min-w-0 space-y-1" data-testid={`release-gate-${id}-${g.key}`} data-passed={g.passed ? 'true' : 'false'}>
+                      <div className="flex min-w-0 gap-2">
+                        <span className={`shrink-0 self-start rounded-md px-1.5 text-xs font-black ${g.passed ? 'bg-emerald-600 text-white' : g.status === 'fail' ? 'bg-rose-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{g.short}</span>
+                        <span className="min-w-0 break-words text-xs leading-5 text-slate-700">{g.passed ? `${g.reviewer} · ${g.date}` : g.reasons[0]}{g.evidence.length ? ` · 已附证据 ${g.evidence.length}` : ''}{!g.passed && g.note ? <span className="hidden sm:inline">（{g.note}）</span> : null}</span>
+                      </div>
+                      {g.evidence.length > 0 && (
+                        <ul className="ml-6 space-y-1" data-testid={`release-evidence-${id}-${g.key}`}>
+                          {g.evidence.map((e, i) => {
+                            const href = e.kind === 'ci' || e.kind === 'pr' ? e.ref : `https://github.com/HelloMrDuan/kidsCoding/blob/main/${e.ref}`
+                            return (
+                              <li key={`${e.kind}-${e.ref}-${i}`} className="min-w-0 break-words text-xs leading-5 text-slate-700">
+                                <a href={href} target="_blank" rel="noreferrer" className="font-bold text-emerald-800">{e.kind}：{e.ref}</a>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      )}
                     </li>
                   ))}
                 </ul>
