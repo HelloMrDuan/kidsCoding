@@ -1517,7 +1517,7 @@
       "unitId": "G2-U2",
       "focusConcept": "循环",
       "plannedLearningOutcome": "能使用循环解释并完成「让角色走路有帧动画」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1531,9 +1531,9 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/208",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U2-L01 block: 5 tests; 本地 E2E 5/5（arm64 chromium + 本地 scratch-vm 副本）; CI real-Chrome result pending)",
+        "mergeCommit": "94813cb46a2067206e4d03b27022d1ddfe46e79a",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40835347879",
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts — G2-U2-L01 用例在 PR #208 与 main 真 Chrome CI（scratch-real-vm-browser 分片）通过",
         "lessonReview": null
       },
       "notes": "Hark B：真实 Scratch VM 原创回家小路项目（小橘猫 4 帧走路循环：重复里移动+下一个造型+等待；小鸟 0.3 秒/帧固定示范）；练习A重复次数让走路停在走路1（VM 计帧数与末帧，4 的倍数多解）、练习B次数×步数走到小屋门口（多解）、等待 0 秒帧太快的找错+三层提示（VM 实测平均每帧毫秒，须先见太快再见看得清）、创意自己的台词+完整回家；.sb3 自动保存/刷新恢复/导出回读/导入、沙箱拒非 0.1 秒格等待/越界/改示范/调换顺序/多余造型/他课工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U2-L01.json，非独立），需独立人工教研复核；无儿童试学；未接 WebGL 渲染器。不得标 completed。"
