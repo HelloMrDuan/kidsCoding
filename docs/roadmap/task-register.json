@@ -754,6 +754,29 @@
       }
     },
     {
+      "id": "TQ-023",
+      "title": "G2 Scratch 实验快捷输入框与 Blockly 异步回写竞态修复（快速连续编辑被改乱）",
+      "priority": "P1",
+      "category": "TQ",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "apps/web/src/features/scratch-g2/{scratch-g2-blocks.tsx,scratch-g2-program.ts}（产品修复）+ scratch-g2-program.test.ts + tests/e2e/scratch-g2-u1.spec.ts（回归用例）。不改课程内容、VM 沙箱、课程状态与发布门禁。",
+      "acceptance": [
+        "根因：Blockly 数字字段（重复次数 1～20、等待 0.2～1.0、x/y）在 setFieldValue 时同步夹取/取整，但变更事件异步回报；快捷输入框先显示键入值，异步快照稍后把它改写成夹取值，正在进行的下一次编辑选区丢失，被拼成 \"208\"/\"1.102\"/\"0.305\"。",
+        "修复：update() 写入后同步读回 Blockly 实存值，在同一次渲染中显示（同一数字保留键入写法，如 1.0）；异步快照用同一规则计算，不再晚到改写输入框；数字框清空时不改积木、失焦后与积木同步。",
+        "回归：单测覆盖夹取/取整、同值保留、清空、文本字段；E2E 在 G2-U2-L01 练习 A 连续不等待地输入 25/8/0/30/3/25/8，每次立刻读取输入框必须已是夹取值（20/8/1/20/3/20/8），旧实现此处必然读到 25。",
+        "PR CI 全绿（curriculum 含真 Chrome Scratch VM 分片、deploy、task-ledger）后合并；合并后 main CI 双绿再关账。"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/235",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "Hark B 发现于 G2-U2-L01/L03 测试（#208、L03 本地）；#209 的“乐观显示键入值”只修了受控输入回退，未覆盖夹取/取整字段。本地：本地真 Chromium 生产构建 scratch-g2-u1+scratch-vm 47/47（rebase 前）、vitest scratch-g2 29/29、旧组件下新回归用例失败（Expected 1, Received 0）"
+    },
+    {
       "id": "TQ-022",
       "title": "Hark B 课程审定 v1 归档（G2/G3/W0/W1/A0 120 节，AI 实现者自审）",
       "priority": "P1",
