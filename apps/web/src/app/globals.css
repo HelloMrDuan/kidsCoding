@@ -733,6 +733,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kc-hamburger { display: none; background: transparent; border: 0; color: #18243a; padding: 4px; border-radius: 7px; }
 .kc-drawer-mask { display: none; }
 .kc-mobile-bottom { display: none; }
+.kc-drawer-mask { display: none; }
 .kc-shell-main { min-width: 0; flex: 1; }
 /* Pages inside the shell share the V2 canvas instead of their own full-screen gradients. */
 .kc-shell-main > main { background: transparent !important; min-height: 0 !important; }
@@ -750,18 +751,19 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 @media (max-width: 600px) {
   .kc-app { display: block; padding-bottom: 62px; }
-  .kc-sidebar { display: none; position: fixed; inset: 0 auto 0 0; width: 222px; height: 100vh; padding: 20px 13px; z-index: 60; }
-  .kc-sidebar.is-open { display: flex; }
+  .kc-sidebar { position: fixed; inset: 0 auto 0 0; width: 222px; height: 100vh; padding: 20px 13px; z-index: 60; transform: translateX(-100%); visibility: hidden; transition: transform .25s ease, visibility 0s linear .25s; }
+  .kc-sidebar.is-open { transform: translateX(0); visibility: visible; transition: transform .25s ease, visibility 0s; }
   .kc-sidebar.is-open .kc-logo { justify-content: flex-start; padding: 2px 12px 22px; }
   .kc-sidebar.is-open .kc-logo-text, .kc-sidebar.is-open .kc-nav-name { display: inline; }
   .kc-sidebar.is-open .kc-nav-group, .kc-sidebar.is-open .kc-side-note { display: block; }
   .kc-sidebar.is-open .kc-nav-item { justify-content: flex-start; padding: 11px 14px; }
-  .kc-drawer-mask { display: block; position: fixed; inset: 0; z-index: 55; background: #0b1a3066; border: 0; }
+  .kc-drawer-mask { display: block; position: fixed; inset: 0; z-index: 55; background: #0b1a3066; border: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s ease, visibility 0s linear .25s; }
+  .kc-drawer-mask.is-open { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .25s ease, visibility 0s; }
   .kc-hamburger { display: grid; place-items: center; }
   .kc-topbar { height: 58px; padding: 0 15px; }
   .kc-top-search { display: none; }
   .kc-mobile-bottom { display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 62px; background: #fff; border-top: 1px solid #e6ebf3; z-index: 40; justify-content: space-around; align-items: center; }
-  .kc-mobile-bottom a { color: #758398; font-size: 11px; display: grid; justify-items: center; gap: 2px; text-decoration: none; min-width: 52px; }
+  .kc-mobile-bottom a { color: #758398; font-size: 11px; display: grid; justify-items: center; align-content: center; gap: 2px; text-decoration: none; min-width: 52px; height: 100%; }
   .kc-mobile-bottom a.is-active { color: #2363e4; font-weight: 800; }
 }
 

@@ -35,4 +35,17 @@ describe('AppShell (frozen V2 global shell)', () => {
     fireEvent.click(screen.getByRole('button', { name: '关闭导航' }))
     expect(button).toHaveAttribute('aria-expanded', 'false')
   })
+
+  it('keeps the drawer mask mounted and toggles its is-open class with the drawer', () => {
+    mockPath = '/learn/catalog'
+    render(<AppShell><div /></AppShell>)
+    const mask = screen.getByRole('button', { name: '关闭导航' })
+    expect(mask).not.toHaveClass('is-open')
+    fireEvent.click(screen.getByRole('button', { name: '展开导航' }))
+    expect(mask).toHaveClass('is-open')
+    expect(document.getElementById('kc-sidebar')).toHaveClass('is-open')
+    fireEvent.click(mask)
+    expect(mask).not.toHaveClass('is-open')
+    expect(document.getElementById('kc-sidebar')).not.toHaveClass('is-open')
+  })
 })
