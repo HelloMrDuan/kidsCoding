@@ -2006,7 +2006,7 @@
       "title": "全站导航动效与性能回归",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-601"
       ],
@@ -2016,13 +2016,19 @@
         "无不可用假按钮"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/250",
+        "mergeCommit": "e8506ece06b5a856255fbeb66e20dd22634595cf",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40877068921",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40877068969",
+        "tests": [
+          "app-shell.test.tsx 新增遮罩常驻断言 1 项，本地 vitest 该文件 4/4 全绿；全量 vitest 本地 159 文件 1075 项全绿",
+          "PR #250 CI 23 success + 3 skipped，gate pass（首轮 deploy vitest 单条绑定表单用例时序抖动、curriculum 真机项取消，经 duan 批准仅重跑失败作业后第 2 次尝试双绿）",
+          "合并后主分支 curriculum https://github.com/HelloMrDuan/kidsCoding/actions/runs/40877068921 与 task accountability https://github.com/HelloMrDuan/kidsCoding/actions/runs/40877068969 均 success（头 e8506ece）",
+          "旧机生产构建真实 Chrome 三断点 E2E 第三轮 14 项全过（抽屉开合、遮罩淡入淡出、点遮罩关闭、桌面端隐藏、减动效关断，三端 pageerror 为空，截图 5 张）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "抽屉与遮罩改走 CSS transition（.25s），减动效全局关断自动遵循；底栏链接铺满栏内容高（栏 62px 含 1px 上边框，内容高 61px）。未竟两点如实记：① 低端弱 CPU 未实测，地图页无限循环动效未改时长（V2 视觉冻结）；② 汉堡按钮点按框 30px 未放大（动 padding 影响顶栏间距，留待裁定）；慢网下路由切换旧页保持可见、无白屏，离线支持（无 service worker、无 loading.tsx）不在最小范围。"
     },
     {
       "id": "SYS-101",
