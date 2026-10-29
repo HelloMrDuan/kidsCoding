@@ -1,28 +1,57 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { assessmentQuestions } from '@/content/assessment/questions'
 import { AssessmentForm } from '@/features/onboarding/assessment-form'
 import {
+  defaultOnboardingSession,
   readOnboardingSession,
+  subscribeOnboardingSession,
   writeOnboardingSession,
+  type OnboardingSession,
 } from '@/features/onboarding/onboarding-session'
 import { readGuestProgress } from '@/features/progress/local-progress'
 import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
 
 export default function AssessmentPage() {
   const router = useRouter()
-  const session = readOnboardingSession()
+  // Hydration fix (HYDRATION-418): the session lives in localStorage, which
+  // the server cannot see. Reading it during render made SSR (null) disagree
+  // with the first client render (full form) and React reported error #418.
+  // The session is therefore loaded in an effect: SSR and the hydration
+  // render both see the default session (null), and the form first mounts
+  // only after the real session is loaded, which also keeps the
+  // refresh-restore initializer correct.
+  const [session, setSession] =
+    useState<OnboardingSession>(defaultOnboardingSession)
+  const [loaded, setLoaded] = useState(false)
+
+  // Why the synchronous initial load below is required (not derivable
+  // during render): the session is client-only localStorage state, so the
+  // value cannot be read while rendering without reintroducing the SSR /
+  // hydration mismatch. The store-hook alternative was tried and proven by
+  // production-build E2E to bounce session users to the age page on reload,
+  // because the redirect effect ran on the default snapshot first. The
+  // `loaded` gate is what prevents that race. Correctness is guarded by
+  // the production-build E2E, not by the lint heuristic.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see above.
+    setSession(readOnboardingSession())
+    setLoaded(true)
+    return subscribeOnboardingSession(() => {
+      setSession(readOnboardingSession())
+    })
+  }, [])
 
   useEffect(() => {
-    if (!session.ageBand) {
+    if (loaded && !session.ageBand) {
       router.replace('/onboarding/age')
     }
-  }, [router, session.ageBand])
+  }, [router, loaded, session.ageBand])
 
-  if (!session.ageBand) {
+  if (!loaded || !session.ageBand) {
     return null
   }
 

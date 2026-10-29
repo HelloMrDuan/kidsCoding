@@ -1970,6 +1970,35 @@
       "notes": "无布局、无颜色改动，只改行为、文案与输入属性；标签文案不动。dev 服务下水合失效属环境问题（已查明，改走生产构建实测）；生产构建三端各 1 次 React #418 水合日志，属检查页服务端恒渲染空的主分支原有结构，未在本任务扩范围修。"
     },
     {
+      "id": "HYDRATION-418",
+      "title": "修复年龄能力检查页 React #418 水合不一致",
+      "priority": "P1",
+      "category": "UX",
+      "status": "in_review",
+      "dependencies": [
+        "UX-602"
+      ],
+      "scope": "apps/web/src/app/onboarding/check/page.tsx、相关单测及真实浏览器水合验证",
+      "acceptance": [
+        "生产模式无 #418",
+        "刷新后学习会话正确恢复",
+        "无会话正常跳转",
+        "三端操作无回归",
+        "CI 全绿"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/226",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "apps/web/src/app/onboarding/check/page.test.tsx 2 项全绿（预置会话恢复到原题、无会话重定向到年龄页）",
+          "旧机生产构建真实 Chrome 三端 E2E 全过（头 58048d74；首次进入、答题、刷新恢复、返回前进、直接加载，pageerror 为空，#418 消失；5e641ff8 仅改注释行不改行为，最终头合并前重跑）"
+        ],
+        "reviewer": null
+      },
+      "notes": "ESLint 根因（2026-10-29）：首版 disable 注释写成两行，disable-next-line 只压住第二行注释，未压住 setSession 行，致 curriculum-web 报 react-hooks/set-state-in-effect；已改为紧贴 setSession 的单行注释并在机上新鲜依赖验证通过。9 个既有 warning 与本 PR 无关，不作新增缺陷处理。"
+    },
+    {
       "id": "UX-603",
       "title": "全站导航动效与性能回归",
       "priority": "P1",
