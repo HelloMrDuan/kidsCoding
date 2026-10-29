@@ -101,3 +101,17 @@ describe('grid engine: repeat N times (SYS-107)', () => {
     expect(runGridProgram(L.straight, [{ type: 'when_start' }, big]).failure).toBe('too_many')
   })
 })
+
+describe('grid engine: jump over one cell (G0-U3-L02)', () => {
+  const road = { cols: 5, rows: 1, start: { x: 0, y: 0, facing: 'right' as const }, goal: { x: 4, y: 0 }, water: [{ x: 1, y: 0 }, { x: 3, y: 0 }] }
+  it('hops over puddles and lands two cells ahead', () => {
+    const r = runGridProgram(road, [{ type: 'when_start' }, { type: 'jump_forward' }, { type: 'jump_forward' }])
+    expect(r.passed).toBe(true)
+    expect(r.steps).toBe(4)
+  })
+  it('lands in a puddle, off the map, or bumps a rock with specific failures', () => {
+    expect(runGridProgram({ ...road, water: [{ x: 2, y: 0 }] }, [{ type: 'when_start' }, { type: 'jump_forward' }]).failure).toBe('fell_in_water')
+    expect(runGridProgram(road, [{ type: 'when_start' }, { type: 'jump_forward' }, { type: 'jump_forward' }, { type: 'jump_forward' }]).failure).toBe('out_of_bounds')
+    expect(runGridProgram({ ...road, water: [], rocks: [{ x: 1, y: 0 }] }, [{ type: 'when_start' }, { type: 'jump_forward' }]).failure).toBe('hit_rock')
+  })
+})

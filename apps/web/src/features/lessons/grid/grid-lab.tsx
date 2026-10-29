@@ -36,6 +36,12 @@ export function stepLevel(step: GridLessonStep, draft: Pick<GridDraft, 'creative
     const i = goal ? step.creative!.goalChoices.findIndex(c => c.x === goal.x && c.y === goal.y) : -1
     return goal && i >= 0 ? { ...step.level, goal, footprints: patterns[i] } : { ...step.level, footprints: undefined }
   }
+  const waters = step.creative?.waters
+  if (waters) {
+    // G0-U3-L02: each goal choice comes with its own puddles.
+    const i = goal ? step.creative!.goalChoices.findIndex(c => c.x === goal.x && c.y === goal.y) : -1
+    return goal && i >= 0 ? { ...step.level, goal, water: waters[i] } : step.level
+  }
   return goal ? { ...step.level, goal } : step.level
 }
 
@@ -129,7 +135,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   function handleRun() {
     if (needsGoal) {
-      setNotice(step.creative?.patterns ? '先选一种脚印节奏，再运行。' : '先选一格，把蘑菇屋搬过去，再运行。')
+      setNotice(step.creative?.patterns ? '先选一种脚印节奏，再运行。' : step.creative?.waters ? '先选有几个水坑，再运行。' : '先选一格，把蘑菇屋搬过去，再运行。')
       return
     }
     const result = runGridProgram(level, blocks)
@@ -181,7 +187,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   function handleComplete() {
     if (!passedHere) {
-      setNotice(needsGoal ? (step.creative?.patterns ? '先选一种脚印节奏，再拼程序运行。' : '先选一格，把蘑菇屋搬过去，再拼程序运行。') : !observedHere ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。' : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
+      setNotice(needsGoal ? (step.creative?.patterns ? '先选一种脚印节奏，再拼程序运行。' : step.creative?.waters ? '先选有几个水坑，再拼程序运行。' : '先选一格，把蘑菇屋搬过去，再拼程序运行。') : !observedHere ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。' : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
       return
     }
     if (draft.stepIndex < lesson.steps.length - 1) goToStep(draft.stepIndex + 1)

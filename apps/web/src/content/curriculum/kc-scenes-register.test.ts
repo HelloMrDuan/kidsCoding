@@ -30,6 +30,7 @@ const ACCEPTANCE_SET = [
   'apple-tree.svg', // G0-U2-L05 apple orchard backdrop
   'meeting-stage.svg', // G0-U2-L06 meet-and-greet stage backdrop
   'mushroom-path.svg', // G0-U3-L01 story scenery
+  'puddle-sign.svg', // G0-U3-L02 story scenery
 ]
 
 describe('kc-scenes asset register (UX-004)', () => {

@@ -2188,8 +2188,7 @@
       "requiredEngineCapabilities": [
         "finite_repeat",
         "movement",
-        "visual_effect",
-        "sound"
+        "jump_over"
       ],
       "prerequisiteLessonIds": [
         "G0-U3-L01"

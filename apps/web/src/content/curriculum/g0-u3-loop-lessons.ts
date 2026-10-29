@@ -180,4 +180,159 @@ const L01: GridLesson = {
   project: { stepId: 'my-rhythm-path', title: '我的节奏小路' },
 }
 
-export const g0u3LoopLessons: Record<string, GridLesson> = { 'G0-U3-L01': L01 }
+const J = 'jump_forward'
+const puddles = (...xs: number[]) => xs.map(x => ({ x, y: 1 }))
+
+const L02: GridLesson = {
+  id: 'G0-U3-L02',
+  title: '重复走两步',
+  story: '下过雨，小兔子回家的路上有一串小水坑：一个水坑、一块干地、又一个水坑……小兔子一跳刚好跳过一格。它要跳几下才能落在家门口的干地上？',
+  concept: '固定次数重复：同一个动作做几次，就把次数设成几',
+  objectives: [
+    '能先数出要跳几下，再把“重复”的次数设成这个数',
+    '会把“向前跳一下”放进“重复 N 次”，跳过一个个水坑',
+    '跳少了、跳多了或落进水坑时，能看着舞台说出该改次数还是该改动作',
+  ],
+  diagnoses: {
+    not_at_goal: '小兔子停在两个水坑中间，还没到家。数一数还差几个水坑，就再跳几下。',
+    fell_in_water: '扑通！小兔子掉进水坑了。走一格会踩进水里，要用“向前跳一下”跳过去。',
+    out_of_bounds: '跳过头了，家门口就在最后一个水坑后面。重复的次数多了，改小一点。',
+    empty_repeat: '“重复”积木的大嘴巴里是空的：把“向前跳一下”放进它里面。',
+    no_start: '程序没有“开始时”：“重复”要接在“开始时”下面才会运行。',
+  },
+  steps: [
+    {
+      id: 'only-one-hop',
+      kind: 'error-lab',
+      title: '错误实验：只跳一次',
+      instruction: '小兔子的程序只有一块“向前跳一下”。路上有两个水坑，这是一个故意的错误：先按原样运行，看看小兔子停在哪里，再让它跳到家。',
+      predict: '先猜一猜：只跳一下，小兔子能到家吗？',
+      predictChoices: [
+        { text: '能，跳到家门口', when: 'pass' },
+        { text: '停在两个水坑中间', when: 'not_at_goal' },
+      ],
+      errorLab: {
+        expect: 'not_at_goal',
+        expected: '如果跳的次数够，小兔子应该跳过两个水坑，落在家门口。',
+        actual: '小兔子只跳了一下，停在两个水坑中间：一下只能跳过一个水坑。',
+      },
+      level: { cols: 5, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 4, y: 1 }, water: puddles(1, 3), actor: 'rabbit', scenery: 'puddlesign' },
+      allowedBlocks: ['when_start', J, f, 'repeat_times'],
+      starterBlocks: [{ type: 'when_start' }, { type: J }],
+      hints: [
+        '小兔子停在两个水坑中间，前面还有一个水坑。',
+        '一下“向前跳”只跳过一个水坑；有两个水坑，就要跳两下。',
+        '清空后接“开始时”，再加“重复”，把“向前跳一下”放进去，次数选 2。',
+      ],
+      solutions: [P(rep(2, J)), P(J, J)],
+      counterExamples: [
+        { program: P(J), failure: 'not_at_goal' },
+        { program: P(rep(3, J)), failure: 'out_of_bounds' },
+      ],
+    },
+    {
+      id: 'one-hop',
+      kind: 'guided',
+      title: '先学跳一下',
+      instruction: '只有一个水坑，家就在水坑后面。走一格会踩进水里，试试“向前跳一下”：它会跳过一格，落在后面那一格。',
+      predict: '先猜一猜：用“向前走一格”，小兔子会怎样？',
+      level: { cols: 3, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 2, y: 1 }, water: puddles(1), actor: 'rabbit', scenery: 'puddlesign' },
+      allowedBlocks: ['when_start', J, f],
+      hints: [
+        '掉进水坑，是因为“向前走一格”刚好走进了水里。',
+        '“向前跳一下”一次跳过一格，水坑就在被跳过的那一格。',
+        '接“开始时”，下面只放一块“向前跳一下”。',
+      ],
+      solutions: [P(J)],
+      counterExamples: [
+        { program: P(f), failure: 'fell_in_water' },
+        { program: P(f, f), failure: 'fell_in_water' },
+        { program: P(J, J), failure: 'out_of_bounds' },
+      ],
+    },
+    {
+      id: 'repeat-two-hops',
+      kind: 'practice-a',
+      title: '练习 A：重复跳两下',
+      instruction: '两个水坑。先用手指比一比：第一下落在哪，第二下落在哪？再把“向前跳一下”放进“重复”，把次数设成你数出来的数。',
+      predict: '先猜一猜：要重复几次，才能刚好落在家门口？',
+      level: { cols: 5, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 4, y: 1 }, water: puddles(1, 3), actor: 'rabbit', scenery: 'puddlesign' },
+      allowedBlocks: ['when_start', J, f, 'repeat_times'],
+      hints: [
+        '停在中间是跳少了，跳出地图是跳多了。',
+        '一个水坑跳一下：两个水坑，就重复两次。',
+        '“重复 2 次”里面放一块“向前跳一下”。',
+      ],
+      solutions: [P(rep(2, J)), P(J, J)],
+      counterExamples: [
+        { program: P(rep(3, J)), failure: 'out_of_bounds' },
+        { program: P(rep(2, f)), failure: 'fell_in_water' },
+        { program: P(J), failure: 'not_at_goal' },
+      ],
+    },
+    {
+      id: 'hop-then-step',
+      kind: 'practice-b',
+      title: '练习 B：先跳还是先走？',
+      instruction: '这条路更长：水坑、干地、干地、水坑、干地、家。小松鼠拼了“重复 2 次（向前走一格、向前跳一下）”，结果小兔子一出门就掉进水里。先运行看看，再改好重复里面的顺序。',
+      predict: '先猜一猜：重复里面先“走”还是先“跳”？',
+      level: { cols: 7, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 6, y: 1 }, water: puddles(1, 4), actor: 'rabbit', scenery: 'puddlesign' },
+      allowedBlocks: ['when_start', J, f, 'repeat_times'],
+      starterBlocks: [{ type: 'when_start' }, rep(2, f, J)],
+      hints: [
+        '小兔子第一步就踩进了门口的水坑。',
+        '重复会按里面的顺序一遍遍做：门口就是水坑，每一轮都要先跳过水坑，再走一格。',
+        '把重复里面换成：向前跳一下、向前走一格，次数还是 2。',
+      ],
+      solutions: [P(rep(2, J, f)), P(J, f, J, f)],
+      counterExamples: [
+        { program: P(rep(2, f, J)), failure: 'fell_in_water' },
+        { program: P(rep(2, J)), failure: 'fell_in_water' },
+        { program: P(rep(3, J, f)), failure: 'out_of_bounds' },
+      ],
+    },
+    {
+      id: 'my-puddle-road',
+      kind: 'creative',
+      title: '创意改造：我的水坑小路',
+      instruction: '雨下得有大有小：先选路上有几个水坑，再数一数要跳几下，用“重复”帮小兔子回家。通过后，它就是你的“水坑小路”作品。',
+      predict: '先猜一猜：水坑多一个，重复的次数要怎么变？',
+      creative: {
+        prompt: '路上有几个水坑？',
+        goalChoices: [{ x: 4, y: 1 }, { x: 6, y: 1 }, { x: 8, y: 1 }],
+        labels: ['2 个水坑', '3 个水坑', '4 个水坑'],
+        waters: [puddles(1, 3), puddles(1, 3, 5), puddles(1, 3, 5, 7)],
+      },
+      level: { cols: 9, rows: 3, start: { x: 0, y: 1, facing: 'right' }, goal: { x: 4, y: 1 }, water: puddles(1, 3), actor: 'rabbit', scenery: 'puddlesign' },
+      allowedBlocks: ['when_start', J, f, 'repeat_times'],
+      hints: [
+        '停在中间就是还没跳够，跳出地图就是跳多了。',
+        '有几个水坑，就跳几下：重复的次数等于水坑的个数。',
+        '例如 3 个水坑：“重复 3 次”里面放“向前跳一下”。',
+      ],
+      solutions: [P(rep(2, J)), P(J, J)],
+      counterExamples: [
+        { program: P(J), failure: 'not_at_goal' },
+        { program: P(rep(2, f)), failure: 'fell_in_water' },
+      ],
+    },
+  ],
+  review: {
+    whatIf: '如果路上有 5 个水坑，程序要怎么改？',
+    answer: '“重复”里面还是一块“向前跳一下”，只把次数改成 5：一个水坑跳一下，几个水坑就重复几次。',
+  },
+  reflection: '说一说：为什么有两个水坑，就要把“重复”设成 2 次？',
+  reflectionCheck: {
+    question: '路上有 3 个水坑，每跳一下跳过一个，要重复几次？',
+    options: [
+      { text: '3 次', correct: true },
+      { text: '1 次', correct: false },
+      { text: '一直重复不停', correct: false },
+    ],
+    why: '一个水坑跳一下，3 个水坑就跳 3 下；重复的次数是固定的，到家就停。',
+  },
+  parentQuestion: '请孩子展示“水坑小路”，问：如果再多一个水坑，你会改哪一个数字？',
+  project: { stepId: 'my-puddle-road', title: '我的水坑小路' },
+}
+
+export const g0u3LoopLessons: Record<string, GridLesson> = { 'G0-U3-L01': L01, 'G0-U3-L02': L02 }

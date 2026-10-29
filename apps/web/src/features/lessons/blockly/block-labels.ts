@@ -33,6 +33,8 @@ export const kidsBlockLabels: Record<string, string> = {
   // G0-U3 pattern path
   stamp_red: '放红脚印',
   stamp_blue: '放蓝脚印',
+  // G0-U3-L02: hop over one cell
+  jump_forward: '向前跳一下（跳过一格）',
   // G0-U2 event stage
   when_bell: '听到铃铛时',
   wake_up: '睁开眼睛',

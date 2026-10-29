@@ -57,7 +57,7 @@ describe('RELEASE-103 child trial records', () => {
   it('rejects children outside the lesson age band and lessons that are not playable', () => {
     expect(validateChildTrial({ ...sample(), age: 10 }, known).some(p => p.detail.includes('适龄'))).toBe(true)
     expect(validateChildTrial({ ...sample(), age: 10, lessons: [{ ...sample().lessons[0], lessonId: 'P0-U1-L01' }] }, known)).toEqual([])
-    expect(validateChildTrial({ ...sample(), lessons: [{ ...sample().lessons[0], lessonId: 'G0-U3-L02' }] }, known).length).toBeGreaterThan(0)
+    expect(validateChildTrial({ ...sample(), lessons: [{ ...sample().lessons[0], lessonId: 'G0-U3-L03' }] }, known).length).toBeGreaterThan(0)
   })
 
   it('AI or implementer review, missing observer, or absurd durations do not count', () => {

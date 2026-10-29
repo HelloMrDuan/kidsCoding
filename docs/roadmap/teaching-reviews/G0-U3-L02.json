@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G0-U3-L02",
+  "reviewedCommit": "679895e",
+  "reviewedAt": "2026-10-30",
+  "reviewer": "Hark A（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G0 启蒙（5～7 岁）",
+  "prerequisites": [
+    "G0-U3-L01"
+  ],
+  "newConcepts": [
+    "固定次数重复：动作做几次，次数就设几",
+    "“向前跳一下”一次跳过一格",
+    "重复里面的顺序会被原样做很多遍"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-29 重新访问官方页面）",
+    "核桃编程“一学九练” https://official.hetao101.com/curriculum（2026-10-29 访问）",
+    "CSTA 2026 PK–12 标准 https://csteachers.org/pk12standards/（2026-10-29 访问）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "g0-u3-loop-lessons.ts G0-U3-L02：三条可观察目标（先数再设次数、用重复跳过水坑、区分改次数还是改动作）",
+        "5 关递进：错误实验（只跳一次）→ 先学跳一下 → 重复跳两下 → 修循环体顺序（先跳后走）→ 自选水坑数",
+        "覆盖详案常见错误：只跳一次（错误实验）、重复块放在开始事件外（no_start 诊断）；“无限循环”本课无此积木，以“一直重复不停”作反思干扰项说明固定次数"
+      ],
+      "defects": [
+        "“无限循环无法停下”只在反思题中讨论，产品内没有无限循环积木可试"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "原创小兔子水坑路牌（kc-scenes/puddle-sign.svg，已登记授权），每关舞台左侧可见",
+        "小兔子角色（项目自绘 character-art），跳跃时舞台画出橙色虚线跳跃弧",
+        "错误实验两个可点选预测，猜错不阻塞"
+      ],
+      "defects": [
+        "跳跃没有音效；朗读用浏览器自带声音"
+      ]
+    },
+    "practice": {
+      "score": 22,
+      "evidence": [
+        "练习 A（数水坑设次数）与练习 B（修循环体里先走后跳的顺序）目标不同，均由网格引擎真实运行判定",
+        "单元测试：每关走路代替跳跃都落水；创意关 3 条路各自只接受等于水坑数的次数（3×3 遍历）",
+        "重复解与平铺解都通过"
+      ],
+      "defects": [
+        "跳跃距离固定为一格，不能设“跳多远”"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "本课专属诊断：not_at_goal 指出“还差几个水坑就再跳几下”，fell_in_water 指出“走会踩进水里，要跳”，out_of_bounds 指出“次数多了改小”",
+        "三层提示：现象 → 规则 → 做法",
+        "复盘卡列出本节真实遇到的错误"
+      ],
+      "defects": [
+        "诊断不高亮循环里对应的那一块积木"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意改造：孩子选 2/3/4 个水坑，路随之变长；作品“我的水坑小路”保存选择与程序，可真实回放"
+      ],
+      "defects": [
+        "只能三选一，不能自己摆放水坑"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "通过只由网格引擎真实运行判定；伪造的循环次数在草稿读取时被夹到可选值",
+        "复盘卡：目标回顾 + 真实错误记录 + What-if；点选反思保存并重开仍在",
+        "三断点截图 docs/roadmap/evidence/G0-U3-L02/"
+      ],
+      "defects": [
+        "没有儿童试学；评分者是实现者，非独立"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "跳跃与落点来自 grid-engine.ts 真实展开执行“重复 N 次”的结果，舞台逐帧回放并画出跳跃弧"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "/learn/grid-lab/G0-U3-L02 可亲手拼块、改重复次数并运行（L3 实验可试玩）"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "第 1 关是错误实验：必须先真实运行只跳一次的程序、看到停在两个水坑中间才能完成；E2E 覆盖"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "判定看落点与是否落水，不比对固定积木序列；重复解与平铺解、创意关三条路都有效"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "“我的水坑小路”只有在所选水坑数真实运行通过后才出现，重开后可回放（E2E）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "角色为项目自绘 character-art（小兔子），路牌为本项目新绘 SVG（puddle-sign.svg 已登记授权表）；文字自写"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "只存本机 localStorage（kids-grid-lesson-v1:G0-U3-L02），不含姓名，不上传"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "错误实验与练习 B 起始程序必失败；少跳、多跳、走路代替跳、循环体顺序错都不判通过（单元测试 + E2E）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 记为 L3 实验可试玩，目录不标正式发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "错误实验改成重复 2 次跳跃后小兔子跳过两个水坑到家；创意关选 3 个水坑，重复 3 次通过并保存为作品（E2E）",
+    "failureCase": "错误实验 → not_at_goal（停在两个水坑中间）；引导关向前走 → fell_in_water；练习 A 重复 3 次 → out_of_bounds；练习 B 先走后跳 → fell_in_water",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清这一课的规则（概念）",
+      "第三层：给出具体积木做法"
+    ],
+    "practiceA": "练习 A：两个水坑，“重复 2 次（向前跳一下）”",
+    "practiceB": "练习 B：重复里先走后跳，改为先跳后走（起始程序必失败）",
+    "equivalentSolutions": [
+      "错误实验 / 练习 A：重复 2 次或两块跳跃",
+      "创意关 3 条路各自有效（单元测试遍历）"
+    ],
+    "saveReopen": "每关程序（含重复积木）、进度、错误实验观察、水坑数选择、真实错误记录存 kids-grid-lesson-v1:G0-U3-L02；刷新后回到完成页，作品可回放（E2E）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U3-L02 puddle hops: only one hop, one hop, repeat two hops, hop then step, my puddle road saved and reopened"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G0-U3-L02/"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 参考评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学（需真实儿童与监护人同意，不得模拟）"
+  ],
+  "notes": "2026-10-30 Hark A 实现者参考评价（非独立人工评分）：G0-U3-L02 五关正式候选课程（固定次数重复），网格引擎新增“向前跳一下”（jump_over）、小兔子角色与水坑路牌场景。"
+}

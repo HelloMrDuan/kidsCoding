@@ -127,4 +127,50 @@ describe('G0-U3 loop lessons (Hark A, SYS-107 repeat on the grid engine)', () =>
       }
     })
   })
+  describe('G0-U3-L02 重复走两步', () => {
+    const lesson = g0u3LoopLessons['G0-U3-L02']
+    const creative = lesson.steps.find(s => s.kind === 'creative')!
+
+    it('the error lab is “only one hop”: one more hop, or the same hop repeated 2 times, fixes it', () => {
+      const lab = lesson.steps[0]
+      expect(runGridProgram(lab.level, [...lab.starterBlocks!, { type: 'jump_forward' }]).passed).toBe(true)
+      expect(runGridProgram(lab.level, [{ type: 'when_start' }, { type: 'repeat_times', times: 2, body: [{ type: 'jump_forward' }] }]).passed).toBe(true)
+    })
+
+    it('walking instead of hopping always lands in a puddle', () => {
+      for (const step of lesson.steps) {
+        const walk = [{ type: 'when_start' }, ...Array(step.level.goal.x).fill({ type: 'move_forward' })]
+        expect(runGridProgram(stepLevel(step, {}), walk).failure, step.id).toBe('fell_in_water')
+      }
+    })
+
+    it('the repeat count equals the number of puddles for every road the child may pick, and one count fits only its own road', () => {
+      const { goalChoices, waters, labels } = creative.creative!
+      expect(goalChoices.length).toBeGreaterThanOrEqual(3)
+      expect(waters).toHaveLength(goalChoices.length)
+      expect(labels).toHaveLength(goalChoices.length)
+      const programs = waters!.map(w => [{ type: 'when_start' }, { type: 'repeat_times', times: w.length, body: [{ type: 'jump_forward' }] }])
+      goalChoices.forEach((goal, i) => {
+        const level = stepLevel(creative, { creative: { [creative.id]: { goal } } })
+        expect(level.water).toEqual(waters![i])
+        programs.forEach((program, j) => expect(runGridProgram(level, program).passed, `road ${i} with ${j}`).toBe(i === j))
+      })
+    })
+
+    it('the debug practice is about the order inside the loop body, not the count', () => {
+      const debug = lesson.steps.find(s => s.kind === 'practice-b')!
+      const body = debug.starterBlocks![1].body!
+      const swapped = [{ type: 'when_start' }, { type: 'repeat_times', times: debug.starterBlocks![1].times, body: [body[1], body[0]] }]
+      expect(runGridProgram(debug.level, swapped).passed).toBe(true)
+    })
+
+    it('every step shows the rabbit and the original puddle sign; review explains changing only the count', () => {
+      for (const step of lesson.steps) {
+        expect(step.level.actor, step.id).toBe('rabbit')
+        expect(step.level.scenery, step.id).toBe('puddlesign')
+      }
+      expect(lesson.project?.stepId).toBe(creative.id)
+      expect(lesson.review?.answer).toContain('次数')
+    })
+  })
 })
