@@ -1657,7 +1657,7 @@
       "unitId": "G2-U2",
       "focusConcept": "音效",
       "plannedLearningOutcome": "能使用音效解释并完成「音乐动画短片」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1670,13 +1670,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/247",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U2-L06 block: 4 tests; local E2E full G2 scratch-g2-u1+scratch-vm 69/69 (9.8m); 3-viewport screenshots; CI real-Chrome result pending)",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Hark B：G2-U2 单元综合项目。真实 Scratch VM 原创音乐短片项目（舞台绿旗“广播 开头→等待→广播 中段→等待→广播 结尾”，小橘猫/小鼓按幕收听；中段猫换帧与鼓“咚”两个永远循环；结尾猫说谢幕词后停止）；练习A猫鼓等待相同→中段每帧与鼓声相差≤0.1秒（≥6帧）、练习B全片 30～60 秒（VM 广播时刻）、停止“这个脚本”后循环不停的找错+三层提示（须先见结尾后仍在跑再见全部停下）、创意自己的开场白与谢幕词；.sb3 自动保存/刷新恢复/导出回读/导入、沙箱拒越界、改固定积木、多余变量、他课工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U2-L06.json，非独立），需独立人工教研复核；无儿童试学；未接 WebGL 渲染器与音频引擎。不得标 completed。"
     },
     {
       "id": "G2-U3-L01",
