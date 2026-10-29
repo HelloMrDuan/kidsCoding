@@ -1629,7 +1629,7 @@
       "unitId": "G2-U2",
       "focusConcept": "音效",
       "plannedLearningOutcome": "能使用音效解释并完成「两只精灵同步表演」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1643,9 +1643,9 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/244",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts (G2-U2-L05 block: 4 tests; local E2E scratch-g2-u1+scratch-vm 65/65 (10.2m); 3-viewport screenshots; CI real-Chrome result pending)",
+        "mergeCommit": "47d3ad72956e3203b7147bdf20c4b7e14ec6beb0",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40858823114",
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u1.spec.ts — G2-U2-L05 用例在 PR #244 与 main 真 Chrome CI（scratch-real-vm-browser 分片）通过",
         "lessonReview": null
       },
       "notes": "Hark B：真实 Scratch VM 原创森林剧场项目（舞台绿旗广播“开演”，舞台/小狐狸/小白兔三个收听脚本；兔子收听脚本里有等待）；练习A等待 0 两只同时开口（VM SAY 时刻差 ≤0.15 秒）、练习B兔子晚 0.9～1.1 秒开口、兔子听“谢幕”不上台的找错+三层提示（须先见兔子没动再见两只都上台）、创意两句自己的台词；.sb3 自动保存/刷新恢复/导出回读/导入、沙箱拒越界等待、未知消息、改固定收听消息、广播并等待、多余变量、他课工程。教学评审仅 AI 参考（docs/roadmap/teaching-reviews/G2-U2-L05.json，非独立），需独立人工教研复核；无儿童试学；未接 WebGL 渲染器。不得标 completed。"
