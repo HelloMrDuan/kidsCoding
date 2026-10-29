@@ -2006,7 +2006,7 @@
       "title": "全站导航动效与性能回归",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "UX-601"
       ],

@@ -110,7 +110,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           一步一步，做出会动的小故事。
         </div>
       </aside>
-      {drawerOpen ? <button type="button" className="kc-drawer-mask" aria-label="关闭导航" onClick={() => setDrawerOpen(false)} /> : null}
+      <button type="button" className={`kc-drawer-mask${drawerOpen ? ' is-open' : ''}`} aria-label="关闭导航" onClick={() => setDrawerOpen(false)} />
       <div className="kc-content-area">
         <header className="kc-topbar">
           <div className="kc-top-left">
