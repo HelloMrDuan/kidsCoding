@@ -181,8 +181,11 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
         <div className="mt-4 flex flex-wrap gap-3">
           {lesson.argLabels.map((label,index)=>(
             <label key={index} className="text-sm font-bold text-slate-700">{label}
-              <input data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
-                className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal" />
+              {lessonId==='P3-U1-L01'&&index===0
+                ? <textarea data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} rows={3} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
+                    className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal align-top" />
+                : <input data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
+                    className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal" />}
             </label>
           ))}
           <button data-testid="python-custom-run" disabled={!ready||customBusy||busy} type="button" onClick={runCustom} className="rounded-full bg-sky-700 px-6 py-2 font-bold text-white disabled:opacity-50">
