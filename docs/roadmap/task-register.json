@@ -2587,7 +2587,7 @@
       "title": "Hark A 负责路线 144 节全量课程审定（G0、G1、M0、D0、S0、R0）",
       "priority": "P0",
       "category": "AUD",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "TQ-007"
       ],
@@ -2600,7 +2600,13 @@
         "PR CI 全绿；不修改任何课程状态"
       ],
       "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/230"
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/230",
+        "mergeCommit": "7de41689fe5bb1caea1016061ad5685a41f41a55",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40843974694",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40843974675",
+        "mainDeployCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40843974807",
+        "tests": ["apps/web/src/features/curriculum/hark-a-audit.test.ts（5 例：覆盖六路线 144 个 ID 各一次且与 lesson-task-register 一致；independent=false 且无试学/发布声明；只有可运行且有教研记录的课才有分数，80–89 必带整改项；每课学习成果互不相同且非模板句；无运行器路线不低于 P1）", "PR CI 19 success + 2 skipped（两次重跑均为已知无关不稳定用例 e2e-blockly mobile gate、bind-account-form.test.tsx:53）；main 7de4168 课程/追踪/部署三条工作流全绿"],
+        "reviewer": "实现者 AI 自审（Hark A），非独立人工教研；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：审定基线 main 300c6dd；AI 审定不能替代独立人工教研。"
     },
