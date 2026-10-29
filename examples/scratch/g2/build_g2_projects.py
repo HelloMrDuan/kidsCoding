@@ -591,6 +591,60 @@ def lesson_g2_u2_l04():
     return "g2-u2-l04-butterfly-loop.sb3.b64", project, files, params
 
 
+MSG_SHOW, MSG_CURTAIN = "kc-msg-show", "kc-msg-curtain"
+
+
+def lesson_g2_u2_l05():
+    """两只精灵同步表演: one broadcast starts every script that receives it at the same moment; a wait inside one receiver staggers the entrance."""
+    theatre, theatre_file = svg_costume("森林剧场", "forest-theatre-backdrop.svg", 240, 180)
+    fox, fox_file = svg_costume("小狐狸", "red-fox.svg", 40, 48)
+    rabbit, rabbit_file = svg_costume("小白兔", "white-rabbit.svg", 36, 48)
+    # Original sine-synthesised opening bell (tone_wav, no samples).
+    bell, bell_data = wav_sound("开演铃", [(880, 880, 0.25), (1175, 1175, 0.35)])
+    stage_blocks = {
+        "stage_flag": block("event_whenflagclicked", "stage_bcast", top=True, x=40, y=40),
+        "stage_bcast": block("event_broadcast", parent="stage_flag", inputs={"BROADCAST_INPUT": broadcast_menu("开演", MSG_SHOW)}),
+        "stage_recv": block("event_whenbroadcastreceived", "stage_play", top=True, x=40, y=200, fields={"BROADCAST_OPTION": ["开演", MSG_SHOW]}),
+        "stage_play": block("sound_playuntildone", parent="stage_recv", inputs={"SOUND_MENU": [1, "stage_sound_menu"]}),
+        "stage_sound_menu": block("sound_sounds_menu", parent="stage_play", fields={"SOUND_MENU": ["开演铃", None]}, shadow=True),
+    }
+    fox_blocks = {
+        "fox_flag": block("event_whenflagclicked", "fox_home", top=True, x=40, y=40),
+        "fox_home": block("motion_gotoxy", parent="fox_flag", inputs={"X": num(-200), "Y": num(-70)}),
+        "fox_recv": block("event_whenbroadcastreceived", "fox_enter", top=True, x=40, y=200, fields={"BROADCAST_OPTION": ["开演", MSG_SHOW]}),
+        "fox_enter": block("motion_gotoxy", "fox_say", parent="fox_recv", inputs={"X": num(-60), "Y": num(-70)}),
+        "fox_say": block("looks_sayforsecs", parent="fox_enter", inputs={"MESSAGE": text("我是小狐狸！"), "SECS": num(2)}),
+    }
+    rabbit_blocks = {
+        "rabbit_flag": block("event_whenflagclicked", "rabbit_home", top=True, x=40, y=40),
+        "rabbit_home": block("motion_gotoxy", parent="rabbit_flag", inputs={"X": num(200), "Y": num(-70)}),
+        # The bug the lesson starts with: the rabbit listens for 谢幕, but the stage broadcasts 开演,
+        # so the rabbit never comes on stage.
+        "rabbit_recv": block("event_whenbroadcastreceived", "rabbit_wait", top=True, x=40, y=200, fields={"BROADCAST_OPTION": ["谢幕", MSG_CURTAIN]}),
+        "rabbit_wait": block("control_wait", "rabbit_enter", parent="rabbit_recv", inputs={"DURATION": num(0.5)}),
+        "rabbit_enter": block("motion_gotoxy", "rabbit_say", parent="rabbit_wait", inputs={"X": num(60), "Y": num(-70)}),
+        "rabbit_say": block("looks_sayforsecs", parent="rabbit_enter", inputs={"MESSAGE": text("我是小白兔！"), "SECS": num(2)}),
+    }
+    project = {
+        "targets": [
+            stage([theatre], stage_blocks, [bell], broadcasts={MSG_SHOW: "开演", MSG_CURTAIN: "谢幕"}),
+            sprite("小狐狸", [fox], fox_blocks, 1, -200, -70),
+            sprite("小白兔", [rabbit], rabbit_blocks, 2, 200, -70),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U2-L05"},
+    }
+    files = {c["md5ext"]: f for c, f in ((theatre, theatre_file), (fox, fox_file), (rabbit, rabbit_file))}
+    files[bell["md5ext"]] = bell_data
+    params = [
+        {"target": "小狐狸", "block": "fox_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "小白兔", "block": "rabbit_recv", "slot": "BROADCAST_OPTION", "kind": "choice", "options": ["开演", "谢幕"]},
+        {"target": "小白兔", "block": "rabbit_wait", "slot": "DURATION", "kind": "tenths", "min": 0, "max": 2.0},
+        {"target": "小白兔", "block": "rabbit_say", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+    ]
+    return "g2-u2-l05-sync-show.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
@@ -602,6 +656,7 @@ LESSONS = {
     "G2-U2-L02": lesson_g2_u2_l02,
     "G2-U2-L03": lesson_g2_u2_l03,
     "G2-U2-L04": lesson_g2_u2_l04,
+    "G2-U2-L05": lesson_g2_u2_l05,
 }
 
 
