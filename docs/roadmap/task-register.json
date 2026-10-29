@@ -758,7 +758,7 @@
       "title": "G2 Scratch 实验快捷输入框与 Blockly 异步回写竞态修复（快速连续编辑被改乱）",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "apps/web/src/features/scratch-g2/{scratch-g2-blocks.tsx,scratch-g2-program.ts}（产品修复）+ scratch-g2-program.test.ts + tests/e2e/scratch-g2-u1.spec.ts（回归用例）。不改课程内容、VM 沙箱、课程状态与发布门禁。",
       "acceptance": [
@@ -769,12 +769,23 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/235",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "prNumber": 235,
+        "mergeCommit": "4b14eae3e45287adb46e66952c1d26bfef3b2a67",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846635603",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846635588",
+        "mainDeployCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846635669",
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40844866603",
+        "prTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40844866760",
+        "prDeployCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40844866846",
+        "reviewer": "仓库负责人常设授权 Hark B 在 CI 全绿后自行合并（2026-10-27 起）；PR #235 于 2026-10-29 17:0x CST 按该授权 squash 合并。代码未经独立人工代码评审",
+        "tests": [
+          "正例（单测 scratch-g2-program.test.ts）：重复次数 25→20、0→1、2.5→3，等待 1.102→1.0 档位夹取；同值保留键入写法（1.0）；清空不写积木；文本字段原样",
+          "反例/回归（E2E scratch-g2-u1.spec.ts，G2-U2-L01 练习 A）：不等待连续输入 25/8/0/30/3/25/8，每次立即读输入框须为 20/8/1/20/3/20/8；旧组件本地失败（Expected \"1\", Received \"0\"），新组件通过",
+          "恢复：失焦后输入框与积木实存值重新同步；刷新后草稿恢复不受影响（G2-U1/U2 既有 save/reopen 用例）",
+          "来源：本地真 Chromium 生产构建 G2-U2+G2-U1-L06 15/15、vitest scratch-g2 29/29（本地）；PR CI curriculum https://github.com/HelloMrDuan/kidsCoding/actions/runs/40844866603（含真 Chrome Scratch VM 分片）/ deploy https://github.com/HelloMrDuan/kidsCoding/actions/runs/40844866846（首轮 e2e-blockly 移动端无关抖动，重跑 1 次绿）/ task https://github.com/HelloMrDuan/kidsCoding/actions/runs/40844866760 全绿；main CI curriculum https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846635603 / task https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846635588 / deploy https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846635669 全绿"
+        ]
       },
-      "notes": "Hark B 发现于 G2-U2-L01/L03 测试（#208、L03 本地）；#209 的“乐观显示键入值”只修了受控输入回退，未覆盖夹取/取整字段。本地：本地真 Chromium 生产构建 scratch-g2-u1+scratch-vm 47/47（rebase 前）、vitest scratch-g2 29/29、旧组件下新回归用例失败（Expected 1, Received 0）"
+      "notes": "Hark B 发现于 G2-U2-L01/L03 测试（#208、L03 本地）；#209 的“乐观显示键入值”只修了受控输入回退，未覆盖夹取/取整字段。本地：本地真 Chromium 生产构建 scratch-g2-u1+scratch-vm 47/47（rebase 前）、vitest scratch-g2 29/29、旧组件下新回归用例失败（Expected 1, Received 0）；关账：合并 4b14eae 后 main CI 全绿。completed 仅指本产品修复任务，不涉及任何课程状态。"
     },
     {
       "id": "TQ-022",
