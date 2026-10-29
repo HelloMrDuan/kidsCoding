@@ -758,7 +758,7 @@
       "title": "Hark B 课程审定 v1 归档（G2/G3/W0/W1/A0 120 节，AI 实现者自审）",
       "priority": "P1",
       "category": "TQ",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "TQ-007"
       ],
@@ -769,7 +769,7 @@
         "PR 只新增审定文档并登记本条；task-ledger CI 绿后合并。"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/227",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
