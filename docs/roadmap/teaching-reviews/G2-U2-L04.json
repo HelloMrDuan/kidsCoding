@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U2-L04",
+  "reviewedCommit": "d1c00688ff99084cab76252fa40fb5609038db85",
+  "reviewedAt": "2026-10-29",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U2-L03"
+  ],
+  "newConcepts": [
+    "循环里“移动 N 步 + 右转 D 度”画出飞行路线（多边形）；一共转的度数 = 重复次数 × 每次度数；正好 360 的整数倍才回到起点、面朝出发方向；次数多每次转得少路线更圆，步数决定圈大小"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u2-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/240"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "conceptExplain：一段+一个弯连成路线、总转角=次数×度数、360=一圈/720=两圈、次数多转得少更圆",
+        "找错针对“6×45=270 停在半路”的总转角误解"
+      ],
+      "defects": [
+        "不能改起点/出发方向或换成左转；无“碰到边缘就反弹”"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "花园里蝴蝶想绕一圈飞回花朵旁的起点圈，边飞边扇翅膀",
+        "预测“能/不能回到起点”，VM 实测总转角与终点对照"
+      ],
+      "defects": [
+        "预测二选一；无朗读；没有画笔轨迹"
+      ]
+    },
+    "practice": {
+      "score": 20,
+      "evidence": [
+        "练习 A：改次数或度数让 VM 总转角为 360 的整数倍并回到起点圈（≤12 步，8×45、6×60、4×90 等多解）",
+        "练习 B：两圈 720 度并回到起点（8×90、12×60、16×45 等多解）"
+      ],
+      "defects": [
+        "不能新增积木或精灵"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "真实错误：6×45 → VM 一共右转 270 度，终点离起点远、面朝 0 度（沙箱观察 motion_turnright 原语的真实调用并累计每次绿旗的总转角）",
+        "右转 150 度、移动 80 步、次数 25 编辑器判无效",
+        "三层提示：现象→原因→修复"
+      ],
+      "defects": [
+        "没有飞行轨迹线可视化"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意：自己的回来台词 + 至少重复 10 次的更圆一圈并回到起点",
+        "导出真 .sb3（4 SVG）独立 VM 回读，刷新后从本机恢复，重新导入恢复次数/度数"
+      ],
+      "defects": [
+        "不能画新造型或加新角色"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U2L04 只读 VM 观察（每次绿旗的总转角、圈数、帧数、终点位置与方向，单测覆盖）",
+        "页面明示未接渲染器与不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 执行；转角来自 VM 对 motion_turnright 原语的真实调用（仅观察后调用原原语），终点位置与方向来自 VM 目标状态，帧数来自 looks_nextcostume，E2E 无 VM mock"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "6×45=270 停在半路真实错误、150 度/80 步被拒、非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "8×45、6×60、4×90、12×30 等都能回到起点；两圈 8×90、12×60、16×45；更圆一圈 10×36、12×30、18×20、20×18；步数 5～60 自定；台词 1～20 字多解"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "新增 4 个 SVG（花园背景、蝴蝶展翅/合翅、粉色花朵）均原创；已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U2-L04：真 Scratch VM 加载原创花园项目；重复 8 次 × 移动 40 步 × 右转 45 度 → VM 一共右转 360 度、换 8 帧、终点回到起点圈（≤12 步）、面朝 90 度",
+    "failureCase": "6 × 45 → VM 一共右转 270 度、终点离起点远、面朝 0 度；8 × 45 两圈练习只有 360 度；右转 150 度、移动 80 步编辑器判无效；越界参数、改起点/方向/等待、调换积木顺序、多余造型、他课工程均被沙箱拒收且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：VM 里蝴蝶一共只右转了 270 度，面朝上方，离起点很远",
+      "第二层（想原因）：6 次 × 45 度 = 270 度，不到 360 度一整圈",
+      "第三层（去修复）：次数改 8（8×45=360）或度数改 60（6×60=360）再点绿旗"
+    ],
+    "practiceA": "练习 A：飞回起点（总转角 360 的整数倍）",
+    "practiceB": "练习 B：绕两圈（720 度并回到起点）",
+    "equivalentSolutions": [
+      "8×45、6×60、4×90、12×30、10×36",
+      "两圈 8×90、12×60、16×45",
+      "步数 5～60",
+      "台词 1～20 字任意"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3，刷新后从本机草稿恢复；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U2-L04 循环飞舞的蝴蝶（4 个用例）"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G2-U2-L04/lab-1440.svg",
+      "docs/roadmap/evidence/G2-U2-L04/lab-375-full.svg",
+      "docs/roadmap/evidence/G2-U2-L04/lab-375.svg",
+      "docs/roadmap/evidence/G2-U2-L04/lab-768.svg"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 WebGL 渲染器（无碰到边缘反弹、无画笔轨迹）；本课无云端保存",
+    "不能改起点/出发方向、换成左转或新增积木"
+  ]
+}
