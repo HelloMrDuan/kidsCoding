@@ -233,5 +233,20 @@ class G2ProjectTests(unittest.TestCase):
         self.assertEqual({p["block"] for p in params}, {"fly_repeat", "fly_move", "fly_turn", "fly_say"}, "start, direction and wait stay fixed")
         self.assertEqual(flower["name"], "花朵")
 
+    def test_u2_l05_one_broadcast_many_receivers(self):
+        _, project, _, params = LESSONS["G2-U2-L05"]()
+        stage, fox, rabbit = project["targets"]
+        self.assertEqual(stage["broadcasts"], {"kc-msg-show": "开演", "kc-msg-curtain": "谢幕"})
+        self.assertEqual(stage["blocks"]["stage_bcast"]["inputs"]["BROADCAST_INPUT"][1][1], "开演")
+        receivers = [(t["name"], b["fields"]["BROADCAST_OPTION"][0]) for t in project["targets"] for b in t["blocks"].values()
+                     if b["opcode"] == "event_whenbroadcastreceived"]
+        # Three receivers of one message (stage bell, fox, rabbit); the bug: the rabbit listens for 谢幕.
+        self.assertEqual(receivers, [("Stage", "开演"), ("小狐狸", "开演"), ("小白兔", "谢幕")])
+        self.assertEqual(rabbit["blocks"]["rabbit_wait"]["opcode"], "control_wait")
+        self.assertEqual(rabbit["blocks"]["rabbit_wait"]["parent"], "rabbit_recv", "the wait sits inside the receiving script")
+        self.assertEqual([s["name"] for s in stage["sounds"]], ["开演铃"])
+        self.assertEqual({p["block"] for p in params}, {"fox_say", "rabbit_recv", "rabbit_wait", "rabbit_say"},
+                         "the broadcast, the fox's receive and both entrance positions stay fixed")
+
 if __name__ == "__main__":
     unittest.main()

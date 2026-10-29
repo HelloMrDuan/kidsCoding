@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U2-L05",
+  "reviewedCommit": "0447bde9684a7283131efe921ebd8fa60d769597",
+  "reviewedAt": "2026-10-29",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U2-L04"
+  ],
+  "newConcepts": [
+    "一条广播同时启动多个收听脚本（舞台、小狐狸、小白兔一起被“开演”叫醒 = 同步）；收听脚本只认消息名；在某个收听脚本最前面放“等待”就能安排它晚多久登场，不必再发第二条广播"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u2-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/244"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 16,
+      "evidence": [
+        "conceptExplain：一对多广播、只认名字、收听脚本里的等待产生时间差",
+        "承接 G2-U1-L05（一对一广播）新增“一条消息多个接收者 + 不同延迟”"
+      ],
+      "defects": [
+        "不能新建消息或用“广播并等待”；找错仍是“消息名不一致”这一类（与 U1-L05 同类错误，换了场景与后果）"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "森林剧场开演：开演铃 + 小狐狸登场，搭档小白兔没出来；导演要一起亮相、再排“晚 1 秒”版",
+        "预测“会/不会上台”，VM 实测谁开口对照"
+      ],
+      "defects": [
+        "预测二选一；无朗读"
+      ]
+    },
+    "practice": {
+      "score": 19,
+      "evidence": [
+        "练习 A：等待 0 → VM 里两只精灵相差 ≤0.15 秒开口（同步）",
+        "练习 B：改等待让兔子比狐狸晚 0.9～1.1 秒开口（VM 时间戳差）"
+      ],
+      "defects": [
+        "练习 B 只有一个正确秒数（1.0）；不能新增角色"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "真实错误：小白兔听“谢幕”→ VM 广播“开演”后只有狐狸开口、兔子留在后台；只改等待不改消息仍不动（E2E 覆盖）",
+        "等待 2.5、1.05、-1 编辑器判无效",
+        "三层提示：现象→原因→修复"
+      ],
+      "defects": [
+        "时间差精度约一帧（0.03 秒）"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意：狐狸和兔子各一句自己的台词，两只都上台；登场时间差自定（0～2 秒）",
+        "导出真 .sb3（3 SVG + 1 WAV）独立 VM 回读，刷新后从本机恢复，重新导入恢复消息/等待/台词"
+      ],
+      "defects": [
+        "不能加新角色或新消息"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U2L05 只读 VM 观察（每次“开演”广播后各角色首次开口的 VM 时刻、谁没动，单测覆盖）",
+        "页面明示未接渲染器/音频引擎与不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 执行；广播来自 VM 对 event_broadcast 原语的真实调用（仅观察后调用原原语），开口时刻来自 VM 的 SAY 事件（沙箱 performance.now），位置来自 VM 目标状态，E2E 无 VM mock"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "兔子听“谢幕”不上台的真实错误、只改等待仍不动、等待 2.5/1.05/-1 被拒、非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "练习 A 等待 0；练习 B 等待 1.0；创意时间差 0～2 秒自定、台词 1～20 字多解"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "新增 2 个 SVG（森林剧场背景、小狐狸）原创，小白兔复用 G2-U1-L05 原创图；开演铃为正弦合成原创 WAV；已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U2-L05：真 Scratch VM 加载原创森林剧场项目；绿旗 → 舞台广播“开演” → 开演铃（舞台播放 1 次）+ 小狐狸上台开口；兔子改听“开演”后也上台（x 60），等待 0 时两只同时开口、等待 1.0 时兔子晚约 1 秒",
+    "failureCase": "小白兔听“谢幕”→ 只有小狐狸开口、兔子留在 x 200；只改等待仍不动；等待 2.5、1.05、-1 编辑器判无效；越界等待、未知消息、改狐狸收听消息、广播并等待、多余变量、他课工程均被沙箱拒收且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：VM 里舞台广播了“开演”，开演铃响了、小狐狸开口了，小白兔没有动",
+      "第二层（想原因）：小白兔的帽子积木是“当接收到（谢幕）”，名字不一样叫不醒它",
+      "第三层（去修复）：把小白兔的“当接收到”改成“开演”再点绿旗"
+    ],
+    "practiceA": "练习 A：两只精灵一起亮相（等待 0，VM 开口时刻相差 ≤0.15 秒）",
+    "practiceB": "练习 B：兔子晚 1 秒登场（VM 开口时刻差 0.9～1.1 秒）",
+    "equivalentSolutions": [
+      "创意时间差 0～2 秒任意（0.1 秒一格）",
+      "台词 1～20 字任意"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3，刷新后从本机草稿恢复；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U2-L05 两只精灵同步表演（4 个用例）"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G2-U2-L05/lab-1440.svg",
+      "docs/roadmap/evidence/G2-U2-L05/lab-375-full.svg",
+      "docs/roadmap/evidence/G2-U2-L05/lab-375.svg",
+      "docs/roadmap/evidence/G2-U2-L05/lab-768.svg"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 WebGL 渲染器与音频引擎；本课无云端保存",
+    "不能新建消息、用“广播并等待”或新增积木/精灵"
+  ]
+}

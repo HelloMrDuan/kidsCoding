@@ -6,7 +6,7 @@ import {
   emptyG2Observations, evaluateG2Lesson, observedPrediction,
   type G2Lesson, type G2Observations, type G2Point,
 } from '@/content/curriculum/g2-u1-scratch-lessons'
-import {beatSummary, flightSummary, L07_TOO_FAST_MS, L07_VISIBLE_MS} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {beatSummary, flightSummary, syncSummary, L07_TOO_FAST_MS, L07_VISIBLE_MS} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {ScratchG2Blocks} from './scratch-g2-blocks'
 import {changedValues, valuesForTarget, type G2Program, type G2Values} from './scratch-g2-program'
 import {decodeSampleArchive, isG2Archive, readG2Draft, removeG2Draft, saveG2Draft} from './scratch-g2-draft'
@@ -118,7 +118,7 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
   const clickTurn = useRef<Map<string, number>>(new Map())
   const [lastTurns, setLastTurns] = useState<Record<string, {total: number; finished: boolean}>>({})
   // The broadcast run in progress: the message the VM sent and who spoke after it.
-  const broadcastRun = useRef<{message: string; speakers: string[]} | null>(null)
+  const broadcastRun = useRef<{message: string; speakers: string[]; t0: number | null; saidAt: Record<string, number>} | null>(null)
   const [lastBroadcast, setLastBroadcast] = useState<{message: string; speakers: string[]; finished: boolean} | null>(null)
   const savedFailed = useRef(false)
   const loadedRef = useRef(false)
@@ -261,7 +261,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         if (broadcastRun.current && msg.activeThreads === 0) {
           const positions: Record<string, G2Point> = {}
           for (const t of current) if (t.original) positions[t.name] = {x: t.x, y: t.y}
-          const run = {...broadcastRun.current, backdrop: msg.backdrop ?? '', positions}
+          const {message: runMessage, speakers: runSpeakers, saidAt} = broadcastRun.current
+          const run = {message: runMessage, speakers: runSpeakers, saidAt: {...saidAt}, backdrop: msg.backdrop ?? '', positions}
           broadcastRun.current = null
           setLastBroadcast({message: run.message, speakers: run.speakers, finished: true})
           setObs(prev => ({...prev, broadcastRuns: [...prev.broadcastRuns, run].slice(-20)}))
@@ -304,6 +305,9 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
         const text = msg.text ?? ''
         if (broadcastRun.current && target && !broadcastRun.current.speakers.includes(target)) {
           broadcastRun.current.speakers.push(target)
+          // Sync lessons: when each receiver first spoke, in ms after the broadcast (sandbox clock).
+          const t = Number(msg.t)
+          if (broadcastRun.current.t0 !== null && Number.isFinite(t)) broadcastRun.current.saidAt[target] = Math.round(t - broadcastRun.current.t0)
           setLastBroadcast({message: broadcastRun.current.message, speakers: [...broadcastRun.current.speakers], finished: false})
         }
         if (flagRun.current && target) {
@@ -366,7 +370,8 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
       } else if (msg.kind === 'BROADCAST') {
         const message = String(msg.message ?? '')
         if (message && !broadcastRun.current) {
-          broadcastRun.current = {message, speakers: []}
+          const t = Number(msg.t)
+          broadcastRun.current = {message, speakers: [], t0: Number.isFinite(t) ? t : null, saidAt: {}}
           setLastBroadcast({message, speakers: [], finished: false})
           setStatus(`Scratch VM：${msg.target === 'Stage' ? '舞台' : msg.target}广播了“${message}”，所有在听“${message}”的脚本一起开始。`)
         }
@@ -693,6 +698,22 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                     : `${run.finished ? '上一次绿旗' : '本次绿旗进行中'}：Scratch VM 里小鼓“咚”响了 ${b.dongs} 下，重音 ${b.bars} 下（${b.bars} 小节）`
                       + `${b.beatsPerBar.length ? `，每小节拍数 ${b.beatsPerBar.join(' / ')}` : ''}；“咚”之间平均 ${sec(b.innerMs)}，重音之后平均 ${sec(b.gapMs)}`
                       + `${b.innerMs !== null && b.gapMs !== null ? (b.steady ? '（节奏稳）' : '（忽快忽慢）') : ''}。`}
+                </p>
+              )
+            })()}
+            {lesson.showSync && (() => {
+              const run = obs.broadcastRuns[obs.broadcastRuns.length - 1]
+              const s = syncSummary(run)
+              const sec = (ms: number) => `${(ms / 1000).toFixed(2)} 秒`
+              return (
+                <p data-testid="g2-sync-log" data-runs={obs.broadcastRuns.length} data-message={run?.message ?? ''} data-entered={s.entered.join(',')}
+                  data-gap-ms={s.gapMs === null ? '' : s.gapMs} className="mt-2 text-sm">
+                  {!run
+                    ? '还没有点绿旗：舞台广播“开演”后，谁收到了、各自隔多久开口，会显示在这里。'
+                    : `上一次绿旗：舞台广播了“${run.message}”。Scratch VM 里 `
+                      + `${s.entered.length ? s.entered.map(name => `${name}在广播后 ${sec(run.saidAt?.[name] ?? 0)} 开口`).join('，') : '没有角色开口'}`
+                      + `${s.missing.length ? `；${s.missing.join('、')}没有动（它没有在听“${run.message}”）` : ''}`
+                      + `${s.gapMs === null ? '' : `；兔子比狐狸晚 ${sec(s.gapMs)}${s.together ? '（同时登场）' : ''}`}。`}
                 </p>
               )
             })()}

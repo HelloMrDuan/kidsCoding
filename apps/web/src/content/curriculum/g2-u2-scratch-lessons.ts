@@ -423,6 +423,135 @@ export function evaluateG2U2L04(obs: G2Observations): G2TaskState {
   }
 }
 
+export const L11_MESSAGES = ['开演', '谢幕']
+export const L11_FOX_LINE = '我是小狐狸！'
+export const L11_RABBIT_LINE = '我是小白兔！'
+/** Both performers count as entering together when the rabbit's first line starts within this many ms of the fox's (VM clock). */
+export const L11_TOGETHER_MS = 150
+/** "One second later" window for the rabbit's entrance after the fox (VM clock, ms). */
+export const L11_LATE_MIN_MS = 900
+export const L11_LATE_MAX_MS = 1100
+const L11_PERFORMERS = ['小狐狸', '小白兔']
+
+type BroadcastRun = G2Observations['broadcastRuns'][number]
+export type SyncSummary = { entered: string[]; missing: string[]; gapMs: number | null; together: boolean; late: boolean }
+
+/** One finished broadcast run: which performers really started a line in the VM, and how much later the rabbit started than the fox. */
+export function syncSummary(run: BroadcastRun | undefined): SyncSummary {
+  if (!run) return {entered: [], missing: [], gapMs: null, together: false, late: false}
+  const at = run.saidAt ?? {}
+  const entered = L11_PERFORMERS.filter(name => run.speakers.includes(name) && typeof at[name] === 'number')
+  const missing = L11_PERFORMERS.filter(name => !entered.includes(name))
+  const gapMs = entered.length === 2 ? Math.round(at['小白兔'] - at['小狐狸']) : null
+  return {
+    entered, missing, gapMs,
+    together: gapMs !== null && Math.abs(gapMs) <= L11_TOGETHER_MS,
+    late: gapMs !== null && gapMs >= L11_LATE_MIN_MS && gapMs <= L11_LATE_MAX_MS,
+  }
+}
+
+const performerSay = (target: string, block: string): G2Slot[] => [{key: `${target}|${block}|MESSAGE`, field: 'MESSAGE', label: '说的话', maxLength: 20}]
+
+export const g2u2L05: G2Lesson = {
+  id: 'G2-U2-L05',
+  title: '两只精灵同步表演',
+  concept: '一条广播同时叫醒好几个收听脚本；在收听脚本里加“等待”，就能安排谁先登场、谁晚多久登场',
+  sample: '/scratch-samples/g2-u2-l05-sync-show.sb3.b64',
+  exportName: 'KidsCoding-两只精灵同步表演.sb3',
+  story: '森林剧场今晚演出！点绿旗，舞台广播“开演”，开演铃响起，小狐狸从左边后台跳上台。可是它的搭档小白兔一直待在右边后台不出来……导演还想让两只精灵先一起亮相，再排一版“兔子晚 1 秒登场”。',
+  conceptExplain: [
+    '一条广播可以有很多个收听者：舞台、小狐狸、小白兔都有自己的“当接收到（开演）”脚本，Scratch 会在同一刻把它们一起启动——这就是“同步”。',
+    '收听脚本只认名字：在听“谢幕”的脚本，听不到“开演”，那个角色就一动不动。',
+    '想让某个角色晚一点登场，不用再发一条广播：在它自己的收听脚本最前面放“等待（ ）秒”。等待 0 秒 ≈ 一起登场，等待 1 秒 = 晚 1 秒登场。',
+  ],
+  predict: {
+    question: '舞台广播的是“开演”，小白兔的脚本是“当接收到（谢幕）→ 等待 → 上台 → 说话”。点绿旗后，小白兔会上台吗？',
+    options: ['会上台', '不会上台'],
+    correct: '不会上台',
+    explain: '小白兔在听“谢幕”，Scratch VM 广播的是“开演”，名字不一样，小白兔的收听脚本根本没有启动，所以它留在后台。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '一条广播让两个角色同时开始（同步）', title: '练习 A：两只精灵一起亮相', goal: '修好小白兔后，把它收听脚本里的“等待（ ）秒”改成 0，应用后点绿旗：Scratch VM 里小狐狸和小白兔都开口，而且相差不超过 0.15 秒。', how: '两个收听脚本在同一刻被“开演”叫醒；兔子不等，就和狐狸一起登场。' },
+    { id: 'practiceB', skill: '用等待安排先后登场（时间差）', title: '练习 B：兔子晚 1 秒登场', goal: '改小白兔的“等待（ ）秒”，点绿旗：VM 里小白兔比小狐狸晚 0.9～1.1 秒开口。', how: '广播只发一次；时间差来自兔子自己脚本里的等待。观察区会显示 VM 测到的“兔子比狐狸晚多少秒”。' },
+    { id: 'debug', skill: '找出收听的消息不对（调试）', title: '找错：小白兔为什么不上台？', goal: '先点一次绿旗，看观察区：舞台广播了什么、谁开口了、谁没动；再修好小白兔的收听脚本，让它也上台。', how: '对一对：舞台广播的名字，和小白兔在听的名字一样吗？' },
+    { id: 'create', skill: '有边界的自由创作', title: '创意：我们的开场对白', goal: '给小狐狸和小白兔各编一句自己的台词（1～20 字），点绿旗让两只精灵都上台说出新台词，再保存为 .sb3。', how: '登场时间差你来定：一起（等待 0）、晚一点（0.5）或者晚很多（2 秒）都行。' },
+  ],
+  hints: [
+    '看现象：点绿旗后，观察区显示 Scratch VM 里舞台广播了“开演”，开演铃响了、小狐狸开口了，小白兔没有动。',
+    '想原因：小白兔的帽子积木是“当接收到（谢幕）”，它在等“谢幕”；舞台广播的是“开演”，名字不一样，叫不醒它。',
+    '去修复：选中小白兔，把“当接收到（ ）”改成“开演”，应用后再点绿旗。',
+  ],
+  reflection: [
+    '一条“开演”广播，让哪几个对象同时开始了？',
+    '兔子晚 1 秒登场，是靠再发一条广播，还是靠它自己脚本里的等待？',
+    '如果还想让一只小鸟晚 2 秒飞进来，它的收听脚本应该怎么搭？',
+  ],
+  limitations: [
+    '本实验只能修改：小狐狸和小白兔的台词（1～20 字）、小白兔在听的消息（开演/谢幕）、小白兔收到广播后先等待的秒数（0～2.0，0.1 秒一格）。',
+    '舞台广播的消息固定为“开演”，舞台收到后固定播放原创开演铃；小狐狸的收听消息、两只精灵的后台和上台位置固定不改；不能新建消息、不能用“广播并等待”或新增积木/精灵（可导出 .sb3 后在完整 Scratch 编辑器里继续改造）。',
+    '舞台画面按 Scratch VM 的对象状态绘制原创 SVG，未接入 WebGL 渲染器；时间差来自 VM 里每个角色真正开始说话的时刻（沙箱时钟，误差约一帧 0.03 秒）；本沙箱的 VM 没有接音频引擎，开演铃由页面播放同一个原创 .wav；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    {
+      name: 'Stage', kind: 'stage', label: '舞台', messages: L11_MESSAGES, sounds: ['开演铃'],
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_broadcast', vmBlock: 'stage_bcast', slots: [], fixed: { BROADCAST_OPTION: '开演' } }] },
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '开演' }, body: [
+          { type: 'kc2_play_sound', vmBlock: 'stage_play', slots: [], fixed: { SOUND_MENU: '开演铃' } },
+        ] },
+      ],
+    },
+    {
+      name: '小狐狸', kind: 'sprite', label: '小狐狸', messages: L11_MESSAGES,
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_goto_start', vmBlock: 'fox_home', slots: [], fixed: { X: '-200', Y: '-70' } }] },
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '开演' }, body: [
+          { type: 'kc2_goto_start', vmBlock: 'fox_enter', slots: [], fixed: { X: '-60', Y: '-70' } },
+          { type: 'kc2_say', vmBlock: 'fox_say', slots: performerSay('小狐狸', 'fox_say') },
+        ] },
+      ],
+    },
+    {
+      name: '小白兔', kind: 'sprite', label: '小白兔', messages: L11_MESSAGES,
+      scripts: [
+        { hat: 'kc2_flag', body: [{ type: 'kc2_goto_start', vmBlock: 'rabbit_home', slots: [], fixed: { X: '200', Y: '-70' } }] },
+        {
+          hat: 'kc2_when_receive',
+          hatSlots: [{ key: '小白兔|rabbit_recv|BROADCAST_OPTION', field: 'BROADCAST_OPTION', label: '消息', options: L11_MESSAGES }],
+          body: [
+            { type: 'kc2_wait_free', vmBlock: 'rabbit_wait', slots: [{ key: '小白兔|rabbit_wait|DURATION', field: 'DURATION', label: '上台前等待秒数', min: 0, max: 2, tenths: true }] },
+            { type: 'kc2_goto_start', vmBlock: 'rabbit_enter', slots: [], fixed: { X: '60', Y: '-70' } },
+            { type: 'kc2_say', vmBlock: 'rabbit_say', slots: performerSay('小白兔', 'rabbit_say') },
+          ],
+        },
+      ],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-enter-together', solutions: ['小白兔听“开演”、等待 0 秒 → VM 里两只精灵相差约 0.03 秒开口'], counterExamples: ['等待 0.5 秒 → 晚了半秒，不算同时', '等待 -1 → 超出 0～2.0 被拒绝'] },
+    { id: 'practiceB-one-second-later', solutions: ['等待 1.0 秒 → VM 测得兔子比狐狸晚约 1.0 秒'], counterExamples: ['等待 2.0 秒 → 晚 2 秒', '等待 1.05 → 不是 0.1 秒一格，被拒绝', '等待 2.5 → 超出 0～2.0 被拒绝'] },
+    { id: 'debug-wrong-message', solutions: ['把小白兔的“当接收到（谢幕）”改成“开演”'], counterExamples: ['只改等待秒数 → 兔子还是在听“谢幕”，依旧不动'] },
+  ],
+  nextLesson: 'G2-U2-L06 音乐动画短片',
+  showSync: true,
+}
+
+const showRuns = (obs: G2Observations) => obs.broadcastRuns.filter(r => r.message === '开演')
+
+export function evaluateG2U2L05(obs: G2Observations): G2TaskState {
+  const runs = showRuns(obs).map(syncSummary)
+  const firstMissing = runs.findIndex(s => s.entered.includes('小狐狸') && s.missing.includes('小白兔'))
+  const both = (s: SyncSummary) => s.entered.length === 2
+  const fox = obs.lastSaid['小狐狸']
+  const rabbit = obs.lastSaid['小白兔']
+  return {
+    practiceA: runs.some(s => s.together),
+    practiceB: runs.some(s => s.late),
+    debug: firstMissing >= 0 && runs.slice(firstMissing + 1).some(both),
+    create: !!fox && !!rabbit && fox !== L11_FOX_LINE && rabbit !== L11_RABBIT_LINE && runs.some(both),
+  }
+}
+
 type CycleRun = G2Observations['cycleRuns'][number]
 const spokeOn = (run: CycleRun, target: string, backdrop: string) => run.speech.some(s => s.target === target && s.backdrop === backdrop)
 const longPhases = (run: CycleRun) => run.switches >= 2 && run.avgMs !== null && run.avgMs >= L08_LONG_PHASE_MS
@@ -470,6 +599,11 @@ export function observedPredictionG2U2(id: string, obs: G2Observations): string 
     if (!first) return null
     return first.closed ? '能回到起点' : '回不到起点'
   }
+  if (id === g2u2L05.id) {
+    const first = obs.broadcastRuns.find(r => r.message === '开演')
+    if (!first) return null
+    return first.speakers.includes('小白兔') ? '会上台' : '不会上台'
+  }
   if (id === g2u2L03.id) {
     const first = obs.beatRuns.find(r => r.finished && r.hits.some(h => h.target === L09_DRUM))
     if (!first) return null
@@ -490,6 +624,7 @@ export function evaluateG2U2Lesson(id: string, obs: G2Observations): G2TaskState
   if (id === g2u2L02.id) return evaluateG2U2L02(obs)
   if (id === g2u2L03.id) return evaluateG2U2L03(obs)
   if (id === g2u2L04.id) return evaluateG2U2L04(obs)
+  if (id === g2u2L05.id) return evaluateG2U2L05(obs)
   return null
 }
 
@@ -498,4 +633,5 @@ export const g2u2ScratchLessons: Record<string, G2Lesson> = {
   [g2u2L02.id]: g2u2L02,
   [g2u2L03.id]: g2u2L03,
   [g2u2L04.id]: g2u2L04,
+  [g2u2L05.id]: g2u2L05,
 }

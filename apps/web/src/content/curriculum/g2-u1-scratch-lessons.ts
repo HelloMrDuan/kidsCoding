@@ -68,6 +68,8 @@ export type G2Lesson = {
   showBeats?: boolean
   /** Show the flight path of the last green-flag run: total degrees turned, laps, end position and distance from the start (move + turn loops). */
   showFlight?: boolean
+  /** Show the last broadcast run: which receivers spoke and how long after the broadcast, and the gap between the two performers (sync lessons). */
+  showSync?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -578,7 +580,9 @@ export type G2Observations = {
   /** Total degrees each sprite really turned in the VM during each finished click run. */
   clickTurns: Record<string, number[]>
   /** Finished broadcast runs: the message the VM really sent, who spoke during the run, and the end state. */
-  broadcastRuns: Array<{ message: string; speakers: string[]; backdrop: string; positions: Record<string, G2Point> }>
+  broadcastRuns: Array<{ message: string; speakers: string[]; backdrop: string; positions: Record<string, G2Point>
+    /** VM time (ms after the broadcast) at which each receiver first started a speech bubble. */
+    saidAt?: Record<string, number> }>
   /** Finished green-flag runs: who spoke, in order, and how many times a sprite started talking while another sprite's line was still showing. */
   speechRuns: Array<{ speakers: string[]; overlaps: number; positions: Record<string, G2Point> }>
   /** Every sound a sprite played in the VM, with the costume it was wearing when the sound started. */

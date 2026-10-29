@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
 import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, evaluateG2U1L06, g2u1L06, L06_CAT_LINE, inRibbonZone, inBirdNest, observedPrediction, g2ScratchLessons, getG2ScratchLesson} from './g2-u1-scratch-lessons'
-import {atDoor, beatSummary, evaluateG2U2L01, evaluateG2U2L02, evaluateG2U2L03, evaluateG2U2L04, flightSummary, g2u2L01, g2u2L02, g2u2L03, g2u2L04, L07_CAT_LINE, L08_OWL_LINE, L09_CAT_LINE, L10_FLY_LINE} from './g2-u2-scratch-lessons'
+import {atDoor, beatSummary, evaluateG2U2L01, evaluateG2U2L02, evaluateG2U2L03, evaluateG2U2L04, evaluateG2U2L05, flightSummary, g2u2L01, g2u2L02, g2u2L03, g2u2L04, g2u2L05, L07_CAT_LINE, L08_OWL_LINE, L09_CAT_LINE, L10_FLY_LINE, L11_FOX_LINE, L11_RABBIT_LINE, syncSummary} from './g2-u2-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -456,5 +456,55 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     const flower = g2u2L04.targets.find(t => t.name === '花朵')!
     expect(flower.scripts[0].body.every(b => b.slots.length === 0)).toBe(true)
     expect(g2u2L04.showFlight).toBe(true)
+  })
+  it('U2-L05 reads entrances from VM speech times after one broadcast: together, one second later, or the rabbit missing', () => {
+    const show = (saidAt: Record<string, number>, message = '开演') => ({message, speakers: Object.keys(saidAt), saidAt, backdrop: '森林剧场', positions: {}})
+    expect(syncSummary(undefined)).toMatchObject({entered: [], gapMs: null, together: false, late: false})
+    expect(syncSummary(show({小狐狸: 0}))).toMatchObject({entered: ['小狐狸'], missing: ['小白兔'], gapMs: null})
+    expect(syncSummary(show({小狐狸: 0, 小白兔: 33}))).toMatchObject({gapMs: 33, together: true, late: false})
+    expect(syncSummary(show({小狐狸: 1, 小白兔: 1017}))).toMatchObject({gapMs: 1016, together: false, late: true})
+    expect(syncSummary(show({小狐狸: 0, 小白兔: 500}))).toMatchObject({together: false, late: false})
+    expect(syncSummary(show({小狐狸: 0, 小白兔: 2010}))).toMatchObject({together: false, late: false})
+    // A speaker without a VM time (older run shape) does not count as an entrance.
+    expect(syncSummary({message: '开演', speakers: ['小狐狸', '小白兔'], backdrop: '', positions: {}}).entered).toEqual([])
+
+    const obs = emptyG2Observations()
+    expect(Object.values(evaluateG2U2L05(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u2L05.id, obs)).toBeNull()
+    obs.broadcastRuns = [show({小狐狸: 0})]
+    expect(observedPrediction(g2u2L05.id, obs)).toBe(g2u2L05.predict.correct)
+    expect(evaluateG2U2L05(obs)).toMatchObject({practiceA: false, practiceB: false, debug: false, create: false})
+    obs.broadcastRuns.push(show({小狐狸: 0, 小白兔: 510}))
+    expect(evaluateG2U2L05(obs)).toMatchObject({practiceA: false, practiceB: false, debug: true})
+    expect(evaluateG2U2L05({...obs, broadcastRuns: [show({小狐狸: 0, 小白兔: 510})]}).debug).toBe(false)
+    obs.broadcastRuns.push(show({小狐狸: 0, 小白兔: 34}), show({小狐狸: 0, 小白兔: 1001}))
+    expect(evaluateG2U2L05(obs)).toMatchObject({practiceA: true, practiceB: true})
+    // Runs of another message never count.
+    expect(evaluateG2U2L05({...obs, broadcastRuns: [show({小狐狸: 0, 小白兔: 20}, '谢幕')]}).practiceA).toBe(false)
+    obs.lastSaid = {小狐狸: L11_FOX_LINE, 小白兔: '轮到我啦'}
+    expect(evaluateG2U2L05(obs).create).toBe(false)
+    obs.lastSaid = {小狐狸: '欢迎来看戏', 小白兔: L11_RABBIT_LINE}
+    expect(evaluateG2U2L05(obs).create).toBe(false)
+    obs.lastSaid = {小狐狸: '欢迎来看戏', 小白兔: '轮到我啦'}
+    expect(evaluateG2U2L05(obs).create).toBe(true)
+    expect(evaluateG2U2L05({...obs, broadcastRuns: [show({小狐狸: 0})]}).create).toBe(false)
+  })
+
+  it('U2-L05 has one fixed broadcast with three receivers; only the rabbit\'s message, its wait and both lines are editable', () => {
+    const stage = g2u2L05.targets.find(t => t.name === 'Stage')!
+    expect(stage.scripts.map(s => s.hat)).toEqual(['kc2_flag', 'kc2_when_receive'])
+    expect(stage.scripts[0].body[0]).toMatchObject({type: 'kc2_broadcast', fixed: {BROADCAST_OPTION: '开演'}})
+    expect(stage.scripts[1].body[0]).toMatchObject({type: 'kc2_play_sound', fixed: {SOUND_MENU: '开演铃'}})
+    const fox = g2u2L05.targets.find(t => t.name === '小狐狸')!
+    expect(fox.scripts[1].hatFixed).toEqual({BROADCAST_OPTION: '开演'})
+    const rabbit = g2u2L05.targets.find(t => t.name === '小白兔')!
+    expect(rabbit.scripts[1].hatSlots?.[0]).toMatchObject({options: ['开演', '谢幕']})
+    expect(rabbit.scripts[1].body.map(b => b.type)).toEqual(['kc2_wait_free', 'kc2_goto_start', 'kc2_say'])
+    expect(rabbit.scripts[1].body[0].slots[0]).toMatchObject({min: 0, max: 2, tenths: true})
+    const slots = g2u2L05.targets.flatMap(t => t.scripts.flatMap(s => [...(s.hatSlots ?? []), ...s.body.flatMap(b => b.slots)])).map(s => s.key)
+    expect(slots.sort()).toEqual(['小狐狸|fox_say|MESSAGE', '小白兔|rabbit_recv|BROADCAST_OPTION', '小白兔|rabbit_say|MESSAGE', '小白兔|rabbit_wait|DURATION'].sort())
+    expect(g2u2L05.showSync).toBe(true)
+    expect(g2u2L05.tasks.map(t => t.id)).toEqual(['practiceA', 'practiceB', 'debug', 'create'])
+    expect(g2u2L05.hints).toHaveLength(3)
   })
 })

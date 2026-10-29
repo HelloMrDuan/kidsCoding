@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u2L01, g2u2L02, g2u2L03, g2u2L04} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {g2u2L01, g2u2L02, g2u2L03, g2u2L04, g2u2L05} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05, g2u1L06} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {G2_TEXT_FIELDS, changedValues, checkSlotValue, quickEditValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
@@ -333,5 +333,33 @@ describe('G2 restricted Blockly adapter (G2-U2-L04 flight loop)', () => {
     expect(readG2Program(flyWs('21', '40', '45'), fly)).toBeNull()
     expect(readG2Program(flyWs('8', '40', '22.5'), fly)).toBeNull()
     expect(readG2Program(flyWs('8', '40', '45', 'turn-first'), fly)).toBeNull()
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U2-L05 one broadcast, two performers)', () => {
+  const rabbit = g2u2L05.targets.find(t => t.name === '小白兔')!
+  const fox = g2u2L05.targets.find(t => t.name === '小狐狸')!
+  const flag = block('kc2_flag', {}, block('kc2_goto_start', {X: '200', Y: '-70'}))
+  const recv = (message: string, wait: string, line = '我是小白兔！') => block('kc2_when_receive', {BROADCAST_OPTION: message},
+    block('kc2_wait_free', {DURATION: wait}, block('kc2_goto_start', {X: '60', Y: '-70'}, block('kc2_say', {MESSAGE: line}))))
+  it('reads the rabbit\'s message, its wait (0 to 2.0 in tenths) and its line', () => {
+    expect(readG2Program(ws(flag, recv('开演', '1')), rabbit)).toEqual({kind: 'sprite', values: {
+      '小白兔|rabbit_recv|BROADCAST_OPTION': '开演', '小白兔|rabbit_wait|DURATION': 1, '小白兔|rabbit_say|MESSAGE': '我是小白兔！',
+    }})
+    expect(readG2Program(ws(flag, recv('谢幕', '0')), rabbit)).not.toBeNull()
+    expect(readG2Program(ws(flag, recv('开演', '2')), rabbit)).not.toBeNull()
+  })
+  it('refuses 2.5 s, 1.05 s, negative waits, unknown messages and a missing green-flag script', () => {
+    expect(readG2Program(ws(flag, recv('开演', '2.5')), rabbit)).toBeNull()
+    expect(readG2Program(ws(flag, recv('开演', '1.05')), rabbit)).toBeNull()
+    expect(readG2Program(ws(flag, recv('开演', '-1')), rabbit)).toBeNull()
+    expect(readG2Program(ws(flag, recv('开饭', '1')), rabbit)).toBeNull()
+    expect(readG2Program(ws(recv('开演', '1')), rabbit)).toBeNull()
+  })
+  it('reads only the fox\'s line; its receive message is a locked field, never a lesson value sent to the VM', () => {
+    const foxFlag = block('kc2_flag', {}, block('kc2_goto_start', {X: '-200', Y: '-70'}))
+    const foxRecv = (message: string) => block('kc2_when_receive', {BROADCAST_OPTION: message}, block('kc2_goto_start', {X: '-60', Y: '-70'}, block('kc2_say', {MESSAGE: '嗷呜'})))
+    expect(readG2Program(ws(foxFlag, foxRecv('开演')), fox)).toEqual({kind: 'sprite', values: {'小狐狸|fox_say|MESSAGE': '嗷呜'}})
+    expect(readG2Program(ws(foxFlag, foxRecv('谢幕')), fox)).toEqual({kind: 'sprite', values: {'小狐狸|fox_say|MESSAGE': '嗷呜'}})
   })
 })
