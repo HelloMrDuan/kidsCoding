@@ -1792,7 +1792,7 @@
       "title": "家长端真实成长报告",
       "priority": "P1",
       "category": "UX",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "UX-303"
       ],
@@ -1801,13 +1801,17 @@
         "知识点/真实学习记录/孩子私有作品关联，无虚构掌握率或分数"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/218",
+        "mergeCommit": "83bdfe49e0a7b832fc5fad5a85cd96a8f92690ae",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40785939033",
+        "tests": [
+          "PR CI 23 success + 3 skipped",
+          "main CI：curriculum 40785939033 success、accountability 40785938919 success（含本合并）",
+          "本地 vitest 4 文件 18 项全绿，ESLint 与 tsc 改动文件 0 错，生产构建通过；旧机真实账号浏览器实测 2 账号全过（知识点关联、A/B 隔离、三端截图 4 张）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "未决点：线上库 guardian_consents 表不存在（迁移 012 未应用），同意已确认态留待 012 应用后复核；作品链接仅断言存在，未点进回放页验证；实测走 dev 服务，生产构建已本地验证通过。"
     },
     {
       "id": "UX-504",
