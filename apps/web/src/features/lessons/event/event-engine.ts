@@ -9,7 +9,7 @@
 // - `send_bell` rings the forest bell; after the running script ends, every
 //   script whose hat is `when_bell` runs (in stage order).
 
-export type EventActorId = 'fox' | 'rabbit' | 'bird' | 'frog' | 'squirrel' | 'apple' | 'flag'
+export type EventActorId = 'fox' | 'rabbit' | 'bird' | 'frog' | 'squirrel' | 'apple' | 'tree' | 'flag'
 
 export const EVENT_HATS = ['when_start', 'when_clicked', 'when_bell'] as const
 export type EventHat = (typeof EVENT_HATS)[number]
@@ -39,6 +39,9 @@ export type EventActor = {
   asleep?: boolean
   /** What its speech bubble says when `say_hello` runs (drawing only). */
   line?: string
+  /** Drawing only: width as % of the stage (default 18), and where it lands after `fall_down` (stage %). */
+  size?: number
+  fallY?: number
 }
 
 export type EventLevel = {

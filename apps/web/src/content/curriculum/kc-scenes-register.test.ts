@@ -27,6 +27,8 @@ const ACCEPTANCE_SET = [
   'stage-flags.svg', // G0-U2-L02 opening stage backdrop
   'bell-tree.svg', // G0-U2-L03 bell tree backdrop
   'two-doors.svg', // G0-U2-L04 forest theatre backdrop
+  'apple-tree.svg', // G0-U2-L05 apple orchard backdrop
+  'meeting-stage.svg', // G0-U2-L06 meet-and-greet stage backdrop
 ]
 
 describe('kc-scenes asset register (UX-004)', () => {

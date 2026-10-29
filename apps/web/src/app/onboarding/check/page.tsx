@@ -55,6 +55,10 @@ export default function AssessmentPage() {
         <AssessmentForm
           ageBand={session.ageBand}
           questions={assessmentQuestions}
+          initialAnswers={session.answers}
+          onProgress={(answers) => {
+            writeOnboardingSession({ ...session, answers })
+          }}
           onComplete={async ({ answers, recommendedLevel }) => {
             const nextSession = {
               ...session,

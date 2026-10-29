@@ -3,7 +3,10 @@ import { redirect } from 'next/navigation'
 
 import { launchCoursePack } from '@/features/billing/course-pack'
 import { loadLaunchCurriculum } from '@/features/curriculum/load-launch-curriculum'
+import { buildParentGrowthReport } from '@/features/parent/build-parent-growth-report'
 import { buildParentOverview } from '@/features/parent/build-parent-overview'
+import { GrowthKnowledgeSection } from '@/features/parent/growth-knowledge-section'
+import { GuardianConsentButton } from '@/features/parent/guardian-consent-button'
 import { hasSupabaseEnv } from '@/lib/env'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
@@ -86,6 +89,7 @@ export default async function ParentOverviewPage() {
     { data: badgeRecords },
     { data: projectSnapshots },
     { data: entitlement },
+    { data: consent },
   ] = await Promise.all([
     loadLaunchCurriculum(),
     supabase.from('child_profiles').select('*').eq('user_id', user.id).single(),
@@ -101,6 +105,12 @@ export default async function ParentOverviewPage() {
       .select('status')
       .eq('user_id', user.id)
       .eq('product_code', launchCoursePack.productCode)
+      .maybeSingle(),
+    supabase
+      .from('guardian_consents')
+      .select('granted_at')
+      .eq('user_id', user.id)
+      .eq('scope', 'cloud-drafts')
       .maybeSingle(),
   ])
 
@@ -118,6 +128,15 @@ export default async function ParentOverviewPage() {
     hasLaunchPack: entitlement?.status === 'active',
   })
   const stageSummary = getStageSummary(summary.completedLessonCount)
+  const growthReport = buildParentGrowthReport({
+    progressRecords: progressRecords ?? [],
+    snapshotLessonIds: new Set(
+      (projectSnapshots ?? []).map((snapshot) => snapshot.lesson_id),
+    ),
+    lessonTitles: new Map(
+      curriculum.lessons.map((lesson) => [lesson.id, lesson.title]),
+    ),
+  })
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f5fbff_0%,#fff8ef_100%)] px-4 py-6 md:px-6 md:py-8">
@@ -134,6 +153,22 @@ export default async function ParentOverviewPage() {
               <p className="max-w-3xl text-base leading-7 text-slate-600 md:text-lg md:leading-8">
                 不用全程陪着学，也能一眼看懂孩子现在走到哪一段、最近做出了什么作品、下一步怎么继续往前走。
               </p>
+            </div>
+
+            <div className="rounded-[1.4rem] bg-white p-4">
+              <p className="text-sm font-semibold text-slate-500">云端作品监护人同意</p>
+              {consent ? (
+                <p className="mt-2 text-sm leading-7 text-slate-600" data-testid="guardian-consent-status">
+                  已确认监护人同意：孩子的云端作品按保留策略保存，可随时删除。
+                </p>
+              ) : (
+                <div className="mt-2 space-y-3">
+                  <p className="text-sm leading-7 text-slate-600" data-testid="guardian-consent-status">
+                    尚未确认监护人同意，请监护人确认。
+                  </p>
+                  <GuardianConsentButton />
+                </div>
+              )}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -353,6 +388,7 @@ export default async function ParentOverviewPage() {
             </section>
           </div>
         </section>
+        <GrowthKnowledgeSection report={growthReport} />
       </section>
     </main>
   )

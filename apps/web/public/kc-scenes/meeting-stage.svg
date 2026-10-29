@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" role="img" aria-label="森林见面会舞台：彩旗、聚光灯、圆形木舞台和观众树桩">
+<g>
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#eef3ff" />
+      <path d="M2 6 Q50 18 98 6" fill="none" stroke="#8a5a2e" stroke-width=".6" />
+      <g stroke-width=".3" stroke="#ffffff">
+        <path d="M14 8.6l2 4 2-3.4z" fill="#ff8a3d" /><path d="M28 11.6l2 4 2-3.3z" fill="#4fae55" /><path d="M42 13.2l2 4 2-3.8z" fill="#ffd23f" />
+        <path d="M56 13.3l2 4 2-3.9z" fill="#3b82f6" /><path d="M70 11.8l2 4 2-3.3z" fill="#ff8a3d" /><path d="M84 8.8l2 4 2-3.4z" fill="#4fae55" />
+      </g>
+      <path d="M22 4 L10 46 H34 Z M78 4 L66 46 H90 Z" fill="#fff6c8" opacity=".35" />
+      <path d="M0 42 Q50 36 100 42 V60 H0 Z" fill="#a8dd88" />
+      <ellipse cx="50" cy="48" rx="40" ry="7" fill="#c9905a" stroke="#8a5a2e" stroke-width=".6" />
+      <ellipse cx="50" cy="47" rx="40" ry="5.6" fill="#e2b27c" />
+      <g fill="#9b6a3c" stroke="#6b4423" stroke-width=".4">
+        <rect x="6" y="54" width="7" height="4" rx="1.5" /><rect x="24" y="55" width="7" height="4" rx="1.5" /><rect x="69" y="55" width="7" height="4" rx="1.5" /><rect x="87" y="54" width="7" height="4" rx="1.5" />
+      </g>
+    </g>
+</svg>

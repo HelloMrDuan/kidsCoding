@@ -1792,7 +1792,7 @@
       "title": "家长端真实成长报告",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "completed",
       "dependencies": [
         "UX-303"
       ],
@@ -1801,20 +1801,24 @@
         "知识点/真实学习记录/孩子私有作品关联，无虚构掌握率或分数"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/218",
+        "mergeCommit": "83bdfe49e0a7b832fc5fad5a85cd96a8f92690ae",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40785939033",
+        "tests": [
+          "PR CI 23 success + 3 skipped",
+          "main CI：curriculum 40785939033 success、accountability 40785938919 success（含本合并）",
+          "本地 vitest 4 文件 18 项全绿，ESLint 与 tsc 改动文件 0 错，生产构建通过；旧机真实账号浏览器实测 2 账号全过（知识点关联、A/B 隔离、三端截图 4 张）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "未决点：线上库 guardian_consents 表不存在（迁移 012 未应用），同意已确认态留待 012 应用后复核；作品链接仅断言存在，未点进回放页验证；实测走 dev 服务，生产构建已本地验证通过。"
     },
     {
       "id": "UX-504",
       "title": "管理员课程发布审阅后台",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "completed",
       "dependencies": [
         "UX-501"
       ],
@@ -1823,13 +1827,17 @@
         "引擎/内容/版权/隐私/人审证据可追溯，无权限不能发布"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/220",
+        "mergeCommit": "39ce1663af4daf0c8ae1ec9a4ee063716371fb35",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40801476519",
+        "tests": [
+          "PR CI 23 success + 3 skipped",
+          "main CI：curriculum 40801476519 success、accountability 40801476412 success（含本合并）",
+          "本地 vitest 新测试 2 项全绿，ESLint 与 tsc 改动文件 0 错；旧机真实浏览器三端实测 1440/768/375 全过（证据链接展示、截图 3 张）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "说明：本任务只补审阅页证据展示，不新增发布行为、不改发布路径；试玩课 L5 仍由 7 门禁派生，门禁证据仍以仓库 JSON 为准。"
     },
     {
       "id": "UX-601",
@@ -1872,7 +1880,7 @@
       "title": "年龄评估与账号流程适龄界面",
       "priority": "P1",
       "category": "UX",
-      "status": "todo",
+      "status": "completed",
       "dependencies": [
         "UX-002"
       ],
@@ -1882,13 +1890,19 @@
         "认证错误正确提示、移动端可操作"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/224",
+        "mergeCommit": "99df4791ff8d8c79b2b629912fcfac8777bbef44",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40829250348",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40829250355",
+        "tests": [
+          "vitest 相关 3 文件 13 项全绿（评估恢复、绑定空输入、切换重置、网络失败文案）",
+          "PR #224 CI 23 success + 3 skipped",
+          "合并后主分支 curriculum #583 success、task accountability #543 success",
+          "旧机生产构建真实 Chrome 三断点实测全过（年龄页、评估刷新恢复、绑定空输入报错，截图 9 张）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "无布局、无颜色改动，只改行为、文案与输入属性；标签文案不动。dev 服务下水合失效属环境问题（已查明，改走生产构建实测）；生产构建三端各 1 次 React #418 水合日志，属检查页服务端恒渲染空的主分支原有结构，未在本任务扩范围修。"
     },
     {
       "id": "UX-603",
@@ -2007,7 +2021,7 @@
       "title": "课程审核发布状态前后台同步",
       "priority": "P1",
       "category": "SYS",
-      "status": "todo",
+      "status": "completed",
       "dependencies": [
         "SYS-102"
       ],
@@ -2016,13 +2030,18 @@
         "实验/详案/可试玩/正式发布标记一致，缺证据不开放"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/222",
+        "mergeCommit": "89b46230b73e3bc640216600dce1df5c885cc49f",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40813169235",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40813169238",
+        "tests": [
+          "vitest status-sync-sys104.test.tsx 3 项全绿（后台审阅页+前台目录页+前台详情页+公开 API 同课同标记；444 课全量不变量）",
+          "PR #222 CI 23 success + 3 skipped",
+          "合并后主分支 curriculum #581 success、task accountability success"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "本任务只补跨表面一致性测试与 workflow 名单，不改产品代码、不改成熟度模型语义、不动发布路径；无视觉改动故无旧机三端实测。合并后主分支 deploy-pipeline #307 failure（e2e-blockly mobile gate）不在关账门禁内，与 UX-503/504 同口径。"
     },
     {
       "id": "SYS-105",
@@ -2236,7 +2255,7 @@
       "title": "作品大小类型资源及删除恢复审查",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "CLOUD-103"
       ],
@@ -2246,20 +2265,24 @@
         "删除恢复与限额/并发保护通过"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/201",
+        "mergeCommit": "5bf36cd2476826c6c05b556538904ed4d0b28d1c",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40659873224",
+        "tests": [
+          "PR CI 25 项 22 success + 3 skipped（test 重跑后全绿）",
+          "main CI 当前主分支：curriculum 40659873224 success、accountability 40659873417 success（含本合并）",
+          "本地 vitest 3 文件 27 测全过；新 spec 3 用例（portfolio-ux302，PR 与主分支 CI 均 success）"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "本合并树 main 运行 40654898627 part2 两次同用例失败（G2-U1-L06 按钮启用超时）；PR CI 时 part2 曾绿；后主分支运行 40659873224/40659873417 全绿（含 part2），关账以当前主分支绿态为准。云端删除是否开放留待 CLOUD-105 定，本任务未建 DELETE 端点。"
     },
     {
       "id": "CLOUD-105",
       "title": "儿童私有作品同意与保留策略",
       "priority": "P1",
       "category": "CLOUD",
-      "status": "todo",
+      "status": "completed",
       "dependencies": [
         "CLOUD-103"
       ],
@@ -2268,13 +2291,17 @@
         "最小采集、监护人同意、删除与分享审核流程实际验证"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/214",
+        "mergeCommit": "604a2aaf4eb7f542010eff47dc30bc1d0d809126",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40672304092",
+        "tests": [
+          "PR CI 22 success + 3 skipped",
+          "main CI：curriculum 40672304092 success、accountability 40672304173 success（含本合并）",
+          "本地 vitest 5 文件 36 项全绿，ESLint 与 tsc 改动文件 0 错"
+        ],
         "reviewer": null
       },
-      "notes": ""
+      "notes": "未决点：owner_user_id 为空的未绑定 guest 快照无 purge 覆盖，留待 duan 定，不擅自加删；迁移 012 需部署侧应用到线上 Supabase 后同意接口在预发布上才可用（与 011 同例）；方案 B（无同意记录阻断保存）未做，需负责人点头才做。"
     },
     {
       "id": "RELEASE-101",

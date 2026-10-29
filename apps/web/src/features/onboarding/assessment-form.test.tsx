@@ -20,20 +20,39 @@ describe('AssessmentForm', () => {
     expect(screen.getByText('第 1 / 2 题')).toBeInTheDocument()
   })
 
-  it('walks through questions and emits a recommended level', () => {
-    const onComplete = vi.fn()
+  it('restores an in-progress assessment from saved answers', () => {
+    const questions = assessmentQuestions.slice(0, 2)
+    const first = questions[0].options[0]
+
+    render(
+      <AssessmentForm
+        ageBand="age_9_12"
+        questions={questions}
+        initialAnswers={[
+          { questionId: questions[0].id, optionId: first.id, score: first.score },
+        ]}
+        onComplete={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('第 2 / 2 题')).toBeInTheDocument()
+  })
+
+  it('reports each intermediate answer so the page can persist it', () => {
+    const onProgress = vi.fn()
 
     render(
       <AssessmentForm
         ageBand="age_9_12"
         questions={assessmentQuestions.slice(0, 2)}
-        onComplete={onComplete}
+        onProgress={onProgress}
+        onComplete={vi.fn()}
       />,
     )
 
     fireEvent.click(screen.getByRole('button', { name: '一件一件按顺序排好' }))
-    fireEvent.click(screen.getByRole('button', { name: '让它重复同一个动作' }))
 
-    expect(onComplete).toHaveBeenCalled()
+    expect(onProgress).toHaveBeenCalledTimes(1)
+    expect(onProgress.mock.calls[0][0]).toHaveLength(1)
   })
 })

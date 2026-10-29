@@ -59,3 +59,29 @@ export async function PUT(request: Request) {
     verifiedGrade: false,
   }, { headers: { 'Cache-Control': 'private, no-store' } })
 }
+
+// CLOUD-105: delete the account's own cloud draft for one lesson. The
+// database already permits owner deletes (practice_drafts_delete_own);
+// this route was the missing half. Same-origin, authenticated mutation.
+// The lesson comes from the query string and the user filter always comes
+// from the session, never from caller-supplied ids; without a lesson id
+// nothing is deleted.
+export async function DELETE(request: Request) {
+  if (!hasSupabaseEnv()) return NextResponse.json({ error: 'cloud-sync-not-configured' }, { status: 503 })
+  if (request.headers.get('sec-fetch-site') === 'cross-site') {
+    return NextResponse.json({ error: 'cross-site-request' }, { status: 403 })
+  }
+  const origin = request.headers.get('origin')
+  if (origin && origin !== new URL(request.url).origin) {
+    return NextResponse.json({ error: 'cross-origin-request' }, { status: 403 })
+  }
+  const client = await createServerSupabaseClient()
+  const { data: { user }, error: authError } = await client.auth.getUser()
+  if (authError || !user) return NextResponse.json({ error: 'authentication-required' }, { status: 401 })
+  const lessonId = new URL(request.url).searchParams.get('lessonId')
+  if (!lessonId) return NextResponse.json({ error: 'invalid-draft' }, { status: 400 })
+  const { error } = await client.from('python_practice_drafts').delete()
+    .eq('user_id', user.id).eq('lesson_id', lessonId)
+  if (error) return NextResponse.json({ error: 'cloud-draft-storage-unavailable' }, { status: 503 })
+  return NextResponse.json({ deleted: true, lessonId }, { headers: { 'Cache-Control': 'private, no-store' } })
+}
