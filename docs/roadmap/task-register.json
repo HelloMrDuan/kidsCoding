@@ -2710,6 +2710,29 @@
         "reviewer": "实现者 AI（Hark A）；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
+    },
+    {
+      "id": "OPS-014",
+      "title": "KidsCoding 长期规范继承补强",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "docs/roadmap/13-LONG-TERM-INHERITANCE.md；docs/roadmap/task-register.json（仅登记本条）；docs-only，不改课程、代码、full-catalog、lesson-task-register 或任何课程状态。",
+      "acceptance": [
+        "新增补充文件存在，引用现有规范（AGENTS.md、VISUAL-LOCK.md、prototype.html、DESIGN-SPEC.md、08/09/10），不编辑现有规范的规则条文",
+        "补充内容包括专业工作区共享同一品牌、课程审定八大专项（适用时逐项记录）、432 节为 V1 规划而非上限且新增路线须保持旧 ID、学习数据与作品兼容、跨账号协调与共享规范保护",
+        "PR 描述含独立成行的 Task-ID: OPS-014，且 task-ledger CI 通过",
+        "本任务不宣称任何课程正式完成、试学或发布"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/258",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "docs-only 补充说明。长期要求由项目负责人 2026-10-30 提出，Muse-C 负责登记与提交 Draft PR 供评审；不覆盖现有共享规范，不改任何课程状态。"
     }
   ]
 }
