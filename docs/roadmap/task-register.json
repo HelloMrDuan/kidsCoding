@@ -2770,7 +2770,7 @@
       "title": "全体 AI Agent 统一工程协作规范并入现有治理体系",
       "priority": "P0",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "SYS-108"
       ],
@@ -2781,7 +2781,18 @@
         "任务状态词汇冲突如实记录：done 对应 completed，done 非法台账值，改名须另立任务",
         "PR CI 全绿"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/294",
+        "mergeCommit": "7f7d1b1b11633650027a2e5027e4f3542e6fc85a",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41043873047",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41043873213",
+        "tests": [
+          "PR #294 门禁全绿（3 项检查全 success，头 69d2539f）",
+          "main 课程运行 #913 Success（17/17，分片 S1–S6 全绿）",
+          "main 台账运行 #899 Success"
+        ],
+        "reviewer": "duan 2026-10-30 任命 kid小宝为总负责人并于 17:14 豁免 #294 独立审核（kid小宝自理）；合并由 kid小宝按门禁全绿执行"
+      },
       "notes": "2026-10-30 duan 任命 kid小宝为主架构治理负责人并下达统一规则；本 PR 不授权合并任何 PR。现状核查：15 个 Open PR；#261/#262 为平行规范重写、#263 用已被 SYS-108 否决的原生 --shard 4 分片、#265 缺耗时证据——裁定见 AGENTS.md §8 与 PR 描述，处置（关闭与否）由 duan 定，本 PR 不动它们。"
     }
   ]
