@@ -116,7 +116,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   function runCustom(){
     if(customBusy||!ready||!frame.current?.contentWindow)return
     if(source.length>5000){setCustomResult('代码超过5000字符，无法运行。');return}
-    if(customArgs.some(a=>a.length>40)){setCustomResult('自选参数每项最多40字。');return}
+    if(customArgs.some((a,index)=>a.length>(lessonId==='P3-U1-L04'&&index===0?200:40))){setCustomResult('自选参数每项最多40字，文件名 JSON 列表最多200字。');return}
     customId.current+=1
     customActive.current=true
     customArgsRef.current=[...customArgs]
