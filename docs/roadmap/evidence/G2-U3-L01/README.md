@@ -39,3 +39,9 @@
 
 ## 下一步（第 2 阶段）
 实验室按键积木 + VM 观察区（x 坐标、按键时刻）+ E2E（右键 +10、左键 -10、找错修复、创意导出）+ 三端截图，再提交台账登记。
+
+## 第 2 阶段新增（本提交）
+- 实验室：g2-u1 类型新增 DX 字段与 kc2_change_x 积木、kc2_when_key_right/left 帽子；blocks 增加方向键帽子与 x 增量快捷输入（g2-edit-dx、g2-edit-dx-2）；lab 增加方向键按钮（g2-key-right/left）与按键日志（g2-key-log）；沙箱增加 KEY 消息，用真实 VM 的 event_whenkeypressed 帽子派发按键。
+- 课程数据：新增 g2-u3-scratch-lessons.ts（g2u3L01），实验室路由已通过 g2ScratchLessons 注册；评价只认 VM 按键观测（keyPresses），不认编辑本身。
+- 测试：Vitest 新增 g2-u3-scratch-lessons.test.ts（评价与预测）；E2E 新增 scratch-g2-u3.spec.ts（找错、练习 A、创意导出）。
+- 未完成（仍不得标 completed）：三端截图、独立教研、儿童试学、台账登记；E2E 与 Vitest 结果以 PR CI 为准，本提交不提前宣称通过。
