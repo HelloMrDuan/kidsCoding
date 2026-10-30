@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'can_visit'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U3-L05': {
+    title: '第5课 · 遵守网站访问规则',
+    prompt: '编写 can_visit(robots_text, path, agent) 函数，判断按网站 robots.txt 规则能不能访问某个路径（不做真实网络请求，只解析给定的模拟规则文本，避免联网风险）。robots.txt 里每组以 User-agent 开头，后面跟 Disallow 或 Allow 规则；组与组之间用空行分开。先找 agent 名字相同的组（大小写不敏感），找不到就用 User-agent: * 的组，都找不到就允许。组内规则按最长前缀匹配：路径以规则路径开头才算匹配，最长的一条说了算，长度相同则 Allow 胜出；Disallow 后面为空表示不禁任何路径。path 必须以斜杠开头，agent 去空格后为空时都抛出 ValueError。返回“允许”或“禁止”。数据全部是虚构示例，不含真实网址。',
+    argLabels: ['robots.txt 文本', '要访问的路径', '爬虫名'],
+    startCode: 'def can_visit(robots_text, path, agent):\n    # 先按空行和 User-agent 分组，再按最长前缀匹配\n    return "待完成"',
+    cases: [
+      { function: 'can_visit', args: ['User-agent: *\nDisallow: /private/\n', '/private/data', '*'], expected: '禁止' },
+      { function: 'can_visit', args: ['User-agent: *\nDisallow: /private/\n', '/public/page', '*'], expected: '允许' },
+      { function: 'can_visit', args: ['User-agent: *\nDisallow: /private/\nAllow: /private/public/\n', '/private/public/page', '*'], expected: '允许' },
+      { function: 'can_visit', args: ['User-agent: 小爬虫\nDisallow: /a/\n\nUser-agent: *\nDisallow: /b/\n', '/b/page', '小爬虫'], expected: '允许' },
+      { function: 'can_visit', args: ['User-agent: *\nDisallow: /private/\n', 'private/data', '*'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：agent = agent.strip()，为空或 path 不以斜杠开头就 raise ValueError；按行解析，空行结束当前组，User-agent 行在当前组已有规则时开始新组，否则追加到当前组；Disallow 或 Allow 按第一个冒号拆，值 strip；先找 agent 相同的组，找不到找星号组，都没有返回允许；组内规则：Disallow 空值跳过，path.startswith(规则路径) 才匹配，取最长，长度相同 Allow 胜出，没有匹配返回允许，否则按胜出规则返回禁止或允许。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
