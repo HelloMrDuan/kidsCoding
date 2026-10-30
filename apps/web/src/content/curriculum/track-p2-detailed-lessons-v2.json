@@ -18,13 +18,13 @@
         "复杂度"
       ],
       "prerequisites": [],
-      "learningOutcome": "有序列表查找同一目标时二分比较次数不超过线性。",
+      "learningOutcome": "平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。",
       "environment": "Python3标准库",
       "project": {
         "title": "比较两种找书方法",
         "brief": "图书管理员要在200本书中快速找一册编号书。",
         "learnerBuild": "比较逐本检查和把有序书目对半分两种策略。",
-        "successCriteria": "有序列表查找同一目标时二分比较次数不超过线性。",
+        "successCriteria": "平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。",
         "creativeExtension": "收集不同规模比较次数。"
       },
       "teachingSteps": [
@@ -32,7 +32,7 @@
           "step": 1,
           "phase": "任务观察",
           "teacherPrompt": "图书管理员要在200本书中快速找一册编号书。 先预测最终状态。",
-          "learnerAction": "记录目标：有序列表查找同一目标时二分比较次数不超过线性。",
+          "learnerAction": "记录目标：平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。",
           "check": "能口述「比较两种找书方法」的开始状态和完成状态"
         },
         {
@@ -53,15 +53,15 @@
           "step": 4,
           "phase": "执行验收",
           "teacherPrompt": "对照预测实际执行，不以截图替代执行。",
-          "learnerAction": "运行并检查：有序列表查找同一目标时二分比较次数不超过线性。",
-          "check": "有序列表查找同一目标时二分比较次数不超过线性。"
+          "learnerAction": "运行并检查：平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。",
+          "check": "平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。"
         },
         {
           "step": 5,
           "phase": "故障排查",
           "teacherPrompt": "本课常见故障：无序列表直接二分可能得出错误结果。",
           "learnerAction": "复现失败再尝试修复：二分前明确数据已按同一规则排序。",
-          "check": "修复后满足：有序列表查找同一目标时二分比较次数不超过线性。"
+          "check": "修复后满足：平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。"
         }
       ],
       "assessment": {
@@ -69,7 +69,7 @@
           "caseId": "P2-U1-L01-POS-01",
           "setup": "图书管理员要在200本书中快速找一册编号书。",
           "action": "比较逐本检查和把有序书目对半分两种策略。",
-          "expected": "有序列表查找同一目标时二分比较次数不超过线性。",
+          "expected": "平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。",
           "executionStatus": "spec_only"
         },
         "negative": {
@@ -83,7 +83,7 @@
           {
             "criterion": "可验证的运行结果",
             "weight": 40,
-            "description": "有序列表查找同一目标时二分比较次数不超过线性。"
+            "description": "平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。"
           },
           {
             "criterion": "知识点解释",
@@ -129,7 +129,7 @@
         "materialsApproval": "pending",
         "releaseAllowed": false
       },
-      "parentReview": "请孩子先解释为什么要比较逐本检查和把有序书目对半分两种策略。，再让他演示有序列表查找同一目标时二分比较次数不超过线性。。"
+      "parentReview": "请孩子先解释为什么要比较逐本检查和把有序书目对半分两种策略。，再让他演示平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性。"
     },
     {
       "id": "P2-U1-L02",
@@ -913,7 +913,7 @@
       "ageRange": "11-16",
       "status": "detailed_not_published",
       "story": "游乐园取号窗口应该按到达先后服务。",
-      "focusConcept": "栈",
+      "focusConcept": "队列",
       "knowledgePoints": [
         "栈"
       ],
@@ -1041,7 +1041,7 @@
       "ageRange": "11-16",
       "status": "detailed_not_published",
       "story": "社团报名表出现很多重复的项目名。",
-      "focusConcept": "队列",
+      "focusConcept": "集合",
       "knowledgePoints": [
         "栈",
         "队列"
@@ -1170,7 +1170,7 @@
       "ageRange": "11-16",
       "status": "detailed_not_published",
       "story": "老师想知道一篇短文里哪些词出现最多。",
-      "focusConcept": "队列",
+      "focusConcept": "词频字典",
       "knowledgePoints": [
         "栈",
         "队列"
@@ -1299,7 +1299,7 @@
       "ageRange": "11-16",
       "status": "detailed_not_published",
       "story": "机器人在二维网格地图里需要知道上下左右是否能走。",
-      "focusConcept": "集合",
+      "focusConcept": "二维数组",
       "knowledgePoints": [
         "栈",
         "队列",
@@ -1429,7 +1429,7 @@
       "ageRange": "11-16",
       "status": "detailed_not_published",
       "story": "模拟社区消息中心需要按发送时间处理多条消息。",
-      "focusConcept": "集合",
+      "focusConcept": "队列",
       "knowledgePoints": [
         "栈",
         "队列",
@@ -2073,7 +2073,7 @@
       "ageRange": "11-16",
       "status": "detailed_not_published",
       "story": "分治队要从海量分数里快速找最大值。",
-      "focusConcept": "图",
+      "focusConcept": "分治",
       "knowledgePoints": [
         "递归",
         "回溯",
