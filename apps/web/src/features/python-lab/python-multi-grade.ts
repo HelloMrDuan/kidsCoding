@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'campus_report'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U2-L06': {
+    title: '第6课 · 生成校园数据报告',
+    prompt: '单元作品：编写 campus_report(csv_text, threshold, digits) 函数，把本单元 L01-L05 连起来。先用 csv.DictReader 读出数据表（表头 项目,数值），再依次做四件事：按 L01 算平均和中位数；按 L04 算每个项目占总和的百分比（四舍五入后合计不是 100 时，把差额补到数值最大的第一项）；按 L03 的比例缩放画井号柱状图（最大数值画满 20 个井号，其他按比例四舍五入，大于 0 至少 1 个）；按 L05 用平均和总体标准差找异常（偏离大于 threshold 倍标准差）。返回报告文本，顺序固定为：第一行“平均：X；中位数：Y”，接着“占比：”和每行“项目：数值 (百分比%)”，接着“柱状：”和每行“项目：井号串 (数值)”，接着“异常：”和异常行（没有异常时写“无异常”）。digits 是保留小数位数（字符串，只能是 0、1、2）。记录少于 3 条、数值为空、不是数字、为负数、总和为 0、标准差为 0、threshold 不是大于 0 的数字、digits 不合法时都抛出 ValueError。数据全部是虚构示例。',
+    argLabels: ['数据 CSV 文本', '异常倍数', '保留小数位数'],
+    startCode: 'import csv\nimport io\nimport math\n\ndef campus_report(csv_text, threshold, digits):\n    # 读表、算平均中位数、算占比、画柱状、找异常，拼成报告\n    return "待完成"',
+    cases: [
+      { function: 'campus_report', args: ['项目,数值\n跑步,30\n跳绳,20\n游泳,10\n', '1', '1'], expected: '平均：20.0；中位数：20.0\n占比：\n跑步：30 (50.0%)\n跳绳：20 (33.3%)\n游泳：10 (16.7%)\n柱状：\n跑步：#################### (30)\n跳绳：############# (20)\n游泳：####### (10)\n异常：\n跑步：30\n游泳：10' },
+      { function: 'campus_report', args: ['项目,数值\nA,10\nB,11\nC,12\nD,13\n', '2', '1'], expected: '平均：11.5；中位数：11.5\n占比：\nA：10 (21.7%)\nB：11 (23.9%)\nC：12 (26.1%)\nD：13 (28.3%)\n柱状：\nA：############### (10)\nB：################# (11)\nC：################## (12)\nD：#################### (13)\n异常：\n无异常' },
+      { function: 'campus_report', args: ['项目,数值\nA,10\nB,abc\nC,12\n', '1', '1'], expected: 'ERROR:ValueError' },
+      { function: 'campus_report', args: ['项目,数值\nA,10\nB,\nC,12\n', '1', '1'], expected: 'ERROR:ValueError' },
+      { function: 'campus_report', args: ['项目,数值\nA,10\nB,11\nC,12\n', 'abc', '1'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：先校验 threshold 大于 0、digits 在 0、1、2 之间；数值用 float() 转换，失败、为空或为负就 raise ValueError；记录少于 3 条、总和为 0、标准差为 0 就 raise ValueError；平均中位数按排序求；百分比四舍五入后差额补到最大项；柱状最大数值画满 20 个井号；异常偏离大于 threshold 倍标准差；输出数值用原始文本。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
