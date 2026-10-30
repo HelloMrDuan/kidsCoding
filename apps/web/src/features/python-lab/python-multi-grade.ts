@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'line_chart'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U2-L02': {
+    title: '第2课 · 天气数据折线图',
+    prompt: '编写 line_chart(csv_text, height) 函数。先用 csv.DictReader 读出天气记录表（表头 日期,温度），再把温度归一化到折线图上：温度最低的点在最底行，最高的点在最顶行，中间按比例四舍五入到最近行；每行从左到右按日期顺序画点，有点的列画 *，无点的列留空格，每行去掉尾部空格后按从顶到底拼接成文本折线图并返回。height 是图的高度（行数，字符串，如 "5"）。记录少于 2 条、温度为空或不是数字、height 不是大于 1 的整数、所有温度相同时都抛出 ValueError。数据全部是虚构示例。',
+    argLabels: ['天气记录 CSV 文本', '图的高度（行数）'],
+    startCode: 'import csv\nimport io\n\ndef line_chart(csv_text, height):\n    # 先 DictReader 读表，再归一化温度画文本折线图\n    return "待完成"',
+    cases: [
+      { function: 'line_chart', args: ['日期,温度\n2026-10-01,20\n2026-10-02,23\n2026-10-03,26\n2026-10-04,29\n2026-10-05,32\n', '5'], expected: '    *\n   *\n  *\n *\n*' },
+      { function: 'line_chart', args: ['日期,温度\n2026-10-01,30\n2026-10-02,28\n2026-10-03,26\n', '3'], expected: '*\n *\n  *' },
+      { function: 'line_chart', args: ['日期,温度\n2026-10-01,20\n2026-10-02,\n', '5'], expected: 'ERROR:ValueError' },
+      { function: 'line_chart', args: ['日期,温度\n2026-10-01,20\n2026-10-02,abc\n', '5'], expected: 'ERROR:ValueError' },
+      { function: 'line_chart', args: ['日期,温度\n2026-10-01,20\n2026-10-02,23\n', '1'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：h = int(height)，小于 2 就 raise ValueError；temps 用 float() 转换，失败或为空就 raise ValueError；记录少于 2 条或最高等于最低就 raise ValueError；每点行号 round((t - 最低) / (最高 - 最低) * (h - 1))，从顶行到底行画 *，每行 rstrip() 后用换行拼接。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
