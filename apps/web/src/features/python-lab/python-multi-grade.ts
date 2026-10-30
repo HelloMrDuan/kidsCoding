@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'weather_on'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U3-L02': {
+    title: '第2课 · 读取公共天气接口',
+    prompt: '编写 weather_on(json_text, date) 函数，读取一段模拟的公共天气接口返回的 JSON 文本（不做真实网络请求，只解析给定文本，避免联网风险和密钥泄露）。JSON 结构是：顶层对象含“天气”列表，每项含日期、温度、状况。按 date 找到日期相同的一项，返回“日期：状况，温度度”（温度是整数）。date 去空格后为空、JSON 解析失败、顶层不是对象、没有“天气”列表、某项缺字段、温度不是整数、找不到日期时都抛出 ValueError。数据全部是虚构示例，不含真实网址和密钥。',
+    argLabels: ['天气接口 JSON 文本', '日期'],
+    startCode: 'import json\n\ndef weather_on(json_text, date):\n    # 先 json.loads 解析，再按日期查找\n    return "待完成"',
+    cases: [
+      { function: 'weather_on', args: ['{"城市": "北京", "天气": [{"日期": "2026-10-01", "温度": 20, "状况": "晴"}, {"日期": "2026-10-02", "温度": 18, "状况": "雨"}]}', '2026-10-01'], expected: '2026-10-01：晴，20度' },
+      { function: 'weather_on', args: ['{"城市": "北京", "天气": [{"日期": "2026-10-01", "温度": 20, "状况": "晴"}, {"日期": "2026-10-02", "温度": 18, "状况": "雨"}]}', '2026-10-02'], expected: '2026-10-02：雨，18度' },
+      { function: 'weather_on', args: ['{"城市": "北京", "天气": [{"日期": "2026-10-01", "温度": 20, "状况": "晴"}]}', '2026-10-03'], expected: 'ERROR:ValueError' },
+      { function: 'weather_on', args: ['不是 JSON', '2026-10-01'], expected: 'ERROR:ValueError' },
+      { function: 'weather_on', args: ['{"城市": "北京"}', '2026-10-01'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：date = date.strip()，为空先 raise ValueError；data = json.loads(json_text)，失败转 ValueError；顶层不是 dict 或“天气”不是 list 就 raise ValueError；每项不是 dict 或缺日期、温度、状况就 raise ValueError；温度不是 int（布尔值也不算）就 raise ValueError；按 item.get("日期") == date 查找，找到返回 f"{date}：{状况}，{温度}度"，找不到 raise ValueError。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
