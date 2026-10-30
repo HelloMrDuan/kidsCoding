@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'clean_table'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,19 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U1-L05': {
+    title: '第5课 · 数据清洗缺失值',
+    prompt: '编写 clean_table(csv_text, fill_value) 函数。先用 csv.DictReader 读出一张 CSV 表格，再逐行、逐列清洗：把空值（空字符串或只有空格）换成 fill_value，其他值去空格后原样保留；最后用 csv.DictWriter 把同一表头、同一行数、同一顺序的表格写回成 CSV 文本并返回。CSV 为空、没有表头、fill_value 为空时都抛出 ValueError。注意：只替换单个值不算表格清洗，必须整张表读入、清洗、写回，并验证行数不变。数据全部是虚构示例。',
+    argLabels: ['CSV 表格文本', '填充值'],
+    startCode: 'import csv\nimport io\n\ndef clean_table(csv_text, fill_value):\n    # 先 DictReader 读表，再逐格清洗，最后 DictWriter 写回\n    return "待完成"',
+    cases: [
+      { function: 'clean_table', args: ['姓名,分数\n小雨,90\n乐乐,\n阿星,85\n', '0'], expected: '姓名,分数\n小雨,90\n乐乐,0\n阿星,85\n' },
+      { function: 'clean_table', args: ['姓名,城市,分数\n小雨,,90\n乐乐,北京,\n', '未知'], expected: '姓名,城市,分数\n小雨,未知,90\n乐乐,北京,未知\n' },
+      { function: 'clean_table', args: ['', '未知'], expected: 'ERROR:ValueError' },
+      { function: 'clean_table', args: ['姓名,分数\n小雨,90\n', ''], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：fill = fill_value.strip()，为空先 raise ValueError；reader = csv.DictReader(io.StringIO(csv_text))，没有 fieldnames 就 raise ValueError；每行把 strip() 后为空的格子换成 fill；用 csv.DictWriter 写回同一 fieldnames，lineterminator="\\n"，行数必须和输入一致。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
