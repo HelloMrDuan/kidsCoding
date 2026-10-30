@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'bar_chart'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U2-L03': {
+    title: '第3课 · 班级运动柱状图',
+    prompt: '编写 bar_chart(csv_text, max_width) 函数。先用 csv.DictReader 读出运动统计表（表头 项目,人数），再按人数比例画文本柱状图：人数最多的项目画满 max_width 个 #，其他项目按人数除以最高人数乘以 max_width 四舍五入（人数大于 0 时至少 1 个 #，人数为 0 时不画 #），每行格式为“项目：### (人数)”，按原顺序拼接返回。max_width 是最长柱子的字符数（字符串，如 "20"）。记录少于 2 条、人数为空、不是数字或为负数、max_width 不是 5 到 40 之间的整数时都抛出 ValueError。数据全部是虚构示例。',
+    argLabels: ['运动统计 CSV 文本', '最长柱子字符数'],
+    startCode: 'import csv\nimport io\n\ndef bar_chart(csv_text, max_width):\n    # 先 DictReader 读表，再按比例画 # 柱状图\n    return "待完成"',
+    cases: [
+      { function: 'bar_chart', args: ['项目,人数\n跑步,30\n跳绳,20\n游泳,10\n', '20'], expected: '跑步：#################### (30)\n跳绳：############# (20)\n游泳：####### (10)' },
+      { function: 'bar_chart', args: ['项目,人数\n篮球,5\n足球,15\n', '10'], expected: '篮球：### (5)\n足球：########## (15)' },
+      { function: 'bar_chart', args: ['项目,人数\n跑步,30\n跳绳,\n', '20'], expected: 'ERROR:ValueError' },
+      { function: 'bar_chart', args: ['项目,人数\n跑步,30\n跳绳,abc\n', '20'], expected: 'ERROR:ValueError' },
+      { function: 'bar_chart', args: ['项目,人数\n跑步,30\n跳绳,20\n', '2'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：w = int(max_width)，不在 5 到 40 之间就 raise ValueError；人数用 int() 转换，失败、为空或为负就 raise ValueError；最高人数记为 mx，长度 round(n / mx * w)，人数大于 0 时至少 1；每行用项目、井号串和人数拼成“项目：井号串 (人数)”。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
