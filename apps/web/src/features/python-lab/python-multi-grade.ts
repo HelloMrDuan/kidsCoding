@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'ledger_row'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,19 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U1-L02': {
+    title: '第2课 · 制作CSV记账表',
+    prompt: '编写 ledger_row(item, amount, category) 函数。用 csv.writer 生成一行记账表：项目、金额、类别。先去除项目和类别首尾空格，空值时抛出 ValueError；金额必须能转成数字，否则抛出 ValueError，输出统一保留两位小数。项目含英文逗号时，csv.writer 必须自动加引号，手工拼逗号不算通过。写完一行后要能读回验证：用 csv.reader 读这一行，字段数必须是 3，金额字段必须是两位小数。数据全部是虚构示例，不含真实个人信息。',
+    argLabels: ['项目', '金额', '类别'],
+    startCode: 'import csv\nimport io\n\ndef ledger_row(item, amount, category):\n    # 先 strip 去空格、校验空值和金额，再用 csv.writer 写一行\n    return "待完成"',
+    cases: [
+      { function: 'ledger_row', args: ['早餐', '12.5', '饮食'], expected: '早餐,12.50,饮食' },
+      { function: 'ledger_row', args: ['书,笔记本', '30', '学习'], expected: '"书,笔记本",30.00,学习' },
+      { function: 'ledger_row', args: ['', '10', '饮食'], expected: 'ERROR:ValueError' },
+      { function: 'ledger_row', args: ['午餐', 'abc', '饮食'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：item = item.strip()，category = category.strip()；空值或 float(amount) 失败就 raise ValueError；用 csv.writer 写 [item, f"{float(amount):.2f}", category]，含逗号的项目会自动加引号。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
