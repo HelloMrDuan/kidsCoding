@@ -91,6 +91,8 @@ function installG2Blocks() {
       {type: 'field_number', name: 'DURATION', value: 0.5, min: 0.2, max: 1.0, precision: 0.1},
     ], previousStatement: null, nextStatement: null, colour: 35, tooltip: '对应 Scratch 的“等待……秒”控制积木'},
     {type: 'kc2_flag', message0: '当绿旗被点击', nextStatement: null, colour: 45, tooltip: '点绿旗时从这里开始'},
+    {type: 'kc2_when_key_right', message0: '当按下右方向键', nextStatement: null, colour: 45, tooltip: '对应 Scratch 的“当按下右方向键”事件积木'},
+    {type: 'kc2_when_key_left', message0: '当按下左方向键', nextStatement: null, colour: 45, tooltip: '对应 Scratch 的“当按下左方向键”事件积木'},
     {type: 'kc2_clicked', message0: '当角色被点击', nextStatement: null, colour: 45, tooltip: '在舞台上点这个精灵时开始'},
     {type: 'kc2_goto', message0: '移到 x: %1 y: %2', args0: [
       {type: 'field_number', name: 'X', value: 0, min: -240, max: 240, precision: 1},
@@ -121,6 +123,9 @@ function installG2Blocks() {
     {type: 'kc2_wait_free', message0: '等待 %1 秒', args0: [
       {type: 'field_number', name: 'DURATION', value: 0},
     ], previousStatement: null, nextStatement: null, colour: 35, tooltip: '对应 Scratch 的“等待……秒”控制积木（0.1 秒一格，可以是 0）'},
+    {type: 'kc2_change_x', message0: '将 x 坐标增加 %1', args0: [
+      {type: 'field_number', name: 'DX', value: 10, precision: 1},
+    ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“将 x 坐标增加……”运动积木（正数往右，负数往左）'},
     {type: 'kc2_change_y', message0: '将 y 坐标增加 %1', args0: [
       {type: 'field_number', name: 'DY', value: 10, precision: 1},
     ], previousStatement: null, nextStatement: null, colour: 215, tooltip: '对应 Scratch 的“将 y 坐标增加……”运动积木（正数往上）'},
@@ -165,7 +170,7 @@ function buildSequence(ws: Blockly.WorkspaceSvg, specs: G2BlockSpec[], values: G
 const FIELD_TYPES: Record<string, string[]> = {
   X: ['kc2_goto'], Y: ['kc2_goto'], MESSAGE: ['kc2_say'], COSTUME: ['kc2_switch_costume'], TIMES: ['kc2_repeat'], DURATION: ['kc2_wait', 'kc2_wait_whole', 'kc2_wait_free'],
   BACKDROP: ['kc2_switch_backdrop', 'kc2_when_backdrop'], SOUND_MENU: ['kc2_play_sound'],
-  DIRECTION: ['kc2_point_direction'], STEPS: ['kc2_move_steps'], DEGREES: ['kc2_turn_right'], BROADCAST_OPTION: ['kc2_when_receive'], DY: ['kc2_change_y'],
+  DIRECTION: ['kc2_point_direction'], STEPS: ['kc2_move_steps'], DEGREES: ['kc2_turn_right'], BROADCAST_OPTION: ['kc2_when_receive'], DY: ['kc2_change_y'], DX: ['kc2_change_x'],
 }
 /** Script blocks in program order: each block, then what is inside its C-mouth, then the block below it (same order as the lesson specs). */
 function blocksInOrder(ws: Blockly.WorkspaceSvg): Blockly.Block[] {
@@ -316,6 +321,8 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
   const waitSlot = findSlot(allSpecs, 'DURATION')
   const waitWhole = !!waitSlot && !waitSlot.tenths
   const dySlot = findSlot(allSpecs, 'DY')
+  const dxSlots = findSlots(allSpecs, 'DX')
+  const dxSlot = findSlot(allSpecs, 'DX')
   const hasGoto = fields.X !== undefined
   const hasSay = fields.MESSAGE !== undefined
   const extraLabel = extra === 'kc2_switch_costume' ? `换成（${costumeOptions[costumeOptions.length - 1]}）造型` : '移到 x y'
@@ -414,6 +421,18 @@ export function ScratchG2Blocks({target, initialValues, onProgramChange}: {
         <label className="text-sm font-bold text-slate-700">{waitSlots[1].label}（{(waitSlots[1].min ?? 0.2).toFixed(1)}～{(waitSlots[1].max ?? 1).toFixed(1)}）
           <input data-testid="g2-edit-wait-2" type="number" min={waitSlots[1].min ?? 0.2} max={waitSlots[1].max ?? 1} step={0.1} value={fields['DURATION#2']}
             onChange={e => update('DURATION', e.target.value, 1)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
+        </label>
+      )}
+      {fields.DX !== undefined && (
+        <label className="text-sm font-bold text-slate-700">{dxSlots.length > 1 ? dxSlots[0].label : '每次 x 增加'}（{dxSlot?.min ?? 1}～{dxSlot?.max ?? 20}）
+          <input data-testid="g2-edit-dx" type="number" step={1} value={fields.DX}
+            onChange={e => update('DX', e.target.value)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
+        </label>
+      )}
+      {fields['DX#2'] !== undefined && dxSlots[1] && (
+        <label className="text-sm font-bold text-slate-700">{dxSlots[1].label}（{dxSlots[1].min ?? -20}～{dxSlots[1].max ?? 20}）
+          <input data-testid="g2-edit-dx-2" type="number" step={1} value={fields['DX#2']}
+            onChange={e => update('DX', e.target.value, 1)} className="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2"/>
         </label>
       )}
       {fields.DY !== undefined && (
