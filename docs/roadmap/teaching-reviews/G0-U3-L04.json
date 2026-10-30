@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G0-U3-L04",
+  "reviewedCommit": "88632d6",
+  "reviewedAt": "2026-10-30",
+  "reviewer": "Hark A（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G0 启蒙（5～7 岁）",
+  "prerequisites": [
+    "G0-U3-L03"
+  ],
+  "newConcepts": [
+    "一轮“亮、灭”重复几次就闪几轮",
+    "同步：几个角色同一拍做同一件事",
+    "用亮灭记录预测第 N 个动作后的状态"
+  ],
+  "references": [
+    "编程猫 6E https://www.codemao.cn/pinzhuan/（2026-10-29 重新访问官方页面）",
+    "核桃编程“一学九练” https://official.hetao101.com/curriculum（2026-10-29 访问）",
+    "CSTA 2026 PK–12 标准 https://csteachers.org/pk12standards/（2026-10-29 访问）"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 17,
+      "evidence": [
+        "G0-U3-L04 三条可观察目标（组成一轮并重复 3 次且最后熄灭、预测第 6 个动作后状态、对照记录找出不同步者）",
+        "5 关递进：错误实验（只亮不熄）→ 先闪一下 → 和亮亮一起闪三轮 → 修点点慢一拍 → 自选轮数",
+        "详案三条常见错误都可真实触发：只重复亮起不熄灭（left_glowing）、重复次数错误（missing_effect / extra_effect）、闪烁相位不同（out_of_sync）"
+      ],
+      "defects": [
+        "“选择所有萤火虫作为同一表演组”在本课是逐只角色编辑，未做角色组/克隆"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "原创池塘夜晚场景（kc-scenes/firefly-night.svg，已登记）与项目自绘萤火虫（亮时尾灯变黄带光晕）",
+        "舞台按“拍”同时播放三只萤火虫，每只下方有亮灭记录点",
+        "错误实验两个可点选预测"
+      ],
+      "defects": [
+        "没有音效节拍；朗读用浏览器自带声音"
+      ]
+    },
+    "practice": {
+      "score": 22,
+      "evidence": [
+        "练习 A（给闪闪写三轮并和亮亮同步，关注次数）与练习 B（点点相位错，关注循环体顺序）目标不同，均由事件引擎真实判定",
+        "单元测试：创意关 3 个轮数选择各自只接受两只次数都匹配的程序（3×3 遍历）；只改一只不通过",
+        "重复解与平铺解均通过"
+      ],
+      "defects": [
+        "“加入不同颜色”的扩展未实现，颜色固定为黄色"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "本课专属诊断：left_glowing、out_of_sync（指出是哪只萤火虫）、missing_effect / extra_effect（少闪/多闪一轮）",
+        "三层提示：现象 → 规则 → 做法",
+        "复盘卡列出真实遇到的错误"
+      ],
+      "defects": [
+        "不在积木上高亮出错的那一块"
+      ]
+    },
+    "creation": {
+      "score": 11,
+      "evidence": [
+        "创意改造：选闪 3/4/5 轮，两只萤火虫都要改对，作品“我的萤火虫表演”保存并可真实回放"
+      ],
+      "defects": [
+        "不能增减萤火虫或换颜色"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "通过只由事件引擎真实判定（同步、最后熄灭、轮数完全一致）",
+        "复盘卡 + 点选反思（第 6 个动作后的状态）保存重开仍在",
+        "三断点截图 docs/roadmap/evidence/G0-U3-L04/"
+      ],
+      "defects": [
+        "没有儿童试学；评分者是实现者，非独立"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "亮灭来自 event-engine.ts 真实展开“重复 N 次”后的效果序列，舞台按拍逐帧回放"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "/learn/event-lab/G0-U3-L04 可亲手为萤火虫拼块、改次数和顺序并运行（L3 实验可试玩）"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "第 1 关错误实验必须先真实运行“重复 3 次（亮起来）”、看到灯一直亮才能完成；E2E 覆盖"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "判定看每只萤火虫的效果序列是否同步、最后是否熄灭、轮数是否一致，不比对积木排列；重复解与平铺解都有效"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "“我的萤火虫表演”只有在所选轮数真实运行通过后才算完成，重开后可回放（E2E）"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "萤火虫与夜晚场景为项目自绘 SVG（event-stage FireflyArt / FireflyNight，firefly-night.svg 已登记授权表）；文字自写"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "只存本机 localStorage（事件课草稿，键含 G0-U3-L04），不含姓名，不上传"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "只亮不熄、少一轮、多一轮、相位错、只改一只的次数都不判通过（单元测试 + E2E）"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "lesson-maturity.ts 记为 L3 实验可试玩，目录不标正式发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "错误实验加上“熄灭”后亮灭记录为亮暗×3；创意关选闪 5 轮，两只都改成重复 5 次通过并保存为作品（E2E）",
+    "failureCase": "错误实验 → left_glowing；练习 A 次数 2 → missing_effect；练习 B 点点先灭后亮 → out_of_sync；创意关只改一只 → missing_effect",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清这一课的规则（概念）",
+      "第三层：给出具体积木做法"
+    ],
+    "practiceA": "练习 A：闪闪“重复 3 次（亮起来、熄灭）”与亮亮同步",
+    "practiceB": "练习 B：点点循环体由“熄灭、亮起来”改为“亮起来、熄灭”（起始程序必失败）",
+    "equivalentSolutions": [
+      "错误实验 / 练习 A / B：重复解与平铺 6 块都通过",
+      "创意关 3 个轮数各自有效（单元测试遍历）"
+    ],
+    "saveReopen": "每关每只萤火虫的程序（含重复积木与次数）、进度、错误实验观察、轮数选择、真实错误记录存本机事件课草稿；刷新后回到完成页，作品可回放（E2E）",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/grid-lab.spec.ts › G0-U3-L04 firefly show: only on, one flash, three rounds, catch the beat, my firefly show saved and reopened"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G0-U3-L04/"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 参考评分且评分者是实现者，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学（需真实儿童与监护人同意，不得模拟）"
+  ],
+  "notes": "2026-10-30 Hark A 实现者参考评价（非独立人工评分）：G0-U3-L04 五关正式候选课程（重复节奏与同步），事件引擎支持脚本内“重复 N 次”与按拍同步的表演舞台（sync_show），新增萤火虫与夜晚场景。"
+}

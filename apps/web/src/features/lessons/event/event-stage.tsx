@@ -183,6 +183,42 @@ function SquirrelArt() {
   )
 }
 
+/** G0-U3-L04 story scenery: a summer night by the pond — moon, stars and reeds where the fireflies perform (original art, V2 flat style). */
+export function FireflyNight() {
+  return (
+    <g data-grid-item="firefly-night">
+      <rect x="0" y="0" width="100" height="60" rx="4" fill="#1f2f57" />
+      <circle cx="84" cy="11" r="6" fill="#fff4c2" />
+      <circle cx="86.5" cy="9.5" r="5" fill="#1f2f57" />
+      <g fill="#fff4c2">
+        <circle cx="12" cy="8" r=".7" /><circle cx="26" cy="14" r=".5" /><circle cx="40" cy="6" r=".6" /><circle cx="58" cy="12" r=".5" /><circle cx="70" cy="5" r=".7" /><circle cx="94" cy="24" r=".5" />
+      </g>
+      <path d="M0 44 Q25 38 50 43 T100 42 V60 H0 Z" fill="#2f6b4a" />
+      <ellipse cx="50" cy="53" rx="30" ry="4.5" fill="#3a5f9c" stroke="#5b86c9" strokeWidth=".5" />
+      <g stroke="#4fae55" strokeWidth="1" strokeLinecap="round" fill="none">
+        <path d="M8 58 q1 -10 -1 -16 M11 58 q0 -8 2 -13 M90 58 q-1 -10 1 -15 M93 58 q0 -7 -2 -12" />
+      </g>
+    </g>
+  )
+}
+
+/** G0-U3-L04 firefly (original art, same chibi style): its tail lights up while glowing. */
+function FireflyArt({ glowing }: { glowing: boolean }) {
+  return (
+    <g>
+      {glowing ? <circle cx="50" cy="74" r="34" fill="#fff36b" opacity=".45" data-event-mark="glow" /> : null}
+      <ellipse cx="50" cy="76" rx="18" ry="16" fill={glowing ? '#fff36b' : '#8a8f5a'} stroke={glowing ? '#e0b400' : '#5b5e3a'} strokeWidth="3" />
+      <ellipse cx="30" cy="40" rx="16" ry="10" fill="#dff3ff" stroke="#8fb6d9" strokeWidth="2" opacity=".9" transform="rotate(-25 30 40)" />
+      <ellipse cx="70" cy="40" rx="16" ry="10" fill="#dff3ff" stroke="#8fb6d9" strokeWidth="2" opacity=".9" transform="rotate(25 70 40)" />
+      <circle cx="50" cy="44" r="20" fill="#3d3a5c" stroke="#24223a" strokeWidth="3" />
+      <ellipse cx="43" cy="42" rx="4" ry="5" fill="#fff" /><ellipse cx="57" cy="42" rx="4" ry="5" fill="#fff" />
+      <circle cx="44" cy="43" r="2.2" fill="#1a2739" /><circle cx="58" cy="43" r="2.2" fill="#1a2739" />
+      <path d="M44 52 Q50 56 56 52" fill="none" stroke="#ffb3c1" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M42 26 q-4 -10 -10 -12 M58 26 q4 -10 10 -12" fill="none" stroke="#24223a" strokeWidth="2.4" strokeLinecap="round" />
+    </g>
+  )
+}
+
 export type EventStageProps = {
   level: EventLevel
   effects: EventEffect[]
@@ -191,7 +227,7 @@ export type EventStageProps = {
   label?: string
 }
 
-const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台', 'two-doors': '森林小剧场', 'apple-tree': '苹果园', 'meeting-stage': '森林见面会舞台' }
+const STAGE_LABELS: Partial<Record<NonNullable<EventLevel['scenery']>, string>> = { 'morning-glade': '林间空地舞台', 'stage-flags': '森林开幕舞台', 'bell-tree': '铃铛树下的舞台', 'two-doors': '森林小剧场', 'apple-tree': '苹果园', 'meeting-stage': '森林见面会舞台', 'firefly-night': '池塘边的萤火虫夜晚舞台' }
 
 /** Draws the characters and what has happened to them so far; characters are tappable. */
 export function EventStage({ level, effects, onActorClick, label }: EventStageProps) {
@@ -205,11 +241,15 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
           : level.scenery === 'two-doors' ? <TwoDoors />
           : level.scenery === 'apple-tree' ? <AppleOrchard />
           : level.scenery === 'meeting-stage' ? <MeetingStage />
+          : level.scenery === 'firefly-night' ? <FireflyNight />
           : <MorningGlade />}
       </svg>
       {level.actors.map(actor => {
         const s = state[actor.id]
         const name = actor.name
+        const firefly = actor.id.startsWith('firefly')
+        // G0-U3-L04: the light log under a firefly, one dot per beat (filled = lit).
+        const glowLog = effects.filter(e => e.actor === actor.id && (e.action === 'glow_on' || e.action === 'glow_off')).map(e => (e.action === 'glow_on' ? '1' : '0')).join('')
         return (
           <button
             key={actor.id}
@@ -223,12 +263,14 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             data-said={s.said ? 'true' : 'false'}
             data-surprised={s.surprised ? 'true' : 'false'}
             data-rang={rang.has(actor.id) ? 'true' : 'false'}
-            aria-label={`${name}：${s.onstage ? '' : '在后台，'}${actor.id === 'apple' || actor.id === 'tree' ? '' : s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${s.fallen ? '，落到了地上' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${onActorClick ? '。点一下它' : ''}`}
+            data-glowing={s.glowing ? 'true' : 'false'}
+            data-glow-log={glowLog}
+            aria-label={`${name}：${s.onstage ? '' : '在后台，'}${firefly ? (s.glowing ? '亮着' : '暗着') : actor.id === 'apple' || actor.id === 'tree' ? '' : s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${s.fallen ? '，落到了地上' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${onActorClick ? '。点一下它' : ''}`}
             onClick={() => onActorClick?.(actor.id)}
           >
             <svg viewBox="0 0 100 110" className="block w-full" aria-hidden="true">
               <g style={{ filter: s.awake ? undefined : 'saturate(.55) brightness(.92)' }}>
-                {actor.id === 'squirrel' ? <SquirrelArt /> : actor.id === 'tree' ? <TreeArt /> : actor.id === 'apple' ? <AppleArt /> : <CharacterArt id={actor.id} />}
+                {firefly ? <FireflyArt glowing={s.glowing} /> : actor.id === 'squirrel' ? <SquirrelArt /> : actor.id === 'tree' ? <TreeArt /> : actor.id === 'apple' ? <AppleArt /> : <CharacterArt id={actor.id} />}
               </g>
               {!s.awake ? (
                 <g data-event-mark="asleep">
@@ -247,7 +289,12 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             {rang.has(actor.id) && !s.said ? (
               <span className="absolute -top-3 left-1/2 whitespace-nowrap rounded-[12px] border-2 border-orange-400 bg-white px-2 py-0.5 text-xs font-black text-orange-700 shadow" style={{ transform: 'translate(-50%, -210%)' }} data-event-mark="bell">{s.surprised ? '✨🔔 叮铃！' : '🔔 叮铃！'}</span>
             ) : null}
-            <span className="mt-0.5 block text-center text-[11px] font-black text-slate-700">{name}</span>
+            <span className={`mt-0.5 block text-center text-[11px] font-black ${firefly ? 'text-amber-100' : 'text-slate-700'}`}>{name}</span>
+            {firefly && glowLog ? (
+              <span className="mx-auto mt-0.5 flex max-w-[64px] flex-wrap justify-center gap-[2px]" data-event-mark="glow-log" aria-hidden="true">
+                {glowLog.split('').map((g, i) => <i key={i} className={`block h-[7px] w-[7px] shrink-0 rounded-full border ${g === '1' ? 'border-amber-500 bg-yellow-300' : 'border-slate-400 bg-slate-600'}`} />)}
+              </span>
+            ) : null}
           </button>
         )
       })}
@@ -255,8 +302,12 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
   )
 }
 
-/** Plays effects one by one so the child sees each block act. */
-export function useEventPlayback(effects: EventEffect[] | null, intervalMs = 520) {
+/** Plays effects one by one so the child sees each block act; on a parallel show stage (G0-U3-L04) a whole beat plays at once. */
+export function useEventPlayback(effects: EventEffect[] | null, intervalMs = 520, parallel = false) {
+  const list = effects ?? []
+  // Step k reveals every effect whose step index is below k.
+  const stepOf = parallel ? beatSteps(list) : list.map((_, i) => i)
+  const total = list.length ? Math.max(...stepOf) + 1 : 0
   const [tick, setTick] = useState<{ effects: EventEffect[] | null; shown: number }>({ effects, shown: 0 })
   if (tick.effects !== effects) setTick({ effects, shown: 0 })
   const shown = tick.effects === effects ? tick.shown : 0
@@ -265,11 +316,16 @@ export function useEventPlayback(effects: EventEffect[] | null, intervalMs = 520
     let i = 0
     const timer = setInterval(() => {
       i += 1
-      if (i > effects.length) { clearInterval(timer); return }
+      if (i > total) { clearInterval(timer); return }
       setTick({ effects, shown: i })
     }, intervalMs)
     return () => clearInterval(timer)
-  }, [effects, intervalMs])
-  const list = effects ?? []
-  return { visible: list.slice(0, shown), done: !!effects && shown >= list.length }
+  }, [effects, intervalMs, total])
+  return { visible: list.filter((_, i) => stepOf[i] < shown), done: !!effects && shown >= total }
+}
+
+/** For a show stage: effects of the same interaction and beat share one playback step. */
+export function beatSteps(effects: EventEffect[]) {
+  const keys = [...new Set(effects.map(e => e.interaction * 1000 + e.beat))].sort((a, b) => a - b)
+  return effects.map(e => keys.indexOf(e.interaction * 1000 + e.beat))
 }

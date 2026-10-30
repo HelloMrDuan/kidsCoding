@@ -9,7 +9,9 @@
 // - `send_bell` rings the forest bell; after the running script ends, every
 //   script whose hat is `when_bell` runs (in stage order).
 
-export type EventActorId = 'fox' | 'rabbit' | 'bird' | 'frog' | 'squirrel' | 'apple' | 'tree' | 'flag'
+import { REPEAT_BLOCK, repeatTimes, type ProgramBlock } from '../blockly/program-tree'
+
+export type EventActorId = 'fox' | 'rabbit' | 'bird' | 'frog' | 'squirrel' | 'apple' | 'tree' | 'flag' | 'firefly_a' | 'firefly_b' | 'firefly_c'
 
 export const EVENT_HATS = ['when_start', 'when_clicked', 'when_bell'] as const
 export type EventHat = (typeof EVENT_HATS)[number]
@@ -22,6 +24,9 @@ export const EVENT_ACTIONS = [
   'raise_flag',
   'fall_down',
   'send_bell',
+  // G0-U3-L04: a firefly lights up / goes dark
+  'glow_on',
+  'glow_off',
 ] as const
 export type EventAction = (typeof EVENT_ACTIONS)[number]
 
@@ -47,10 +52,13 @@ export type EventActor = {
 export type EventLevel = {
   actors: EventActor[]
   /** Original story art behind the stage. */
-  scenery?: 'morning-glade' | 'stage-flags' | 'bell-tree' | 'two-doors' | 'apple-tree' | 'meeting-stage'
+  scenery?: 'morning-glade' | 'stage-flags' | 'bell-tree' | 'two-doors' | 'apple-tree' | 'meeting-stage' | 'firefly-night'
+  /** G0-U3-L04: every character's script plays at the same time, beat by beat (a show), and must stay in step. */
+  parallel?: boolean
 }
 
-export type EventBlock = { type: string; disconnected?: boolean }
+/** SYS-107 repeat blocks carry `times` and `body` (G0-U3-L04 brings them to the event stage). */
+export type EventBlock = ProgramBlock
 export type EventScripts = Partial<Record<EventActorId, EventBlock[]>>
 
 export type EventInteraction = { kind: 'start' } | { kind: 'click'; actor: EventActorId }
@@ -62,9 +70,11 @@ export type EventEffect = {
   interaction: number
   /** Which block ran (1-based after the hat). */
   blockIndex: number
+  /** G0-U3-L04: the beat within its script (0-based); on a parallel stage the same beat plays together. */
+  beat: number
 }
 
-export type EventScriptIssue = 'no_hat' | 'hat_not_on_top' | 'unknown_block' | 'cannot_do' | 'disconnected'
+export type EventScriptIssue = 'no_hat' | 'hat_not_on_top' | 'unknown_block' | 'cannot_do' | 'disconnected' | 'empty_repeat'
 
 export type EventRun = {
   effects: EventEffect[]
@@ -87,14 +97,22 @@ export function parseScript(actor: EventActor, blocks: EventBlock[] | undefined)
   if (hatIndex === -1) return { hat: null, actions: [], issue: { issue: 'no_hat' as const, blockIndex: 0, type: list[0].type } }
   if (hatIndex > 0) return { hat: null, actions: [], issue: { issue: 'hat_not_on_top' as const, blockIndex: 0, type: list[0].type } }
   const actions: EventAction[] = []
+  /** 1-based top-level block each action came from. */
+  const from: number[] = []
   for (let i = 1; i < list.length; i += 1) {
     const b = list[i]
     if (b.disconnected) return { hat: null, actions: [], issue: { issue: 'disconnected' as const, blockIndex: i, type: b.type } }
-    if (!isAction(b.type)) return { hat: null, actions: [], issue: { issue: 'unknown_block' as const, blockIndex: i, type: b.type } }
-    if (!actor.can.includes(b.type)) return { hat: null, actions: [], issue: { issue: 'cannot_do' as const, blockIndex: i, type: b.type } }
-    actions.push(b.type)
+    // G0-U3-L04: one level of “重复 N 次” around actions (no repeat inside a repeat on the event stage).
+    const inner = b.type === REPEAT_BLOCK ? b.body ?? [] : [b]
+    if (b.type === REPEAT_BLOCK && inner.length === 0) return { hat: null, actions: [], issue: { issue: 'empty_repeat' as const, blockIndex: i, type: b.type } }
+    for (const c of inner) {
+      if (!isAction(c.type)) return { hat: null, actions: [], issue: { issue: 'unknown_block' as const, blockIndex: i, type: c.type } }
+      if (!actor.can.includes(c.type)) return { hat: null, actions: [], issue: { issue: 'cannot_do' as const, blockIndex: i, type: c.type } }
+    }
+    const times = b.type === REPEAT_BLOCK ? repeatTimes(b) : 1
+    for (let t = 0; t < times; t += 1) for (const c of inner) { actions.push(c.type as EventAction); from.push(i) }
   }
-  return { hat: list[0].type as EventHat, actions }
+  return { hat: list[0].type as EventHat, actions, from }
 }
 
 /** Runs the interactions in order against every character's script. */
@@ -114,7 +132,7 @@ export function runEventProgram(level: EventLevel, scripts: EventScripts, intera
       p.actions.forEach((action, i) => {
         if (loop) return
         if (effects.length >= EVENT_MAX_EFFECTS) { loop = true; return }
-        effects.push({ actor: p.actor.id, action, interaction: index, blockIndex: i + 1 })
+        effects.push({ actor: p.actor.id, action, interaction: index, blockIndex: p.from?.[i] ?? i + 1, beat: i })
         if (action === 'send_bell') rang = true
       })
       if (rang) queue.push(...parsed.filter(q => q.hat === 'when_bell'))
@@ -124,11 +142,11 @@ export function runEventProgram(level: EventLevel, scripts: EventScripts, intera
 }
 
 /** What the stage looks like after some effects (for drawing and for checks). */
-export type EventActorState = { awake: boolean; onstage: boolean; said: boolean; surprised: boolean; flagUp: boolean; fallen: boolean }
+export type EventActorState = { awake: boolean; onstage: boolean; said: boolean; surprised: boolean; flagUp: boolean; fallen: boolean; glowing: boolean }
 
 export function stageStateAfter(level: EventLevel, effects: EventEffect[]): Record<EventActorId, EventActorState> {
   const state = {} as Record<EventActorId, EventActorState>
-  for (const a of level.actors) state[a.id] = { awake: !a.asleep, onstage: !a.offstage, said: false, surprised: false, flagUp: false, fallen: false }
+  for (const a of level.actors) state[a.id] = { awake: !a.asleep, onstage: !a.offstage, said: false, surprised: false, flagUp: false, fallen: false, glowing: false }
   for (const e of effects) {
     const s = state[e.actor]
     if (!s) continue
@@ -138,6 +156,8 @@ export function stageStateAfter(level: EventLevel, effects: EventEffect[]): Reco
     if (e.action === 'enter_stage') s.onstage = true
     if (e.action === 'raise_flag') s.flagUp = true
     if (e.action === 'fall_down') s.fallen = true
+    if (e.action === 'glow_on') s.glowing = true
+    if (e.action === 'glow_off') s.glowing = false
   }
   return state
 }
@@ -165,6 +185,9 @@ export type EventFailure =
   | 'missing_effect'
   | 'extra_effect'
   | 'wrong_trigger'
+  | 'empty_repeat'
+  | 'out_of_sync'
+  | 'left_glowing'
 
 export type EventCheck = {
   passed: boolean
@@ -193,6 +216,17 @@ export function checkEventGoal(level: EventLevel, scripts: EventScripts, expecta
     const issue = run.issues[actor.id]
     if (issue && expectedActors.has(actor.id)) return fail(issue.issue, undefined, actor.id)
   }
+  if (level.parallel) {
+    // G0-U3-L04: on a show stage every performer the goal names must do the same thing on the same beat.
+    const performers = level.actors.filter(a => expectedActors.has(a.id)).map(a => a.id)
+    const seq = (id: EventActorId) => run.effects.filter(e => e.actor === id).map(e => e.action)
+    const lead = seq(performers[0])
+    const odd = performers.find(id => { const s = seq(id); return s.some((x, k) => k < lead.length && x !== lead[k]) })
+    if (odd) return fail('out_of_sync', undefined, odd)
+    const final = stageStateAfter(level, run.effects)
+    const lit = performers.find(id => final[id]?.glowing)
+    if (lit) return fail('left_glowing', undefined, lit)
+  }
   for (let i = 0; i < expectations.length; i += 1) {
     const want = expectations[i].effects
     const got = run.effects.filter(e => e.interaction === i).map(e => [e.actor, e.action] as [EventActorId, EventAction])
@@ -201,6 +235,10 @@ export function checkEventGoal(level: EventLevel, scripts: EventScripts, expecta
     const later = expectations.slice(i + 1).flatMap(e => e.effects)
     if (got.some(([a, x]) => later.some(([b, y]) => a === b && x === y) && !want.some(([b, y]) => a === b && x === y))) return fail('too_early', i, got[0]?.[0])
     if (got.length === 0) return fail('nothing_happened', i)
+    // G0-U3-L04: a repeat that ran too few / too many rounds leaves a prefix of the goal / overshoots it.
+    const prefix = (a: Array<[string, string]>, b: Array<[string, string]>) => a.length < b.length && a.every((x, k) => x[0] === b[k][0] && x[1] === b[k][1])
+    if (level.parallel && prefix(got, want)) return fail('missing_effect', i, want[got.length][0])
+    if (level.parallel && prefix(want, got)) return fail('extra_effect', i, got[want.length][0])
     const wantKeys = new Set(want.map(([a, x]) => `${a}:${x}`))
     const gotKeys = new Set(got.map(([a, x]) => `${a}:${x}`))
     // Another character did what the goal wanted from someone who stayed still.
