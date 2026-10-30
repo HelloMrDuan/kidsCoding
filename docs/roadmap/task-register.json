@@ -2710,6 +2710,29 @@
         "reviewer": "实现者 AI（Hark A）；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
+    },
+    {
+      "id": "OPS-016",
+      "title": "Scratch VM Playwright 分片从 2 改为 4，timeout 15 改为 12",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": ["OPS-015"],
+      "scope": ".github/workflows/curriculum-content.yml（仅 Scratch VM Job 家族）；docs/roadmap/task-register.json（仅登记本条）；不改其他 Job、不改测试内容、不改业务代码。",
+      "acceptance": [
+        "scratch-real-vm-browser、part2、part3、part4 四个 Job，分别为 shard 1/4、2/4、3/4、4/4，timeout-minutes 均为 12",
+        "同一 17 个 spec 文件、同一 desktop 项目、workers=2，各分片独立上传 test-results（if: always()）",
+        "PR 描述含独立成行的 Task-ID: OPS-016，且 task-ledger CI 通过",
+        "整改后对比待 CI 运行后补齐，不得提前宣称已解决超时"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/263",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "工作流整改独立 PR，遵循统一 CI 规范草案 PR #262 的分片规则；规范本身仍为 Draft，待主要架构与 CI 负责账号评审；本任务不改其他 Job 家族。"
     }
   ]
 }
