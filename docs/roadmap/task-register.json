@@ -2727,6 +2727,25 @@
       ],
       "evidence": {},
       "notes": "2026-10-30 duan 下达全仓库 CI 治理指令：所有 Muse 账号、所有课程方向、所有 PR 适用；kid小宝牵头规范与架构协调，四账号分工不变。Scratch 分片实施另立 SYS-109 独立 PR，不混入本 PR。"
+    },
+    {
+      "id": "SYS-109",
+      "title": "Scratch/Blockly 桌面套件拆 6 分片：消除 15 分钟作业超时",
+      "priority": "P0",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [
+        "SYS-108"
+      ],
+      "scope": "只改 .github/workflows/curriculum-content.yml：将旧 scratch-real-vm-browser（--shard=1/2，123 测试，单步 14m54s，两次 15 分钟取消）与 part2（25 测试）替换为 6 个显式文件清单并行 Job（S1/S2 以 --grep/--grep-invert 配对拆 scratch-g2-u1.spec.ts，S3-S6 按文件分组），每 Job timeout-minutes: 12、独立上传报告。不改 Scratch VM 业务行为，不删测试，不降断言，不混入 SSR-101，不碰其他账号分支。",
+      "acceptance": [
+        "6 个分片 Job 全部并行通过，每片实测耗时≤12 分钟",
+        "6 片测试数之和等于 --list 全量 148，无重复、无遗漏",
+        "旧 2 分片 Job 已移除，workflow YAML 解析通过",
+        "PR CI 全绿"
+      ],
+      "evidence": {},
+      "notes": "2026-10-30 duan 裁定测试分片拆分 + 耗时优化 + 分级门禁；SYS-108 规范附录 B 为实施依据。计数勘误：全量 148（17 文件），123 只是旧分片 1 的计数。原生 --shard 实测不均衡（1/2 得 123/25，1/4 得 41/82/0/25 含空分片），故用显式文件清单。"
     }
   ]
 }
