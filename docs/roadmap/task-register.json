@@ -2765,6 +2765,18 @@
       ],
       "evidence": {},
       "notes": "2026-10-30 duan 任命 kid小宝为主架构治理负责人并下达统一规则；本 PR 不授权合并任何 PR。现状核查：15 个 Open PR；#261/#262 为平行规范重写、#263 用已被 SYS-108 否决的原生 --shard 4 分片、#265 缺耗时证据——裁定见 AGENTS.md §8 与 PR 描述，处置（关闭与否）由 duan 定，本 PR 不动它们。"
+    },
+    {
+      "id": "SSR-102",
+      "title": "修复 /project 完成页服务端 navigator 引用导致的 HTTP 500 风险",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "complete 页链路静态 import 图去 Blockly 化：DuoProject、UnitProject 内 BlocklyWorkspace 改 next/dynamic ssr:false；新增 SSR 边界回归测试；不改课程内容、引擎、V2、进度与数据库",
+      "acceptance": ["生产构建正常", "complete 页静态 import 图不再可达 blockly-workspace 与 @blockly/keyboard-navigation（回归测试）", "DuoProject/UnitProject 渲染与重播行为不退化", "真实 Chrome 三断点", "必需 CI 全过", "合并部署后预发布实测（如能拿到有效 projectId；拿不到则如实注明未复现）"],
+      "evidence": {},
+      "notes": "duan 2026-10-30 全权授权下由 kid小宝自取编号 SSR-102（合并前可改名）；与 SSR-101 同根因；线上 500 未实测复现（无有效 projectId），不得宣称已验证线上；本地生产构建未跑（VM 无干净构建环境），以 PR CI 构建作业验证为准"
     }
   ]
 }
