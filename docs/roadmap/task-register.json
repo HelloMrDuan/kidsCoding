@@ -2710,6 +2710,30 @@
         "reviewer": "实现者 AI（Hark A）；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
+    },
+    {
+      "id": "OPS-015",
+      "title": "KidsCoding 统一 CI 执行治理规范",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "docs/engineering/CI-EXECUTION-STANDARD.md；docs/roadmap/task-register.json（仅登记本条）；docs-only，不改工作流、不改业务代码、不改现有规范、不改课程状态。",
+      "acceptance": [
+        "新增统一 CI 规范文件，规定 Job 目标 ≤12 分钟、15 分钟为硬限制、3 分钟余量、所有必需测试不得跳过",
+        "规范包含分片、worker 与资源隔离、耗时采集、日志报告、失败分类与有限重试、PR/夜间/发布门禁、覆盖完整性、超时诊断流程",
+        "附录为实测盘点：6 个工作流、curriculum 13 个 Job 的 timeout 与近期耗时、Scratch VM 超时证据与整改优先级",
+        "PR 描述含独立成行的 Task-ID: OPS-015，且 task-ledger CI 通过",
+        "本任务不宣称任何工作流已整改、任何 Job 已通过全部 CI、任何课程已完成"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/262",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "docs-only 规范草案。统一 CI 治理要求由项目负责人 2026-10-30 提出，Muse-C 负责盘点、起草与提交 Draft PR 供主要架构与 CI 负责账号评审；工作流整改另起独立 PR，不在本 PR 中改 workflow。"
     }
   ]
 }
