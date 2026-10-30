@@ -173,4 +173,54 @@ describe('G0-U3 loop lessons (Hark A, SYS-107 repeat on the grid engine)', () =>
       expect(lesson.review?.answer).toContain('次数')
     })
   })
+  describe('G0-U3-L03 花园浇水机器', () => {
+    const lesson = g0u3LoopLessons['G0-U3-L03']
+    const creative = lesson.steps.find(s => s.kind === 'creative')!
+    const F = { type: 'move_forward' }
+    const Wt = { type: 'water_plant' }
+    const loop = (times: number, ...body: { type: string }[]) => [{ type: 'when_start' }, { type: 'repeat_times', times, body }]
+
+    it('the error lab is “repeated three times”: only the count changes to 4', () => {
+      const lab = lesson.steps[0]
+      expect(runGridProgram(lab.level, lab.starterBlocks!).failure).toBe('pots_missed')
+      expect(runGridProgram(lab.level, loop(4, F, Wt)).passed).toBe(true)
+    })
+
+    it('moving without watering, watering before moving, and one round too many each fail with their own reason', () => {
+      const a = lesson.steps.find(s => s.kind === 'practice-a')!
+      expect(runGridProgram(a.level, loop(4, F)).failure).toBe('pots_missed')
+      expect(runGridProgram(a.level, loop(4, Wt, F)).failure).toBe('no_pot_here')
+      expect(runGridProgram(a.level, loop(5, F, Wt)).failure).toBe('out_of_bounds')
+      expect(runGridProgram(a.level, [{ type: 'when_start' }, F, Wt, Wt]).failure).toBe('watered_twice')
+    })
+
+    it('spaced pots need a different loop body, not a different count', () => {
+      const b = lesson.steps.find(s => s.kind === 'practice-b')!
+      expect(b.starterBlocks![1].times).toBe(4)
+      expect(runGridProgram(b.level, loop(4, F, F, Wt)).passed).toBe(true)
+    })
+
+    it('each garden the child may pick accepts only its own loop (count = pots, body = step to the next pot + water)', () => {
+      const { goalChoices, pots, labels } = creative.creative!
+      expect(pots).toHaveLength(goalChoices.length)
+      expect(labels).toHaveLength(goalChoices.length)
+      const programs = pots!.map(p => loop(p.length, ...(p[1].x - p[0].x === 2 ? [F, F] : [F]), Wt))
+      goalChoices.forEach((goal, i) => {
+        const level = stepLevel(creative, { creative: { [creative.id]: { goal } } })
+        expect(level.pots).toEqual(pots![i])
+        programs.forEach((program, j) => expect(runGridProgram(level, program).passed, `garden ${i} with ${j}`).toBe(i === j))
+      })
+    })
+
+    it('every step shows the robot and the original watering plan; the reflection contrasts water inside vs after the loop', () => {
+      for (const step of lesson.steps) {
+        expect(step.level.actor, step.id).toBe('robot')
+        expect(step.level.scenery, step.id).toBe('wateringplan')
+        expect(step.level.pots?.length, step.id).toBeGreaterThan(0)
+      }
+      const after = [{ type: 'when_start' }, { type: 'repeat_times', times: 4, body: [F] }, Wt]
+      expect(runGridProgram(lesson.steps[2].level, after).failure).toBe('pots_missed')
+      expect(lesson.project?.stepId).toBe(creative.id)
+    })
+  })
 })

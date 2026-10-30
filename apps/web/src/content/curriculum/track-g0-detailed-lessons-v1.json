@@ -2354,8 +2354,7 @@
       "requiredEngineCapabilities": [
         "finite_repeat",
         "movement",
-        "visual_effect",
-        "sound"
+        "batch_action"
       ],
       "prerequisiteLessonIds": [
         "G0-U3-L02"

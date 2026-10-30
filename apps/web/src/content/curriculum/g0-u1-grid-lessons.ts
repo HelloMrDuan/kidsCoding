@@ -45,7 +45,7 @@ export type GridLessonStep = {
   /** error-lab: the starter program must be run and produce this failure before a fix counts. */
   errorLab?: { expect: GridFailure; expected: string; actual: string }
   /** creative: the child places the goal on one of these cells, then programs a route to it. */
-  creative?: { prompt: string; goalChoices: Cell[]; /** Story names for the choices, same order (e.g. who the letter goes to). */ labels?: string[]; /** G0-U3: the footprint pattern each choice asks for (same order as goalChoices). */ patterns?: Footprint[][]; /** G0-U3-L02: the puddles each choice puts on the path (same order as goalChoices). */ waters?: Cell[][] }
+  creative?: { prompt: string; goalChoices: Cell[]; /** Story names for the choices, same order (e.g. who the letter goes to). */ labels?: string[]; /** G0-U3: the footprint pattern each choice asks for (same order as goalChoices). */ patterns?: Footprint[][]; /** G0-U3-L02: the puddles each choice puts on the path (same order as goalChoices). */ waters?: Cell[][]; /** G0-U3-L03: the flower pots each choice puts on the path (same order as goalChoices). */ pots?: Cell[][] }
 }
 
 export type GridLesson = {

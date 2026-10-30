@@ -113,6 +113,26 @@ export function MushroomPath() {
   )
 }
 
+/** G0-U3-L03 story scenery: the robot's watering plan — four pots, one drop each, in patrol order (original art, V2 flat style). */
+export function WateringPlan() {
+  return (
+    <g data-grid-item="wateringplan">
+      <ellipse cx="28" cy="60" rx="26" ry="5" fill="#2f5a3f" opacity=".22" />
+      <rect x="25" y="34" width="6" height="26" rx="2" fill="#9b6a3c" stroke="#5e3b1c" strokeWidth="2" />
+      <rect x="2" y="4" width="52" height="34" rx="5" fill="#eaf8ff" stroke="#2f6d8f" strokeWidth="2.5" />
+      <path d="M8 30 H50" stroke="#2f6d8f" strokeWidth="1.5" strokeDasharray="3 3" />
+      <path d="M46 27 l4 3 -4 3" fill="none" stroke="#2f6d8f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <g fill="#d9774b" stroke="#9c4a26" strokeWidth="1.2">
+        <path d="M7 22 h8 l-1 6 h-6 z" /><path d="M18 22 h8 l-1 6 h-6 z" /><path d="M29 22 h8 l-1 6 h-6 z" /><path d="M40 22 h8 l-1 6 h-6 z" />
+      </g>
+      <g fill="#6cc8ff" stroke="#3a9ad9" strokeWidth="1">
+        <path d="M11 9 q3 5 0 7 q-3 -2 0 -7" /><path d="M22 9 q3 5 0 7 q-3 -2 0 -7" /><path d="M33 9 q3 5 0 7 q-3 -2 0 -7" /><path d="M44 9 q3 5 0 7 q-3 -2 0 -7" />
+      </g>
+      <path d="M6 58 q4 -8 10 -4 q4 -6 8 2" fill="#5cbf60" stroke="#2f7d3a" strokeWidth="1.5" />
+    </g>
+  )
+}
+
 /** G0-U3-L02 story scenery: the rabbit's puddle sign — two hops over two puddles (original art, V2 flat style). */
 export function PuddleSign() {
   return (
@@ -274,6 +294,29 @@ function Bump({ x, y }: Cell) {
   )
 }
 
+/** G0-U3-L03: a flower pot on a cell — a bud while dry, a bloom with a drop once watered. */
+function Pot({ x, y, wet }: Cell & { wet: boolean }) {
+  return (
+    <g transform={`translate(${x * T} ${y * T})`} data-grid-item="pot" data-wet={wet ? 'yes' : 'no'}>
+      <path d="M20 40 h24 l-3 16 h-18 z" fill="#d9774b" stroke="#9c4a26" strokeWidth="2" strokeLinejoin="round" />
+      <rect x="18" y="36" width="28" height="6" rx="2" fill="#e88b5c" stroke="#9c4a26" strokeWidth="2" />
+      <path d="M32 36 V24" stroke="#2f7d3a" strokeWidth="3" strokeLinecap="round" />
+      {wet ? (
+        <g>
+          {[0, 72, 144, 216, 288].map(r => <ellipse key={r} cx="32" cy="14" rx="4.5" ry="7" fill="#ff8fb7" stroke="#d1477a" strokeWidth="1.2" transform={`rotate(${r} 32 20)`} />)}
+          <circle cx="32" cy="20" r="4" fill="#ffd23f" stroke="#c9961a" strokeWidth="1.2" />
+          <path d="M50 30 q4 6 0 8 q-4 -2 0 -8" fill="#6cc8ff" stroke="#3a9ad9" strokeWidth="1.2" />
+        </g>
+      ) : (
+        <g>
+          <ellipse cx="32" cy="21" rx="4" ry="6" fill="#9ad66b" stroke="#2f7d3a" strokeWidth="1.5" />
+          <path d="M32 30 q-8 -2 -9 -8 q7 0 9 6" fill="#5cbf60" stroke="#2f7d3a" strokeWidth="1.2" />
+        </g>
+      )}
+    </g>
+  )
+}
+
 const HOP_BACK: Record<Facing, Cell> = { up: { x: 0, y: 2 }, right: { x: -2, y: 0 }, down: { x: 0, y: -2 }, left: { x: 2, y: 0 } }
 /** G0-U3-L02: a dashed arc from where the hop started to where it landed. */
 function HopArc({ x, y, facing }: { x: number; y: number; facing: Facing }) {
@@ -285,7 +328,7 @@ function HopArc({ x, y, facing }: { x: number; y: number; facing: Facing }) {
 
 export type GridStageState = { x: number; y: number; facing: Facing; hasKey: boolean; doorOpen: boolean; bump?: Cell; /** the block that produced this frame (G0-U3-L02 draws the hop arc). */ action?: string }
 
-export function GridStage({ level, state, trail = [], stamps = [], label }: { level: GridLevel; state: GridStageState; trail?: Cell[]; /** G0-U3: footprints already stamped. */ stamps?: Footprint[]; label?: string }) {
+export function GridStage({ level, state, trail = [], stamps = [], watered = [], label }: { level: GridLevel; state: GridStageState; trail?: Cell[]; /** G0-U3: footprints already stamped. */ stamps?: Footprint[]; /** G0-U3-L03: pots already watered. */ watered?: Cell[]; label?: string }) {
   const w = level.cols * T
   const h = level.rows * T
   // Story scenery sits just left of the map, so the fox visibly leaves home or the post office; it is never a cell.
@@ -307,15 +350,17 @@ export function GridStage({ level, state, trail = [], stamps = [], label }: { le
       data-fox-cell={`${state.x},${state.y}`}
       data-fox-facing={state.facing}
       data-stamps={stamps.map(p => p.color[0]).join('')}
+      data-watered={watered.length}
     >
-      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : level.scenery === 'guidemap' ? <GuideMap /> : level.scenery === 'mushroompath' ? <MushroomPath /> : level.scenery === 'puddlesign' ? <PuddleSign /> : <Treehouse />}</g> : null}
+      {left ? <g transform={`translate(${-left - 2} 2)`}>{level.scenery === 'signpost' ? <Signpost /> : level.scenery === 'counting' ? <CountingBoard /> : level.scenery === 'turnsign' ? <TurnSign /> : level.scenery === 'keyhook' ? <KeyHook /> : level.scenery === 'guidemap' ? <GuideMap /> : level.scenery === 'mushroompath' ? <MushroomPath /> : level.scenery === 'puddlesign' ? <PuddleSign /> : level.scenery === 'wateringplan' ? <WateringPlan /> : <Treehouse />}</g> : null}
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}
       {trail.map((c, i) => <circle key={`t${i}`} cx={c.x * T + 32} cy={c.y * T + 32} r="5" fill="#fff" opacity=".7" />)}
       {level.footprints?.map((p, i) => <Paw key={`g${i}`} {...p} ghost />)}
       {stamps.map((p, i) => <Paw key={`p${i}`} {...p} />)}
-      <Goal {...level.goal} />
+      {level.pots?.map(c => <Pot key={`pot${c.x}-${c.y}`} {...c} wet={watered.some(w => w.x === c.x && w.y === c.y)} />)}
+      {level.pots ? null : <Goal {...level.goal} />}
       {level.rocks?.map(c => <Rock key={`r${c.x}-${c.y}`} {...c} />)}
       {level.key && !state.hasKey ? <Key {...level.key} /> : null}
       {level.door ? <Door {...level.door} open={state.doorOpen} /> : null}
@@ -362,6 +407,7 @@ export function useGridPlayback(level: GridLevel, run: GridRun | null, intervalM
   const state: GridStageState = index >= 0 ? frames[index] : start
   const trail = [{ x: level.start.x, y: level.start.y }, ...frames.slice(0, index + 1).map(f => ({ x: f.x, y: f.y }))]
   const stamps = frames.slice(0, index + 1).flatMap(f => (f.stamp ? [f.stamp] : []))
+  const watered = frames.slice(0, index + 1).flatMap(f => (f.water ? [f.water] : []))
   const done = !!run && index >= frames.length - 1
-  return { state, trail, stamps, done }
+  return { state, trail, stamps, watered, done }
 }

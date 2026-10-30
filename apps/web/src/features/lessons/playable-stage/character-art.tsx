@@ -3,7 +3,7 @@
 // Standing rule: characters are always real illustrations, never plain
 // coloured circles standing in for them.
 
-export type CharacterId = 'fox' | 'rabbit' | 'bird' | 'butterfly' | 'frog' | 'bear'
+export type CharacterId = 'fox' | 'rabbit' | 'bird' | 'butterfly' | 'frog' | 'bear' | 'robot'
 export type SceneId = 'forest' | 'meadow' | 'garden'
 
 // Chibi proportions: big head, small round body, stubby feet, glossy eyes.
@@ -162,6 +162,32 @@ function Bear() {
   )
 }
 
+// G0-U3-L03: the garden watering robot (same chibi proportions, rounded metal body, watering-can arm).
+function Robot() {
+  const body = '#9fd8f5', line = '#2f6d8f', dark = '#5aa9d6'
+  return (
+    <>
+      {shadow}
+      <ellipse cx="38" cy="100" rx="9" ry="5" fill={dark} stroke={line} strokeWidth="2" />
+      <ellipse cx="62" cy="100" rx="9" ry="5" fill={dark} stroke={line} strokeWidth="2" />
+      <rect x="28" y="70" width="44" height="28" rx="12" fill={body} stroke={line} strokeWidth="3" />
+      <circle cx="50" cy="84" r="5" fill="#ffd23f" stroke="#c9961a" strokeWidth="1.5" />
+      <path d="M72 80 h8 l6 -6" fill="none" stroke={line} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M82 70 h10 v8 h-10 z" fill="#5cbf60" stroke="#2f7d3a" strokeWidth="2" />
+      <path d="M92 72 l6 -4" stroke="#2f7d3a" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M50 18 V8" stroke={line} strokeWidth="3" strokeLinecap="round" />
+      <circle cx="50" cy="7" r="5" fill="#ff8a3d" stroke="#b5531a" strokeWidth="2" />
+      <rect x="16" y="18" width="68" height="54" rx="22" fill={body} stroke={line} strokeWidth="3" />
+      <rect x="24" y="28" width="52" height="34" rx="14" fill="#eaf8ff" stroke={line} strokeWidth="2" />
+      <Eyes y={44} dx={12} />
+      <Blush y={54} dx={20} />
+      <Smile y={52} />
+      <rect x="10" y="38" width="7" height="14" rx="3" fill={dark} stroke={line} strokeWidth="2" />
+      <rect x="83" y="38" width="7" height="14" rx="3" fill={dark} stroke={line} strokeWidth="2" />
+    </>
+  )
+}
+
 const ART: Record<CharacterId, () => React.JSX.Element> = {
   fox: Fox,
   rabbit: Rabbit,
@@ -169,6 +195,7 @@ const ART: Record<CharacterId, () => React.JSX.Element> = {
   butterfly: Butterfly,
   frog: Frog,
   bear: Bear,
+  robot: Robot,
 }
 
 export function CharacterArt({ id, className }: { id?: string; className?: string }) {
