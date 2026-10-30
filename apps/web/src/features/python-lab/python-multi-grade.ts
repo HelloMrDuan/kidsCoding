@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'find_outliers'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U2-L05': {
+    title: '第5课 · 识别异常数据',
+    prompt: '编写 find_outliers(csv_text, threshold) 函数。先用 csv.DictReader 读出数据表（表头 项目,数值），再算平均数和总体标准差：偏离平均数的绝对值大于 threshold 倍标准差的项目就是异常数据。threshold 是倍数（字符串，如 "1" 或 "2"）。返回异常项目，每行“项目：数值”，按原顺序拼接；没有异常时返回“无异常”。记录少于 3 条、数值为空、不是数字、threshold 不是大于 0 的数字、标准差为 0 时都抛出 ValueError。数据全部是虚构示例。',
+    argLabels: ['数据 CSV 文本', '异常倍数'],
+    startCode: 'import csv\nimport io\nimport math\n\ndef find_outliers(csv_text, threshold):\n    # 先 DictReader 读表，再算平均和标准差找异常\n    return "待完成"',
+    cases: [
+      { function: 'find_outliers', args: ['项目,数值\nA,10\nB,11\nC,10\nD,12\nE,100\n', '1'], expected: 'E：100' },
+      { function: 'find_outliers', args: ['项目,数值\nA,10\nB,11\nC,12\nD,13\n', '2'], expected: '无异常' },
+      { function: 'find_outliers', args: ['项目,数值\nA,10\nB,abc\nC,12\n', '1'], expected: 'ERROR:ValueError' },
+      { function: 'find_outliers', args: ['项目,数值\nA,10\nB,\nC,12\n', '1'], expected: 'ERROR:ValueError' },
+      { function: 'find_outliers', args: ['项目,数值\nA,10\nB,11\nC,12\n', 'abc'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：k = float(threshold)，小于等于 0 就 raise ValueError；数值用 float() 转换，失败或为空就 raise ValueError；记录少于 3 条就 raise ValueError；平均等于数值之和除以个数，标准差等于方差开平方，方差等于每个数与平均差的平方和除以个数；标准差为 0 就 raise ValueError；偏离大于 k 倍标准差的记为异常，没有异常返回无异常；输出用原始数值文本，不要转成浮点再输出，以免 100 变成 100.0。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
