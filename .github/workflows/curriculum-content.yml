@@ -227,7 +227,7 @@ jobs:
 
   python-batch3:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     defaults:
       run:
         working-directory: apps/web
@@ -246,7 +246,7 @@ jobs:
 
   portfolio-ux302:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     defaults:
       run:
         working-directory: apps/web
@@ -265,7 +265,7 @@ jobs:
 
   parent-growth-ux503:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     defaults:
       run:
         working-directory: apps/web
