@@ -101,6 +101,7 @@ jobs:
   test:
     name: test
     needs: config-check
+    timeout-minutes: 12
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -125,6 +126,7 @@ jobs:
   e2e-blockly:
     name: e2e-blockly (mobile gate)
     needs: config-check
+    timeout-minutes: 12
     runs-on: ubuntu-latest
     defaults:
       run:

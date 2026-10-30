@@ -108,6 +108,7 @@ permissions:
 
 jobs:
   curriculum-web:
+    timeout-minutes: 12
     runs-on: ubuntu-latest
     defaults:
       run:
