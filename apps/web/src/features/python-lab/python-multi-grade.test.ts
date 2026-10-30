@@ -18,16 +18,24 @@ describe('TQ-005 practice B custom arguments must differ from every fixed case',
 
 describe('multi-case real Python practice grading contract', () => {
   it('registers five independent lesson IDs with three or six diverse cases', () => {
-    expect(Object.keys(pythonPracticeLessons)).toEqual(['P0-U1-L02','P0-U1-L03','P0-U1-L04','P0-U1-L05','P0-U1-L06'])
+    expect(Object.keys(pythonPracticeLessons)).toEqual(['P0-U1-L02','P0-U1-L03','P0-U1-L04','P0-U1-L05','P0-U1-L06','P3-U2-L01'])
     expect(isMultiPythonLessonId('P0-U1-L02')).toBe(true)
     expect(isMultiPythonLessonId('P0-U1-L04')).toBe(true)
     expect(isMultiPythonLessonId('P0-U1-L05')).toBe(true)
     expect(isMultiPythonLessonId('P0-U1-L06')).toBe(true)
+    expect(isMultiPythonLessonId('P3-U2-L01')).toBe(true)
     expect(isMultiPythonLessonId('P0-U1-L01')).toBe(false)
     for(const [id,lesson] of Object.entries(pythonPracticeLessons)) {
-      expect(lesson.cases).toHaveLength(id === 'P0-U1-L06' ? 6 : 3)
+      expect(lesson.cases).toHaveLength(id === 'P0-U1-L06' ? 6 : id === 'P3-U2-L01' ? 5 : 3)
       expect(new Set(lesson.cases.map(test=>JSON.stringify(test.args))).size).toBe(lesson.cases.length)
     }
+  })
+  it('covers P3-U2-L01 average and median with even-count and error boundaries', () => {
+    const cases=pythonPracticeLessons['P3-U2-L01'].cases
+    expect(cases.filter(item=>item.expected.startsWith('ERROR:'))).toHaveLength(2)
+    expect(cases[2].expected).toBe('平均：4.5；中位数：4.0')
+    expect(gradeMultiCases(cases,cases.map(item=>item.expected),null)).toMatchObject({passed:true,passedCount:5,total:5})
+    expect(gradeMultiCases(cases,[cases[0].expected,'wrong',cases[2].expected,cases[3].expected,cases[4].expected],null)).toMatchObject({passed:false,passedCount:4})
   })
   it('verifies actual numeric conversion and blank-name boundary expectations', () => {
     const digits=pythonPracticeLessons['P0-U1-L04'].cases

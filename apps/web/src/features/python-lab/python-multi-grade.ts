@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'avg_median'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U2-L01': {
+    title: '第1课 · 计算平均与中位数',
+    prompt: '编写 avg_median(json_text, digits) 函数。先用 json.loads 解析一个数字列表，再计算平均数和中位数：平均数是全部数字之和除以个数，中位数是排序后中间的数（偶数个取中间两个的平均）。digits 是保留的小数位数（字符串，如 "1"），结果格式为“平均：X；中位数：Y”，按 digits 保留小数。列表为空、含非数字、JSON 解析失败、digits 不是非负整数时都抛出 ValueError。数据全部是虚构示例。',
+    argLabels: ['数字 JSON 列表', '保留小数位数'],
+    startCode: 'import json\n\ndef avg_median(json_text, digits):\n    # 先 json.loads 解析，再排序求平均和中位数\n    return "待完成"',
+    cases: [
+      { function: 'avg_median', args: ['[10, 20, 30]', '1'], expected: '平均：20.0；中位数：20.0' },
+      { function: 'avg_median', args: ['[10, 20]', '1'], expected: '平均：15.0；中位数：15.0' },
+      { function: 'avg_median', args: ['[5, 1, 9, 3]', '1'], expected: '平均：4.5；中位数：4.0' },
+      { function: 'avg_median', args: ['[]', '1'], expected: 'ERROR:ValueError' },
+      { function: 'avg_median', args: ['[10, "a"]', '1'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：nums = json.loads(json_text)，不是列表、为空、含非数字就 raise ValueError；d = int(digits)，失败或小于 0 就 raise ValueError；排序后，奇数取中间，偶数取中间两个平均；用 f"平均：{avg:.{d}f}；中位数：{med:.{d}f}" 返回。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
