@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'weather_alert'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,21 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U3-L06': {
+    title: '第6课 · 制作天气提醒助手',
+    prompt: '单元作品：编写 weather_alert(weather_json, date, robots_text, agent, env_json) 函数，把本单元 L01-L05 连起来。先按 L05 的 robots.txt 规则判断能不能访问路径 /weather（agent 专属组优先，否则星号组，最长前缀匹配，长度相同 Allow 胜出），被禁止就返回“禁止访问：请遵守网站访问规则”。再按 L04 检查 env_json 里必须有非空字符串 WEATHER_KEY，缺失或无效就抛出 ValueError（密钥只从环境变量里读，不写死在代码里，不原样输出）。再按 L02 从模拟天气接口 JSON 里按 date 查找（温度必须是整数，布尔值不算），找不到、JSON 解析失败、结构不对都抛出 ValueError。最后按天气生成提醒：状况含雨返回“日期：有雨，记得带伞”，温度大于等于 30 返回“日期：高温温度度，注意防暑”，温度小于等于 0 返回“日期：低温温度度，注意保暖”，否则返回“日期：状况，温度度，天气正常”。不做真实网络请求，不使用真实密钥和网址，数据全部是虚构示例。',
+    argLabels: ['天气接口 JSON 文本', '日期', 'robots.txt 文本', '爬虫名', '环境变量 JSON 文本'],
+    startCode: 'import json\n\ndef weather_alert(weather_json, date, robots_text, agent, env_json):\n    # 先查 robots 规则，再查环境变量密钥，再查天气，最后生成提醒\n    return "待完成"',
+    cases: [
+      { function: 'weather_alert', args: ['{"天气": [{"日期": "2026-10-01", "温度": 20, "状况": "晴"}]}', '2026-10-01', 'User-agent: *\nDisallow: /admin/\n', '*', '{"WEATHER_KEY": "abc123"}'], expected: '2026-10-01：晴，20度，天气正常' },
+      { function: 'weather_alert', args: ['{"天气": [{"日期": "2026-10-02", "温度": 18, "状况": "雨"}]}', '2026-10-02', 'User-agent: *\nDisallow: /admin/\n', '*', '{"WEATHER_KEY": "abc123"}'], expected: '2026-10-02：有雨，记得带伞' },
+      { function: 'weather_alert', args: ['{"天气": [{"日期": "2026-10-03", "温度": 32, "状况": "晴"}]}', '2026-10-03', 'User-agent: *\nDisallow: /admin/\n', '*', '{"WEATHER_KEY": "abc123"}'], expected: '2026-10-03：高温32度，注意防暑' },
+      { function: 'weather_alert', args: ['{"天气": [{"日期": "2026-10-01", "温度": 20, "状况": "晴"}]}', '2026-10-01', 'User-agent: *\nDisallow: /weather\n', '*', '{"WEATHER_KEY": "abc123"}'], expected: '禁止访问：请遵守网站访问规则' },
+      { function: 'weather_alert', args: ['{"天气": [{"日期": "2026-10-01", "温度": 20, "状况": "晴"}]}', '2026-10-01', 'User-agent: *\nDisallow: /admin/\n', '*', '{"OTHER_KEY": "abc123"}'], expected: 'ERROR:ValueError' },
+      { function: 'weather_alert', args: ['{"天气": [{"日期": "2026-10-01", "温度": 20, "状况": "晴"}]}', '2026-10-09', 'User-agent: *\nDisallow: /admin/\n', '*', '{"WEATHER_KEY": "abc123"}'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：先复用 L05 的分组与最长前缀逻辑判断 /weather，禁止直接返回禁止文案；再 json.loads(env_json)，不是 dict 或 WEATHER_KEY 不是非空字符串就 raise ValueError；再 json.loads(weather_json)，不是 dict 或天气不是 list 就 raise ValueError；按日期查找，缺字段或温度不是 int 就 raise ValueError，找不到 raise ValueError；最后按状况含雨、高温、低温、正常的顺序返回提醒。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
