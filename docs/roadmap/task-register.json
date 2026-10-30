@@ -2740,7 +2740,7 @@
       "title": "Scratch/Blockly 桌面套件拆 6 分片：消除 15 分钟作业超时",
       "priority": "P0",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "SYS-108"
       ],
@@ -2751,7 +2751,18 @@
         "旧 2 分片 Job 已移除，workflow YAML 解析通过",
         "PR CI 全绿"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/266",
+        "mergeCommit": "4f4f7aa07be40b1ec2f45f1900c8b365a21c434a",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41043873047",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41043873213",
+        "tests": [
+          "PR #266 门禁全绿（6 分片恰覆盖 17 文件 148 测试一次：S1 32、S2 23、S3 24、S4 24+1 跳过、S5 25、S6 19；运行 #678 整体 Success）",
+          "main 课程运行 #913 Success（17/17，分片 S1–S6 全绿）",
+          "main 台账运行 #899 Success"
+        ],
+        "reviewer": "duan 2026-10-30 总授权下建立；合并由 kid小宝按门禁全绿执行"
+      },
       "notes": "2026-10-30 duan 裁定测试分片拆分 + 耗时优化 + 分级门禁；SYS-108 规范附录 B 为实施依据。计数勘误：全量 148（17 文件），123 只是旧分片 1 的计数。原生 --shard 实测不均衡（1/2 得 123/25，1/4 得 41/82/0/25 含空分片），故用显式文件清单。"
     },
     {
