@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'pie_share'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U2-L04': {
+    title: '第4课 · 预算组成饼图',
+    prompt: '编写 pie_share(csv_text, digits) 函数。先用 csv.DictReader 读出预算表（表头 项目,金额），再算每个项目占总预算的百分比：百分比等于金额除以总金额乘以 100，按 digits 保留小数；四舍五入后如果合计不是 100，就把差额加到金额最大的第一项上（差额也按 digits 取整），保证合计恰好是 100。返回每行“项目：金额 (百分比%)”，按原顺序拼接。digits 是保留小数位数（字符串，只能是 0、1、2）。记录少于 2 条、金额为空、不是数字、为负数、总金额为 0、digits 不合法时都抛出 ValueError。数据全部是虚构示例。',
+    argLabels: ['预算 CSV 文本', '保留小数位数'],
+    startCode: 'import csv\nimport io\n\ndef pie_share(csv_text, digits):\n    # 先 DictReader 读表求总金额，再算百分比并补齐合计\n    return "待完成"',
+    cases: [
+      { function: 'pie_share', args: ['项目,金额\n餐饮,300\n交通,200\n学习,500\n', '1'], expected: '餐饮：300 (30.0%)\n交通：200 (20.0%)\n学习：500 (50.0%)' },
+      { function: 'pie_share', args: ['项目,金额\n零食,1\n文具,1\n交通,1\n', '1'], expected: '零食：1 (33.4%)\n文具：1 (33.3%)\n交通：1 (33.3%)' },
+      { function: 'pie_share', args: ['项目,金额\n餐饮,300\n交通,\n', '1'], expected: 'ERROR:ValueError' },
+      { function: 'pie_share', args: ['项目,金额\n餐饮,300\n交通,-50\n', '1'], expected: 'ERROR:ValueError' },
+      { function: 'pie_share', args: ['项目,金额\n餐饮,0\n交通,0\n', '1'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：d = int(digits)，不在 0、1、2 之间就 raise ValueError；金额用 int() 转换，失败、为空或为负就 raise ValueError；总金额为 0 就 raise ValueError；百分比 round(金额 / 总金额 * 100, d)，合计差额加到金额最大的第一项；用 f 串按 digits 格式化百分比。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
