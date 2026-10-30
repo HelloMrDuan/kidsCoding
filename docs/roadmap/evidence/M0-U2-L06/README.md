@@ -1,0 +1,10 @@
+# M0-U2-L06《数学规律闯关》证据（第一阶段）
+
+- 执行器：examples/blockly/m0/challenge_executor.py
+- 测试：examples/blockly/m0/test_challenge_executor.py，本地 8 个测试全部通过。
+  命令：python3 -m unittest test_challenge_executor -v
+  结果：8 tests, OK。包括正确通关、练习 B 部分通过不算通关、缺少关卡失败、
+  第 1 关错误失败、拓展加分通过、加分错误失败、保存重开重跑一致、缺少开始事件失败。
+- 来源缺口：本课无详细稿文件（见 LESSON-DESIGN.md），所有数值为实现选择。
+- 尚缺：详细稿、网页课堂接入、三端截图、独立人工教研、儿童试学与监护人授权、PR CI 全绿。
+  task-ledger 通过不代表课程验收通过。
