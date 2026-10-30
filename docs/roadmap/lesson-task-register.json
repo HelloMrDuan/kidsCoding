@@ -5175,7 +5175,7 @@
       "unitId": "P3-U3",
       "focusConcept": "安全",
       "plannedLearningOutcome": "能使用安全解释并完成「制作天气提醒助手」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -5188,13 +5188,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/339",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Muse-C：/learn/python-lab/P3-U3-L06 制作天气提醒助手 Draft PR #339，头 a7c2ae6，U3 整合 weather_alert（robots 规则 + 环境变量密钥检查 + 模拟天气查找 + 提醒生成；超时重试已在 L03 单独成课，本课不重复实现、不声称真实联网重试），本地 Python 参考实现 6/6、本地 vitest 7/7；本机真实浏览器 E2E 尚未执行，V2 视觉对齐未宣称通过、独立人工教研复核未完成，保持 in_review，未合并，未发布，catalogStatus 仍为 outline_not_playable。"
     },
     {
       "id": "P3-U4-L01",
