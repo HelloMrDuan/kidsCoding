@@ -2710,6 +2710,31 @@
         "reviewer": "实现者 AI（Hark A）；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
+    },
+    {
+      "id": "SPEC-001",
+      "title": "新增 KidsCoding 长期门禁清单（不改现有规范）",
+      "priority": "P0",
+      "category": "SPEC",
+      "status": "in_review",
+      "dependencies": [
+        "AUD-101"
+      ],
+      "scope": "docs/roadmap/kidscoding-longterm-gate.md；不修改 AGENTS.md、VISUAL-LOCK.md、DESIGN-SPEC.md、08/09/10 及任何课程状态、课程 ID、目录文件",
+      "acceptance": [
+        "新增文件只做门禁清单引用与两项常设补强，不改写已有规范",
+        "八大专项作为常设审定门禁写明，每项有覆盖、缺口、优先级、引擎、综合项目与验收方法要求",
+        "432 节为 V1 规划基线而非系统上限，新增必须保持旧 ID、学习数据、作品兼容，且不得在单课 PR 里悄悄破坏恰好 432 节校验",
+        "PR 为 Draft，不合并，不改 main，不修改其他账号的分支、提交与 PR"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/259",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": null,
+        "reviewer": null
+      },
+      "notes": "Muse-C 2026-10-30：最高优先级长期门禁补强。来源：AGENTS.md、VISUAL-LOCK.md、prototype.html、DESIGN-SPEC.md、08/09/10，以及 AUD-101 第 8 节八大专项与第 9 节扩展建议。保持 in_review：等待 CI 与项目负责人裁定后方可谈 completed；未改现有规范，未发布。"
     }
   ]
 }
