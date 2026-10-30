@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'clean_filenames'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,19 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U1-L04': {
+    title: '第4课 · 文件名批量整理',
+    prompt: '编写 clean_filenames(json_text, sep) 函数。先用 json.loads 解析一个文件名的 JSON 列表（接上节 JSON 解析），再批量清理每一个文件名：去除首尾空格、把空格换成 sep（如下划线或短横线）、删除 / \\ : * ? " < > | 等非法字符；sep 为空、清理后为空的文件名、JSON 解析失败、输入不是列表时都抛出 ValueError。最后用 json.dumps（ensure_ascii=False）把清理后的文件名列表写回成 JSON 文本并返回。数据全部是虚构示例。',
+    argLabels: ['文件名 JSON 列表', '空格替换符'],
+    startCode: 'import json\nimport re\n\ndef clean_filenames(json_text, sep):\n    # 先 json.loads 解析列表，再逐个清理，最后 json.dumps 写回\n    return "待完成"',
+    cases: [
+      { function: 'clean_filenames', args: ['["我的 日记.txt", "报告 2026 v1.md", "a/b:c*.txt"]', '_'], expected: '["我的_日记.txt", "报告_2026_v1.md", "abc.txt"]' },
+      { function: 'clean_filenames', args: ['["照片 1.png", "笔记:草稿.md"]', '-'], expected: '["照片-1.png", "笔记草稿.md"]' },
+      { function: 'clean_filenames', args: ['["///"]', '_'], expected: 'ERROR:ValueError' },
+      { function: 'clean_filenames', args: ['不是 JSON', '_'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：sep 为空先 raise ValueError；names = json.loads(json_text)，不是列表就 raise ValueError；每个名字 strip() 后把空格换成 sep，再用 re.sub 删除非法字符，清理后为空就 raise ValueError；最后 return json.dumps(cleaned, ensure_ascii=False)。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
