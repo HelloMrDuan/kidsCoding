@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'reminders_due'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U4-L05': {
+    title: '第5课 · 模拟定时提醒',
+    prompt: '编写 reminders_due(reminders_json, now_time) 函数，模拟定时提醒：从提醒列表里取出到当前时间为止该响的提醒。reminders_json 是提醒列表的 JSON 文本，每项含时间（24 小时制 HH:MM 字符串）、内容（字符串）。now_time 去空格后也必须是 HH:MM，否则抛出 ValueError；JSON 解析失败、不是列表、某项缺字段、时间格式不对或小时分钟超出范围、内容不是字符串或为空时都抛出 ValueError。到期的判断是提醒时间小于等于当前时间（按分钟换算比较，不是字符串比较）。按原顺序返回到期提醒，每行“时间 内容”；没有到期提醒时返回“暂无提醒”。不做真实等待和真实通知，只按给定时间做判断，数据全部是虚构示例。',
+    argLabels: ['提醒列表 JSON 文本', '当前时间'],
+    startCode: 'import json\n\ndef reminders_due(reminders_json, now_time):\n    # 先校验时间格式，再按分钟比较筛选\n    return "待完成"',
+    cases: [
+      { function: 'reminders_due', args: ['[{"时间": "08:00", "内容": "背单词"}, {"时间": "09:30", "内容": "练琴"}, {"时间": "10:00", "内容": "喝水"}]', '09:30'], expected: '08:00 背单词\n09:30 练琴' },
+      { function: 'reminders_due', args: ['[{"时间": "08:00", "内容": "背单词"}]', '07:00'], expected: '暂无提醒' },
+      { function: 'reminders_due', args: ['[{"时间": "08:00", "内容": "背单词"}]', '25:00'], expected: 'ERROR:ValueError' },
+      { function: 'reminders_due', args: ['不是 JSON', '09:30'], expected: 'ERROR:ValueError' },
+      { function: 'reminders_due', args: ['[{"时间": "08:00"}]', '09:30'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：先写一个校验时间的办法：按冒号拆成 2 段，每段是数字，小时 0 到 23、分钟 0 到 59，否则 raise ValueError；now_time.strip() 后先校验；reminders = json.loads(reminders_json)，失败或不是 list 就 raise ValueError；每项不是 dict 或缺时间、内容就 raise ValueError；时间校验不过、内容不是 str 或为空就 raise ValueError；按分钟换算（小时乘 60 加分钟）比较，提醒分钟数小于等于当前分钟数就留，每行“时间 内容”，没有就返回“暂无提醒”。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
