@@ -2716,7 +2716,7 @@
       "title": "建立全仓库 CI 执行治理规范：Job 12 分钟预算、分片规则与超时诊断流程",
       "priority": "P0",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "新建 docs/engineering/CI-EXECUTION-STANDARD.md：Job 超时预算（目标≤12 分钟、硬限制 15 分钟、余量≥3 分钟）、测试分片与分配规则、worker 与资源隔离、耗时采集、日志与报告、失败分类与有限重试、PR/夜间/发布门禁、全量覆盖完整性检查、超时诊断处理流程；附录含全仓库 Job 风险清单与 Scratch 套件 6 分片方案概要。只新增规范文件与本台账条目，不改任何 workflow、不改业务代码、不碰其他账号分支。",
       "acceptance": [
@@ -2725,7 +2725,14 @@
         "规范含全仓库 Job 风险清单与优先级，Scratch 超时列为 P0 并指向 SYS-109",
         "PR CI 全绿"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/264",
+        "mergeCommit": "30ee22789325b0b44c5958acc84a455f28530ae6",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41017213616",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41017213786",
+        "tests": ["PR #264 门禁 3 success 全绿（连接器实读，头 3d99b5f）", "main 追踪运行 41017213786 Success（task-ledger 6s）", "main 课程运行 41017213616 Cancelled：除 scratch-real-vm-browser 因 15 分钟超时被取消外其余 12 作业全成功、0 失败（该超时即 SYS-109 已修的已知问题）"],
+        "reviewer": "duan 2026-10-30 CI 治理指令下建立；合并由 kid小宝按门禁全绿执行"
+      },
       "notes": "2026-10-30 duan 下达全仓库 CI 治理指令：所有 Muse 账号、所有课程方向、所有 PR 适用；kid小宝牵头规范与架构协调，四账号分工不变。Scratch 分片实施另立 SYS-109 独立 PR，不混入本 PR。"
     }
   ]
