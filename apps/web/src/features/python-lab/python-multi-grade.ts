@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'filter_mails'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,21 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U4-L02': {
+    title: '第2课 · 筛选邮件模拟数据',
+    prompt: '编写 filter_mails(mails_json, keyword, mode) 函数，从模拟邮件列表里筛选邮件。mails_json 是邮件列表的 JSON 文本，每项含发件人（字符串）、主题（字符串）、已读（布尔值）。keyword 去空格后为空、mode 不是“全部”或“未读”、JSON 解析失败、不是列表、某项缺字段、发件人或主题不是字符串或为空、已读不是布尔值时都抛出 ValueError。筛选规则：主题里含 keyword 的才算匹配；mode 为“未读”时还要只留已读为 false 的。按原顺序返回匹配邮件，每行“发件人：主题”；没有匹配时返回“没有匹配的邮件”。数据全部是虚构示例，不访问真实邮箱。',
+    argLabels: ['模拟邮件 JSON 列表', '关键词', '筛选模式'],
+    startCode: 'import json\n\ndef filter_mails(mails_json, keyword, mode):\n    # 先 json.loads 解析并校验模式，再按主题和已读筛选\n    return "待完成"',
+    cases: [
+      { function: 'filter_mails', args: ['[{"发件人": "老师", "主题": "作业提醒", "已读": false}, {"发件人": "班长", "主题": "课程通知", "已读": true}, {"发件人": "同学", "主题": "作业答案", "已读": false}]', '作业', '全部'], expected: '老师：作业提醒\n同学：作业答案' },
+      { function: 'filter_mails', args: ['[{"发件人": "老师", "主题": "作业提醒", "已读": false}, {"发件人": "班长", "主题": "课程通知", "已读": true}]', '课程', '未读'], expected: '没有匹配的邮件' },
+      { function: 'filter_mails', args: ['[{"发件人": "老师", "主题": "作业提醒", "已读": false}, {"发件人": "班长", "主题": "作业通知", "已读": true}]', '作业', '未读'], expected: '老师：作业提醒' },
+      { function: 'filter_mails', args: ['[{"发件人": "老师", "主题": "作业提醒", "已读": false}]', '作业', '随便'], expected: 'ERROR:ValueError' },
+      { function: 'filter_mails', args: ['不是 JSON', '作业', '全部'], expected: 'ERROR:ValueError' },
+      { function: 'filter_mails', args: ['[{"发件人": "老师", "主题": "作业提醒"}]', '作业', '全部'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：keyword = keyword.strip()，为空先 raise ValueError；mode 不在全部、未读里就 raise ValueError；mails = json.loads(mails_json)，失败或不是 list 就 raise ValueError；每项不是 dict 或缺发件人、主题、已读就 raise ValueError；发件人或主题不是 str 或为空、已读不是 bool 就 raise ValueError；按原顺序留主题含 keyword 的，mode 为未读时还要已读为 false；没有就返回“没有匹配的邮件”，否则每行“发件人：主题”用换行拼接。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
