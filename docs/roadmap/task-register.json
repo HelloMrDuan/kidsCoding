@@ -2717,7 +2717,7 @@
       "priority": "P0",
       "category": "OPS",
       "status": "in_review",
-      "dependencies": ["OPS-015"],
+      "dependencies": [],
       "scope": ".github/workflows/curriculum-content.yml（仅 Scratch VM Job 家族）；docs/roadmap/task-register.json（仅登记本条）；不改其他 Job、不改测试内容、不改业务代码。",
       "acceptance": [
         "scratch-real-vm-browser、part2、part3、part4 四个 Job，分别为 shard 1/4、2/4、3/4、4/4，timeout-minutes 均为 12",
@@ -2732,7 +2732,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": "工作流整改独立 PR，遵循统一 CI 规范草案 PR #262 的分片规则；规范本身仍为 Draft，待主要架构与 CI 负责账号评审；本任务不改其他 Job 家族。"
+      "notes": "工作流整改独立 PR，遵循统一 CI 规范草案 PR #262 的分片规则（规范本身仍为 Draft，待主要架构与 CI 负责账号评审）；台账依赖为空，因 OPS-015 尚未合并进 main， ledger 依赖不得引用未合并的任务 ID；本任务不改其他 Job 家族。"
     }
   ]
 }
