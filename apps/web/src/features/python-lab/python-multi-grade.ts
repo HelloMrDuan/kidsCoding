@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'tasks_for_day'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U4-L01': {
+    title: '第1课 · 每周任务清单',
+    prompt: '编写 tasks_for_day(tasks_json, day) 函数，从一周任务清单里取出某一天的任务。tasks_json 是任务列表的 JSON 文本，每项含任务（字符串）、星期（周一到周日）、完成（布尔值）。day 去空格后必须是周一到周日之一，否则抛出 ValueError；JSON 解析失败、不是列表、某项缺字段、任务不是字符串或为空、完成不是布尔值时都抛出 ValueError。按原顺序返回这一天的任务，每行“未完成：任务”或“已完成：任务”；这一天没有任务时返回“本日无任务”。数据全部是虚构示例。',
+    argLabels: ['一周任务 JSON 列表', '星期'],
+    startCode: 'import json\n\ndef tasks_for_day(tasks_json, day):\n    # 先 json.loads 解析并校验星期，再按天筛选\n    return "待完成"',
+    cases: [
+      { function: 'tasks_for_day', args: ['[{"任务": "数学作业", "星期": "周一", "完成": false}, {"任务": "读英语", "星期": "周一", "完成": true}, {"任务": "跑步", "星期": "周二", "完成": false}]', '周一'], expected: '未完成：数学作业\n已完成：读英语' },
+      { function: 'tasks_for_day', args: ['[{"任务": "数学作业", "星期": "周一", "完成": false}]', '周三'], expected: '本日无任务' },
+      { function: 'tasks_for_day', args: ['[{"任务": "数学作业", "星期": "周一", "完成": false}]', '周八'], expected: 'ERROR:ValueError' },
+      { function: 'tasks_for_day', args: ['不是 JSON', '周一'], expected: 'ERROR:ValueError' },
+      { function: 'tasks_for_day', args: ['[{"任务": "数学作业", "星期": "周一"}]', '周一'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：day = day.strip()，不在周一到周日里先 raise ValueError；tasks = json.loads(tasks_json)，失败或不是 list 就 raise ValueError；每项不是 dict 或缺任务、星期、完成就 raise ValueError；任务不是 str 或为空、完成不是 bool 就 raise ValueError；按原顺序筛选星期等于 day 的项，已完成写“已完成：任务”，否则写“未完成：任务”，没有就返回“本日无任务”。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
