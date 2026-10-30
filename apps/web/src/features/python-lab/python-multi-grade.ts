@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'fetch_with_timeout'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U3-L03': {
+    title: '第3课 · 处理网络超时',
+    prompt: '编写 fetch_with_timeout(attempts_json, timeout, max_attempts) 函数，处理模拟的网络请求超时（不做真实网络请求，只按给定模拟数据决策，避免联网风险）。attempts_json 是一个尝试列表的 JSON 文本，每项含耗时（数字，秒）、状态（成功、超时、错误）、数据（成功时才有）。按顺序最多尝试 max_attempts 次：耗时大于 timeout 的尝试按超时处理、继续下一次；状态为成功的尝试如果耗时不大于 timeout，就返回它的数据；状态为超时或错误的尝试继续下一次；全部尝试用完仍没有成功，就抛出 TimeoutError。timeout 必须是大于 0 的数字，max_attempts 必须是大于等于 1 的整数，JSON 解析失败、不是列表、某项缺字段、耗时为负数或不是数字时都抛出 ValueError。数据全部是虚构示例，不含真实网址和密钥。',
+    argLabels: ['模拟尝试 JSON 列表', '超时秒数', '最多尝试次数'],
+    startCode: 'import json\n\ndef fetch_with_timeout(attempts_json, timeout, max_attempts):\n    # 先校验超时和次数，再按顺序尝试并处理超时\n    return "待完成"',
+    cases: [
+      { function: 'fetch_with_timeout', args: ['[{"耗时": 2, "状态": "成功", "数据": "晴"}]', '3', '3'], expected: '晴' },
+      { function: 'fetch_with_timeout', args: ['[{"耗时": 5, "状态": "超时"}, {"耗时": 2, "状态": "成功", "数据": "雨"}]', '3', '3'], expected: '雨' },
+      { function: 'fetch_with_timeout', args: ['[{"耗时": 5, "状态": "超时"}, {"耗时": 2, "状态": "错误"}]', '3', '3'], expected: 'ERROR:TimeoutError' },
+      { function: 'fetch_with_timeout', args: ['不是 JSON', '3', '3'], expected: 'ERROR:ValueError' },
+      { function: 'fetch_with_timeout', args: ['[{"耗时": 2, "状态": "成功", "数据": "晴"}]', '0', '3'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：to = float(timeout)，小于等于 0 就 raise ValueError；n = int(max_attempts)，小于 1 就 raise ValueError；attempts = json.loads(attempts_json)，失败或不是 list 就 raise ValueError；每项不是 dict 或缺耗时、状态就 raise ValueError；耗时不是数字或为负就 raise ValueError；按顺序取前 n 项，耗时大于 to 或状态不是成功就继续，成功且耗时不大于 to 就返回数据；循环结束 raise TimeoutError。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
