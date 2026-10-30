@@ -2,7 +2,12 @@
 
 import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BlocklyWorkspace } from '../blockly/blockly-workspace'
+import dynamic from 'next/dynamic'
+
+const BlocklyWorkspace = dynamic(
+  () => import('../blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
+  { ssr: false },
+)
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { readGuestProgress, writeGuestProgress } from '@/features/progress/local-progress'
 import { buildHintState } from '../build-hint-state'

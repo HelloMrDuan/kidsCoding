@@ -8,7 +8,12 @@ import { readGuestProgress, writeGuestProgress } from '@/features/progress/local
 import type { SnapshotBlock } from '@/features/progress/project-snapshot'
 
 import { motionVerbForTemplate } from '../blockly/block-labels'
-import { BlocklyWorkspace } from '../blockly/blockly-workspace'
+import dynamic from 'next/dynamic'
+
+const BlocklyWorkspace = dynamic(
+  () => import('../blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
+  { ssr: false },
+)
 import type { ProgramBlock } from '../blockly/observable-run'
 import { PlayableStage } from './playable-stage'
 
