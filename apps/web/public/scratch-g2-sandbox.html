@@ -452,6 +452,18 @@
       send('CLICKED', {target: target.isStage ? 'Stage' : nameOf(target), isStage: Boolean(target.isStage)});
       return;
     }
+    if (data.kind === 'KEY' && data.id === currentId && vm && ready) {
+      const key = String(data.key ?? '')
+      if (key !== 'right arrow' && key !== 'left arrow') { send('ERROR', {error: '不支持的按键：' + key.slice(0, 30)}); return; }
+      try {
+        // Real VM hat dispatch: the same hats Scratch starts when an arrow key is pressed.
+        vm.runtime.startHats('event_whenkeypressed', {KEY_OPTION: key});
+        snapshot();
+        const boat = vm.runtime.targets.find(t => !t.isStage && t.isOriginal) ?? null;
+        send('KEY_PRESSED', {key, x: boat ? Math.round(Number(boat.x)) : null});
+      } catch (error) { send('ERROR', {error: String(error).slice(0, 400)}); }
+      return;
+    }
     if (data.kind === 'TRY_MOVE' && data.id === currentId && vm && ready) {
       const target = findTarget(String(data.target));
       const x = Number(data.x), y = Number(data.y);
