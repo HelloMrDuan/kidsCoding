@@ -2710,6 +2710,29 @@
         "reviewer": "实现者 AI（Hark A）；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
+    },
+    {
+      "id": "OPS-017",
+      "title": "P0 Job timeout 15 改为 12：python-batch3、portfolio-ux302、parent-growth-ux503",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": ".github/workflows/curriculum-content.yml（仅上述三个 Job 的 timeout）；docs/roadmap/task-register.json（仅登记本条）；不改测试内容、不改其他 Job、不改业务代码。",
+      "acceptance": [
+        "python-batch3、portfolio-ux302、parent-growth-ux503 的 timeout-minutes 均为 12",
+        "YAML 校验通过，测试文件与命令不变",
+        "PR 描述含独立成行的 Task-ID: OPS-017，且 task-ledger CI 通过",
+        "本任务不改 Scratch VM Job（见 OPS-016），不宣称已解决全部超时"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/265",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "工作流整改独立 PR，遵循统一 CI 规范草案 PR #262；若分片 PR #263 先合并，本 PR 需 rebase；本任务不改其他 Job 家族。"
     }
   ]
 }
