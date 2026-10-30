@@ -11205,7 +11205,7 @@
       "unitId": "M0-U3",
       "focusConcept": "数据",
       "plannedLearningOutcome": "能使用数据解释并完成「制作班级数据展」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -11218,13 +11218,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/336",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。 2026-10-30 课程开发账号A第一阶段：数据展执行器与8个本地测试通过，证据 docs/roadmap/evidence/M0-U3-L06/；本课无详细稿文件，所有数值为实现选择，详细稿缺失需主架构补齐；不是网页课堂可玩课程，未独立教研，未儿童试学，不得标 completed。前置 M0-U3-L05 尚在 PR #334 未合并，本登记不写未合并依赖。"
     },
     {
       "id": "M0-U4-L01",
