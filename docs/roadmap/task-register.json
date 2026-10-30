@@ -1459,10 +1459,7 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/146",
         "mergeCommit": "8f57d9718f294c62d6fbfd50cdba059492c2d5eb",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40275987635",
-        "tests": [
-          "e2e local: mobile-tabs-ux205 4 passed + 4 project-applicability skips (desktop+mobile); tab switches keep blocks and say choice, footer/run actions sticky on <=600px",
-          "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"
-        ],
+        "tests": ["e2e local: mobile-tabs-ux205 4 passed + 4 project-applicability skips (desktop+mobile); tab switches keep blocks and say choice, footer/run actions sticky on <=600px", "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"],
         "reviewer": null
       },
       "notes": ""
@@ -1486,11 +1483,7 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/146",
         "mergeCommit": "8f57d9718f294c62d6fbfd50cdba059492c2d5eb",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40275987635",
-        "tests": [
-          "e2e local: lesson-ui-responsive 7 tests x desktop+mobile all green; L01/L05/L09/L12 success/error/recovery/reward legs, real tap chain on mobile",
-          "screenshots l05-1440/768/375 verified locally (desktop+tablet+mobile layout assertions pass)",
-          "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"
-        ],
+        "tests": ["e2e local: lesson-ui-responsive 7 tests x desktop+mobile all green; L01/L05/L09/L12 success/error/recovery/reward legs, real tap chain on mobile", "screenshots l05-1440/768/375 verified locally (desktop+tablet+mobile layout assertions pass)", "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"],
         "reviewer": null
       },
       "notes": ""
@@ -1642,10 +1635,8 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/155",
         "mergeCommit": "48791b29a4ceb64d0c3914d729e0391725f9b954",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40447120319",
-        "tests": [
-          "e2e: portfolio-resume-export-ux302 6/6 in CI portfolio-ux302 + local 6/6; vitest 139 files 822 items green; eslint changed files 0 errors; Next build pass; PR CI gate pass on rerun (part2 guest-story flake cleared on close/reopen rerun)"
-        ],
-        "reviewer": "duan 2026-10-27 instruction authorized merge; executed by kid小宝 via connector"
+        "tests": ["e2e: portfolio-resume-export-ux302 6/6 in CI portfolio-ux302 + local 6/6; vitest 139 files 822 items green; eslint changed files 0 errors; Next build pass; PR CI gate pass on rerun (part2 guest-story flake cleared on close/reopen rerun)"],
+        "reviewer": "duan 2026-10-27 instruction authorized merge; executed by kid\u5c0f\u5b9d via connector"
       },
       "notes": ""
     },
@@ -1663,16 +1654,7 @@
         "账号A作品账号B不可读写",
         "未登录本机解释，1440/768/375测试"
       ],
-      "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/159",
-        "mergeCommit": "6a5ad31599b87ff149c31af319697dadfe35f6c3",
-        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40475971321",
-        "tests": [
-          "live table-layer A/B real accounts: anon 401, A write 201/read 1, B read 0, B write own row, A still own source; route session binding verified by code (GET eq user_id, PUT user from session, 401 anon); new portfolio-cloud-isolation-ux303 spec local 3/3 (logged-out, A/B presentation, 1440/768/375 no overflow); PR CI 22 success + 3 skipped; main CI curriculum 40475971321 + accountability 40475971469 + deploy 40475971332 green; eslint 0 errors; progress unit tests 11/11"
-        ],
-        "reviewer": "duan 2026-10-27 three-account mode authorized platform chain; executed by kid小宝 via connector"
-      },
-      "notes": ""
+      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/159", "mergeCommit": "6a5ad31599b87ff149c31af319697dadfe35f6c3", "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40475971321", "tests": ["live table-layer A/B real accounts: anon 401, A write 201/read 1, B read 0, B write own row, A still own source; route session binding verified by code (GET eq user_id, PUT user from session, 401 anon); new portfolio-cloud-isolation-ux303 spec local 3/3 (logged-out, A/B presentation, 1440/768/375 no overflow); PR CI 22 success + 3 skipped; main CI curriculum 40475971321 + accountability 40475971469 + deploy 40475971332 green; eslint 0 errors; progress unit tests 11/11"], "reviewer": "duan 2026-10-27 three-account mode authorized platform chain; executed by kid小宝 via connector"}, "notes": ""
     },
     {
       "id": "UX-401",
@@ -1692,9 +1674,7 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/148",
         "mergeCommit": "6d38ef84ad6a8369a515ced39dcc9eca06124617",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40324387304",
-        "tests": [
-          "e2e local: scratch-workbench-ux401 4 passed + 2 project-applicability skips (desktop+mobile); workbench domains/labels visible at 1440/768/375, zero horizontal overflow, mobile tap chain green-flag→clones→move→delete→stop; 3-breakpoint screenshots kept"
-        ],
+        "tests": ["e2e local: scratch-workbench-ux401 4 passed + 2 project-applicability skips (desktop+mobile); workbench domains/labels visible at 1440/768/375, zero horizontal overflow, mobile tap chain green-flag→clones→move→delete→stop; 3-breakpoint screenshots kept"],
         "reviewer": null
       },
       "notes": ""
@@ -1717,9 +1697,7 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/148",
         "mergeCommit": "6d38ef84ad6a8369a515ced39dcc9eca06124617",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40324387304",
-        "tests": [
-          "e2e local: scratch-characters-ux402 15 passed + 1 skip (desktop+mobile); dual-character sample, character area, per-character programs and separate runs, 4 illegal fixtures refused with reasons, single-character old project compatible; helper vitest scratch-character-stats 5/5; old scratch-vm.spec.ts 8 assertions updated to dual-character totals"
-        ],
+        "tests": ["e2e local: scratch-characters-ux402 15 passed + 1 skip (desktop+mobile); dual-character sample, character area, per-character programs and separate runs, 4 illegal fixtures refused with reasons, single-character old project compatible; helper vitest scratch-character-stats 5/5; old scratch-vm.spec.ts 8 assertions updated to dual-character totals"],
         "reviewer": null
       },
       "notes": ""
@@ -1741,9 +1719,7 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/148",
         "mergeCommit": "6d38ef84ad6a8369a515ced39dcc9eca06124617",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40324387304",
-        "tests": [
-          "e2e local: scratch-vm-regression-ux403 3 tests (green flag x3 with fresh counts, run-after-refusal recovery, CDN reachability recorded as observed: cdn-unreachable branch locally, failure state shown); old scratch-vm.spec.ts 18/20, 2 failures are the export filename assertion proven environmental (minimal blob-download probe yields 'download' in sandbox browsers; app download code byte-identical to main; CI authoritative); full vitest 136 files 815 tests all green"
-        ],
+        "tests": ["e2e local: scratch-vm-regression-ux403 3 tests (green flag x3 with fresh counts, run-after-refusal recovery, CDN reachability recorded as observed: cdn-unreachable branch locally, failure state shown); old scratch-vm.spec.ts 18/20, 2 failures are the export filename assertion proven environmental (minimal blob-download probe yields 'download' in sandbox browsers; app download code byte-identical to main; CI authoritative); full vitest 136 files 815 tests all green"],
         "reviewer": null
       },
       "notes": ""
@@ -1871,11 +1847,7 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/146",
         "mergeCommit": "8f57d9718f294c62d6fbfd50cdba059492c2d5eb",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40275987635",
-        "tests": [
-          "e2e local: lesson-recovery-ux502 3 tests x desktop+mobile all green; advance-reload resumes new step, remedial return restores failed program, click farming awards nothing, cards shelf exactly once",
-          "unit local full suite 135 files 810 tests green (incl. goToStep draft fix)",
-          "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"
-        ],
+        "tests": ["e2e local: lesson-recovery-ux502 3 tests x desktop+mobile all green; advance-reload resumes new step, remedial return restores failed program, click farming awards nothing, cards shelf exactly once", "unit local full suite 135 files 810 tests green (incl. goToStep draft fix)", "PR CI all green on 07060523: gate pass 17 success + 3 skipped; main CI green: 13 checks all success incl. curriculum-web rerun 40275987635 and task-ledger"],
         "reviewer": null
       },
       "notes": ""
@@ -2322,16 +2294,7 @@
       "acceptance": [
         "目标生产环境迁移版本、备份/回滚操作有可核验证据"
       ],
-      "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/157",
-        "mergeCommit": "2cd2620c022d72e1130036ff2788c7391919b891",
-        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40467148084",
-        "tests": [
-          "db: migration 10/11 + 011 partial; backup sha256 + isolated restore verified; guest answers 14->0 rows intact; purge systemd timer armed 2026-10-28 03:17 UTC; owner_all 7 policies removed with rollback file; RLS A/B + gateway re-run all green post-removal; test users cleaned, final auth.users 4 originals; PR CI 15/15 green; main CI curriculum 40467148084 + accountability 40467147989 green"
-        ],
-        "reviewer": "duan 2026-10-27 decisions authorized scrub + owner_all removal; executed by kid小宝 via connector"
-      },
-      "notes": ""
+      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/157", "mergeCommit": "2cd2620c022d72e1130036ff2788c7391919b891", "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40467148084", "tests": ["db: migration 10/11 + 011 partial; backup sha256 + isolated restore verified; guest answers 14->0 rows intact; purge systemd timer armed 2026-10-28 03:17 UTC; owner_all 7 policies removed with rollback file; RLS A/B + gateway re-run all green post-removal; test users cleaned, final auth.users 4 originals; PR CI 15/15 green; main CI curriculum 40467148084 + accountability 40467147989 green"], "reviewer": "duan 2026-10-27 decisions authorized scrub + owner_all removal; executed by kid小宝 via connector"}, "notes": ""
     },
     {
       "id": "CLOUD-102",
@@ -2714,10 +2677,7 @@
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40843974694",
         "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40843974675",
         "mainDeployCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40843974807",
-        "tests": [
-          "apps/web/src/features/curriculum/hark-a-audit.test.ts（5 例：覆盖六路线 144 个 ID 各一次且与 lesson-task-register 一致；independent=false 且无试学/发布声明；只有可运行且有教研记录的课才有分数，80–89 必带整改项；每课学习成果互不相同且非模板句；无运行器路线不低于 P1）",
-          "PR CI 19 success + 2 skipped（两次重跑均为已知无关不稳定用例 e2e-blockly mobile gate、bind-account-form.test.tsx:53）；main 7de4168 课程/追踪/部署三条工作流全绿"
-        ],
+        "tests": ["apps/web/src/features/curriculum/hark-a-audit.test.ts（5 例：覆盖六路线 144 个 ID 各一次且与 lesson-task-register 一致；independent=false 且无试学/发布声明；只有可运行且有教研记录的课才有分数，80–89 必带整改项；每课学习成果互不相同且非模板句；无运行器路线不低于 P1）", "PR CI 19 success + 2 skipped（两次重跑均为已知无关不稳定用例 e2e-blockly mobile gate、bind-account-form.test.tsx:53）；main 7de4168 课程/追踪/部署三条工作流全绿"],
         "reviewer": "实现者 AI 自审（Hark A），非独立人工教研；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：审定基线 main 300c6dd；AI 审定不能替代独立人工教研。"
@@ -2746,12 +2706,7 @@
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846202124",
         "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846202117",
         "mainDeployCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/40846202313",
-        "tests": [
-          "apps/web/src/features/lessons/blockly/program-tree.test.ts（9 例：展开与 rounds、只改次数改变动作数、平铺兼容、循环后积木只跑一次、两层嵌套与第三层拒绝、空循环与 80 步上限、次数夹值、计数、草稿防伪解析）",
-          "apps/web/src/features/lessons/blockly/repeat-block-serialize.test.ts（3 例，真实 Blockly 无头工作区：次数与口内积木进入快照、空循环、只提供 2/3/4/5/6/8）",
-          "grid-engine.test.ts 循环 5 例；grid-draft / restore-block-sequence 嵌套用例",
-          "本地 lessons+curriculum 49 files / 536 tests；PR CI 19 success + 2 skipped；main 6897f51 课程/追踪/部署三条工作流全绿"
-        ],
+        "tests": ["apps/web/src/features/lessons/blockly/program-tree.test.ts（9 例：展开与 rounds、只改次数改变动作数、平铺兼容、循环后积木只跑一次、两层嵌套与第三层拒绝、空循环与 80 步上限、次数夹值、计数、草稿防伪解析）", "apps/web/src/features/lessons/blockly/repeat-block-serialize.test.ts（3 例，真实 Blockly 无头工作区：次数与口内积木进入快照、空循环、只提供 2/3/4/5/6/8）", "grid-engine.test.ts 循环 5 例；grid-draft / restore-block-sequence 嵌套用例", "本地 lessons+curriculum 49 files / 536 tests；PR CI 19 success + 2 skipped；main 6897f51 课程/追踪/部署三条工作流全绿"],
         "reviewer": "实现者 AI（Hark A）；owner 2026-10-27 授权 CI 绿后直接合并"
       },
       "notes": "Hark A 2026-10-29：AUD-101 审定 P0 引擎缺口第 6 条；事件引擎（萤火虫同步等）的循环支持随 G0-U3-L04 课程 PR 另行实现。"
