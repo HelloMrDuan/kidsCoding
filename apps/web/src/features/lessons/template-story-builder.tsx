@@ -2,7 +2,12 @@
 
 import type { ProjectTemplateDefinition } from '@/features/domain/types'
 
-import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
+import dynamic from 'next/dynamic'
+
+const BlocklyWorkspace = dynamic(
+  () => import('@/features/lessons/blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
+  { ssr: false },
+)
 import { PreviewStage } from '@/features/lessons/blockly/preview-stage'
 
 export function TemplateStoryBuilder({
