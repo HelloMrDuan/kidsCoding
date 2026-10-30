@@ -7,15 +7,16 @@
 // course or a verified grade.
 
 import {evaluateG2U2Lesson, g2u2ScratchLessons, observedPredictionG2U2} from './g2-u2-scratch-lessons'
+import {evaluateG2U3Lesson, g2u3ScratchLessons, observedPredictionG2U3} from './g2-u3-scratch-lessons'
 
-export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION' | 'DY'
+export type G2Field = 'X' | 'Y' | 'MESSAGE' | 'COSTUME' | 'TIMES' | 'DURATION' | 'BACKDROP' | 'SOUND_MENU' | 'DIRECTION' | 'STEPS' | 'DEGREES' | 'BROADCAST_OPTION' | 'DY' | 'DX'
 export type G2Slot = { key: string; field: G2Field; label: string; min?: number; max?: number; maxLength?: number; options?: string[]; tenths?: boolean }
 export type G2BlockType = 'kc2_goto' | 'kc2_say' | 'kc2_switch_costume' | 'kc2_repeat' | 'kc2_next_costume' | 'kc2_wait' | 'kc2_switch_backdrop' | 'kc2_play_sound'
-  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast' | 'kc2_wait_whole' | 'kc2_change_y' | 'kc2_wait_free' | 'kc2_forever' | 'kc2_next_backdrop'
+  | 'kc2_goto_start' | 'kc2_point_direction' | 'kc2_move_steps' | 'kc2_turn_right' | 'kc2_broadcast' | 'kc2_wait_whole' | 'kc2_change_y' | 'kc2_wait_free' | 'kc2_forever' | 'kc2_next_backdrop' | 'kc2_change_x'
 /** `fixed` shows a value the lesson keeps fixed (its field is shown but locked in the editor). */
 export type G2BlockSpec = { type: G2BlockType; vmBlock: string; slots: G2Slot[]; children?: G2BlockSpec[]; fixed?: Partial<Record<G2Field, string>> }
 export type G2ScriptSpec = {
-  hat: 'kc2_flag' | 'kc2_clicked' | 'kc2_when_receive' | 'kc2_when_backdrop'
+  hat: 'kc2_flag' | 'kc2_clicked' | 'kc2_when_receive' | 'kc2_when_backdrop' | 'kc2_when_key_right' | 'kc2_when_key_left'
   body: G2BlockSpec[]
   /** Editable fields on the hat itself (the message a "when I receive" hat listens for). */
   hatSlots?: G2Slot[]
@@ -70,6 +71,8 @@ export type G2Lesson = {
   showFlight?: boolean
   /** Show the last broadcast run: which receivers spoke and how long after the broadcast, and the gap between the two performers (sync lessons). */
   showSync?: boolean
+  /** Show the keyboard buttons and the key-press log (keyboard lessons). */
+  showKeys?: boolean
 }
 
 export type G2Point = { x: number; y: number }
@@ -549,7 +552,7 @@ export const g2u1ScratchLessons: Record<string, G2Lesson> = {
 }
 
 /** Every G2 lesson on the scratch-g2 lab (U1 basics + U2 animation). */
-export const g2ScratchLessons: Record<string, G2Lesson> = {...g2u1ScratchLessons, ...g2u2ScratchLessons}
+export const g2ScratchLessons: Record<string, G2Lesson> = {...g2u1ScratchLessons, ...g2u2ScratchLessons, ...g2u3ScratchLessons}
 
 export function getG2ScratchLesson(id: string): G2Lesson | null {
   return g2ScratchLessons[id] ?? null
@@ -596,12 +599,14 @@ export type G2Observations = {
   cycleRuns: Array<{ switches: number; avgMs: number | null; speech: Array<{ target: string; backdrop: string }>; finished: boolean; stopped: boolean }>
   /** Green-flag runs: every sprite sound the VM started, in order, with the VM time since the run's first sound (ms), and whether the run has ended. */
   beatRuns: Array<{ hits: Array<{ target: string; sound: string; ms: number }>; finished: boolean }>
+  /** Keyboard presses the VM really ran, in order: which arrow key, and the boat x right after it (keyboard lessons). */
+  keyPresses: Array<{ key: string; x: number }>
 }
 
 export const emptyG2Observations = (): G2Observations => ({
   clickedSpeakers: [], stageMoveRejected: false, positionsAfterRun: null, lastSaid: {},
   costumesAfterRun: null, clickCostumeChanges: {}, firstClickTransition: {}, stageCostumeRejected: false,
-  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [], cycleRuns: [], beatRuns: [],
+  flagRuns: [], clickSounds: {}, clickTurns: {}, broadcastRuns: [], speechRuns: [], soundCostumes: [], frameRuns: [], cycleRuns: [], beatRuns: [], keyPresses: [],
 })
 
 export function inBirdNest(point: G2Point | undefined | null): boolean {
@@ -717,6 +722,8 @@ export function observedPrediction(id: string, obs: G2Observations): string | nu
     if (!first) return null
     return first.overlaps > 0 ? '会同时出现' : '一个说完另一个才说'
   }
+  const u3 = observedPredictionG2U3(id, obs)
+  if (u3 !== null) return u3
   return observedPredictionG2U2(id, obs)
 }
 
@@ -727,5 +734,7 @@ export function evaluateG2Lesson(id: string, obs: G2Observations): G2TaskState |
   if (id === g2u1L04.id) return evaluateG2U1L04(obs)
   if (id === g2u1L05.id) return evaluateG2U1L05(obs)
   if (id === g2u1L06.id) return evaluateG2U1L06(obs)
+  const u3 = evaluateG2U3Lesson(id, obs)
+  if (u3 !== null) return u3
   return evaluateG2U2Lesson(id, obs)
 }
