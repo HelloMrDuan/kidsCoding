@@ -116,7 +116,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   function runCustom(){
     if(customBusy||!ready||!frame.current?.contentWindow)return
     if(source.length>5000){setCustomResult('代码超过5000字符，无法运行。');return}
-    if(customArgs.some(a=>a.length>40)){setCustomResult('自选参数每项最多40字。');return}
+    if(customArgs.some((a,index)=>a.length>(lessonId==='P3-U4-L03'&&index===0?1000:40))){setCustomResult('自选参数每项最多40字，CSV 表格文本最多1000字。');return}
     customId.current+=1
     customActive.current=true
     customArgsRef.current=[...customArgs]
@@ -181,8 +181,11 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
         <div className="mt-4 flex flex-wrap gap-3">
           {lesson.argLabels.map((label,index)=>(
             <label key={index} className="text-sm font-bold text-slate-700">{label}
-              <input data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
-                className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal" />
+              {lessonId==='P3-U4-L03'&&index===0
+                ? <textarea data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} rows={3} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
+                    className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal align-top" />
+                : <input data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
+                    className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal" />}
             </label>
           ))}
           <button data-testid="python-custom-run" disabled={!ready||customBusy||busy} type="button" onClick={runCustom} className="rounded-full bg-sky-700 px-6 py-2 font-bold text-white disabled:opacity-50">
