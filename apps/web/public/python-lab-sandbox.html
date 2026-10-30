@@ -33,11 +33,11 @@ self.onmessage = async (event) => {
     // These tests are *local practice*, not a trustworthy exam or server grade.
     if (event.data.kind === 'RUN_TESTS') {
       const tests = event.data.tests;
-      const argCount = {introduce:2, weather_line:2, number_or_text:2, greet_name:2, make_profile:3};
+      const argCount = {introduce:2, weather_line:2, number_or_text:2, greet_name:2, make_profile:3, filter_logs:2};
       if (!Array.isArray(tests) || tests.length < 2 || tests.length > 6 ||
           tests.some(t => !t || !Object.prototype.hasOwnProperty.call(argCount, t.function) ||
                      !Array.isArray(t.args) || t.args.length !== argCount[t.function] ||
-                     t.args.some(a => typeof a !== 'string' || a.length > 40))) {
+                     t.args.some((a, i) => typeof a !== 'string' || a.length > (t.function === 'filter_logs' && i === 0 ? 1000 : 40)))) {
         throw new Error('非法练习测试配置');
       }
       python.globals.set('__kc_source', source);
@@ -60,12 +60,12 @@ self.onmessage = async (event) => {
       self.postMessage({kind:'RESULT',output:output.slice(0,4000),cases,error:null});
     } else if (event.data.kind === 'RUN_CUSTOM') {
       // TQ-005 练习 B：用孩子自选的参数真实调用一次函数，只返回结果，不评分。
-      const argCount = {introduce:2, weather_line:2, number_or_text:2, greet_name:2, make_profile:3};
+      const argCount = {introduce:2, weather_line:2, number_or_text:2, greet_name:2, make_profile:3, filter_logs:2};
       const fn = event.data.function;
       const args = event.data.args;
       if (!fn || !Object.prototype.hasOwnProperty.call(argCount, fn) ||
           !Array.isArray(args) || args.length !== argCount[fn] ||
-          args.some(a => typeof a !== 'string' || a.length > 40)) {
+          args.some((a, i) => typeof a !== 'string' || a.length > (fn === 'filter_logs' && i === 0 ? 1000 : 40))) {
         throw new Error('非法自选输入');
       }
       python.globals.set('__kc_source', source);
