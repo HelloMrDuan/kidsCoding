@@ -2727,6 +2727,58 @@
       ],
       "evidence": {},
       "notes": "2026-10-30 duan 下达全仓库 CI 治理指令：所有 Muse 账号、所有课程方向、所有 PR 适用；kid小宝牵头规范与架构协调，四账号分工不变。Scratch 分片实施另立 SYS-109 独立 PR，不混入本 PR。"
+    },
+    {
+      "id": "AUD-102",
+      "title": "P0-U1-L01《运行第一行代码》忘记引号错误类型表述整改",
+      "priority": "P1",
+      "category": "AUD",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "只改 track-p0-detailed-lessons-v1.json 中 P0-U1-L01 的四处断言（第 5 步 teacherPrompt、feedback.commonMistakes[0].symptom、assessment.failCases 否定用例 when、assessment.scoring 调试能力 evidence）：由裸露的“忘记引号产生 NameError”改为区分“中文名字报 SyntaxError，英文名字报 NameError”；mustPass 否定标准原样保留；新增 apps/web/src/content/curriculum/aud-102-rectification.test.ts 回归测试。不改其他课节，不改课节台账状态，不改 ID。",
+      "acceptance": [
+        "四处断言均含 SyntaxError 与 NameError 的区分表述，不再有裸露旧断言",
+        "mustPass“不能出现：忘记引号产生 NameError”原样保留",
+        "回归测试含四字段断言、mustPass 保留断言与去 mustPass 后的旧断言缺席断言",
+        "PR CI 全绿；不声称独立教研与真实儿童试学"
+      ],
+      "evidence": {},
+      "notes": "2026-10-30 主 Muse 纠偏批处理分配（duan 纠偏指令：不等新人工指令即实施；合并仍需 duan 授权）。python3 真跑复证：print(你好，编程世界) 报 SyntaxError invalid character U+FF0C，print(hello) 报 NameError。独立教研与真实儿童试学仍为 0，本 PR 不声称试学通过或教研合格。"
+    },
+    {
+      "id": "AUD-103",
+      "title": "P2-U1-L01《比较两种找书方法》二分比较次数全称断言整改",
+      "priority": "P1",
+      "category": "AUD",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "只改 track-p2-detailed-lessons-v2.json 中 P2-U1-L01 的全称断言（learningOutcome、project.successCriteria、assessment.positive.expected、assessment.rubric 40 分标准及 teachingSteps 相关复述共 9 处）：改为“平均与最坏情况下，有序列表查找同一目标时二分比较次数不超过线性”；parentReview 双句号一并修正；assessment executionStatus 的 spec_only 原样保留，不擅改枚举值，执行证据放回归测试与 PR 正文；新增回归测试中的真实计数证明。不改其他课节，不改课节台账状态。",
+      "acceptance": [
+        "四处关键断言均为带平均/最坏条件的表述，课节内无裸露全称断言",
+        "回归测试真跑反例：63 本有序书、目标为首元素时线性 1 次、二分 6 次",
+        "回归测试真跑成立：n=1..200 最坏与平均情形下二分均不超过线性",
+        "PR CI 全绿；不声称独立教研与真实儿童试学"
+      ],
+      "evidence": {},
+      "notes": "2026-10-30 主 Muse 纠偏批处理分配（duan 纠偏指令：不等新人工指令即实施；合并仍需 duan 授权）。反例 2026-10-30 再次复现：线性 1、二分 6。"
+    },
+    {
+      "id": "AUD-104",
+      "title": "P2-U2 focusConcept 标签系统性错位整改（含 P2-U3-L05）",
+      "priority": "P1",
+      "category": "AUD",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "只改 track-p2-detailed-lessons-v2.json 中 6 个 focusConcept 标签：P2-U2-L02 栈→队列、L03 队列→集合、L04 队列→词频字典、L05 集合→二维数组、L06 集合→队列，P2-U3-L05 图→分治；每项均以本课 learnerBuild 实际内容为准；knowledgePoints 累计口径不动，另议；新增回归测试逐课核对 focusConcept 与 learnerBuild 关键词。不改其他课节，不改课节台账状态。",
+      "acceptance": [
+        "6 个 focusConcept 均与本课 learnerBuild 实际内容一致",
+        "knowledgePoints 原样保留（累计口径，改动另议，不静默重写）",
+        "回归测试逐课断言 focusConcept 与 learnerBuild 关键词",
+        "PR 正文写明家长报告连带影响：getLessonKnowledge 以 focusConcept 作 concepts 缺失时的 fallback，错位标签污染家长端知识点分组",
+        "PR CI 全绿；不声称独立教研与真实儿童试学"
+      ],
+      "evidence": {},
+      "notes": "2026-10-30 主 Muse 纠偏批处理分配（duan 纠偏指令：不等新人工指令即实施；合并仍需 duan 授权）。标签现状与内容对照经当前 main 实读确认；家长报告读取链经 build-parent-growth-report.ts 与 lesson-knowledge.ts 实读确认。"
     }
   ]
 }
