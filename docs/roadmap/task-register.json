@@ -3039,6 +3039,34 @@
         "reviewer": null
       },
       "notes": "workflow 治理（SYS-111 显式预算治理的 documented 例外）：S3 通过、仅买余量，不为掩盖失败放宽；拆分 S3 为后续提速任务，另行立项。"
+    },
+    {
+      "id": "SYS-114",
+      "title": "bind-account-form submitOtp durable 加固：等验证码输入框本身的 waitFor（仅改测试）",
+      "priority": "P2",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "仅改测试，不改产品代码：bind-account-form.test.tsx 的 submitOtp helper 改成等验证码输入框本身的 waitFor（同文件测试 7 的范式），一处改动覆盖 7 个调用者；断言未删除、未放宽；不改其他测试，不改产品代码。",
+      "acceptance": [
+        "bind-account-form spec 本地 9/9 通过",
+        "断言未删除、未放宽",
+        "产品代码零改动",
+        "PR CI 全绿后合并"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "mainTaskCI": null,
+        "tests": [
+          "bind-account-form spec 本地 9/9 通过（改动后两次、改动前一次；act 控制台警告数改动前后均为 2 条，非失败）",
+          "submitOtp 一处改动覆盖 7 个调用者；断言未删除、未放宽；产品代码零改动",
+          "本地运行用主盘 node_modules 软链（其 lockfile 早于 b58b417f、缺 @blockly/keyboard-navigation，但本 spec 不引 blockly，不影响；CI 为最终验证）"
+        ],
+        "reviewer": null
+      },
+      "notes": "测试时序竞态（非产品 bug）：submitOtp 等 mock 调用触发、不等 codeSent 重渲染结果，React 18 commit 滞后致找不到验证码；与 SYS-112 的 say-too-early 同类代理信号竞态；三度同签名复发 #376/#255/#431；该文件在 #255 未动、属共享测试结构问题；durable 加固另行立项，不阻塞 #255。"
     }
   ]
 }
