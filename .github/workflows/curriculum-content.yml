@@ -345,7 +345,7 @@ jobs:
           path: apps/web/test-results/
 
   scratch-real-vm-shard-s3:
-    timeout-minutes: 12
+    timeout-minutes: 15 # documented exception (SYS-113): slowest shard, mean ~9.9 min over 10 runs
     runs-on: ubuntu-latest
     defaults:
       run:
