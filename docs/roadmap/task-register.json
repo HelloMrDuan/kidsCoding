@@ -3012,6 +3012,33 @@
         "reviewer": null
       },
       "notes": "测试时序竞态（非产品回调 bug）：原因渲染先到、回调后到，旧断言抢跑；durable 加固另行立项，不阻塞其他合并。"
+    },
+    {
+      "id": "SYS-113",
+      "title": "scratch-real-vm-shard-s3 预算 12→15 分钟（documented 例外，workflow 治理，不改测试）",
+      "priority": "P2",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "仅改 workflow 预算，不改测试、不改产品代码：curriculum-content.yml 中 scratch-real-vm-shard-s3 的 timeout-minutes 由 12 改为 15，并附注记（已知最慢分片）；不改其他作业、超时、测试。",
+      "acceptance": [
+        "S3 作业超时预算为 15 分钟并附注记",
+        "其他作业、超时、测试零改动",
+        "PR CI 全绿后合并"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "mainTaskCI": null,
+        "tests": [
+          "S3 10 次运行均值 ~9.9 分钟（9.5–10.2 分钟，扁平无增长）",
+          "S3 10 次运行 0 超时、0 失败（仅提超时上限，不改通过/失败判定）",
+          "npm ci 开销仅 6–12 秒；24 个整课测试 + --workers=2 为时长主因"
+        ],
+        "reviewer": null
+      },
+      "notes": "workflow 治理（SYS-111 显式预算治理的 documented 例外）：S3 通过、仅买余量，不为掩盖失败放宽；拆分 S3 为后续提速任务，另行立项。"
     }
   ]
 }
