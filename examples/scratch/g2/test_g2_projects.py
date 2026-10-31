@@ -48,6 +48,28 @@ class G2ProjectTests(unittest.TestCase):
                 block = targets[param["target"]]["blocks"][param["block"]]
                 self.assertTrue(param["slot"] in block["inputs"] or param["slot"] in block["fields"], (lesson_id, param))
 
+    def test_u3_l01_boat_has_right_and_left_key_scripts_and_the_left_bug(self):
+        project = project_for("G2-U3-L01")
+        stage_t, boat = project["targets"]
+        self.assertTrue(stage_t["isStage"])
+        self.assertEqual([c["name"] for c in stage_t["costumes"]], ["海洋巡逻"])
+        self.assertEqual(boat["name"], "巡逻小船")
+        blocks = boat["blocks"]
+        self.assertEqual(blocks["boat_right"]["opcode"], "event_whenkeypressed")
+        self.assertEqual(blocks["boat_right"]["fields"]["KEY_OPTION"][0], "right arrow")
+        self.assertEqual(blocks["boat_left"]["opcode"], "event_whenkeypressed")
+        self.assertEqual(blocks["boat_left"]["fields"]["KEY_OPTION"][0], "left arrow")
+        self.assertEqual(blocks["boat_right_move"]["opcode"], "motion_changexby")
+        self.assertEqual(blocks["boat_right_move"]["inputs"]["DX"], [1, [4, "10"]])
+        self.assertEqual(blocks["boat_left_move"]["opcode"], "motion_changexby")
+        # Starting bug: left also moves +10, so the boat cannot sail back yet.
+        self.assertEqual(blocks["boat_left_move"]["inputs"]["DX"], [1, [4, "10"]])
+        self.assertEqual(blocks["boat_home"]["inputs"]["X"], [1, [4, "0"]])
+        model = build_models()["G2-U3-L01"]
+        kinds = {(pp["block"], pp["slot"]): pp for pp in model["params"]}
+        self.assertEqual(kinds[("boat_right_move", "DX")]["min"], 1)
+        self.assertEqual(kinds[("boat_left_move", "DX")]["min"], -20)
+
     def test_l01_is_stage_plus_two_sprites_with_their_own_scripts(self):
         project = project_for("G2-U1-L01")
         stage, cat, bird = project["targets"]

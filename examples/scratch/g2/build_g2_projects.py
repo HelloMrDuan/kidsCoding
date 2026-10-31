@@ -645,6 +645,40 @@ def lesson_g2_u2_l05():
     return "g2-u2-l05-sync-show.sb3.b64", project, files, params
 
 
+
+def lesson_g2_u3_l01():
+    """键盘控制小船: when the right arrow is pressed the boat moves +10 in x;
+    when the left arrow is pressed it moves -10. The starting project has the
+    left-arrow bug: it also moves +10, so the boat can never sail back."""
+    sea, sea_file = svg_costume("海洋巡逻", "sea-patrol-backdrop.svg", 240, 180)
+    boat, boat_file = svg_costume("巡逻小船", "patrol-boat.svg", 60, 45)
+    boat_blocks = {
+        "boat_flag": block("event_whenflagclicked", "boat_home", top=True, x=40, y=40),
+        "boat_home": block("motion_gotoxy", parent="boat_flag", inputs={"X": num(0), "Y": num(-20)}),
+        "boat_right": block("event_whenkeypressed", "boat_right_move", top=True, x=40, y=200,
+                             fields={"KEY_OPTION": ["right arrow", None]}),
+        "boat_right_move": block("motion_changexby", parent="boat_right", inputs={"DX": num(10)}),
+        "boat_left": block("event_whenkeypressed", "boat_left_move", top=True, x=40, y=320,
+                            fields={"KEY_OPTION": ["left arrow", None]}),
+        # Bug the lesson starts with: the left arrow also moves +10.
+        "boat_left_move": block("motion_changexby", parent="boat_left", inputs={"DX": num(10)}),
+    }
+    project = {
+        "targets": [
+            stage([sea]),
+            sprite("巡逻小船", [boat], boat_blocks, 1, 0, -20),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U3-L01"},
+    }
+    files = {c["md5ext"]: f for c, f in ((sea, sea_file), (boat, boat_file))}
+    params = [
+        {"target": "巡逻小船", "block": "boat_right_move", "slot": "DX", "kind": "int", "min": 1, "max": 20},
+        {"target": "巡逻小船", "block": "boat_left_move", "slot": "DX", "kind": "int", "min": -20, "max": 20},
+    ]
+    return "g2-u3-l01-boat-keys.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
@@ -657,6 +691,7 @@ LESSONS = {
     "G2-U2-L03": lesson_g2_u2_l03,
     "G2-U2-L04": lesson_g2_u2_l04,
     "G2-U2-L05": lesson_g2_u2_l05,
+    "G2-U3-L01": lesson_g2_u3_l01,
 }
 
 
