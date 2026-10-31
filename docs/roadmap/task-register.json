@@ -3018,7 +3018,7 @@
       "title": "scratch-real-vm-shard-s3 预算 12→15 分钟（documented 例外，workflow 治理，不改测试）",
       "priority": "P2",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "仅改 workflow 预算，不改测试、不改产品代码：curriculum-content.yml 中 scratch-real-vm-shard-s3 的 timeout-minutes 由 12 改为 15，并附注记（已知最慢分片）；不改其他作业、超时、测试。",
       "acceptance": [
@@ -3027,10 +3027,10 @@
         "PR CI 全绿后合并"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "mainTaskCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/440",
+        "mergeCommit": "00ceed97b25e1419e5fc43107e3d0413c0455458",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41222145753",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41222145801",
         "tests": [
           "S3 10 次运行均值 ~9.9 分钟（9.5–10.2 分钟，扁平无增长）",
           "S3 10 次运行 0 超时、0 失败（仅提超时上限，不改通过/失败判定）",
