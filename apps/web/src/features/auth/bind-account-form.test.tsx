@@ -50,6 +50,10 @@ function setupForm({
       expect(otpRequest).toHaveBeenCalledWith('email', email)
     })
 
+    await waitFor(() => {
+      expect(screen.getByLabelText('验证码')).toBeInTheDocument()
+    })
+
     fireEvent.change(screen.getByLabelText('验证码'), {
       target: { value: token },
     })
