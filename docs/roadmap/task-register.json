@@ -3091,6 +3091,33 @@
         "reviewer": null
       },
       "notes": "spec 流程 vs 产品 needsRun 门禁不匹配、确定性失败：完成前须先运行成功，否则 handleNext 直接 return、clearLessonDraft 到不了；产品门禁是有意教学流程，不修产品；接线另立 §7 任务 + PR，不捆进修复 PR。"
+    },
+    {
+      "id": "SYS-117",
+      "title": "lesson-draft-persistence spec 手机端面板修复：断言与加积木前先切 code 面板（仅改测试）",
+      "priority": "P2",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "lesson-draft-persistence spec 手机端面板修复（test-only）：工作区可见性断言前与刷新后先用 lesson-pane-helpers 切到 code 面板、加积木改用 clickLessonControl；断言一字不动、产品代码零改动、不改 workflow。",
+      "acceptance": [
+        "spec 在 CI e2e-blockly 作业中手机端与桌面端均跑绿",
+        "断言未删除、未放宽",
+        "产品代码零改动",
+        "PR CI 全绿后合并"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "mainTaskCI": null,
+        "tests": [
+          "修复分支 fix/lesson-draft-persistence-mobile-pane：spec 在断言工作区可见前与刷新后先切 code 面板、加积木改用 clickLessonControl（照抄 lesson-recovery-ux502 范式），其余断言一字不动、产品代码零改动",
+          "本地 playwright --list 可加载解析：desktop + mobile 各 1 条（本机无 Chrome，不跑浏览器；CI 跑绿为准）"
+        ],
+        "reviewer": null
+      },
+      "notes": "SYS-116 接线后 CI 首跑暴露：e2e-blockly 运行 41232920690 中本 spec 仅 [mobile] 失败（42 测 1 失败），第 31 行工作区可见性断言在手机端 5 秒内始终 hidden（DOM 里定位到 7 次）；手机课堂一次只显示一个区，断言前须先切 code 面板；刷新后面板状态重置，刷新后断言前亦须重切；其余 8 spec 全过、桌面端通过；本次日志未跑到草稿逻辑，不证明草稿逻辑对错"
     }
   ]
 }
