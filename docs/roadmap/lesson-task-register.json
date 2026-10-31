@@ -12015,7 +12015,7 @@
       "unitId": "D0-U4",
       "focusConcept": "协作",
       "plannedLearningOutcome": "能使用协作解释并完成「三轮创作迭代」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -12028,13 +12028,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/382",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。 第一阶段：分支 muse-a/d0-u4-l05，Draft PR #382，迭代执行器本地 10 测试通过；无详细稿、数值为实现选择；尚缺详细稿、网页课堂接入、三端截图、独立人工教研、儿童试学与监护人授权，不得标 completed。"
     },
     {
       "id": "D0-U4-L06",
