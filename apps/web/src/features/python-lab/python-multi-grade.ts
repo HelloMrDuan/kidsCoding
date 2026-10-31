@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'efficiency_report'; args: readonly string[]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,21 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U4-L06': {
+    title: '第6课 · 个人效率工具套件',
+    prompt: '单元作品：编写 efficiency_report(tasks_json, day, reminders_json, now_time) 函数，把本单元 L01-L05 连起来，做一份个人效率日报。先按 L01 从任务列表里取出 day 这一天的任务（day 必须是周一到周日，任务项含任务、星期、完成，缺字段或完成不是布尔值就报错），每行“未完成：任务”或“已完成：任务”，没有就写“本日无任务”。再按 L05 从提醒列表里取出到 now_time 为止到期的提醒（时间是 HH:MM，小时 0 到 23、分钟 0 到 59，按分钟比较，含等于），每行“时间 内容”，没有就写“暂无提醒”。最后汇总今日任务总数、已完成数和到期提醒数。返回顺序固定为：第一行“任务：”，接着任务行，接着“提醒：”，接着提醒行，最后一行“汇总：今日任务：X 项，已完成 Y 项；到期提醒：Z 条”。JSON 解析失败、不是列表、时间格式不对、内容不是字符串或为空时都抛出 ValueError。不做真实等待和真实通知，只按给定模拟数据判断，数据全部是虚构示例。',
+    argLabels: ['一周任务 JSON 列表', '星期', '提醒列表 JSON 文本', '当前时间'],
+    startCode: 'import json\n\ndef efficiency_report(tasks_json, day, reminders_json, now_time):\n    # 先取当天任务，再取到期提醒，最后汇总\n    return "待完成"',
+    cases: [
+      { function: 'efficiency_report', args: ['[{"任务": "数学作业", "星期": "周一", "完成": false}, {"任务": "读英语", "星期": "周一", "完成": true}, {"任务": "跑步", "星期": "周二", "完成": false}]', '周一', '[{"时间": "08:00", "内容": "背单词"}, {"时间": "09:30", "内容": "练琴"}, {"时间": "10:00", "内容": "喝水"}]', '09:30'], expected: '任务：\n未完成：数学作业\n已完成：读英语\n提醒：\n08:00 背单词\n09:30 练琴\n汇总：今日任务：2 项，已完成 1 项；到期提醒：2 条' },
+      { function: 'efficiency_report', args: ['[{"任务": "数学作业", "星期": "周一", "完成": false}]', '周三', '[{"时间": "08:00", "内容": "背单词"}]', '07:00'], expected: '任务：\n本日无任务\n提醒：\n暂无提醒\n汇总：今日任务：0 项，已完成 0 项；到期提醒：0 条' },
+      { function: 'efficiency_report', args: ['[{"任务": "数学作业", "星期": "周一", "完成": false}]', '周八', '[{"时间": "08:00", "内容": "背单词"}]', '09:30'], expected: 'ERROR:ValueError' },
+      { function: 'efficiency_report', args: ['[{"任务": "数学作业", "星期": "周一", "完成": false}]', '周一', '[{"时间": "08:00", "内容": "背单词"}]', '25:00'], expected: 'ERROR:ValueError' },
+      { function: 'efficiency_report', args: ['不是 JSON', '周一', '[{"时间": "08:00", "内容": "背单词"}]', '09:30'], expected: 'ERROR:ValueError' },
+      { function: 'efficiency_report', args: ['[{"任务": "数学作业", "星期": "周一", "完成": false}]', '周一', '[{"时间": "08:00"}]', '09:30'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：day = day.strip()，不在周一到周日里先 raise ValueError；tasks = json.loads(tasks_json)，失败或不是 list 就 raise ValueError；任务项缺字段、任务不是 str 或为空、完成不是 bool 就 raise ValueError；先写时间校验：按冒号拆 2 段，数字，小时 0 到 23、分钟 0 到 59，否则 raise ValueError；reminders = json.loads(reminders_json)，失败或不是 list 就 raise ValueError；提醒项缺字段、时间校验不过、内容不是 str 或为空就 raise ValueError；任务行和提醒行按原顺序生成，计数汇总，顺序固定为任务、提醒、汇总。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
