@@ -3125,17 +3125,17 @@
       "title": "lesson-draft-persistence spec 接线进 CI：deploy e2e-blockly SPECS（workflow-only）",
       "priority": "P2",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "lesson-draft-persistence spec 接线进 CI（workflow-only）",
       "acceptance": [
         "spec 在 CI 内 desktop + mobile 均被跑且通过；workflow 改动不捆 spec 内容改动"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "mainTaskCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/446",
+        "mergeCommit": "9b866acda630bac220913248da23d902d9d2a3f5",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41242649304",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41242649272",
         "tests": [
           "deploy.yml e2e-blockly SPECS 追加 tests/e2e/lesson-draft-persistence.spec.ts（与 lesson-recovery-ux502 同作业，mobile + desktop 各跑一遍）",
           "workflow YAML 解析合法；接线 job 是否出现在 PR 检查集中以 CI 初查为准"
