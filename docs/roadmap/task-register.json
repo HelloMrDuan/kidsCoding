@@ -2959,6 +2959,31 @@
         "reviewer": "duan 2026-10-30 总授权下合并"
       },
       "notes": "duan 2026-10-30 P0 裁定批准新增；根因链 TemplateStoryBuilder→BlocklyWorkspace→@blockly/keyboard-navigation（模块顶层读 navigator.platform），预发布 main 679895e0 日志 digest 2491557641；分支 fix/ssr-101-blockly-navigator；72 节课程审计证据另立 PR，不混入本 PR。"
+    },
+    {
+      "id": "AUD-105",
+      "title": "P0/P1/P2 72 节审定工程审计证据入库",
+      "priority": "P1",
+      "category": "AUD",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "P0/P1/P2 共 72 节课程审定工程审计证据入库（基线 main 679895e0）：72/72 正向与边界 claim 真实运行验证；证据文件入库至 docs/curriculum-audit/kid-audit/；课节文件未动，内容缺陷 2 项 + 元数据观察 1 项记入整改计划；不含 SSR-101 代码修改，与 SSR-101 PR 完全独立。",
+      "acceptance": [
+        "P0/P1/P2 72 节真实运行审定证据入库（72-summary、72-progression、扩展架构草案、12 单元 findings）",
+        "证据声明如实：不等于浏览器课全部可玩、不等于人工教研合格，独立教研与真实儿童试学未完成",
+        "台账 AUD-105 条目状态与证据 PR 一致"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "mainTaskCI": null,
+        "tests": [
+          "P0/P1/P2 72 节正向与边界 claim 真实运行验证（python3.12.3、真实 pygame 2.6.1 + SDL dummy、unittest/tracemalloc/JSON/CSV/XML），基线 main 679895e0"
+        ],
+        "reviewer": null
+      },
+      "notes": "基线 main 679895e0；原始运行输出各 *-run.txt 留工作区备查、未全量入库；独立教研与真实儿童试学未完成，不得伪造或跳过。"
     }
   ]
 }
