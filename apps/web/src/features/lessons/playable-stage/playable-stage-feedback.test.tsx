@@ -64,7 +64,7 @@ describe('PlayableStage failure feedback (TQ-008)', () => {
     )
     fireEvent.click(screen.getByTestId('run-code-button'))
     await waitFor(() => expect(screen.getByTestId('stage-run-reason')).toHaveTextContent('说话说早啦'), { timeout: 5000 })
-    expect(onRunFailure).toHaveBeenCalledWith({ code: 'say-too-early', message: expect.stringContaining('小狐狸') })
+    await waitFor(() => expect(onRunFailure).toHaveBeenCalledWith({ code: 'say-too-early', message: expect.stringContaining('小狐狸') }))
   })
 
   it('uses the lesson character name on the garden stage', async () => {
