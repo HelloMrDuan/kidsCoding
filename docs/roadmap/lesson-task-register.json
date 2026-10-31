@@ -10227,7 +10227,7 @@
       "unitId": "S0-U2",
       "focusConcept": "认证",
       "plannedLearningOutcome": "能使用认证解释并完成「为账号创建口令」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -10240,13 +10240,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/389",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。 第一阶段：分支 muse-a/s0-u2-l01，Draft PR #389，口令执行器本地 11 测试通过；无详细稿、数值为实现选择；所有口令均为课堂示例，绝不是真实口令；尚缺详细稿、网页课堂接入、三端截图、独立人工教研、儿童试学与监护人授权，不得标 completed。"
     },
     {
       "id": "S0-U2-L02",
