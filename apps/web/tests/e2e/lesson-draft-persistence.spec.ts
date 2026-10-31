@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { clickLessonControl } from './lesson-pane-helpers'
+import { clickLessonControl, showLessonPane } from './lesson-pane-helpers'
 
 // lesson-02 step-1 allows when_start + move_right + say_line, so we can add two
 // distinct blocks and verify their order survives a refresh. lesson-01 step-1
@@ -28,11 +28,15 @@ test.describe('lesson draft persistence', () => {
   }) => {
     await page.goto(`/learn/lesson/${LESSON_ID}`)
 
+    // Mobile shows one classroom zone at a time and the workspace lives in
+    // the code pane, so switch there first (no-op on desktop; same pattern
+    // as lesson-recovery-ux502).
+    await showLessonPane(page, 'code')
     await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
 
     // Add two distinct blocks in a specific order.
-    await page.getByTestId('lesson-add-when_start').click()
-    await page.getByTestId('lesson-add-move_right').click()
+    await clickLessonControl(page, 'lesson-add-when_start')
+    await clickLessonControl(page, 'lesson-add-move_right')
 
     // The draft for step 0 must be persisted before we refresh.
     await expect
@@ -41,6 +45,9 @@ test.describe('lesson draft persistence', () => {
 
     await page.reload()
 
+    // Reload resets the mobile pane to its initial zone, so switch to the
+    // code pane again before asserting the workspace is visible.
+    await showLessonPane(page, 'code')
     await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
 
     // After refresh the saved block sequence (order included) must be restored.
