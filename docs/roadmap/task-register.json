@@ -3118,6 +3118,30 @@
         "reviewer": null
       },
       "notes": "SYS-116 接线后 CI 首跑暴露：e2e-blockly 运行 41232920690 中本 spec 仅 [mobile] 失败（42 测 1 失败），第 31 行工作区可见性断言在手机端 5 秒内始终 hidden（DOM 里定位到 7 次）；手机课堂一次只显示一个区，断言前须先切 code 面板；刷新后面板状态重置，刷新后断言前亦须重切；其余 8 spec 全过、桌面端通过；本次日志未跑到草稿逻辑，不证明草稿逻辑对错"
+    },
+    {
+      "id": "SYS-116",
+      "title": "lesson-draft-persistence spec 接线进 CI：deploy e2e-blockly SPECS（workflow-only）",
+      "priority": "P2",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "lesson-draft-persistence spec 接线进 CI（workflow-only）",
+      "acceptance": [
+        "spec 在 CI 内 desktop + mobile 均被跑且通过；workflow 改动不捆 spec 内容改动"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "mainTaskCI": null,
+        "tests": [
+          "deploy.yml e2e-blockly SPECS 追加 tests/e2e/lesson-draft-persistence.spec.ts（与 lesson-recovery-ux502 同作业，mobile + desktop 各跑一遍）",
+          "workflow YAML 解析合法；接线 job 是否出现在 PR 检查集中以 CI 初查为准"
+        ],
+        "reviewer": null
+      },
+      "notes": "SYS-115 的接线任务（§7 独立任务 + 独立 PR）：spec 本身不动、产品代码不动；接线后 CI 跑绿是 SYS-115 关账的验收依据；若 CI 跑 spec 失败（如 mobile 端原有直接点击问题），另立 spec 任务，不捆进本 PR。"
     }
   ]
 }
