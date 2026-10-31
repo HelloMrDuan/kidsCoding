@@ -29,3 +29,35 @@
 - 6 项全对且有理由 → 通过；5 项 → 通过；4 项及以下 → 不通过。
 - 分类正确但理由为空 → 不计入通过数。
 - 反例：会发声的收音机判为 AI → 判错；判为传统程序且有理由 → 判对。
+
+## 第 2 阶段：分类试玩（本阶段新增）
+
+- 总调决定（2026-10-31）：A0 试玩引擎类型定为 `'classify'`（分类与判定引擎）。
+  第 1 阶段证据中“不得在本 PR 擅自扩展共享类型”的限制已被该决定取代，
+  本阶段扩展是经统筹决定的，不是擅自行为。
+- 共享类型：`lesson-maturity.ts` 的 `TrialIntegration['engine']` 新增 `'classify'`，
+  并登记 `A0-U1-L01`（路由 `/learn/classify-lab/A0-U1-L01`，E2E `tests/e2e/classify-a0-u1.spec.ts`）；
+  成熟度测试的试玩计数由 34 + G2 课数改为 35 + G2 课数，并新增 classify 登记断言。
+- Widget：`apps/web/src/features/classify/classify-lab.tsx`（`'use client'`，SSR 安全：
+  localStorage 只在 effect 与事件处理中读写，服务端渲染不碰浏览器 API）。
+  6 张工具卡 + 3 个分类桶 + 每项理由输入 + 会发声反例 + 自创例子 + 提交 +
+  逐项反馈 + 通过判定（沿用第 1 阶段判定函数）+ 本机草稿持久化。
+  理由只判定有无，不评价理由质量，不宣称 AI 批改理由质量。
+  3 项 `implementer_example` 工具在界面上继续标注“示例工具（待教研复核）”，教研通过前不去掉。
+- 路由：`apps/web/src/app/learn/classify-lab/[lessonId]/page.tsx`，仅 `A0-U1-L01` 可达，其他 id 走 `notFound()`。
+- E2E：`tests/e2e/classify-a0-u1.spec.ts`，5 个用例——全对有理由→通过；
+  正确分类无理由→不计分（6 项全对分类、2 项无理由时为 4/6 未通过）；收音机判 AI→失败提示；
+  自创无理由→拒绝；关闭重开→草稿仍在（同 context 新页面断言 localStorage 草稿恢复）。
+- **E2E 接线先查结论**：课程内容 workflow 不自动拾取新 spec——全部 Job 均为显式文件清单，
+  且 pull_request 路径过滤也不含新 spec、路由与 widget 目录。否则新 spec 等于无 E2E。
+  因此本阶段在 workflow 中新增 `a0-classify-browser-trial` Job（仿 python-browser-trial 结构，
+  12 分钟超时，只跑本 spec 的 desktop 工程），并补 3 条路径过滤；
+  未改动任何已有 Job、超时与分片。Workflow 改动按仓库 AGENTS.md 第 7 节本应走独立任务与独立 PR，
+  此处随本 PR 一并提交是为让本课 E2E 真实跑起来，提请主账号在评审时裁定该接线方式；
+  若裁定须独立 PR，拆出 workflow 两处改动即可，课内代码不受影响。
+- 发布证据：`release-evidence-v1.json` 新增 `A0-U1-L01` 条目（试玩登记后，发布证据必须覆盖全部试玩课，
+  否则发布就绪检查失败——第 1 阶段无试玩故无条目，第 2 阶段必须补），7 门禁全 `unchecked`；
+  台账仅把本行 `evidence.realE2E` 由 null 改为新 spec 路径，状态仍 `in_review`，
+  `catalogStatus` 仍 `outline_not_playable`，`mergeCommit` / `mainCI` / `lessonReview` 仍 null。
+- 本阶段不做：独立教研、儿童试学、三端截图（按本次指令暂不做，非遗漏）、发布。
+  目录页不新增 classify 试玩入口区块（本阶段只交付路由试玩本身），后续 UI 工作可另起。

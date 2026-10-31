@@ -1,7 +1,11 @@
 // A0-U1 AI lessons: classification ("AI在哪里出现").
-// Stage 1 only: lesson data plus a pure evaluation function. There is no
-// routed trial page, no E2E spec, no independent teaching review and no
-// child trial yet, so nothing here is a published or playable course.
+// Stage 1 delivered lesson data plus a pure evaluation function. Stage 2
+// adds the routed classify trial (React widget + E2E spec) under the
+// 'classify' engine type in trialIntegrations. That type extension is NOT
+// unilateral: the main account decided 'classify' as the A0 trial engine in
+// the 2026-10-31 general dispatch, which is what unlocked stage 2. There is
+// still no independent teaching review and no child trial, so nothing here
+// is a published or playable course.
 // The classification rule comes from the detailed lesson plan
 // (track-a0-detailed-lessons-v1.json): whether the tool recognises patterns
 // from data. The detailed plan names only three tools in its setting, so
