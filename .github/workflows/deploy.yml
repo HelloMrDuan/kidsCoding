@@ -154,7 +154,7 @@ jobs:
       # itself (webServer on 127.0.0.1:3100).
       - name: Blockly E2E — mobile + desktop
         run: |
-          SPECS="tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-toolbox-ux203.spec.ts tests/e2e/stage-observe-ux204.spec.ts tests/e2e/mobile-tabs-ux205.spec.ts tests/e2e/lesson-ui-responsive.spec.ts tests/e2e/lesson-recovery-ux502.spec.ts"
+          SPECS="tests/e2e/blockly-first-run.spec.ts tests/e2e/blockly-second-practice.spec.ts tests/e2e/blockly-meadow-journey.spec.ts tests/e2e/blockly-toolbox-ux203.spec.ts tests/e2e/stage-observe-ux204.spec.ts tests/e2e/mobile-tabs-ux205.spec.ts tests/e2e/lesson-ui-responsive.spec.ts tests/e2e/lesson-recovery-ux502.spec.ts tests/e2e/lesson-draft-persistence.spec.ts"
           npx playwright test $SPECS --project=mobile
           npx playwright test $SPECS --project=desktop
 
