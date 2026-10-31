@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { clickLessonControl } from './lesson-pane-helpers'
 
 // lesson-02 step-1 allows when_start + move_right + say_line, so we can add two
 // distinct blocks and verify their order survives a refresh. lesson-01 step-1
@@ -51,7 +52,7 @@ test.describe('lesson draft persistence', () => {
 
     // The product needsRun gate requires a successful run before the step
     // can complete (same pattern as lesson-recovery-ux502).
-    await page.getByTestId('run-code-button').click()
+    await clickLessonControl(page, 'run-code-button')
     await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 15_000 })
 
     // Completing the step clears the step-0 draft.
