@@ -2965,7 +2965,7 @@
       "title": "P0/P1/P2 72 节审定工程审计证据入库",
       "priority": "P1",
       "category": "AUD",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "P0/P1/P2 共 72 节课程审定工程审计证据入库（基线 main 679895e0）：72/72 正向与边界 claim 真实运行验证；证据文件入库至 docs/curriculum-audit/kid-audit/；课节文件未动，内容缺陷 2 项 + 元数据观察 1 项记入整改计划；不含 SSR-101 代码修改，与 SSR-101 PR 完全独立。",
       "acceptance": [
@@ -2974,10 +2974,10 @@
         "台账 AUD-105 条目状态与证据 PR 一致"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "mainTaskCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/436",
+        "mergeCommit": "7cd7863862f1ba2b1a7980fbcb44128ae1ffc134",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41200177828",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41200177863",
         "tests": [
           "P0/P1/P2 72 节正向与边界 claim 真实运行验证（python3.12.3、真实 pygame 2.6.1 + SDL dummy、unittest/tracemalloc/JSON/CSV/XML），基线 main 679895e0"
         ],
