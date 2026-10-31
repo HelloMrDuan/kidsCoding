@@ -2990,7 +2990,7 @@
       "title": "say-too-early 用例 durable 加固：等 onRunFailure 回调本身的 waitFor 重试断言（仅改测试）",
       "priority": "P2",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "仅改测试，不改产品代码：playable-stage-feedback.test.tsx 的 say-too-early 用例改成等 onRunFailure 回调本身的 waitFor 重试断言；断言与期望参数逐字节不变；不改其他测试，不改产品代码。",
       "acceptance": [
@@ -3000,13 +3000,14 @@
         "PR CI 全绿后合并"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "mainTaskCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/437",
+        "mergeCommit": "d1a505b06dc8b9bc660567e2771905fa11681652",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41212299821",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41212299875",
         "tests": [
           "say-too-early spec 本地 5/5 通过两次",
-          "playable-stage 全套 12 文件 114/114 通过一次"
+          "playable-stage 全套 12 文件 114/114 通过一次",
+          "PR #437 CI 全绿（30 项：27 成功 + 3 跳过）"
         ],
         "reviewer": null
       },
