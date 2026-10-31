@@ -3073,20 +3073,21 @@
       "title": "lesson-draft-persistence spec 补运行步骤：完成前先等运行成功（仅改测试）",
       "priority": "P2",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "lesson-draft-persistence spec 补运行步骤（test-only）",
       "acceptance": [
         "spec 流程与产品 needsRun 门禁一致、产品行为不动、接线后 CI 跑绿为准"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "mainTaskCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/443",
+        "mergeCommit": "270960a2678b0c01811c08a0ecb4dc7f4149b25c",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41242649304",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41242649272",
         "tests": [
           "修复 PR 分支 fix/lesson-draft-persistence-run-step：spec 在刷新恢复后、完成前补运行步骤（点 run-code-button、等“运行成功”，照抄 lesson-recovery-ux502 范式），其余断言一字不动、产品代码零改动",
-          "本地 playwright --list 可加载解析（本机无 Chrome，不跑浏览器；该 spec 目前无 CI 接线，接线后 CI 跑绿为准）"
+          "本地 playwright --list 可加载解析（本机无 Chrome，不跑浏览器；该 spec 目前无 CI 接线，接线后 CI 跑绿为准）",
+          "接线后 CI 跑绿：#446 新头 f464a2e4 的 e2e-blockly 作业在手机+桌面均跑绿（deploy-pipeline 运行 41241747926），含修复后 spec"
         ],
         "reviewer": null
       },
