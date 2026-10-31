@@ -8051,7 +8051,7 @@
       "unitId": "A0-U1",
       "focusConcept": "分类",
       "plannedLearningOutcome": "能使用分类解释并完成「AI在哪里出现」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [],
@@ -8062,10 +8062,10 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/433",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/classify-a0-u1.spec.ts",
         "lessonReview": null
       },
       "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
