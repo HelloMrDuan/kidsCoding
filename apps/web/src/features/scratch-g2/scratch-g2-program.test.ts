@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {g2u2L01, g2u2L02, g2u2L03, g2u2L04, g2u2L05} from '@/content/curriculum/g2-u2-scratch-lessons'
+import {g2u2L01, g2u2L02, g2u2L03, g2u2L04, g2u2L05, g2u2L06} from '@/content/curriculum/g2-u2-scratch-lessons'
 import {g2u1L01, g2u1L02, g2u1L03, g2u1L04, g2u1L05, g2u1L06} from '@/content/curriculum/g2-u1-scratch-lessons'
 import {G2_TEXT_FIELDS, changedValues, checkSlotValue, quickEditValue, readG2Program, valuesForTarget, type BlockLike, type WorkspaceLike} from './scratch-g2-program'
 
@@ -361,5 +361,41 @@ describe('G2 restricted Blockly adapter (G2-U2-L05 one broadcast, two performers
     const foxRecv = (message: string) => block('kc2_when_receive', {BROADCAST_OPTION: message}, block('kc2_goto_start', {X: '-60', Y: '-70'}, block('kc2_say', {MESSAGE: '嗷呜'})))
     expect(readG2Program(ws(foxFlag, foxRecv('开演')), fox)).toEqual({kind: 'sprite', values: {'小狐狸|fox_say|MESSAGE': '嗷呜'}})
     expect(readG2Program(ws(foxFlag, foxRecv('谢幕')), fox)).toEqual({kind: 'sprite', values: {'小狐狸|fox_say|MESSAGE': '嗷呜'}})
+  })
+})
+
+describe('G2 restricted Blockly adapter (G2-U2-L06 music short: three receive hats, a forever loop and a stop block)', () => {
+  const filmCat = g2u2L06.targets.find(t => t.name === '小橘猫')!
+  const filmStage = g2u2L06.targets.find(t => t.name === 'Stage')!
+  const recv = (message: string, body: BlockLike) => block('kc2_when_receive', {BROADCAST_OPTION: message}, body)
+  const hello = (line = '音乐短片开始啦！') => recv('开头', block('kc2_say', {MESSAGE: line}))
+  const dance = (wait = '0.3') => recv('中段', block('kc2_forever', {}, null, block('kc2_next_costume', {}, block('kc2_wait_free', {DURATION: wait}))))
+  const bye = (option = 'this script', line = '谢谢观看！') => recv('结尾', block('kc2_say', {MESSAGE: line}, block('kc2_stop', {STOP_OPTION: option})))
+  it('matches each "when I receive" hat to the script listening for that message, in any order', () => {
+    const expected = {kind: 'sprite', values: {'小橘猫|cat_hello|MESSAGE': '开拍啦', '小橘猫|cat_wait|DURATION': 0.5, '小橘猫|cat_bye|MESSAGE': '下次见', '小橘猫|cat_stop|STOP_OPTION': 'all'}}
+    expect(readG2Program(ws(hello('开拍啦'), dance('0.5'), bye('all', '下次见')), filmCat)).toEqual(expected)
+    expect(readG2Program(ws(bye('all', '下次见'), hello('开拍啦'), dance('0.5')), filmCat)).toEqual(expected)
+  })
+  it('refuses a body under the wrong scene, a missing or duplicated scene, a bad stop option and out-of-range loop waits', () => {
+    // The dance loop under the 开头 hat and the greeting under 中段: same blocks, wrong scenes.
+    expect(readG2Program(ws(recv('中段', block('kc2_say', {MESSAGE: 'hi'})), recv('开头', block('kc2_forever', {}, null, block('kc2_next_costume', {}, block('kc2_wait_free', {DURATION: '0.5'})))), bye()), filmCat)).toBeNull()
+    expect(readG2Program(ws(hello(), dance()), filmCat)).toBeNull()
+    expect(readG2Program(ws(hello(), dance(), bye(), bye()), filmCat)).toBeNull()
+    expect(readG2Program(ws(hello(), dance(), bye('other scripts in sprite')), filmCat)).toBeNull()
+    expect(readG2Program(ws(hello(), dance('0.25'), bye()), filmCat)).toBeNull()
+    expect(readG2Program(ws(hello(), dance('1.5'), bye()), filmCat)).toBeNull()
+    expect(readG2Program(ws(hello(), dance('0.1'), bye()), filmCat)).toBeNull()
+  })
+  it('reads the stage director: two whole-second scene waits within 1–10 and 4–50', () => {
+    const director = (t1: string, t2: string) => block('kc2_flag', {}, block('kc2_switch_backdrop', {BACKDROP: '开场'}, block('kc2_broadcast', {BROADCAST_OPTION: '开头'},
+      block('kc2_wait_whole', {DURATION: t1}, block('kc2_broadcast', {BROADCAST_OPTION: '中段'}, block('kc2_wait_whole', {DURATION: t2}, block('kc2_broadcast', {BROADCAST_OPTION: '结尾'})))))))
+    const scenes = [recv('中段', block('kc2_switch_backdrop', {BACKDROP: '音乐舞台'})), recv('结尾', block('kc2_switch_backdrop', {BACKDROP: '谢幕'}))]
+    expect(readG2Program(ws(director('3', '27'), ...scenes), filmStage)).toEqual({kind: 'sprite', values: {'Stage|stage_wait1|DURATION': 3, 'Stage|stage_wait2|DURATION': 27}})
+    expect(readG2Program(ws(director('0', '27'), ...scenes), filmStage)).toBeNull()
+    expect(readG2Program(ws(director('3', '51'), ...scenes), filmStage)).toBeNull()
+    expect(readG2Program(ws(director('2.5', '27'), ...scenes), filmStage)).toBeNull()
+  })
+  it('treats the stop option as a menu choice, not a number', () => {
+    expect(G2_TEXT_FIELDS.has('STOP_OPTION')).toBe(true)
   })
 })

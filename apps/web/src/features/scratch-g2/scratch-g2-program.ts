@@ -25,7 +25,7 @@ export function checkSlotValue(slot: G2Slot, raw: unknown): number | string | nu
     if (text.length < 1 || text.length > max || /[\u0000-\u001f\u007f<>]/.test(text)) return null
     return text
   }
-  if (slot.field === 'COSTUME' || slot.field === 'BACKDROP' || slot.field === 'SOUND_MENU' || slot.field === 'DIRECTION' || slot.field === 'BROADCAST_OPTION') {
+  if (slot.field === 'COSTUME' || slot.field === 'BACKDROP' || slot.field === 'SOUND_MENU' || slot.field === 'DIRECTION' || slot.field === 'BROADCAST_OPTION' || slot.field === 'STOP_OPTION') {
     const name = String(raw ?? '')
     return slot.options?.includes(name) ? name : null
   }
@@ -101,11 +101,16 @@ export function readG2Program(workspace: WorkspaceLike, target: G2TargetSpec): G
   }
   if (tops.length !== target.scripts.length) return null
   const values: G2Values = {}
-  const usedHats = new Set<string>()
+  // Each lesson script is matched once. When a target has several hats of one kind
+  // ("when I receive 开头/中段/结尾"), a hat's locked message picks the script listening for it.
+  const used = new Set<number>()
   for (const top of tops) {
-    const script = target.scripts.find(s => s.hat === top.type)
-    if (!script || usedHats.has(top.type)) return null
-    usedHats.add(top.type)
+    const sameKind = target.scripts.filter(s => s.hat === top.type).length
+    const index = target.scripts.findIndex((s, i) => !used.has(i) && s.hat === top.type && (sameKind < 2 ||
+      s.hatFixed?.BROADCAST_OPTION === undefined || String(top.getFieldValue('BROADCAST_OPTION')) === s.hatFixed.BROADCAST_OPTION))
+    if (index < 0) return null
+    used.add(index)
+    const script = target.scripts[index]
     for (const slot of script.hatSlots ?? []) {
       const value = checkSlotValue(slot, top.getFieldValue(slot.field))
       if (value === null) return null
@@ -130,7 +135,7 @@ export function valuesForTarget(all: G2Values, target: string): G2Values {
 }
 
 /** Quick-edit fields that hold text or a menu choice; every other quick-edit field is a number. */
-export const G2_TEXT_FIELDS = new Set(['MESSAGE', 'COSTUME', 'BACKDROP', 'SOUND_MENU', 'DIRECTION', 'BROADCAST_OPTION'])
+export const G2_TEXT_FIELDS = new Set(['MESSAGE', 'COSTUME', 'BACKDROP', 'SOUND_MENU', 'DIRECTION', 'BROADCAST_OPTION', 'STOP_OPTION'])
 
 /**
  * What a quick-edit box shows for one field, given what the learner typed (if they are editing it)

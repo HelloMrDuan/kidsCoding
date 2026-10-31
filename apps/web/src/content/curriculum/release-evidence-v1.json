@@ -1389,6 +1389,33 @@
       "humanApproved": {
         "status": "unchecked"
       }
+    },
+    "G2-U2-L06": {
+      "contentReviewed": {
+        "status": "unchecked",
+        "note": "仅有实现者 AI 参考评审，需独立人工教研复核"
+      },
+      "engineProductionReady": {
+        "status": "unchecked",
+        "note": "G2 受限 Scratch VM 实验：未接 WebGL 渲染器、无云端保存、scratch-vm 走 jsDelivr CDN；音画同步按 VM 换帧/开始播放时刻判断，不测真实音频"
+      },
+      "assessmentE2EPassed": {
+        "status": "unchecked",
+        "note": "scratch-g2-u1.spec.ts（G2-U2-L06 用例）需在 PR 与 main CI 真 Chrome 通过后再登记"
+      },
+      "licensedAssetsReady": {
+        "status": "unchecked",
+        "note": "本课 SVG 与鼓声 WAV 为本项目原创（WAV 为正弦合成）；scratch-vm 运行库 AGPL/第三方许可审查待完成"
+      },
+      "progressVerified": {
+        "status": "unchecked"
+      },
+      "minorPrivacyApproved": {
+        "status": "unchecked"
+      },
+      "humanApproved": {
+        "status": "unchecked"
+      }
     }
   }
 }

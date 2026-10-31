@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "G2-U2-L06",
+  "reviewedCommit": "76dec83c5175c67106e10d445f6cd91ab49f9417",
+  "reviewedAt": "2026-10-29",
+  "reviewer": "Hark B（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "independent": false,
+  "ageBand": "G2 图形入门（7-11 岁）",
+  "prerequisites": [
+    "G2-U2-L05"
+  ],
+  "newConcepts": [
+    "单元综合：舞台用“广播 开头→等待→广播 中段→等待→广播 结尾”把短片分成三幕；中段两个永远循环（换帧、敲鼓）用同样的等待才能音画同步；“停止 这个脚本”只停所在脚本，“停止 全部脚本”才能让整部短片收场"
+  ],
+  "references": [
+    "apps/web/src/content/curriculum/g2-u2-scratch-lessons.ts",
+    "apps/web/public/scratch-g2-sandbox.html",
+    "examples/scratch/g2/build_g2_projects.py",
+    "https://github.com/HelloMrDuan/kidsCoding/pull/247"
+  ],
+  "scores": {
+    "knowledge": {
+      "score": 16,
+      "evidence": [
+        "conceptExplain：广播分幕、两个循环同节拍、停止这个脚本 vs 全部脚本",
+        "串联本单元 L01 帧动画、L02 永远循环、L03 节拍、L05 广播"
+      ],
+      "defects": [
+        "音画同步按 VM 换帧/开始播放时刻判断，沙箱 VM 无音频引擎，不测真实声音"
+      ]
+    },
+    "story": {
+      "score": 13,
+      "evidence": [
+        "小橘猫拍音乐短片：开场打招呼、中段跟鼓跳舞、结尾谢幕；试映时舞步对不上、谢幕后停不下来",
+        "预测“结尾后小鼓会不会继续响”，VM 实测对照"
+      ],
+      "defects": [
+        "预测二选一；无朗读"
+      ]
+    },
+    "practice": {
+      "score": 19,
+      "evidence": [
+        "练习 A：猫和鼓的等待改成一样 → 中段 ≥6 帧、每帧与鼓声相差 ≤0.1 秒（VM 时刻）",
+        "练习 B：改舞台两幕等待，全片 30～60 秒（VM 广播时刻）"
+      ],
+      "defects": [
+        "练习 B 需真实等待 30 秒以上；不能新增角色或场景"
+      ]
+    },
+    "feedback": {
+      "score": 14,
+      "evidence": [
+        "真实错误：停止“这个脚本”后 VM 里猫还在换帧、鼓还在响（观察区计数，E2E 覆盖）",
+        "等待 0.25、1.5、0.1 与幕长 0、11、51、2.5 编辑器判无效",
+        "三层提示：现象→原因→修复"
+      ],
+      "defects": [
+        "同步容差 0.1 秒，误差约一帧"
+      ]
+    },
+    "creation": {
+      "score": 12,
+      "evidence": [
+        "创意：开场白和谢幕词都换成自己的话，节拍快慢、幕长自定，完整放一遍且结尾全部停下",
+        "导出真 .sb3（6 SVG + 1 WAV）独立 VM 回读，刷新后从本机恢复，重新导入后完整重放三幕"
+      ],
+      "defects": [
+        "不能加新角色、新场景或新消息"
+      ]
+    },
+    "assessment": {
+      "score": 8,
+      "evidence": [
+        "evaluateG2U2L06 只读 VM 观察（广播时刻、换帧/开始播放时刻、停止积木选项与时刻、VM 线程是否清零，单测覆盖）",
+        "页面明示未接渲染器/音频引擎与不保存正式成绩"
+      ],
+      "defects": [
+        "无家长报告；无儿童试学；无独立人审"
+      ]
+    }
+  },
+  "vetoes": {
+    "fake-execution": {
+      "status": "pass",
+      "note": "官方 scratch-vm@5.0.300 执行；广播、换帧、开始播放、停止积木均为 VM 对原语的真实调用（仅观察后调用原原语），时刻来自沙箱 performance.now，“结尾后没有脚本在运行”来自 VM 线程数为 0，E2E 无 VM mock"
+    },
+    "no-hands-on": {
+      "status": "pass",
+      "note": "两项亲手练习 + 找错 + 创意"
+    },
+    "no-failure-test": {
+      "status": "pass",
+      "note": "停止“这个脚本”后循环仍在跑的真实错误、越界等待/幕长被拒、非法工程拒收均有 E2E"
+    },
+    "rigid-answer": {
+      "status": "pass",
+      "note": "练习 A 任意相同等待（0.2～1.0）；练习 B 任意两幕长度之和 30～60 秒；创意台词与节拍自定"
+    },
+    "fake-project": {
+      "status": "pass",
+      "note": "作品为可导出、可重新导入的真 .sb3"
+    },
+    "unlicensed-assets": {
+      "status": "pass",
+      "note": "不新增图片：三个背景、小橘猫两帧、小鼓复用 G2-U1/G2-U2 原创 SVG；鼓声“咚”为正弦合成原创 WAV；已登记 asset-licenses-v1.json"
+    },
+    "minor-privacy-risk": {
+      "status": "pass",
+      "note": "本课不上传作品，只存本机 IndexedDB"
+    },
+    "broken-or-false-success": {
+      "status": "pass",
+      "note": "保存失败会显示失败；非法导入不覆盖原作品"
+    },
+    "id-status-mismatch": {
+      "status": "pass",
+      "note": "L3 实验可试玩，release-evidence 全部 unchecked，不标发布"
+    }
+  },
+  "runEvidence": {
+    "normalRun": "G2-U2-L06：真 Scratch VM 加载原创音乐短片项目；绿旗 → 舞台广播“开头”（猫说开场白）→ 等 T1 → 广播“中段”（背景换音乐舞台，猫换帧循环 + 鼓“咚”循环）→ 等 T2 → 广播“结尾”（背景换谢幕，猫说谢幕词后停止）",
+    "failureCase": "停止“这个脚本”→ 结尾后 VM 里猫仍换帧、鼓仍响（观察区计数 >0）；猫 0.3/鼓 0.5 时多数帧不踩鼓点；越界等待与幕长编辑器判无效；幕长 60、停止“其他脚本”、鼓改“播放等待播完”、猫舞蹈改听“开头”、多余变量、他课工程均被沙箱拒收且原作品保留",
+    "hintLayers": [
+      "第一层（看现象）：结尾的“停止（这个脚本）”之后，VM 里小橘猫还在换帧、小鼓还在发出“咚”",
+      "第二层（想原因）：“这个脚本”只停收到“结尾”的那一条脚本，舞蹈循环和鼓点循环是别的脚本",
+      "第三层（去修复）：把小橘猫的“停止（ ）”改成“全部脚本”再完整放一遍"
+    ],
+    "practiceA": "练习 A：舞步踩上鼓点（猫与鼓等待相同，中段 ≥6 帧且每帧与鼓声相差 ≤0.1 秒）",
+    "practiceB": "练习 B：剪出 30～60 秒的短片（VM 测“开头”到“结尾”广播间隔）",
+    "equivalentSolutions": [
+      "相同等待 0.2～1.0 任意（0.4/0.4、0.5/0.5……）",
+      "两幕长度任意组合，和在 30～60 秒",
+      "台词 1～20 字任意"
+    ],
+    "saveReopen": "应用后 IndexedDB 自动保存真 .sb3，刷新后从本机草稿恢复；导出经独立 VM 回读后可重新导入",
+    "e2eSpecs": [
+      "apps/web/tests/e2e/scratch-g2-u1.spec.ts › G2-U2-L06 音乐动画短片（4 个用例）"
+    ],
+    "screenshots": [
+      "docs/roadmap/evidence/G2-U2-L06/lab-1440.svg",
+      "docs/roadmap/evidence/G2-U2-L06/lab-375-full.svg",
+      "docs/roadmap/evidence/G2-U2-L06/lab-375.svg",
+      "docs/roadmap/evidence/G2-U2-L06/lab-768.svg"
+    ]
+  },
+  "maturityLevel": 3,
+  "childTrial": "none",
+  "blockers": [
+    "AI 评分且评分者是实现者，需独立人工教研复核",
+    "没有儿童试学",
+    "未接 WebGL 渲染器与音频引擎（音画同步按 VM 时刻判断）；本课无云端保存",
+    "不能新建消息、角色、场景或积木"
+  ]
+}

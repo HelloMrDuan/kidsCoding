@@ -645,6 +645,82 @@ def lesson_g2_u2_l05():
     return "g2-u2-l05-sync-show.sb3.b64", project, files, params
 
 
+MSG_OPEN, MSG_MIDDLE, MSG_END = "kc-msg-open", "kc-msg-middle", "kc-msg-end"
+
+
+def lesson_g2_u2_l06():
+    """音乐动画短片 (G2-U2 unit project): three scenes chained by broadcasts
+    (开头 → 中段 → 结尾); in 中段 the cat's frame loop and the drum's beat loop run with the same wait so
+    every costume change lands on a beat; 结尾 must stop every forever loop (停止 全部脚本)."""
+    show, show_file = svg_costume("开场", "show-stage-backdrop.svg", 240, 180)
+    music, music_file = svg_costume("音乐舞台", "music-stage-backdrop.svg", 240, 180)
+    curtain, curtain_file = svg_costume("谢幕", "curtain-stage-backdrop.svg", 240, 180)
+    cat_a, cat_a_file = svg_costume("站好", "orange-cat.svg", 48, 48)
+    cat_b, cat_b_file = svg_costume("挥手", "orange-cat-wave.svg", 48, 48)
+    drum_costume, drum_file = svg_costume("小鼓", "drum.svg", 50, 48)
+    dong, dong_data = wav_sound("咚", [(150, 70, 0.18)])
+    stage_blocks = {
+        "stage_flag": block("event_whenflagclicked", "stage_first", top=True, x=40, y=40),
+        "stage_first": block("looks_switchbackdropto", "stage_open", parent="stage_flag", inputs={"BACKDROP": [1, "stage_first_menu"]}),
+        "stage_first_menu": block("looks_backdrops", parent="stage_first", fields={"BACKDROP": ["开场", None]}, shadow=True),
+        "stage_open": block("event_broadcast", "stage_wait1", parent="stage_first", inputs={"BROADCAST_INPUT": broadcast_menu("开头", MSG_OPEN)}),
+        "stage_wait1": block("control_wait", "stage_middle", parent="stage_open", inputs={"DURATION": num(2)}),
+        "stage_middle": block("event_broadcast", "stage_wait2", parent="stage_wait1", inputs={"BROADCAST_INPUT": broadcast_menu("中段", MSG_MIDDLE)}),
+        "stage_wait2": block("control_wait", "stage_end", parent="stage_middle", inputs={"DURATION": num(6)}),
+        "stage_end": block("event_broadcast", parent="stage_wait2", inputs={"BROADCAST_INPUT": broadcast_menu("结尾", MSG_END)}),
+        "stage_recv_mid": block("event_whenbroadcastreceived", "stage_to_music", top=True, x=40, y=320, fields={"BROADCAST_OPTION": ["中段", MSG_MIDDLE]}),
+        "stage_to_music": block("looks_switchbackdropto", parent="stage_recv_mid", inputs={"BACKDROP": [1, "stage_music_menu"]}),
+        "stage_music_menu": block("looks_backdrops", parent="stage_to_music", fields={"BACKDROP": ["音乐舞台", None]}, shadow=True),
+        "stage_recv_end": block("event_whenbroadcastreceived", "stage_to_curtain", top=True, x=40, y=440, fields={"BROADCAST_OPTION": ["结尾", MSG_END]}),
+        "stage_to_curtain": block("looks_switchbackdropto", parent="stage_recv_end", inputs={"BACKDROP": [1, "stage_curtain_menu"]}),
+        "stage_curtain_menu": block("looks_backdrops", parent="stage_to_curtain", fields={"BACKDROP": ["谢幕", None]}, shadow=True),
+    }
+    cat_blocks = {
+        "cat_recv_open": block("event_whenbroadcastreceived", "cat_hello", top=True, x=40, y=40, fields={"BROADCAST_OPTION": ["开头", MSG_OPEN]}),
+        "cat_hello": block("looks_sayforsecs", parent="cat_recv_open", inputs={"MESSAGE": text("音乐短片开始啦！"), "SECS": num(2)}),
+        "cat_recv_mid": block("event_whenbroadcastreceived", "cat_dance", top=True, x=40, y=180, fields={"BROADCAST_OPTION": ["中段", MSG_MIDDLE]}),
+        "cat_dance": block("control_forever", parent="cat_recv_mid", inputs={"SUBSTACK": [2, "cat_next"]}),
+        "cat_next": block("looks_nextcostume", "cat_wait", parent="cat_dance"),
+        # Out of step at the start: the cat changes frame every 0.3 s, the drum beats every 0.5 s.
+        "cat_wait": block("control_wait", parent="cat_next", inputs={"DURATION": num(0.3)}),
+        "cat_recv_end": block("event_whenbroadcastreceived", "cat_bye", top=True, x=40, y=320, fields={"BROADCAST_OPTION": ["结尾", MSG_END]}),
+        "cat_bye": block("looks_sayforsecs", "cat_stop", parent="cat_recv_end", inputs={"MESSAGE": text("谢谢观看！"), "SECS": num(2)}),
+        # The bug the lesson starts with: 停止 [这个脚本] only ends this receive script, so the cat's
+        # dance loop and the drum's beat loop keep running after 结尾.
+        "cat_stop": {**block("control_stop", parent="cat_bye", fields={"STOP_OPTION": ["this script", None]}),
+                     "mutation": {"tagName": "mutation", "children": [], "hasnext": "false"}},
+    }
+    drum_blocks = {
+        "drum_recv_mid": block("event_whenbroadcastreceived", "drum_loop", top=True, x=40, y=40, fields={"BROADCAST_OPTION": ["中段", MSG_MIDDLE]}),
+        "drum_loop": block("control_forever", parent="drum_recv_mid", inputs={"SUBSTACK": [2, "drum_dong"]}),
+        "drum_dong": block("sound_play", "drum_wait", parent="drum_loop", inputs={"SOUND_MENU": [1, "drum_dong_menu"]}),
+        "drum_dong_menu": block("sound_sounds_menu", parent="drum_dong", fields={"SOUND_MENU": ["咚", None]}, shadow=True),
+        "drum_wait": block("control_wait", parent="drum_dong", inputs={"DURATION": num(0.5)}),
+    }
+    project = {
+        "targets": [
+            stage([show, music, curtain], stage_blocks, broadcasts={MSG_OPEN: "开头", MSG_MIDDLE: "中段", MSG_END: "结尾"}),
+            sprite("小橘猫", [cat_a, cat_b], cat_blocks, 2, -60, -60),
+            sprite("小鼓", [drum_costume], drum_blocks, 1, 80, -70, [dong]),
+        ],
+        "monitors": [], "extensions": [],
+        "meta": {"semver": "3.0.0", "vm": "0.2.0", "agent": "KidsCoding G2-U2-L06"},
+    }
+    files = {c["md5ext"]: f for c, f in ((show, show_file), (music, music_file), (curtain, curtain_file),
+                                          (cat_a, cat_a_file), (cat_b, cat_b_file), (drum_costume, drum_file))}
+    files[dong["md5ext"]] = dong_data
+    params = [
+        {"target": "Stage", "block": "stage_wait1", "slot": "DURATION", "kind": "int", "min": 1, "max": 10},
+        {"target": "Stage", "block": "stage_wait2", "slot": "DURATION", "kind": "int", "min": 4, "max": 50},
+        {"target": "小橘猫", "block": "cat_hello", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "小橘猫", "block": "cat_wait", "slot": "DURATION", "kind": "tenths", "min": 0.2, "max": 1.0},
+        {"target": "小橘猫", "block": "cat_bye", "slot": "MESSAGE", "kind": "text", "maxLength": 20},
+        {"target": "小橘猫", "block": "cat_stop", "slot": "STOP_OPTION", "kind": "choice", "options": ["this script", "all"]},
+        {"target": "小鼓", "block": "drum_wait", "slot": "DURATION", "kind": "tenths", "min": 0.2, "max": 1.0},
+    ]
+    return "g2-u2-l06-music-short.sb3.b64", project, files, params
+
+
 LESSONS = {
     "G2-U1-L01": lesson_g2_u1_l01,
     "G2-U1-L02": lesson_g2_u1_l02,
@@ -657,6 +733,7 @@ LESSONS = {
     "G2-U2-L03": lesson_g2_u2_l03,
     "G2-U2-L04": lesson_g2_u2_l04,
     "G2-U2-L05": lesson_g2_u2_l05,
+    "G2-U2-L06": lesson_g2_u2_l06,
 }
 
 

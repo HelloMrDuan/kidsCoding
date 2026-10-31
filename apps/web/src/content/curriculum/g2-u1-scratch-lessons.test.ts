@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest'
 import {existsSync} from 'node:fs'
 import path from 'node:path'
 import {BIRD_NEST_ZONE, emptyG2Observations, evaluateG2Lesson, evaluateG2U1L01, evaluateG2U1L02, evaluateG2U1L03, g2u1L01, g2u1L02, g2u1L03, L03_WELCOME, g2u1ScratchLessons, evaluateG2U1L04, g2u1L04, L04_ARRIVAL, inFishZone, evaluateG2U1L05, g2u1L05, L05_BIRD_LINE, inCenterZone, evaluateG2U1L06, g2u1L06, L06_CAT_LINE, inRibbonZone, inBirdNest, observedPrediction, g2ScratchLessons, getG2ScratchLesson} from './g2-u1-scratch-lessons'
-import {atDoor, beatSummary, evaluateG2U2L01, evaluateG2U2L02, evaluateG2U2L03, evaluateG2U2L04, evaluateG2U2L05, flightSummary, g2u2L01, g2u2L02, g2u2L03, g2u2L04, g2u2L05, L07_CAT_LINE, L08_OWL_LINE, L09_CAT_LINE, L10_FLY_LINE, L11_FOX_LINE, L11_RABBIT_LINE, syncSummary} from './g2-u2-scratch-lessons'
+import {atDoor, beatSummary, evaluateG2U2L01, evaluateG2U2L02, evaluateG2U2L03, evaluateG2U2L04, evaluateG2U2L05, flightSummary, g2u2L01, g2u2L02, g2u2L03, g2u2L04, g2u2L05, L07_CAT_LINE, L08_OWL_LINE, L09_CAT_LINE, L10_FLY_LINE, L11_FOX_LINE, L11_RABBIT_LINE, syncSummary, evaluateG2U2L06, filmSummary, g2u2L06, L12_BYE, L12_HELLO} from './g2-u2-scratch-lessons'
 import fullCatalog from './full-catalog-v1.json'
 
 const web = path.resolve(__dirname, '../../..')
@@ -506,5 +506,72 @@ describe('G2-U1 Scratch VM lessons: teaching contract', () => {
     expect(g2u2L05.showSync).toBe(true)
     expect(g2u2L05.tasks.map(t => t.id)).toEqual(['practiceA', 'practiceB', 'debug', 'create'])
     expect(g2u2L05.hints).toHaveLength(3)
+  })
+
+  it('U2-L06 reads the film from VM times: scene lengths, frames on the beat, and loops still running after the stop block', () => {
+    // A film: 开头 at 0, 中段 at T1, 结尾 at T1+T2 (seconds); the cat steps a frame every catWait s, the drum beats every drumWait s,
+    // from 中段 until the stop block 2 s after 结尾 (or for `tail` s more when a loop keeps running).
+    const film = (t1: number, t2: number, catWait: number, drumWait: number, option: string | null, opts: {tail?: number; ended?: boolean; lines?: string[]} = {}) => {
+      const mid = t1 * 1000
+      const end = (t1 + t2) * 1000
+      const stopAt = end + 2000
+      const until = stopAt + (opts.tail ?? 0) * 1000
+      const series = (step: number) => { const out: number[] = []; for (let t = mid; t <= until; t += step * 1000) out.push(1000 + t); return out }
+      return {broadcasts: [{message: '开头', t: 1000}, {message: '中段', t: 1000 + mid}, {message: '结尾', t: 1000 + end}],
+        frames: series(catWait), sounds: series(drumWait), lines: opts.lines ?? [L12_HELLO, L12_BYE],
+        stop: option ? {option, t: 1000 + stopAt} : null, ended: opts.ended ?? false}
+    }
+    expect(filmSummary(undefined)).toMatchObject({scenes: [], totalMs: null, synced: false, keptRunning: false})
+    const bug = filmSummary(film(2, 6, 0.3, 0.5, 'this script', {tail: 1.5}))
+    expect(bug).toMatchObject({scenes: ['开头', '中段', '结尾'], openMs: 2000, middleMs: 6000, totalMs: 8000, synced: false, keptRunning: true, stoppedAll: false})
+    expect(bug.tailFrames).toBeGreaterThan(0)
+    expect(bug.tailBeats).toBeGreaterThan(0)
+    expect(bug.onBeat).toBeLessThan(bug.frames)
+    const fixed = filmSummary(film(2, 6, 0.5, 0.5, 'all', {ended: true}))
+    expect(fixed).toMatchObject({synced: true, keptRunning: false, stoppedAll: true, tailFrames: 0, tailBeats: 0})
+    expect(fixed.frames).toBeGreaterThanOrEqual(6)
+    // Twice as many beats as frames: every frame is on a beat, but half the beats have no frame - not in sync.
+    expect(filmSummary(film(2, 6, 0.4, 0.2, 'all', {ended: true})).synced).toBe(false)
+    // Fewer than 6 frames in the middle scene is not enough to judge.
+    const short = film(1, 4, 1, 1, 'all', {ended: true})
+    expect(filmSummary({...short, frames: short.frames.slice(0, 5), sounds: short.sounds.slice(0, 5)}).synced).toBe(false)
+    // "Stop all" that the VM has not yet confirmed (threads still running) is not a finished ending.
+    expect(filmSummary(film(2, 6, 0.5, 0.5, 'all', {ended: false})).stoppedAll).toBe(false)
+
+    const obs = emptyG2Observations()
+    expect(Object.values(evaluateG2U2L06(obs)).every(v => v === false)).toBe(true)
+    expect(observedPrediction(g2u2L06.id, obs)).toBeNull()
+    obs.filmRuns = [film(2, 6, 0.3, 0.5, 'this script', {tail: 1.5})]
+    expect(observedPrediction(g2u2L06.id, obs)).toBe(g2u2L06.predict.correct)
+    expect(evaluateG2U2L06(obs)).toMatchObject({practiceA: false, practiceB: false, debug: false, create: false})
+    obs.filmRuns.push(film(2, 6, 0.5, 0.5, 'all', {ended: true}))
+    expect(evaluateG2U2L06(obs)).toMatchObject({practiceA: true, practiceB: false, debug: true, create: false})
+    expect(evaluateG2U2L06({...obs, filmRuns: [film(2, 6, 0.5, 0.5, 'all', {ended: true})]}).debug).toBe(false)
+    obs.filmRuns.push(film(3, 27, 0.4, 0.4, 'all', {ended: true}))
+    expect(evaluateG2U2L06(obs).practiceB).toBe(true)
+    expect(evaluateG2U2L06({...obs, filmRuns: [film(10, 51, 0.5, 0.5, 'all', {ended: true})]}).practiceB).toBe(false)
+    expect(evaluateG2U2L06({...obs, filmRuns: [film(3, 26, 0.5, 0.5, 'all', {ended: true})]}).practiceB).toBe(false)
+    expect(evaluateG2U2L06({...obs, filmRuns: [film(2, 6, 0.5, 0.5, 'all', {ended: true, lines: ['开拍啦', L12_BYE]})]}).create).toBe(false)
+    expect(evaluateG2U2L06({...obs, filmRuns: [film(2, 6, 0.5, 0.5, 'this script', {tail: 1, lines: ['开拍啦', '下次见']})]}).create).toBe(false)
+    expect(evaluateG2U2L06({...obs, filmRuns: [film(2, 6, 0.5, 0.5, 'all', {ended: true, lines: ['开拍啦', '下次见']})]}).create).toBe(true)
+  })
+
+  it('U2-L06 fixes the three broadcasts, receivers, backdrops and sound; only the two scene waits, two lines, two loop waits and the stop option are editable', () => {
+    const stage = g2u2L06.targets.find(t => t.name === 'Stage')!
+    expect(stage.scripts.map(s => s.hatFixed?.BROADCAST_OPTION ?? s.hat)).toEqual(['kc2_flag', '中段', '结尾'])
+    expect(stage.scripts[0].body.map(b => b.fixed?.BROADCAST_OPTION ?? b.type)).toEqual(['kc2_switch_backdrop', '开头', 'kc2_wait_whole', '中段', 'kc2_wait_whole', '结尾'])
+    const cat = g2u2L06.targets.find(t => t.name === '小橘猫')!
+    expect(cat.scripts.map(s => s.hatFixed?.BROADCAST_OPTION)).toEqual(['开头', '中段', '结尾'])
+    expect(cat.scripts[1].body[0]).toMatchObject({type: 'kc2_forever'})
+    expect(cat.scripts[2].body.map(b => b.type)).toEqual(['kc2_say', 'kc2_stop'])
+    const drum = g2u2L06.targets.find(t => t.name === '小鼓')!
+    expect(drum.scripts[0].body[0].children?.map(b => b.type)).toEqual(['kc2_start_sound', 'kc2_wait_free'])
+    const slots = g2u2L06.targets.flatMap(t => t.scripts.flatMap(s => [...(s.hatSlots ?? []), ...s.body.flatMap(b => [...b.slots, ...(b.children ?? []).flatMap(c => c.slots)])])).map(s => s.key)
+    expect(slots.sort()).toEqual(['Stage|stage_wait1|DURATION', 'Stage|stage_wait2|DURATION', '小橘猫|cat_hello|MESSAGE', '小橘猫|cat_wait|DURATION',
+      '小橘猫|cat_bye|MESSAGE', '小橘猫|cat_stop|STOP_OPTION', '小鼓|drum_wait|DURATION'].sort())
+    expect(g2u2L06.showFilm).toBe(true)
+    expect(g2u2L06.tasks.map(t => t.id)).toEqual(['practiceA', 'practiceB', 'debug', 'create'])
+    expect(g2u2L06.hints).toHaveLength(3)
+    expect(existsSync(path.join(web, 'public', g2u2L06.sample))).toBe(true)
   })
 })

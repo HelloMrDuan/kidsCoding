@@ -552,6 +552,174 @@ export function evaluateG2U2L05(obs: G2Observations): G2TaskState {
   }
 }
 
+export const L12_SCENES = ['开头', '中段', '结尾']
+export const L12_BACKDROPS = ['开场', '音乐舞台', '谢幕']
+export const L12_HELLO = '音乐短片开始啦！'
+export const L12_BYE = '谢谢观看！'
+/** A costume frame and a drum beat count as "on the beat" when the VM ran them within this many ms of each other. */
+export const L12_ON_BEAT_MS = 100
+/** At least this many frames and beats in the middle scene before sync is judged. */
+export const L12_MIN_BEATS = 6
+/** The whole film (开头 broadcast → 结尾 broadcast, VM clock) must last 30–60 s; small allowances for the sandbox clock. */
+export const L12_FILM_MIN_MS = 29_950
+export const L12_FILM_MAX_MS = 60_300
+/** Frames or beats more than this long after the ending's stop block mean a loop kept running. */
+export const L12_TAIL_AFTER_MS = 300
+/** Events this close to the stop block are not judged for sync (the stop can land between the cat's and the drum's turn in one VM frame). */
+const L12_EDGE_MS = 60
+
+type FilmRun = G2Observations['filmRuns'][number]
+export type FilmSummary = {
+  scenes: string[]; openMs: number | null; middleMs: number | null; totalMs: number | null
+  frames: number; beats: number; onBeat: number; synced: boolean
+  stop: string | null; tailFrames: number; tailBeats: number; keptRunning: boolean; stoppedAll: boolean; lines: string[]
+}
+
+const near = (t: number, list: number[]) => list.some(x => Math.abs(x - t) <= L12_ON_BEAT_MS)
+
+/** One green-flag film: scene times from the VM broadcasts, how many middle-scene frames landed on a drum beat, and what happened after the stop block. */
+export function filmSummary(run: FilmRun | undefined): FilmSummary {
+  const empty: FilmSummary = {scenes: [], openMs: null, middleMs: null, totalMs: null, frames: 0, beats: 0, onBeat: 0, synced: false,
+    stop: null, tailFrames: 0, tailBeats: 0, keptRunning: false, stoppedAll: false, lines: []}
+  if (!run) return empty
+  const at = (message: string) => run.broadcasts.find(b => b.message === message)?.t ?? null
+  const [tOpen, tMid, tEnd] = L12_SCENES.map(at)
+  const scenes = run.broadcasts.map(b => b.message).filter((m, i, all) => L12_SCENES.includes(m) && all.indexOf(m) === i)
+  const until = run.stop ? run.stop.t - L12_EDGE_MS : Number.POSITIVE_INFINITY
+  const inMiddle = (t: number) => tMid !== null && t >= tMid - 1 && t <= until
+  const frames = run.frames.filter(inMiddle)
+  const beats = run.sounds.filter(inMiddle)
+  const onBeat = frames.filter(t => near(t, run.sounds)).length
+  const beatsMatched = beats.filter(t => near(t, run.frames)).length
+  const after = (t: number) => !!run.stop && t > run.stop.t + L12_TAIL_AFTER_MS
+  const tailFrames = run.frames.filter(after).length
+  const tailBeats = run.sounds.filter(after).length
+  const diff = (a: number | null, b: number | null) => (a === null || b === null ? null : Math.round(b - a))
+  return {
+    scenes, openMs: diff(tOpen, tMid), middleMs: diff(tMid, tEnd), totalMs: diff(tOpen, tEnd),
+    frames: frames.length, beats: beats.length, onBeat,
+    synced: frames.length >= L12_MIN_BEATS && beats.length >= L12_MIN_BEATS && onBeat === frames.length && beatsMatched === beats.length,
+    stop: run.stop?.option ?? null, tailFrames, tailBeats,
+    keptRunning: !!run.stop && tailFrames + tailBeats > 0,
+    stoppedAll: run.stop?.option === 'all' && run.ended && tailFrames + tailBeats === 0,
+    lines: [...run.lines],
+  }
+}
+
+const catLine = (block: string, label: string): G2Slot[] => [{key: `小橘猫|${block}|MESSAGE`, field: 'MESSAGE', label, maxLength: 20}]
+const loopWait = (target: string, block: string, label: string): G2Slot => ({key: `${target}|${block}|DURATION`, field: 'DURATION', label, min: 0.2, max: 1, tenths: true})
+
+export const g2u2L06: G2Lesson = {
+  id: 'G2-U2-L06',
+  title: '音乐动画短片',
+  concept: '单元综合：用广播把开头、中段、结尾三幕串成一部短片；中段让帧动画循环和鼓点循环用同样的节拍；结尾用“停止全部脚本”收场',
+  sample: '/scratch-samples/g2-u2-l06-music-short.sb3.b64',
+  exportName: 'KidsCoding-音乐动画短片.sb3',
+  story: '小橘猫要拍一部自己的音乐短片：开场打招呼，中段跟着小鼓跳舞，结尾谢幕。可是试映时，猫的舞步和鼓点总是对不上；谢幕以后，小鼓还在“咚咚咚”，小橘猫也还在一直换动作，短片停不下来……',
+  conceptExplain: [
+    '这一课把整个单元串起来：帧动画（下一个造型）+ 永远循环 + 等待定节拍 + 广播分场景。舞台用“广播 开头 → 等 → 广播 中段 → 等 → 广播 结尾”当导演，各角色用“当接收到”在自己的那一幕开工。',
+    '音画同步：两个永远循环同时被“中段”叫醒；猫每换一帧等多久、鼓每敲一下等多久，两个等待一样，每一帧才会落在鼓点上。',
+    '“停止 这个脚本”只结束它所在的那一条脚本；别的角色里的永远循环还在跑。要让整部短片收场，用“停止 全部脚本”。',
+  ],
+  predict: {
+    question: '小橘猫在结尾说完“谢谢观看！”后执行“停止（这个脚本）”。之后，小鼓还会继续“咚咚”响吗？',
+    options: ['会继续响', '会停下来'],
+    correct: '会继续响',
+    explain: '“这个脚本”只是小橘猫收到“结尾”的那一条脚本。小鼓自己的“重复执行（永远）”在另一条脚本里，Scratch VM 不会替你停掉它。',
+  },
+  tasks: [
+    { id: 'practiceA', skill: '让两个循环用同一个节拍（音画同步）', title: '练习 A：舞步踩上鼓点', goal: '改小橘猫“中段”循环里的等待秒数（或小鼓的），点绿旗：中段里 VM 至少换 6 帧、敲 6 下，每一帧和最近一下鼓声相差不超过 0.1 秒。', how: '现在猫每 0.3 秒换一帧，鼓每 0.5 秒敲一下。两个等待改成一样的数（0.4、0.5、0.6……都行）就同步了。' },
+    { id: 'practiceB', skill: '用等待安排每一幕的长度（时间规划）', title: '练习 B：剪出 30～60 秒的短片', goal: '改舞台的两个等待（开头那幕 1～10 秒、中段那幕 4～50 秒），点绿旗：VM 测得从“开头”广播到“结尾”广播共 30～60 秒。', how: '全片长度 = 第一个等待 + 第二个等待。观察区会显示 VM 测到的每一幕时长。' },
+    { id: 'debug', skill: '找出停不下来的循环（调试）', title: '找错：谢幕后为什么还停不下来？', goal: '先完整放一次，看观察区：结尾的“停止”后，VM 里是否还有换帧或鼓声；再改正停止积木，让短片结尾后什么都不再运行。', how: '想一想：停止“这个脚本”停的是哪一条？鼓的循环在谁的脚本里？' },
+    { id: 'create', skill: '单元综合创作', title: '创意：我的音乐短片', goal: '给小橘猫的开场白和谢幕词都换成你自己的话（1～20 字），完整放一遍：三幕都出现、结尾全部停下，再保存为 .sb3、重新导入后还能完整重放。', how: '节拍快慢和每一幕的长度你来定；记得让猫和鼓的等待一样。' },
+  ],
+  hints: [
+    '看现象：观察区显示结尾的“停止（这个脚本）”之后，Scratch VM 里小橘猫还在换帧、小鼓还在发出“咚”。',
+    '想原因：“这个脚本”只停小橘猫收到“结尾”的那一条脚本；小橘猫的舞蹈循环和小鼓的鼓点循环是别的脚本，还在永远重复。',
+    '去修复：选中小橘猫，把“停止（ ）”改成“全部脚本”，应用后再完整放一遍。',
+  ],
+  reflection: [
+    '这部短片里，哪些地方用到了前五课学过的本领（帧动画、永远循环、节拍、广播）？',
+    '为什么两个循环的等待一样，舞步才会一直踩在鼓点上？如果一个 0.4、一个 0.5，会怎样？',
+    '“停止 这个脚本”和“停止 全部脚本”分别适合什么时候用？',
+  ],
+  limitations: [
+    '本实验只能修改：舞台开头那幕的等待（1～10 整数秒）和中段那幕的等待（4～50 整数秒）、小橘猫的开场白和谢幕词（1～20 字）、小橘猫换帧等待和小鼓敲击等待（0.2～1.0 秒，0.1 秒一格）、小橘猫结尾的停止选项（这个脚本/全部脚本）。',
+    '三条广播（开头/中段/结尾）、各角色收听的消息、三个背景、两个造型和原创鼓声“咚”都固定不改；不能新建消息、角色或积木（可导出 .sb3 后在完整 Scratch 编辑器里继续改造）。',
+    '舞台画面按 Scratch VM 的对象状态绘制原创 SVG，未接入 WebGL 渲染器；本沙箱的 VM 没有接音频引擎，鼓声由页面播放同一个原创 .wav，所以“音画同步”是用 VM 里每次换帧和每次开始播放的时刻来判断（沙箱时钟，误差约一帧 0.03 秒），不是测量真实声音；全片时长同样按 VM 广播时刻计算；不保存正式成绩，本课暂不开放云端保存。',
+  ],
+  targets: [
+    {
+      name: 'Stage', kind: 'stage', label: '舞台', costumes: L12_BACKDROPS, messages: L12_SCENES,
+      scripts: [
+        { hat: 'kc2_flag', body: [
+          { type: 'kc2_switch_backdrop', vmBlock: 'stage_first_menu', slots: [], fixed: { BACKDROP: '开场' } },
+          { type: 'kc2_broadcast', vmBlock: 'stage_open', slots: [], fixed: { BROADCAST_OPTION: '开头' } },
+          { type: 'kc2_wait_whole', vmBlock: 'stage_wait1', slots: [{ key: 'Stage|stage_wait1|DURATION', field: 'DURATION', label: '开头那幕等待秒数', min: 1, max: 10 }] },
+          { type: 'kc2_broadcast', vmBlock: 'stage_middle', slots: [], fixed: { BROADCAST_OPTION: '中段' } },
+          { type: 'kc2_wait_whole', vmBlock: 'stage_wait2', slots: [{ key: 'Stage|stage_wait2|DURATION', field: 'DURATION', label: '中段那幕等待秒数', min: 4, max: 50 }] },
+          { type: 'kc2_broadcast', vmBlock: 'stage_end', slots: [], fixed: { BROADCAST_OPTION: '结尾' } },
+        ] },
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '中段' }, body: [
+          { type: 'kc2_switch_backdrop', vmBlock: 'stage_music_menu', slots: [], fixed: { BACKDROP: '音乐舞台' } },
+        ] },
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '结尾' }, body: [
+          { type: 'kc2_switch_backdrop', vmBlock: 'stage_curtain_menu', slots: [], fixed: { BACKDROP: '谢幕' } },
+        ] },
+      ],
+    },
+    {
+      name: '小橘猫', kind: 'sprite', label: '小橘猫', costumes: ['站好', '挥手'], messages: L12_SCENES,
+      scripts: [
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '开头' }, body: [
+          { type: 'kc2_say', vmBlock: 'cat_hello', slots: catLine('cat_hello', '开场白') },
+        ] },
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '中段' }, body: [
+          { type: 'kc2_forever', vmBlock: 'cat_dance', slots: [], children: [
+            { type: 'kc2_next_costume', vmBlock: 'cat_next', slots: [] },
+            { type: 'kc2_wait_free', vmBlock: 'cat_wait', slots: [loopWait('小橘猫', 'cat_wait', '换帧后等待秒数')] },
+          ] },
+        ] },
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '结尾' }, body: [
+          { type: 'kc2_say', vmBlock: 'cat_bye', slots: catLine('cat_bye', '谢幕词') },
+          { type: 'kc2_stop', vmBlock: 'cat_stop', slots: [{ key: '小橘猫|cat_stop|STOP_OPTION', field: 'STOP_OPTION', label: '停止', options: ['this script', 'all'] }] },
+        ] },
+      ],
+    },
+    {
+      name: '小鼓', kind: 'sprite', label: '小鼓', sounds: ['咚'], messages: L12_SCENES,
+      scripts: [
+        { hat: 'kc2_when_receive', hatFixed: { BROADCAST_OPTION: '中段' }, body: [
+          { type: 'kc2_forever', vmBlock: 'drum_loop', slots: [], children: [
+            { type: 'kc2_start_sound', vmBlock: 'drum_dong', slots: [], fixed: { SOUND_MENU: '咚' } },
+            { type: 'kc2_wait_free', vmBlock: 'drum_wait', slots: [loopWait('小鼓', 'drum_wait', '敲一下后等待秒数')] },
+          ] },
+        ] },
+      ],
+    },
+  ],
+  steps: [
+    { id: 'practiceA-frames-on-the-beat', solutions: ['猫等待 0.5、鼓等待 0.5 → VM 里每一帧都和鼓声相差约 0 秒', '两边都 0.4 秒 → 更快也同步'], counterExamples: ['猫 0.3、鼓 0.5 → 很多帧落在两拍中间', '猫 0.25 → 不是 0.1 秒一格，被拒绝'] },
+    { id: 'practiceB-film-length', solutions: ['开头 3 秒 + 中段 27 秒 → VM 测得全片约 30 秒', '开头 5 + 中段 40 → 约 45 秒'], counterExamples: ['开头 2 + 中段 6 → 只有约 8 秒，太短', '中段 60 → 超出 4～50 被拒绝'] },
+    { id: 'debug-stop-only-this-script', solutions: ['把小橘猫结尾的“停止（这个脚本）”改成“停止（全部脚本）”→ 结尾后 VM 里没有脚本在运行'], counterExamples: ['只改等待秒数 → 结尾后猫和鼓仍在循环'] },
+  ],
+  nextLesson: 'G2-U3-L01 键盘控制小船',
+  showFilm: true,
+}
+
+export function evaluateG2U2L06(obs: G2Observations): G2TaskState {
+  const runs = obs.filmRuns.map(filmSummary)
+  const firstKept = runs.findIndex(s => s.keptRunning)
+  const allScenes = (s: FilmSummary) => L12_SCENES.every(m => s.scenes.includes(m))
+  const longEnough = (s: FilmSummary) => s.totalMs !== null && s.totalMs >= L12_FILM_MIN_MS && s.totalMs <= L12_FILM_MAX_MS
+  return {
+    practiceA: runs.some(s => s.synced),
+    practiceB: runs.some(s => allScenes(s) && longEnough(s)),
+    debug: firstKept >= 0 && runs.slice(firstKept + 1).some(s => s.stoppedAll),
+    create: runs.some(s => allScenes(s) && s.stoppedAll && s.lines.length >= 2 && s.lines[0] !== L12_HELLO && s.lines[s.lines.length - 1] !== L12_BYE),
+  }
+}
+
 type CycleRun = G2Observations['cycleRuns'][number]
 const spokeOn = (run: CycleRun, target: string, backdrop: string) => run.speech.some(s => s.target === target && s.backdrop === backdrop)
 const longPhases = (run: CycleRun) => run.switches >= 2 && run.avgMs !== null && run.avgMs >= L08_LONG_PHASE_MS
@@ -604,6 +772,11 @@ export function observedPredictionG2U2(id: string, obs: G2Observations): string 
     if (!first) return null
     return first.speakers.includes('小白兔') ? '会上台' : '不会上台'
   }
+  if (id === g2u2L06.id) {
+    const first = obs.filmRuns.map(filmSummary).find(s => s.stop !== null && (s.tailBeats > 0 || s.stoppedAll))
+    if (!first) return null
+    return first.tailBeats > 0 ? '会继续响' : '会停下来'
+  }
   if (id === g2u2L03.id) {
     const first = obs.beatRuns.find(r => r.finished && r.hits.some(h => h.target === L09_DRUM))
     if (!first) return null
@@ -625,6 +798,7 @@ export function evaluateG2U2Lesson(id: string, obs: G2Observations): G2TaskState
   if (id === g2u2L03.id) return evaluateG2U2L03(obs)
   if (id === g2u2L04.id) return evaluateG2U2L04(obs)
   if (id === g2u2L05.id) return evaluateG2U2L05(obs)
+  if (id === g2u2L06.id) return evaluateG2U2L06(obs)
   return null
 }
 
@@ -634,4 +808,5 @@ export const g2u2ScratchLessons: Record<string, G2Lesson> = {
   [g2u2L03.id]: g2u2L03,
   [g2u2L04.id]: g2u2L04,
   [g2u2L05.id]: g2u2L05,
+  [g2u2L06.id]: g2u2L06,
 }
