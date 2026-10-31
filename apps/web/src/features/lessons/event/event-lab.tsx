@@ -4,7 +4,12 @@ import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { resolveEventGoal, type EventLesson, type EventLessonStep } from '@/content/curriculum/g0-u2-event-lessons'
-import { BlocklyWorkspace } from '@/features/lessons/blockly/blockly-workspace'
+import dynamic from 'next/dynamic'
+
+const BlocklyWorkspace = dynamic(
+  () => import('@/features/lessons/blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
+  { ssr: false },
+)
 import { getKidsBlockLabel } from '@/features/lessons/blockly/register-kids-blocks'
 import { GuidedLessonShell, type LessonLocalSaveState } from '@/features/lessons/guided-lesson-shell'
 import { ReadAloudButton } from '@/features/lessons/voice/read-aloud'

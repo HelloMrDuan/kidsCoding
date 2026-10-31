@@ -2914,6 +2914,29 @@
       "acceptance": ["生产构建正常", "complete 页静态 import 图不再可达 blockly-workspace 与 @blockly/keyboard-navigation（回归测试）", "DuoProject/UnitProject 渲染与重播行为不退化", "真实 Chrome 三断点", "必需 CI 全过", "合并部署后预发布实测（如能拿到有效 projectId；拿不到则如实注明未复现）"],
       "evidence": {},
       "notes": "duan 2026-10-30 全权授权下由 kid小宝自取编号 SSR-102（合并前可改名）；与 SSR-101 同根因；线上 500 未实测复现（无有效 projectId），不得宣称已验证线上；本地生产构建未跑（VM 无干净构建环境），以 PR CI 构建作业验证为准"
+    },
+    {
+      "id": "SSR-101",
+      "title": "修复启蒙 Blockly 课堂服务端 navigator 引用导致的 HTTP 500",
+      "priority": "P0",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [
+            "UX-203"
+      ],
+      "scope": "启蒙课堂 SSR 模块引用链：app/learn/lesson 页面、TemplateStoryBuilder、BlocklyWorkspace、@blockly/keyboard-navigation 加载边界及专项回归测试",
+      "acceptance": [
+            "生产构建正常",
+            "原独立 12 节启蒙课程的有效 URL 均不再因 navigator 抛出 HTTP 500",
+            "服务端不再执行浏览器专用模块顶层代码",
+            "Blockly 工具箱、键盘导航、积木点击/拖拽与执行不退化",
+            "保存、刷新恢复、进度和奖励逻辑保持不变",
+            "真实 Chrome 1440×900、768×1024、375×812 验证",
+            "所有必需 CI 通过",
+            "修复合并并部署后，在预发布实际验证"
+      ],
+      "evidence": {},
+      "notes": "duan 2026-10-30 P0 裁定批准新增；根因链 TemplateStoryBuilder→BlocklyWorkspace→@blockly/keyboard-navigation（模块顶层读 navigator.platform），预发布 main 679895e0 日志 digest 2491557641；分支 fix/ssr-101-blockly-navigator；72 节课程审计证据另立 PR，不混入本 PR。"
     }
   ]
 }
