@@ -3,6 +3,7 @@ import {
   A0_U1_L01_COUNTER_EXAMPLE,
   A0_U1_L01_PASS_THRESHOLD,
   a0u1L01,
+  a0u1L01SnapshotSteps,
   evaluateA0CounterExample,
   evaluateA0Creative,
   evaluateA0U1L01,
@@ -70,5 +71,19 @@ describe('A0-U1-L01 AI在哪里出现: classification data and judge', () => {
     expect(a0u1L01.nextLesson).toBe('A0-U1-L02 人和机器的判断')
     expect(a0u1L01.materialsReady).toBe(false)
     expect(a0u1L01.doesNotCollectPersonalData).toBe(true)
+  })
+
+  it('exposes SYS-105 snapshot steps with real positive and negative examples', () => {
+    expect(a0u1L01SnapshotSteps).toHaveLength(2)
+    for (const step of a0u1L01SnapshotSteps) {
+      expect(step.positiveExamples.length).toBeGreaterThanOrEqual(1)
+      expect(step.negativeExamples.length).toBeGreaterThanOrEqual(1)
+    }
+    // Practice A positives are exactly the lesson data's six correct classifications.
+    expect(a0u1L01SnapshotSteps[0].positiveExamples).toHaveLength(6)
+    expect(a0u1L01SnapshotSteps[0].positiveExamples[0]).toContain('导航软件')
+    // Practice B positives reuse the counter-example data, not a second copy of it.
+    expect(a0u1L01SnapshotSteps[1].positiveExamples[0]).toContain('收音机')
+    expect(a0u1L01SnapshotSteps[1].positiveExamples[0]).toContain(A0_U1_L01_COUNTER_EXAMPLE.reason)
   })
 })

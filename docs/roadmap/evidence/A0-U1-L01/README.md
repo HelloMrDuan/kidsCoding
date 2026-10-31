@@ -61,3 +61,19 @@
   `catalogStatus` 仍 `outline_not_playable`，`mergeCommit` / `mainCI` / `lessonReview` 仍 null。
 - 本阶段不做：独立教研、儿童试学、三端截图（按本次指令暂不做，非遗漏）、发布。
   目录页不新增 classify 试玩入口区块（本阶段只交付路由试玩本身），后续 UI 工作可另起。
+
+## 第 2 阶段修复（2026-10-31 晚，用户批准后补推，与第 2 阶段同一 PR、同一分支）
+
+- 新 head 4a034549 的 CI：任务台账 success，课程内容与部署 failure，唯一失败点均为
+  lesson-schema.test.ts 的 SYS-105 门禁。根因两点，皆为第 2 阶段引入、非旧问题：
+  1）漏改第二处硬编码试玩计数：lesson-schema.test.ts 仍要求 trials 34 + G2 课数
+  （成熟度测试那处已改 35），实际登记后为 46 节；2）A0-U1-L01 登记试玩后被判
+  missing_examples——门禁要求每个试玩课有带正反例的步骤，否则只能进历史欠账名单，
+  而欠账名单已满 19 条上限且只能减少、不能新增；快照构造器此前只从 G0 网格/事件/循环课
+  与 G2 Scratch 课取步骤，A0 课没有步骤来源。
+- 修复（未改 widget、路由、E2E、判定逻辑）：课数据新增 `a0u1L01SnapshotSteps`（2 步：
+  practiceA-classify 正例为课数据自身的 6 项正确分类、反例为详案诊断与无理由不计分规则；
+  practiceB-counter-example 正例复用反例数据、反例为详案诊断原话），快照构造器接入该步骤源；
+  lesson-schema.test.ts 计数 trials 34→35、steps 75→77（+2 步）；a0 测试新增快照步骤断言
+  （每步正反例均 ≥1、正例与课数据一致）。正反例均为课内真实内容，非为过门禁编造。
+- 本修复未动：独立教研、儿童试学、三端截图、发布、合并；目录页 classify 入口区块仍未加。

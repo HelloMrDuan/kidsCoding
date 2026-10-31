@@ -105,6 +105,42 @@ export const a0u1AiLessons: Record<string, A0Lesson> = {
   'A0-U1-L01': a0u1L01,
 }
 
+const categoryLabel = (category: A0ToolCategory): string =>
+  category === 'ai' ? 'AI 相关' : category === 'traditional' ? '传统程序' : '非数字工具'
+
+export type A0SnapshotStep = {
+  id: string
+  /** Correct classifications with reasons, taken from the lesson data itself. */
+  positiveExamples: string[]
+  /** Documented wrong answers: the lesson's own diagnostics and judge rules. */
+  negativeExamples: string[]
+}
+
+/**
+ * Steps the SYS-105 schema gate reads for this trial lesson. Every trial
+ * needs steps with at least one right and one wrong example (or a place on
+ * the historical debt list, which can only shrink, so it is not an option
+ * for a new trial). Positive examples are the lesson data's own correct
+ * classifications; negative examples are the lesson's own documented
+ * mistakes — its diagnostics and the no-reason-scores-nothing judge rule —
+ * not invented cases.
+ */
+export const a0u1L01SnapshotSteps: A0SnapshotStep[] = [
+  {
+    id: 'practiceA-classify',
+    positiveExamples: a0u1L01.tools.map((tool) => `${tool.name}→${categoryLabel(tool.category)}：${tool.reason}`),
+    negativeExamples: [
+      '把所有电子产品都叫人工智能（详案评分依据：不把所有电子产品都叫人工智能）',
+      '分类正确但没有理由（判定规则：无理由不计分）',
+    ],
+  },
+  {
+    id: 'practiceB-counter-example',
+    positiveExamples: [`${A0_U1_L01_COUNTER_EXAMPLE.name}→传统程序：${A0_U1_L01_COUNTER_EXAMPLE.reason}`],
+    negativeExamples: ['把所有会发声的设备都算成 AI（详案诊断原话）'],
+  },
+]
+
 export function getA0Lesson(id: string): A0Lesson | undefined {
   return a0u1AiLessons[id]
 }
