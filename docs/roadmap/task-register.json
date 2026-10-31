@@ -3045,7 +3045,7 @@
       "title": "bind-account-form submitOtp durable 加固：等验证码输入框本身的 waitFor（仅改测试）",
       "priority": "P2",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "仅改测试，不改产品代码：bind-account-form.test.tsx 的 submitOtp helper 改成等验证码输入框本身的 waitFor（同文件测试 7 的范式），一处改动覆盖 7 个调用者；断言未删除、未放宽；不改其他测试，不改产品代码。",
       "acceptance": [
@@ -3055,10 +3055,10 @@
         "PR CI 全绿后合并"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "mainTaskCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/441",
+        "mergeCommit": "5a5fa0ef2ddf5ae89a9dfb95b013745438d6eae6",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41227043951",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41227043864",
         "tests": [
           "bind-account-form spec 本地 9/9 通过（改动后两次、改动前一次；act 控制台警告数改动前后均为 2 条，非失败）",
           "submitOtp 一处改动覆盖 7 个调用者；断言未删除、未放宽；产品代码零改动",
