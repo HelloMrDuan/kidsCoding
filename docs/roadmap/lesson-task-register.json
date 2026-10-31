@@ -8062,7 +8062,7 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/433",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
