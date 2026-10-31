@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'csv_to_json'; args: readonly string[]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U4-L03': {
+    title: '第3课 · 表格批量转换',
+    prompt: '编写 csv_to_json(csv_text) 函数，把一张 CSV 表格批量转换成 JSON 文本。第一行是表头，后面每行是一条记录；用 csv.DictReader 读表，表头不能为空、不能有空列名，每条记录的字段数必须和表头一致（缺值就报错），至少要有一条记录。返回 json.dumps(记录列表, ensure_ascii=False) 的结果，记录里的值保持 CSV 读出的字符串原样。csv_text 为空、只有表头没有记录、表头为空或有空列名、某条记录缺值时都抛出 ValueError。数据全部是虚构示例。',
+    argLabels: ['CSV 表格文本'],
+    startCode: 'import csv\nimport io\nimport json\n\ndef csv_to_json(csv_text):\n    # 先用 DictReader 读表并校验，再 json.dumps 转回\n    return "待完成"',
+    cases: [
+      { function: 'csv_to_json', args: ['姓名,分数\n小明,90\n小红,85\n'], expected: '[{"姓名": "小明", "分数": "90"}, {"姓名": "小红", "分数": "85"}]' },
+      { function: 'csv_to_json', args: ['项目,数值\n跑步,30\n'], expected: '[{"项目": "跑步", "数值": "30"}]' },
+      { function: 'csv_to_json', args: [''], expected: 'ERROR:ValueError' },
+      { function: 'csv_to_json', args: ['姓名,分数\n'], expected: 'ERROR:ValueError' },
+      { function: 'csv_to_json', args: ['姓名,分数\n小明\n'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：csv_text.strip() 为空先 raise ValueError；reader = csv.DictReader(io.StringIO(csv_text))，fieldnames 为空或含空列名就 raise ValueError；rows = list(reader)，为空就 raise ValueError；每行值里有 None 就 raise ValueError；返回 json.dumps(rows, ensure_ascii=False)。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
