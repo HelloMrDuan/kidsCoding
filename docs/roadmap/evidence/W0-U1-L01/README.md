@@ -32,3 +32,7 @@
 ## 本地校验（推前实测，以 CI 为准）
 
 - 见 PR 正文“测试证据”一节（Vitest、ESLint、tsc 结果如实填写，不只写“通过”）。
+
+## PR 链接
+
+- 本 PR：https://github.com/HelloMrDuan/kidsCoding/pull/442（Draft，送主账号评审）
