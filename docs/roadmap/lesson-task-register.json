@@ -6711,7 +6711,7 @@
       "unitId": "W0-U1",
       "focusConcept": "标签",
       "plannedLearningOutcome": "能使用标签解释并完成「写出我的第一张网页」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [],
@@ -6722,7 +6722,7 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/442",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
