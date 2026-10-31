@@ -2984,6 +2984,33 @@
         "reviewer": null
       },
       "notes": "基线 main 679895e0；原始运行输出各 *-run.txt 留工作区备查、未全量入库；独立教研与真实儿童试学未完成，不得伪造或跳过。"
+    },
+    {
+      "id": "SYS-112",
+      "title": "say-too-early 用例 durable 加固：等 onRunFailure 回调本身的 waitFor 重试断言（仅改测试）",
+      "priority": "P2",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "仅改测试，不改产品代码：playable-stage-feedback.test.tsx 的 say-too-early 用例改成等 onRunFailure 回调本身的 waitFor 重试断言；断言与期望参数逐字节不变；不改其他测试，不改产品代码。",
+      "acceptance": [
+        "say-too-early 用例本地通过",
+        "断言与期望参数逐字节不变",
+        "产品代码零改动",
+        "PR CI 全绿后合并"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "mainTaskCI": null,
+        "tests": [
+          "say-too-early spec 本地 5/5 通过两次",
+          "playable-stage 全套 12 文件 114/114 通过一次"
+        ],
+        "reviewer": null
+      },
+      "notes": "测试时序竞态（非产品回调 bug）：原因渲染先到、回调后到，旧断言抢跑；durable 加固另行立项，不阻塞其他合并。"
     }
   ]
 }
