@@ -3097,7 +3097,7 @@
       "title": "lesson-draft-persistence spec 手机端面板修复：断言与加积木前先切 code 面板（仅改测试）",
       "priority": "P2",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "lesson-draft-persistence spec 手机端面板修复（test-only）：工作区可见性断言前与刷新后先用 lesson-pane-helpers 切到 code 面板、加积木改用 clickLessonControl；断言一字不动、产品代码零改动、不改 workflow。",
       "acceptance": [
@@ -3107,10 +3107,10 @@
         "PR CI 全绿后合并"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "mainTaskCI": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/447",
+        "mergeCommit": "f3770a8f5c96fce4d7fc8c53c4df1b834eb5f6c2",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41241186624",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41241186641",
         "tests": [
           "修复分支 fix/lesson-draft-persistence-mobile-pane：spec 在断言工作区可见前与刷新后先切 code 面板、加积木改用 clickLessonControl（照抄 lesson-recovery-ux502 范式），其余断言一字不动、产品代码零改动",
           "本地 playwright --list 可加载解析：desktop + mobile 各 1 条（本机无 Chrome，不跑浏览器；CI 跑绿为准）"
