@@ -46,6 +46,9 @@ export const kidsBlockLabels: Record<string, string> = {
   raise_flag: '升起彩旗',
   fall_down: '掉到地上',
   send_bell: '摇响铃铛',
+  // G0-U3-L04: firefly lights
+  glow_on: '亮起来',
+  glow_off: '熄灭',
 }
 
 /** Labels that change when the character flies instead of walks. */

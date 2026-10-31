@@ -1,5 +1,6 @@
 import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { g0u2EventLessons } from '@/content/curriculum/g0-u2-event-lessons'
+import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
 import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
@@ -72,7 +73,7 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
   ),
   // G0-U2 (Hark A): event lessons on the event-stage engine; their E2E lives in grid-lab.spec.ts (already in CI).
   ...Object.fromEntries(
-    Object.keys(g0u2EventLessons).map((id) => [
+    [...Object.keys(g0u2EventLessons), ...Object.keys(g0u3EventLessons)].map((id) => [
       id,
       { engine: 'blockly', route: `/learn/event-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
     ]),

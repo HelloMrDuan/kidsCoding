@@ -100,3 +100,30 @@ describe('G0-U2 event engine', () => {
     })
   })
 })
+
+describe('event engine: repeat and show stage (G0-U3-L04)', () => {
+  const fly = (id: 'firefly_a' | 'firefly_b') => ({ id, name: id, can: ['glow_on', 'glow_off'] as const, x: 50, y: 40 })
+  const show = { actors: [{ ...fly('firefly_a'), can: [...fly('firefly_a').can] }, { ...fly('firefly_b'), can: [...fly('firefly_b').can] }], parallel: true }
+  const rounds = (n: number, ...body: string[]) => [{ type: 'when_start' }, { type: 'repeat_times', times: n, body: body.map(type => ({ type })) }]
+  const goal = (n: number) => [{ interaction: { kind: 'start' as const }, effects: (['firefly_a', 'firefly_b'] as const).flatMap(id => Array.from({ length: n }, () => [[id, 'glow_on'], [id, 'glow_off']] as Array<[typeof id, 'glow_on' | 'glow_off']>).flat()) }]
+
+  it('unrolls a repeat inside a script and numbers the beats', () => {
+    const run = runEventProgram(show, { firefly_a: rounds(3, 'glow_on', 'glow_off') }, [{ kind: 'start' }])
+    expect(run.effects.map(e => e.action)).toEqual(['glow_on', 'glow_off', 'glow_on', 'glow_off', 'glow_on', 'glow_off'])
+    expect(run.effects.map(e => e.beat)).toEqual([0, 1, 2, 3, 4, 5])
+    expect(run.effects.every(e => e.blockIndex === 1)).toBe(true)
+  })
+
+  it('an empty repeat or an action the character cannot do never runs', () => {
+    expect(runEventProgram(show, { firefly_a: [{ type: 'when_start' }, { type: 'repeat_times', times: 2, body: [] }] }, [{ kind: 'start' }]).issues.firefly_a?.issue).toBe('empty_repeat')
+    expect(runEventProgram(show, { firefly_a: rounds(2, 'say_hello') }, [{ kind: 'start' }]).issues.firefly_a?.issue).toBe('cannot_do')
+  })
+
+  it('judges a show: in step, finished dark, and the right number of rounds', () => {
+    expect(checkEventGoal(show, { firefly_a: rounds(3, 'glow_on', 'glow_off'), firefly_b: rounds(3, 'glow_on', 'glow_off') }, goal(3)).passed).toBe(true)
+    expect(checkEventGoal(show, { firefly_a: rounds(3, 'glow_on', 'glow_off'), firefly_b: rounds(3, 'glow_off', 'glow_on') }, goal(3)).failure).toBe('out_of_sync')
+    expect(checkEventGoal(show, { firefly_a: rounds(3, 'glow_on'), firefly_b: rounds(3, 'glow_on') }, goal(3)).failure).toBe('left_glowing')
+    expect(checkEventGoal(show, { firefly_a: rounds(3, 'glow_on', 'glow_off'), firefly_b: rounds(2, 'glow_on', 'glow_off') }, goal(3)).failure).toBe('missing_effect')
+    expect(checkEventGoal(show, { firefly_a: rounds(3, 'glow_on', 'glow_off'), firefly_b: rounds(4, 'glow_on', 'glow_off') }, goal(3)).failure).toBe('extra_effect')
+  })
+})

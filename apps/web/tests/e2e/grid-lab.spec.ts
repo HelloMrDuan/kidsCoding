@@ -1425,3 +1425,76 @@ test('G0-U3-L03 garden watering: three rounds, one pot, four pots, spaced pots, 
   await page.getByTestId('grid-project-play').click()
   await expect(page.getByTestId('grid-project-card').getByTestId('grid-stage')).toHaveAttribute('data-watered', '5', { timeout: 15_000 })
 })
+
+test('G0-U3-L04 firefly show: only on, one flash, three rounds, catch the beat, my firefly show saved and reopened', async ({ page }) => {
+  test.setTimeout(240_000)
+  const q = async (...types: string[]) => { for (const t of types) await add(page, t) }
+  const edit = (id: string) => page.getByTestId(`event-edit-${id}`).click()
+  const clear = () => page.getByTestId('lesson-clear-program').click()
+  await page.goto('/learn/catalog/G0-U3-L04')
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+  await page.getByTestId('event-trial-entry').click()
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  await expect(page.locator('[data-grid-item="firefly-night"]').first()).toBeVisible()
+  const a = page.getByTestId('event-actor-firefly_a')
+  const b = page.getByTestId('event-actor-firefly_b')
+  const c = page.getByTestId('event-actor-firefly_c')
+
+  // Step 1 — error lab: repeat 3 × light up never goes dark; add “熄灭” inside the repeat.
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await page.getByTestId('grid-predict-choice-0').click()
+  await runAndExpect(page, 'error', '预想')
+  await expect(a).toHaveAttribute('data-glow-log', '111', { timeout: 15_000 })
+  await expect(a).toHaveAttribute('data-glowing', 'true')
+  await q('glow_off')
+  await runAndExpect(page, 'success')
+  await expect(a).toHaveAttribute('data-glow-log', '101010', { timeout: 15_000 })
+  await expect(a).toHaveAttribute('data-glowing', 'false')
+  await next(page)
+
+  // Guided: light only stays lit; light then dark is one flash.
+  await q('when_start', 'glow_on')
+  await runAndExpect(page, 'error', '灯还亮着')
+  await q('glow_off')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  // Practice A: 闪闪 with 2 rounds misses one; 3 rounds keeps in step with 亮亮.
+  await q('when_start', 'repeat_times', 'glow_on', 'glow_off')
+  await runAndExpect(page, 'error', '少闪了一轮')
+  await page.getByTestId('lesson-repeat-times-3').click()
+  await runAndExpect(page, 'success')
+  await expect(b).toHaveAttribute('data-glow-log', '101010', { timeout: 15_000 })
+  await next(page)
+
+  // Practice B: 点点 is a beat behind; rebuild its loop body light-then-dark.
+  await runAndExpect(page, 'error', '没跟上节拍')
+  await expect(c).toHaveAttribute('data-glow-log', '010101', { timeout: 15_000 })
+  await clear()
+  await q('when_start', 'repeat_times', 'glow_on', 'glow_off')
+  await page.getByTestId('lesson-repeat-times-3').click()
+  await runAndExpect(page, 'success')
+  await expect(c).toHaveAttribute('data-glow-log', '101010', { timeout: 15_000 })
+  await next(page)
+
+  // Creative remake: 5 rounds; changing only one firefly misses rounds, changing both passes.
+  await page.getByTestId('grid-goal-choice-2').click()
+  await edit('firefly_a'); await page.getByTestId('lesson-repeat-times-5').click()
+  await runAndExpect(page, 'error', '少闪了一轮')
+  await edit('firefly_b'); await page.getByTestId('lesson-repeat-times-5').click()
+  await runAndExpect(page, 'success')
+  await expect(b).toHaveAttribute('data-glow-log', '1010101010', { timeout: 15_000 })
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('表演完灯还亮着')
+  await expect(page.getByTestId('grid-review-mistakes')).toContainText('有角色没跟上节奏')
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('改成 6')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await expect(page.getByTestId('grid-project-card')).toContainText('闪 5 轮')
+})

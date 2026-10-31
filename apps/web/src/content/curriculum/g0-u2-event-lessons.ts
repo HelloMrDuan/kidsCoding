@@ -11,7 +11,9 @@ import type { EventActor, EventActorId, EventBlock, EventExpectation, EventFailu
 
 export type EventStepKind = 'guided' | 'practice-a' | 'practice-b' | 'error-lab' | 'creative'
 export type EventPrediction = { text: string; when: 'pass' | EventFailure }
-export type EventScriptsSpec = Partial<Record<EventActorId, string[]>>
+/** A block type, or a repeat written as { repeat: N, body: [...] } (G0-U3-L04). */
+export type EventSpecBlock = string | { repeat: number; body: string[] }
+export type EventScriptsSpec = Partial<Record<EventActorId, EventSpecBlock[]>>
 
 /** `$target` stands for the character the child picked in a creative step. */
 export type EventGoal = {
@@ -37,8 +39,8 @@ export type EventLessonStep = {
   counterExamples: Array<{ scripts: EventScriptsSpec; failure: EventFailure }>
   predictChoices?: [EventPrediction, EventPrediction]
   errorLab?: { expect: EventFailure; expected: string; actual: string }
-  /** creative: the child picks which character the goal is about. */
-  creative?: { prompt: string; choices: EventActorId[]; labels: string[] }
+  /** creative: the child picks which character the goal is about; with `goals` (G0-U3-L04) each choice brings its own goal instead. */
+  creative?: { prompt: string; choices: string[]; labels: string[]; goals?: EventGoal[] }
 }
 
 export type EventLesson = {
@@ -1214,13 +1216,15 @@ export function getEventLesson(id: string): EventLesson | undefined {
 }
 
 /** The goal a step really checks: a creative step's `$target` becomes the picked character. */
-export function resolveEventGoal(step: EventLessonStep, target?: EventActorId) {
-  const who = target ?? step.creative?.choices[0] ?? 'fox'
-  const expectations: EventExpectation[] = step.goal.expectations.map(e => ({
+export function resolveEventGoal(step: EventLessonStep, target?: string) {
+  const picked = step.creative?.goals ? step.creative.goals[Math.max(0, step.creative.choices.indexOf(target ?? ''))] : undefined
+  const goalSpec = picked ?? step.goal
+  const who = (picked ? 'fox' : target ?? step.creative?.choices[0] ?? 'fox') as EventActorId
+  const expectations: EventExpectation[] = goalSpec.expectations.map(e => ({
     interaction: e.interaction.kind === 'click' ? { kind: 'click', actor: e.interaction.actor === '$target' ? who : e.interaction.actor } : e.interaction,
     effects: e.effects.map(([a, x]) => [a === '$target' ? who : a, x]),
   }))
-  const probes: EventInteraction[] = (step.goal.probes ?? []).flatMap(p => p === 'others'
+  const probes: EventInteraction[] = (goalSpec.probes ?? []).flatMap(p => p === 'others'
     ? step.level.actors.filter(a => a.id !== who).map(a => ({ kind: 'click' as const, actor: a.id }))
     : [p])
   return { expectations, probes }
@@ -1228,4 +1232,4 @@ export function resolveEventGoal(step: EventLessonStep, target?: EventActorId) {
 
 /** Turns a spec like { fox: ['when_start', 'wake_up'] } into block lists. */
 export const toEventScripts = (spec: EventScriptsSpec) =>
-  Object.fromEntries(Object.entries(spec).map(([actor, types]) => [actor, (types ?? []).map(type => ({ type }))]))
+  Object.fromEntries(Object.entries(spec).map(([actor, types]) => [actor, (types ?? []).map(t => (typeof t === 'string' ? { type: t } : { type: 'repeat_times', times: t.repeat, body: t.body.map(type => ({ type })) }))]))
