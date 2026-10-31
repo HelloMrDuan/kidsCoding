@@ -2908,11 +2908,22 @@
       "title": "修复 /project 完成页服务端 navigator 引用导致的 HTTP 500 风险",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "scope": "complete 页链路静态 import 图去 Blockly 化：DuoProject、UnitProject 内 BlocklyWorkspace 改 next/dynamic ssr:false；新增 SSR 边界回归测试；不改课程内容、引擎、V2、进度与数据库",
       "acceptance": ["生产构建正常", "complete 页静态 import 图不再可达 blockly-workspace 与 @blockly/keyboard-navigation（回归测试）", "DuoProject/UnitProject 渲染与重播行为不退化", "真实 Chrome 三断点", "必需 CI 全过", "合并部署后预发布实测（如能拿到有效 projectId；拿不到则如实注明未复现）"],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/432",
+        "mergeCommit": "e3da8b8e45883496ab6efe5905c7ac674d66ae29",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41186612295",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41186612429",
+        "tests": [
+          "PR #432 门禁全绿（30 项：27 成功 + 3 跳过，头 b8c44759）",
+          "main 课程运行 41186612295 Success（17/17）",
+          "main 台账运行 41186612429 Success"
+        ],
+        "reviewer": "duan 2026-10-30 总授权下合并"
+      },
       "notes": "duan 2026-10-30 全权授权下由 kid小宝自取编号 SSR-102（合并前可改名）；与 SSR-101 同根因；线上 500 未实测复现（无有效 projectId），不得宣称已验证线上；本地生产构建未跑（VM 无干净构建环境），以 PR CI 构建作业验证为准"
     },
     {
@@ -2920,7 +2931,7 @@
       "title": "修复启蒙 Blockly 课堂服务端 navigator 引用导致的 HTTP 500",
       "priority": "P0",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
             "UX-203"
       ],
@@ -2935,7 +2946,18 @@
             "所有必需 CI 通过",
             "修复合并并部署后，在预发布实际验证"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/434",
+        "mergeCommit": "f75991ab5858693d5ff861599b0b2e342bfd48d3",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41186612295",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41186612429",
+        "tests": [
+          "PR #434 门禁全绿（30 项：27 成功 + 3 跳过，头 e14dae50）",
+          "main 课程运行 41186612295 Success（17/17）",
+          "main 台账运行 41186612429 Success"
+        ],
+        "reviewer": "duan 2026-10-30 总授权下合并"
+      },
       "notes": "duan 2026-10-30 P0 裁定批准新增；根因链 TemplateStoryBuilder→BlocklyWorkspace→@blockly/keyboard-navigation（模块顶层读 navigator.platform），预发布 main 679895e0 日志 digest 2491557641；分支 fix/ssr-101-blockly-navigator；72 节课程审计证据另立 PR，不混入本 PR。"
     }
   ]
