@@ -2800,11 +2800,22 @@
       "title": "CI 治理第四阶段：补 deploy test、e2e-blockly、curriculum-web 显式预算声明",
       "priority": "P2",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": ["SYS-108"],
       "scope": "只补 3 处 timeout-minutes: 12 显式预算声明，不拆分、不改测试、不改超时数字；不碰 #265 的 3 处、不碰观察项、不碰他人失败",
       "acceptance": ["deploy.yml test 作业含 timeout-minutes: 12", "deploy.yml e2e-blockly 作业含 timeout-minutes: 12", "curriculum-content.yml curriculum-web 作业含 timeout-minutes: 12", "其余作业预算声明不变", "必需 CI 全过"],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/372",
+        "mergeCommit": "2dcd796df4d912cddd0201a52f2a5ff47b6ce582",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41134739922",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41134739929",
+        "tests": [
+          "PR #372 门禁全绿（30 项：27 成功 + 3 跳过，头 be8abf9d；e2e-blockly mobile gate 重跑后转 success）",
+          "main 课程运行 #919 Success（17/17，分片 S1–S6 全绿）",
+          "main 台账运行 #910 Success"
+        ],
+        "reviewer": "duan 2026-10-30 全权授权下由 kid小宝自取编号 SYS-111；合并由 kid小宝按门禁全绿执行"
+      },
       "notes": "duan 2026-10-30 全权授权下由 kid小宝自取编号 SYS-111（合并前可改名）；依据第四阶段证据简报（test 2m05s、e2e-blockly 4m46s、curriculum-web 2m14-2m25s）；以 #266 合并后新 main 为基"
     }
   ]
