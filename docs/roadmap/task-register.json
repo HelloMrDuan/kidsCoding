@@ -3067,6 +3067,30 @@
         "reviewer": null
       },
       "notes": "测试时序竞态（非产品 bug）：submitOtp 等 mock 调用触发、不等 codeSent 重渲染结果，React 18 commit 滞后致找不到验证码；与 SYS-112 的 say-too-early 同类代理信号竞态；三度同签名复发 #376/#255/#431；该文件在 #255 未动、属共享测试结构问题；durable 加固另行立项，不阻塞 #255。"
+    },
+    {
+      "id": "SYS-115",
+      "title": "lesson-draft-persistence spec 补运行步骤：完成前先等运行成功（仅改测试）",
+      "priority": "P2",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "lesson-draft-persistence spec 补运行步骤（test-only）",
+      "acceptance": [
+        "spec 流程与产品 needsRun 门禁一致、产品行为不动、接线后 CI 跑绿为准"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "mainTaskCI": null,
+        "tests": [
+          "修复 PR 分支 fix/lesson-draft-persistence-run-step：spec 在刷新恢复后、完成前补运行步骤（点 run-code-button、等“运行成功”，照抄 lesson-recovery-ux502 范式），其余断言一字不动、产品代码零改动",
+          "本地 playwright --list 可加载解析（本机无 Chrome，不跑浏览器；该 spec 目前无 CI 接线，接线后 CI 跑绿为准）"
+        ],
+        "reviewer": null
+      },
+      "notes": "spec 流程 vs 产品 needsRun 门禁不匹配、确定性失败：完成前须先运行成功，否则 handleNext 直接 return、clearLessonDraft 到不了；产品门禁是有意教学流程，不修产品；接线另立 §7 任务 + PR，不捆进修复 PR。"
     }
   ]
 }

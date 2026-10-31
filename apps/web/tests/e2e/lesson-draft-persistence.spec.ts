@@ -49,6 +49,11 @@ test.describe('lesson draft persistence', () => {
       { type: 'move_right' },
     ])
 
+    // The product needsRun gate requires a successful run before the step
+    // can complete (same pattern as lesson-recovery-ux502).
+    await page.getByTestId('run-code-button').click()
+    await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 15_000 })
+
     // Completing the step clears the step-0 draft.
     await page.getByTestId('lesson-complete-step').click()
 
