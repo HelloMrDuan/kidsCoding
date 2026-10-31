@@ -62,7 +62,7 @@
         {
           "order": 5,
           "mode": "边界与修复",
-          "teacherPrompt": "故意测试一种错误情形：忘记引号产生NameError。",
+          "teacherPrompt": "故意测试一种错误情形：忘记引号：中文名字报 SyntaxError，英文名字报 NameError。",
           "learnerAction": "尝试重现错误，利用提示改正：检查字符串是否包在匹配的引号中。",
           "verification": "失败场景可解释，修正后重新满足：终端输出一行“你好，编程世界”。"
         }
@@ -71,7 +71,7 @@
         "success": "完成「运行第一行代码」：终端输出一行“你好，编程世界”。",
         "commonMistakes": [
           {
-            "symptom": "忘记引号产生NameError。",
+            "symptom": "忘记引号：中文名字报 SyntaxError，英文名字报 NameError。",
             "diagnosis": "观察输入输出的输入、触发与状态是否符合目标",
             "repair": "检查字符串是否包在匹配的引号中。"
           },
@@ -109,7 +109,7 @@
             "caseId": "P0-U1-L01-FAIL-01",
             "kind": "negative",
             "given": "新同学在控制台看到一片空白，要让电脑打招呼。",
-            "when": "忘记引号产生NameError。",
+            "when": "忘记引号：中文名字报 SyntaxError，英文名字报 NameError。",
             "then": "应识别问题并引导：检查字符串是否包在匹配的引号中。",
             "oracle": "manual_or_engine_specific",
             "status": "assessment_spec_not_executed"
@@ -129,7 +129,7 @@
           {
             "criterion": "调试能力",
             "weight": 20,
-            "evidence": "解释并修正：忘记引号产生NameError。"
+            "evidence": "解释并修正：忘记引号：中文名字报 SyntaxError，英文名字报 NameError。"
           },
           {
             "criterion": "原创表达",
