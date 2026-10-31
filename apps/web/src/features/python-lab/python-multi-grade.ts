@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'study_stats'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U1-L06': {
+    title: '第6课 · 个人学习统计器',
+    prompt: '单元作品：编写 study_stats(csv_text, fill_value, targets_json) 函数，把本单元 L01-L05 连起来。先用 csv.DictReader 读出学习记录表（表头 日期,科目,分钟），再按 L05 清洗缺失分钟（空值换成 fill_value，其他值去空格），无效分钟、空 CSV、空填充值都抛出 ValueError；再用 json.loads 解析目标 JSON 列表（每项含科目、目标，见 L03-L04），按目标顺序统计每个科目的实际分钟和目标；最后用 csv.DictWriter 写回清洗后的表格，再接 "---" 和统计行返回。统计行格式：每行“科目：实际/目标”，最后一行“总分钟：X；平均：Y”（平均保留 1 位小数）。数据全部是虚构示例。',
+    argLabels: ['学习记录 CSV 文本', '填充值', '目标 JSON 列表'],
+    startCode: 'import csv\nimport io\nimport json\n\ndef study_stats(csv_text, fill_value, targets_json):\n    # 读 CSV、清洗缺失、解析 JSON 目标、统计、写回表格加统计行\n    return "待完成"',
+    cases: [
+      { function: 'study_stats', args: ['日期,科目,分钟\n2026-10-01,数学,30\n2026-10-02,语文,\n2026-10-03,数学,20\n', '0', '[{"科目": "数学", "目标": 40}, {"科目": "语文", "目标": 30}]'], expected: '日期,科目,分钟\n2026-10-01,数学,30\n2026-10-02,语文,0\n2026-10-03,数学,20\n---\n数学：50/40\n语文：0/30\n总分钟：50；平均：16.7' },
+      { function: 'study_stats', args: ['日期,科目,分钟\n2026-10-01,数学,40\n2026-10-02,数学,20\n', '0', '[{"科目": "数学", "目标": 50}]'], expected: '日期,科目,分钟\n2026-10-01,数学,40\n2026-10-02,数学,20\n---\n数学：60/50\n总分钟：60；平均：30.0' },
+      { function: 'study_stats', args: ['日期,科目,分钟\n2026-10-01,数学,30\n', '0', '[{"科目": "数学", "目标": 40}, {"科目": "英语", "目标": 20}]'], expected: '日期,科目,分钟\n2026-10-01,数学,30\n---\n数学：30/40\n英语：0/20\n总分钟：30；平均：30.0' },
+      { function: 'study_stats', args: ['日期,科目,分钟\n2026-10-01,数学,abc\n', '0', '[{"科目": "数学", "目标": 40}]'], expected: 'ERROR:ValueError' },
+      { function: 'study_stats', args: ['日期,科目,分钟\n2026-10-01,数学,30\n', '0', '不是 JSON'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：先校验 fill 和表头；DictReader 读行，分钟空值换 fill、去空格后 int() 转换，失败 raise ValueError；json.loads 解析目标列表，不是列表或缺字段就 raise ValueError；按目标顺序统计实际分钟，缺席科目记 0；DictWriter 写回清洗表，lineterminator="\\n"，再接 "---" 和统计行。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
