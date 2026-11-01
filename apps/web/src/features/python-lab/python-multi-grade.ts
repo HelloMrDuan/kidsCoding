@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'parse_http'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,21 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U3-L01': {
+    title: '第1课 · 理解请求与响应',
+    prompt: '编写 parse_http(raw, query) 函数，解析一段 HTTP 响应文本（不做真实网络请求，只解析文本，避免联网风险）。响应结构是：第一行是状态行“HTTP/版本 状态码 状态文本”，接着是若干“名字: 值”响应头，空行后是正文。query 可以是“状态码”、“状态文本”、“正文”，也可以是一个响应头的名字（大小写不敏感）。返回对应的值：状态码返回数字文本，状态文本返回原文本，响应头返回去空格后的值，正文返回空行后的全部文本。raw 为空、第一行不是 HTTP 状态行、状态码不是数字、query 为空、要查的响应头不存在时都抛出 ValueError。数据全部是虚构示例，不含真实网址和密钥。',
+    argLabels: ['HTTP 响应文本', '要查询的项'],
+    startCode: 'def parse_http(raw, query):\n    # 先拆状态行，再拆响应头和正文，按 query 返回\n    return "待完成"',
+    cases: [
+      { function: 'parse_http', args: ['HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"天气": "晴"}', '状态码'], expected: '200' },
+      { function: 'parse_http', args: ['HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"天气": "晴"}', 'Content-Type'], expected: 'application/json' },
+      { function: 'parse_http', args: ['HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"天气": "晴"}', '正文'], expected: '{"天气": "晴"}' },
+      { function: 'parse_http', args: ['HTTP/1.1 404 Not Found\nContent-Type: text/plain\n\n找不到页面', '状态文本'], expected: 'Not Found' },
+      { function: 'parse_http', args: ['HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"天气": "晴"}', 'X-Missing'], expected: 'ERROR:ValueError' },
+      { function: 'parse_http', args: ['不是 HTTP', '状态码'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：query = query.strip()，为空先 raise ValueError；lines = raw.splitlines()，第一行 split(None, 2) 必须有 3 段且以 HTTP/ 开头、第二段是数字，否则 raise ValueError；响应头在空行前，每行按第一个冒号拆，名字小写比对；正文是空行后的行用换行拼接；状态码、状态文本、正文直接返回，响应头不存在就 raise ValueError。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
