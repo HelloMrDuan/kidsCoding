@@ -5,6 +5,7 @@ import { join, relative } from 'node:path'
 import assetLicenses from '@/content/curriculum/asset-licenses-v1.json'
 import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { g0u2EventLessons } from '@/content/curriculum/g0-u2-event-lessons'
+import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
 import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
@@ -54,7 +55,7 @@ export function readCurriculumSnapshot(): CurriculumSnapshot {
     publishedLessonIds: allIds.filter(id => getLessonMaturity(id)?.published),
     steps: [...Object.values(g0u1GridLessons), ...Object.values(g0u3LoopLessons)].flatMap(lesson => lesson.steps.map(step => ({
       lessonId: lesson.id, stepId: step.id, positiveExamples: step.solutions.length, negativeExamples: step.counterExamples.length,
-    }))).concat(Object.values(g0u2EventLessons).flatMap(lesson => lesson.steps.map(step => ({
+    }))).concat([...Object.values(g0u2EventLessons), ...Object.values(g0u3EventLessons)].flatMap(lesson => lesson.steps.map(step => ({
       lessonId: lesson.id, stepId: step.id, positiveExamples: step.solutions.length, negativeExamples: step.counterExamples.length,
     })))).concat(Object.values(g2ScratchLessons).flatMap(lesson => lesson.steps.map(step => ({
       lessonId: lesson.id, stepId: step.id, positiveExamples: step.solutions.length, negativeExamples: step.counterExamples.length,

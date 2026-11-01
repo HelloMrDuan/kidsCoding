@@ -2519,9 +2519,7 @@
       "engineVerified": false,
       "requiredEngineCapabilities": [
         "finite_repeat",
-        "movement",
-        "visual_effect",
-        "sound"
+        "sync_show"
       ],
       "prerequisiteLessonIds": [
         "G0-U3-L03"

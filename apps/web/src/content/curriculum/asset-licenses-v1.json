@@ -46,6 +46,7 @@
     { "path": "kc-scenes/meeting-stage.svg", "license": "original", "source": "本项目新绘 SVG，G0-U2-L06 森林见面会舞台背景（彩旗、聚光灯、圆形木舞台、观众树桩），与 event-stage.tsx 内联 MeetingStage 几何一致" },
     { "path": "kc-scenes/mushroom-path.svg", "license": "original", "source": "本项目新绘 SVG，G0-U3-L01 故事场景（小熊的蘑菇路牌，红蓝红蓝四个脚印），与 grid-stage.tsx 内联 MushroomPath 几何一致" },
     { "path": "kc-scenes/puddle-sign.svg", "license": "original", "source": "本项目新绘 SVG，G0-U3-L02 故事场景（小兔子的水坑路牌，两下跳跃越过两个水坑），与 grid-stage.tsx 内联 PuddleSign 几何一致" },
-    { "path": "kc-scenes/watering-plan.svg", "license": "original", "source": "本项目新绘 SVG，G0-U3-L03 故事场景（浇水机器人的巡回计划，四盆花各一份水），与 grid-stage.tsx 内联 WateringPlan 几何一致" }
+    { "path": "kc-scenes/watering-plan.svg", "license": "original", "source": "本项目新绘 SVG，G0-U3-L03 故事场景（浇水机器人的巡回计划，四盆花各一份水），与 grid-stage.tsx 内联 WateringPlan 几何一致" },
+    { "path": "kc-scenes/firefly-night.svg", "license": "original", "source": "本项目新绘 SVG，G0-U3-L04 故事场景（池塘边的萤火虫夜晚），与 event-stage.tsx 内联 FireflyNight 几何一致" }
   ]
 }

@@ -19,11 +19,12 @@ describe('engine capabilities (SYS-106)', () => {
     }
   })
 
-  it('G0-U3-L01..L03 needs are implemented: the SYS-107 repeat, grid footprints, hops and watering (Hark A)', () => {
+  it('G0-U3-L01..L04 needs are implemented: the SYS-107 repeat, grid footprints, hops, watering and the firefly show stage (Hark A)', () => {
     const l01 = lessons.find(l => l.id === 'G0-U3-L01')!
     expect(missingEngineCapabilities(l01.requiredEngineCapabilities)).toEqual([])
     expect(missingEngineCapabilities(lessons.find(l => l.id === 'G0-U3-L02')!.requiredEngineCapabilities)).toEqual([])
     expect(missingEngineCapabilities(lessons.find(l => l.id === 'G0-U3-L03')!.requiredEngineCapabilities)).toEqual([])
+    expect(missingEngineCapabilities(lessons.find(l => l.id === 'G0-U3-L04')!.requiredEngineCapabilities)).toEqual([])
     expect(blocklyEngineCapabilities.finite_repeat).toContain('program-tree.ts')
     expect(existsSync(path.resolve(__dirname, '../lessons/blockly/program-tree.ts'))).toBe(true)
   })

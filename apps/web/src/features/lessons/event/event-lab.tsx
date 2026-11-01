@@ -33,6 +33,9 @@ export const EVENT_MISTAKE_LABELS: Record<EventFailure, string> = {
   missing_effect: '少了一个动作',
   extra_effect: '多了不该有的动作',
   wrong_trigger: '点错角色也有反应',
+  empty_repeat: '重复里面是空的',
+  out_of_sync: '有角色没跟上节奏',
+  left_glowing: '表演完灯还亮着',
 }
 
 const actorName = (step: EventLessonStep, id?: EventActorId) => step.level.actors.find(a => a.id === id)?.name ?? ''
@@ -40,6 +43,10 @@ const actorName = (step: EventLessonStep, id?: EventActorId) => step.level.actor
 /** The scripts a step really runs: what the child built for each editable character, else its starter. */
 export function stepScripts(step: EventLessonStep, draft: Pick<EventDraft, 'programs'>): EventScripts {
   const scripts: EventScripts = {}
+  // G0-U3-L04: characters the child does not edit perform their fixed starter script.
+  for (const [id, blocks] of Object.entries(step.starter ?? {}) as Array<[EventActorId, EventBlock[]]>) {
+    if (!step.editable.includes(id) && blocks.length) scripts[id] = blocks
+  }
   for (const id of step.editable) {
     const blocks = draft.programs[step.id]?.[id] ?? step.starter?.[id]
     if (blocks?.length) scripts[id] = blocks
@@ -80,7 +87,7 @@ export function EventLab({ lesson }: { lesson: EventLesson }) {
   const passedHere = draft.passed.includes(step.id)
   const observedHere = !step.errorLab || !!draft.observed?.includes(step.id)
   const freeEffects = useMemo(() => (play.length ? runEventProgram(step.level, scripts, play).effects : []), [play, step.level, scripts])
-  const { visible, done } = useEventPlayback(check ? check.run.effects : null)
+  const { visible, done } = useEventPlayback(check ? check.run.effects : null, 520, step.level.parallel)
   const shownEffects = check ? visible : freeEffects
 
   useEffect(() => {
@@ -163,7 +170,8 @@ export function EventLab({ lesson }: { lesson: EventLesson }) {
     setCheck(null)
     setPlay([])
     setNotice(null)
-    setEditing(picked)
+    // A character pick also opens that character's script; a goal pick (G0-U3-L04) keeps the current one.
+    if (!step.creative!.goals) setEditing(picked as EventActorId)
     // A new pick means the old pass no longer proves this card.
     persist({ ...draft, creative: { ...(draft.creative ?? {}), [step.id]: { target: picked } }, passed: draft.passed.filter(id => id !== step.id) })
   }
@@ -349,13 +357,13 @@ function EventProjectCard({ lesson, draft }: { lesson: EventLesson; draft: Event
   const goal = useMemo(() => resolveEventGoal(step, target), [step, target])
   const verdict = useMemo(() => checkEventGoal(step.level, scripts, goal.expectations, goal.probes), [step.level, scripts, goal])
   const [effects, setEffects] = useState<ReturnType<typeof runEventProgram>['effects'] | null>(null)
-  const { visible, done } = useEventPlayback(effects)
+  const { visible, done } = useEventPlayback(effects, 520, step.level.parallel)
   return (
     <section className="kc-surface-3d mt-4 rounded-[18px] p-5" data-testid="grid-project-card">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-lg font-black">🌞 {project.title}</h3>
         <span className={`kc-chip ${verdict.passed ? 'kc-chip-success' : 'kc-chip-warning'}`} data-testid="grid-project-status">
-          {verdict.passed ? project.passedText.replace('{target}', actorName(step, target ?? step.creative?.choices[0])) : '这张卡还不符合目标，回去改一改'}
+          {verdict.passed ? project.passedText.replace('{target}', actorName(step, (target ?? step.creative?.choices[0]) as EventActorId)).replace('{label}', step.creative?.labels[Math.max(0, step.creative.choices.indexOf(target ?? ''))] ?? '') : '这张卡还不符合目标，回去改一改'}
         </span>
       </div>
       <ul className="mt-3 space-y-2" data-testid="grid-project-steps">

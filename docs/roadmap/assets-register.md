@@ -30,6 +30,7 @@
 | apps/web/public/kc-scenes/mushroom-path.svg | 小熊的蘑菇路牌（红蓝红蓝四个脚印），G0-U3-L01 故事场景 | 本项目新绘（Hark A，G0-U3-L01），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `MushroomPath` 与本文件几何一致 | original | 1731 |
 | apps/web/public/kc-scenes/puddle-sign.svg | 小兔子的水坑路牌（两下跳跃越过两个水坑），G0-U3-L02 故事场景 | 本项目新绘（Hark A，G0-U3-L02），与上述资产同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `PuddleSign` 与本文件几何一致 | original | 1031 |
 | apps/web/public/kc-scenes/watering-plan.svg | 浇水机器人的巡回计划（四盆花各一份水），G0-U3-L03 故事场景 | 本项目新绘（Hark A，G0-U3-L03），同一扁平柔和风格；课堂 `grid-stage.tsx` 的内联 `WateringPlan` 与本文件几何一致；浇水机器人角色为 `character-art.tsx` 新增 `Robot`（项目自绘） | original | 1226 |
+| apps/web/public/kc-scenes/firefly-night.svg | 池塘边的萤火虫夜晚（月亮、星星、芦苇），G0-U3-L04 故事场景 | 本项目新绘（Hark A，G0-U3-L04），同一扁平柔和风格；课堂 `event-stage.tsx` 的内联 `FireflyNight` 与本文件几何一致；萤火虫角色为 `event-stage.tsx` 内联 `FireflyArt`（项目自绘，亮时尾灯变黄并有光晕） | original | 947 |
 
 机器可读登记：上表 14 个文件同时登记在
 `apps/web/src/content/curriculum/asset-licenses-v1.json`（SYS-105 课程 schema

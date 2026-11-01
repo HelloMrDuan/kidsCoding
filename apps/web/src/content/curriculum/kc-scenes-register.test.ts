@@ -32,6 +32,7 @@ const ACCEPTANCE_SET = [
   'mushroom-path.svg', // G0-U3-L01 story scenery
   'puddle-sign.svg', // G0-U3-L02 story scenery
   'watering-plan.svg', // G0-U3-L03 story scenery
+  'firefly-night.svg', // G0-U3-L04 story scenery
 ]
 
 describe('kc-scenes asset register (UX-004)', () => {
