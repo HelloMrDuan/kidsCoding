@@ -6,7 +6,7 @@ test.describe('A1-U3 local-plane pilot (no sandbox: all outputs are synchronous)
     await expect(page.getByTestId('u3-local-lab')).toBeVisible()
     await expect(page.getByTestId('u3-lesson-title')).toContainText('A1-U3-L01')
     await expect(page.getByTestId('u3-gate-output')).toContainText('拒绝')
-    await expect(page.getByTestId('u3-gate-output')).toContainText('门禁①失败')
+    await expect(page.getByTestId('u3-gate-output')).toContainText('失败门：门禁①')
     await expect(page.getByTestId('u3-gate-output')).toContainText('不能通过')
   })
 
