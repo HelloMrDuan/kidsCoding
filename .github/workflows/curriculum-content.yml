@@ -71,6 +71,9 @@ on:
       - 'apps/web/src/app/learn/grid-lab/**'
       - 'apps/web/src/app/learn/catalog/**'
       - 'apps/web/src/app/learn/scratch-lab/**'
+      - 'apps/web/tests/e2e/classify-a0-u1.spec.ts'
+      - 'apps/web/src/app/learn/classify-lab/**'
+      - 'apps/web/src/features/classify/**'
       - 'apps/web/supabase/migrations/**'
       - 'apps/web/scripts/child-privacy-rls.sql'
       - 'apps/web/src/app/api/guest/**'
@@ -225,6 +228,25 @@ jobs:
         run: npx playwright install chrome --with-deps
       - name: Run first lesson with actual Pyodide Python in a sandboxed browser
         run: npx playwright test tests/e2e/python-lab.spec.ts tests/e2e/python-multi.spec.ts --project=desktop
+
+  a0-classify-browser-trial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A0-U1-L01 classify trial spec with real Chrome
+        run: npx playwright test tests/e2e/classify-a0-u1.spec.ts --project=desktop
 
   python-batch3:
     runs-on: ubuntu-latest
