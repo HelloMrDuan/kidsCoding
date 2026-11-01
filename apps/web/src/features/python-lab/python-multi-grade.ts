@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'safe_secret'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -112,6 +112,20 @@ export const pythonPracticeLessons = {
           }
     ],
     hint: '三步：strip() 去空格；验证空值、长度和换行制表符；用换行符拼成名片。',
+  },
+  'P3-U3-L04': {
+    title: '第4课 · 使用环境变量保管密钥',
+    prompt: '编写 safe_secret(env_json, key) 函数，模拟从环境变量里安全读取密钥（不做真实网络请求，不使用真实密钥，只处理给定的模拟环境变量文本）。env_json 是一个环境变量字典的 JSON 文本，例如 WEATHER_KEY 对应一段模拟密钥。key 去空格后为空、JSON 解析失败、顶层不是对象、找不到 key、值不是字符串或为空时都抛出 ValueError。找到密钥后绝不能原样返回：长度大于 4 时返回前 2 位加三个星号加后 2 位，长度小于等于 4 时只返回三个星号。学生代码里不许把密钥写死在代码里，只能从环境变量字典里读；数据全部是虚构示例，不含真实密钥和网址。',
+    argLabels: ['环境变量 JSON 文本', '密钥名'],
+    startCode: 'import json\n\ndef safe_secret(env_json, key):\n    # 先 json.loads 解析，再按 key 查找并脱敏返回\n    return "待完成"',
+    cases: [
+      { function: 'safe_secret', args: ['{"WEATHER_KEY": "abc12345"}', 'WEATHER_KEY'], expected: 'ab***45' },
+      { function: 'safe_secret', args: ['{"API_KEY": "1234"}', 'API_KEY'], expected: '***' },
+      { function: 'safe_secret', args: ['{"WEATHER_KEY": "abc12345"}', 'MISSING_KEY'], expected: 'ERROR:ValueError' },
+      { function: 'safe_secret', args: ['不是 JSON', 'WEATHER_KEY'], expected: 'ERROR:ValueError' },
+      { function: 'safe_secret', args: ['{"WEATHER_KEY": ""}', 'WEATHER_KEY'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：key = key.strip()，为空先 raise ValueError；data = json.loads(env_json)，失败或不是 dict 就 raise ValueError；key 不在 data 里就 raise ValueError；值不是 str 或为空就 raise ValueError；长度大于 4 返回 value[:2] + "***" + value[-2:]，否则返回 "***"。',
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
