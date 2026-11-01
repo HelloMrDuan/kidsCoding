@@ -35,7 +35,10 @@ export const maturityLevels = [
 export type MaturityLevel = (typeof maturityLevels)[number]['level']
 
 export type TrialIntegration = {
-  engine: 'blockly' | 'scratch-vm' | 'pyodide'
+  // 'classify' is the A0 classification-and-judgement engine, decided by the
+  // main account's general dispatch (2026-10-31): A0 trial entries use it,
+  // and no other track may reuse it without the same decision.
+  engine: 'blockly' | 'scratch-vm' | 'pyodide' | 'classify'
   /** Route a learner opens; must exist in app/ and be covered by the e2e spec below. */
   route: string
   e2eSpec: string
@@ -57,6 +60,11 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
   'P0-U1-L04': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L04', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
   'P0-U1-L05': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L05', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
   'P0-U1-L06': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L06', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
+  // A0-U1-L01 stage 2: the classify trial (React widget, reason presence only).
+  // The 'classify' engine type exists only because the main account decided it
+  // (2026-10-31 general dispatch); the widget judges reasons by presence only
+  // and never claims to grade reason quality.
+  'A0-U1-L01': { engine: 'classify', route: '/learn/classify-lab/A0-U1-L01', e2eSpec: 'tests/e2e/classify-a0-u1.spec.ts' },
   // EDU-104: G0-U1 rewritten lessons on the SYS-106 grid engine.
   ...Object.fromEntries(
     Object.keys(g0u1GridLessons).map((id) => [

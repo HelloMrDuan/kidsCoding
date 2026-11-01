@@ -1430,6 +1430,41 @@
         "status": "unchecked"
       }
     },
+    "A0-U1-L01": {
+      "contentReviewed": {
+        "status": "unchecked",
+        "note": "仅有实现者自查，无独立人工教研复核；3 项 implementer_example 工具待复核"
+      },
+      "engineProductionReady": {
+        "status": "unchecked",
+        "note": "classify widget 为浏览器 React 组件，未做目标浏览器与真实设备验收"
+      },
+      "assessmentE2EPassed": {
+        "status": "unchecked",
+        "evidence": [
+          {
+            "kind": "file",
+            "ref": "apps/web/tests/e2e/classify-a0-u1.spec.ts"
+          }
+        ],
+        "note": "classify-a0-u1.spec.ts（A0-U1-L01 用例）需在 PR 与 main CI 真 Chrome 通过后再登记"
+      },
+      "licensedAssetsReady": {
+        "status": "unchecked",
+        "note": "第 2 阶段未新增公开素材；原创情境卡等材料仍 materialsReady: false，正式素材清单未审"
+      },
+      "progressVerified": {
+        "status": "unchecked",
+        "note": "仅本机 localStorage 草稿保存与关闭重开恢复验证（E2E 覆盖），未验证正式登录与跨设备"
+      },
+      "minorPrivacyApproved": {
+        "status": "unchecked",
+        "note": "不收集个人信息（doesNotCollectPersonalData: true），但未成年人隐私审批未做"
+      },
+      "humanApproved": {
+        "status": "unchecked"
+      }
+    },
     "G2-U2-L06": {
       "contentReviewed": {
         "status": "unchecked",

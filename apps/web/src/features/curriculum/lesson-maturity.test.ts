@@ -42,7 +42,7 @@ describe('SYS-102 single L0–L5 maturity source', () => {
   it('L3 trial lessons point at a real route and an existing e2e spec, and are not published', () => {
     const trials = [...allCatalogIds, ...launchLessons.map((l) => l.id)].filter((id) => getLessonMaturity(id)!.trialAvailable)
     expect(trials.sort()).toEqual(Object.keys(trialIntegrations).sort())
-    expect(trials).toHaveLength(35 + g2LabLessons) // 7 lab pilots + 6 G0-U1 grid lessons + 6 G0-U2 event lessons + 4 G0-U3 loop lessons + 12 launch lessons, plus every G2 Scratch lab lesson
+    expect(trials).toHaveLength(36 + g2LabLessons) // 7 lab pilots + 6 G0-U1 grid lessons + 6 G0-U2 event lessons + 4 G0-U3 loop lessons + 12 launch lessons + 1 A0-U1-L01 classify trial, plus every G2 Scratch lab lesson
     for (const id of trials) {
       const m = getLessonMaturity(id)!
       expect(m.level).toBe(3)
@@ -51,6 +51,20 @@ describe('SYS-102 single L0–L5 maturity source', () => {
       const spec = trialIntegrations[id].e2eSpec
       if (!spec.includes('*')) expect(existsSync(path.join(webRoot, spec))).toBe(true)
     }
+  })
+
+  it('classify trial for A0-U1-L01 is registered with its route and spec', () => {
+    expect(trialIntegrations['A0-U1-L01']).toEqual({
+      engine: 'classify',
+      route: '/learn/classify-lab/A0-U1-L01',
+      e2eSpec: 'tests/e2e/classify-a0-u1.spec.ts',
+    })
+    const m = getLessonMaturity('A0-U1-L01')!
+    expect(m.level).toBe(3)
+    expect(m.engine).toBe('classify')
+    expect(m.trialAvailable).toBe(true)
+    expect(m.trialRoute).toBe('/learn/classify-lab/A0-U1-L01')
+    expect(m.published).toBe(false)
   })
 
   it('API reads the same source: unpublished lessons are never playable', async () => {
