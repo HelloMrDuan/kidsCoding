@@ -47,6 +47,9 @@ export type TrialIntegration = {
 /** Auditable engine evidence: only lessons with a real runner + routed trial + e2e spec. */
 export const trialIntegrations: Record<string, TrialIntegration> = {
   'G3-U1-L02': { engine: 'scratch-vm', route: '/learn/scratch-lab/G3-U1-L02', e2eSpec: 'tests/e2e/scratch-vm.spec.ts' },
+  // G3-U1-L01 pen trial (PR #260): runs the lesson's own star project in the
+  // real Scratch VM and draws the VM's pen output; run-only, no pen editing.
+  'G3-U1-L01': { engine: 'scratch-vm', route: '/learn/scratch-lab/G3-U1-L01', e2eSpec: 'tests/e2e/scratch-pen-u1-l01.spec.ts' },
   // G2 lessons (U1 + U2; one shared spec file) on the restricted G2 Scratch VM lab (scratch-g2-sandbox.html).
   ...Object.fromEntries(
     Object.keys(g2ScratchLessons).map((id) => [
