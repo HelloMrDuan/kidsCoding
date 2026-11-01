@@ -8,6 +8,16 @@ import {downloadPythonFile} from '@/features/progress/python-download'
 
 const PREFIX='kids-python-local-practice-v1:'
 type RunMsg={kind:'FRAME_READY'|'LOADED'|'RESULT';id?:number;error?:string|null;cases?:unknown;output?:string;custom?:unknown}
+// 自选参数上限表：缺省每项 40 字；表里列出的（课节，参数序号）用表内上限。
+// 新增课节需要放宽时只加表项，不加 lessonId 串条件。
+const CUSTOM_ARG_DEFAULT_MAX_LEN=40
+const CUSTOM_ARG_MAX_LEN: Partial<Record<MultiPythonLessonId, readonly number[]>> = {
+  'P3-U1-L03': [200],
+}
+// 自选参数多行输入表：表里列出的（课节，参数序号）渲染为 textarea，其余为 input。
+const CUSTOM_ARG_TEXTAREA: Partial<Record<MultiPythonLessonId, readonly number[]>> = {
+  'P3-U1-L03': [0],
+}
 
 export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   const lesson=pythonPracticeLessons[lessonId]
@@ -116,7 +126,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   function runCustom(){
     if(customBusy||!ready||!frame.current?.contentWindow)return
     if(source.length>5000){setCustomResult('代码超过5000字符，无法运行。');return}
-    if(customArgs.some((a,index)=>a.length>(lessonId==='P3-U1-L03'&&index===0?200:40))){setCustomResult('自选参数每项最多40字，通讯录 JSON 文本最多200字。');return}
+    if(customArgs.some((a,index)=>a.length>(CUSTOM_ARG_MAX_LEN[lessonId]?.[index]??CUSTOM_ARG_DEFAULT_MAX_LEN))){setCustomResult('自选参数每项最多40字，通讯录 JSON 文本最多200字。');return}
     customId.current+=1
     customActive.current=true
     customArgsRef.current=[...customArgs]
@@ -181,8 +191,13 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
         <div className="mt-4 flex flex-wrap gap-3">
           {lesson.argLabels.map((label,index)=>(
             <label key={index} className="text-sm font-bold text-slate-700">{label}
-              <input data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
-                className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal" />
+              {CUSTOM_ARG_TEXTAREA[lessonId]?.includes(index)?(
+                <textarea data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
+                  rows={4} className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal" />
+              ):(
+                <input data-testid={`python-custom-arg-${index}`} value={customArgs[index]??''} disabled={customBusy} onChange={event=>{const next=[...customArgs];next[index]=event.target.value;setCustomArgs(next)}}
+                  className="ml-2 rounded-xl border border-slate-200 px-3 py-2 font-normal" />
+              )}
             </label>
           ))}
           <button data-testid="python-custom-run" disabled={!ready||customBusy||busy} type="button" onClick={runCustom} className="rounded-full bg-sky-700 px-6 py-2 font-bold text-white disabled:opacity-50">
