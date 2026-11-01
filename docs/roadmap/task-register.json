@@ -2554,7 +2554,7 @@
       "title": "天机 Cloudflare 主监控平台冷却处理与自动恢复验证",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-009"
       ],
@@ -2566,10 +2566,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/130",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "6c863e3246ba03576d5211b1aace5a1ba93a672c",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41242649304",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41242649272",
         "tests": [
-          "新增真实时间线模拟、错误边界负例、平台 API 错误合同测试；PR CI 待核验"
+          "新增真实时间线模拟、错误边界负例、平台 API 错误合同测试；PR CI 待核验",
+          "生产证据：2026-10-30 20:16:04 CST CF 主监控独立恢复（tj-core-01 自然暂停后），lastResumeAt 推进，备用层该 episode 尝试 0/2 未接管"
         ],
         "reviewer": null
       },
