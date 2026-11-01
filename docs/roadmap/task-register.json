@@ -3180,7 +3180,7 @@
       "title": "A1 U3 本地层试点（L01→L06 本地判定纵线）",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "A1 U3 本地层试点：六节纯本地引擎（L01 门禁五步、L02 摘要三步法与三项对照、L03 水果记录 JSON 校验、L04 本地语料库检索与可信度四问、L05 逐字引用核对、L06 问答分类与拒答计数）、试玩路由 ai-python-lab-u3、E2E a1-u3-local-trial；生成式环节不在本任务（等批），不动网关代码、不接供应商、不调外部模型。",
       "acceptance": [
@@ -3192,6 +3192,9 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/455",
+      "mergeCommit": "1ca97ada6d2b63a1f616817b5d221e48710cb3f0",
+      "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41304103839",
+      "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41304103841",
         "tests": [
           "本地 Vitest 新 18 项 + U1 水果分类回归 11 项，29/29 全绿",
           "E2E a1-u3-local-trial 在试点 PR 上跑绿（新头 CI 终局为准）"
