@@ -3151,7 +3151,7 @@
       "title": "A1 ai-python 引擎与 U1 本地平面试点（L01→L05 水果分类器纵线）",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "A1 ai-python 引擎注册（lesson-maturity 登记体系外另行注册，与 pyodide 共存，P0/P1/P2 登记与路由未动）与 U1 本地平面试点：试玩路由 A1-U1-L01～L05、30 条合成数据集静态下发、规则 v1/v2、混淆矩阵程序输出、E2E ai-python-browser-trial；L06 第二批不在本任务。",
       "acceptance": [
@@ -3163,6 +3163,9 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/453",
+        "mergeCommit": "3bb49e67a66375f6cf60098f4da038aaa3b239af",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41296248802",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41296248844",
         "tests": [
           "本地 Vitest fruit-classifier 11 项 + lesson-maturity 回归 7 项，18/18 全绿",
           "矩阵程序输出：v1 训练 24/24、测试 5/6（矩阵 [1,1,0]/[0,2,0]/[0,0,2]，唯一错误 T2）；v2 训练 24/24、测试 6/6（练习记录，已污染）",
