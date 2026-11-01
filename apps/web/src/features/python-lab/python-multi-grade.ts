@@ -1,4 +1,4 @@
-export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'ledger_row'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
+export type PythonCase = { function: 'introduce' | 'weather_line' | 'number_or_text' | 'greet_name' | 'make_profile' | 'ledger_row' | 'contact_card'; args: readonly [string, string] | readonly [string, string, string]; expected: string }
 
 export const pythonPracticeLessons = {
   'P0-U1-L02': {
@@ -125,6 +125,20 @@ export const pythonPracticeLessons = {
       { function: 'ledger_row', args: ['午餐', 'abc', '饮食'], expected: 'ERROR:ValueError' },
     ],
     hint: '提示：item = item.strip()，category = category.strip()；空值或 float(amount) 失败就 raise ValueError；用 csv.writer 写 [item, f"{float(amount):.2f}", category]，含逗号的项目会自动加引号。',
+  },
+  'P3-U1-L03': {
+    title: '第3课 · JSON通讯录',
+    prompt: '编写 contact_card(json_text, name) 函数。用 json.loads 解析通讯录 JSON 文本（联系人列表，每项含姓名、电话），找到姓名相同的一项，返回“姓名：…；电话：…”。姓名去空格后为空、JSON 解析失败、通讯录不是列表、找不到姓名时都抛出 ValueError。请只用虚构联系人和分机号，不填真实姓名、电话或住址。',
+    argLabels: ['通讯录 JSON 文本', '姓名'],
+    startCode: 'import json\n\ndef contact_card(json_text, name):\n    # 先 strip 姓名、json.loads 解析，再按姓名查找\n    return "待完成"',
+    cases: [
+      { function: 'contact_card', args: ['[{"姓名": "小雨", "电话": "分机101"}, {"姓名": "乐乐", "电话": "分机102"}]', '小雨'], expected: '姓名：小雨；电话：分机101' },
+      { function: 'contact_card', args: ['[{"姓名": "小雨", "电话": "分机101"}, {"姓名": "乐乐", "电话": "分机102"}]', '乐乐'], expected: '姓名：乐乐；电话：分机102' },
+      { function: 'contact_card', args: ['[{"姓名": "小雨", "电话": "分机101"}]', '阿星'], expected: 'ERROR:ValueError' },
+      { function: 'contact_card', args: ['不是 JSON', '小雨'], expected: 'ERROR:ValueError' },
+    ],
+    hint: '提示：name = name.strip()，空值先 raise ValueError；try 用 json.loads 解析，失败转 ValueError；列表里按 person.get("姓名") == name 查找，找到就返回 f"姓名：{name}；电话：{person.get(\"电话\", \"\")}"，找不到 raise ValueError。',
+
   },
 } as const satisfies Record<string, {title:string; prompt:string; argLabels: readonly string[]; startCode:string; cases: readonly PythonCase[]; hint:string}>
 
