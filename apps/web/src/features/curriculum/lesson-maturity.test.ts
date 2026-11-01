@@ -42,7 +42,7 @@ describe('SYS-102 single L0–L5 maturity source', () => {
   it('L3 trial lessons point at a real route and an existing e2e spec, and are not published', () => {
     const trials = [...allCatalogIds, ...launchLessons.map((l) => l.id)].filter((id) => getLessonMaturity(id)!.trialAvailable)
     expect(trials.sort()).toEqual(Object.keys(trialIntegrations).sort())
-    expect(trials).toHaveLength(36 + g2LabLessons) // 7 lab pilots + 6 G0-U1 grid lessons + 6 G0-U2 event lessons + 4 G0-U3 loop lessons + 12 launch lessons + 1 A0-U1-L01 classify trial, plus every G2 Scratch lab lesson
+    expect(trials).toHaveLength(37 + g2LabLessons) // 7 lab pilots + 6 G0-U1 grid lessons + 6 G0-U2 event lessons + 4 G0-U3 loop lessons + 12 launch lessons + G3-U1-L01 pen trial + 1 A0-U1-L01 classify trial, plus every G2 Scratch lab lesson
     for (const id of trials) {
       const m = getLessonMaturity(id)!
       expect(m.level).toBe(3)
@@ -68,7 +68,7 @@ describe('SYS-102 single L0–L5 maturity source', () => {
   })
 
   it('API reads the same source: unpublished lessons are never playable', async () => {
-    for (const id of ['P0-U1-L02', 'G3-U1-L02', 'G0-U1-L01']) {
+    for (const id of ['P0-U1-L02', 'G3-U1-L02', 'G3-U1-L01', 'G0-U1-L01']) {
       const body = await (await GET(new Request(`http://x/api/curriculum/catalog?lessonId=${id}`))).json()
       const m = getLessonMaturity(id)!
       expect(body.maturity.level).toBe(m.level)

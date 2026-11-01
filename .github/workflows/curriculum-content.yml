@@ -410,8 +410,8 @@ jobs:
         run: |
           command -v google-chrome
           google-chrome --version
-      - name: Run Scratch/Blockly desktop shard S4 (scratch-vm + unit-project + workbench + regression)
-        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts --project=desktop --workers=2
+      - name: Run Scratch/Blockly desktop shard S4 (scratch-vm + pen-u1-l01 + unit-project + workbench + regression)
+        run: npx playwright test tests/e2e/scratch-vm.spec.ts tests/e2e/scratch-pen-u1-l01.spec.ts tests/e2e/unit-project.spec.ts tests/e2e/scratch-workbench-ux401.spec.ts tests/e2e/scratch-vm-regression-ux403.spec.ts --project=desktop --workers=2
       - uses: actions/upload-artifact@v4
         if: always()
         with:

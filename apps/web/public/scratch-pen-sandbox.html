@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Scratch VM 画笔实验沙箱</title>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/scratch-vm@5.0.300/dist/web/scratch-vm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/scratch-storage@4.0.0/dist/web/scratch-storage.min.js"></script>
+<script>
+(() => {
+  // G3-U1-L01 pen trial sandbox (PR #260 web-classroom access).
+  // This sandbox runs ONLY the lesson's own star-drawing project shape and
+  // is fail-closed: a project that is not structurally this lesson is
+  // rejected and the last working project is never replaced. It never runs
+  // an arbitrary Scratch project and it never claims a grade.
+  // The parent draws the stage itself from the VM's own penLine output, so
+  // the stars on screen are the VM's pen data, not a screenshot.
+  let vm = null;
+  let timer = null;
+  let currentId = null;
+  let ready = false;
+  let running = false;
+  let loading = false;
+  let segments = [];
+  const MAX_SPRITES = 2;
+  const MAX_ZIP_ENTRIES = 50;
+  const MAX_UNCOMPRESSED_BYTES = 20_000_000;
+  // Exact opcode set of the shipped G3-U1-L01 main project
+  // (examples/scratch/g3/g3-u1-l01-star-flags.sb3, verified by Node VM run).
+  const EXPECTED_OPCODES = new Set([
+    'argument_reporter_string_number', 'control_repeat', 'data_changevariableby',
+    'data_setvariableto', 'data_variable', 'event_whenflagclicked', 'math_number',
+    'motion_changexby', 'motion_gotoxy', 'motion_movesteps', 'motion_turnright',
+    'pen_clear', 'pen_penDown', 'pen_penUp', 'procedures_call',
+    'procedures_definition', 'procedures_prototype',
+  ]);
+  function send(kind, info = {}) {
+    window.parent.postMessage({kind, id: currentId, ...info}, '*');
+  }
+  function reset() {
+    if (timer) clearInterval(timer);
+    timer = null;
+    running = false;
+    if (vm) {
+      try { vm.stopAll(); } catch (_error) {}
+      try { vm.quit(); } catch (_error) {}
+    }
+    vm = null;
+  }
+
+  // Minimal ZIP central-directory scan: bounds entry count, total
+  // uncompressed size and entry names before the VM ever parses the file.
+  // No decompression happens here; the VM still does the real parsing.
+  function validateZipArchive(buffer) {
+    const bytes = new Uint8Array(buffer);
+    const view = new DataView(buffer);
+    const tailStart = Math.max(0, bytes.length - 65557);
+    let eocd = -1;
+    for (let i = bytes.length - 22; i >= tailStart; i--) {
+      if (view.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) throw new Error('ZIP 结构非法');
+    const totalEntries = view.getUint16(eocd + 10, true);
+    const cdSize = view.getUint32(eocd + 12, true);
+    const cdOffset = view.getUint32(eocd + 16, true);
+    if (totalEntries === 0xffff || cdOffset === 0xffffffff) throw new Error('不支持 ZIP64 工程');
+    if (totalEntries < 1 || totalEntries > MAX_ZIP_ENTRIES) throw new Error('ZIP 条目数量不符合要求');
+    if (cdOffset + cdSize > bytes.length) throw new Error('ZIP 目录越界');
+    const namePattern = /^(project\.json|[0-9a-f]{32}\.(svg|png|jpg|jpeg|wav|mp3))$/;
+    let offset = cdOffset;
+    let totalUncompressed = 0;
+    let sawProject = false;
+    for (let n = 0; n < totalEntries; n++) {
+      if (view.getUint32(offset, true) !== 0x02014b50) throw new Error('ZIP 目录损坏');
+      const uncompressed = view.getUint32(offset + 24, true);
+      const nameLen = view.getUint16(offset + 28, true);
+      const extraLen = view.getUint16(offset + 30, true);
+      const commentLen = view.getUint16(offset + 32, true);
+      const name = new TextDecoder().decode(bytes.subarray(offset + 46, offset + 46 + nameLen));
+      if (!namePattern.test(name)) throw new Error('ZIP 条目路径非法：' + name.slice(0, 80));
+      if (name === 'project.json') sawProject = true;
+      totalUncompressed += uncompressed;
+      if (totalUncompressed > MAX_UNCOMPRESSED_BYTES) throw new Error('ZIP 解包后体积超限');
+      offset += 46 + nameLen + extraLen + commentLen;
+    }
+    if (!sawProject) throw new Error('ZIP 缺少 project.json');
+  }
+
+  // Recording renderer stub (same shape as the Node diagnostic harness that
+  // verified this lesson): the VM's pen extension draws through the
+  // renderer, so penLine calls are the drawing itself. Skin/drawable calls
+  // return fixed stub values because this sandbox draws no WebGL stage.
+  function makeRenderer(recorded) {
+    let drawableCounter = 0;
+    return new Proxy({}, {
+      get(target, prop) {
+        if (prop === 'canvas') return null;
+        if (prop === Symbol.toPrimitive) return undefined;
+        return (...args) => {
+          if (prop === 'penLine') {
+            const attrs = args[1];
+            recorded.push({
+              x0: args[2], y0: args[3], x1: args[4], y1: args[5],
+              color: Array.isArray(attrs?.color4f) ? attrs.color4f.slice() : [0, 0, 1, 1],
+              diameter: typeof attrs?.diameter === 'number' ? attrs.diameter : 1,
+            });
+            return undefined;
+          }
+          if (prop === 'penClear') { recorded.length = 0; return undefined; }
+          if (prop === 'createDrawable') return ++drawableCounter;
+          if (prop === 'createPenSkin') return 1;
+          if (prop === 'createBitmapSkin') return 2;
+          if (prop === 'createSVGSkin') return 3;
+          if (prop === 'getSkinSize') return [80, 80];
+          if (prop === 'getCurrentSkinSize') return [80, 80];
+          if (prop === 'getSkinRotationCenter') return [40, 40];
+          if (prop === 'getNativeSize') return [480, 360];
+          if (prop === 'getBounds') return {left: -240, right: 240, top: 180, bottom: -180};
+          if (prop === 'getFencedPositionOfDrawable') return [Math.max(-240, Math.min(240, args[1][0])), Math.max(-180, Math.min(180, args[1][1]))];
+          return undefined;
+        };
+      }
+    });
+  }
+
+  function spriteState(machine) {
+    if (!machine) return null;
+    const sprite = machine.runtime.targets.find(t => !t.isStage);
+    if (!sprite) return null;
+    let sizeVar = null;
+    try {
+      for (const v of Object.values(sprite.variables || {})) {
+        if (v && v.name === 'size') sizeVar = v.value;
+      }
+    } catch (_error) {}
+    return {name: typeof sprite.getName === 'function' ? sprite.getName() : '画笔', x: sprite.x, y: sprite.y, direction: sprite.direction, sizeVar};
+  }
+
+  function snapshotPayload() {
+    const sprite = spriteState(vm);
+    return {targets: sprite ? [sprite] : [], segments: segments.slice()};
+  }
+
+  function validateLessonShape(machine) {
+    const targets = machine.runtime.targets || [];
+    if (targets.length !== MAX_SPRITES) throw new Error('精灵数量不是本课的 1 个角色加舞台');
+    const sprite = targets.find(t => !t.isStage);
+    if (!sprite) throw new Error('找不到本课角色');
+    const blocks = sprite.blocks?._blocks || {};
+    const opcodes = new Set();
+    let definitions = 0;
+    for (const block of Object.values(blocks)) {
+      if (!block || !block.opcode) continue;
+      opcodes.add(block.opcode);
+      if (block.opcode === 'procedures_definition') definitions += 1;
+    }
+    if (opcodes.size !== EXPECTED_OPCODES.size) throw new Error('积木种类与本课主项目不一致');
+    for (const opcode of opcodes) {
+      if (!EXPECTED_OPCODES.has(opcode)) throw new Error('含本课主项目之外的积木：' + opcode);
+    }
+    if (definitions !== 1) throw new Error('自制积木定义不是恰好 1 个');
+  }
+
+  function stopPolling() {
+    if (timer) clearInterval(timer);
+    timer = null;
+    running = false;
+  }
+
+  function finishRun(timedOut) {
+    stopPolling();
+    try { vm?.stopAll(); } catch (_error) {}
+    const payload = snapshotPayload();
+    send('STOPPED', {...payload, final: payload.targets[0] ? {x: payload.targets[0].x, y: payload.targets[0].y, direction: payload.targets[0].direction, sizeVar: payload.targets[0].sizeVar} : null, timedOut: !!timedOut});
+  }
+
+  window.addEventListener('message', async (event) => {
+    if (event.source !== window.parent || !event.data) return;
+    const data = event.data;
+    if (data.kind === 'PING') {
+      send('FRAME_READY', {available: typeof window.VirtualMachine === 'function' && !!window.ScratchStorage});
+      return;
+    }
+    if (data.kind === 'LOAD' && !loading) {
+      loading = true;
+      currentId = data.id;
+      try {
+        if (!(data.archive instanceof ArrayBuffer)) throw new Error('项目数据不是 ArrayBuffer');
+        validateZipArchive(data.archive);
+        const Storage = typeof window.ScratchStorage === 'function' ? window.ScratchStorage : window.ScratchStorage.ScratchStorage;
+        const recorded = [];
+        const candidate = new window.VirtualMachine();
+        candidate.attachStorage(new Storage());
+        candidate.attachRenderer(makeRenderer(recorded));
+        await candidate.loadProject(data.archive);
+        validateLessonShape(candidate);
+        reset();
+        vm = candidate;
+        segments = recorded;
+        ready = true;
+        send('PROJECT_LOADED', snapshotPayload());
+      } catch (error) {
+        send('ERROR', {error: '项目加载失败：' + String(error).slice(0, 400)});
+      } finally {
+        loading = false;
+      }
+      return;
+    }
+    if (data.kind === 'START' && data.id === currentId && vm && ready && !running) {
+      running = true;
+      try {
+        vm.greenFlag();
+        vm.start();
+      } catch (error) {
+        stopPolling();
+        send('ERROR', {error: '绿旗运行失败：' + String(error).slice(0, 400)});
+        return;
+      }
+      const startedAt = Date.now();
+      timer = setInterval(() => {
+        if (!vm) { stopPolling(); return; }
+        send('SNAPSHOT', snapshotPayload());
+        const threads = vm.runtime.threads?.length ?? 0;
+        if (threads === 0) finishRun(false);
+        else if (Date.now() - startedAt > 30_000) finishRun(true);
+      }, 100);
+      return;
+    }
+    if (data.kind === 'STOP' && data.id === currentId && vm) {
+      finishRun(false);
+      return;
+    }
+  });
+})();
+</script>
+</body>
+</html>
