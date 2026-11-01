@@ -3145,6 +3145,32 @@
         "reviewer": null
       },
       "notes": "SYS-115 的接线任务（§7 独立任务 + 独立 PR）：spec 本身不动、产品代码不动；接线后 CI 跑绿是 SYS-115 关账的验收依据；若 CI 跑 spec 失败（如 mobile 端原有直接点击问题），另立 spec 任务，不捆进本 PR。"
+    },
+    {
+      "id": "SYS-118",
+      "title": "A1 ai-python 引擎与 U1 本地平面试点（L01→L05 水果分类器纵线）",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "A1 ai-python 引擎注册（lesson-maturity 登记体系外另行注册，与 pyodide 共存，P0/P1/P2 登记与路由未动）与 U1 本地平面试点：试玩路由 A1-U1-L01～L05、30 条合成数据集静态下发、规则 v1/v2、混淆矩阵程序输出、E2E ai-python-browser-trial；L06 第二批不在本任务。",
+      "acceptance": [
+        "ai-python 引擎注册与 pyodide 共存，P0/P1/P2 登记与路由未动",
+        "U1 L01→L05 试玩在 Pyodide 沙箱模式下跑通，矩阵由程序逐条判定统计输出",
+        "矩阵数字与 U1 详案一致（v1 训练 24/24、测试 5/6；v2 训练 24/24、测试 6/6，标注练习记录、已污染）",
+        "E2E ai-python-browser-trial 跑绿",
+        "PR CI 全绿后合并"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/453",
+        "tests": [
+          "本地 Vitest fruit-classifier 11 项 + lesson-maturity 回归 7 项，18/18 全绿",
+          "矩阵程序输出：v1 训练 24/24、测试 5/6（矩阵 [1,1,0]/[0,2,0]/[0,0,2]，唯一错误 T2）；v2 训练 24/24、测试 6/6（练习记录，已污染）",
+          "E2E ai-python-browser-trial 在试点 PR 上跑绿（新头 CI 重跑为准）"
+        ],
+        "reviewer": null
+      },
+      "notes": "A1 第二阶段 U1 试点实现：数据集 30 条随课节静态下发，学生规则代码传输余量 4077 字（课节静态 923 字进传输校验，协议层彻底分离列为后续改进项，不阻塞试点）；v2 原测试集 6/6 页面标注练习记录、已污染，最终复验须第二批新测试样本；L06 第二批不在本任务；关账待本 PR 合并 + 主线两工作流全绿后另立关账 PR。"
     }
   ]
 }

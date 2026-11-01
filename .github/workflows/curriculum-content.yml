@@ -74,6 +74,9 @@ on:
       - 'apps/web/tests/e2e/classify-a0-u1.spec.ts'
       - 'apps/web/src/app/learn/classify-lab/**'
       - 'apps/web/src/features/classify/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u1.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab/**'
+      - 'apps/web/src/features/ai-python/**'
       - 'apps/web/supabase/migrations/**'
       - 'apps/web/scripts/child-privacy-rls.sql'
       - 'apps/web/src/app/api/guest/**'
@@ -128,7 +131,7 @@ jobs:
       - name: ESLint
         run: npm run lint
       - name: Curriculum contract tests
-        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts src/features/progress/cloud-python-drafts.test.ts src/app/api/practice/drafts/route.test.ts src/features/scratch-vm/scratch-local-draft.test.ts src/features/scratch-vm/scratch-cloud-draft.test.ts src/app/api/practice/scratch/route.test.ts src/features/lessons/playable-stage/use-block-executor.test.ts src/features/lessons/playable-stage/duo-executor.test.ts src/features/lessons/playable-stage/duo-dialogue-executor.test.ts src/features/lessons/playable-stage/duo-graduation-executor.test.ts src/features/lessons/complete-launch-lesson.test.ts src/features/progress/local-progress-storage.test.ts src/features/projects/build-project-completion-copy.test.ts src/features/projects/project-complete-card.test.tsx src/content/curriculum/foundation-units.test.ts src/features/curriculum/teaching-review.test.ts src/content/curriculum/duo-lesson-hints.test.ts src/features/lessons/grid/grid-engine.test.ts src/features/lessons/grid/grid-stage.test.tsx src/features/curriculum/engine-capabilities.test.ts src/content/curriculum/g0-u1-grid-lessons.test.ts src/features/lessons/grid/grid-draft.test.ts src/features/lessons/grid/grid-lab-pointer.test.ts src/features/lessons/voice/read-aloud.test.tsx src/features/curriculum/lesson-maturity.test.ts src/features/curriculum/lesson-schema.test.ts src/features/curriculum/child-trial.test.ts src/features/lessons/build-hint-state.test.ts src/features/lessons/remedial-routing.test.ts src/features/lessons/blockly/run-feedback.test.ts src/features/lessons/blockly/tq008-lesson-judging.test.ts src/features/lessons/blockly/observable-run.test.ts src/features/lessons/playable-stage/playable-stage-feedback.test.tsx src/content/curriculum/tq009-copy-alignment.test.ts src/content/curriculum/tq010-mistake-steps.test.ts src/features/lessons/playable-stage/playable-stage-mistake.test.tsx src/content/curriculum/tq011-practice-steps.test.ts src/features/lessons/playable-stage/playable-stage-practice.test.tsx src/content/curriculum/tq012-unit-projects.test.ts src/features/lessons/playable-stage/unit-project.test.tsx src/features/progress/project-snapshot.test.ts src/features/lessons/playable-stage/stage-walk.test.ts src/features/lessons/use-back-scroll-restore.test.ts src/app/api/guest/route.test.ts src/features/progress/guest-snapshot-payload.test.ts src/features/privacy/child-privacy-migration.test.ts src/features/progress/sync-guest-snapshot.test.ts src/features/lessons/guided-lesson-shell.test.tsx src/features/scratch-g2/scratch-g2-program.test.ts src/features/scratch-g2/scratch-g2-draft.test.ts src/content/curriculum/g2-u1-scratch-lessons.test.ts src/app/api/guardian-consent/route.test.ts src/features/privacy/guardian-consent-migration.test.ts src/features/parent/guardian-consent-button.test.tsx src/features/parent/lesson-knowledge.test.ts src/features/parent/build-parent-growth-report.test.ts src/features/parent/growth-knowledge-section.test.tsx src/app/parent/overview/page.test.tsx src/app/admin/catalog/page.test.tsx src/app/learn/catalog/status-sync-sys104.test.tsx
+        run: npx vitest run src/content/curriculum/full-catalog-v1.test.ts src/features/curriculum/full-catalog-access.test.ts src/app/api/curriculum/catalog/route.test.ts src/features/python-lab/python-lab-grade.test.ts src/features/python-lab/python-multi-grade.test.ts src/features/curriculum/release-readiness.test.ts src/features/progress/local-practice.test.ts src/features/progress/cloud-python-drafts.test.ts src/app/api/practice/drafts/route.test.ts src/features/scratch-vm/scratch-local-draft.test.ts src/features/scratch-vm/scratch-cloud-draft.test.ts src/app/api/practice/scratch/route.test.ts src/features/lessons/playable-stage/use-block-executor.test.ts src/features/lessons/playable-stage/duo-executor.test.ts src/features/lessons/playable-stage/duo-dialogue-executor.test.ts src/features/lessons/playable-stage/duo-graduation-executor.test.ts src/features/lessons/complete-launch-lesson.test.ts src/features/progress/local-progress-storage.test.ts src/features/projects/build-project-completion-copy.test.ts src/features/projects/project-complete-card.test.tsx src/content/curriculum/foundation-units.test.ts src/features/curriculum/teaching-review.test.ts src/content/curriculum/duo-lesson-hints.test.ts src/features/lessons/grid/grid-engine.test.ts src/features/lessons/grid/grid-stage.test.tsx src/features/curriculum/engine-capabilities.test.ts src/content/curriculum/g0-u1-grid-lessons.test.ts src/features/lessons/grid/grid-draft.test.ts src/features/lessons/grid/grid-lab-pointer.test.ts src/features/lessons/voice/read-aloud.test.tsx src/features/curriculum/lesson-maturity.test.ts src/features/curriculum/lesson-schema.test.ts src/features/curriculum/child-trial.test.ts src/features/lessons/build-hint-state.test.ts src/features/lessons/remedial-routing.test.ts src/features/lessons/blockly/run-feedback.test.ts src/features/lessons/blockly/tq008-lesson-judging.test.ts src/features/lessons/blockly/observable-run.test.ts src/features/lessons/playable-stage/playable-stage-feedback.test.tsx src/content/curriculum/tq009-copy-alignment.test.ts src/content/curriculum/tq010-mistake-steps.test.ts src/features/lessons/playable-stage/playable-stage-mistake.test.tsx src/content/curriculum/tq011-practice-steps.test.ts src/features/lessons/playable-stage/playable-stage-practice.test.tsx src/content/curriculum/tq012-unit-projects.test.ts src/features/lessons/playable-stage/unit-project.test.tsx src/features/progress/project-snapshot.test.ts src/features/lessons/playable-stage/stage-walk.test.ts src/features/lessons/use-back-scroll-restore.test.ts src/app/api/guest/route.test.ts src/features/progress/guest-snapshot-payload.test.ts src/features/privacy/child-privacy-migration.test.ts src/features/progress/sync-guest-snapshot.test.ts src/features/lessons/guided-lesson-shell.test.tsx src/features/scratch-g2/scratch-g2-program.test.ts src/features/scratch-g2/scratch-g2-draft.test.ts src/content/curriculum/g2-u1-scratch-lessons.test.ts src/app/api/guardian-consent/route.test.ts src/features/privacy/guardian-consent-migration.test.ts src/features/parent/guardian-consent-button.test.tsx src/features/parent/lesson-knowledge.test.ts src/features/parent/build-parent-growth-report.test.ts src/features/parent/growth-knowledge-section.test.tsx src/app/parent/overview/page.test.tsx src/app/admin/catalog/page.test.tsx src/app/learn/catalog/status-sync-sys104.test.tsx src/features/ai-python/fruit-classifier.test.ts
       - name: Production build
         run: npm run build
       - name: Frozen V2 tokens and recorded contrast limitations
@@ -247,6 +250,25 @@ jobs:
         run: npx playwright install chrome --with-deps
       - name: Run A0-U1-L01 classify trial spec with real Chrome
         run: npx playwright test tests/e2e/classify-a0-u1.spec.ts --project=desktop
+
+  ai-python-browser-trial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U1 ai-python pilot trial spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u1.spec.ts --project=desktop
 
   python-batch3:
     runs-on: ubuntu-latest
