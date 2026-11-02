@@ -21,6 +21,53 @@ test.describe('A1-U3-L02 lesson page', () => {
     await expect(checks).toContainText('漏要点：通过')
     await expect(checks).toContainText('添内容：通过')
     await expect(checks).toContainText('改原意：通过')
+    await expect(checks).toContainText('抽取规范：通过')
+    await expect(checks).toContainText('来源核验：通过')
+  })
+
+  test('reverse: selecting all sentences fails extractive rules', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    for (const id of ['P1-1', 'P1-2', 'P2-1', 'P2-2', 'P3-1', 'P3-2', 'P4-1', 'P4-2', 'P5-1', 'P5-2']) {
+      await page.getByTestId(`ai-u3-l02-pick-${id}`).check()
+    }
+    await page.getByTestId('ai-u3-l02-check-summary').click()
+    const checks = page.getByTestId('ai-u3-l02-summary-checks')
+    await expect(checks).toContainText('漏要点：通过')
+    await expect(checks).toContainText('抽取规范：失败')
+  })
+
+  test('reverse: repeating one point fails extractive rules', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    for (const id of ['P1-1', 'P2-1', 'P3-1', 'P4-1']) {
+      await page.getByTestId(`ai-u3-l02-pick-${id}`).check()
+    }
+    await page.getByTestId('ai-u3-l02-check-summary').click()
+    await expect(page.getByTestId('ai-u3-l02-summary-checks')).toContainText('抽取规范：失败')
+  })
+
+  test('reverse: a custom sentence fails added-content and source checks; removal clears it', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await page.getByTestId('ai-u3-l02-custom-input').fill('黄苹果最甜。')
+    await page.getByTestId('ai-u3-l02-add-custom').click()
+    await expect(page.getByTestId('ai-u3-l02-entries')).toContainText('自加：黄苹果最甜。')
+    await page.getByTestId('ai-u3-l02-check-summary').click()
+    const checks = page.getByTestId('ai-u3-l02-summary-checks')
+    await expect(checks).toContainText('添内容：失败')
+    await expect(checks).toContainText('来源核验：失败')
+    await page.getByTestId('ai-u3-l02-remove-custom-0').click()
+    await expect(page.getByTestId('ai-u3-l02-entries')).toHaveCount(0)
+  })
+
+  test('reverse: a custom sentence with an invented digit fails meaning', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await page.getByTestId('ai-u3-l02-custom-input').fill('训练集共 30 条。')
+    await page.getByTestId('ai-u3-l02-add-custom').click()
+    await page.getByTestId('ai-u3-l02-check-summary').click()
+    await expect(page.getByTestId('ai-u3-l02-summary-checks')).toContainText('改原意：失败')
   })
 
   test('bad summary fails the missing-point check', async ({ page }) => {
@@ -58,16 +105,19 @@ test.describe('A1-U3-L02 lesson page', () => {
     await expect(page.getByTestId('ai-u3-l02-hint-text')).toContainText('先读每段第一句')
     await expect(page.getByTestId('ai-u3-l02-hint-text')).not.toContainText('逐句回原文查三项')
     await page.getByTestId('ai-u3-l02-hint-3').click()
-    await expect(page.getByTestId('ai-u3-l02-hint-text')).toContainText('逐句回原文查三项')
+    await expect(page.getByTestId('ai-u3-l02-hint-text')).toContainText('有来源吗？')
   })
 
   test('draft saves and restores across reload; restore-default clears', async ({ page }) => {
     test.setTimeout(150_000)
     await page.goto(ROUTE)
     await page.getByTestId('ai-u3-l02-pick-P1-1').check()
+    await page.getByTestId('ai-u3-l02-custom-input').fill('黄苹果最甜。')
+    await page.getByTestId('ai-u3-l02-add-custom').click()
     await page.getByTestId('ai-u3-l02-fact-F1').selectOption('原文事实')
     await page.reload()
     await expect(page.getByTestId('ai-u3-l02-pick-P1-1')).toBeChecked()
+    await expect(page.getByTestId('ai-u3-l02-entries')).toContainText('自加：黄苹果最甜。')
     await expect(page.getByTestId('ai-u3-l02-fact-F1')).toHaveValue('原文事实')
     await page.getByTestId('ai-u3-l02-reset').click()
     await expect(page.getByTestId('ai-u3-l02-pick-P1-1')).not.toBeChecked()
