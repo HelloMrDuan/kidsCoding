@@ -3233,7 +3233,7 @@
       "title": "C-01 M0-U1-L05 错误预言机独立修正任务登记",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [],
       "scope": "C-01 独立修正任务：修正 examples/blockly/m0/fractal_executor.py 的判定输入与校验逻辑（声明输入 → 真实分支构造输入）：层级父子完整、总数由构造数出再与 2^d−1 对照、对称镜像对、长度 ×0.7（1 位小数）与角度 ±30° 链（以实测 build_tree 为准：左 −30°、右 +30°）；不改其他五课执行器、不改台账课程条目、不接线；修正验收通过后按差分方案重建语料、零分歧后重新纳入差分一致性要求。准备材料（独立工作区，已实测）：差分语料 20 例、Python 参考实现与测试、TS 对照样例。",
       "acceptance": [
@@ -3243,7 +3243,7 @@
         "PR 合并后主线 CI 通过"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/463",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
