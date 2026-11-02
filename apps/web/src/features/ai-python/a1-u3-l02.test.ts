@@ -5,7 +5,9 @@ import {
   GOOD_SUMMARY,
   HINTS,
   SUMMARY_METHOD_STEPS,
+  buildDraftSummary,
   buildStudentSummary,
+  checkDraftSummary,
   judgeFact,
 } from './a1-u3-l02'
 import {
@@ -29,22 +31,67 @@ describe('A1-U3-L02 lesson content (reuses the U3 pilot engine)', () => {
       '划分方法定死为分层固定划分：按水果分层，每类前 8 条进训练集、后 2 条进测试集，共 24 条训练、6 条测试。',
     )
     expect(result.sentences[2]).toBe('测试集是没有见过的考题，定规则时不许看测试集。')
+    expect(GOOD_SUMMARY.result.sentences).toEqual(result.sentences)
   })
 
-  it('the good summary passes all three checks', () => {
+  it('the good summary passes all five checks', () => {
+    expect(GOOD_SUMMARY.checks).toHaveLength(5)
     expect(GOOD_SUMMARY.checks.every((c) => c.passed)).toBe(true)
     expect(checkSummary(GOOD_SUMMARY.result).map((c) => c.name)).toEqual(['漏要点', '添内容', '改原意'])
   })
 
-  it('each bad example fails its headline check', () => {
+  it('each bad example fails its headline checks', () => {
     const byId = new Map(BAD_SUMMARIES.map((e) => [e.id, e]))
     const missing = byId.get('missing')!
     expect(missing.checks.find((c) => c.name === '漏要点')?.passed).toBe(false)
-    expect(missing.checks.find((c) => c.name === '添内容')?.passed).toBe(true)
+    expect(missing.checks.find((c) => c.name === '抽取规范')?.passed).toBe(false)
     const added = byId.get('added')!
     expect(added.checks.find((c) => c.name === '添内容')?.passed).toBe(false)
+    expect(added.checks.find((c) => c.name === '来源核验')?.passed).toBe(false)
     const digit = byId.get('digit')!
     expect(digit.checks.find((c) => c.name === '改原意')?.passed).toBe(false)
+    expect(digit.checks.find((c) => c.name === '来源核验')?.passed).toBe(false)
+  })
+
+  it('reverse: selecting all 10 sentences passes the old three checks but fails extractive rules', () => {
+    const all = buildDraftSummary(
+      ['P1-1', 'P1-2', 'P2-1', 'P2-2', 'P3-1', 'P3-2', 'P4-1', 'P4-2', 'P5-1', 'P5-2'],
+      [],
+    )
+    const checks = checkDraftSummary(all)
+    expect(checks.find((c) => c.name === '漏要点')?.passed).toBe(true)
+    expect(checks.find((c) => c.name === '添内容')?.passed).toBe(true)
+    expect(checks.find((c) => c.name === '改原意')?.passed).toBe(true)
+    expect(checks.find((c) => c.name === '抽取规范')?.passed).toBe(false)
+  })
+
+  it('reverse: repeating one point fails extractive rules even when all points are covered', () => {
+    const dup = buildDraftSummary(['P1-1', 'P2-1', 'P3-1', 'P4-1'], [])
+    const checks = checkDraftSummary(dup)
+    expect(checks.find((c) => c.name === '漏要点')?.passed).toBe(true)
+    const extract = checks.find((c) => c.name === '抽取规范')
+    expect(extract?.passed).toBe(false)
+    expect(extract?.detail).toContain('要点 A 重复')
+  })
+
+  it('reverse: an unsourced custom sentence cannot claim point coverage', () => {
+    const custom = buildDraftSummary(['P1-1', 'P3-1'], ['测试集是裁判。'])
+    const checks = checkDraftSummary(custom)
+    expect(checks.find((c) => c.name === '漏要点')?.passed).toBe(false)
+    expect(checks.find((c) => c.name === '添内容')?.passed).toBe(false)
+    expect(checks.find((c) => c.name === '来源核验')?.passed).toBe(false)
+  })
+
+  it('reverse: a custom sentence with an invented digit fails meaning', () => {
+    const custom = buildDraftSummary(['P1-1', 'P3-1', 'P4-1'], ['训练集共 30 条。'])
+    const checks = checkDraftSummary(custom)
+    expect(checks.find((c) => c.name === '改原意')?.passed).toBe(false)
+    expect(checks.find((c) => c.name === '来源核验')?.passed).toBe(false)
+  })
+
+  it('extractive length band: 2 fails, 3 passes', () => {
+    expect(checkDraftSummary(buildDraftSummary(['P1-1', 'P3-1'], [])).find((c) => c.name === '抽取规范')?.passed).toBe(false)
+    expect(checkDraftSummary(buildDraftSummary(['P1-1', 'P3-1', 'P4-1'], [])).find((c) => c.name === '抽取规范')?.passed).toBe(true)
   })
 
   it('the student builder maps selections to sentences and points in passage order', () => {
