@@ -211,7 +211,7 @@ export function AiPythonU1L06Lab() {
     if (!result) return null
     if (!result.ok) {
       return (
-        <p data-testid="ai-u1-l06-error" className="mt-3 rounded-xl bg-[#fdecec] p-4 text-sm leading-7 text-[#d64c4c]">
+        <p data-testid="ai-u1-l06-error" className="mt-3 break-words rounded-xl bg-[#fdecec] p-4 text-sm leading-7 text-[#d64c4c]">
           未生成矩阵：{result.error}
         </p>
       )
@@ -490,7 +490,7 @@ export function AiPythonU1L06Lab() {
         </p>
       </section>
 
-      <p data-testid="ai-u1-l06-status" role="status" aria-live="polite" className="mt-6 rounded-xl bg-[#eef4ff] p-4 text-sm leading-7 text-[#18243a]">
+      <p data-testid="ai-u1-l06-status" role="status" aria-live="polite" className="mt-6 break-words rounded-xl bg-[#eef4ff] p-4 text-sm leading-7 text-[#18243a]">
         {status}
       </p>
       <p className="mt-4 text-xs leading-6 text-[#6f7d92]">
