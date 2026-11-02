@@ -1491,6 +1491,33 @@
       "humanApproved": {
         "status": "unchecked"
       }
+    },
+    "G2-U3-L01": {
+      "contentReviewed": {
+        "status": "unchecked",
+        "note": "暂无独立人工教研复核"
+      },
+      "engineProductionReady": {
+        "status": "unchecked",
+        "note": "G2 受限 Scratch VM 实验：未接 WebGL 渲染器、无云端保存、scratch-vm 走 jsDelivr CDN"
+      },
+      "assessmentE2EPassed": {
+        "status": "unchecked",
+        "note": "scratch-g2-u3.spec.ts（G2-U3-L01 用例）需在 PR 与 main CI 真 Chrome 通过后再登记"
+      },
+      "licensedAssetsReady": {
+        "status": "unchecked",
+        "note": "本课海洋/巡逻小船 SVG 为本项目原创，已登记于 asset-licenses-v1.json；scratch-vm 运行库 AGPL/第三方许可审查待完成"
+      },
+      "progressVerified": {
+        "status": "unchecked"
+      },
+      "minorPrivacyApproved": {
+        "status": "unchecked"
+      },
+      "humanApproved": {
+        "status": "unchecked"
+      }
     }
   }
 }
