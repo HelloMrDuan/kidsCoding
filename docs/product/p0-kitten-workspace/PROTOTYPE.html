@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kitten 式工作台原型 v2（P0 第二阶段重做草案）</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #eef2f7; color: #18243a; }
+  .page { padding: 16px; }
+  .note { max-width: 1440px; margin: 0 auto 12px; background: #fff8e1; border: 1px solid #f0d98c; border-radius: 10px; padding: 10px 14px; font-size: 14px; line-height: 1.7; }
+  .switcher { max-width: 1440px; margin: 0 auto 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .switcher button { border: 1px solid #c7d2e0; background: #fff; border-radius: 999px; padding: 8px 16px; font-size: 15px; cursor: pointer; }
+  .switcher button.on { background: #2f6df6; color: #fff; border-color: #2f6df6; }
+  .frame { position: relative; margin: 0 auto; background: #f3f6fb; border: 2px solid #18243a; border-radius: 14px; overflow: hidden; }
+  .frame.vp-desktop { width: 1440px; }
+  .frame.vp-tablet { width: 768px; }
+  .frame.vp-mobile { width: 375px; }
+  .topbar { background: #1e2a5a; color: #fff; padding: 12px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .topbar h1 { font-size: 18px; margin: 0; }
+  .topbar .meta { font-size: 14px; opacity: .9; }
+  .topbar button { margin-left: auto; border: 0; border-radius: 10px; padding: 9px 14px; font-size: 15px; cursor: pointer; background: #fff; color: #18243a; }
+  .topbar button + button { margin-left: 0; }
+  .menu-pop { display: none; position: absolute; right: 16px; top: 58px; z-index: 30; background: #fff; border: 1px solid #c7d2e0; border-radius: 10px; padding: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.15); }
+  .menu-pop.show { display: block; }
+  .menu-pop button { display: block; width: 100%; text-align: left; margin: 4px 0; padding: 10px 14px; border: 1px solid #e7edf5; background: #fff; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  .body { display: grid; }
+  .vp-desktop .body { grid-template-columns: 340px 120px 230px 1fr; }
+  .vp-desktop .body.stage-small { grid-template-columns: 260px 120px 230px 1fr; }
+  .vp-tablet .body { grid-template-columns: 200px 1fr; grid-template-rows: auto 1fr; }
+  .vp-tablet .stage-col { grid-column: 1 / -1; }
+  .vp-tablet .body.hide-stage .stage-col { display: none; }
+  .vp-tablet .roles-col { grid-column: 1 / -1; }
+  .vp-mobile .body { grid-template-columns: 1fr; }
+  .panel { padding: 12px; background: #fff; border-right: 1px solid #e7edf5; min-height: 480px; }
+  .panel:last-child { border-right: 0; }
+  .panel h2 { font-size: 16px; margin: 0 0 8px; }
+  .panel p, .panel li { font-size: 14px; line-height: 1.8; }
+  .stage-head { display: flex; gap: 8px; align-items: center; }
+  .stage-head button { border: 0; border-radius: 10px; padding: 10px 16px; font-size: 16px; cursor: pointer; }
+  .btn-run { background: #22a06b; color: #fff; font-weight: 700; }
+  .btn-stop { background: #fff; border: 1px solid #c7d2e0 !important; }
+  .stage { position: relative; background: #bfe6ff; border-radius: 12px; height: 260px; margin-top: 10px; overflow: hidden; }
+  .basket { position: absolute; bottom: 16px; font-size: 44px; transition: left .3s; }
+  .fruit { position: absolute; font-size: 32px; transition: top .9s linear; }
+  .roles { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .role { border: 2px solid #c7d2e0; border-radius: 10px; padding: 8px 12px; cursor: pointer; font-size: 14px; background: #fff; }
+  .role.sel { border-color: #2f6df6; background: #eaf3ff; }
+  .cat-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .cat-tabs button { border: 1px solid #c7d2e0; background: #fff; border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 14px; }
+  .cat-tabs button.on { background: #2f6df6; color: #fff; }
+  .pblock { border-radius: 8px; padding: 10px 12px; margin: 6px 0; font-size: 15px; cursor: grab; user-select: none; touch-action: none; color: #fff; }
+  .pblock.evt { background: #ff9f1c; }
+  .pblock.mot { background: #5aa9ff; }
+  .pblock.ctl { background: #ff8c42; }
+  .pblock.det { background: #2ec4b6; }
+  .wblock { border-radius: 8px; padding: 10px 12px; margin: 6px 0; font-size: 15px; cursor: grab; user-select: none; touch-action: none; color: #fff; display: flex; gap: 8px; align-items: center; }
+  .wblock input { width: 64px; font-size: 15px; padding: 4px; border: 0; border-radius: 6px; }
+  .workspace { min-height: 300px; border: 2px dashed #c7d2e0; border-radius: 12px; padding: 8px; }
+  .workspace.over { border-color: #2f6df6; background: #eaf3ff; }
+  .trash { margin-top: 10px; border: 1px dashed #d77; border-radius: 10px; padding: 14px; text-align: center; color: #b3261e; font-size: 14px; }
+  .trash.over { background: #fdecea; }
+  .feedback { border-radius: 10px; padding: 10px; background: #f3f6fb; font-size: 14px; line-height: 1.8; min-height: 110px; white-space: pre-wrap; }
+  .feedback .ok { color: #1a7a4c; font-weight: 700; }
+  .feedback .bad { color: #b3261e; font-weight: 700; }
+  .drawer { display: none; position: absolute; right: 0; top: 58px; bottom: 0; width: 340px; z-index: 20; background: #fff; border-left: 2px solid #18243a; padding: 14px; overflow-y: auto; box-shadow: -6px 0 20px rgba(0,0,0,.15); }
+  .drawer.show { display: block; }
+  .drawer h2 { font-size: 16px; }
+  .drawer p, .drawer li { font-size: 14px; line-height: 1.8; }
+  .hint button { display: block; width: 100%; text-align: left; margin: 6px 0; padding: 10px; border-radius: 10px; border: 1px solid #c7d2e0; background: #fff; cursor: pointer; font-size: 14px; }
+  .hint p { display: none; background: #fff8e1; border-radius: 8px; padding: 8px; }
+  .hint p.show { display: block; }
+  .mobile-tabs { display: none; gap: 8px; padding: 10px 12px; background: #fff; border-bottom: 1px solid #e7edf5; }
+  .mobile-tabs button { flex: 1; padding: 10px 4px; border-radius: 10px; border: 1px solid #c7d2e0; background: #fff; font-size: 15px; cursor: pointer; }
+  .mobile-tabs button.on { background: #2f6df6; color: #fff; }
+  .vp-mobile .mobile-tabs { display: flex; }
+  .vp-mobile .panel { display: none; min-height: 420px; border-right: 0; }
+  .vp-mobile .panel.show { display: block; }
+  .vp-mobile .drawer { width: 320px; }
+  .wblock .act { margin-left: auto; display: flex; gap: 4px; }
+  .wblock .act button { border: 0; border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 14px; background: rgba(0,0,0,.25); color: #fff; }
+  .block-drawer { display: none; border: 1px solid #c7d2e0; border-radius: 10px; padding: 8px; margin-top: 8px; background: #f3f6fb; }
+  .block-drawer.show { display: block; }
+  .block-drawer .pblock { cursor: pointer; }
+  .ghost { position: fixed; z-index: 100; pointer-events: none; opacity: .85; transform: translate(-50%, -50%); }
+  .sent { border: 1px solid #c7d2e0; border-radius: 10px; padding: 10px; margin: 6px 0; cursor: pointer; font-size: 14px; line-height: 1.7; background: #fff; }
+  .sent.sel { border-color: #2f6df6; background: #eaf3ff; }
+  .draft-note { font-size: 13px; color: #6f7d92; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="note">Kitten 式工作台原型 v2（P0 第二阶段重做草案，已按 duan 裁定修复三处缺陷）：左舞台 + 角色列、中积木分类、右脚本工作区；运行/停止为舞台下方居中单按钮切换，任务与提示收进抽屉。手机端不用跨标签拖放：脚本区内有素材抽屉，点积木插入，↑ ↓ 排序，✕ 删除，脚本区内可直接运行，不用切回舞台标签。判定分三层，缺一不可混为一谈：舞台碰撞（篮子与水果坐标差）、任务完成（篮子真实移动并接住）、知识证据（本节知识点循环是否真实移动了篮子）；水果 x=200、阈值 80，只有绿旗的脚本接不住。两课内容由页面内的 Lesson Content Contract 对象驱动渲染，G2 与 A1 的草稿分键保存、互不污染；示意数值不是正式教学参数，正式参数与新知识点分步表以三号方案裁定为准；角色增删与造型编辑接真实 VM 时落地。</div>
+
+  <div class="switcher">
+    <span>视口（真实宽度）：</span>
+    <button data-vp="vp-desktop" class="on">桌面 1440</button>
+    <button data-vp="vp-tablet">平板 768</button>
+    <button data-vp="vp-mobile">手机 375</button>
+    <button id="stageToggle">舞台：放大 / 缩小</button>
+    <button id="stageRowToggle">平板：舞台行 显示 / 隐藏</button>
+    <label style="font-size:14px"><input type="checkbox" id="failSave"> 模拟保存失败</label>
+  </div>
+
+  <div class="frame vp-desktop" id="frame">
+    <div class="topbar">
+      <h1 id="lessonTitle">接住掉落水果</h1>
+      <span class="meta" id="levelMeta">关卡 1 / 3 · 步骤 1 / 3 · 未完成</span>
+      <button id="taskBtn">任务抽屉</button>
+      <button id="menuBtn">文件 ▾</button>
+      <button id="modeBtn">切换 A1 摘要版式</button>
+    </div>
+    <div class="menu-pop" id="menuPop">
+      <button id="saveBtn">保存作品</button>
+      <button id="exportBtn">导出作品（示意）</button>
+      <button id="resetBtn">恢复初始</button>
+    </div>
+
+    <div class="mobile-tabs">
+      <button data-tab="stage" class="on">舞台</button>
+      <button data-tab="palette">积木</button>
+      <button data-tab="workspace">脚本</button>
+      <button data-tab="feedback">任务</button>
+    </div>
+
+    <div class="body" id="body">
+      <section class="panel stage-col show" data-panel="stage">
+        <div class="stage-head">
+          <button class="btn-run" id="runBtn">▶ 运行作品</button>
+          <span style="font-size:14px" id="runState">未运行</span>
+        </div>
+        <div class="stage" id="stage">
+          <div class="fruit" id="fruit" style="left:60%;top:8px">🍎</div>
+          <div class="basket" id="basket" style="left:10%">🧺</div>
+        </div>
+        <p style="font-size:14px">水果 x：<b id="fruitX">200</b> · 篮子 x：<b id="basketX">0</b> · 分数：<b id="score">0</b> · 当前角色：<b id="curRole">篮子</b></p>
+      </section>
+
+      <section class="panel roles-col show" data-panel="stage">
+        <h2>角色管理</h2>
+        <div class="roles">
+          <div class="role sel" data-role="篮子">🧺 篮子（玩家）</div>
+          <div class="role" data-role="苹果">🍎 苹果（掉落物）</div>
+        </div>
+        <p class="draft-note">角色列在舞台与积木分类之间（与 Kitten 参考一致）；增删与造型编辑接真实 VM 时落地。</p>
+      </section>
+
+      <section class="panel show" data-panel="palette">
+        <div id="blocksPalette">
+          <h2>积木分类</h2>
+          <div class="cat-tabs">
+            <button data-cat="all" class="on">全部</button>
+            <button data-cat="evt">事件</button>
+            <button data-cat="mot">运动</button>
+            <button data-cat="ctl">控制</button>
+          </div>
+          <div class="pblock evt" data-kind="hat" data-cat="evt">当绿旗被点击</div>
+          <div class="pblock mot" data-kind="left" data-cat="mot">向左移 <span class="pn">30</span> 步</div>
+          <div class="pblock mot" data-kind="right" data-cat="mot">向右移 <span class="pn">30</span> 步</div>
+          <div class="pblock ctl" data-kind="repeat" data-cat="ctl">重复 <span class="pn">2</span> 次（重复下一块）</div>
+          <p class="draft-note">拖动积木到右侧脚本区；重复块重复其下一块，不是整段脚本。</p>
+        </div>
+        <div id="passagePanel" style="display:none">
+          <h2>课文（合成数据，三段）</h2>
+          <div class="sent" data-point="A">A · 小明每天坚持跑步，身体越来越好。</div>
+          <div class="sent" data-point="B">B · 他还坚持早睡，早上精神饱满。</div>
+          <div class="sent" data-point="A2">A · 他每天都跑步，越跑越快。</div>
+          <div class="sent" data-point="C">C · 老师夸他有毅力，同学向他学习。</div>
+          <div class="sent" data-point="X">X · 隔壁小区的猫今天晒太阳。</div>
+          <p class="draft-note">点句子选入摘要；同一要点只留一句，离题句不能入选。</p>
+        </div>
+      </section>
+
+      <section class="panel show" data-panel="workspace">
+        <div id="blocksWorkspace">
+          <h2>脚本工作区（拖放、改参、重排、拖到垃圾桶删除）</h2>
+          <button id="drawerBtn" style="border:1px solid #c7d2e0;background:#fff;border-radius:10px;padding:9px 14px;font-size:15px;cursor:pointer">＋ 添加积木（手机端不用跨标签拖放）</button>
+          <button id="runBtn2" class="btn-run" style="border:0;border-radius:10px;padding:9px 14px;font-size:15px;cursor:pointer">▶ 运行作品</button>
+          <div class="block-drawer" id="blockDrawer">
+            <div class="pblock evt" data-kind="hat">当绿旗被点击</div>
+            <div class="pblock mot" data-kind="left">向左移 30 步</div>
+            <div class="pblock mot" data-kind="right">向右移 30 步</div>
+            <div class="pblock ctl" data-kind="repeat">重复 2 次（重复下一块）</div>
+            <p class="draft-note">点积木直接插到脚本末尾；脚本内用 ↑ ↓ 排序、✕ 删除，改参直接改数字。素材抽屉与脚本在同一工作区，不用跨标签拖放。</p>
+          </div>
+          <div class="workspace" id="workspace"></div>
+          <div class="trash" id="trash">🗑 拖到这里删除积木</div>
+          <p class="draft-note">脚本状态：<span id="draftState">未保存</span>。切换工作区、折叠抽屉、缩放舞台都不会清空脚本。</p>
+        </div>
+        <div id="summaryWorkspace" style="display:none">
+          <h2>摘要编辑（与积木版共用顶栏、抽屉、保存与反馈系统）</h2>
+          <button id="checkBtn2" style="border:0;border-radius:10px;padding:9px 14px;font-size:15px;cursor:pointer;background:#22a06b;color:#fff;font-weight:700">✓ 检查摘要</button>
+          <div id="selList" style="font-size:14px;line-height:1.8;border:1px dashed #c7d2e0;border-radius:10px;padding:8px;min-height:80px">已选：无（点左侧课文选句）</div>
+          <p class="draft-note">右侧是摘要编辑、事实核对与结果预览，不强行塞进积木布局。</p>
+        </div>
+        <h2 style="margin-top:14px">反馈区</h2>
+        <div class="feedback" id="feedback">还没运行。搭好脚本点「运行作品」，这里显示真实执行步骤与判定。</div>
+      </section>
+
+      <section class="panel show" data-panel="feedback">
+        <h2>任务简报（抽屉里有完整版）</h2>
+        <div id="briefBody"></div>
+      </section>
+    </div>
+
+    <aside class="drawer" id="drawer">
+      <h2>课程目标栏（简洁版，不占主工作区）</h2>
+      <div id="drawerBody"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+// Lesson Content Contract（原型内演示用：页面内容全部由此对象渲染，不靠硬编码切换标题；
+// 正式工程中该对象由仓库课程数据与内容契约文件提供，外壳只渲染不编造课程内容）
+var LESSONS = {
+  g2: {
+    id: 'G2-U3-L02', title: '接住掉落水果', fruitX: 200, threshold: 80,
+    goal5: ['今天学什么：循环（重复）与侦测（接住判定）。', '要解决什么问题：让篮子接住落下的水果。', '学完能做什么：用循环移动篮子，接住不同位置的水果。', '和上节课的联系：上节键盘控制小船（方向键改坐标），本节改用脚本控制移动。', '当前要完成哪一步：步骤 1 — 搭脚本并运行一次。'],
+    brief: '目标：让篮子接住落下的水果。先预测，再搭脚本，再换条件试一次。',
+    step: '搭脚本并运行一次',
+    hints: ['先看水果在哪个 x，再想篮子要往哪边走。', '篮子移动用运动积木；走多次用重复块重复下一块。', '例如：先右移一个大步，再用重复块走两小步 —— 具体数字自己算：水果在 200，篮子要走到 120 以上。']
+  },
+  a1: {
+    id: 'A1-U3-L02', title: '实现文本摘要',
+    goal5: ['今天学什么：忠实摘要（只写原文有的要点，不添不改）。', '要解决什么问题：从短文里挑出 3 句要点，写出忠实摘要。', '学完能做什么：判断一句摘要是否忠实（要点齐全、无重复、无离题）。', '和上节课的联系：前置 A1-U3-L01《建立安全的模型调用》尚未建成（生成式等批），本课用本地规则抽取，不调用外部模型。', '当前要完成哪一步：步骤 1 — 读课文，选出要点句并核对。'],
+    brief: '目标：从短文里挑出要点，写出忠实摘要。先读，再选，再核对。',
+    step: '读课文，选出要点句并核对',
+    hints: ['先读每段第一句，找要点。', '同一要点只留第一次出现的那句。', '对照清单：三项要点齐全、无重复、无离题。']
+  }
+};
+var DRAFT_KEYS = { g2: 'kitten-ws-g2', a1: 'kitten-ws-a1' };
+var state = { script: [{ kind: 'hat' }], x: 0, score: 0, fruitX: 200, saved: false, done: false, mode: 'blocks', sel: [], running: false, lesson: 'g2' };
+var runTimer = null;
+function curLesson() { return LESSONS[state.lesson]; }
+function saveDraft() {
+  try {
+    if (state.lesson === 'g2') localStorage.setItem(DRAFT_KEYS.g2, JSON.stringify({ script: state.script }));
+    else localStorage.setItem(DRAFT_KEYS.a1, JSON.stringify({ sel: state.sel }));
+    state.saved = true;
+  } catch (e) {}
+}
+function loadDraft() {
+  try {
+    var raw = localStorage.getItem(DRAFT_KEYS[state.lesson]);
+    if (raw) {
+      var d = JSON.parse(raw);
+      if (state.lesson === 'g2' && Array.isArray(d.script)) state.script = d.script;
+      if (state.lesson === 'a1' && Array.isArray(d.sel)) state.sel = d.sel;
+    } else if (state.lesson === 'g2') {
+      var old = localStorage.getItem('kitten-ws-v2');
+      if (old) { var o = JSON.parse(old); if (o && Array.isArray(o.script)) state.script = o.script; }
+    }
+  } catch (e) {}
+  state.saved = false;
+}
+loadDraft();
+var frame = document.getElementById('frame');
+var body = document.getElementById('body');
+var ws = document.getElementById('workspace');
+function label(b) {
+  if (b.kind === 'hat') return '当绿旗被点击';
+  if (b.kind === 'left') return '向左移';
+  if (b.kind === 'right') return '向右移';
+  if (b.kind === 'repeat') return '重复';
+  return b.kind;
+}
+function cls(b) {
+  return b.kind === 'hat' ? 'evt' : (b.kind === 'repeat' ? 'ctl' : 'mot');
+}
+function renderScript() {
+  ws.innerHTML = '';
+  if (!state.script.length) { ws.innerHTML = '<p style="font-size:14px;color:#6f7d92">把左侧积木拖到这里。</p>'; }
+  state.script.forEach(function (b, i) {
+    var d = document.createElement('div');
+    d.className = 'wblock ' + cls(b);
+    d.dataset.index = i;
+    d.innerHTML = '<span>' + label(b) + '</span>' + (b.kind === 'hat' ? '' : '<input type="number" value="' + (b.n || 30) + '" data-param="' + i + '">')
+      + '<span class="act"><button data-act="up" data-i="' + i + '">↑</button><button data-act="down" data-i="' + i + '">↓</button><button data-act="del" data-i="' + i + '">✕</button></span>';
+    if (b.kind === 'repeat') { d.querySelector('span').textContent = '重复（重复下一块）'; }
+    ws.appendChild(d);
+  });
+  ws.querySelectorAll('[data-act]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var i = parseInt(btn.dataset.i, 10), act = btn.dataset.act;
+      if (act === 'up' && i > 0) { var t = state.script[i - 1]; state.script[i - 1] = state.script[i]; state.script[i] = t; }
+      else if (act === 'down' && i < state.script.length - 1) { var u = state.script[i + 1]; state.script[i + 1] = state.script[i]; state.script[i] = u; }
+      else if (act === 'del') { state.script.splice(i, 1); }
+      else return;
+      state.saved = false; renderScript();
+    });
+  });
+  ws.querySelectorAll('input').forEach(function (inp) {
+    inp.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    inp.addEventListener('change', function () {
+      var v = parseInt(inp.value, 10);
+      if (!isNaN(v)) { state.script[parseInt(inp.dataset.param, 10)].n = v; state.saved = false; renderMeta(); }
+    });
+  });
+  bindWorkspaceDrag();
+  renderMeta();
+}
+function renderDrawer() {
+  var L = curLesson();
+  var html = '<ul>' + L.goal5.map(function (g) { return '<li>' + g + '</li>'; }).join('') + '</ul>'
+    + '<h2>三级提示（按需揭示，不提前给答案）</h2><div class="hint">'
+    + L.hints.map(function (h, i) {
+        return '<button data-hint="' + (i + 1) + '">提示 ' + (i + 1) + ' 级 ▾</button><p id="hint' + (i + 1) + '">' + h + '</p>';
+      }).join('') + '</div>'
+    + '<h2>进度</h2><p id="drawerProgress"></p>';
+  document.getElementById('drawerBody').innerHTML = html;
+  document.querySelectorAll('#drawerBody [data-hint]').forEach(function (b) {
+    b.onclick = function () { document.getElementById('hint' + b.dataset.hint).classList.toggle('show'); };
+  });
+  document.getElementById('briefBody').innerHTML = '<p>' + L.brief + '</p><p>当前步骤：<b>步骤 1</b> — ' + L.step + '。</p>';
+}
+function renderMeta() {
+  document.getElementById('basketX').textContent = state.x;
+  document.getElementById('score').textContent = state.score;
+  document.getElementById('basket').style.left = (10 + state.x * 0.25) + '%';
+  document.getElementById('draftState').textContent = state.saved ? '已保存' : '未保存';
+  var prog = state.done ? '步骤 1 / 3 · 已完成（判定通过）' : '步骤 1 / 3 · 未完成';
+  document.getElementById('levelMeta').textContent = '关卡 1 / 3 · ' + prog;
+  var dp = document.getElementById('drawerProgress');
+  if (dp) dp.textContent = prog;
+  document.getElementById('fruitX').textContent = state.fruitX;
+  document.getElementById('selList').textContent = '已选：' + (state.sel.length ? state.sel.join(' / ') : '无（点左侧课文选句）');
+  document.querySelectorAll('#passagePanel .sent').forEach(function (s) {
+    s.classList.toggle('sel', state.sel.includes(s.textContent.trim()));
+  });
+}
+function bindWorkspaceDrag() {
+  ws.querySelectorAll('.wblock').forEach(function (el) {
+    el.addEventListener('pointerdown', function (e) {
+      if (e.target.tagName === 'INPUT' || (e.target.closest && e.target.closest('[data-act]'))) return;
+      startDrag(e, { source: 'ws', index: parseInt(el.dataset.index, 10) }, el.textContent);
+    });
+  });
+}
+var ghost = null, dragData = null;
+function startDrag(e, data, text) {
+  dragData = data;
+  ghost = document.createElement('div');
+  ghost.className = 'ghost pblock mot';
+  ghost.textContent = text;
+  document.body.appendChild(ghost);
+  moveGhost(e);
+  function mm(ev) { moveGhost(ev); }
+  function uu(ev) {
+    document.removeEventListener('pointermove', mm);
+    document.removeEventListener('pointerup', uu);
+    if (ghost) { ghost.remove(); ghost = null; }
+    var el = document.elementFromPoint(ev.clientX, ev.clientY);
+    var overWs = el && el.closest && el.closest('#workspace');
+    var overTrash = el && el.closest && el.closest('#trash');
+    if (dragData.source === 'palette') {
+      if (overWs) {
+        var kind = dragData.kind;
+        state.script.push({ kind: kind, n: kind === 'repeat' ? 2 : 30 });
+        state.saved = false; renderScript();
+      }
+    } else if (dragData.source === 'ws') {
+      var item = state.script.splice(dragData.index, 1)[0];
+      if (overTrash) { state.saved = false; renderScript(); return; }
+      if (overWs) {
+        var target = el.closest('.wblock');
+        if (target && target.dataset.index !== undefined) {
+          var ti = parseInt(target.dataset.index, 10);
+          if (ti > dragData.index) ti -= 1;
+          state.script.splice(ti, 0, item);
+        } else { state.script.push(item); }
+      } else { state.script.splice(dragData.index, 0, item); }
+      state.saved = false; renderScript();
+    }
+    dragData = null;
+  }
+  document.addEventListener('pointermove', mm);
+  document.addEventListener('pointerup', uu);
+}
+function moveGhost(e) {
+  if (!ghost) return;
+  ghost.style.left = e.clientX + 'px';
+  ghost.style.top = e.clientY + 'px';
+}
+document.querySelectorAll('#blocksPalette .pblock').forEach(function (el) {
+  el.addEventListener('pointerdown', function (e) {
+    startDrag(e, { source: 'palette', kind: el.dataset.kind }, el.textContent);
+  });
+});
+document.getElementById('drawerBtn').onclick = function () { document.getElementById('blockDrawer').classList.toggle('show'); };
+document.querySelectorAll('#blockDrawer .pblock').forEach(function (el) {
+  el.onclick = function () {
+    state.script.push({ kind: el.dataset.kind, n: el.dataset.kind === 'repeat' ? 2 : 30 });
+    state.saved = false; renderScript();
+  };
+});
+document.querySelectorAll('.cat-tabs button').forEach(function (b) {
+  b.onclick = function () {
+    document.querySelectorAll('.cat-tabs button').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    var cat = b.dataset.cat;
+    document.querySelectorAll('#blocksPalette .pblock').forEach(function (p) {
+      p.style.display = (cat === 'all' || p.dataset.cat === cat) ? '' : 'none';
+    });
+  };
+});
+document.querySelectorAll('.role').forEach(function (r) {
+  r.onclick = function () {
+    document.querySelectorAll('.role').forEach(function (x) { x.classList.remove('sel'); });
+    r.classList.add('sel');
+    document.getElementById('curRole').textContent = r.dataset.role;
+  };
+});
+document.querySelectorAll('[data-vp]').forEach(function (b) {
+  b.onclick = function () {
+    frame.className = 'frame ' + b.dataset.vp;
+    document.querySelectorAll('[data-vp]').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    if (b.dataset.vp === 'vp-mobile') { showTab('stage'); }
+  };
+});
+function showTab(name) {
+  document.querySelectorAll('.mobile-tabs button').forEach(function (x) { x.classList.toggle('on', x.dataset.tab === name); });
+  document.querySelectorAll('.panel').forEach(function (p) { p.classList.toggle('show', p.dataset.panel === name); });
+}
+document.querySelectorAll('.mobile-tabs button').forEach(function (b) { b.onclick = function () { showTab(b.dataset.tab); }; });
+function setRunUI(running) {
+  var t = state.mode === 'a1' ? '✓ 检查摘要' : (running ? '■ 停止' : '▶ 运行作品');
+  var bg = running ? '#d33' : '';
+  ['runBtn', 'runBtn2'].forEach(function (id) { var el = document.getElementById(id); if (el) { el.textContent = t; el.style.background = bg; } });
+}
+function onRun() {
+  if (state.mode === 'a1') { checkSummary(); return; }
+  if (state.running) { doStop(); return; }
+  state.running = true;
+  state.x = 0; state.score = 0; // 每次运行舞台复位：篮子回起点、分数清零，多次运行同一脚本结果一致
+  renderMeta();
+  var fb = document.getElementById('feedback');
+  var steps = [];
+  var usedLoop = false;
+  var x = state.x;
+  for (var i = 0; i < state.script.length; i++) {
+    var b = state.script[i];
+    if (b.kind === 'hat') { steps.push('绿旗开始'); continue; }
+    if (b.kind === 'repeat') {
+      var nxt = state.script[i + 1];
+      if (!nxt || nxt.kind === 'hat' || nxt.kind === 'repeat') { steps.push('重复块后面没有可重复的积木（无效）'); continue; }
+      usedLoop = true;
+      var n = b.n || 2;
+      var d = (nxt.kind === 'left' ? -(nxt.n || 30) : (nxt.n || 30)) * n;
+      x += d;
+      steps.push('重复 ' + n + ' 次 ' + label(nxt) + ' ' + (nxt.n || 30) + ' → x 变化 ' + d);
+      i += 1; continue;
+    }
+    var dd = (b.kind === 'left' ? -(b.n || 30) : (b.n || 30));
+    x += dd;
+    steps.push(label(b) + ' ' + (b.n || 30) + ' → x 变化 ' + dd);
+  }
+  state.x = x;
+  document.getElementById('runState').textContent = '运行中：水果下落…';
+  setRunUI(true);
+  var fruitEl = document.getElementById('fruit');
+  fruitEl.style.top = '8px';
+  setTimeout(function () { fruitEl.style.top = '200px'; }, 50);
+  runTimer = setTimeout(function () {
+    var th = 80;
+    var caught = Math.abs(state.fruitX - state.x) < th;
+    var moved = state.x !== 0;
+    var taskPass = caught && moved;
+    var knowPass = usedLoop && moved;
+    state.score = caught ? 1 : 0;
+    state.done = taskPass && knowPass;
+    var stageLine = caught
+      ? '舞台结果：接住了（篮子 x=' + state.x + '，水果 x=' + state.fruitX + '，差 ' + Math.abs(state.fruitX - state.x) + '，阈值 ' + th + '）。'
+      : '舞台结果：没接住（篮子 x=' + state.x + '，水果 x=' + state.fruitX + '，差 ' + Math.abs(state.fruitX - state.x) + '，阈值 ' + th + '）。';
+    var taskLine = taskPass
+      ? '任务判定：完成（篮子真实移动并接住）。'
+      : (caught ? '任务判定：未完成——只发生了碰撞，篮子没有移动，不算完成任务。' : '任务判定：未完成——篮子没有接住水果。');
+    var knowLine = knowPass
+      ? '知识证据：通过——脚本用了循环，且循环确实移动了篮子。'
+      : (usedLoop ? '知识证据：未通过——用了循环，但循环没有让篮子移动。' : '知识证据：未通过——脚本里没有用到本节知识点（循环）。');
+    var verdict = (taskPass && knowPass)
+      ? '<span class="ok">结论：合格（任务与知识证据都通过）。</span>'
+      : (taskPass ? '<span class="bad">结论：任务完成，但知识证据未通过——不能写“已掌握循环”。</span>' : '<span class="bad">结论：未合格。</span>');
+    fb.innerHTML = verdict + '\n' + stageLine + '\n' + taskLine + '\n' + knowLine
+      + '\n执行步骤：' + (steps.length ? steps.join('；') : '（无）')
+      + '\n分数（本次运行）：' + state.score;
+    document.getElementById('runState').textContent = caught ? '已接住' : '未接住';
+    state.running = false; runTimer = null;
+    setRunUI(false);
+    renderMeta();
+  }, 1000);
+}
+document.getElementById('runBtn').onclick = onRun;
+document.getElementById('runBtn2').onclick = onRun;
+document.getElementById('checkBtn2').onclick = function () { checkSummary(); };
+function doStop() {
+  if (runTimer) { clearTimeout(runTimer); runTimer = null; }
+  state.running = false;
+  setRunUI(false);
+  document.getElementById('fruit').style.top = '8px';
+  document.getElementById('runState').textContent = '已停止（脚本与分数保留）';
+  document.getElementById('feedback').textContent = '已停止。脚本与分数保留，没丢。';
+  renderMeta();
+}
+document.getElementById('taskBtn').onclick = function () { document.getElementById('drawer').classList.toggle('show'); };
+document.getElementById('menuBtn').onclick = function () { document.getElementById('menuPop').classList.toggle('show'); };
+document.getElementById('saveBtn').onclick = function () {
+  document.getElementById('menuPop').classList.remove('show');
+  var fb = document.getElementById('feedback');
+  if (document.getElementById('failSave').checked) {
+    state.saved = false;
+    fb.innerHTML = '<span class="bad">本机草稿未能保存：存储不可用，刚才的修改没有存下来。</span>（保存失败不显示已保存）';
+  } else {
+    try { saveDraft(); fb.innerHTML = '<span class="ok">已保存作品（' + curLesson().id + ' 草稿，分键保存）。</span>刷新或切换课节后本课草稿仍在。'; }
+    catch (e) { fb.innerHTML = '<span class="bad">保存失败：</span>' + e.message; }
+  }
+  renderMeta();
+};
+document.getElementById('exportBtn').onclick = function () { document.getElementById('menuPop').classList.remove('show'); document.getElementById('feedback').textContent = '导出作品（示意）：' + curLesson().id + ' 草稿：' + JSON.stringify(state.lesson === 'g2' ? state.script : state.sel); };
+document.getElementById('resetBtn').onclick = function () {
+  document.getElementById('menuPop').classList.remove('show');
+  try { localStorage.removeItem(DRAFT_KEYS[state.lesson]); } catch (e) {}
+  state.script = [{ kind: 'hat' }]; state.x = 0; state.score = 0; state.done = false; state.saved = false; state.sel = [];
+  document.getElementById('feedback').textContent = '已恢复初始（仅本课草稿）：脚本/选句、分数、篮子位置都回到初始。';
+  renderScript();
+};
+document.getElementById('stageToggle').onclick = function () { body.classList.toggle('stage-small'); };
+document.getElementById('stageRowToggle').onclick = function () { body.classList.toggle('hide-stage'); };
+document.querySelectorAll('[data-hint]').forEach(function (b) {
+  b.onclick = function () { document.getElementById('hint' + b.dataset.hint).classList.toggle('show'); };
+});
+document.querySelectorAll('#passagePanel .sent').forEach(function (s) {
+  s.onclick = function () {
+    s.classList.toggle('sel');
+    var t = s.textContent.trim();
+    if (s.classList.contains('sel')) { if (!state.sel.includes(t)) state.sel.push(t); }
+    else { state.sel = state.sel.filter(function (x) { return x !== t; }); }
+    renderMeta();
+  };
+});
+function checkSummary() {
+  var fb = document.getElementById('feedback');
+  var pts = [];
+  document.querySelectorAll('#passagePanel .sent.sel').forEach(function (s) { pts.push(s.dataset.point); });
+  var hasA = pts.includes('A'), hasB = pts.includes('B'), hasC = pts.includes('C');
+  var dupA = pts.filter(function (p) { return p === 'A' || p === 'A2'; }).length > 1;
+  var offTopic = pts.includes('X');
+  var problems = [];
+  if (!hasA) problems.push('缺要点 A');
+  if (!hasB) problems.push('缺要点 B');
+  if (!hasC) problems.push('缺要点 C');
+  if (dupA) problems.push('要点 A 重复出现');
+  if (offTopic) problems.push('含离题句');
+  if (!problems.length && pts.length === 3) {
+    fb.innerHTML = '<span class="ok">合格：三项要点齐全、无重复、无离题。</span>';
+  } else {
+    fb.innerHTML = '<span class="bad">未合格：</span>' + (problems.length ? problems.join('、') : '句数不是 3 句') + '。';
+  }
+}
+document.getElementById('modeBtn').onclick = function () {
+  saveDraft(); // 切换前先保存当前课草稿（分键）
+  state.lesson = state.lesson === 'g2' ? 'a1' : 'g2';
+  var a1 = state.lesson === 'a1';
+  state.mode = a1 ? 'a1' : 'blocks';
+  loadDraft(); // 载入新课草稿（分键，互不污染）
+  state.fruitX = curLesson().fruitX || 200;
+  state.x = 0; state.score = 0; state.done = false; state.running = false;
+  if (runTimer) { clearTimeout(runTimer); runTimer = null; }
+  document.getElementById('fruit').style.top = '8px';
+  document.getElementById('blocksPalette').style.display = a1 ? 'none' : '';
+  document.getElementById('passagePanel').style.display = a1 ? '' : 'none';
+  document.getElementById('blocksWorkspace').style.display = a1 ? 'none' : '';
+  document.getElementById('summaryWorkspace').style.display = a1 ? '' : 'none';
+  setRunUI(false);
+  document.getElementById('lessonTitle').textContent = curLesson().title;
+  document.getElementById('modeBtn').textContent = a1 ? '切换回 G2 课节' : '切换到 A1 课节';
+  document.getElementById('feedback').textContent = '已切换到《' + curLesson().title + '》（' + curLesson().id + '）。这里显示的是本课的目标、任务、提示与反馈，不带上一课的内容。';
+  renderDrawer();
+  renderScript();
+};
+renderDrawer();
+renderScript();
+</script>
+</body>
+</html>

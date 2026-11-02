@@ -3256,6 +3256,30 @@
         "reviewer": null
       },
       "notes": "首席已定方向：通过独立任务修正错误预言机、先验证目标语义；修正前 M0-U1-L05 不得接入课堂、不得以差分通过验收。登记时点：#460 已合并（6ee706a2）且主线 CI 29/29 success 后登记；本条目不标 completed。角度约定以实测 build_tree 为准，规格书第二节示例与规则 4 文字反向，须首席一并订正。"
+    },
+    {
+      "id": "SPEC-001",
+      "title": "P0 Kitten 式工作区设计与接口规范入 docs/product/p0-kitten-workspace/",
+      "priority": "P0",
+      "category": "SPEC",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "仅设计与验证材料：docs/product/p0-kitten-workspace/ 下 DESIGN.md、LESSON-CONTRACT.md、WORKSPACE-API.md、OWNERSHIP.md、ACCEPTANCE.md、PROTOTYPE.html、TEST-EVIDENCE.md（版本 p0-kitten-workspace-v1.0，2026-11-02 duan 裁定：设计方向批准、v2 有条件认可、全量迁移禁止）；原型 SHA-256 ca4ba09651cd13b335ea274852c27fe272a143aedb42cddfbab95ccd0d4568d1；不改共享 UI、不改教学逻辑、不改课程台账（432 节）；本条目为该规范 PR 自身的门禁登记。",
+      "acceptance": [
+        "7 个设计与验证文件合并到 main 的 docs/product/p0-kitten-workspace/ 目录",
+        "任务门禁通过（声明条目与改动条目完全一致）",
+        "PR 合并后主线 CI 通过"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/467",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "原型 20 项断言本地真实 Chromium 全过，无 JS 报错（见 TEST-EVIDENCE.md）"
+        ],
+        "reviewer": null
+      },
+      "notes": "首席说明：本条目为 P0 规范 PR 自身的门禁登记；PR 除 7 个设计与验证文件外仅含本条目一行；课程台账（432 节）未动，共享 UI 与教学逻辑未动；文件顶层 updatedAt 按现有惯例不随本条改动。"
     }
   ]
 }
