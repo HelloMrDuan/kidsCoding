@@ -265,6 +265,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
       lessonGoal={lesson.objectives.join('；')}
       lessonTitle={lesson.title}
       localSaveState={saveState}
+      cloudSyncState="local-only"
       onCompleteStep={handleComplete}
       onStartRemedial={() => {}}
       resumedFromStep={resumedFrom}

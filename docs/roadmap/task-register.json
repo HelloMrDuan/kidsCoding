@@ -3202,6 +3202,33 @@
         "reviewer": null
       },
       "notes": "A1 第二阶段 U3 本地层试点：生成式环节仍等批（设计包阶段 3 五条批件未齐），本任务只含本地层；L02 课文与 L06 问答对为试点新增合成数据、页内明码标注，L06 答案取自 U1 详案已验证结论；U3 课节仍为 todo；关账待本 PR 合并 + 主线两工作流全绿后另立关账 PR。"
+    },
+    {
+      "id": "OPS-018",
+      "title": "G0-U1 最小整改：介绍页五关文案与 GridLab 本机保存声明（D1/D3）",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "apps/web/src/app/learn/catalog/[lessonId]/page.tsx、apps/web/src/features/lessons/grid/grid-lab.tsx、apps/web/src/features/lessons/grid/grid-gates.test.ts、apps/web/tests/e2e/grid-gates-copy.spec.ts；只改介绍页关数文案与 GridLab 云同步声明并新增回归断言，不改 V2 颜色布局、不改 lessonId/前置/学习数据键/作品键、不删不放宽已有测试。",
+      "acceptance": [
+        "目录页网格区文案为“五关”，不含“四关”（G0-U1-L01 与 G0-U3-L01 的 E2E 断言通过）",
+        "网格课堂显示“仅保存到本机”，不显示“存到服务器”隐私注（cloudSyncState=\"local-only\"）",
+        "两份网格课数据每节含 guided、practice-a、practice-b、error-lab、creative 五种 kind，且各有 1 个 errorLab（vitest grid-gates.test.ts）",
+        "保留全部教学环节与已有测试；单元测试、网格 E2E 与关联回归通过；正式 CI 绿（本地临时检查不代替正式 CI）"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/458",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "vitest apps/web 全量：169 文件 1205/1205 通过（含新 grid-gates 11/11），204.73s，基底 fcb2ed91",
+          "E2E grid-gates-copy.spec.ts：4/4 通过（生产构建 + start，自有 3123 端口，desktop + mobile）",
+          "E2E 日志含既有 next start/standalone 警告（服务可用、用例全绿；警告本身未消除，见首席裁定项 9）"
+        ],
+        "reviewer": null
+      },
+      "notes": "D1/D3 经首席 2026-11-02 批准；基底 fcb2ed91，本地提交 6cea057（修复）与 00a08d5（回归断言），API 推送后头见本 PR（树逐字节验过）。标题统一另立最小 PR，不混入本 PR；评审 reviewedCommit 错位另案处理，不改历史记录。"
     }
   ]
 }
