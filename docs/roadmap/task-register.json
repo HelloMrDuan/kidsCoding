@@ -3202,6 +3202,33 @@
         "reviewer": null
       },
       "notes": "A1 第二阶段 U3 本地层试点：生成式环节仍等批（设计包阶段 3 五条批件未齐），本任务只含本地层；L02 课文与 L06 问答对为试点新增合成数据、页内明码标注，L06 答案取自 U1 详案已验证结论；U3 课节仍为 todo；关账待本 PR 合并 + 主线两工作流全绿后另立关账 PR。"
+    },
+    {
+      "id": "OPS-019",
+      "title": "G0-U1 标题统一：课堂显示正式课名、故事标题作场景副标题",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "apps/web/src/content/curriculum/g0-u1-grid-lessons.ts、apps/web/src/content/curriculum/g0-u1-grid-lessons.test.ts、apps/web/src/features/lessons/grid/grid-lab.tsx、apps/web/src/features/lessons/guided-lesson-shell.tsx；只改课堂显示标题并新增 1 条回归断言，不改目录、详细稿、台账，不改 lessonId/前置/关卡文案/学习数据键/作品键，不改 V2，不改、不删现有测试断言。",
+      "acceptance": [
+        "5 课课堂 title 为目录正式名，sceneTitle 为旧故事标题；L02 为正式名且无副行",
+        "课堂 h2 下显示“场景：{sceneTitle}”副行（复用 kc-subtitle 类），G0-U3 循环课与 event-lab 显示不变",
+        "新增标题回归断言通过（grid-lessons 文件 70/70）",
+        "保留全部教学环节与已有测试；正式 CI 绿（本地临时检查不代替正式 CI）"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/459",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "vitest apps/web 全量：168 文件 1195/1195 通过（含 grid-lessons 70/70，即新增标题断言通过），224.18s，基底 fcb2ed91",
+          "node_modules 系借用兄弟 worktree 符号链接（跑后已删）；正式 CI 将以精确依赖重跑",
+          "未本地跑 E2E/tsc 全量（现有 grid-lab.spec.ts 无标题断言；改动仅为可选字段与可选 prop），由正式 CI 覆盖"
+        ],
+        "reviewer": null
+      },
+      "notes": "标题统一经首席 2026-11-02 裁定；基底 fcb2ed91；目录、详细稿、台账三源标题已与正式名一致，本 PR 只改课堂显示；L05 副行“场景：先拿钥匙再开门”防误读（story 后补半句留首席定）；与 D1/D3 PR #458 相邻行且台账尾部同位置追加，#458 合并后本 PR 变基；不混入 D1/D3。"
     }
   ]
 }
