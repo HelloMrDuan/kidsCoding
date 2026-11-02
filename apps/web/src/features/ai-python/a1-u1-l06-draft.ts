@@ -43,11 +43,18 @@ export function parseDraft(raw: string | null, fallbackV1: string, fallbackV2: s
     const parsed = JSON.parse(raw) as Partial<L06Draft>
     if (parsed.version !== 1) return emptyDraft(fallbackV1, fallbackV2)
     const contaminated = parsed.contaminated ?? { v1: false, v2: false }
+    // A damaged draft must degrade safely: drop prediction values that are
+    // not real fruits instead of letting an illegal value reach the UI.
+    const rawPredictions = (parsed.predictions ?? {}) as Record<string, unknown>
+    const predictions: Record<string, FruitName | undefined> = {}
+    for (const [key, value] of Object.entries(rawPredictions)) {
+      if (value === '苹果' || value === '香蕉' || value === '橙子') predictions[key] = value
+    }
     return {
       version: 1,
       ruleV1: typeof parsed.ruleV1 === 'string' ? parsed.ruleV1 : fallbackV1,
       ruleV2: typeof parsed.ruleV2 === 'string' ? parsed.ruleV2 : fallbackV2,
-      predictions: (parsed.predictions ?? {}) as Record<string, FruitName | undefined>,
+      predictions,
       contaminated: { v1: contaminated.v1 === true, v2: contaminated.v2 === true },
     }
   } catch {
