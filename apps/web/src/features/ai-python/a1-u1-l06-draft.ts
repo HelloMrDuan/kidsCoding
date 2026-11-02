@@ -1,0 +1,69 @@
+/**
+ * A1-U1-L06 local draft persistence (browser localStorage only, no server).
+ *
+ * What is saved: the two editable rule texts, the per-sample predictions,
+ * and the per-rule contamination flags. Run results (matrices) are NOT saved:
+ * after a refresh the student re-runs to get fresh results.
+ *
+ * Anti-contamination rule (the point of this module): once a rule has been
+ * edited for this batch, its clean re-verification eligibility is spent.
+ * Refreshing the page must restore that spent state, and restoring the
+ * default rule text must NOT clear it — seeing the batch results cannot be
+ * unseen, and an edit shows the rule was already worked on for this batch.
+ * The only thing that clears eligibility loss is outside this lesson's
+ * control (the student clearing browser storage entirely), which the page
+ * states plainly instead of pretending otherwise.
+ */
+
+import type { FruitName, RuleId } from './fruit-classifier'
+
+export const L06_DRAFT_STORAGE_KEY = 'a1-u1-l06-draft-v1'
+
+export type L06Draft = {
+  version: 1
+  ruleV1: string
+  ruleV2: string
+  predictions: Record<string, FruitName | undefined>
+  /** True once the rule was edited for this batch; refresh and restore-default must preserve it. */
+  contaminated: Record<RuleId, boolean>
+}
+
+export function emptyDraft(ruleV1: string, ruleV2: string): L06Draft {
+  return { version: 1, ruleV1, ruleV2, predictions: {}, contaminated: { v1: false, v2: false } }
+}
+
+export function serializeDraft(draft: L06Draft): string {
+  return JSON.stringify(draft)
+}
+
+/** Parse stored text defensively: anything unrecognized falls back to clean defaults. */
+export function parseDraft(raw: string | null, fallbackV1: string, fallbackV2: string): L06Draft {
+  if (!raw) return emptyDraft(fallbackV1, fallbackV2)
+  try {
+    const parsed = JSON.parse(raw) as Partial<L06Draft>
+    if (parsed.version !== 1) return emptyDraft(fallbackV1, fallbackV2)
+    const contaminated = parsed.contaminated ?? { v1: false, v2: false }
+    return {
+      version: 1,
+      ruleV1: typeof parsed.ruleV1 === 'string' ? parsed.ruleV1 : fallbackV1,
+      ruleV2: typeof parsed.ruleV2 === 'string' ? parsed.ruleV2 : fallbackV2,
+      predictions: (parsed.predictions ?? {}) as Record<string, FruitName | undefined>,
+      contaminated: { v1: contaminated.v1 === true, v2: contaminated.v2 === true },
+    }
+  } catch {
+    return emptyDraft(fallbackV1, fallbackV2)
+  }
+}
+
+/**
+ * Restoring default code text resets the text only. Contamination is
+ * deliberately untouched: restoring defaults must not restore eligibility.
+ */
+export function restoreDefaultCode(draft: L06Draft, rule: RuleId, defaultCode: string): L06Draft {
+  return { ...draft, ...(rule === 'v1' ? { ruleV1: defaultCode } : { ruleV2: defaultCode }) }
+}
+
+/** Mark a rule edited for this batch: its eligibility is spent from now on. */
+export function markEdited(draft: L06Draft, rule: RuleId): L06Draft {
+  return { ...draft, contaminated: { ...draft.contaminated, [rule]: true } }
+}
