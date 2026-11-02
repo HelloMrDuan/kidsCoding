@@ -1,9 +1,9 @@
 /**
  * A1-U3-L02 本机草稿：只存学生的课堂选择，不存判定结果。
  *
- * 存：动手摘要所选句子编号、事实核对每条的选择、已揭示到的提示级数。
- * 不存：三项检查结果与核对正误——刷新后须重新检查、重新核对才出结果。
- * 恢复默认：清空选择与提示级数，回到未做状态。
+ * 存：动手摘要所选句子编号、自加句文本、事实核对每条的选择、已揭示到的提示级数。
+ * 不存：五项检查结果与核对正误——刷新后须重新检查、重新核对才出结果。
+ * 恢复默认：清空选择、自加句与提示级数，回到未做状态。
  *
  * 与 U1-L06 草稿同一模式：localStorage 单键、防御解析、损坏降级、
  * 写入失败返回 false（由页面提示“未能保存”，不悄悄丢修改）。
@@ -18,12 +18,13 @@ export const L02_DRAFT_KEY = 'a1-u3-l02-draft-v1'
 export type L02Draft = {
   version: 1
   selected: string[]
+  custom: string[]
   facts: Record<string, FactKind | undefined>
   hintLevel: 0 | 1 | 2 | 3
 }
 
 export function emptyDraft(): L02Draft {
-  return { version: 1, selected: [], facts: {}, hintLevel: 0 }
+  return { version: 1, selected: [], custom: [], facts: {}, hintLevel: 0 }
 }
 
 function isFactKind(value: unknown): value is FactKind {
@@ -48,6 +49,11 @@ export function parseDraft(raw: string | null, fallback: L02Draft = emptyDraft()
         (id): id is string => typeof id === 'string' && validIds.has(id),
       )
     : []
+  const custom = Array.isArray(record['custom'])
+    ? (record['custom'] as unknown[])
+        .filter((text): text is string => typeof text === 'string' && text.trim() !== '')
+        .slice(0, 5)
+    : []
   const rawFacts = (record['facts'] ?? {}) as Record<string, unknown>
   const facts: Record<string, FactKind | undefined> = {}
   for (const [key, value] of Object.entries(rawFacts)) {
@@ -57,6 +63,7 @@ export function parseDraft(raw: string | null, fallback: L02Draft = emptyDraft()
   return {
     version: 1,
     selected,
+    custom,
     facts,
     hintLevel: hintLevel === 1 || hintLevel === 2 || hintLevel === 3 ? hintLevel : 0,
   }
@@ -66,7 +73,7 @@ export function serializeDraft(draft: L02Draft): string {
   return JSON.stringify(draft)
 }
 
-/** 恢复默认：只清空选择与提示级数，不动其他键。 */
+/** 恢复默认：只清空选择、自加句与提示级数，不动其他键。 */
 export function restoreDefaultDraft(): L02Draft {
   return emptyDraft()
 }
