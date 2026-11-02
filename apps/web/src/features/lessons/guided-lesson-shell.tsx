@@ -32,6 +32,8 @@ export type LessonPane = 'task' | 'code' | 'stage'
 
 type GuidedLessonShellProps = {
   lessonTitle: string
+  /** Scene title shown under the formal lesson name (e.g. a G0-U1 story title); omitted when absent. */
+  lessonSubtitle?: string
   lessonGoal: string
   /** Real "what this lesson builds" copy, shown in the task objective. */
   completionPreview?: string
@@ -89,6 +91,7 @@ const PANE_TABS: Array<{ id: LessonPane; label: string }> = [
 
 export function GuidedLessonShell({
   lessonTitle,
+  lessonSubtitle,
   lessonGoal,
   completionPreview,
   isLocked,
@@ -223,6 +226,9 @@ export function GuidedLessonShell({
         <div className="kc-lesson-header" data-testid="lesson-progress-strip">
           <div className="min-w-0">
             <h2>{lessonTitle}</h2>
+            {lessonSubtitle ? (
+              <span className="kc-subtitle">场景：{lessonSubtitle}</span>
+            ) : null}
             {stepTitle ? (
               <span className="kc-subtitle">当前任务：{stepTitle}</span>
             ) : null}
