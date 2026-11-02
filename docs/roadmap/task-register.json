@@ -3271,7 +3271,7 @@
         "PR 合并后主线 CI 通过"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/467",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
