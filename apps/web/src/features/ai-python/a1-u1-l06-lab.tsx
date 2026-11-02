@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import {
   confusionMatrix,
   RULE_V1_PYTHON,
@@ -18,11 +18,12 @@ import {
   SECOND_BATCH_ROWS,
 } from './a1-u1-l06'
 import {
-  L06_DRAFT_STORAGE_KEY,
-  parseDraft,
+  getDraftSnapshot,
+  getServerDraftSnapshot,
+  markEdited,
   restoreDefaultCode,
-  serializeDraft,
-  type L06Draft,
+  saveDraft,
+  subscribeDraft,
 } from './a1-u1-l06-draft'
 
 type SandboxEvent = { kind: 'FRAME_READY' | 'LOADED' | 'RESULT'; id?: number; output?: string; error?: string | null }
@@ -62,44 +63,24 @@ function MatrixTable({ matrix, caption }: { matrix: ConfusionMatrix; caption: st
 const FRUIT_OPTIONS: FruitName[] = ['苹果', '香蕉', '橙子']
 
 export function AiPythonU1L06Lab() {
-  const [ruleV1, setRuleV1] = useState(RULE_V1_PYTHON)
-  const [ruleV2, setRuleV2] = useState(RULE_V2_PYTHON)
+  // The stored draft is the single source of truth (useSyncExternalStore):
+  // no effect loads it with synchronous setState, and edits write through
+  // saveDraft so every render reads the persisted state.
+  const draft = useSyncExternalStore(subscribeDraft, getDraftSnapshot, getServerDraftSnapshot)
+  const ruleV1 = draft.ruleV1
+  const ruleV2 = draft.ruleV2
+  const predictions = draft.predictions
+  const contaminated = draft.contaminated
   const [ready, setReady] = useState(false)
   const [busy, setBusy] = useState<RuleId | null>(null)
   const [status, setStatus] = useState('先做预测练习，再运行沙箱复验。首次运行需要加载 Python 引擎。本机草稿会自动保存，刷新后恢复。')
   const [results, setResults] = useState<Record<RuleId, RunResult | null>>({ v1: null, v2: null })
-  const [contaminated, setContaminated] = useState<Record<RuleId, boolean>>({ v1: false, v2: false })
-  const [predictions, setPredictions] = useState<Record<string, FruitName | undefined>>({})
   const [predictionScores, setPredictionScores] = useState<Record<RuleId, { correct: number; total: number } | null>>({ v1: null, v2: null })
-  const [hydrated, setHydrated] = useState(false)
   const frame = useRef<HTMLIFrameElement>(null)
   const requestId = useRef(0)
   const timeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const active = useRef(false)
   const pendingRule = useRef<RuleId | null>(null)
-
-  useEffect(() => {
-    try {
-      const draft = parseDraft(window.localStorage.getItem(L06_DRAFT_STORAGE_KEY), RULE_V1_PYTHON, RULE_V2_PYTHON)
-      setRuleV1(draft.ruleV1)
-      setRuleV2(draft.ruleV2)
-      setPredictions(draft.predictions)
-      setContaminated(draft.contaminated)
-    } catch {
-      // Storage unavailable: the lesson still works, just without draft restore.
-    }
-    setHydrated(true)
-  }, [])
-
-  useEffect(() => {
-    if (!hydrated) return
-    try {
-      const draft: L06Draft = { version: 1, ruleV1, ruleV2, predictions, contaminated }
-      window.localStorage.setItem(L06_DRAFT_STORAGE_KEY, serializeDraft(draft))
-    } catch {
-      // Storage unavailable: ignore, the lesson still works.
-    }
-  }, [hydrated, ruleV1, ruleV2, predictions, contaminated])
 
   useEffect(() => {
     const frameNode = frame.current
@@ -200,10 +181,7 @@ export function AiPythonU1L06Lab() {
   }
 
   function resetRule(rule: RuleId) {
-    const draft: L06Draft = { version: 1, ruleV1, ruleV2, predictions, contaminated }
-    const next = restoreDefaultCode(draft, rule, rule === 'v1' ? RULE_V1_PYTHON : RULE_V2_PYTHON)
-    if (rule === 'v1') setRuleV1(next.ruleV1)
-    else setRuleV2(next.ruleV2)
+    saveDraft(restoreDefaultCode(draft, rule, rule === 'v1' ? RULE_V1_PYTHON : RULE_V2_PYTHON))
     setStatus('已恢复默认代码；复验资格状态不变——为这批样本改过规则的记录不会因还原而清除。')
   }
 
@@ -289,7 +267,7 @@ export function AiPythonU1L06Lab() {
                     value={predictions[`${rule}:${row.id}`] ?? ''}
                     onChange={(event) => {
                       const value = event.target.value
-                      setPredictions((prev) => ({ ...prev, [`${rule}:${row.id}`]: value === '' ? undefined : (value as FruitName) }))
+                      saveDraft({ ...draft, predictions: { ...draft.predictions, [`${rule}:${row.id}`]: value === '' ? undefined : (value as FruitName) } })
                     }}
                     aria-label={`${row.id} 的规则 ${rule} 预测`}
                     className="rounded-lg border border-[#e7edf5] p-2"
@@ -418,7 +396,7 @@ export function AiPythonU1L06Lab() {
           spellCheck={false}
           disabled={busy !== null}
           value={ruleV1}
-          onChange={(event) => { setRuleV1(event.target.value); setContaminated((prev) => ({ ...prev, v1: true })) }}
+          onChange={(event) => { saveDraft(markEdited({ ...draft, ruleV1: event.target.value }, 'v1')) }}
           rows={6}
           className="mt-2 w-full rounded-lg border border-[#e7edf5] p-3 font-mono text-sm leading-7 text-[#18243a] disabled:opacity-70"
           aria-label="规则 v1 代码编辑区"
@@ -451,7 +429,7 @@ export function AiPythonU1L06Lab() {
           spellCheck={false}
           disabled={busy !== null}
           value={ruleV2}
-          onChange={(event) => { setRuleV2(event.target.value); setContaminated((prev) => ({ ...prev, v2: true })) }}
+          onChange={(event) => { saveDraft(markEdited({ ...draft, ruleV2: event.target.value }, 'v2')) }}
           rows={8}
           className="mt-2 w-full rounded-lg border border-[#e7edf5] p-3 font-mono text-sm leading-7 text-[#18243a] disabled:opacity-70"
           aria-label="规则 v2 代码编辑区"
