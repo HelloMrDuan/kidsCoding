@@ -5,6 +5,7 @@ import {
   parseDraft,
   restoreDefaultCode,
   serializeDraft,
+  type L06Draft,
 } from './a1-u1-l06-draft'
 
 const V1 = 'def classify(color, weight):\n    return "苹果"'
@@ -18,7 +19,7 @@ describe('A1-U1-L06 draft persistence', () => {
   })
 
   it('restores rule texts, predictions, and contamination flags from stored text', () => {
-    const draft = {
+    const draft: L06Draft = {
       ...emptyDraft(V1, V2),
       ruleV1: 'edited v1',
       predictions: { 'v1:S1': '苹果', 'v2:S2': '香蕉' },
