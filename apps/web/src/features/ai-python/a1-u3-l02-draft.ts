@@ -15,6 +15,10 @@ import { allSentenceIds } from './a1-u3-l02'
 
 export const L02_DRAFT_KEY = 'a1-u3-l02-draft-v1'
 
+/** 自加句上限：最多 5 句、每句最多 200 字。超限在加入时提示，在读取时丢弃。 */
+export const MAX_CUSTOM_COUNT = 5
+export const MAX_CUSTOM_LENGTH = 200
+
 export type L02Draft = {
   version: 1
   selected: string[]
@@ -51,8 +55,11 @@ export function parseDraft(raw: string | null, fallback: L02Draft = emptyDraft()
     : []
   const custom = Array.isArray(record['custom'])
     ? (record['custom'] as unknown[])
-        .filter((text): text is string => typeof text === 'string' && text.trim() !== '')
-        .slice(0, 5)
+        .filter(
+          (text): text is string =>
+            typeof text === 'string' && text.trim() !== '' && text.length <= MAX_CUSTOM_LENGTH,
+        )
+        .slice(0, MAX_CUSTOM_COUNT)
     : []
   const rawFacts = (record['facts'] ?? {}) as Record<string, unknown>
   const facts: Record<string, FactKind | undefined> = {}
