@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   emptyDraft,
   getCachedDraft,
+  getDraftSnapshot,
   markEdited,
   parseDraft,
   restoreDefaultCode,
@@ -59,7 +60,14 @@ describe('A1-U1-L06 draft persistence', () => {
     expect(getCachedDraft(null, V1, V2)).toEqual(emptyDraft(V1, V2))
   })
 
-  it('saveDraft reports false without a browser window instead of throwing', () => {
-    expect(saveDraft(emptyDraft(V1, V2))).toBe(false)
+  it('saveDraft persists when a window exists and never throws', () => {
+    const draft = markEdited(emptyDraft(V1, V2), 'v2')
+    const saved = saveDraft(draft)
+    if (typeof window === 'undefined') {
+      expect(saved).toBe(false)
+    } else {
+      expect(saved).toBe(true)
+      expect(getDraftSnapshot()).toEqual(draft)
+    }
   })
 })
