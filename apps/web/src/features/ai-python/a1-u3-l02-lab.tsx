@@ -16,6 +16,8 @@ import {
   type L02Check,
 } from './a1-u3-l02'
 import {
+  MAX_CUSTOM_COUNT,
+  MAX_CUSTOM_LENGTH,
   getDraftSnapshot,
   getServerDraftSnapshot,
   restoreDefaultDraft,
@@ -32,6 +34,9 @@ function CheckLines({ checks }: { checks: L02Check[] }) {
           {check.name}：{check.passed ? '通过' : '失败'}——{check.detail}
         </p>
       ))}
+      <p className="text-sm leading-7 text-[#6f7d92]">
+        注意：改原意只做数字规则检查（数字在全文出现即通过），不能证明语义完全正确；完整核验以来源核验为准。
+      </p>
     </div>
   )
 }
@@ -42,6 +47,7 @@ export function AiPythonU3L02Lab() {
   const [summaryChecks, setSummaryChecks] = useState<L02Check[] | null>(null)
   const [factsChecked, setFactsChecked] = useState(false)
   const [customInput, setCustomInput] = useState('')
+  const [customNotice, setCustomNotice] = useState<string | null>(null)
 
   // Persist a draft edit and surface a visible "not saved" state when the
   // browser storage write fails, instead of silently dropping the edit.
@@ -60,13 +66,23 @@ export function AiPythonU3L02Lab() {
   function addCustom() {
     const text = customInput.trim()
     if (text === '') return
+    if (draft.custom.length >= MAX_CUSTOM_COUNT) {
+      setCustomNotice(`自加句最多 ${MAX_CUSTOM_COUNT} 句，已达上限。`)
+      return
+    }
+    if (text.length > MAX_CUSTOM_LENGTH) {
+      setCustomNotice(`自加句过长（最多 ${MAX_CUSTOM_LENGTH} 字），请缩短后再加入。`)
+      return
+    }
     persist({ ...draft, custom: [...draft.custom, text] })
     setCustomInput('')
+    setCustomNotice(null)
     setSummaryChecks(null)
   }
 
   function removeCustom(index: number) {
     persist({ ...draft, custom: draft.custom.filter((_, i) => i !== index) })
+    setCustomNotice(null)
     setSummaryChecks(null)
   }
 
@@ -82,6 +98,8 @@ export function AiPythonU3L02Lab() {
     persist(restoreDefaultDraft())
     setSummaryChecks(null)
     setFactsChecked(false)
+    setCustomInput('')
+    setCustomNotice(null)
   }
 
   const draftSummary = buildDraftSummary(draft.selected, draft.custom)
@@ -133,7 +151,7 @@ export function AiPythonU3L02Lab() {
       <section className="mt-6 rounded-[14px] border border-[#e7edf5] bg-white p-4">
         <h2 className="text-lg font-black text-[#18243a]">练习 A：动手摘要</h2>
         <p className="mt-1 text-sm leading-7 text-[#6f7d92]">
-          勾选进摘要的句子，也可自加一句自己的话；点“检查摘要”看五项检查。本课 3 个要点，标准摘要 3 句；全文照搬、要点重复、无来源的句子都会被判违规。
+          勾选进摘要的句子，也可自加一句自己的话；点“检查摘要”看五项检查，最终合格必须五项全部通过。本课 3 个要点，标准摘要 3 句；全文照搬、要点重复、无来源的句子都会被判违规。
         </p>
         <div className="mt-3 space-y-2">
           {SUMMARY_PASSAGE.map((paragraph) =>
@@ -162,7 +180,7 @@ export function AiPythonU3L02Lab() {
             data-testid="ai-u3-l02-custom-input"
             value={customInput}
             onChange={(event) => setCustomInput(event.target.value)}
-            placeholder="自加一句自己的话（无来源，通不过来源核验）"
+            placeholder={`自加一句自己的话（最多 ${MAX_CUSTOM_LENGTH} 字、共最多 ${MAX_CUSTOM_COUNT} 句）`}
             className="w-full rounded-[14px] border border-[#e7edf5] bg-white px-3 py-2 text-sm text-[#18243a]"
           />
           <button
@@ -175,8 +193,16 @@ export function AiPythonU3L02Lab() {
           </button>
         </div>
         <p className="mt-1 text-sm leading-7 text-[#6f7d92]">
+          自加句是用来练习识别添内容与来源不明的错误实验；抽取式摘要不接受无来源的自加句作为合格答案。
+        </p>
+        <p className="mt-1 text-sm leading-7 text-[#6f7d92]">
           试试触发错误：自加一句原文没有的话看添内容，自加一句带新数字的话看改原意。
         </p>
+        {customNotice !== null && (
+          <p data-testid="ai-u3-l02-custom-notice" className="mt-1 text-sm leading-7 text-[#d64c4c]">
+            {customNotice}
+          </p>
+        )}
         {draftSummary.entries.length > 0 && (
           <div data-testid="ai-u3-l02-entries" className="mt-3 space-y-1 rounded-[14px] bg-[#f3f6fb] p-4">
             <p className="text-sm font-bold text-[#18243a]">当前摘要条目：</p>
@@ -253,6 +279,11 @@ export function AiPythonU3L02Lab() {
               <p key={`${sentence}-${index}`} className="text-sm leading-7 text-[#18243a]">{sentence}</p>
             ))}
             <CheckLines checks={summaryChecks} />
+            <p data-testid="ai-u3-l02-summary-verdict" className="mt-2 text-sm font-bold text-[#18243a]">
+              {summaryChecks.every((check) => check.passed)
+                ? '合格：五项全部通过。'
+                : `未合格：还有 ${summaryChecks.filter((check) => !check.passed).length} 项未通过（${summaryChecks.filter((check) => !check.passed).map((check) => check.name).join('、')}）。`}
+            </p>
           </div>
         )}
       </section>
