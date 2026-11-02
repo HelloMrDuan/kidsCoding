@@ -50,7 +50,10 @@ export type GridLessonStep = {
 
 export type GridLesson = {
   id: string
+  /** Canonical lesson name (full-catalog-v1.json / detailed draft); shown as the classroom heading. */
   title: string
+  /** Story title kept as the scene subtitle (the lesson's old classroom title); omitted when it equals the formal name. */
+  sceneTitle?: string
   story: string
   concept: string
   objectives: string[]
@@ -80,7 +83,8 @@ const o = 'open_door'
 
 const L01: GridLesson = {
   id: 'G0-U1-L01',
-  title: '按下开始，小狐狸出发',
+  title: '小狐狸认识按钮',
+  sceneTitle: '按下开始，小狐狸出发',
   story: '小狐狸住在树屋里，门口挂着两块指令牌：一块是黄色的“开始时”，一块画着向右的箭头。只有先有“开始时”，箭头才会动起来。',
   concept: '开始事件与一条动作顺序',
   objectives: [
@@ -360,7 +364,8 @@ const L02: GridLesson = {
 
 const L03: GridLesson = {
   id: 'G0-U1-L03',
-  title: '数一数，刚好走三步',
+  title: '向右走三步',
+  sceneTitle: '数一数，刚好走三步',
   story: '松鼠在蘑菇屋门口立了一块数数牌，牌上挂着三颗橡果：走一格，数一颗。小狐狸要刚好走到门口：少走够不着，多走就走过了。',
   concept: '动作次数与停在准确的位置',
   objectives: [
@@ -494,7 +499,8 @@ const L03: GridLesson = {
 
 const L04: GridLesson = {
   id: 'G0-U1-L04',
-  title: '转个弯，绕开大石头',
+  title: '转弯避开石头',
+  sceneTitle: '转个弯，绕开大石头',
   story: '一块大石头挡住了直路。路口有块转弯牌，画着向左转、向右转两只弯箭头。小狐狸不能穿过石头，要先转个弯，绕过去再走。',
   concept: '转向与把路线分成几段',
   objectives: [
@@ -634,7 +640,8 @@ const L04: GridLesson = {
 
 const L05: GridLesson = {
   id: 'G0-U1-L05',
-  title: '先拿钥匙再开门',
+  title: '先开门再前进',
+  sceneTitle: '先拿钥匙再开门',
   story: '树洞门锁着，门口的挂钩牌上画着钥匙和小锁：先拿钥匙，才能开锁。金钥匙放在路上，小狐狸要先捡钥匙、再开门，最后才能走过去。顺序反了，门不会开。',
   concept: '先后顺序与前提条件',
   objectives: [
@@ -785,7 +792,8 @@ const BIG_MAP: GridLevel = {
 
 const L06: GridLesson = {
   id: 'G0-U1-L06',
-  title: '做一张森林寻路卡',
+  title: '制作森林寻路卡',
+  sceneTitle: '做一张森林寻路卡',
   story: '森林向导摊开一张手绘地图，请你给新来的小伙伴做一张寻路卡：路上有石头、小河，还有一扇锁着的树洞门。你的程序就是寻路卡。',
   concept: '方向、顺序、调试综合（单元作品）',
   objectives: [

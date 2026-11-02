@@ -433,3 +433,28 @@ describe('EDU-104 G0-U1 grid lessons (TQ-001 rewrite)', () => {
     })
   })
 })
+
+describe('G0-U1 classroom titles match the catalog formal names', () => {
+  const FORMAL_TITLES: Record<string, string> = {
+    'G0-U1-L01': '小狐狸认识按钮',
+    'G0-U1-L02': '给森林邮差指路',
+    'G0-U1-L03': '向右走三步',
+    'G0-U1-L04': '转弯避开石头',
+    'G0-U1-L05': '先开门再前进',
+    'G0-U1-L06': '制作森林寻路卡',
+  }
+  /** Old classroom story titles, kept as scene subtitles (L02 has none). */
+  const STORY_TITLES: Record<string, string | undefined> = {
+    'G0-U1-L01': '按下开始，小狐狸出发',
+    'G0-U1-L03': '数一数，刚好走三步',
+    'G0-U1-L04': '转个弯，绕开大石头',
+    'G0-U1-L05': '先拿钥匙再开门',
+    'G0-U1-L06': '做一张森林寻路卡',
+  }
+  it('every lesson title is the formal name and every scene subtitle is the old story title', () => {
+    for (const lesson of lessons) {
+      expect(lesson.title, lesson.id).toBe(FORMAL_TITLES[lesson.id])
+      expect(lesson.sceneTitle, lesson.id).toBe(STORY_TITLES[lesson.id])
+    }
+  })
+})

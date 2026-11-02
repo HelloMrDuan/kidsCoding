@@ -264,6 +264,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
       isLocked={false}
       lessonGoal={lesson.objectives.join('；')}
       lessonTitle={lesson.title}
+      lessonSubtitle={lesson.sceneTitle}
       localSaveState={saveState}
       onCompleteStep={handleComplete}
       onStartRemedial={() => {}}
