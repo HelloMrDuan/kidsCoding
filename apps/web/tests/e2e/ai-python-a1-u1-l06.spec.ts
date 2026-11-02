@@ -72,3 +72,20 @@ test.describe('A1-U1-L06 second-batch re-verification', () => {
     await expect(page.getByTestId('ai-u1-l06-draft-status')).toContainText('未能保存')
   })
 })
+
+test.describe('A1-U1-L06 narrow-screen overflow regression', () => {
+  test.use({ viewport: { width: 375, height: 812 }, hasTouch: true, isMobile: true })
+
+  test('CDN failure on a narrow screen shows the error without horizontal overflow', async ({ page }) => {
+    // Regression: the CDN-failure error text contains a 58-char unbroken
+    // jsDelivr URL. Without break-words it spills out of the error box and
+    // pushes document scrollWidth to 380 on a 375 viewport.
+    await page.route('**/cdn.jsdelivr.net/**', (route) => route.abort())
+    await page.goto(ROUTE)
+    await expect(page.getByTestId('ai-u1-l06-run-v2')).toBeEnabled({ timeout: 30_000 })
+    await page.getByTestId('ai-u1-l06-run-v2').click()
+    await expect(page.getByTestId('ai-u1-l06-error')).toBeVisible({ timeout: 120_000 })
+    const overflow = await page.evaluate(() => ({ scrollW: document.documentElement.scrollWidth, innerW: window.innerWidth }))
+    expect(overflow.scrollW).toBeLessThanOrEqual(overflow.innerW)
+  })
+})
