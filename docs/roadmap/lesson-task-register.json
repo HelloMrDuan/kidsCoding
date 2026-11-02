@@ -8855,11 +8855,11 @@
     },
     {
       "id": "A1-U1-L06",
-      "title": "手写数字识别实验",
+      "title": "水果分类综合项目：第二批复验",
       "trackId": "A1",
       "unitId": "A1-U1",
       "focusConcept": "评估",
-      "plannedLearningOutcome": "能使用评估解释并完成「手写数字识别实验」中的关键操作，并展示可运行的结果或设计证据。",
+      "plannedLearningOutcome": "能使用评估解释并完成「水果分类综合项目：第二批复验」中的关键操作：用第二批固定合成样本复验水果分类器，给出两栏成绩并分析边界错误，且不把复验数据宣传为严格盲测或真实泛化准确率，并展示可运行的结果或设计证据。",
       "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
@@ -8879,7 +8879,7 @@
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "4号：/learn/ai-python-lab-u1-l06/A1-U1-L06 水果分类综合项目 Draft PR #457，第二批复验（新增合成样本 S1-S6，与原始 30 条无一行重合；干净复验 v1 4/6、v2 5/6）；本地 vitest 与 Playwright 规格已加；未合并，未发布，V2 视觉对齐未宣称通过、独立人工教研复核未完成，保持 in_review，catalogStatus 仍为 outline_not_playable。"
+      "notes": "4号：/learn/ai-python-lab-u1-l06/A1-U1-L06 水果分类综合项目：第二批复验 Draft PR #457（首席裁定正式课名，不再用手写数字识别实验）；第二批固定合成样本 S1-S6，与原始 30 条无一行重合；复验成绩 v1 4/6、v2 5/6（固定合成复验数据，不得宣传为严格盲测或真实泛化准确率）；本机草稿保存与刷新恢复已加，刷新或恢复默认代码不恢复未用于调规则的复验资格；V2 品牌 token 已对齐本页；专属 Vitest 与 Playwright 规格已纳入正式 CI；未合并，未发布，独立人工教研复核未完成，保持 in_review，catalogStatus 仍为 outline_not_playable。"
     },
     {
       "id": "A1-U2-L01",
