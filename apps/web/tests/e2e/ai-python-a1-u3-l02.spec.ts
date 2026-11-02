@@ -23,6 +23,37 @@ test.describe('A1-U3-L02 lesson page', () => {
     await expect(checks).toContainText('改原意：通过')
     await expect(checks).toContainText('抽取规范：通过')
     await expect(checks).toContainText('来源核验：通过')
+    await expect(checks).toContainText('数字规则检查')
+    await expect(page.getByTestId('ai-u3-l02-summary-verdict')).toContainText('合格：五项全部通过')
+  })
+
+  test('verdict: a failing summary is marked not passed', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await page.getByTestId('ai-u3-l02-pick-P1-1').check()
+    await page.getByTestId('ai-u3-l02-pick-P3-1').check()
+    await page.getByTestId('ai-u3-l02-check-summary').click()
+    await expect(page.getByTestId('ai-u3-l02-summary-verdict')).toContainText('未合格')
+  })
+
+  test('custom limits: at most 5 sentences, at most 200 chars, with visible notices', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await expect(page.getByText('自加句是用来练习识别添内容与来源不明的错误实验')).toBeVisible()
+    for (let i = 1; i <= 5; i++) {
+      await page.getByTestId('ai-u3-l02-custom-input').fill(`自加句${i}。`)
+      await page.getByTestId('ai-u3-l02-add-custom').click()
+    }
+    await expect(page.getByTestId('ai-u3-l02-entries')).toContainText('自加句5。')
+    await page.getByTestId('ai-u3-l02-custom-input').fill('自加句6。')
+    await page.getByTestId('ai-u3-l02-add-custom').click()
+    await expect(page.getByTestId('ai-u3-l02-custom-notice')).toContainText('最多 5 句，已达上限')
+    await expect(page.getByTestId('ai-u3-l02-entries')).not.toContainText('自加句6。')
+    await page.getByTestId('ai-u3-l02-reset').click()
+    await page.getByTestId('ai-u3-l02-custom-input').fill('x'.repeat(201))
+    await page.getByTestId('ai-u3-l02-add-custom').click()
+    await expect(page.getByTestId('ai-u3-l02-custom-notice')).toContainText('过长')
+    await expect(page.getByTestId('ai-u3-l02-entries')).toHaveCount(0)
   })
 
   test('reverse: selecting all sentences fails extractive rules', async ({ page }) => {
