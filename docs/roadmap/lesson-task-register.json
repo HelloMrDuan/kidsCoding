@@ -1685,7 +1685,7 @@
       "unitId": "G2-U3",
       "focusConcept": "侦测",
       "plannedLearningOutcome": "能使用侦测解释并完成「键盘控制小船」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1698,10 +1698,10 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/271",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/scratch-g2-u3.spec.ts › G2-U3-L01 键盘控制小船（找错、练习 A、创意导出）",
         "lessonReview": null
       },
       "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
@@ -4727,7 +4727,7 @@
       "unitId": "P3-U1",
       "focusConcept": "CSV",
       "plannedLearningOutcome": "能使用CSV解释并完成「制作CSV记账表」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -4741,12 +4741,13 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/270",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "9db9745376af28093bca259f4e359a5737fc24ad",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41277333982",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41277334012",
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "Muse-C：/learn/python-lab/P3-U1-L02 CSV 记账表 Draft PR #270，头 c4be9ec，本地 Python 参考实现 4/4、本地 vitest 7/7；本机真实浏览器 E2E 尚未执行，V2 视觉对齐未宣称通过、独立人工教研复核未完成，保持 in_review，未合并，未发布，catalogStatus 仍为 outline_not_playable。"
+      "notes": "Muse-C：P3-U1-L02 已合并（Merge PR #270，合并提交 9db97453，分支头 e1dbe82）；主线 CI 成功：curriculum content checks 41277333982、mandatory task accountability 41277334012；独立人工教研复核、真实 E2E 与发布证据仍未完成，保持 merged_waiting_ci，未发布，catalogStatus 仍为 outline_not_playable。"
     },
     {
       "id": "P3-U1-L03",
