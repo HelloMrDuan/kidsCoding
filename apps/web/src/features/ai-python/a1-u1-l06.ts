@@ -6,10 +6,13 @@
  * The second batch below is NEW synthetic data, authored for this lesson:
  * none of its six (fruit, color, weight, diameter) rows appears in the original
  * 30-row table. The original test set (T1-T6) is contaminated for v2 (v2 was
- * tuned after seeing the T2 miss), so the second batch is the clean
- * re-verification set. Clean means: the rule run is the taught rule, untouched
- * for this batch. Once a rule is edited for this batch, later runs are practice
- * records, never final scores.
+ * tuned after seeing the T2 miss), so the second batch is the fixed synthetic
+ * re-verification set: it was never used to tune the rules, but it is NOT a
+ * strict blind test and NOT a generalization estimate — students can see the
+ * samples, and six fixed rows cannot measure true generalization accuracy.
+ * Untuned means: the rule run is the taught rule, untouched for this batch.
+ * Once a rule is edited for this batch, later runs are practice records,
+ * never final scores.
  *
  * This module alone is not a completed or published lesson: the ledger entry
  * stays out of the playable catalog until merge plus independent review.
