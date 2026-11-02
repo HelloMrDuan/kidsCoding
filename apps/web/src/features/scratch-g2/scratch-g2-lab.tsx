@@ -18,7 +18,7 @@ type MoveResult = {requested: G2Point; before: G2Point; after: G2Point; moved: b
 type CostumeResult = {requested: string; before: Array<{name: string; costume: string}>; after: Array<{name: string; costume: string}>; changed: boolean; stageCostumes: string[]}
 type LabMessage = {
   kind: 'FRAME_READY' | 'PROJECT_LOADED' | 'STARTED' | 'STOPPED' | 'SNAPSHOT' | 'CONFIGURED' | 'CLICKED' | 'SAID' | 'MOVE_RESULT' | 'COSTUME_RESULT' | 'SOUND' | 'TURN' | 'BROADCAST' | 'FRAME' | 'BACKDROP_SWITCH' | 'STOP_BLOCK' |
-    'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR'
+    'PROJECT_EXPORTED' | 'DRAFT_EXPORTED' | 'DRAFT_SAVE_FAILED' | 'ERROR' | 'KEY_PRESSED'
   id: number | null
   available?: boolean
   params?: G2Values
@@ -46,6 +46,9 @@ type LabMessage = {
   costume?: string
   /** Sandbox clock (ms) when the VM ran "next costume". */
   t?: number
+  /** Arrow key the VM really ran, and the boat x right after it (keyboard lessons). */
+  key?: string
+  x?: number
   activeThreads?: number
   /** The option Scratch's "stop" block really ran with ("all", "this script"). */
   option?: string
@@ -148,8 +151,11 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
     (selectedDraft !== null && selectedDraft.kind === 'sprite' && Object.keys(changedValues(selectedDraft.values, params)).length === 0)
   const pendingForSelected = selectedProgram?.kind === 'sprite' ? changedValues(selectedProgram.values, params) : {}
   const busy = running || exporting || importing || saving
-  const tasks = evaluateG2Lesson(lesson.id, obs)
-  const observed = observedPrediction(lesson.id, obs)
+  // Live boat x from VM object state; only the U3 keyboard lesson's evaluation uses it (pre-move key log needs the final position to judge landings).
+  const boatSpriteName = lesson.targets.find(t => t.kind === 'sprite')?.name
+  const boatX = boatSpriteName ? sprites.find(s => s.name === boatSpriteName)?.x : undefined
+  const tasks = evaluateG2Lesson(lesson.id, obs, boatX)
+  const observed = observedPrediction(lesson.id, obs, boatX)
 
   const post = useCallback((message: Record<string, unknown>, transfer?: Transferable[]) => {
     frame.current?.contentWindow?.postMessage(message, '*', transfer ?? [])
@@ -427,6 +433,10 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
             setStatus('没有任何对象换造型：Scratch VM 中舞台和精灵的造型前后相同。看看下面的提示。')
           }
         }
+      } else if (msg.kind === 'KEY_PRESSED') {
+        const key = String(msg.key ?? '')
+        const x = Number(msg.x)
+        if (key && Number.isFinite(x)) setObs(prev => ({...prev, keyPresses: [...prev.keyPresses, {key, x}].slice(-40)}))
       } else if (msg.kind === 'MOVE_RESULT') {
         if (msg.requested && typeof msg.requested === 'object' && msg.before && !Array.isArray(msg.before) && msg.after && !Array.isArray(msg.after)) {
           const result = {requested: msg.requested, before: msg.before, after: msg.after, moved: !!msg.moved}
@@ -651,6 +661,16 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
               <button data-testid="g2-green-flag" type="button" disabled={!loaded || !allApplied || busy}
                 className="rounded-full bg-emerald-600 px-7 py-3 font-bold text-white disabled:opacity-40"
                 onClick={() => post({kind: 'RUN', id: id.current})}>▶ 绿旗运行</button>
+              {lesson.showKeys && (
+                <>
+                  <button data-testid="g2-key-right" type="button" disabled={!loaded || busy}
+                    className="rounded-full bg-teal-100 px-6 py-3 font-bold text-teal-900 disabled:opacity-40"
+                    onClick={() => post({kind: 'KEY', id: id.current, key: 'right arrow'})}>→ 按右方向键</button>
+                  <button data-testid="g2-key-left" type="button" disabled={!loaded || busy}
+                    className="rounded-full bg-teal-100 px-6 py-3 font-bold text-teal-900 disabled:opacity-40"
+                    onClick={() => post({kind: 'KEY', id: id.current, key: 'left arrow'})}>← 按左方向键</button>
+                </>
+              )}
               <button data-testid="g2-export-sb3" type="button" disabled={!loaded || !allApplied || busy}
                 className="rounded-full bg-amber-100 px-6 py-3 font-bold text-amber-950 disabled:opacity-40"
                 onClick={() => { setExporting(true); setExportDetails('正在由真实 Scratch VM 打包，并在独立 VM 中重新载入检查……'); post({kind: 'EXPORT', id: id.current}) }}>
@@ -820,6 +840,16 @@ export function ScratchG2Lab({lesson}: {lesson: G2Lesson}) {
                 ))}
               </p>
             )}
+            {lesson.showKeys && (() => {
+              const last = obs.keyPresses[obs.keyPresses.length - 1]
+              return (
+                <p data-testid="g2-key-log" data-last-key={last?.key ?? ''} data-last-x={last ? Math.round(last.x) : ''} data-press-count={obs.keyPresses.length} className="mt-2 text-sm">
+                  {last
+                    ? `Scratch VM 刚才执行了“${last.key === 'right arrow' ? '右方向键' : '左方向键'}”按键脚本，小船现在 x ${Math.round(last.x)}。一共按了 ${obs.keyPresses.length} 次。`
+                    : '还没有按键：先点绿旗，再按上面的方向键按钮，小船的 x 坐标会显示在这里。'}
+                </p>
+              )
+            })()}
             {spriteTargets.map(t => {
               const s = spriteOf(t.name)
               return <p key={t.name} data-testid="g2-sprite-state" data-name={t.name} className="mt-2 text-sm">
