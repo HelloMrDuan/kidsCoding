@@ -1,11 +1,13 @@
 import { expect, test } from '@playwright/test'
 
 // A1-U1-L06: second-batch re-verification for the fruit classifier. The page
-// runs real Pyodide Python in the shared sandboxed iframe against six NEW
+// runs real Pyodide Python in the shared sandboxed iframe against six FIXED
 // synthetic samples (S1-S6), disjoint from the original 30-row table.
 // Matrices are computed by the page from the sandbox's per-row printed
-// judgments, never hand-filled. The taught rules run untouched are the clean
-// re-verification; edited rules are labelled practice records.
+// judgments, never hand-filled. The taught rules run untouched are the
+// untuned re-verification; edited rules are labelled practice records.
+// S1-S6 are fixed synthetic re-verification data: they are NOT a strict
+// blind test and NOT a generalization accuracy estimate.
 const ROUTE = '/learn/ai-python-lab-u1-l06/A1-U1-L06'
 
 test.describe('A1-U1-L06 second-batch re-verification', () => {
@@ -18,14 +20,14 @@ test.describe('A1-U1-L06 second-batch re-verification', () => {
     await expect(page.getByTestId('ai-u1-l06-dataset')).toContainText('S6')
   })
 
-  test('v2 clean run produces the program-computed 5/6 second-batch matrix with the S2 miss', async ({ page }) => {
+  test('v2 untuned run produces the program-computed 5/6 second-batch matrix with the S2 miss', async ({ page }) => {
     test.setTimeout(180_000)
     await page.goto(ROUTE)
     await expect(page.getByTestId('ai-u1-l06-run-v2')).toBeEnabled({ timeout: 15_000 })
     await page.getByTestId('ai-u1-l06-run-v2').click()
     await expect(page.getByTestId('ai-u1-l06-matrix-v2')).toContainText('第二批：5/6', { timeout: 70_000 })
     await expect(page.getByTestId('ai-u1-l06-matrix-v2')).toContainText('S2')
-    await expect(page.getByTestId('ai-u1-l06-clean-label-v2')).toContainText('干净复验')
+    await expect(page.getByTestId('ai-u1-l06-clean-label-v2')).toContainText('未用于调规则的复验')
   })
 
   test('v1 run produces 4/6 with the S1 and S2 misses', async ({ page }) => {
@@ -36,5 +38,23 @@ test.describe('A1-U1-L06 second-batch re-verification', () => {
     await expect(page.getByTestId('ai-u1-l06-matrix-v1')).toContainText('第二批：4/6', { timeout: 70_000 })
     await expect(page.getByTestId('ai-u1-l06-matrix-v1')).toContainText('S1')
     await expect(page.getByTestId('ai-u1-l06-matrix-v1')).toContainText('S2')
+  })
+
+  test('draft restore keeps practice eligibility after refresh and reset-to-default', async ({ page }) => {
+    await page.goto(ROUTE)
+    await expect(page.getByTestId('ai-u1-l06-draft-status')).toContainText('规则 v1：未改动')
+    await page.getByTestId('ai-u1-l06-rule-v1').fill('def classify(color, weight):\n    return "橙子"')
+    await page.waitForFunction(
+      () => (window.localStorage.getItem('a1-u1-l06-draft-v1') ?? '').includes('"v1":true'),
+    )
+    await page.reload()
+    await expect(page.getByTestId('ai-u1-l06-draft-status')).toContainText('规则 v1：已改动（复验资格：练习记录）')
+    await page.getByTestId('ai-u1-l06-reset-v1').click()
+    await expect(page.getByTestId('ai-u1-l06-rule-v1')).toHaveValue(
+      'def classify(color, weight):\n    if color == "黄":\n        return "香蕉"\n    if color == "橙":\n        return "橙子"\n    return "苹果"',
+    )
+    await expect(page.getByTestId('ai-u1-l06-draft-status')).toContainText('规则 v1：已改动（复验资格：练习记录）')
+    await page.reload()
+    await expect(page.getByTestId('ai-u1-l06-draft-status')).toContainText('规则 v1：已改动（复验资格：练习记录）')
   })
 })
