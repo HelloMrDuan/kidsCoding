@@ -40,6 +40,19 @@ describe('A1-U3-L02 draft save/restore', () => {
     expect(restored.hintLevel).toBe(0)
   })
 
+  it('drops over-long custom sentences on read (safe degradation)', () => {
+    const restored = parseDraft(
+      JSON.stringify({
+        version: 1,
+        selected: [],
+        custom: ['短句。', 'x'.repeat(201)],
+        facts: {},
+        hintLevel: 0,
+      }),
+    )
+    expect(restored.custom).toEqual(['短句。'])
+  })
+
   it('an old draft without custom defaults custom to empty', () => {
     const restored = parseDraft(
       JSON.stringify({ version: 1, selected: ['P1-1'], facts: {}, hintLevel: 0 }),
