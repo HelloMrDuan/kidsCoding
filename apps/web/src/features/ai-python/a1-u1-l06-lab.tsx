@@ -24,6 +24,7 @@ import {
   restoreDefaultCode,
   saveDraft,
   subscribeDraft,
+  type L06Draft,
 } from './a1-u1-l06-draft'
 
 type SandboxEvent = { kind: 'FRAME_READY' | 'LOADED' | 'RESULT'; id?: number; output?: string; error?: string | null }
@@ -36,6 +37,7 @@ function MatrixTable({ matrix, caption }: { matrix: ConfusionMatrix; caption: st
   return (
     <div className="mt-3">
       <p className="text-sm font-bold text-[#18243a]">{caption}</p>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm text-[#18243a]">
         <thead>
           <tr>
@@ -56,6 +58,7 @@ function MatrixTable({ matrix, caption }: { matrix: ConfusionMatrix; caption: st
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }
@@ -76,6 +79,12 @@ export function AiPythonU1L06Lab() {
   const [status, setStatus] = useState('先做预测练习，再运行沙箱复验。首次运行需要加载 Python 引擎。本机草稿会自动保存，刷新后恢复。')
   const [results, setResults] = useState<Record<RuleId, RunResult | null>>({ v1: null, v2: null })
   const [predictionScores, setPredictionScores] = useState<Record<RuleId, { correct: number; total: number } | null>>({ v1: null, v2: null })
+  const [saveError, setSaveError] = useState(false)
+  // Persist a draft edit and surface a visible "not saved" state when the
+  // browser storage write fails, instead of silently dropping the edit.
+  function persist(next: L06Draft) {
+    setSaveError(!saveDraft(next))
+  }
   const frame = useRef<HTMLIFrameElement>(null)
   const requestId = useRef(0)
   const timeout = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -181,7 +190,7 @@ export function AiPythonU1L06Lab() {
   }
 
   function resetRule(rule: RuleId) {
-    saveDraft(restoreDefaultCode(draft, rule, rule === 'v1' ? RULE_V1_PYTHON : RULE_V2_PYTHON))
+    persist(restoreDefaultCode(draft, rule, rule === 'v1' ? RULE_V1_PYTHON : RULE_V2_PYTHON))
     setStatus('已恢复默认代码；复验资格状态不变——为这批样本改过规则的记录不会因还原而清除。')
   }
 
@@ -267,7 +276,7 @@ export function AiPythonU1L06Lab() {
                     value={predictions[`${rule}:${row.id}`] ?? ''}
                     onChange={(event) => {
                       const value = event.target.value
-                      saveDraft({ ...draft, predictions: { ...draft.predictions, [`${rule}:${row.id}`]: value === '' ? undefined : (value as FruitName) } })
+                      persist({ ...draft, predictions: { ...draft.predictions, [`${rule}:${row.id}`]: value === '' ? undefined : (value as FruitName) } })
                     }}
                     aria-label={`${row.id} 的规则 ${rule} 预测`}
                     className="rounded-lg border border-[#e7edf5] p-2"
@@ -388,6 +397,7 @@ export function AiPythonU1L06Lab() {
         </p>
         <p data-testid="ai-u1-l06-draft-status" className="mt-2 text-sm leading-7 text-[#6f7d92]">
           本机草稿状态：规则 v1：{draftStatusLine('v1')}；规则 v2：{draftStatusLine('v2')}。
+          {saveError ? '本机草稿未能保存：浏览器存储不可用，刷新后草稿不会恢复；刚才的修改没有存下来。' : null}
         </p>
         <label htmlFor="ai-u1-l06-rule-v1" className="mt-4 block font-bold text-[#18243a]">规则 v1（颜色规则）</label>
         <textarea
@@ -396,7 +406,7 @@ export function AiPythonU1L06Lab() {
           spellCheck={false}
           disabled={busy !== null}
           value={ruleV1}
-          onChange={(event) => { saveDraft(markEdited({ ...draft, ruleV1: event.target.value }, 'v1')) }}
+          onChange={(event) => { persist(markEdited({ ...draft, ruleV1: event.target.value }, 'v1')) }}
           rows={6}
           className="mt-2 w-full rounded-lg border border-[#e7edf5] p-3 font-mono text-sm leading-7 text-[#18243a] disabled:opacity-70"
           aria-label="规则 v1 代码编辑区"
@@ -429,7 +439,7 @@ export function AiPythonU1L06Lab() {
           spellCheck={false}
           disabled={busy !== null}
           value={ruleV2}
-          onChange={(event) => { saveDraft(markEdited({ ...draft, ruleV2: event.target.value }, 'v2')) }}
+          onChange={(event) => { persist(markEdited({ ...draft, ruleV2: event.target.value }, 'v2')) }}
           rows={8}
           className="mt-2 w-full rounded-lg border border-[#e7edf5] p-3 font-mono text-sm leading-7 text-[#18243a] disabled:opacity-70"
           aria-label="规则 v2 代码编辑区"
