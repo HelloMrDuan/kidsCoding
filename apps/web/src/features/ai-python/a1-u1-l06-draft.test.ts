@@ -60,6 +60,15 @@ describe('A1-U1-L06 draft persistence', () => {
     expect(getCachedDraft(null, V1, V2)).toEqual(emptyDraft(V1, V2))
   })
 
+  it('drops illegal prediction values from a damaged draft instead of trusting them', () => {
+    const raw = JSON.stringify({
+      ...emptyDraft(V1, V2),
+      predictions: { 'v1:S1': '西瓜', 'v1:S2': '苹果', 'v2:S3': 42 },
+    })
+    const restored = parseDraft(raw, V1, V2)
+    expect(restored.predictions).toEqual({ 'v1:S2': '苹果' })
+  })
+
   it('saveDraft persists when a window exists and never throws', () => {
     const draft = markEdited(emptyDraft(V1, V2), 'v2')
     const saved = saveDraft(draft)
