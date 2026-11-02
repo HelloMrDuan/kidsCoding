@@ -57,4 +57,18 @@ test.describe('A1-U1-L06 second-batch re-verification', () => {
     await page.reload()
     await expect(page.getByTestId('ai-u1-l06-draft-status')).toContainText('规则 v1：已改动（复验资格：练习记录）')
   })
+
+  test('storage failure shows a not-saved notice instead of silently dropping the edit', async ({ page }) => {
+    await page.addInitScript(() => {
+      const orig = Storage.prototype.setItem
+      Storage.prototype.setItem = function (key: string, value: string) {
+        if (key === 'a1-u1-l06-draft-v1') throw new Error('storage denied')
+        return orig.call(this, key, value)
+      }
+    })
+    await page.goto(ROUTE)
+    await expect(page.getByTestId('ai-u1-l06-draft-status')).toContainText('规则 v1：未改动')
+    await page.getByTestId('ai-u1-l06-rule-v1').fill('def classify(color, weight):\n    return "橙子"')
+    await expect(page.getByTestId('ai-u1-l06-draft-status')).toContainText('未能保存')
+  })
 })
