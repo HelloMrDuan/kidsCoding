@@ -17,6 +17,13 @@ import {
   scorePredictions,
   SECOND_BATCH_ROWS,
 } from './a1-u1-l06'
+import {
+  L06_DRAFT_STORAGE_KEY,
+  parseDraft,
+  restoreDefaultCode,
+  serializeDraft,
+  type L06Draft,
+} from './a1-u1-l06-draft'
 
 type SandboxEvent = { kind: 'FRAME_READY' | 'LOADED' | 'RESULT'; id?: number; output?: string; error?: string | null }
 
@@ -27,22 +34,22 @@ type RunResult =
 function MatrixTable({ matrix, caption }: { matrix: ConfusionMatrix; caption: string }) {
   return (
     <div className="mt-3">
-      <p className="text-sm font-bold text-slate-800">{caption}</p>
-      <table className="mt-2 w-full border-collapse text-sm text-slate-800">
+      <p className="text-sm font-bold text-[#18243a]">{caption}</p>
+      <table className="w-full border-collapse text-sm text-[#18243a]">
         <thead>
           <tr>
-            <th className="border border-slate-200 p-2 text-left">真实＼预测</th>
+            <th className="border border-[#e7edf5] p-2 text-left">真实＼预测</th>
             {matrix.labels.map((label) => (
-              <th key={label} className="border border-slate-200 p-2">{label}</th>
+              <th key={label} className="border border-[#e7edf5] p-2">{label}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {matrix.labels.map((label, rowIndex) => (
             <tr key={label}>
-              <th className="border border-slate-200 p-2 text-left">{label}</th>
+              <th className="border border-[#e7edf5] p-2 text-left">{label}</th>
               {matrix.counts[rowIndex].map((value, colIndex) => (
-                <td key={`${label}-${matrix.labels[colIndex]}`} className="border border-slate-200 p-2 text-center">{value}</td>
+                <td key={`${label}-${matrix.labels[colIndex]}`} className="border border-[#e7edf5] p-2 text-center">{value}</td>
               ))}
             </tr>
           ))}
@@ -59,16 +66,40 @@ export function AiPythonU1L06Lab() {
   const [ruleV2, setRuleV2] = useState(RULE_V2_PYTHON)
   const [ready, setReady] = useState(false)
   const [busy, setBusy] = useState<RuleId | null>(null)
-  const [status, setStatus] = useState('先做预测练习，再运行沙箱复验。首次运行需要加载 Python 引擎。')
+  const [status, setStatus] = useState('先做预测练习，再运行沙箱复验。首次运行需要加载 Python 引擎。本机草稿会自动保存，刷新后恢复。')
   const [results, setResults] = useState<Record<RuleId, RunResult | null>>({ v1: null, v2: null })
-  const [touched, setTouched] = useState<Record<RuleId, boolean>>({ v1: false, v2: false })
+  const [contaminated, setContaminated] = useState<Record<RuleId, boolean>>({ v1: false, v2: false })
   const [predictions, setPredictions] = useState<Record<string, FruitName | undefined>>({})
   const [predictionScores, setPredictionScores] = useState<Record<RuleId, { correct: number; total: number } | null>>({ v1: null, v2: null })
+  const [hydrated, setHydrated] = useState(false)
   const frame = useRef<HTMLIFrameElement>(null)
   const requestId = useRef(0)
   const timeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const active = useRef(false)
   const pendingRule = useRef<RuleId | null>(null)
+
+  useEffect(() => {
+    try {
+      const draft = parseDraft(window.localStorage.getItem(L06_DRAFT_STORAGE_KEY), RULE_V1_PYTHON, RULE_V2_PYTHON)
+      setRuleV1(draft.ruleV1)
+      setRuleV2(draft.ruleV2)
+      setPredictions(draft.predictions)
+      setContaminated(draft.contaminated)
+    } catch {
+      // Storage unavailable: the lesson still works, just without draft restore.
+    }
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+    try {
+      const draft: L06Draft = { version: 1, ruleV1, ruleV2, predictions, contaminated }
+      window.localStorage.setItem(L06_DRAFT_STORAGE_KEY, serializeDraft(draft))
+    } catch {
+      // Storage unavailable: ignore, the lesson still works.
+    }
+  }, [hydrated, ruleV1, ruleV2, predictions, contaminated])
 
   useEffect(() => {
     const frameNode = frame.current
@@ -168,6 +199,14 @@ export function AiPythonU1L06Lab() {
     return `规则代码 ${built.studentCode.length} 字（学生源码上限 5000 字）· 课节静态数据 ${built.lessonStaticLength} 字（不计入学生源码）· 本次传输共 ${built.transmitted.length} 字（沙箱上限 5000 字）`
   }
 
+  function resetRule(rule: RuleId) {
+    const draft: L06Draft = { version: 1, ruleV1, ruleV2, predictions, contaminated }
+    const next = restoreDefaultCode(draft, rule, rule === 'v1' ? RULE_V1_PYTHON : RULE_V2_PYTHON)
+    if (rule === 'v1') setRuleV1(next.ruleV1)
+    else setRuleV2(next.ruleV2)
+    setStatus('已恢复默认代码；复验资格状态不变——为这批样本改过规则的记录不会因还原而清除。')
+  }
+
   function checkPredictions(rule: RuleId) {
     const perSample: Record<string, FruitName | undefined> = {}
     for (const row of SECOND_BATCH_ROWS) perSample[row.id] = predictions[`${rule}:${row.id}`]
@@ -177,7 +216,7 @@ export function AiPythonU1L06Lab() {
     }
     const scored = scorePredictions(perSample, rule)
     setPredictionScores((prev) => ({ ...prev, [rule]: { correct: scored.correct, total: scored.total } }))
-    setStatus(`规则 ${rule} 预测核对完成：${scored.correct}/${scored.total}。预测用的是固定规则、不改规则，所以不污染沙箱复验。`)
+    setStatus(`规则 ${rule} 预测核对完成：${scored.correct}/${scored.total}。预测用的是固定规则、不改规则，所以不影响沙箱复验资格。`)
   }
 
   function renderResult(rule: RuleId) {
@@ -185,7 +224,7 @@ export function AiPythonU1L06Lab() {
     if (!result) return null
     if (!result.ok) {
       return (
-        <p data-testid="ai-u1-l06-error" className="mt-3 rounded-xl bg-red-50 p-4 text-sm leading-7 text-red-900">
+        <p data-testid="ai-u1-l06-error" className="mt-3 rounded-xl bg-[#fdecec] p-4 text-sm leading-7 text-[#d64c4c]">
           未生成矩阵：{result.error}
         </p>
       )
@@ -193,32 +232,33 @@ export function AiPythonU1L06Lab() {
     const misses = result.judgments.filter((judgment) => judgment.actual !== judgment.predicted)
     return (
       <div data-testid={`ai-u1-l06-matrix-${rule}`} className="mt-3">
-        <p className="text-sm font-bold text-slate-900">
+        <p className="text-sm font-bold text-[#18243a]">
           第二批：{result.matrix.correct}/{result.matrix.total}
         </p>
         <MatrixTable matrix={result.matrix} caption="第二批混淆矩阵（行是真实，列是预测）" />
         {misses.length > 0 ? (
-          <p className="mt-3 text-sm leading-7 text-slate-800">
+          <p className="mt-3 text-sm leading-7 text-[#18243a]">
             第二批错误：
             {misses.map((miss) => `${miss.id}（真实${miss.actual}，判为${miss.predicted}）`).join('、')}
           </p>
         ) : (
-          <p className="mt-3 text-sm leading-7 text-slate-800">第二批无错误。</p>
+          <p className="mt-3 text-sm leading-7 text-[#18243a]">第二批无错误。</p>
         )}
-        {touched[rule] ? (
-          <div data-testid={`ai-u1-l06-practice-label-${rule}`} className="mt-3 rounded-xl bg-amber-50 p-4">
-            <p className="font-black text-amber-900">练习记录，已污染，不作最终成绩</p>
-            <p className="mt-1 text-sm leading-7 text-slate-700">
+        {contaminated[rule] ? (
+          <div data-testid={`ai-u1-l06-practice-label-${rule}`} className="mt-3 rounded-xl bg-[#fdf3e3] p-4">
+            <p className="font-black text-[#ad6b20]">练习记录，已污染，不作最终成绩</p>
+            <p className="mt-1 text-sm leading-7 text-[#18243a]">
               这次运行的规则代码已被改动，不再是课堂教过的原规则；为这批样本改过规则后，
               这批样本就不再是干净裁判。本次结果只作练习记录。
             </p>
           </div>
         ) : (
-          <div data-testid={`ai-u1-l06-clean-label-${rule}`} className="mt-3 rounded-xl bg-emerald-50 p-4">
-            <p className="font-black text-emerald-900">干净复验</p>
-            <p className="mt-1 text-sm leading-7 text-slate-700">
+          <div data-testid={`ai-u1-l06-clean-label-${rule}`} className="mt-3 rounded-xl bg-[#e6f4ec] p-4">
+            <p className="font-black text-[#148767]">未用于调规则的复验</p>
+            <p className="mt-1 text-sm leading-7 text-[#18243a]">
               这次运行的是课堂教过的原规则、运行前没有为这批样本改过规则，
-              因此这批样本是干净裁判，本次结果可作最终成绩候选。
+              因此这批样本没有被用来调规则，本次结果可作本节复验成绩；
+              但 S1–S6 是固定合成数据，不是严格盲测，也不是真实泛化准确率。
             </p>
           </div>
         )}
@@ -229,21 +269,21 @@ export function AiPythonU1L06Lab() {
   function renderPredictionTable(rule: RuleId) {
     const score = predictionScores[rule]
     return (
-      <div className="mt-3">
-        <table className="w-full border-collapse text-sm text-slate-800">
+      <div className="mt-3 overflow-x-auto">
+        <table className="w-full border-collapse text-sm text-[#18243a]">
           <thead>
             <tr>
-              <th className="border border-slate-200 p-2 text-left">样本</th>
-              <th className="border border-slate-200 p-2 text-left">真实（复验后可见，预测时先不看）</th>
-              <th className="border border-slate-200 p-2 text-left">你的预测</th>
+              <th className="border border-[#e7edf5] p-2 text-left">样本</th>
+              <th className="border border-[#e7edf5] p-2 text-left">真实（复验后可见，预测时先不看）</th>
+              <th className="border border-[#e7edf5] p-2 text-left">你的预测</th>
             </tr>
           </thead>
           <tbody>
             {SECOND_BATCH_ROWS.map((row) => (
               <tr key={row.id}>
-                <td className="border border-slate-200 p-2">{row.id}（{row.color}，{row.weight} 克）</td>
-                <td className="border border-slate-200 p-2">先预测，核对后再看</td>
-                <td className="border border-slate-200 p-2">
+                <td className="border border-[#e7edf5] p-2">{row.id}（{row.color}，{row.weight} 克）</td>
+                <td className="border border-[#e7edf5] p-2">先预测，核对后再看</td>
+                <td className="border border-[#e7edf5] p-2">
                   <select
                     data-testid={`ai-u1-l06-predict-${rule}-${row.id}`}
                     value={predictions[`${rule}:${row.id}`] ?? ''}
@@ -252,7 +292,7 @@ export function AiPythonU1L06Lab() {
                       setPredictions((prev) => ({ ...prev, [`${rule}:${row.id}`]: value === '' ? undefined : (value as FruitName) }))
                     }}
                     aria-label={`${row.id} 的规则 ${rule} 预测`}
-                    className="rounded-lg border border-slate-300 p-2"
+                    className="rounded-lg border border-[#e7edf5] p-2"
                   >
                     <option value="">请选择</option>
                     {FRUIT_OPTIONS.map((fruit) => (
@@ -268,12 +308,12 @@ export function AiPythonU1L06Lab() {
           type="button"
           data-testid={`ai-u1-l06-check-${rule}`}
           onClick={() => checkPredictions(rule)}
-          className="mt-3 rounded-full bg-indigo-700 px-6 py-3 font-bold text-white"
+          className="mt-3 rounded-full bg-[#2463eb] px-6 py-3 font-bold text-white hover:bg-[#1748b2]"
         >
           核对规则 {rule} 的预测
         </button>
         {score ? (
-          <p data-testid={`ai-u1-l06-predict-score-${rule}`} className="mt-2 text-sm font-bold text-slate-900">
+          <p data-testid={`ai-u1-l06-predict-score-${rule}`} className="mt-2 text-sm font-bold text-[#18243a]">
             预测得分：规则 {rule} {score.correct}/{score.total}
           </p>
         ) : null}
@@ -281,131 +321,166 @@ export function AiPythonU1L06Lab() {
     )
   }
 
+  function draftStatusLine(rule: RuleId): string {
+    return contaminated[rule] ? '已改动（复验资格：练习记录）' : '未改动（复验资格：未用于调规则的复验）'
+  }
+
   return (
-    <main data-testid="ai-u1-l06-lab" className="mx-auto max-w-3xl px-4 py-8">
-      <p className="text-xs font-bold tracking-widest text-indigo-700">课程开发中（未发布、未通过独立复核）</p>
-      <h1 className="mt-2 text-2xl font-black text-slate-900">A1-U1 水果分类综合项目</h1>
-      <p data-testid="ai-u1-l06-lesson-heading" className="mt-2 font-bold text-slate-900">
-        当前课节：A1-U1-L06 综合项目：第二批复验
+    <main data-testid="ai-u1-l06-lab" className="mx-auto max-w-3xl bg-[#f3f6fb] px-4 py-8">
+      <p className="text-xs font-bold tracking-widest text-[#2463eb]">课程开发中（未发布、未通过独立复核）</p>
+      <h1 className="mt-2 text-2xl font-black text-[#18243a]">A1-U1 水果分类综合项目</h1>
+      <p data-testid="ai-u1-l06-lesson-heading" className="mt-2 font-bold text-[#18243a]">
+        当前课节：A1-U1-L06 水果分类综合项目：第二批复验
       </p>
-      <p className="mt-2 leading-7 text-slate-700">
-        本节只走浏览器本地平面，不调用外部模型，不保存正式成绩。主线台账中本节仍为
-        todo，目录仍为 outline_not_playable；本页完成不等于课节完成、发布或通过验证。
+      <p className="mt-2 leading-7 text-[#18243a]">
+        本节只走浏览器本地平面，不调用外部模型，不保存正式成绩。
+        本页是开发中的课程，不代表已完成、已发布或已通过验证。
+        S1–S6 是教师给定的固定合成复验数据：学生看得见样本、规则没有为这批样本调过；
+        它能检验规则有没有被原测试集虚高，但不能当作严格盲测，也不能当作真实泛化准确率；
+        真实泛化需要更大、更新、学生没见过的数据。
       </p>
 
-      <section className="mt-6 rounded-[14px] border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-black text-slate-900">回顾：为什么需要第二批</h2>
-        <p className="mt-2 leading-7 text-slate-700">
+      <section className="mt-6 rounded-[14px] border border-[#e7edf5] bg-[#ffffff] p-4 shadow-sm">
+        <h2 className="text-lg font-black text-[#18243a]">回顾：为什么需要第二批</h2>
+        <p className="mt-2 leading-7 text-[#18243a]">
           原始 30 条表按水果分层划分：训练集 24 条、测试集 6 条。规则 v1 在原测试集上
           5/6，唯一错误是 T2 金帅苹果（黄、168 克）被判成香蕉；规则 v2 加了“黄且
           150 克以上判苹果”分支后，在原测试集上 6/6。但 v2 是在看过 T2 错误后改的，
           原测试集已不再是干净裁判——“改后 6/6”不得当最终成绩。最终复验必须用一批
-          在教学和调规则时都没见过的新样本，就是本节的第二批。
+          没有为它调过规则的新样本，就是本节的第二批固定合成数据。
         </p>
       </section>
 
       <section className="mt-8">
-        <h2 className="text-lg font-black text-slate-900">第二批新样本：6 条（新增合成数据）</h2>
-        <p className="mt-2 text-sm leading-7 text-slate-600">
+        <h2 className="text-lg font-black text-[#18243a]">第二批新样本：6 条（新增合成数据）</h2>
+        <p className="mt-2 text-sm leading-7 text-[#6f7d92]">
           每类水果 2 条；6 条样本的（水果、颜色、重量、直径）没有一行与原始 30 条表重合，
-          教学和调规则时都没用过。全合成数据，无真实个人信息。
+          没有为它调过规则；它是固定合成复验数据，不是严格盲测。
+          全合成数据，无真实个人信息。
         </p>
-        <table data-testid="ai-u1-l06-dataset" className="mt-3 w-full border-collapse text-sm text-slate-800">
-          <thead>
-            <tr>
-              <th className="border border-slate-200 p-2 text-left">编号</th>
-              <th className="border border-slate-200 p-2 text-left">水果</th>
-              <th className="border border-slate-200 p-2 text-left">颜色</th>
-              <th className="border border-slate-200 p-2 text-left">重量（克）</th>
-              <th className="border border-slate-200 p-2 text-left">直径（厘米）</th>
-            </tr>
-          </thead>
-          <tbody>
-            {SECOND_BATCH_ROWS.map((row) => (
-              <tr key={row.id}>
-                <td className="border border-slate-200 p-2">{row.id}</td>
-                <td className="border border-slate-200 p-2">{row.fruit}</td>
-                <td className="border border-slate-200 p-2">{row.color}</td>
-                <td className="border border-slate-200 p-2">{row.weight}</td>
-                <td className="border border-slate-200 p-2">{row.diameter}</td>
+        <div className="overflow-x-auto">
+          <table data-testid="ai-u1-l06-dataset" className="mt-3 w-full border-collapse text-sm text-[#18243a]">
+            <thead>
+              <tr>
+                <th className="border border-[#e7edf5] p-2 text-left">编号</th>
+                <th className="border border-[#e7edf5] p-2 text-left">水果</th>
+                <th className="border border-[#e7edf5] p-2 text-left">颜色</th>
+                <th className="border border-[#e7edf5] p-2 text-left">重量（克）</th>
+                <th className="border border-[#e7edf5] p-2 text-left">直径（厘米）</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {SECOND_BATCH_ROWS.map((row) => (
+                <tr key={row.id}>
+                  <td className="border border-[#e7edf5] p-2">{row.id}</td>
+                  <td className="border border-[#e7edf5] p-2">{row.fruit}</td>
+                  <td className="border border-[#e7edf5] p-2">{row.color}</td>
+                  <td className="border border-[#e7edf5] p-2">{row.weight}</td>
+                  <td className="border border-[#e7edf5] p-2">{row.diameter}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
-      <section className="mt-8 rounded-[14px] border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-black text-slate-900">练习 A：先预测，再运行</h2>
-        <p className="mt-2 leading-7 text-slate-700">
+      <section className="mt-8 rounded-[14px] border border-[#e7edf5] bg-[#ffffff] p-4 shadow-sm">
+        <h2 className="text-lg font-black text-[#18243a]">练习 A：先预测，再运行</h2>
+        <p className="mt-2 leading-7 text-[#18243a]">
           不看答案，先凭规则给每条第二批样本写预测：规则 v1 只看颜色，
           规则 v2 多看“黄且 150 克以上”分支。预测用的是固定规则、不改规则，
-          所以不污染后面的沙箱复验。
+          所以不影响后面的复验资格。
         </p>
-        <h3 className="mt-4 font-black text-slate-900">规则 v1 预测</h3>
+        <h3 className="mt-4 font-black text-[#18243a]">规则 v1 预测</h3>
         {renderPredictionTable('v1')}
-        <h3 className="mt-6 font-black text-slate-900">规则 v2 预测</h3>
+        <h3 className="mt-6 font-black text-[#18243a]">规则 v2 预测</h3>
         {renderPredictionTable('v2')}
       </section>
 
-      <section className="mt-8 rounded-[14px] border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-black text-slate-900">练习 B：沙箱复验（真实 Python 运行）</h2>
-        <p className="mt-2 text-sm leading-7 text-slate-600">
+      <section className="mt-8 rounded-[14px] border border-[#e7edf5] bg-[#ffffff] p-4 shadow-sm">
+        <h2 className="text-lg font-black text-[#18243a]">练习 B：沙箱复验（真实 Python 运行）</h2>
+        <p className="mt-2 text-sm leading-7 text-[#6f7d92]">
           规则代码由课节提供，可编辑；第二批数据集与驱动代码由课节静态下发，
           不计入学生源码。运行只用 Python 标准库，不引任何 ML 库。
-          直接运行原规则就是干净复验；一旦改动规则代码再运行，结果即记为练习记录。
+          直接运行未改动的原规则就是未用于调规则的复验；一旦改动规则代码再运行，
+          结果即记为练习记录。草稿自动保存在本机浏览器：刷新后规则代码、预测与
+          复验资格状态都会恢复；点“恢复默认代码”只还原代码文字，不恢复资格——
+          为这批样本改过规则的事实不会因刷新或还原而消失；运行结果不保存，
+          刷新后需重新运行。
         </p>
-        <label htmlFor="ai-u1-l06-rule-v1" className="mt-4 block font-bold text-slate-900">规则 v1（颜色规则）</label>
+        <p data-testid="ai-u1-l06-draft-status" className="mt-2 text-sm leading-7 text-[#6f7d92]">
+          本机草稿状态：规则 v1：{draftStatusLine('v1')}；规则 v2：{draftStatusLine('v2')}。
+        </p>
+        <label htmlFor="ai-u1-l06-rule-v1" className="mt-4 block font-bold text-[#18243a]">规则 v1（颜色规则）</label>
         <textarea
           id="ai-u1-l06-rule-v1"
           data-testid="ai-u1-l06-rule-v1"
           spellCheck={false}
           disabled={busy !== null}
           value={ruleV1}
-          onChange={(event) => { setRuleV1(event.target.value); setTouched((prev) => ({ ...prev, v1: true })) }}
+          onChange={(event) => { setRuleV1(event.target.value); setContaminated((prev) => ({ ...prev, v1: true })) }}
           rows={6}
-          className="mt-2 w-full rounded-lg border border-slate-300 p-3 font-mono text-sm leading-7 text-slate-900 disabled:opacity-70"
+          className="mt-2 w-full rounded-lg border border-[#e7edf5] p-3 font-mono text-sm leading-7 text-[#18243a] disabled:opacity-70"
           aria-label="规则 v1 代码编辑区"
         />
-        <p data-testid="ai-u1-l06-length-v1" className="mt-1 text-xs text-slate-500">{lengthLine('v1')}</p>
+        <p data-testid="ai-u1-l06-length-v1" className="mt-1 text-xs text-[#6f7d92]">{lengthLine('v1')}</p>
         <button
           type="button"
           data-testid="ai-u1-l06-run-v1"
           onClick={() => run('v1')}
           disabled={!ready || busy !== null}
-          className="mt-3 rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:cursor-wait disabled:opacity-50"
+          className="mt-3 rounded-full bg-[#2463eb] px-6 py-3 font-bold text-white hover:bg-[#1748b2] disabled:cursor-wait disabled:opacity-50"
         >
           {busy === 'v1' ? '运行中…' : '▶ 运行规则 v1'}
         </button>
+        <button
+          type="button"
+          data-testid="ai-u1-l06-reset-v1"
+          onClick={() => resetRule('v1')}
+          disabled={busy !== null}
+          className="mt-3 ml-3 rounded-full border border-[#e7edf5] bg-[#ffffff] px-6 py-3 font-bold text-[#18243a] disabled:opacity-50"
+        >
+          恢复默认代码
+        </button>
         {renderResult('v1')}
 
-        <label htmlFor="ai-u1-l06-rule-v2" className="mt-8 block font-bold text-slate-900">规则 v2（颜色 + 重量分支）</label>
+        <label htmlFor="ai-u1-l06-rule-v2" className="mt-8 block font-bold text-[#18243a]">规则 v2（颜色 + 重量分支）</label>
         <textarea
           id="ai-u1-l06-rule-v2"
           data-testid="ai-u1-l06-rule-v2"
           spellCheck={false}
           disabled={busy !== null}
           value={ruleV2}
-          onChange={(event) => { setRuleV2(event.target.value); setTouched((prev) => ({ ...prev, v2: true })) }}
+          onChange={(event) => { setRuleV2(event.target.value); setContaminated((prev) => ({ ...prev, v2: true })) }}
           rows={8}
-          className="mt-2 w-full rounded-lg border border-slate-300 p-3 font-mono text-sm leading-7 text-slate-900 disabled:opacity-70"
+          className="mt-2 w-full rounded-lg border border-[#e7edf5] p-3 font-mono text-sm leading-7 text-[#18243a] disabled:opacity-70"
           aria-label="规则 v2 代码编辑区"
         />
-        <p data-testid="ai-u1-l06-length-v2" className="mt-1 text-xs text-slate-500">{lengthLine('v2')}</p>
+        <p data-testid="ai-u1-l06-length-v2" className="mt-1 text-xs text-[#6f7d92]">{lengthLine('v2')}</p>
         <button
           type="button"
           data-testid="ai-u1-l06-run-v2"
           onClick={() => run('v2')}
           disabled={!ready || busy !== null}
-          className="mt-3 rounded-full bg-indigo-700 px-6 py-3 font-bold text-white disabled:cursor-wait disabled:opacity-50"
+          className="mt-3 rounded-full bg-[#2463eb] px-6 py-3 font-bold text-white hover:bg-[#1748b2] disabled:cursor-wait disabled:opacity-50"
         >
           {busy === 'v2' ? '运行中…' : '▶ 运行规则 v2'}
+        </button>
+        <button
+          type="button"
+          data-testid="ai-u1-l06-reset-v2"
+          onClick={() => resetRule('v2')}
+          disabled={busy !== null}
+          className="mt-3 ml-3 rounded-full border border-[#e7edf5] bg-[#ffffff] px-6 py-3 font-bold text-[#18243a] disabled:opacity-50"
+        >
+          恢复默认代码
         </button>
         {renderResult('v2')}
       </section>
 
-      <section className="mt-8 rounded-[14px] border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-black text-slate-900">误分类分析：v2 剩下的那一个错误</h2>
-        <p className="mt-2 leading-7 text-slate-700">
+      <section className="mt-8 rounded-[14px] border border-[#e7edf5] bg-[#ffffff] p-4 shadow-sm">
+        <h2 className="text-lg font-black text-[#18243a]">误分类分析：v2 剩下的那一个错误</h2>
+        <p className="mt-2 leading-7 text-[#18243a]">
           第二批里 v2 只错一条：S2 黄苹果 142 克。重量分支的门槛是 150 克，
           142 克够不着门槛，所以 v2 仍把它判成香蕉——v2 修好了重黄苹果（S1，172 克），
           没修好轻黄苹果。这是“边界代价”：颜色撞车的地方，单看重量门槛总有一侧会漏。
@@ -414,25 +489,27 @@ export function AiPythonU1L06Lab() {
         </p>
       </section>
 
-      <section className="mt-8 rounded-[14px] border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-black text-slate-900">项目总结：两栏成绩</h2>
-        <p className="mt-2 leading-7 text-slate-700">
+      <section className="mt-8 rounded-[14px] border border-[#e7edf5] bg-[#ffffff] p-4 shadow-sm">
+        <h2 className="text-lg font-black text-[#18243a]">项目总结：两栏成绩</h2>
+        <p className="mt-2 leading-7 text-[#18243a]">
           原测试集成绩（已污染，不作最终成绩）：v1 5/6，v2 6/6。
-          第二批干净复验成绩：v1 4/6，v2 5/6。两栏都要报，只报第二栏是诚实分，
-          只报第一栏是虚高分。本分类器只认苹果、香蕉、橙子三类，只用颜色和重量规则；
+          第二批复验成绩（固定合成数据）：v1 4/6，v2 5/6。两栏都要报；
+          第二栏是未用于调规则的复验分，不是严格盲测分，更不是真实泛化准确率。
+          本分类器只认苹果、香蕉、橙子三类，只用颜色和重量规则；
           新类别（如梨）超范围，颜色缺失时应拒答而不是猜一个；数据全合成，
           结论不能直接搬到真实水果上。下一步是更多样本、更多特征，但那是后续课的内容，
           不在本节假装做完。
         </p>
       </section>
 
-      <p data-testid="ai-u1-l06-status" role="status" aria-live="polite" className="mt-6 rounded-xl bg-sky-50 p-4 text-sm leading-7 text-slate-800">
+      <p data-testid="ai-u1-l06-status" role="status" aria-live="polite" className="mt-6 rounded-xl bg-[#eef4ff] p-4 text-sm leading-7 text-[#18243a]">
         {status}
       </p>
-      <p className="mt-4 text-xs leading-6 text-slate-600">
+      <p className="mt-4 text-xs leading-6 text-[#6f7d92]">
         隔离说明：代码仅在无同源权限的 sandbox iframe 及其 Web Worker 里的 Pyodide 运行，
         不在 Next.js 服务器执行。矩阵由沙箱输出统计得出，不产生可信成绩记录；
-        本节无保存与恢复能力，刷新后预测与运行结果不保留。
+        草稿只存在本机浏览器，不上传服务器；运行结果不保存，刷新后需重新运行；
+        清除浏览器数据会丢掉草稿，这是浏览器行为，不在本节控制内。
         沙箱限制了应用数据访问，但不是通用的恶意代码安全执行平台。
       </p>
       <iframe
