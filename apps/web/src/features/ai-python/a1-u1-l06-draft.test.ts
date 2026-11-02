@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
   emptyDraft,
+  getCachedDraft,
   markEdited,
   parseDraft,
   restoreDefaultCode,
+  saveDraft,
   serializeDraft,
   type L06Draft,
 } from './a1-u1-l06-draft'
@@ -49,5 +51,15 @@ describe('A1-U1-L06 draft persistence', () => {
   it('marking one rule edited leaves the other rule clean', () => {
     const draft = markEdited(emptyDraft(V1, V2), 'v1')
     expect(draft.contaminated).toEqual({ v1: true, v2: false })
+  })
+
+  it('cached snapshot returns the same object for unchanged stored text', () => {
+    const raw = serializeDraft(markEdited(emptyDraft(V1, V2), 'v1'))
+    expect(getCachedDraft(raw, V1, V2)).toBe(getCachedDraft(raw, V1, V2))
+    expect(getCachedDraft(null, V1, V2)).toEqual(emptyDraft(V1, V2))
+  })
+
+  it('saveDraft reports false without a browser window instead of throwing', () => {
+    expect(saveDraft(emptyDraft(V1, V2))).toBe(false)
   })
 })
