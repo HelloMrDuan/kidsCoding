@@ -3202,6 +3202,32 @@
         "reviewer": null
       },
       "notes": "A1 第二阶段 U3 本地层试点：生成式环节仍等批（设计包阶段 3 五条批件未齐），本任务只含本地层；L02 课文与 L06 问答对为试点新增合成数据、页内明码标注，L06 答案取自 U1 详案已验证结论；U3 课节仍为 todo；关账待本 PR 合并 + 主线两工作流全绿后另立关账 PR。"
+    },
+    {
+      "id": "SYS-120",
+      "title": "G2-U1 六课三端真实 Chrome 验收测试与 CI 接线",
+      "priority": "P1",
+      "category": "SYS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "G2-U1 六节三端验收测试接线：新增 apps/web/tests/e2e/scratch-g2-u1-viewport.spec.ts（19 项：每节×手机 375×812 触摸模拟 / 平板 768×1024 触摸 / 桌面 1440×900，另含移动端保存恢复抽测；交互前后均断言无横向溢出）与 curriculum-content.yml 独立 Job g2-u1-viewport-trial（timeout 12 分钟，截图与 metrics 构件常传）及路径过滤；不改课程、不改台账课程条目、不改他人文件、不放宽校验。",
+      "acceptance": [
+        "19 项测试在 CI 新 Job 下跑绿",
+        "截图与 metrics 构件上传",
+        "任务门禁通过（声明条目与改动条目完全一致）",
+        "PR 合并后主线 CI 通过"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/460",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "本地加强版 19/19 通过，1.8 分钟（Chrome for Testing；交互前后溢出断言均已执行）",
+          "CI g2-u1-viewport-trial 在上一头 success，构件 g2-u1-viewport-chrome-evidence（19 张 PNG + 18 份 metrics JSON）；新头 CI 待验"
+        ],
+        "reviewer": null
+      },
+      "notes": "负责人：KidsCoding 开发账号 B（kid小宝三号）。G2-U1 六节结论仅为工程验收通过，不标 completed，不可发布；独立教研、儿童试学、发布批准仍缺。自动化验收不等于教学审定。条目追加位置为 tasks 数组末尾（SYS-119 之后）；文件顶层 updatedAt 已是旧值（2026-10-24），按现有惯例不随本条改动。"
     }
   ]
 }
