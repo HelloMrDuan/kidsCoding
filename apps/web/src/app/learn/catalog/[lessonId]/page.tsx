@@ -66,7 +66,7 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
           <section className="rounded-[2rem] border-2 border-amber-200 bg-white p-6 shadow-sm">
             <p className="text-xs font-bold text-amber-700">Blockly 真运行 · 森林网格 · 浏览器草稿</p>
             <h2 className="mt-2 text-xl font-black">用积木带小狐狸走格子</h2>
-            <p className="mt-2 text-sm leading-7 text-slate-600">四关都要真的运行到目标才算过；走错会告诉你撞到了什么、差几格。程序自动保存在本机，正式课程仍未发布。</p>
+            <p className="mt-2 text-sm leading-7 text-slate-600">五关都要真的运行到目标才算过；走错会告诉你撞到了什么、差几格。程序自动保存在本机，正式课程仍未发布。</p>
             <Link href={trial} data-testid="grid-trial-entry" className="mt-4 inline-flex rounded-full bg-amber-500 px-6 py-3 font-bold text-white">开始森林寻路 →</Link>
           </section>
         ) : null}
