@@ -3208,7 +3208,7 @@
       "title": "G2-U1 六课三端真实 Chrome 验收测试与 CI 接线",
       "priority": "P1",
       "category": "SYS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "G2-U1 六节三端验收测试接线：新增 apps/web/tests/e2e/scratch-g2-u1-viewport.spec.ts（19 项：每节×手机 375×812 触摸模拟 / 平板 768×1024 触摸 / 桌面 1440×900，另含移动端保存恢复抽测；交互前后均断言无横向溢出）与 curriculum-content.yml 独立 Job g2-u1-viewport-trial（timeout 12 分钟，截图与 metrics 构件常传）及路径过滤；不改课程、不改台账课程条目、不改他人文件、不放宽校验。",
       "acceptance": [
@@ -3219,11 +3219,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/460",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "6ee706a215b6d13d8eaffb447118f7d93b2cea95",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41407872380",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41407872439",
         "tests": [
           "本地加强版 19/19 通过，1.8 分钟（Chrome for Testing；交互前后溢出断言均已执行）",
-          "CI g2-u1-viewport-trial 在上一头 success，构件 g2-u1-viewport-chrome-evidence（19 张 PNG + 18 份 metrics JSON）；新头 CI 待验"
+          "主线 6ee706a2：课程运行 41407872380 success（含 g2-u1-viewport-trial success）；任务运行 41407872439 success"
         ],
         "reviewer": null
       },
