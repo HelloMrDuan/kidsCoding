@@ -8879,7 +8879,7 @@
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "4号：/learn/ai-python-lab-u1-l06/A1-U1-L06 水果分类综合项目：第二批复验 Draft PR #457（首席裁定正式课名，不再用手写数字识别实验）；第二批固定合成样本 S1-S6，与原始 30 条无一行重合；复验成绩 v1 4/6、v2 5/6（固定合成复验数据，不得宣传为严格盲测或真实泛化准确率）；本机草稿保存与刷新恢复已加，刷新或恢复默认代码不恢复未用于调规则的复验资格；V2 品牌 token 已对齐本页；专属 Vitest 与 Playwright 规格已纳入正式 CI；未合并，未发布，独立人工教研复核未完成，保持 in_review，catalogStatus 仍为 outline_not_playable。"
+      "notes": "4号：/learn/ai-python-lab-u1-l06/A1-U1-L06 水果分类综合项目：第二批复验 PR #457（首席裁定正式课名，不再用手写数字识别实验）；第二批固定合成样本 S1-S6，与原始 30 条无一行重合；复验成绩 v1 4/6、v2 5/6（固定合成复验数据，不得宣传为严格盲测或真实泛化准确率）；本机草稿保存与刷新恢复已加，刷新或恢复默认代码不恢复未用于调规则的复验资格；V2 品牌 token 已应用于本页（以代码与三端截图为准），视觉符合性待独立视觉复核，不宣称通过；专属 Vitest 与 Playwright 规格已纳入正式 CI；未合并，未发布，独立人工教研复核未完成，保持 in_review，catalogStatus 仍为 outline_not_playable。"
     },
     {
       "id": "A1-U2-L01",
