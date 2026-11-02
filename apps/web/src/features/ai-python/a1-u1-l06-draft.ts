@@ -15,7 +15,7 @@
  * states plainly instead of pretending otherwise.
  */
 
-import type { FruitName, RuleId } from './fruit-classifier'
+import { RULE_V1_PYTHON, RULE_V2_PYTHON, type FruitName, type RuleId } from './fruit-classifier'
 
 export const L06_DRAFT_STORAGE_KEY = 'a1-u1-l06-draft-v1'
 
@@ -66,4 +66,63 @@ export function restoreDefaultCode(draft: L06Draft, rule: RuleId, defaultCode: s
 /** Mark a rule edited for this batch: its eligibility is spent from now on. */
 export function markEdited(draft: L06Draft, rule: RuleId): L06Draft {
   return { ...draft, contaminated: { ...draft.contaminated, [rule]: true } }
+}
+
+/**
+ * React store wiring (useSyncExternalStore): the stored draft is the single
+ * source of truth, so the page never calls setState synchronously inside an
+ * effect to load it. Edits write through saveDraft, which notifies local
+ * subscribers immediately (the 'storage' event only fires across tabs, so the
+ * same tab needs the manual notification).
+ */
+type DraftListener = () => void
+
+const draftListeners = new Set<DraftListener>()
+
+export function subscribeDraft(listener: DraftListener): () => void {
+  draftListeners.add(listener)
+  if (typeof window !== 'undefined') window.addEventListener('storage', listener)
+  return () => {
+    draftListeners.delete(listener)
+    if (typeof window !== 'undefined') window.removeEventListener('storage', listener)
+  }
+}
+
+export function readStoredRaw(): string | null {
+  try {
+    return typeof window === 'undefined' ? null : window.localStorage.getItem(L06_DRAFT_STORAGE_KEY)
+  } catch {
+    return null
+  }
+}
+
+let cachedRaw: string | null | undefined
+let cachedDraft: L06Draft | null = null
+
+/** Cached parse: the same stored text returns the same object, as useSyncExternalStore requires. */
+export function getCachedDraft(raw: string | null, fallbackV1: string, fallbackV2: string): L06Draft {
+  if (cachedDraft && cachedRaw === raw) return cachedDraft
+  cachedRaw = raw
+  cachedDraft = parseDraft(raw, fallbackV1, fallbackV2)
+  return cachedDraft
+}
+
+export function getDraftSnapshot(): L06Draft {
+  return getCachedDraft(readStoredRaw(), RULE_V1_PYTHON, RULE_V2_PYTHON)
+}
+
+export function getServerDraftSnapshot(): L06Draft {
+  return emptyDraft(RULE_V1_PYTHON, RULE_V2_PYTHON)
+}
+
+/** Persist and notify. Returns false when storage is unavailable; the lesson still works. */
+export function saveDraft(draft: L06Draft): boolean {
+  try {
+    if (typeof window === 'undefined') return false
+    window.localStorage.setItem(L06_DRAFT_STORAGE_KEY, serializeDraft(draft))
+    draftListeners.forEach((listener) => listener())
+    return true
+  } catch {
+    return false
+  }
 }
