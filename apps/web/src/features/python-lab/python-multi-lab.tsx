@@ -13,10 +13,12 @@ type RunMsg={kind:'FRAME_READY'|'LOADED'|'RESULT';id?:number;error?:string|null;
 const CUSTOM_ARG_DEFAULT_MAX_LEN=40
 const CUSTOM_ARG_MAX_LEN: Partial<Record<MultiPythonLessonId, readonly number[]>> = {
   'P3-U1-L03': [200],
+  'P3-U2-L02': [1000],
 }
 // 自选参数多行输入表：表里列出的（课节，参数序号）渲染为 textarea，其余为 input。
 const CUSTOM_ARG_TEXTAREA: Partial<Record<MultiPythonLessonId, readonly number[]>> = {
   'P3-U1-L03': [0],
+  'P3-U2-L02': [0],
 }
 
 export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
@@ -126,7 +128,7 @@ export function PythonMultiLab({lessonId}:{lessonId:MultiPythonLessonId}) {
   function runCustom(){
     if(customBusy||!ready||!frame.current?.contentWindow)return
     if(source.length>5000){setCustomResult('代码超过5000字符，无法运行。');return}
-    if(customArgs.some((a,index)=>a.length>(CUSTOM_ARG_MAX_LEN[lessonId]?.[index]??CUSTOM_ARG_DEFAULT_MAX_LEN))){setCustomResult('自选参数每项最多40字，通讯录 JSON 文本最多200字。');return}
+    if(customArgs.some((a,index)=>a.length>(CUSTOM_ARG_MAX_LEN[lessonId]?.[index]??CUSTOM_ARG_DEFAULT_MAX_LEN))){setCustomResult('自选参数每项最多40字，通讯录 JSON 文本最多200字，天气 CSV 文本最多1000字。');return}
     customId.current+=1
     customActive.current=true
     customArgsRef.current=[...customArgs]
