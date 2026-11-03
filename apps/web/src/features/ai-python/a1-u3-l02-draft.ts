@@ -1,23 +1,35 @@
 /**
  * A1-U3-L02 本机草稿：只存学生的课堂选择，不存判定结果。
  *
- * 存：动手摘要所选句子编号、自加句文本、事实核对每条的选择、已揭示到的提示级数。
+ * 存：动手摘要所选句子编号、自加句文本、事实核对每条的选择、已揭示到的提示级数、
+ * 预测活动每候选的预测与揭示状态、迁移课文所选句、独立检查是否已做过、
+ * 每项未通过检查的学生自写错误解释、一句话方法总结。
  * 不存：五项检查结果与核对正误——刷新后须重新检查、重新核对才出结果。
- * 恢复默认：清空选择、自加句与提示级数，回到未做状态。
+ * 恢复默认：清空全部课堂选择，回到未做状态。
  *
  * 与 U1-L06 草稿同一模式：localStorage 单键、防御解析、损坏降级、
  * 写入失败返回 false（由页面提示“未能保存”，不悄悄丢修改）。
  * 本课没有“污染资格”概念，不设污染标志；不要把 L06 的资格规则搬过来。
+ *
+ * 草稿键（P0 契约格式）：kidscoding-draft:A1-U3-L02。旧 #462 草稿键
+ * a1-u3-l02-draft-v1 不再读写——#462 从未合并发布，不存在已发布
+ * 课堂下真实学生的旧草稿，无需迁移；新键与旧键互不干扰。
  */
 
-import type { FactKind } from './a1-u3-l02'
-import { allSentenceIds } from './a1-u3-l02'
+import type { FactKind, L02CheckName } from './a1-u3-l02'
+import { allSentenceIds, allTransferSentenceIds } from './a1-u3-l02'
+import { L02_DRAFT_KEY, PREDICTION_CANDIDATES } from './a1-u3-l02-contract'
 
-export const L02_DRAFT_KEY = 'a1-u3-l02-draft-v1'
+export { L02_DRAFT_KEY }
 
 /** 自加句上限：最多 5 句、每句最多 200 字。超限在加入时提示，在读取时丢弃。 */
 export const MAX_CUSTOM_COUNT = 5
 export const MAX_CUSTOM_LENGTH = 200
+
+export type L02Prediction = {
+  verdict: '合格' | '未合格'
+  firstFailed: L02CheckName | ''
+}
 
 export type L02Draft = {
   version: 1
@@ -25,10 +37,37 @@ export type L02Draft = {
   custom: string[]
   facts: Record<string, FactKind | undefined>
   hintLevel: 0 | 1 | 2 | 3
+  /** 预测活动：每候选的学生预测（揭示前不存真实结果）。 */
+  predictions: Record<string, L02Prediction | undefined>
+  /** 预测活动：已揭示真实结果的候选编号。 */
+  revealed: string[]
+  /** 迁移课文所选句编号（T1/T2/T3 体系，与主课文分开存）。 */
+  transferSelected: string[]
+  /** 迁移课文是否已做过一次检查。 */
+  transferChecked: boolean
+  /** 独立摘要是否已做过一次检查（解锁正反例的门）。 */
+  hasChecked: boolean
+  /** 学生自写的错误解释：检查名 → 一句话。 */
+  errorExplanations: Record<string, string>
+  /** 学生一句话方法总结。 */
+  methodSummary: string
 }
 
 export function emptyDraft(): L02Draft {
-  return { version: 1, selected: [], custom: [], facts: {}, hintLevel: 0 }
+  return {
+    version: 1,
+    selected: [],
+    custom: [],
+    facts: {},
+    hintLevel: 0,
+    predictions: {},
+    revealed: [],
+    transferSelected: [],
+    transferChecked: false,
+    hasChecked: false,
+    errorExplanations: {},
+    methodSummary: '',
+  }
 }
 
 function isFactKind(value: unknown): value is FactKind {
@@ -67,12 +106,47 @@ export function parseDraft(raw: string | null, fallback: L02Draft = emptyDraft()
     if (isFactKind(value)) facts[key] = value
   }
   const hintLevel = record['hintLevel']
+  const candidateIds = new Set(PREDICTION_CANDIDATES.map((item) => item.id))
+  const checkNames = new Set(['漏要点', '添内容', '改原意', '抽取规范', '来源核验'])
+  const rawPredictions = (record['predictions'] ?? {}) as Record<string, unknown>
+  const predictions: Record<string, L02Prediction | undefined> = {}
+  for (const [key, value] of Object.entries(rawPredictions)) {
+    if (!candidateIds.has(key) || typeof value !== 'object' || value === null) continue
+    const entry = value as Record<string, unknown>
+    if (entry['verdict'] !== '合格' && entry['verdict'] !== '未合格') continue
+    const firstFailedRaw = typeof entry['firstFailed'] === 'string' ? entry['firstFailed'] : ''
+    if (firstFailedRaw !== '' && !checkNames.has(firstFailedRaw as L02CheckName)) continue
+    predictions[key] = { verdict: entry['verdict'], firstFailed: firstFailedRaw as L02CheckName | '' }
+  }
+  const revealed = Array.isArray(record['revealed'])
+    ? (record['revealed'] as unknown[]).filter(
+        (id): id is string => typeof id === 'string' && candidateIds.has(id),
+      )
+    : []
+  const validTransferIds = new Set(allTransferSentenceIds())
+  const transferSelected = Array.isArray(record['transferSelected'])
+    ? (record['transferSelected'] as unknown[]).filter(
+        (id): id is string => typeof id === 'string' && validTransferIds.has(id),
+      )
+    : []
+  const rawExplanations = (record['errorExplanations'] ?? {}) as Record<string, unknown>
+  const errorExplanations: Record<string, string> = {}
+  for (const [key, value] of Object.entries(rawExplanations)) {
+    if (checkNames.has(key) && typeof value === 'string') errorExplanations[key] = value
+  }
   return {
     version: 1,
     selected,
     custom,
     facts,
     hintLevel: hintLevel === 1 || hintLevel === 2 || hintLevel === 3 ? hintLevel : 0,
+    predictions,
+    revealed,
+    transferSelected,
+    transferChecked: record['transferChecked'] === true,
+    hasChecked: record['hasChecked'] === true,
+    errorExplanations,
+    methodSummary: typeof record['methodSummary'] === 'string' ? record['methodSummary'] : '',
   }
 }
 
