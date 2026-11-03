@@ -4,12 +4,19 @@ import {
   FACT_STATEMENTS,
   GOOD_SUMMARY,
   HINTS,
+  PREDICTION_RESULTS,
   SUMMARY_METHOD_STEPS,
   buildDraftSummary,
+  buildDraftSummaryForPassage,
   buildStudentSummary,
+  buildTransferSummary,
   checkDraftSummary,
+  checkDraftSummaryForPassage,
+  checkTransferSummary,
   judgeFact,
+  judgePrediction,
 } from './a1-u3-l02'
+import { L02_CONTRACT, TRANSFER_PASSAGE, TRANSFER_POINTS } from './a1-u3-l02-contract'
 import {
   SUMMARY_PASSAGE,
   checkSummary,
@@ -128,5 +135,87 @@ describe('A1-U3-L02 lesson content (reuses the U3 pilot engine)', () => {
   it('hints have three progressive levels and the method has three steps', () => {
     expect(HINTS.map((h) => h.level)).toEqual([1, 2, 3])
     expect(SUMMARY_METHOD_STEPS).toHaveLength(3)
+  })
+})
+
+describe('A1-U3-L02 P0 content contract', () => {
+  it('goal5 has exactly five items and names no API call', () => {
+    expect(L02_CONTRACT.goal5).toHaveLength(5)
+    expect(L02_CONTRACT.lessonId).toBe('A1-U3-L02')
+    expect(L02_CONTRACT.title).toBe('实现文本摘要')
+    expect(L02_CONTRACT.engine).toBe('summary')
+    expect(L02_CONTRACT.goal5.join('')).not.toContain('API')
+    expect(L02_CONTRACT.goal5[3]).toContain('尚未建成')
+    expect(L02_CONTRACT.goal5[3]).toContain('不调用外部模型')
+  })
+
+  it('draft key follows the spec format and scope is honestly labelled', () => {
+    expect(L02_CONTRACT.draftKey).toBe('kidscoding-draft:A1-U3-L02')
+    expect(L02_CONTRACT.scopeLabel).toBe('教学定向')
+    expect(L02_CONTRACT.scopeGap).toContain('不等于完全掌握')
+    expect(L02_CONTRACT.hints.map((h) => h.level)).toEqual([1, 2, 3])
+  })
+
+  it('the transfer passage is a new passage with the same 3-point structure', () => {
+    expect(TRANSFER_PASSAGE).toHaveLength(3)
+    expect(TRANSFER_PASSAGE.map((p) => p.point)).toEqual(['A', 'B', 'C'])
+    expect(TRANSFER_POINTS).toEqual({ A: '先分类', B: '按顺序装', C: '出门前检查' })
+    const mainText = SUMMARY_PASSAGE.flatMap((p) => p.sentences).join('')
+    for (const sentence of TRANSFER_PASSAGE.flatMap((p) => p.sentences)) {
+      expect(mainText).not.toContain(sentence)
+    }
+  })
+
+  it('the transfer theme triple passes all five checks under the same rules', () => {
+    const summary = buildTransferSummary(['T1-1', 'T2-1', 'T3-1'])
+    expect(summary.pointsCovered).toEqual(['A', 'B', 'C'])
+    const checks = checkTransferSummary(summary)
+    expect(checks).toHaveLength(5)
+    expect(checks.every((c) => c.passed)).toBe(true)
+  })
+
+  it('transfer failures use the same five checks (missing point, repeated point)', () => {
+    const missing = checkTransferSummary(buildTransferSummary(['T1-1', 'T2-1']))
+    expect(missing.find((c) => c.name === '漏要点')?.passed).toBe(false)
+    const repeated = checkTransferSummary(buildTransferSummary(['T1-1', 'T1-2', 'T2-1', 'T3-1']))
+    expect(repeated.find((c) => c.name === '抽取规范')?.passed).toBe(false)
+  })
+
+  it('the passage-parameterized checker matches the main-passage checker', () => {
+    const summary = buildDraftSummary(['P1-1', 'P3-1', 'P4-1'], [])
+    expect(checkDraftSummaryForPassage(SUMMARY_PASSAGE, summary)).toEqual(checkDraftSummary(summary))
+    expect(buildDraftSummaryForPassage(SUMMARY_PASSAGE, ['P1-1'], [])).toEqual(
+      buildDraftSummary(['P1-1'], []),
+    )
+  })
+
+  it('prediction candidates are computed, not hand-filled, and none is the theme triple', () => {
+    const byId = new Map(PREDICTION_RESULTS.map((r) => [r.candidate.id, r]))
+    const a = byId.get('pred-a')!
+    expect(a.passed).toBe(true)
+    expect(a.failedNames).toEqual([])
+    const b = byId.get('pred-b')!
+    expect(b.passed).toBe(false)
+    expect(b.failedNames).toEqual(['漏要点', '抽取规范'])
+    const c = byId.get('pred-c')!
+    expect(c.passed).toBe(false)
+    expect(c.failedNames).toEqual(['添内容', '来源核验'])
+    const theme = new Set(['P1-1', 'P3-1', 'P4-1'])
+    for (const result of PREDICTION_RESULTS) {
+      const ids = new Set(result.candidate.selectedIds)
+      expect(ids).not.toEqual(theme)
+    }
+  })
+
+  it('prediction judging requires the verdict and, when failing, a real failed check', () => {
+    const byId = new Map(PREDICTION_RESULTS.map((r) => [r.candidate.id, r]))
+    const a = byId.get('pred-a')!
+    expect(judgePrediction(a, '合格', '')).toBe(true)
+    expect(judgePrediction(a, '未合格', '漏要点')).toBe(false)
+    const b = byId.get('pred-b')!
+    expect(judgePrediction(b, '未合格', '漏要点')).toBe(true)
+    expect(judgePrediction(b, '未合格', '抽取规范')).toBe(true)
+    expect(judgePrediction(b, '未合格', '添内容')).toBe(false)
+    expect(judgePrediction(b, '合格', '')).toBe(false)
   })
 })
