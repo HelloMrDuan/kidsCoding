@@ -9097,13 +9097,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/462",
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/468",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "P0 样板 B 整改（Draft PR 待填，未合并、未发布）：首屏五要素、任务抽屉（默认收起）、预测/独立/迁移三层活动、迁移新课文（整理书包）、正反例须先独立检查解锁、契约驱动文案、草稿键改为规范格式 kidscoding-draft:A1-U3-L02；五项检查与本地规则引擎不回退（Vitest 与真实浏览器 E2E 见 PR 正文）；台账本行订正：focusConcept 与学习目标、验收首条的 API 表述为旧规划模板残留，已改为忠实摘要；前置 A1-U3-L01 尚未建成（生成式等批），它是顺序前置而非本课本地方法的知识前置，prerequisiteLessonIds 是否改动留待首席裁定，本 PR 未擅自改动该字段；V2 品牌 token 已应用于本页（以代码与三端截图为准），视觉符合性待独立视觉复核，不宣称通过；独立人工教研与儿童试学仍在发布门禁内；页面任何位置不写“已掌握”，一次全过只表示本次摘要合格。"
+      "notes": "P0 样板 B 整改（Draft PR #468，未合并、未发布）：首屏五要素、任务抽屉（默认收起）、预测/独立/迁移三层活动、迁移新课文（整理书包）、正反例须先独立检查解锁、契约驱动文案、草稿键改为规范格式 kidscoding-draft:A1-U3-L02；五项检查与本地规则引擎不回退（Vitest 与真实浏览器 E2E 见 PR 正文）；台账本行订正：focusConcept 与学习目标、验收首条的 API 表述为旧规划模板残留，已改为忠实摘要；前置 A1-U3-L01 尚未建成（生成式等批），它是顺序前置而非本课本地方法的知识前置，prerequisiteLessonIds 是否改动留待首席裁定，本 PR 未擅自改动该字段；V2 品牌 token 已应用于本页（以代码与三端截图为准），视觉符合性待独立视觉复核，不宣称通过；独立人工教研与儿童试学仍在发布门禁内；页面任何位置不写“已掌握”，一次全过只表示本次摘要合格。"
     },
     {
       "id": "A1-U3-L03",
