@@ -25,13 +25,24 @@ import {
   checkSummary,
   summarizePassage,
   type SummaryCheck,
+  type SummaryParagraph,
   type SummaryPoint,
   type SummaryResult,
 } from './u3-local-engines'
+import {
+  L02_CONTRACT,
+  PREDICTION_CANDIDATES,
+  TRANSFER_PASSAGE,
+  TRANSFER_POINTS,
+  type PredictionCandidate,
+} from './a1-u3-l02-contract'
 
-export const L02_LESSON_ID = 'A1-U3-L02'
-export const L02_LESSON_TITLE = '实现文本摘要'
-export const L02_ROUTE = '/learn/ai-python-lab-u3-l02/A1-U3-L02'
+/** 课程文案唯一来源：契约（本文件只保留判定逻辑，不再自带课堂文案）。 */
+export { L02_CONTRACT, TRANSFER_PASSAGE, TRANSFER_POINTS }
+export { L02_LESSON_ID, L02_LESSON_TITLE, L02_ROUTE } from './a1-u3-l02-contract'
+export const HINTS = L02_CONTRACT.hints
+export const SUMMARY_METHOD_STEPS = L02_CONTRACT.methodSteps
+export type { PredictionCandidate }
 
 export { SUMMARY_PASSAGE, SUMMARY_POINTS, summarizePassage, checkSummary }
 export type { SummaryCheck, SummaryPoint, SummaryResult }
@@ -49,8 +60,11 @@ export function allSentenceIds(): SentenceId[] {
   )
 }
 
-function sentenceById(id: SentenceId): { text: string; point: SummaryPoint } | null {
-  for (const paragraph of SUMMARY_PASSAGE) {
+function sentenceInPassage(
+  passage: SummaryParagraph[],
+  id: SentenceId,
+): { text: string; point: SummaryPoint } | null {
+  for (const paragraph of passage) {
     for (let index = 0; index < paragraph.sentences.length; index++) {
       if (sentenceId(paragraph.id, index) === id) {
         return { text: paragraph.sentences[index], point: paragraph.point }
@@ -58,6 +72,20 @@ function sentenceById(id: SentenceId): { text: string; point: SummaryPoint } | n
     }
   }
   return null
+}
+
+function sentenceById(id: SentenceId): { text: string; point: SummaryPoint } | null {
+  return sentenceInPassage(SUMMARY_PASSAGE, id)
+}
+
+export function allTransferSentenceIds(): SentenceId[] {
+  return TRANSFER_PASSAGE.flatMap((paragraph) =>
+    paragraph.sentences.map((_, index) => sentenceId(paragraph.id, index)),
+  )
+}
+
+export function transferSentenceText(id: SentenceId): string {
+  return sentenceInPassage(TRANSFER_PASSAGE, id)?.text ?? ''
 }
 
 const POINT_ORDER: SummaryPoint[] = ['A', 'B', 'C']
@@ -104,11 +132,16 @@ export type DraftSummary = {
 /**
  * 草稿摘要：选句按课文顺序排在前，自加句按加入顺序排在后。
  * 要点覆盖只算有来源的选句——自加句就算写了要点词，也不能替要点背书。
+ * passage 参数化：主课文与迁移课文共用同一套规则，判定逻辑只写一次。
  */
-export function buildDraftSummary(selectedIds: SentenceId[], customTexts: string[]): DraftSummary {
+export function buildDraftSummaryForPassage(
+  passage: SummaryParagraph[],
+  selectedIds: SentenceId[],
+  customTexts: string[],
+): DraftSummary {
   const entries: SummaryEntry[] = []
   const points = new Set<SummaryPoint>()
-  for (const paragraph of SUMMARY_PASSAGE) {
+  for (const paragraph of passage) {
     for (let index = 0; index < paragraph.sentences.length; index++) {
       const id = sentenceId(paragraph.id, index)
       if (selectedIds.includes(id)) {
@@ -127,6 +160,15 @@ export function buildDraftSummary(selectedIds: SentenceId[], customTexts: string
   }
 }
 
+export function buildDraftSummary(selectedIds: SentenceId[], customTexts: string[]): DraftSummary {
+  return buildDraftSummaryForPassage(SUMMARY_PASSAGE, selectedIds, customTexts)
+}
+
+/** 迁移摘要：只选句、无自加句，规则与主课文完全一致。 */
+export function buildTransferSummary(selectedIds: SentenceId[]): DraftSummary {
+  return buildDraftSummaryForPassage(TRANSFER_PASSAGE, selectedIds, [])
+}
+
 /** 课堂检查项：试点三项名 + 本课新增两项名。 */
 export type L02CheckName = SummaryCheck['name'] | '抽取规范' | '来源核验'
 
@@ -134,15 +176,18 @@ export type L02Check = { name: L02CheckName; passed: boolean; detail: string }
 
 /**
  * 课堂五项检查：试点三项 + 抽取规范 + 结构化来源核验。
- * 试点三项直接复用 checkSummary，不改试点引擎。
+ * 试点三项直接复用 checkSummary（可传任意课文），不改试点引擎。
  */
-export function checkDraftSummary(summary: DraftSummary): L02Check[] {
-  const pilot = checkSummary({ sentences: summary.sentences, pointsCovered: summary.pointsCovered })
+export function checkDraftSummaryForPassage(passage: SummaryParagraph[], summary: DraftSummary): L02Check[] {
+  const pilot = checkSummary(
+    { sentences: summary.sentences, pointsCovered: summary.pointsCovered },
+    passage,
+  )
   const count = summary.sentences.length
   const perPoint = new Map<SummaryPoint, number>()
   for (const entry of summary.entries) {
     if (entry.sourceId === null) continue
-    const found = sentenceById(entry.sourceId)
+    const found = sentenceInPassage(passage, entry.sourceId)
     if (found) perPoint.set(found.point, (perPoint.get(found.point) ?? 0) + 1)
   }
   const repeated = POINT_ORDER.filter((point) => (perPoint.get(point) ?? 0) > 1)
@@ -157,7 +202,7 @@ export function checkDraftSummary(summary: DraftSummary): L02Check[] {
           : '句数与要点去重都合规（本课 3 个要点，标准摘要 3 句）。'
   const unsourced = summary.entries.filter((entry) => entry.sourceId === null).length
   const tampered = summary.entries.filter(
-    (entry) => entry.sourceId !== null && sentenceById(entry.sourceId)?.text !== entry.text,
+    (entry) => entry.sourceId !== null && sentenceInPassage(passage, entry.sourceId)?.text !== entry.text,
   ).length
   const sourcePassed = unsourced === 0 && tampered === 0
   const sourceDetail =
@@ -173,6 +218,52 @@ export function checkDraftSummary(summary: DraftSummary): L02Check[] {
     { name: '抽取规范', passed: extractPassed, detail: extractDetail },
     { name: '来源核验', passed: sourcePassed, detail: sourceDetail },
   ]
+}
+
+export function checkDraftSummary(summary: DraftSummary): L02Check[] {
+  return checkDraftSummaryForPassage(SUMMARY_PASSAGE, summary)
+}
+
+export function checkTransferSummary(summary: DraftSummary): L02Check[] {
+  return checkDraftSummaryForPassage(TRANSFER_PASSAGE, summary)
+}
+
+/* ------------------------------------------------------------------ */
+/* 预测候选的真实检查结果（本地引擎实算，不手填）                         */
+/* ------------------------------------------------------------------ */
+
+export type PredictionResult = {
+  candidate: PredictionCandidate
+  summary: DraftSummary
+  checks: L02Check[]
+  passed: boolean
+  failedNames: L02CheckName[]
+}
+
+export const PREDICTION_RESULTS: PredictionResult[] = PREDICTION_CANDIDATES.map((candidate) => {
+  const summary = buildDraftSummary(candidate.selectedIds, candidate.customTexts)
+  const checks = checkDraftSummary(summary)
+  return {
+    candidate,
+    summary,
+    checks,
+    passed: checks.every((check) => check.passed),
+    failedNames: checks.filter((check) => !check.passed).map((check) => check.name),
+  }
+})
+
+/**
+ * 预测是否猜中： verdict 一致，且未合格时所猜“最先违反项”确实在
+ * 未通过项里；合格时不要求猜违反项。
+ */
+export function judgePrediction(
+  result: PredictionResult,
+  verdict: '合格' | '未合格',
+  firstFailed: L02CheckName | '',
+): boolean {
+  if ((verdict === '合格') !== result.passed) return false
+  if (result.passed) return true
+  return firstFailed !== '' && result.failedNames.includes(firstFailed)
 }
 
 /* ------------------------------------------------------------------ */
@@ -285,18 +376,4 @@ export const BAD_SUMMARIES: SummaryExample[] = [
   ),
 ]
 
-/* ------------------------------------------------------------------ */
-/* 三级提示：逐级揭示，不一次全给                                       */
-/* ------------------------------------------------------------------ */
-
-export const HINTS: { level: 1 | 2 | 3; title: string; text: string }[] = [
-  { level: 1, title: '一级提示：方向', text: '先读每段第一句，那就是这段的主题句。' },
-  { level: 2, title: '二级提示：方法', text: '同一要点只留第一次出现的那句，再按 A → B → C 的顺序排。' },
-  { level: 3, title: '三级提示：对照', text: '写完逐句回原文查：每句都在原文里吗？A、B、C 全了吗？数字对吗？有来源吗？' },
-]
-
-export const SUMMARY_METHOD_STEPS: string[] = [
-  '第一步：找主题句——每段第一句就是主题句。',
-  '第二步：删重复——同一要点只留第一次出现的那句。',
-  '第三步：按要点重组——按 A → B → C 的顺序排成 3 句（本课 3 个要点）。',
-]
+/* 三级提示与方法步骤的唯一来源是契约 L02_CONTRACT（见文件头重导出）。 */
