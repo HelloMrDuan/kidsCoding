@@ -3286,7 +3286,7 @@
       "title": "P0 LessonWorkspace 共享工作区外壳与引擎适配器（演示）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [],
       "scope": "新增共享工作区（apps/web/src/features/lessons/workspace/：契约类型、EngineAdapter 接口、BlocklyAdapter、ScratchVMAdapter、规范键草稿、三层判定、外壳组件、演示契约）与演示路由（apps/web/src/app/learn/workspace/[lessonId]）及 E2E（apps/web/tests/e2e/lesson-workspace.spec.ts）；演示契约均标演示、只用规范已公布演示值；不改规范目录、不改课程台账（432 节）、不改共享 CI、不改任何现有课堂与 G2/A1 课程文件。",
       "acceptance": [
@@ -3298,7 +3298,7 @@
         "三端真实浏览器 E2E 通过（1440/768/375）与单元测试通过，PR 门禁通过"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/469",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
