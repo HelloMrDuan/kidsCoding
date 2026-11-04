@@ -21,6 +21,7 @@ import { use, useMemo } from 'react'
 
 import { BlocklyAdapter } from '@/features/lessons/workspace/blockly-adapter'
 import { getDemoContract } from '@/features/lessons/workspace/demo-contracts'
+import { createDemoStage, DemoRoles } from '@/features/lessons/workspace/demo-stage'
 import { DemoSummaryEditor } from '@/features/lessons/workspace/demo-summary-editor'
 import { LessonWorkspace } from '@/features/lessons/workspace/lesson-workspace'
 import { ScratchVMAdapter } from '@/features/lessons/workspace/scratch-adapter'
@@ -63,16 +64,34 @@ export default function WorkspaceDemoPage({
 
   const testFailSave = sp.demoFailSave === '1'
 
+  // Demo stage + roles reach the shell only through slots now: the shell
+  // itself renders no demo character, backdrop, or target. Scratch and
+  // summary demos supply no stage/roles slot (scratch renders its own
+  // mount; summary is stageless). The stage component is memoized on
+  // fruitX so re-renders never remount the scene.
+  const isBlocklyDemo = engine === 'blockly' && demo.contract.judging.target !== undefined
+  const fruitX = demo.contract.judging.target?.fruitX ?? 200
+  const demoStageSlot = useMemo(
+    () => (isBlocklyDemo ? createDemoStage(fruitX) : undefined),
+    [isBlocklyDemo, fruitX],
+  )
+
   return (
     <main className="min-h-screen bg-[var(--kc-canvas)]">
       <section className="kc-page-main">
-        <nav aria-label="演示课程切换" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        {/* Slim demo strip OUTSIDE the IDE: plain text links, no buttons,
+            no topbar space — the IDE topbar is for course operations only. */}
+        <nav
+          aria-label="演示课程切换"
+          style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'baseline', marginBottom: 8, fontSize: 13, color: '#6f7d92' }}
+        >
+          <span>演示切换（测试用）：</span>
           {DEMO_LINKS.map((link) => (
             <Link
               key={link.lessonId}
-              className="kc-action-surface kc-btn-outline kc-btn-sm"
               href={`/learn/workspace/${link.lessonId}`}
               aria-current={link.lessonId === lessonId ? 'page' : undefined}
+              style={{ color: link.lessonId === lessonId ? '#18243a' : '#2463eb', fontWeight: link.lessonId === lessonId ? 700 : 400 }}
             >
               {link.label}
             </Link>
@@ -84,6 +103,8 @@ export default function WorkspaceDemoPage({
           initialScript={demo.initialScript}
           testFailSave={testFailSave}
           editorSlot={lessonId === 'demo-s' ? DemoSummaryEditor : undefined}
+          stageSlot={demoStageSlot}
+          rolesSlot={isBlocklyDemo ? DemoRoles : undefined}
         />
       </section>
     </main>

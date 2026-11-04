@@ -37,8 +37,16 @@ import {
   updateBlockSelection,
   type SelectionState,
 } from './block-selection'
-import type { EngineAdapter, EngineState, RunEvent } from './workspace-adapters'
-import type { FileCapabilities } from './workspace-slots'
+import { buildJudgment } from './demo-judging'
+import type {
+  BlockCategory,
+  BlockInventoryItem,
+  EngineAdapter,
+  EngineState,
+  RunEvent,
+} from './workspace-adapters'
+import type { FileCapabilities, JudgmentResult } from './workspace-slots'
+import { toJudgmentResult } from './workspace-judging'
 
 export const DEMO_HAT = 'when_start'
 export const DEMO_REPEAT = 'repeat_times'
@@ -351,6 +359,149 @@ export class BlocklyAdapter implements EngineAdapter {
   /** The demo blockly adapter supports every file operation. */
   getFileCapabilities(): FileCapabilities {
     return { canNew: true, canSave: true, canExport: true, canImport: true, canReset: true }
+  }
+
+  /**
+   * Adapter-owned judgment: the demo three-layer rules live in
+   * demo-judging.ts (demo fruit target + threshold + wording). The shell
+   * only displays this result; null before any run means "no judgment
+   * yet", never a fabricated pass/fail.
+   */
+  getJudgmentResult(): JudgmentResult | null {
+    if (!this.lastTrace) return null
+    return toJudgmentResult(buildJudgment(this.stageTarget, this.getState(), this.lastTrace))
+  }
+
+  /**
+   * Icon rail categories, derived from the same toolbox builder as the
+   * flyout, so rail and flyout can never disagree about categories.
+   * Pure (no workspace needed): works before mount.
+   */
+  getBlockCategories(): BlockCategory[] {
+    return buildKidsToolboxCategories(this.allowedBlocks).map((category) => ({
+      id: category.name,
+      label: category.name,
+      color: category.colour,
+    }))
+  }
+
+  /**
+   * Drive the real Blockly toolbox selection from the shell's icon rail.
+   * Uses IToolbox.setSelectedItem on the item whose category name matches
+   * the id (the concrete ToolboxCategory exposes getName(); getId() is
+   * the fallback). Clicking the active category deselects it, which
+   * closes its flyout. Returns the newly selected id, or null.
+   */
+  selectCategory(id: string): string | null {
+    const workspace = this.workspace
+    if (!workspace) return null
+    try {
+      // Duck-typed on purpose: the IToolbox interface in this Blockly
+      // version does not declare getToolboxItems, but the concrete
+      // Toolbox (and its .d.ts) does; getSelectedItem/setSelectedItem
+      // are on the interface.
+      const toolbox = workspace.getToolbox() as unknown as {
+        getToolboxItems?: () => Array<{ getName?: () => string; getId?: () => string }>
+        getSelectedItem?: () => { getName?: () => string; getId?: () => string } | null
+        setSelectedItem?: (item: unknown | null) => void
+      } | null
+      if (!toolbox) return null
+      const items = toolbox.getToolboxItems?.() ?? []
+      const item = items.find((candidate) => candidate.getName?.() === id || candidate.getId?.() === id)
+      if (!item) return null
+      const selected = toolbox.getSelectedItem?.() ?? null
+      const selectedId = selected?.getName?.() ?? selected?.getId?.() ?? null
+      if (selectedId === id) {
+        toolbox.setSelectedItem?.(null)
+        return null
+      }
+      toolbox.setSelectedItem?.(item)
+      return id
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * Search inventory: one entry per allowed block, labelled from the
+   * block's own display text. Pure (no workspace needed).
+   */
+  getBlockInventory(): BlockInventoryItem[] {
+    const labels: Record<string, string> = {
+      when_start: '开始时',
+      ws_move_right: '向右走',
+      ws_move_left: '向左走',
+      repeat_times: '重复',
+    }
+    const categories = buildKidsToolboxCategories(this.allowedBlocks)
+    const categoryOf = new Map<string, string>()
+    for (const category of categories) {
+      for (const type of category.types) categoryOf.set(type, category.name)
+    }
+    return this.allowedBlocks.map((type) => ({
+      type,
+      label: labels[type] ?? type,
+      categoryId: categoryOf.get(type) ?? '更多',
+    }))
+  }
+
+  /**
+   * Insert one block through the real Blockly API (newBlock + initSvg +
+   * render, then connect after the last block of the main chain). Returns
+   * false when the type is not allowed or no workspace is mounted; never
+   * pretends an insert happened.
+   */
+  insertBlock(type: string): boolean {
+    const workspace = this.workspace
+    if (!workspace) return false
+    if (!this.allowedBlocks.includes(type)) return false
+    try {
+      const block = workspace.newBlock(type)
+      block.initSvg()
+      block.render()
+      const tops = workspace.getTopBlocks(false)
+      const main = tops.find((candidate) => candidate.type === DEMO_HAT) ?? tops[0] ?? null
+      let last: Blockly.BlockSvg | null = main
+      while (last?.getNextBlock()) last = last.getNextBlock()
+      if (last && last.nextConnection && block.previousConnection) {
+        last.nextConnection.connect(block.previousConnection)
+        block.render()
+      }
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /** Editor zoom through WorkspaceSvg scale (inject options: 0.4–2, start 0.9). */
+  zoomIn() {
+    const workspace = this.workspace
+    if (!workspace) return
+    try {
+      workspace.setScale(Math.min(2, workspace.getScale() * 1.2))
+    } catch {
+      // A failed zoom never breaks the program.
+    }
+  }
+
+  zoomOut() {
+    const workspace = this.workspace
+    if (!workspace) return
+    try {
+      workspace.setScale(Math.max(0.4, workspace.getScale() / 1.2))
+    } catch {
+      // A failed zoom never breaks the program.
+    }
+  }
+
+  zoomReset() {
+    const workspace = this.workspace
+    if (!workspace) return
+    try {
+      workspace.setScale(0.9)
+    } catch {
+      // A failed zoom never breaks the program.
+    }
   }
 
   mount(el: HTMLElement) {

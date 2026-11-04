@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { validateLessonContract } from './lesson-contract'
 import { DEMO_A } from './demo-contracts'
 import { judgmentAppliesTo, shouldAutosavePreservePrompt, stableFingerprint } from './workspace-slots'
-import { buildJudgment, toJudgmentResult } from './workspace-judging'
+import { buildJudgment } from './demo-judging'
+import { toJudgmentResult } from './workspace-judging'
 
 describe('slot helpers', () => {
   it('fingerprints the same program identically regardless of key order', () => {
@@ -23,7 +24,7 @@ describe('slot helpers', () => {
   })
 
   it('converts the demo judgment to the generic display shape unchanged', () => {
-    const judgment = buildJudgment(DEMO_A.contract, { x: 200, score: 1, running: false }, {
+    const judgment = buildJudgment(DEMO_A.contract.judging.target, { x: 200, score: 1, running: false }, {
       didMove: true,
       usedRepeat: true,
       finalX: 200,

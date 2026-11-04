@@ -119,6 +119,17 @@ export interface StageSlotProps {
 
 export type StageSlotComponent = ComponentType<StageSlotProps>
 
+/**
+ * Props the shell passes to a course-provided role column component.
+ * The shell renders the roles section chrome; the slot renders the role
+ * cards (and any selection state they own).
+ */
+export interface RolesSlotProps {
+  lessonId: string
+}
+
+export type RolesSlotComponent = ComponentType<RolesSlotProps>
+
 /** Optional course-info extension: rendered ONLY inside the task drawer. */
 export interface CourseInfoExtension {
   /** Teaching method steps, shown as an ordered list in the drawer. */

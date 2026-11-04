@@ -85,6 +85,52 @@ describe('workspace drafts (spec key kidscoding-draft:{lessonId})', () => {
     expect(result.ok).toBe(false)
   })
 
+  it('accepts envelopes without a version as v1-compatible (pre-versioning drafts)', () => {
+    const storage = mapStorage()
+    const script = [{ type: 'when_start' }]
+    storage.map.set(
+      draftKeyFor('demo-a'),
+      JSON.stringify({ lessonId: 'demo-a', savedAt: '2026-01-01', script }),
+    )
+    const loaded = loadDraft(storage, 'demo-a')
+    expect(loaded.reason).toBeNull()
+    expect(loaded.data).toEqual(script)
+  })
+
+  it('accepts version 1 envelopes', () => {
+    const storage = mapStorage()
+    const script = [{ type: 'when_start' }]
+    storage.map.set(
+      draftKeyFor('demo-a'),
+      JSON.stringify({ lessonId: 'demo-a', savedAt: '2026-01-01', script, version: 1 }),
+    )
+    const loaded = loadDraft(storage, 'demo-a')
+    expect(loaded.reason).toBeNull()
+    expect(loaded.data).toEqual(script)
+  })
+
+  it('fail-closes on version 2 envelopes without overwriting the stored draft', () => {
+    const storage = mapStorage()
+    const script = [{ type: 'when_start' }]
+    const raw = JSON.stringify({ lessonId: 'demo-a', savedAt: '2026-01-01', script, version: 2 })
+    storage.map.set(draftKeyFor('demo-a'), raw)
+    const loaded = loadDraft(storage, 'demo-a')
+    expect(loaded.data).toBeNull()
+    expect(loaded.reason).toMatch('版本不受支持')
+    expect(storage.map.get(draftKeyFor('demo-a'))).toBe(raw)
+  })
+
+  it('fail-closes on illegal version values without overwriting the stored draft', () => {
+    const storage = mapStorage()
+    const script = [{ type: 'when_start' }]
+    const raw = JSON.stringify({ lessonId: 'demo-a', savedAt: '2026-01-01', script, version: 'v1' })
+    storage.map.set(draftKeyFor('demo-a'), raw)
+    const loaded = loadDraft(storage, 'demo-a')
+    expect(loaded.data).toBeNull()
+    expect(loaded.reason).toMatch('版本不受支持')
+    expect(storage.map.get(draftKeyFor('demo-a'))).toBe(raw)
+  })
+
   it('keeps lessons isolated across switches: save A, save B, load A intact', () => {
     const storage = mapStorage()
     const scriptA = [{ type: 'when_start' }, { type: 'ws_move_right', steps: 100 }]

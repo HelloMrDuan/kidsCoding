@@ -18,6 +18,14 @@
  * - `getJudgmentResult`: adapter-owned generic judgment (see
  *   workspace-slots.ts). When present, the shell displays it instead of the
  *   demo three-layer builder; the shell never invents a conclusion.
+ * - `getBlockCategories` / `selectCategory`: data-driven icon rail. The
+ *   shell renders one icon per category and drives selection through the
+ *   adapter; adapters without them get no rail and no fake categories.
+ * - `getBlockInventory` / `insertBlock`: block search. The shell filters
+ *   the adapter's own inventory and inserts through the adapter's real
+ *   editor API; adapters without them get no search box.
+ * - `zoomIn` / `zoomOut` / `zoomReset`: editor zoom. The shell renders
+ *   zoom controls only when the adapter exposes them.
  */
 
 import type { FileCapabilities, JudgmentResult } from './workspace-slots'
@@ -48,6 +56,20 @@ export type RunHandle = {
   readonly stopped: boolean
 }
 
+/** One block category, as exposed to the shell's icon rail. */
+export interface BlockCategory {
+  id: string
+  label: string
+  color: string
+}
+
+/** One block in an adapter's inventory, as exposed to the shell's search. */
+export interface BlockInventoryItem {
+  type: string
+  label: string
+  categoryId: string
+}
+
 export type EngineAdapter = {
   mount: (el: HTMLElement) => void
   unmount: () => void
@@ -62,4 +84,17 @@ export type EngineAdapter = {
   validateDraft?: (script: unknown) => boolean
   getFileCapabilities?: () => FileCapabilities
   getJudgmentResult?: () => JudgmentResult | null
+  getBlockCategories?: () => BlockCategory[]
+  /**
+   * Select a category (toggles: selecting the active one deselects it).
+   * Returns the newly selected category id, or null when nothing is
+   * selected afterwards. Returns null when the id is unknown.
+   */
+  selectCategory?: (id: string) => string | null
+  getBlockInventory?: () => BlockInventoryItem[]
+  /** Insert one block through the adapter's real editor API. */
+  insertBlock?: (type: string) => boolean
+  zoomIn?: () => void
+  zoomOut?: () => void
+  zoomReset?: () => void
 }

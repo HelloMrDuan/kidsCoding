@@ -31,10 +31,19 @@ export type SaveResult = { ok: true } | { ok: false; reason: string }
 
 export type LoadResult = { data: unknown | null; reason: string | null }
 
+/**
+ * Draft envelope version. v1 is the first (and only) version shipped:
+ * envelopes written before versioning carry no `version` field and are
+ * accepted as v1-compatible. Any other version value is fail-closed
+ * (refuse to restore, never overwrite the stored draft).
+ */
+export const DRAFT_ENVELOPE_VERSION = 1
+
 type DraftEnvelope = {
   lessonId: string
   savedAt: string
   script: unknown
+  version?: unknown
 }
 
 function byteLength(text: string): number {
@@ -55,7 +64,12 @@ export function saveDraft(
   if (!storage) return { ok: false, reason: '本机存储不可用，未能保存' }
   let text: string
   try {
-    const envelope: DraftEnvelope = { lessonId, savedAt: new Date().toISOString(), script }
+    const envelope: DraftEnvelope = {
+    lessonId,
+    savedAt: new Date().toISOString(),
+    script,
+    version: DRAFT_ENVELOPE_VERSION,
+  }
     text = JSON.stringify(envelope)
   } catch {
     return { ok: false, reason: '草稿无法序列化，未能保存' }
@@ -95,6 +109,12 @@ export function loadDraft(storage: StorageLike | null, lessonId: string): LoadRe
   }
   if (envelope.lessonId !== lessonId) {
     return { data: null, reason: '草稿属于其他课节，已拒绝恢复' }
+  }
+  // Version gate: missing version = v1 (pre-versioning drafts); exactly
+  // v1 = current; anything else is fail-closed and never overwrites
+  // the stored draft.
+  if (envelope.version !== undefined && envelope.version !== DRAFT_ENVELOPE_VERSION) {
+    return { data: null, reason: '草稿版本不受支持，已拒绝恢复' }
   }
   return { data: envelope.script, reason: null }
 }

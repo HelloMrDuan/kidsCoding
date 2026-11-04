@@ -127,6 +127,35 @@ describe('loop ownership (R8): body vs after-loop vs nested', () => {
     expect(expanded.actions.map((a) => a.steps)).toEqual([10, 5, 5, 10, 5, 5, 7])
   })
 
+  it('exposes rail categories from the same toolbox builder (no workspace needed)', () => {
+    const adapter = new BlocklyAdapter()
+    const categories = adapter.getBlockCategories()
+    expect(categories.map((c) => c.id)).toEqual(['开始', '控制', '更多'])
+    expect(categories.find((c) => c.id === '开始')?.color).toBe('#ffab19')
+    expect(categories.find((c) => c.id === '控制')?.color).toBe('#0fbdbd')
+    expect(categories.find((c) => c.id === '更多')?.color).toBe('#6f7d92')
+  })
+
+  it('exposes a search inventory with labels and category ids (no workspace needed)', () => {
+    const adapter = new BlocklyAdapter()
+    const inventory = adapter.getBlockInventory()
+    expect(inventory.map((item) => item.type)).toEqual(['when_start', 'ws_move_right', 'ws_move_left', 'repeat_times'])
+    expect(inventory.find((item) => item.type === 'when_start')).toEqual({
+      type: 'when_start',
+      label: '开始时',
+      categoryId: '开始',
+    })
+    expect(inventory.find((item) => item.type === 'ws_move_right')?.categoryId).toBe('更多')
+    expect(inventory.find((item) => item.type === 'repeat_times')?.categoryId).toBe('控制')
+  })
+
+  it('returns null judgment before any run, and refuses category/insert without a workspace', () => {
+    const adapter = new BlocklyAdapter()
+    expect(adapter.getJudgmentResult()).toBeNull()
+    expect(adapter.selectCategory('开始')).toBeNull()
+    expect(adapter.insertBlock('ws_move_right')).toBe(false)
+  })
+
   it('keeps body and next-chain separate after a script-list delete and rebuild', () => {
     const adapter = new BlocklyAdapter()
     adapter.loadScript([hat, repeat(3, [right(50)]), right(30)])

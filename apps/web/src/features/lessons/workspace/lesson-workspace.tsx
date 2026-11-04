@@ -4,21 +4,19 @@
  * LessonWorkspace — shared shell per docs/product/p0-kitten-workspace/DESIGN.md §2–§3
  * and WORKSPACE-API.md (p0-kitten-workspace-v1.0).
  *
- * Layout note (honest): the积木 categories column is Blockly's own category
- * toolbox (buildKidsToolboxCategories) rendered inside the script column — the
- * repo has no separate Kitten-style icon-strip column, and DESIGN.md §7 lists
- * the icon strip as a refinement item for chief decision, not something this
- * shell invents. Desktop shows stage + roles + script on one screen; tablet
- * puts the stage row on top with a show/hide switch; mobile switches four
- * tabs by visibility only (DOM kept, adapter never remounted, script never reset).
- *
- * The shell renders ONLY contract content. Demo contracts are labelled 演示.
- * Editing the program after a run invalidates the previous judgment.
+ * Layout: desktop shows stage + roles + icon rail + script on one screen
+ * (the material zone is the Blockly flyout opened from the rail, so the
+ * script column stays maximal); tablet puts stage + roles on top and
+ * rail + script below; mobile switches tabs by visibility only (DOM kept,
+ * adapter never remounted, script never reset). The shell renders ONLY
+ * contract content plus adapter-owned slot content. Demo contracts are
+ * labelled 演示. The shell never invents a judgment: it displays only
+ * what an adapter returns, and with no adapter judgment it shows run
+ * state alone. Editing the program after a run invalidates the previous
+ * judgment (and it never auto-recovers, even if the edit is reverted).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-
-import { CharacterArt, SceneBackdrop } from '@/features/lessons/playable-stage/character-art'
 
 import {
   DEMO_HAT,
@@ -31,11 +29,11 @@ import type { LessonContract } from './lesson-contract'
 import { validateLessonContract } from './lesson-contract'
 import type { EngineAdapter, EngineState, RunEvent } from './workspace-adapters'
 import { loadDraftFromLocal, saveDraftToLocal } from './workspace-draft'
-import { buildJudgment, toJudgmentResult } from './workspace-judging'
 import {
   shouldAutosavePreservePrompt,
   type EditorSlotComponent,
   type JudgmentResult,
+  type RolesSlotComponent,
   type StageSlotComponent,
 } from './workspace-slots'
 
@@ -54,38 +52,70 @@ export type LessonWorkspaceProps = {
    * Three-engine slots (OPS-020). When `editorSlot` is present, the shell
    * renders that React component as the editor and never mounts the
    * imperative adapter for this lesson; adapters must never call
-   * createRoot themselves. When `stageSlot` is present, it replaces the
-   * demo stage box; when `contract.hasStage === false`, no stage area
-   * renders at all. Both slots are optional; demo contracts use neither.
+   * createRoot themselves. When `stageSlot` is present, it renders the
+   * stage scene content inside the shell's stage box (the shell keeps the
+   * card chrome: header, state line, run bar, zoom). When `rolesSlot` is
+   * present, it renders the role column; the shell itself renders no
+   * characters and no roles. When `contract.hasStage === false`, no stage
+   * or roles area renders at all. All slots are optional; the demo route
+   * supplies stageSlot + rolesSlot for its demo lessons.
    */
   editorSlot?: EditorSlotComponent
   stageSlot?: StageSlotComponent
+  rolesSlot?: RolesSlotComponent
 }
 
 /** Autosave debounce (R4/C8 proposal value; #470's 350ms is reference only). */
 export const AUTOSAVE_DEBOUNCE_MS = 1000
 
-/** Generic fail judgment used for stopped / sync-thrown runs. */
-function failJudgment(message: string): JudgmentResult {
-  return {
-    layers: [
-      { id: 'stage', label: '舞台结果', passed: false, detail: `舞台结果：运行失败——${message}` },
-      { id: 'task', label: '任务判定', passed: false, detail: '任务判定：未通过——运行未能完成' },
-      { id: 'knowledge', label: '知识证据', passed: false, detail: '知识证据：未通过——运行未能完成' },
-    ],
-    passed: false,
-    conclusion: '结论：未合格——任务判定、知识证据未通过',
+/**
+ * Self-drawn icon-rail glyphs (simple geometric shapes, not copied from
+ * any vendor icon set). Unknown categories fall back to a brand-colour dot
+ * with the category's first character; the mapping below only covers
+ * generic words (start / move / control / more).
+ */
+function RailIcon({ label, color }: { label: string; color: string }) {
+  if (label.includes('开始') || label.includes('事件')) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 3v18" stroke={color} strokeWidth="2.6" strokeLinecap="round" fill="none" />
+        <path d="M7 4h11l-3 4 3 4H7z" fill={color} />
+      </svg>
+    )
   }
+  if (label.includes('移动')) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 9.5h10V5l8 7-8 7v-4.5H3z" fill={color} />
+      </svg>
+    )
+  }
+  if (label.includes('控制') || label.includes('重复')) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5" stroke={color} strokeWidth="2.2" strokeLinecap="round" fill="none" />
+        <path d="M18 2v4H14M6 22v-4h4" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      </svg>
+    )
+  }
+  if (label.includes('更多')) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="5" cy="12" r="2.6" fill={color} />
+        <circle cx="12" cy="12" r="2.6" fill={color} />
+        <circle cx="19" cy="12" r="2.6" fill={color} />
+      </svg>
+    )
+  }
+  return (
+    <span className="ws-rail-dot" style={{ background: color }}>
+      {label.charAt(0)}
+    </span>
+  )
 }
 
 type TabId = 'stage' | 'blocks' | 'script' | 'task'
 type SaveState = 'unsaved' | 'saved' | 'failed'
-
-const DEMO_ROLES = [
-  { id: 'fox', label: '小狐狸' },
-  { id: 'rabbit', label: '小兔子' },
-  { id: 'bird', label: '小鸟' },
-]
 
 const REPEAT_OPTIONS = [2, 3, 4, 5, 6, 8]
 
@@ -124,12 +154,14 @@ export function LessonWorkspace({
   testFailSave,
   editorSlot,
   stageSlot,
+  rolesSlot,
 }: LessonWorkspaceProps) {
   const contractErrors = useMemo(() => validateLessonContract(contract), [contract])
   const hasStage = contract.hasStage !== false
   // JSX needs capitalised aliases to render the slot component types.
   const StageSlotView = stageSlot ?? null
   const EditorSlotView = editorSlot ?? null
+  const RolesSlotView = rolesSlot ?? null
   // File capabilities: adapter first, then contract, then demo default
   // (all shown). Absent capabilities mean "shown", never "fake button".
   const fileCaps = useMemo(
@@ -145,7 +177,11 @@ export function LessonWorkspace({
   const [goalExpanded, setGoalExpanded] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(true)
   const [revealedHints, setRevealedHints] = useState(0)
-  const [selectedRole, setSelectedRole] = useState('fox')
+  // Icon rail selection, driven by the adapter (see iconRail below).
+  const [railSelected, setRailSelected] = useState<string | null>(null)
+  // Block search text; filters both the adapter inventory results and the
+  // demo drawer chips. Empty = unfiltered.
+  const [searchText, setSearchText] = useState('')
   const [engineState, setEngineState] = useState<EngineState>({ x: 0, score: 0, running: false, frames: 0 })
   const [judgment, setJudgment] = useState<JudgmentResult | null>(null)
   // Editor-slot courses (no imperative adapter): the slot's current data
@@ -498,20 +534,12 @@ export function LessonWorkspace({
     (event: RunEvent) => {
       setEngineState(event.state)
       if (event.kind === 'finished') {
-        // Adapter-owned generic judgment wins when the adapter supplies one;
-        // otherwise the demo three-layer builder converts to the same shape.
+        // The shell displays ONLY an adapter-owned judgment. With no
+        // adapter judgment, a finished run shows run state alone — the
+        // shell never invents a pass/fail conclusion (no failJudgment).
         const generic = mountedAdapterRef.current?.adapter.getJudgmentResult?.()
         if (generic) {
           setJudgment(generic)
-        } else {
-          const trace = (
-            mountedAdapterRef.current?.adapter as EngineAdapter & {
-              getLastTrace?: () => { didMove: boolean; usedRepeat: boolean; finalX: number } | null
-            }
-          ).getLastTrace?.()
-          if (trace) {
-            setJudgment(toJudgmentResult(buildJudgment(contractRef.current, event.state, trace)))
-          }
         }
         setJudgmentStale(false)
         refreshScriptList()
@@ -523,8 +551,10 @@ export function LessonWorkspace({
           }
         ).getLastRunError?.()
         if (asyncError) {
+          // Run errors surface as errors only, never as a fabricated
+          // "未合格" judgment: the previous judgment (if any) stays cleared
+          // by the run start, and no new conclusion is invented.
           setRunError(asyncError)
-          setJudgment(failJudgment(asyncError))
         }
       }
     },
@@ -563,8 +593,8 @@ export function LessonWorkspace({
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : '运行失败'
+      // Sync run failure: error text only, no invented judgment.
       setRunError(message)
-      setJudgment(failJudgment(message))
     }
     try {
       setEngineState(entry.adapter.getState())
@@ -647,6 +677,35 @@ export function LessonWorkspace({
       applyScriptEdit([...current, block])
     },
     [applyScriptEdit],
+  )
+
+  /**
+   * Search-result insert: through the adapter's real editor API
+   * (insertBlock), never a fake list entry. Mirrors handleAdapterChange's
+   * invalidation (judgment clears, autosave schedules) in case the
+   * adapter's change event does not reach the shell.
+   */
+  const insertSearchBlock = useCallback(
+    (type: string) => {
+      const entry = mountedAdapterRef.current
+      if (!entry) {
+        setNotice('插入失败，原脚本未变')
+        return
+      }
+      const ok = entry.adapter.insertBlock?.(type) ?? false
+      if (!ok) {
+        setNotice('插入失败，原脚本未变')
+        return
+      }
+      refreshScriptList()
+      setSaveState('unsaved')
+      if (judgmentRef.current) {
+        setJudgment(null)
+        setJudgmentStale(true)
+      }
+      scheduleAutosave()
+    },
+    [refreshScriptList, scheduleAutosave],
   )
 
   const moveBlock = useCallback(
@@ -853,13 +912,19 @@ export function LessonWorkspace({
     [editorSlot, isBlockly, isScratch, refreshScriptList, scheduleAutosave],
   )
 
-  const stageWidth = stageZoom === 'small' ? 240 : stageZoom === 'large' ? 420 : 320
+  const stageWidth = stageZoom === 'small' ? 220 : stageZoom === 'large' ? 380 : 280
   const stageHeight = stageZoom === 'small' ? 180 : stageZoom === 'large' ? 320 : 240
-  const target = contract.judging.target
-  const stagePercent = (x: number) => {
-    const clamped = Math.max(-50, Math.min(300, x))
-    return ((clamped + 50) / 350) * 100
-  }
+  // Icon rail + search data, probed from the adapter each render (the
+  // Blockly adapter answers from its static toolbox builder, so this
+  // works before mount too). Absent = no rail, no search box, never fake.
+  const railCategories = isBlockly ? (adapter.getBlockCategories?.() ?? []) : []
+  const railOn = railCategories.length > 0
+  const blockInventory = isBlockly ? (adapter.getBlockInventory?.() ?? []) : []
+  const searchResults =
+    searchText.trim() === ''
+      ? []
+      : blockInventory.filter((item) => item.label.includes(searchText.trim()))
+  const hasEditorZoom = Boolean(adapter.zoomIn && adapter.zoomOut && adapter.zoomReset)
 
   const taskContent = (
     <div data-testid="ws-task-content">
@@ -953,43 +1018,55 @@ export function LessonWorkspace({
     </div>
   )
 
+  // Demo drawer chips, filtered by the same search text as the adapter
+  // inventory results (empty search = all chips). Filtering hides chips;
+  // it never invents blocks.
+  const drawerChips: Array<{ label: string; testid: string; insert: () => void; color: string }> = [
+    {
+      label: '向右走 50 步',
+      testid: 'ws-drawer-move-right',
+      insert: () => insertBlock({ type: DEMO_MOVE_RIGHT, steps: 50 }),
+      color: '#4c97ff',
+    },
+    {
+      label: '向左走 50 步',
+      testid: 'ws-drawer-move-left',
+      insert: () => insertBlock({ type: DEMO_MOVE_LEFT, steps: 50 }),
+      color: '#4c97ff',
+    },
+    {
+      label: '重复 3 次（向右走 50 步）',
+      testid: 'ws-drawer-repeat',
+      insert: () =>
+        insertBlock({
+          type: DEMO_REPEAT,
+          times: 3,
+          body: [{ type: DEMO_MOVE_RIGHT, steps: 50 }],
+        }),
+      color: '#0fbdbd',
+    },
+  ]
+  const visibleDrawerChips =
+    searchText.trim() === ''
+      ? drawerChips
+      : drawerChips.filter((chip) => chip.label.includes(searchText.trim()))
+
   const drawer = (
     <div data-testid="ws-block-drawer">
       <p>点积木插入脚本末尾（演示积木，颜色与分类一致）：</p>
       <div className="ws-palette-chips">
-        <button
-          type="button"
-          className="ws-palette-chip"
-          style={{ background: '#4c97ff' }}
-          onClick={() => insertBlock({ type: DEMO_MOVE_RIGHT, steps: 50 })}
-          data-testid="ws-drawer-move-right"
-        >
-          向右走 50 步
-        </button>
-        <button
-          type="button"
-          className="ws-palette-chip"
-          style={{ background: '#4c97ff' }}
-          onClick={() => insertBlock({ type: DEMO_MOVE_LEFT, steps: 50 })}
-          data-testid="ws-drawer-move-left"
-        >
-          向左走 50 步
-        </button>
-        <button
-          type="button"
-          className="ws-palette-chip"
-          style={{ background: '#0fbdbd' }}
-          onClick={() =>
-            insertBlock({
-              type: DEMO_REPEAT,
-              times: 3,
-              body: [{ type: DEMO_MOVE_RIGHT, steps: 50 }],
-            })
-          }
-          data-testid="ws-drawer-repeat"
-        >
-          重复 3 次（向右走 50 步）
-        </button>
+        {visibleDrawerChips.map((chip) => (
+          <button
+            key={chip.testid}
+            type="button"
+            className="ws-palette-chip"
+            style={{ background: chip.color }}
+            onClick={chip.insert}
+            data-testid={chip.testid}
+          >
+            {chip.label}
+          </button>
+        ))}
       </div>
     </div>
   )
@@ -1119,28 +1196,11 @@ export function LessonWorkspace({
         ) : isScratch ? (
           <div ref={scratchMountRef} data-testid="ws-scratch-mount" style={{ width: '100%', height: '100%' }} />
         ) : (
-          <>
-            <SceneBackdrop scene="forest" />
-            <div
-              style={{ position: 'absolute', left: `${stagePercent(engineState.x)}%`, bottom: 12, transform: 'translateX(-50%)' }}
-              data-testid="ws-stage-character"
-            >
-              <CharacterArt id="fox" />
-            </div>
-            {target && (
-              <div
-                style={{ position: 'absolute', left: `${stagePercent(target.fruitX)}%`, bottom: 12, transform: 'translateX(-50%)', fontSize: 28 }}
-                data-testid="ws-stage-target"
-                aria-label="水果目标"
-              >
-                🍎
-              </div>
-            )}
-          </>
+          <p>舞台尚未接入：本课程未提供舞台组件。</p>
         )}
       </div>
       <p data-testid="ws-stage-state">
-        篮子 x={engineState.x}，分数={engineState.score}，{engineState.running ? '运行中' : '未运行'}
+        x={engineState.x}，分数={engineState.score}，{engineState.running ? '运行中' : '未运行'}
         {isScratch && (scratchReady ? '，沙箱已就绪' : scratchError ? `，沙箱未就绪：${scratchError}` : '，沙箱握手中…')}
       </p>
       <div className="ws-runbar">
@@ -1153,7 +1213,7 @@ export function LessonWorkspace({
           {engineState.running ? '停止' : '运行作品'}
         </button>
         <span className="ws-zoom-group">
-          舞台缩放（只改列宽与舞台高度，不重建引擎）：
+          舞台缩放：
           <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('small')} data-testid="ws-zoom-small">
             缩小
           </button>{' '}
@@ -1168,38 +1228,60 @@ export function LessonWorkspace({
     </section>
   )
 
-  const rolesPanel = (
-    <section className="ws-roles" data-panel="roles" data-testid="ws-roles-panel">
-      <h2>角色</h2>
-      <ul className="ws-role-list">
-        {DEMO_ROLES.map((role) => (
-          <li key={role.id}>
-            <button
-              type="button"
-              className="ws-role-card"
-              aria-pressed={selectedRole === role.id}
-              onClick={() => setSelectedRole(role.id)}
-              data-testid={`ws-role-${role.id}`}
-            >
-              <CharacterArt id={role.id as 'fox' | 'rabbit' | 'bird'} />
-              <span>
-                {role.label}
-                {selectedRole === role.id ? '（已选中）' : ''}
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
-      <p className="ws-role-note">演示仅支持点选角色；角色增删、造型编辑与背景管理为引擎接入工作，未冒充已实现。</p>
-    </section>
-  )
+  /**
+   * Icon rail: one icon button per adapter category, rendered by the shell
+   * (not by Blockly). Clicking drives the real Blockly toolbox selection
+   * through adapter.selectCategory; the shell's own category column in
+   * Blockly is hidden by scoped CSS while the rail is on, so the two
+   * never coexist. Adapters without categories get no rail at all.
+   */
+  const iconRail = railOn ? (
+    <nav className="ws-rail" data-testid="ws-icon-rail" aria-label="积木分类">
+      {railCategories.map((category) => (
+        <button
+          key={category.id}
+          type="button"
+          className="ws-rail-btn"
+          aria-pressed={railSelected === category.id}
+          aria-label={category.label}
+          title={category.label}
+          onClick={() => {
+            const next = adapter.selectCategory?.(category.id) ?? null
+            setRailSelected(next)
+          }}
+          data-testid={`ws-rail-${category.id}`}
+        >
+          <RailIcon label={category.label} color={category.color} />
+          <span>{category.label}</span>
+        </button>
+      ))}
+    </nav>
+  ) : null
 
   const scriptPanel = (
     <section className="ws-script" data-panel="script" data-testid="ws-script-panel">
       <h2>脚本工作区</h2>
+      {/* Mobile sticky action row: in-flow sticky (never a fixed overlay),
+          so run/stop/save stay reachable without scrolling the editor.
+          Slot courses (e.g. summary) have no run concept and get no row. */}
+      {!EditorSlotView && (
+        <div className="ws-sticky-actions">
+          <button
+            type="button"
+            className={`kc-action-surface kc-btn-dark ${engineState.running ? 'ws-stop-btn' : 'ws-run-btn'}`}
+            onClick={handleRunToggle}
+            data-testid="ws-sticky-run"
+          >
+            {engineState.running ? '停止' : '运行作品'}
+          </button>
+          <span data-testid="ws-sticky-save">
+            {saveState === 'saved' ? '已保存到本机' : saveState === 'failed' ? '未能保存' : '未保存'}
+          </span>
+        </div>
+      )}
       {EditorSlotView ? (
         editorInitialLesson === contract.lessonId ? (
-          <div data-testid="ws-editor-slot">
+          <div className="ws-editor-slot" data-testid="ws-editor-slot">
             <EditorSlotView
               key={`${contract.lessonId}-${slotResetKey}`}
               lessonId={contract.lessonId}
@@ -1215,6 +1297,40 @@ export function LessonWorkspace({
         <>
           {isBlockly && (
         <>
+          {/* Block search: only when the adapter exposes an inventory.
+              Results insert through the adapter's real editor API; the
+              same text also filters the demo drawer chips below. */}
+          {blockInventory.length > 0 && (
+            <div className="ws-search-row">
+              <label htmlFor="ws-block-search">搜索积木</label>
+              <input
+                id="ws-block-search"
+                type="search"
+                value={searchText}
+                onChange={(event) => setSearchText(event.target.value)}
+                placeholder="输入积木名称，如“向右”"
+                data-testid="ws-block-search"
+              />
+            </div>
+          )}
+          {searchText.trim() !== '' && searchResults.length > 0 && (
+            <div className="ws-search-results" data-testid="ws-search-results">
+              {searchResults.map((item) => (
+                <button
+                  key={item.type}
+                  type="button"
+                  className="ws-search-result kc-action-surface kc-btn-outline kc-btn-sm"
+                  onClick={() => insertSearchBlock(item.type)}
+                  data-testid={`ws-search-result-${item.type}`}
+                >
+                  {item.label}（{item.categoryId}）
+                </button>
+              ))}
+            </div>
+          )}
+          {searchText.trim() !== '' && searchResults.length === 0 && (
+            <p data-testid="ws-search-empty">没有找到匹配的积木。</p>
+          )}
           <div className="ws-palette">
             <div className="ws-palette-head">
               <h3>积木素材</h3>
@@ -1234,7 +1350,21 @@ export function LessonWorkspace({
             className="ws-blockly-mount"
             data-testid="ws-blockly-mount"
           />
-          <p>左侧为积木分类栏（开始 / 移动 / 控制 / 更多，颜色与积木一致），拖放、改参、垃圾桶删除均真实可用；下方脚本列表与画布同一程序。</p>
+          {hasEditorZoom && (
+            <div className="ws-editor-zoom">
+              编辑器缩放：
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => adapter.zoomOut?.()} data-testid="ws-editor-zoom-out">
+                缩小
+              </button>{' '}
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => adapter.zoomReset?.()} data-testid="ws-editor-zoom-reset">
+                还原
+              </button>{' '}
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => adapter.zoomIn?.()} data-testid="ws-editor-zoom-in">
+                放大
+              </button>
+            </div>
+          )}
+          <p>分类由左侧图标列选择（点图标打开素材面板，素材面板即 Blockly 弹出面板），拖放、改参、垃圾桶删除均真实可用；下方脚本列表与画布同一程序。</p>
           {scriptListPanel}
           <div className="ws-runbar">
             <button
@@ -1321,7 +1451,7 @@ export function LessonWorkspace({
 
   return (
     <div
-      className="ws-root"
+      className={`ws-root${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}`}
       data-testid="ws-root"
       style={{ '--ws-stage-w': `${stageWidth}px` } as CSSProperties}
     >
@@ -1332,7 +1462,7 @@ export function LessonWorkspace({
         .ws-root h3 { font-size: 14px; margin: 0 0 8px; }
         /* Top bar: one compact IDE bar (Kitten structure, KidsCoding V2 colours).
            Teaching text never lives here; it lives in the goal strip + drawer. */
-        .ws-topbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: #152238; color: #fff; padding: 10px 12px; border-radius: 12px; margin-bottom: 12px; }
+        .ws-topbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; background: #152238; color: #fff; padding: 8px 12px; border-radius: 12px; margin-bottom: 12px; }
         .ws-topbar h1 { color: #fff; }
         .ws-topbar .kc-btn-outline { color: #fff; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.08); }
         .ws-topbar [data-testid="ws-demo-badge"] { background: #ffab19; color: #18243a; font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 999px; }
@@ -1342,7 +1472,7 @@ export function LessonWorkspace({
         .ws-topbar [data-testid="ws-file-menu"] .kc-btn-outline { color: #18243a; border-color: #e7edf5; background: #fff; }
         /* Goal strip: current goal + step + progress only; the full five
            goals stay in the DOM (ws-goal5) and expand on one tap. */
-        .ws-goalstrip { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; }
+        .ws-goalstrip { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; }
         .ws-goalstrip-current { font-size: 14px; margin: 0 0 4px; }
         .ws-goalstrip-meta { color: #6f7d92; font-size: 13px; margin: 0; }
         .ws-goal5-list { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: #3d4a5e; }
@@ -1392,31 +1522,87 @@ export function LessonWorkspace({
         .ws-script-list-panel input[type="number"], .ws-script-list-panel select { min-height: 36px; border: 1px solid #e7edf5; border-radius: 8px; padding: 4px 8px; }
         .ws-feedback-card { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 12px; margin-top: 12px; }
         .ws-feedback-card [data-testid="ws-feedback-conclusion"] { font-weight: 700; }
+        /* Icon rail: shell-rendered narrow column, icon-first with a small
+           label under each glyph. While the rail is on, Blockly's own
+           category column is hidden by scoped CSS so the two never
+           coexist; the flyout still opens from the rail (verified by E2E). */
+        .ws-rail { display: flex; flex-direction: column; gap: 6px; }
+        .ws-rail-btn { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border: 2px solid #e7edf5; border-radius: 12px; background: #fff; cursor: pointer; }
+        .ws-rail-btn svg { width: 24px; height: 24px; display: block; }
+        .ws-rail-btn span { font-size: 11px; color: #18243a; line-height: 1.2; }
+        .ws-rail-btn[aria-pressed="true"] { border-color: #2463eb; background: #eaf1fe; }
+        .ws-rail-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; }
+        .ws-rail-on .ws-blockly-mount .blocklyToolbox { display: none !important; }
+        /* Block search + editor zoom controls (rendered only when the
+           adapter exposes the capability). */
+        .ws-search-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .ws-search-row label { font-size: 13px; color: #6f7d92; white-space: nowrap; }
+        .ws-search-row input { flex: 1; min-width: 0; min-height: 40px; border: 1px solid #e7edf5; border-radius: 8px; padding: 6px 10px; }
+        .ws-search-results { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .ws-editor-zoom { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; color: #6f7d92; font-size: 13px; }
+        /* Summary wide layout: stageless slot courses get a real two-column
+           layout (task text left, editor right, feedback below the editor)
+           instead of the old narrow textbox. */
+        .ws-editor-slot textarea { width: 100%; min-height: 280px; box-sizing: border-box; }
         @media (max-width: 767px) {
           .ws-tabs .kc-btn-outline, .ws-palette-chip { min-height: 44px; }
           .ws-script-list-panel input[type="number"], .ws-script-list-panel select { min-height: 44px; }
           .ws-script-list-panel .kc-btn-outline { min-height: 44px; }
           .ws-role-list { flex-direction: row; }
           .ws-role-card { min-width: 84px; }
+          .ws-rail-wrap { display: none !important; }
+          /* Mobile sticky action row: in-flow sticky at the top of the
+             script panel content — never a fixed overlay on the editor. */
+          .ws-sticky-actions { position: sticky; top: 0; z-index: 5; background: #fff; padding: 8px 0; display: flex; gap: 8px; align-items: center; }
         }
         @media (min-width: 768px) {
           .ws-tabs { display: none; }
-          .ws-grid { display: grid; grid-template-columns: minmax(0, 1fr) 148px; gap: 12px; align-items: start; }
+          .ws-sticky-actions { display: none; }
+          .ws-grid { display: grid; gap: 12px; align-items: start; }
           .ws-panel { display: block; }
           .ws-blocks-panel { display: none; }
           .ws-task-wrap { display: none; }
           .ws-script-wrap { grid-column: 1 / -1; }
           .ws-blockly-mount { height: 480px; }
+          /* Tablet without rail: stage + roles row, script full row. */
+          .ws-grid { grid-template-columns: minmax(0, 1fr) 120px; }
+          /* Tablet with rail: stage + roles row, rail + script row. */
+          .ws-grid.ws-has-rail { grid-template-columns: 56px minmax(0, 1fr) 120px; }
+          .ws-grid.ws-has-rail .ws-stage-wrap { grid-column: 1 / 3; }
+          .ws-grid.ws-has-rail .ws-roles-wrap { grid-column: 3; }
+          .ws-grid.ws-has-rail .ws-rail-wrap { grid-column: 1; grid-row: 2; }
+          .ws-grid.ws-has-rail .ws-script-wrap { grid-column: 2 / 4; grid-row: 2; }
+          /* Summary wide: task text left, editor right, feedback below.
+             Both placements pin row 1 explicitly: with only columns
+             pinned, the grid auto-placement cursor (advanced past the
+             first item) drops the second item into row 2. */
+          .ws-summary-wide .ws-grid { grid-template-columns: 300px minmax(0, 1fr); }
+          .ws-summary-wide .ws-task-wrap { display: block; grid-column: 1; grid-row: 1; }
+          .ws-summary-wide .ws-script-wrap { grid-column: 2; grid-row: 1; }
+          .ws-summary-wide .ws-editor-slot textarea { min-height: 360px; }
         }
         @media (min-width: 1280px) {
-          .ws-grid { grid-template-columns: var(--ws-stage-w, 320px) 148px minmax(0, 1fr); }
+          /* Desktop: stage + roles + rail + script, only the present
+             columns take space (no empty column gaps). */
+          .ws-grid { grid-template-columns: var(--ws-stage-w, 280px) minmax(0, 1fr); }
+          .ws-grid.ws-has-roles { grid-template-columns: var(--ws-stage-w, 280px) 120px minmax(0, 1fr); }
+          .ws-grid.ws-has-rail { grid-template-columns: var(--ws-stage-w, 280px) 56px minmax(0, 1fr); }
+          .ws-grid.ws-has-roles.ws-has-rail { grid-template-columns: var(--ws-stage-w, 280px) 120px 56px minmax(0, 1fr); }
+          /* Desktop is a single row: undo the tablet row placements. */
+          .ws-grid.ws-has-rail .ws-stage-wrap { grid-column: auto; grid-row: auto; }
+          .ws-grid.ws-has-rail .ws-roles-wrap { grid-column: auto; }
+          .ws-grid.ws-has-rail .ws-rail-wrap { grid-column: auto; grid-row: auto; }
+          .ws-grid.ws-has-rail .ws-script-wrap { grid-column: auto; grid-row: auto; }
           .ws-script-wrap { grid-column: auto; }
-          .ws-blockly-mount { height: 520px; }
+          .ws-blockly-mount { height: 600px; }
+          /* Summary wide on desktop: wider task column, taller editor. */
+          .ws-summary-wide .ws-grid { grid-template-columns: 340px minmax(0, 1fr); }
+          .ws-summary-wide .ws-editor-slot textarea { min-height: 420px; }
         }
       `}</style>
 
       <header className="ws-topbar" data-testid="ws-topbar">
-        <h1 style={{ margin: 0, fontSize: 20 }}>{contract.title}</h1>
+        <h1 style={{ margin: 0, fontSize: 18 }}>{contract.title}</h1>
         {contract.demo && <span data-testid="ws-demo-badge">演示</span>}
         <span data-testid="ws-step-meta">{contract.step}</span>
         <span data-testid="ws-save-chip">
@@ -1546,18 +1732,32 @@ export function LessonWorkspace({
 
       <nav className="ws-tabs" data-testid="ws-tabs">
         {(
-          (hasStage
-            ? [
-                ['stage', '舞台'],
-                ['blocks', '积木'],
-                ['script', '脚本'],
-                ['task', '任务'],
-              ]
-            : [
-                ['blocks', '积木'],
-                ['script', '脚本'],
-                ['task', '任务'],
-              ]) as Array<[TabId, string]>
+          // Slot courses edit through their slot component: no blocks tab
+          // (the drawer chips would silently do nothing without a mounted
+          // adapter). Imperative courses keep the previous four tabs.
+          (EditorSlotView
+            ? hasStage
+              ? [
+                  ['stage', '舞台'],
+                  ['script', '脚本'],
+                  ['task', '任务'],
+                ]
+              : [
+                  ['script', '脚本'],
+                  ['task', '任务'],
+                ]
+            : hasStage
+              ? [
+                  ['stage', '舞台'],
+                  ['blocks', '积木'],
+                  ['script', '脚本'],
+                  ['task', '任务'],
+                ]
+              : [
+                  ['blocks', '积木'],
+                  ['script', '脚本'],
+                  ['task', '任务'],
+                ]) as Array<[TabId, string]>
         ).map(([tab, label]) => (
           <button
             key={tab}
@@ -1576,7 +1776,10 @@ export function LessonWorkspace({
           The mount divs stay in the DOM either way — tab switches never
           remount the adapter. The ws-active class is applied on mobile only
           via the tab state; on >=768px CSS forces all panels visible. */}
-      <div className="ws-grid" data-testid="ws-grid">
+      <div
+        className={`ws-grid${hasStage && RolesSlotView ? ' ws-has-roles' : ''}${railOn ? ' ws-has-rail' : ''}`}
+        data-testid="ws-grid"
+      >
         {/* The stage panel always stays in the DOM: hiding it only sets
             display:none, so the Scratch iframe (and the Blockly mount in the
             script panel) is never destroyed by a visibility switch. */}
@@ -1589,20 +1792,31 @@ export function LessonWorkspace({
           </div>
         )}
         {hasStage && !stageVisible && <p data-testid="ws-stage-hidden-note">舞台已隐藏（脚本不受影响）。</p>}
-        {/* Demo roles are demo content: a course that brings its own stage
-            renders its own roles UI inside the stage slot, never these.
-            Roles belong to the stage area, so a stageless course
-            (hasStage === false) renders no roles column either. */}
-        {hasStage && !StageSlotView && (
-          <div className={`ws-panel ws-roles-wrap ${activeTab === 'stage' ? 'ws-active' : ''}`}>{rolesPanel}</div>
+        {/* Roles are course content: only a rolesSlot renders them, never
+            the shell. Roles belong to the stage area, so a stageless
+            course (hasStage === false) renders no roles column either. */}
+        {hasStage && RolesSlotView && (
+          <div className={`ws-panel ws-roles-wrap ${activeTab === 'stage' ? 'ws-active' : ''}`}>
+            <section className="ws-roles" data-panel="roles" data-testid="ws-roles-panel">
+              <h2>角色</h2>
+              <RolesSlotView lessonId={contract.lessonId} />
+            </section>
+          </div>
         )}
-        <div className={`ws-panel ws-blocks-panel ${activeTab === 'blocks' ? 'ws-active' : ''}`}>
-          <section data-testid="ws-blocks-panel">
-            <h2>积木素材</h2>
-            {drawer}
-            <p>点积木插入脚本末尾；脚本区内也可直接操作。</p>
-          </section>
-        </div>
+        {/* Icon rail: shell-rendered category column. On mobile it is
+            hidden by CSS; the blocks tab drawer + search serve there. */}
+        {railOn && (
+          <div className="ws-panel ws-rail-wrap ws-active">{iconRail}</div>
+        )}
+        {!EditorSlotView && (
+          <div className={`ws-panel ws-blocks-panel ${activeTab === 'blocks' ? 'ws-active' : ''}`}>
+            <section data-testid="ws-blocks-panel">
+              <h2>积木素材</h2>
+              {drawer}
+              <p>点积木插入脚本末尾；脚本区内也可直接操作。</p>
+            </section>
+          </div>
+        )}
         <div className={`ws-panel ws-script-wrap ${activeTab === 'script' ? 'ws-active' : ''}`}>{scriptPanel}</div>
         <div className={`ws-panel ws-task-wrap ${activeTab === 'task' ? 'ws-active' : ''}`}>
           <section data-testid="ws-task-panel">
@@ -1628,7 +1842,11 @@ export function LessonWorkspace({
           </>
         ) : (
           !judgmentStale &&
-          !EditorSlotView && <p>尚未运行：运行后这里会显示舞台结果、任务判定、知识证据三行。</p>
+          (EditorSlotView ? (
+            <p>暂无检查结果：检查与判定由课程适配器提供，本演示不作判定。</p>
+          ) : (
+            <p>尚未运行：运行后这里显示运行状态与课程反馈。</p>
+          ))
         )}
       </section>
     </div>

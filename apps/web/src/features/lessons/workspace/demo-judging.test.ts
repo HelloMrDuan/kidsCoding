@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { runDemoProgram, type DemoBlock } from './blockly-adapter'
 import { DEMO_A } from './demo-contracts'
-import { buildJudgment } from './workspace-judging'
+import { buildJudgment } from './demo-judging'
 
 const hat = { type: 'when_start' }
 const right = (steps: number): DemoBlock => ({ type: 'ws_move_right', steps })
@@ -11,7 +11,7 @@ const repeat = (times: number, body: DemoBlock[]): DemoBlock => ({ type: 'repeat
 function judge(script: DemoBlock[]) {
   const result = runDemoProgram(script)
   if (!result.ok) throw new Error(`demo program should run: ${result.message}`)
-  return buildJudgment(DEMO_A.contract, { x: result.finalX, score: 0, running: false }, result.trace)
+  return buildJudgment(DEMO_A.contract.judging.target, { x: result.finalX, score: 0, running: false }, result.trace)
 }
 
 describe('three-layer judging (ACCEPTANCE R1–R6, demo fruit x=200, threshold 80)', () => {

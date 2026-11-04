@@ -2,9 +2,11 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { DEMO_A, DEMO_B } from './demo-contracts'
+import { buildJudgment } from './demo-judging'
 import { draftKeyFor, type LessonContract } from './lesson-contract'
 import { LessonWorkspace } from './lesson-workspace'
 import type { EngineAdapter, EngineState, RunEvent } from './workspace-adapters'
+import { toJudgmentResult } from './workspace-judging'
 
 /**
  * Fake engine: in-memory script + synchronous finished event. It exercises the
@@ -47,8 +49,10 @@ class FakeAdapter implements EngineAdapter {
     return { x: 150, score: 1, running: false, frames: 3 }
   }
 
-  getLastTrace() {
-    return this.trace
+  // Test double for an adapter-owned judgment: the shell displays only
+  // what the adapter returns (demo rules live in demo-judging.ts).
+  getJudgmentResult() {
+    return toJudgmentResult(buildJudgment(DEMO_A.contract.judging.target, this.getState(), this.trace))
   }
 
   addChangeListener(cb: () => void) {
@@ -237,8 +241,8 @@ class LateFakeAdapter implements EngineAdapter {
   getState(): EngineState {
     return { x: 0, score: 0, running: this.running, frames: 0 }
   }
-  getLastTrace() {
-    return this.trace
+  getJudgmentResult() {
+    return toJudgmentResult(buildJudgment(DEMO_A.contract.judging.target, this.getState(), this.trace))
   }
   addChangeListener(cb: () => void) {
     this.listeners.add(cb)
@@ -255,13 +259,15 @@ class LateFakeAdapter implements EngineAdapter {
 }
 
 class CappedFakeAdapter extends FakeAdapter {
-  override getFileCapabilities() {
+  // No `override`: these are optional EngineAdapter members the base
+  // FakeAdapter does not declare, so `override` is a type error here.
+  getFileCapabilities() {
     return { canNew: false, canExport: false }
   }
 }
 
 class RejectingDraftAdapter extends FakeAdapter {
-  override validateDraft() {
+  validateDraft() {
     return false
   }
 }

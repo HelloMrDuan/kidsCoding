@@ -18,10 +18,10 @@ async function dragFlyoutBlockToWorkspace(
   page: import('@playwright/test').Page,
   categoryLabel: string,
 ) {
-  // Blockly v12 toolbox: categories are .blocklyToolboxCategory divs (the
-  // label span itself is pointer-intercepted by its parent div).
-  const toolbox = page.locator('.blocklyToolbox')
-  await toolbox.locator('.blocklyToolboxCategory', { hasText: categoryLabel }).click()
+  // Category selection goes through the shell's icon rail (which drives
+  // the real Blockly toolbox selection); Blockly's own category column is
+  // hidden by scoped CSS while the rail is on.
+  await page.getByTestId(`ws-rail-${categoryLabel}`).click()
   const flyoutBlock = page.locator('.blocklyFlyout .blocklyDraggable').first()
   await flyoutBlock.waitFor({ state: 'visible', timeout: 10000 })
   const box = await flyoutBlock.boundingBox()
@@ -285,10 +285,10 @@ test('R6 tablet 768: category flyout, run/stop, resize keeps the editor usable',
   await page.goto(DEMO_A)
   await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
-  // Expand a real toolbox category: the flyout must appear (not just a button).
-  // The demo toolbox renders 开始 / 控制 / 更多 ('移动' is not a demo category).
-  const toolbox = page.locator('.blocklyToolbox')
-  await toolbox.locator('.blocklyToolboxCategory', { hasText: '更多' }).click()
+  // Expand a real category via the icon rail: the flyout must appear (not
+  // just a button). The demo toolbox renders 开始 / 控制 / 更多 ('移动'
+  // is not a demo category).
+  await page.getByTestId('ws-rail-更多').click()
   await expect(page.locator('.blocklyFlyout .blocklyDraggable').first()).toBeVisible({ timeout: 10000 })
   await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
@@ -298,10 +298,12 @@ test('R6 tablet 768: category flyout, run/stop, resize keeps the editor usable',
   await expect(page.getByTestId('ws-stage-state')).toContainText('未运行')
   await expect(page.getByTestId('ws-stage-state')).toContainText('分数=0')
   await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0)
-  // Resize (tablet rotation shape): the editor must re-measure and stay usable.
+  // Resize (tablet rotation shape): the editor must re-measure and stay
+  // usable — same strength as before, but the rail (not Blockly's own
+  // hidden column) is the visible category surface after resize.
   await page.setViewportSize({ width: 1024, height: 768 })
   await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
-  await expect(page.locator('.blocklyToolbox')).toBeVisible()
+  await expect(page.getByTestId('ws-icon-rail')).toBeVisible()
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
 })
 
@@ -355,6 +357,109 @@ test('R4 restore prompt survives autosave; autosave persists edits without expli
   await page.reload()
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2, { timeout: 10000 })
   await expect(page.getByTestId('ws-script-item-1')).toContainText('向右走 50 步')
+})
+
+test('icon rail drives a real category flyout; Blockly own column stays hidden', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
+  // Three rail buttons, one per demo category; Blockly's own column hidden.
+  await expect(page.getByTestId('ws-icon-rail')).toBeVisible()
+  await expect(page.getByTestId('ws-rail-开始')).toBeVisible()
+  await expect(page.getByTestId('ws-rail-控制')).toBeVisible()
+  await expect(page.getByTestId('ws-rail-更多')).toBeVisible()
+  await expect(page.locator('.blocklyToolbox')).toBeHidden()
+  // Clicking a rail icon opens the real flyout with draggable blocks.
+  await page.getByTestId('ws-rail-开始').click()
+  await expect(page.getByTestId('ws-rail-开始')).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.blocklyFlyout .blocklyDraggable').first()).toBeVisible({ timeout: 10000 })
+  // Clicking the active rail icon again closes the flyout (toggle).
+  await page.getByTestId('ws-rail-开始').click()
+  await expect(page.locator('.blocklyFlyout .blocklyDraggable').first()).toBeHidden({ timeout: 10000 })
+})
+
+test('block search inserts a real block and filters the drawer chips', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  await page.getByTestId('ws-block-search').fill('向右')
+  await expect(page.getByTestId('ws-search-results')).toBeVisible()
+  await page.getByTestId('ws-search-result-ws_move_right').click()
+  // A real Blockly block landed at the end of the main chain.
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await expect(page.getByTestId('ws-script-item-2')).toContainText('向右走 50 步')
+  // The same search text filters the demo drawer chips.
+  await page.getByTestId('ws-block-search').fill('重复')
+  await expect(page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right')).toHaveCount(0)
+  await expect(page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat')).toBeVisible()
+  await page.getByTestId('ws-block-search').fill('')
+  await expect(page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right')).toBeVisible()
+})
+
+test('editor zoom changes the real canvas scale and resets', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
+  const readScale = async () => {
+    const transform = await page
+      .locator('.blocklyBlockCanvas')
+      .first()
+      .getAttribute('transform')
+    const match = transform?.match(/scale\(([\d.]+)\)/)
+    expect(match).not.toBeNull()
+    return parseFloat(match![1])
+  }
+  const before = await readScale()
+  await page.getByTestId('ws-editor-zoom-in').click()
+  const zoomed = await readScale()
+  expect(zoomed).toBeGreaterThan(before)
+  await page.getByTestId('ws-editor-zoom-reset').click()
+  const reset = await readScale()
+  expect(Math.abs(reset - 0.9)).toBeLessThan(0.01)
+})
+
+test('mobile sticky action row is in-flow sticky and runs the program', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto(DEMO_A)
+  await page.getByTestId('ws-tab-script').click()
+  await expect(page.getByTestId('ws-sticky-run')).toBeVisible()
+  // In-flow sticky, never a fixed overlay on the editor.
+  const position = await page.evaluate(
+    () => getComputedStyle(document.querySelector('.ws-sticky-actions')!).position,
+  )
+  expect(position).toBe('sticky')
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await page.getByTestId('ws-sticky-run').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveText('结论：已完成，已掌握', {
+    timeout: 15000,
+  })
+})
+
+test('summary wide layout: task left, editor wide, honest empty feedback, no blocks tab', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_S)
+  await expect(page.getByTestId('ws-demo-summary-editor')).toBeVisible()
+  // Desktop shows the task column beside the editor (not a narrow box),
+  // on the SAME row as the editor (not dropped below it).
+  await expect(page.getByTestId('ws-task-panel')).toBeVisible()
+  const taskBox = await page.getByTestId('ws-task-panel').boundingBox()
+  const scriptBox = await page.getByTestId('ws-script-panel').boundingBox()
+  expect(taskBox).not.toBeNull()
+  expect(scriptBox).not.toBeNull()
+  expect(Math.abs(taskBox!.y - scriptBox!.y)).toBeLessThanOrEqual(20)
+  expect(taskBox!.x).toBeLessThan(scriptBox!.x)
+  const editorBox = await page.getByTestId('ws-summary-textarea').boundingBox()
+  expect(editorBox).not.toBeNull()
+  expect(editorBox!.width).toBeGreaterThan(400)
+  // No stage, no roles, no run button, no blocks tab, honest empty state.
+  expect(await page.getByTestId('ws-stage-panel').count()).toBe(0)
+  expect(await page.getByTestId('ws-roles-panel').count()).toBe(0)
+  expect(await page.getByTestId('ws-run-script').count()).toBe(0)
+  expect(await page.getByTestId('ws-tab-blocks').count()).toBe(0)
+  await expect(page.getByTestId('ws-feedback')).toContainText('暂无检查结果')
 })
 
 test('summary demo: React editor slot mounts, types, saves, restores; no stage or run button', async ({
