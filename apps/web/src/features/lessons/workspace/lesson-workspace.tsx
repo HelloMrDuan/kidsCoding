@@ -1262,6 +1262,42 @@ export function LessonWorkspace({
    * Blockly is hidden by scoped CSS while the rail is on, so the two
    * never coexist. Adapters without categories get no rail at all.
    */
+  /**
+   * Single material surface (round 4 fix 2): the icon rail and the
+   * in-script palette drawer never stay open together. Opening the rail
+   * closes the drawer (and clears search results); opening the drawer
+   * deselects the rail category, which closes the Blockly flyout (the
+   * adapter toggles: selecting the active category deselects it).
+   * Search results are in-flow above the palette, never an overlay, so
+   * they cannot cover the canvas; they close with either surface switch.
+   */
+  const handleRailSelect = useCallback(
+    (categoryId: string) => {
+      const next = adapter.selectCategory?.(categoryId) ?? null
+      setRailSelected(next)
+      setPaletteOpen(false)
+      setSearchText('')
+    },
+    [adapter],
+  )
+
+  const handlePaletteToggle = useCallback(() => {
+    const opening = !paletteOpen
+    if (opening) {
+      if (railSelected !== null) {
+        try {
+          adapter.selectCategory?.(railSelected)
+        } catch {
+          // A failed deselect never blocks the drawer; the flyout state
+          // is re-checked by the E2E single-surface assertions.
+        }
+        setRailSelected(null)
+      }
+      setSearchText('')
+    }
+    setPaletteOpen(opening)
+  }, [adapter, paletteOpen, railSelected])
+
   const iconRail = railOn ? (
     <nav className="ws-rail" data-testid="ws-icon-rail" aria-label="积木分类">
       {railCategories.map((category) => (
@@ -1272,10 +1308,7 @@ export function LessonWorkspace({
           aria-pressed={railSelected === category.id}
           aria-label={category.label}
           title={category.label}
-          onClick={() => {
-            const next = adapter.selectCategory?.(category.id) ?? null
-            setRailSelected(next)
-          }}
+          onClick={() => handleRailSelect(category.id)}
           data-testid={`ws-rail-${category.id}`}
         >
           <RailIcon label={category.label} color={category.color} />
@@ -1364,7 +1397,7 @@ export function LessonWorkspace({
               <button
                 type="button"
                 className="kc-action-surface kc-btn-outline kc-btn-sm"
-                onClick={() => setPaletteOpen((v) => !v)}
+                onClick={handlePaletteToggle}
                 data-testid="ws-palette-toggle"
               >
                 {paletteOpen ? '收起' : '展开'}
@@ -1478,7 +1511,7 @@ export function LessonWorkspace({
 
   return (
     <div
-      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}`}
+      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}${hasStage && !stageVisible ? ' ws-stage-hidden' : ''}`}
       data-testid="ws-root"
       style={{ '--ws-stage-w': `${stageWidth}px` } as CSSProperties}
     >
@@ -1650,6 +1683,43 @@ export function LessonWorkspace({
           .ws-summary-wide .ws-script-wrap { grid-column: 2; grid-row: 1; }
           .ws-summary-wide .ws-editor-slot textarea { min-height: 360px; }
         }
+        /* Round 4 fix 1: when the stage is hidden, the in-flow sticky
+           run row shows on EVERY viewport (it is hidden >= 768px by
+           default). It sits at the top of the script column, inside the
+           first screen, so a folded stage never strands run/stop below
+           the fold. Higher specificity than the >= 768px hide below. */
+        @media (min-width: 768px) {
+          .ws-stage-hidden .ws-sticky-actions { display: flex; }
+        }
+        /* Round 4 first-screen compaction (<= 1023px): section headings
+           that duplicate an already-labelled area are hidden, and the
+           goal strip keeps the current goal to one ellipsised line so
+           the canvas top clears the mobile bottom nav. No button, input,
+           or teaching control is removed: the full goals stay one tap
+           away via the expand button, the step text stays in the task
+           drawer, and every control keeps its testid. */
+        @media (max-width: 1023px) {
+          [data-testid="ws-script-panel"] > h2, [data-testid="ws-roles-panel"] > h2 { display: none; }
+          .ws-goalstrip-current { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .ws-topbar { padding: 4px 6px; gap: 4px; }
+          .ws-topbar h1 { font-size: 15px !important; }
+          .ws-topbar .kc-btn-sm { padding: 4px 8px; }
+        }
+        @media (max-width: 767px) {
+          /* Mobile goal strip: one row (ellipsised goal + expand button).
+             The meta row (step + save state) is hidden here only: the
+             save state also shows in the topbar chip and the sticky row,
+             and the step text stays in the task drawer. */
+          .ws-goalstrip { padding: 4px 8px; }
+          .ws-goalstrip-current { flex: 0 1 auto; max-width: 60%; }
+          .ws-goalstrip-meta { display: none; }
+          .ws-search-row { margin-bottom: 2px; }
+          .ws-search-row input { min-height: 36px; }
+          .ws-palette { padding: 6px 8px; margin-bottom: 4px; }
+          .ws-panel { margin-bottom: 4px; }
+          .ws-panel > section { padding: 4px 6px; }
+          .ws-runbar { margin-top: 2px; }
+        }
         @media (min-width: 1280px) {
           /* Desktop: stage + roles + rail + script, only the present
              columns take space (no empty column gaps). */
@@ -1675,6 +1745,18 @@ export function LessonWorkspace({
           /* Summary wide on desktop: wider task column, taller editor. */
           .ws-summary-wide .ws-grid { grid-template-columns: 340px minmax(0, 1fr); }
           .ws-summary-wide .ws-editor-slot textarea { min-height: 420px; }
+          /* Round 4 fix 1b (found by final measurement): with the stage
+             hidden, the stage-wrap is display:none and leaves the grid,
+             so the remaining items auto-place into the 280/120/56
+             columns and the script column collapses to 56px wide. The
+             hidden note spans the full first row; redefine the columns
+             for the hidden stage so roles/rail keep their widths and
+             the script takes the rest. Higher specificity (extra
+             ancestor class) than the column rules above. */
+          .ws-stage-hidden .ws-grid { grid-template-columns: minmax(0, 1fr); }
+          .ws-stage-hidden .ws-grid.ws-has-roles { grid-template-columns: 120px minmax(0, 1fr); }
+          .ws-stage-hidden .ws-grid.ws-has-rail { grid-template-columns: 56px minmax(0, 1fr); }
+          .ws-stage-hidden .ws-grid.ws-has-roles.ws-has-rail { grid-template-columns: 120px 56px minmax(0, 1fr); }
         }
       `}</style>
 

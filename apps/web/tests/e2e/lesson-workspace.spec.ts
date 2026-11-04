@@ -94,6 +94,13 @@ test('tablet 768 first screen: stage + script + rail + run + task entry, compact
   const svgBox = await page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg').boundingBox()
   expect(svgBox).not.toBeNull()
   expect(svgBox!.y).toBeLessThan(1024)
+  // Round 4 strengthening: tablet canvas >= 300px tall, and a real
+  // rendered block fully inside the 1024px viewport.
+  expect(svgBox!.height).toBeGreaterThanOrEqual(300)
+  const firstBlockBox = await page.locator('.blocklyBlockCanvas .blocklyDraggable').first().boundingBox()
+  expect(firstBlockBox).not.toBeNull()
+  expect(firstBlockBox!.y).toBeGreaterThanOrEqual(svgBox!.y)
+  expect(firstBlockBox!.y + firstBlockBox!.height).toBeLessThanOrEqual(1024)
   const runBox = await page.getByTestId('ws-run-toggle').boundingBox()
   expect(runBox).not.toBeNull()
   expect(runBox!.y + runBox!.height).toBeLessThan(1024)
@@ -191,6 +198,14 @@ test('mobile 375 first screen: stage preview + script + run + drawer entry + sea
   // roughly the bottom 62px, so the canvas top must clear y=750 to be
   // genuinely visible to the child, not merely rendered behind the nav.
   expect(svgBox!.y).toBeLessThan(750)
+  // Round 4 strengthening: the canvas itself must be tall enough to work
+  // in (>= 220px), and a real rendered block must sit fully above the
+  // bottom nav — not merely inside the 812px viewport behind it.
+  expect(svgBox!.height).toBeGreaterThanOrEqual(220)
+  const firstBlockBox = await page.locator('.blocklyBlockCanvas .blocklyDraggable').first().boundingBox()
+  expect(firstBlockBox).not.toBeNull()
+  expect(firstBlockBox!.y).toBeGreaterThanOrEqual(svgBox!.y)
+  expect(firstBlockBox!.y + firstBlockBox!.height).toBeLessThanOrEqual(750)
   const runBox = await page.getByTestId('ws-run-toggle').boundingBox()
   expect(runBox).not.toBeNull()
   expect(runBox!.y + runBox!.height).toBeLessThanOrEqual(812)
@@ -649,4 +664,161 @@ test('summary tablet + mobile: editor stays wide, task via drawer, type/save/res
   await expect(page.getByTestId('ws-summary-textarea')).toHaveValue('今天学了循环和总结', {
     timeout: 10000,
   })
+})
+
+/* ---------------- Round 4: approved-layout implementation ---------------- */
+
+test('round4 layout budget default: stage/run/materials/task in view, svg height targets, first block fully in view', async ({
+  page,
+}) => {
+  for (const [width, height, minSvg] of [
+    [1440, 900, 0],
+    [768, 1024, 300],
+    [375, 812, 220],
+  ] as const) {
+    await page.setViewportSize({ width, height })
+    await page.goto(DEMO_A)
+    await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
+    const inView = async (testid: string) => {
+      const box = await page.getByTestId(testid).boundingBox()
+      expect(box).not.toBeNull()
+      expect(box!.y).toBeGreaterThanOrEqual(0)
+      expect(box!.y + box!.height).toBeLessThanOrEqual(height)
+    }
+    await inView('ws-stage-box')
+    await inView('ws-run-toggle')
+    await inView('ws-palette-toggle')
+    await inView('ws-task-button')
+    const svgBox = await page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg').boundingBox()
+    expect(svgBox).not.toBeNull()
+    expect(svgBox!.y).toBeLessThan(height)
+    expect(svgBox!.height).toBeGreaterThanOrEqual(minSvg)
+    const firstBlockBox = await page.locator('.blocklyBlockCanvas .blocklyDraggable').first().boundingBox()
+    expect(firstBlockBox).not.toBeNull()
+    expect(firstBlockBox!.y).toBeGreaterThanOrEqual(svgBox!.y)
+    expect(firstBlockBox!.y + firstBlockBox!.height).toBeLessThanOrEqual(height)
+  }
+})
+
+test('round4 fix 1: folded stage keeps run/stop reachable via the sticky row (desktop + tablet)', async ({
+  page,
+}) => {
+  for (const [width, height] of [
+    [1440, 900],
+    [768, 1024],
+  ] as const) {
+    await page.setViewportSize({ width, height })
+    await page.goto(DEMO_A)
+    await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
+    await page.getByTestId('ws-stage-toggle').click()
+    await expect(page.getByTestId('ws-stage-hidden-note')).toBeVisible()
+    // The stage run bar is gone with the stage; the sticky row must be
+    // visible in the first screen instead (it is hidden >= 768px by
+    // default and only appears when the stage is hidden).
+    await expect(page.getByTestId('ws-sticky-run')).toBeVisible()
+    const stickyBox = await page.getByTestId('ws-sticky-run').boundingBox()
+    expect(stickyBox).not.toBeNull()
+    expect(stickyBox!.y + stickyBox!.height).toBeLessThanOrEqual(height)
+    // Regression guard (round 4 measurement finding): a hidden stage
+    // must not collapse the script column into the 56px rail column.
+    const mountBox = await page.getByTestId('ws-blockly-mount').boundingBox()
+    expect(mountBox).not.toBeNull()
+    expect(mountBox!.width).toBeGreaterThanOrEqual(500)
+    await page.getByTestId('ws-sticky-run').click()
+    await expect(page.getByTestId('ws-sticky-run')).toHaveText('停止')
+    await page.getByTestId('ws-sticky-run').click()
+    await expect(page.getByTestId('ws-sticky-run')).toHaveText('运行作品')
+    await page.screenshot({ path: `test-results/lesson-workspace-folded-${width}.png` })
+    // Unfolding restores the stage and hides the sticky row again.
+    await page.getByTestId('ws-stage-toggle').click()
+    await expect(page.getByTestId('ws-stage-panel')).toBeVisible()
+    await expect(page.getByTestId('ws-sticky-run')).toBeHidden()
+  }
+})
+
+test('round4 fix 2: one material surface at a time (rail flyout vs palette drawer)', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
+  // Desktop default: palette drawer open, flyout closed.
+  await expect(page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right')).toBeVisible()
+  expect(await page.locator('.blocklyFlyout .blocklyDraggable').count()).toBe(0)
+  // Opening the rail closes the drawer and opens the flyout.
+  await page.getByTestId('ws-rail-开始').click()
+  await expect(page.locator('.blocklyFlyout .blocklyDraggable').first()).toBeVisible({ timeout: 10000 })
+  await expect(page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right')).toBeHidden()
+  // Opening the drawer closes the flyout again.
+  await page.getByTestId('ws-palette-toggle').click()
+  await expect(page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right')).toBeVisible()
+  await expect(page.locator('.blocklyFlyout .blocklyDraggable').first()).toBeHidden({ timeout: 10000 })
+  await page.screenshot({ path: 'test-results/lesson-workspace-drawer-1440.png' })
+  // Drawer chips still insert for real.
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+
+  // Mobile: the rail is hidden by CSS, so the drawer is the only surface;
+  // opening it must not summon a flyout.
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto(DEMO_A)
+  await page.getByTestId('ws-palette-toggle').click()
+  await expect(page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right')).toBeVisible()
+  expect(await page.locator('.blocklyFlyout .blocklyDraggable').count()).toBe(0)
+  await page.screenshot({ path: 'test-results/lesson-workspace-drawer-375.png' })
+})
+
+test('round4 mobile touch: touchscreen taps open the drawer, add a block, and run to pass', async ({
+  page,
+}) => {
+  // Touchscreen.tap needs a touch context; the desktop/tablet projects
+  // skip honestly instead of faking a tap with a mouse click.
+  const touchPoints = await page.evaluate(() => navigator.maxTouchPoints)
+  test.skip(touchPoints === 0, 'needs a touch-capable browser context')
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto(DEMO_A)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  const tap = async (testid: string) => {
+    const box = await page.getByTestId(testid).boundingBox()
+    expect(box).not.toBeNull()
+    await page.touchscreen.tap(box!.x + box!.width / 2, box!.y + box!.height / 2)
+  }
+  await tap('ws-palette-toggle')
+  await expect(page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat')).toBeVisible()
+  await tap('ws-drawer-repeat')
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  // Sticky run is first-screen on phones: tap it, run to a real pass.
+  await tap('ws-sticky-run')
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveText('结论：已完成，已掌握', {
+    timeout: 15000,
+  })
+})
+
+test('round4 fix 3: file menu audit — blockly shows all five, scratch hides new/reset', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await page.getByTestId('ws-file-menu-button').click()
+  for (const item of ['ws-file-new', 'ws-file-save', 'ws-file-export', 'ws-file-import', 'ws-file-reset']) {
+    await expect(page.getByTestId(item)).toBeVisible()
+  }
+  await page.goto(DEMO_SCRATCH)
+  await expect(page.locator('[data-testid="ws-scratch-mount"] iframe')).toHaveCount(1)
+  await page.getByTestId('ws-file-menu-button').click()
+  expect(await page.getByTestId('ws-file-new').count()).toBe(0)
+  expect(await page.getByTestId('ws-file-reset').count()).toBe(0)
+  for (const item of ['ws-file-save', 'ws-file-export', 'ws-file-import']) {
+    await expect(page.getByTestId(item)).toBeVisible()
+  }
+  // Scratch save is a real draft write (of the current, possibly empty,
+  // project state) — it must report the true outcome, never a fake one.
+  await page.getByTestId('ws-file-save').click()
+  await expect(page.getByTestId('ws-save-chip')).toHaveText('已保存到本机')
+  // Scratch export without a ready engine is an honest failure, not a
+  // silent no-op: the notice carries the real reason, whichever honest
+  // path fires here (VM unavailable, load timeout, not ready, no project).
+  await page.getByTestId('ws-file-menu-button').click()
+  await page.getByTestId('ws-file-export').click()
+  await expect(page.getByTestId('ws-notice')).toHaveText(/Scratch.*(就绪|挂载|加载)/)
 })

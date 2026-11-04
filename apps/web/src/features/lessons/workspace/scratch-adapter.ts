@@ -31,6 +31,7 @@
  */
 
 import type { EngineAdapter, EngineState, RunEvent } from './workspace-adapters'
+import type { FileCapabilities } from './workspace-slots'
 
 export const SCRATCH_READY_TIMEOUT_MS = 15000
 export const SCRATCH_PROJECT_TIMEOUT_MS = 15000
@@ -83,6 +84,19 @@ export class ScratchVMAdapter implements EngineAdapter {
   private onEvent: ((e: RunEvent) => void) | null = null
   private waiters: Waiter[] = []
   private onMessage: ((event: MessageEvent) => void) | null = null
+
+  /**
+   * File operations the adapter actually supports (round 4 fix 3).
+   * Scratch has no blank-project 新建 and no 初始恢复: both used to
+   * render as buttons that only showed a notice. They are now hidden
+   * by capability instead of rendered as empty shells. 保存 / 导出 /
+   * 导入 stay shown: save writes the real draft, export attempts a
+   * real VM export (honest failure when not ready), import runs the
+   * real sandbox verdict path.
+   */
+  getFileCapabilities(): FileCapabilities {
+    return { canNew: false, canReset: false }
+  }
 
   /** Engine-load failure message, or null when the sandbox handshake succeeded. */
   getLoadError(): string | null {
