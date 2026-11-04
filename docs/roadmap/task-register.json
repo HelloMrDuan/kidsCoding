@@ -3286,7 +3286,7 @@
       "title": "G2-U3-L02 专属测试接入 curriculum-content CI：单元测试步骤 + 真实 VM/三端浏览器 Job",
       "priority": "P0",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "SYS-108",
         "SYS-109"
@@ -3300,10 +3300,16 @@
         "与并行 PR #460 之后的 #462/#464/#468/#260/#265 的 workflow 三方合并无冲突块"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/471",
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+      "PR #471 head 647b8707 curriculum content checks（run 41757100374）success：24 个 Job，仅新增 g2-u3-l02-browser-trial，其余 23 个与 #470 运行结论逐个一致",
+      "curriculum-web 新步骤 G2-U3-L02 unit tests 真实执行：g2-u3-l02.test.ts 66 passed (66)",
+      "g2-u3-l02-browser-trial（真实 Chrome、真实 jsDelivr 的 scratch-vm）：69 个用例，64 passed / 5 skipped（按设计）/ 0 failed；vm.spec 21 条 + classroom.spec 48 条；实测 328 秒（5.5 分钟）≤ 12 分钟",
+      "失败演练（一次性 PR #472，已关闭并删分支）：故意让 R2 断言失败 → Job 变红，upload-artifact 仍执行，artifact 含 trace.zip/error-context.md/junit.xml，日志含 Expected/Received 与出错行",
+      "workflow 相对 main +30/-0 纯新增；与并行 PR #468/#464/#462/#265/#260 三方合并 0 冲突块、无重名 Job"
+    ],
         "reviewer": null
       },
       "notes": "首席 2026-11-04 批准方案 A（独立 CI PR，Stacked）。起因：#470 的三个工作流全绿但未执行任何 G2-U3-L02 测试（审计见 docs/curriculum/g2-u3-l02/CI-COVERAGE-PLAN.md）。本条目仅为本 CI PR 的门禁登记；文件顶层 updatedAt 按现有惯例不随本条改动。"
