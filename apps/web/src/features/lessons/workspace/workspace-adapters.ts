@@ -5,7 +5,22 @@
  * engine is mounted. Adapters may add engine-specific extensions (e.g. Blockly
  * change listeners, Scratch project export), but the shell only relies on this
  * interface plus duck-typed optional extensions it probes for explicitly.
+ *
+ * Three-engine extensions (OPS-020, all optional, probed never required):
+ * - `getSelectedBlockId` / `selectBlockById`: shell-owned selection tracking
+ *   (see block-selection.ts). The shell never trusts Blockly's focus-fragile
+ *   getSelected() directly.
+ * - `validateDraft`: adapter-owned draft data validation, applied on
+ *   restore. An invalid draft falls back to the initial script and never
+ *   overwrites a good draft.
+ * - `getFileCapabilities`: file operations the adapter actually supports.
+ *   Unsupported operations are hidden, never rendered as fake buttons.
+ * - `getJudgmentResult`: adapter-owned generic judgment (see
+ *   workspace-slots.ts). When present, the shell displays it instead of the
+ *   demo three-layer builder; the shell never invents a conclusion.
  */
+
+import type { FileCapabilities, JudgmentResult } from './workspace-slots'
 
 export type EngineState = {
   /** Stage x of the demo player character (0 = start). */
@@ -41,4 +56,10 @@ export type EngineAdapter = {
   run: (onEvent: (e: RunEvent) => void) => void
   stop: () => void
   getState: () => EngineState
+  /** Optional extensions, probed by the shell with `?.` — never required. */
+  getSelectedBlockId?: () => string | null
+  selectBlockById?: (id: string) => void
+  validateDraft?: (script: unknown) => boolean
+  getFileCapabilities?: () => FileCapabilities
+  getJudgmentResult?: () => JudgmentResult | null
 }

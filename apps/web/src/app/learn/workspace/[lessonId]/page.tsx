@@ -21,6 +21,7 @@ import { use, useMemo } from 'react'
 
 import { BlocklyAdapter } from '@/features/lessons/workspace/blockly-adapter'
 import { getDemoContract } from '@/features/lessons/workspace/demo-contracts'
+import { DemoSummaryEditor } from '@/features/lessons/workspace/demo-summary-editor'
 import { LessonWorkspace } from '@/features/lessons/workspace/lesson-workspace'
 import { ScratchVMAdapter } from '@/features/lessons/workspace/scratch-adapter'
 import type { EngineAdapter } from '@/features/lessons/workspace/workspace-adapters'
@@ -29,6 +30,7 @@ const DEMO_LINKS = [
   { lessonId: 'demo-a', label: '演示 A：接住掉落水果' },
   { lessonId: 'demo-b', label: '演示 B：送篮子到果园' },
   { lessonId: 'demo-scratch', label: '演示 C：Scratch 沙箱' },
+  { lessonId: 'demo-s', label: '演示 S：写一段学习总结' },
 ]
 
 export default function WorkspaceDemoPage({
@@ -81,6 +83,7 @@ export default function WorkspaceDemoPage({
           adapter={adapter}
           initialScript={demo.initialScript}
           testFailSave={testFailSave}
+          editorSlot={lessonId === 'demo-s' ? DemoSummaryEditor : undefined}
         />
       </section>
     </main>

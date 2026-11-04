@@ -6,6 +6,12 @@
  * and every one of them is labelled 演示 in UI copy and in code comments.
  */
 
+import type {
+  CourseInfoExtension,
+  FileCapabilities,
+  StructuredHint,
+} from './workspace-slots'
+
 export type WorkspaceEngine = 'blockly' | 'scratch-vm' | 'summary'
 
 export type ScopeLabel = '教学定向' | '开放创作'
@@ -42,7 +48,29 @@ export type LessonContract = {
   draftKey: `kidscoding-draft:${string}`
   /** True only for demo fixtures. Demo contracts are never formal lesson data. */
   demo?: boolean
+  /**
+   * Three-engine extension fields (all optional, purely additive).
+   * `structuredHints` renders level/title/text with the same cumulative
+   * reveal; without it the shell renders the plain `hints` strings.
+   * `methodSteps` / `scopeGap` / `progress` / `activities` render ONLY
+   * inside the task drawer, never in the permanent editing area.
+   * `hasStage: false` renders no stage area at all (stage-less courses).
+   * `fileCapabilities` hides file operations the adapter does not support;
+   * absent capabilities keep the demo default (all shown). Adopting the
+   * structured hint form in the frozen spec text is a chief decision (C2);
+   * this code only makes the form available.
+   */
+  structuredHints?: StructuredHint[]
+  methodSteps?: string[]
+  scopeGap?: string
+  progress?: { label: string; current: number; total: number }
+  activities?: { level: 1 | 2 | 3; title: string; text: string }[]
+  fileCapabilities?: FileCapabilities
+  hasStage?: boolean
 }
+
+/** Course-info extension view of a contract (drawer-only fields). */
+export type ContractCourseInfo = CourseInfoExtension
 
 export function draftKeyFor(lessonId: string): `kidscoding-draft:${string}` {
   return `kidscoding-draft:${lessonId}`
@@ -104,6 +132,70 @@ export function validateLessonContract(contract: unknown): string[] {
     errors.push('draftKey 必须形如 kidscoding-draft:{lessonId}')
   } else if (typeof c.lessonId === 'string' && c.lessonId.length > 0 && c.draftKey !== draftKeyFor(c.lessonId)) {
     errors.push('draftKey 与 lessonId 不一致')
+  }
+  // Optional extension fields: validated only when present, never required.
+  if (c.structuredHints !== undefined) {
+    const ok =
+      Array.isArray(c.structuredHints) &&
+      c.structuredHints.every(
+        (h) =>
+          h !== null &&
+          typeof h === 'object' &&
+          (h.level === 1 || h.level === 2 || h.level === 3) &&
+          typeof h.title === 'string' &&
+          h.title.length > 0 &&
+          typeof h.text === 'string' &&
+          h.text.length > 0,
+      )
+    if (!ok) errors.push('structuredHints 每项必须是 level 1|2|3 且 title/text 非空')
+  }
+  if (c.methodSteps !== undefined) {
+    const ok = Array.isArray(c.methodSteps) && c.methodSteps.every((s) => typeof s === 'string' && s.length > 0)
+    if (!ok) errors.push('methodSteps 必须是非空字符串数组')
+  }
+  if (c.scopeGap !== undefined && typeof c.scopeGap !== 'string') {
+    errors.push('scopeGap 必须是字符串')
+  }
+  if (c.progress !== undefined) {
+    const p = c.progress as Partial<{ label: string; current: number; total: number }>
+    const ok =
+      p !== null &&
+      typeof p === 'object' &&
+      typeof p.label === 'string' &&
+      typeof p.current === 'number' &&
+      Number.isFinite(p.current) &&
+      typeof p.total === 'number' &&
+      Number.isFinite(p.total) &&
+      p.total > 0
+    if (!ok) errors.push('progress 必须是 label 字符串与有限 current/total，且 total > 0')
+  }
+  if (c.activities !== undefined) {
+    const ok =
+      Array.isArray(c.activities) &&
+      c.activities.every(
+        (a) =>
+          a !== null &&
+          typeof a === 'object' &&
+          (a.level === 1 || a.level === 2 || a.level === 3) &&
+          typeof a.title === 'string' &&
+          a.title.length > 0 &&
+          typeof a.text === 'string' &&
+          a.text.length > 0,
+      )
+    if (!ok) errors.push('activities 每项必须是 level 1|2|3 且 title/text 非空')
+  }
+  if (c.fileCapabilities !== undefined) {
+    const f = c.fileCapabilities as Partial<FileCapabilities>
+    const ok =
+      f !== null &&
+      typeof f === 'object' &&
+      (['canNew', 'canSave', 'canExport', 'canImport', 'canReset'] as const).every(
+        (k) => f[k] === undefined || typeof f[k] === 'boolean',
+      )
+    if (!ok) errors.push('fileCapabilities 各项必须是布尔值')
+  }
+  if (c.hasStage !== undefined && typeof c.hasStage !== 'boolean') {
+    errors.push('hasStage 必须是布尔值')
   }
   return errors
 }

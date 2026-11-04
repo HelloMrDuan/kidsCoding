@@ -1,13 +1,17 @@
 /**
  * LessonWorkspace E2E — real browser, production build, stock chromium.
  * Covers DESIGN.md §3 three viewports + ACCEPTANCE.md R7 lifecycle + draft
- * isolation + fail-closed save. Run via a TEMP Playwright config inside
- * apps/web (own port, no channel line); the temp config is deleted after the
- * run and playwright.config.ts is never modified.
+ * isolation + fail-closed save + OPS-020 regressions R3/R4/R5/R6/R8.
+ * No fixed-duration sleep is used as a sync mechanism: every wait is a
+ * conditional expectation (visible text, count, storage state).
+ * Run via a TEMP Playwright config inside apps/web (own port, no channel
+ * line); the temp config is deleted after the run and playwright.config.ts
+ * is never modified.
  */
 import { expect, test } from '@playwright/test'
 
 const DEMO_A = '/learn/workspace/demo-a'
+const DEMO_S = '/learn/workspace/demo-s'
 const DEMO_SCRATCH = '/learn/workspace/demo-scratch'
 
 async function dragFlyoutBlockToWorkspace(
@@ -102,8 +106,10 @@ test('run/stop/rerun (R7): stop keeps script and score 0, rerun passes with scor
   await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
   // Program: hat + right 30 + repeat 3 x right 50 -> x=180 caught, 4 frames.
+  // Conditional wait, not a fixed sleep: the first frame (x=30) proves the
+  // run is genuinely mid-playback before stopping it.
   await page.getByTestId('ws-run-toggle').click()
-  await page.waitForTimeout(500)
+  await expect(page.getByTestId('ws-stage-state')).toContainText('x=30')
   await page.getByTestId('ws-run-toggle').click()
   await expect(page.getByTestId('ws-stage-state')).toContainText('分数=0')
   await expect(page.getByTestId('ws-stage-state')).toContainText('未运行')
@@ -193,4 +199,181 @@ test('scratch demo: iframe mounts with sandbox attr and reports an honest readin
   // Either ready or an honest failure/pending state — never a fake ready.
   await expect(page.getByTestId('ws-scratch-note')).toHaveText(/已就绪|未就绪|握手/, { timeout: 20000 })
   expect(await page.getByTestId('ws-blockly-mount').count()).toBe(0)
+})
+
+test('R8 loop ownership: post-loop move runs once, delete restores structure', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  // [hat, right 30] + repeat(3 x right 50) + right 50 -> x = 30 + 150 + 50 = 230.
+  // If the trailing move were misjudged as in-loop, x would be 30 + 3*100 = 330
+  // and the conclusion would fail instead of passing.
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(4)
+  await page.getByTestId('ws-run-script').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveText('结论：已完成，已掌握', {
+    timeout: 15000,
+  })
+  await expect(page.getByTestId('ws-stage-state')).toContainText('x=230')
+  // Delete the repeat (index 2): [hat, right 30, right 50] -> x=80, not caught.
+  await page.getByTestId('ws-script-delete-2').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await page.getByTestId('ws-run-script').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('未合格', { timeout: 15000 })
+  await expect(page.getByTestId('ws-stage-state')).toContainText('x=80')
+})
+
+test('R3 edit invalidates a pass; rerun restores it', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
+  await page.getByTestId('ws-run-script').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveText('结论：已完成，已掌握', {
+    timeout: 15000,
+  })
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0)
+  await expect(page.getByTestId('ws-judgment-stale')).toBeVisible()
+  await page.getByTestId('ws-run-script').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveText('结论：已完成，已掌握', {
+    timeout: 15000,
+  })
+})
+
+test('R5 mobile 375: blocks-tab drawer chain, no cross-tab drag, engine intact', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto(DEMO_A)
+  // Material drawer on the blocks tab (not the script-panel palette).
+  await page.getByTestId('ws-tab-blocks').click()
+  await page.getByTestId('ws-blocks-panel').getByTestId('ws-drawer-move-right').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await page.getByTestId('ws-tab-script').click()
+  await page.getByTestId('ws-script-steps-2').fill('100')
+  await expect(page.getByTestId('ws-script-item-2')).toContainText('向右走 100 步')
+  await page.getByTestId('ws-script-up-2').click()
+  await expect(page.getByTestId('ws-script-item-1')).toContainText('向右走 100 步')
+  await page.getByTestId('ws-script-down-1').click()
+  await expect(page.getByTestId('ws-script-item-2')).toContainText('向右走 100 步')
+  await page.getByTestId('ws-script-delete-2').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await page.getByTestId('ws-run-script').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveText('结论：已完成，已掌握', {
+    timeout: 15000,
+  })
+  // Tab round-trip neither rebuilds the engine nor loses the script.
+  // (The 100-step move was deleted above, so the surviving items are the
+  // 30-step move and the repeat — assert those, not the deleted move.)
+  await page.getByTestId('ws-tab-stage').click()
+  await page.getByTestId('ws-tab-script').click()
+  await expect(page.getByTestId('ws-blockly-mount')).toHaveCount(1)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await expect(page.getByTestId('ws-script-item-1')).toContainText('向右走 30 步')
+  await expect(page.getByTestId('ws-script-item-2')).toContainText('重复 3 次')
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
+  expect(overflow).toBeLessThanOrEqual(0)
+  const runBox = await page.getByTestId('ws-run-script').boundingBox()
+  expect(runBox).not.toBeNull()
+  expect(runBox!.x + runBox!.width).toBeLessThanOrEqual(375)
+})
+
+test('R6 tablet 768: category flyout, run/stop, resize keeps the editor usable', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 1024 })
+  await page.goto(DEMO_A)
+  await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  // Expand a real toolbox category: the flyout must appear (not just a button).
+  // The demo toolbox renders 开始 / 控制 / 更多 ('移动' is not a demo category).
+  const toolbox = page.locator('.blocklyToolbox')
+  await toolbox.locator('.blocklyToolboxCategory', { hasText: '更多' }).click()
+  await expect(page.locator('.blocklyFlyout .blocklyDraggable').first()).toBeVisible({ timeout: 10000 })
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await page.getByTestId('ws-run-script').click()
+  await expect(page.getByTestId('ws-stage-state')).toContainText('x=30')
+  await page.getByTestId('ws-run-script').click()
+  await expect(page.getByTestId('ws-stage-state')).toContainText('未运行')
+  await expect(page.getByTestId('ws-stage-state')).toContainText('分数=0')
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0)
+  // Resize (tablet rotation shape): the editor must re-measure and stay usable.
+  await page.setViewportSize({ width: 1024, height: 768 })
+  await expect(page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg')).toBeVisible()
+  await expect(page.locator('.blocklyToolbox')).toBeVisible()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+})
+
+test('R4 corrupt draft degrades safely to the initial script', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  // Seed via evaluate + reload: addInitScript would re-seed on every
+  // navigation (including reload) and mask the real stored draft.
+  await page.evaluate(() => {
+    localStorage.setItem('kidscoding-draft:demo-a', 'not-json{{{')
+  })
+  await page.reload()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  await expect(page.getByTestId('ws-script-item-1')).toContainText('向右走 30 步')
+})
+
+test('R4 restore prompt survives autosave; autosave persists edits without explicit save', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  // Seed via evaluate + reload (see the corrupt-draft test: addInitScript
+  // re-seeds on reload and would overwrite the autosaved draft).
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'kidscoding-draft:demo-a',
+      JSON.stringify({
+        lessonId: 'demo-a',
+        savedAt: '2026-11-04T00:00:00.000Z',
+        script: [{ type: 'when_start' }, { type: 'ws_move_right', steps: 99 }],
+      }),
+    )
+  })
+  await page.reload()
+  await expect(page.getByTestId('ws-script-item-1')).toContainText('向右走 99 步')
+  await expect(page.getByTestId('ws-save-message')).toHaveText('已恢复草稿')
+  // Edit without any explicit save: delete the 99-step move, add a 50-step one.
+  await page.getByTestId('ws-script-delete-1').click()
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-move-right').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  // Autosave (1s debounce) writes the edited script; poll storage, never sleep.
+  await page.waitForFunction(() => {
+    const d = localStorage.getItem('kidscoding-draft:demo-a')
+    return d !== null && d.includes('"steps":50')
+  })
+  // Chip shows the current save state (saved); the restore prompt is preserved.
+  await expect(page.getByTestId('ws-save-chip')).toHaveText('已保存到本机')
+  await expect(page.getByTestId('ws-save-message')).toHaveText('已恢复草稿')
+  await page.reload()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2, { timeout: 10000 })
+  await expect(page.getByTestId('ws-script-item-1')).toContainText('向右走 50 步')
+})
+
+test('summary demo: React editor slot mounts, types, saves, restores; no stage or run button', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_S)
+  await expect(page.getByTestId('ws-demo-summary-editor')).toBeVisible()
+  expect(await page.getByTestId('ws-stage-panel').count()).toBe(0)
+  expect(await page.getByTestId('ws-tab-stage').count()).toBe(0)
+  expect(await page.getByTestId('ws-run-script').count()).toBe(0)
+  expect(await page.getByTestId('ws-roles-panel').count()).toBe(0)
+  await page.getByTestId('ws-summary-textarea').fill('今天学了循环和总结')
+  await expect(page.getByTestId('ws-summary-count')).toContainText('1 句')
+  await page.getByTestId('ws-file-menu-button').click()
+  await page.getByTestId('ws-file-save').click()
+  await expect(page.getByTestId('ws-save-chip')).toHaveText('已保存到本机')
+  await page.reload()
+  await expect(page.getByTestId('ws-summary-textarea')).toHaveValue('今天学了循环和总结', {
+    timeout: 10000,
+  })
 })

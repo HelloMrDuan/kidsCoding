@@ -96,3 +96,50 @@ describe('BlocklyAdapter script cache round-trip (unmounted: validation + cache 
     expect(() => validateDemoBlocks([hat, repeat(7, [right(10)])])).toThrow()
   })
 })
+
+describe('loop ownership (R8): body vs after-loop vs nested', () => {
+  it('marks only loop-body moves as fromRepeat; post-loop moves are not in-loop', () => {
+    const expanded = expandDemoProgram([hat, repeat(3, [right(50)]), right(30)])
+    expect(expanded.ok).toBe(true)
+    if (!expanded.ok) return
+    // Body move expanded 3x with fromRepeat=true; the trailing move once, false.
+    expect(expanded.actions).toHaveLength(4)
+    expect(expanded.actions.map((a) => a.fromRepeat)).toEqual([true, true, true, false])
+    expect(expanded.actions.map((a) => a.steps)).toEqual([50, 50, 50, 30])
+  })
+
+  it('runs a post-loop move exactly once, not once per iteration', () => {
+    const result = runDemoProgram([hat, right(30), repeat(3, [right(50)]), right(50)])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    // 30 + 3*50 + 50 = 230. If the trailing move were misjudged as in-loop
+    // it would be 30 + 3*(50 + 50) = 330.
+    expect(result.finalX).toBe(230)
+    expect(result.frames).toHaveLength(5)
+  })
+
+  it('marks nested-loop inner moves as fromRepeat and keeps the outer after-loop separate', () => {
+    const expanded = expandDemoProgram([hat, repeat(2, [right(10), repeat(2, [left(5)])]), right(7)])
+    expect(expanded.ok).toBe(true)
+    if (!expanded.ok) return
+    // 2 * (10 + 2*(-5)) then trailing 7: flags [T,T,T, T,T,T, F].
+    expect(expanded.actions.map((a) => a.fromRepeat)).toEqual([true, true, true, true, true, true, false])
+    expect(expanded.actions.map((a) => a.steps)).toEqual([10, 5, 5, 10, 5, 5, 7])
+  })
+
+  it('keeps body and next-chain separate after a script-list delete and rebuild', () => {
+    const adapter = new BlocklyAdapter()
+    adapter.loadScript([hat, repeat(3, [right(50)]), right(30)])
+    const before = adapter.getScript() as DemoBlock[]
+    expect(before).toHaveLength(3)
+    // Simulate the shell's removeBlockAt([1]) (delete the repeat): rebuild
+    // from the remaining list and re-run — the trailing move stays a
+    // top-level move, not a loop remnant.
+    adapter.loadScript([before[0], before[2]])
+    const result = runDemoProgram(adapter.getScript() as DemoBlock[])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.finalX).toBe(30)
+    expect(result.trace.usedRepeat).toBe(false)
+  })
+})

@@ -31,7 +31,13 @@ import type { LessonContract } from './lesson-contract'
 import { validateLessonContract } from './lesson-contract'
 import type { EngineAdapter, EngineState, RunEvent } from './workspace-adapters'
 import { loadDraftFromLocal, saveDraftToLocal } from './workspace-draft'
-import { buildJudgment, type ThreeLayerJudgment } from './workspace-judging'
+import { buildJudgment, toJudgmentResult } from './workspace-judging'
+import {
+  shouldAutosavePreservePrompt,
+  type EditorSlotComponent,
+  type JudgmentResult,
+  type StageSlotComponent,
+} from './workspace-slots'
 
 export type LessonWorkspaceProps = {
   contract: LessonContract
@@ -44,6 +50,32 @@ export type LessonWorkspaceProps = {
    * Never part of the real save path.
    */
   testFailSave?: boolean
+  /**
+   * Three-engine slots (OPS-020). When `editorSlot` is present, the shell
+   * renders that React component as the editor and never mounts the
+   * imperative adapter for this lesson; adapters must never call
+   * createRoot themselves. When `stageSlot` is present, it replaces the
+   * demo stage box; when `contract.hasStage === false`, no stage area
+   * renders at all. Both slots are optional; demo contracts use neither.
+   */
+  editorSlot?: EditorSlotComponent
+  stageSlot?: StageSlotComponent
+}
+
+/** Autosave debounce (R4/C8 proposal value; #470's 350ms is reference only). */
+export const AUTOSAVE_DEBOUNCE_MS = 1000
+
+/** Generic fail judgment used for stopped / sync-thrown runs. */
+function failJudgment(message: string): JudgmentResult {
+  return {
+    layers: [
+      { id: 'stage', label: '舞台结果', passed: false, detail: `舞台结果：运行失败——${message}` },
+      { id: 'task', label: '任务判定', passed: false, detail: '任务判定：未通过——运行未能完成' },
+      { id: 'knowledge', label: '知识证据', passed: false, detail: '知识证据：未通过——运行未能完成' },
+    ],
+    passed: false,
+    conclusion: '结论：未合格——任务判定、知识证据未通过',
+  }
 }
 
 type TabId = 'stage' | 'blocks' | 'script' | 'task'
@@ -90,9 +122,23 @@ export function LessonWorkspace({
   initialScript,
   onLessonSwitch,
   testFailSave,
+  editorSlot,
+  stageSlot,
 }: LessonWorkspaceProps) {
   const contractErrors = useMemo(() => validateLessonContract(contract), [contract])
-  const [activeTab, setActiveTab] = useState<TabId>('stage')
+  const hasStage = contract.hasStage !== false
+  // JSX needs capitalised aliases to render the slot component types.
+  const StageSlotView = stageSlot ?? null
+  const EditorSlotView = editorSlot ?? null
+  // File capabilities: adapter first, then contract, then demo default
+  // (all shown). Absent capabilities mean "shown", never "fake button".
+  const fileCaps = useMemo(
+    () => adapter.getFileCapabilities?.() ?? contract.fileCapabilities ?? {},
+    [adapter, contract.fileCapabilities],
+  )
+  const showFile = (key: 'canNew' | 'canSave' | 'canExport' | 'canImport' | 'canReset') =>
+    fileCaps[key] !== false
+  const [activeTab, setActiveTab] = useState<TabId>(hasStage ? 'stage' : 'script')
   const [stageVisible, setStageVisible] = useState(true)
   const [stageZoom, setStageZoom] = useState<'small' | 'medium' | 'large'>('medium')
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -101,7 +147,18 @@ export function LessonWorkspace({
   const [revealedHints, setRevealedHints] = useState(0)
   const [selectedRole, setSelectedRole] = useState('fox')
   const [engineState, setEngineState] = useState<EngineState>({ x: 0, score: 0, running: false, frames: 0 })
-  const [judgment, setJudgment] = useState<ThreeLayerJudgment | null>(null)
+  const [judgment, setJudgment] = useState<JudgmentResult | null>(null)
+  // Editor-slot courses (no imperative adapter): the slot's current data
+  // lives in a ref so save/autosave never read stale state; `editorInitial`
+  // is the value the slot mounts with (draft or initialScript), refreshed
+  // only on mount / lesson switch / explicit reset (slot key remounts).
+  const [editorInitial, setEditorInitial] = useState<unknown>(undefined)
+  // The lesson the loaded editorInitial belongs to. The slot mounts only
+  // when this matches the current lesson: without the guard, a slot could
+  // mount with a stale (previous lesson's or empty) initial and never
+  // re-read it, because React useState(initial) reads initial only on mount.
+  const [editorInitialLesson, setEditorInitialLesson] = useState<string | null>(null)
+  const [slotResetKey, setSlotResetKey] = useState(0)
   const [judgmentStale, setJudgmentStale] = useState(false)
   const [runError, setRunError] = useState<string | null>(null)
   const [saveState, setSaveState] = useState<SaveState>('unsaved')
@@ -120,11 +177,20 @@ export function LessonWorkspace({
   contractRef.current = contract
   const initialScriptRef = useRef(initialScript)
   initialScriptRef.current = initialScript
-  const judgmentRef = useRef<ThreeLayerJudgment | null>(null)
+  const judgmentRef = useRef<JudgmentResult | null>(null)
   judgmentRef.current = judgment
   const lastScriptJsonRef = useRef('')
+  const lastSavedJsonRef = useRef('')
   const prevLessonRef = useRef<string | null>(null)
   const scratchAdapterRef = useRef<EngineAdapter | null>(null)
+  /** R3 run generation: every run start / stop / lesson switch bumps this;
+   * event callbacks captured an older generation are dropped as stale. */
+  const runGenRef = useRef(0)
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const editorDataRef = useRef<unknown>(undefined)
+  const saveMessageRef = useRef<string | null>(null)
+  const activeTabRef = useRef(activeTab)
+  activeTabRef.current = activeTab
 
   const isBlockly = contract.engine === 'blockly'
   const isScratch = contract.engine === 'scratch-vm'
@@ -140,17 +206,90 @@ export function LessonWorkspace({
     }
   }, [isBlockly])
 
+  const setSaveMessageAndRef = useCallback((message: string | null) => {
+    saveMessageRef.current = message
+    setSaveMessage(message)
+  }, [])
+
+  /** Current student work, whichever surface owns it (slot data or adapter). */
+  const getCurrentScript = useCallback(() => {
+    if (editorSlot) return editorDataRef.current ?? null
+    return mountedAdapterRef.current?.adapter.getScript()
+  }, [editorSlot])
+
+  /**
+   * R4 autosave: debounced, deduplicated (no write when unchanged), never
+   * before the initial restore (only edit handlers call this), and an
+   * autosave success never overwrites a restore prompt (R4 rule) while an
+   * autosave failure always reports honestly.
+   */
+  const scheduleAutosave = useCallback(() => {
+    if (autosaveTimerRef.current !== null) clearTimeout(autosaveTimerRef.current)
+    autosaveTimerRef.current = setTimeout(() => {
+      autosaveTimerRef.current = null
+      const script = getCurrentScript()
+      const json = scriptToJson(script)
+      if (json === lastSavedJsonRef.current) return
+      if (testFailSave) {
+        setSaveState('failed')
+        setSaveMessageAndRef('演示保存失败（测试钩子）：未能保存')
+        return
+      }
+      const result = saveDraftToLocal(contractRef.current.lessonId, script)
+      if (result.ok) {
+        lastSavedJsonRef.current = json
+        setSaveState('saved')
+        if (!shouldAutosavePreservePrompt(saveMessageRef.current)) {
+          setSaveMessageAndRef('已保存到本机')
+        }
+      } else {
+        setSaveState('failed')
+        setSaveMessageAndRef(result.reason)
+      }
+    }, AUTOSAVE_DEBOUNCE_MS)
+  }, [getCurrentScript, setSaveMessageAndRef, testFailSave])
+
   const handleAdapterChange = useCallback(() => {
     const json = scriptToJson(mountedAdapterRef.current?.adapter.getScript())
     if (json && json !== lastScriptJsonRef.current) {
       lastScriptJsonRef.current = json
       refreshScriptList()
+      setSaveState('unsaved')
       if (judgmentRef.current) {
         setJudgment(null)
         setJudgmentStale(true)
       }
+      scheduleAutosave()
     }
-  }, [refreshScriptList])
+  }, [refreshScriptList, scheduleAutosave])
+
+  /** Editor-slot counterpart of loadIntoAdapter (draft or initial, no adapter). */
+  const loadEditorSlotData = useCallback(
+    (targetContract: LessonContract, targetInitial: unknown) => {
+      const draft = loadDraftFromLocal(targetContract.lessonId)
+      let loaded: unknown = null
+      let fromDraft = false
+      if (draft.data !== null && draft.reason === null) {
+        loaded = draft.data
+        fromDraft = true
+      } else if (targetInitial !== undefined && targetInitial !== null) {
+        loaded = targetInitial
+      }
+      editorDataRef.current = loaded
+      setEditorInitial(loaded)
+      setEditorInitialLesson(targetContract.lessonId)
+      const json = scriptToJson(loaded)
+      lastSavedJsonRef.current = fromDraft ? json : ''
+      if (fromDraft) {
+        setSaveState('saved')
+        setSaveMessageAndRef('已恢复草稿')
+      } else {
+        setSaveState('unsaved')
+        setSaveMessageAndRef(null)
+      }
+    },
+    [setSaveMessageAndRef],
+  )
 
   const loadIntoAdapter = useCallback(
     (targetContract: LessonContract, targetInitial: unknown) => {
@@ -158,12 +297,19 @@ export function LessonWorkspace({
       if (!entry) return
       const draft = loadDraftFromLocal(targetContract.lessonId)
       let loaded = false
+      let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
-        try {
-          entry.adapter.loadScript(draft.data)
-          loaded = true
-        } catch {
-          loaded = false
+        // Adapter-owned draft validation (R4): an invalid draft falls back
+        // to the initial script and never overwrites a good draft.
+        const valid = entry.adapter.validateDraft?.(draft.data) ?? true
+        if (valid) {
+          try {
+            entry.adapter.loadScript(draft.data)
+            loaded = true
+            fromDraft = true
+          } catch {
+            loaded = false
+          }
         }
       }
       if (!loaded && targetInitial !== undefined && targetInitial !== null) {
@@ -182,9 +328,14 @@ export function LessonWorkspace({
         }
       }
       lastScriptJsonRef.current = scriptToJson(entry.adapter.getScript())
+      lastSavedJsonRef.current = fromDraft ? lastScriptJsonRef.current : ''
+      if (fromDraft) {
+        setSaveState('saved')
+        setSaveMessageAndRef('已恢复草稿')
+      }
       refreshScriptList()
     },
-    [refreshScriptList],
+    [refreshScriptList, setSaveMessageAndRef],
   )
 
   // Adapter lifecycle: mount once per engine kind. A new adapter instance of
@@ -192,6 +343,20 @@ export function LessonWorkspace({
   // tab switches and lesson switches never remount the engine.
   useEffect(() => {
     const engine = contract.engine
+    // Editor-slot courses never mount the imperative adapter: the React
+    // slot component owns the editing surface, and the shell owns its data.
+    if (editorSlot) {
+      loadEditorSlotData(contractRef.current, initialScriptRef.current)
+      return () => {
+        if (autosaveTimerRef.current !== null) clearTimeout(autosaveTimerRef.current)
+        runGenRef.current += 1
+        try {
+          saveDraftToLocal(contractRef.current.lessonId, editorDataRef.current ?? null)
+        } catch {
+          // Unmount save is best effort; explicit 保存 is the reliable path.
+        }
+      }
+    }
     if (isSummary) return
     const prev = mountedAdapterRef.current
     if (prev && prev.engine !== engine) {
@@ -227,6 +392,8 @@ export function LessonWorkspace({
     if (engine === 'scratch-vm') scratchAdapterRef.current = active
     return () => {
       maybeListener.removeChangeListener?.(changeListener)
+      if (autosaveTimerRef.current !== null) clearTimeout(autosaveTimerRef.current)
+      runGenRef.current += 1
       try {
         saveDraftToLocal(contractRef.current.lessonId, active.getScript())
       } catch {
@@ -251,7 +418,13 @@ export function LessonWorkspace({
     if (prevLessonRef.current === contract.lessonId) return
     const prevId = prevLessonRef.current
     const entry = mountedAdapterRef.current
-    if (entry) {
+    if (editorSlot) {
+      try {
+        saveDraftToLocal(prevId, editorDataRef.current ?? null)
+      } catch {
+        // Best effort; explicit 保存 remains available.
+      }
+    } else if (entry) {
       try {
         saveDraftToLocal(prevId, entry.adapter.getScript())
       } catch {
@@ -259,14 +432,18 @@ export function LessonWorkspace({
       }
     }
     prevLessonRef.current = contract.lessonId
+    // A lesson switch invalidates every in-flight run event (R3).
+    runGenRef.current += 1
     setJudgment(null)
     setJudgmentStale(false)
     setRunError(null)
     setRevealedHints(0)
     setSaveState('unsaved')
-    setSaveMessage(null)
+    setSaveMessageAndRef(null)
     setNotice(null)
-    if (entry) loadIntoAdapter(contract, initialScript)
+    setActiveTab(contract.hasStage === false ? 'script' : 'stage')
+    if (editorSlot) loadEditorSlotData(contract, initialScript)
+    else if (entry) loadIntoAdapter(contract, initialScript)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract.lessonId])
 
@@ -321,13 +498,20 @@ export function LessonWorkspace({
     (event: RunEvent) => {
       setEngineState(event.state)
       if (event.kind === 'finished') {
-        const trace = (
-          mountedAdapterRef.current?.adapter as EngineAdapter & {
-            getLastTrace?: () => { didMove: boolean; usedRepeat: boolean; finalX: number } | null
+        // Adapter-owned generic judgment wins when the adapter supplies one;
+        // otherwise the demo three-layer builder converts to the same shape.
+        const generic = mountedAdapterRef.current?.adapter.getJudgmentResult?.()
+        if (generic) {
+          setJudgment(generic)
+        } else {
+          const trace = (
+            mountedAdapterRef.current?.adapter as EngineAdapter & {
+              getLastTrace?: () => { didMove: boolean; usedRepeat: boolean; finalX: number } | null
+            }
+          ).getLastTrace?.()
+          if (trace) {
+            setJudgment(toJudgmentResult(buildJudgment(contractRef.current, event.state, trace)))
           }
-        ).getLastTrace?.()
-        if (trace) {
-          setJudgment(buildJudgment(contractRef.current, event.state, trace))
         }
         setJudgmentStale(false)
         refreshScriptList()
@@ -340,13 +524,7 @@ export function LessonWorkspace({
         ).getLastRunError?.()
         if (asyncError) {
           setRunError(asyncError)
-          setJudgment({
-            stage: { passed: false, line: `舞台结果：运行失败——${asyncError}` },
-            task: { passed: false, line: '任务判定：未通过——运行未能完成' },
-            knowledge: { passed: false, line: '知识证据：未通过——运行未能完成' },
-            passed: false,
-            conclusion: '结论：未合格——任务判定、知识证据未通过',
-          })
+          setJudgment(failJudgment(asyncError))
         }
       }
     },
@@ -357,29 +535,36 @@ export function LessonWorkspace({
     const entry = mountedAdapterRef.current
     if (!entry) return
     if (engineState.running) {
+      // R3: stop invalidates the run generation first, so a late 'finished'
+      // from the stopped run can never display a stale pass afterwards.
+      // Clearing the displayed judgment here is defence-in-depth on top of
+      // the generation guard (the start branch already clears on run).
+      runGenRef.current += 1
       try {
         entry.adapter.stop()
       } catch {
         // Stop is best effort; the state below reflects the local view.
       }
+      setJudgment(null)
+      setJudgmentStale(false)
       setEngineState(entry.adapter.getState())
       return
     }
     setRunError(null)
     setJudgment(null)
     setJudgmentStale(false)
+    // Capture this run's generation: only events from the current run reach
+    // handleRunEvent; stale async results are dropped, never displayed.
+    const gen = ++runGenRef.current
     try {
-      entry.adapter.run(handleRunEvent)
+      entry.adapter.run((event) => {
+        if (gen !== runGenRef.current) return
+        handleRunEvent(event)
+      })
     } catch (error) {
       const message = error instanceof Error ? error.message : '运行失败'
       setRunError(message)
-      setJudgment({
-        stage: { passed: false, line: `舞台结果：运行失败——${message}` },
-        task: { passed: false, line: '任务判定：未通过——运行未能完成' },
-        knowledge: { passed: false, line: '知识证据：未通过——运行未能完成' },
-        passed: false,
-        conclusion: '结论：未合格——任务判定、知识证据未通过',
-      })
+      setJudgment(failJudgment(message))
     }
     try {
       setEngineState(entry.adapter.getState())
@@ -392,24 +577,31 @@ export function LessonWorkspace({
     if (testFailSave) {
       // TEST HOOK (demo route only): report failure without writing.
       setSaveState('failed')
-      setSaveMessage('演示保存失败（测试钩子）：未能保存')
+      setSaveMessageAndRef('演示保存失败（测试钩子）：未能保存')
       return
     }
-    const entry = mountedAdapterRef.current
-    if (!entry) {
-      setSaveState('failed')
-      setSaveMessage('未能保存：引擎未挂载')
-      return
+    let script: unknown
+    if (editorSlot) {
+      script = editorDataRef.current ?? null
+    } else {
+      const entry = mountedAdapterRef.current
+      if (!entry) {
+        setSaveState('failed')
+        setSaveMessageAndRef('未能保存：引擎未挂载')
+        return
+      }
+      script = entry.adapter.getScript()
     }
-    const result = saveDraftToLocal(contract.lessonId, entry.adapter.getScript())
+    const result = saveDraftToLocal(contract.lessonId, script)
     if (result.ok) {
+      lastSavedJsonRef.current = scriptToJson(script)
       setSaveState('saved')
-      setSaveMessage('已保存到本机')
+      setSaveMessageAndRef('已保存到本机')
     } else {
       setSaveState('failed')
-      setSaveMessage(result.reason)
+      setSaveMessageAndRef(result.reason)
     }
-  }, [contract.lessonId, testFailSave])
+  }, [contract.lessonId, editorSlot, setSaveMessageAndRef, testFailSave])
 
   const applyScriptEdit = useCallback(
     (next: DemoBlock[]) => {
@@ -423,12 +615,28 @@ export function LessonWorkspace({
       }
       lastScriptJsonRef.current = scriptToJson(next)
       refreshScriptList()
+      setSaveState('unsaved')
       if (judgmentRef.current) {
         setJudgment(null)
         setJudgmentStale(true)
       }
+      scheduleAutosave()
     },
-    [refreshScriptList],
+    [refreshScriptList, scheduleAutosave],
+  )
+
+  /** Editor-slot edit path: same invalidation + autosave as adapter edits. */
+  const handleEditorSlotChange = useCallback(
+    (data: unknown) => {
+      editorDataRef.current = data
+      setSaveState('unsaved')
+      if (judgmentRef.current) {
+        setJudgment(null)
+        setJudgmentStale(true)
+      }
+      scheduleAutosave()
+    },
+    [scheduleAutosave],
   )
 
   const insertBlock = useCallback(
@@ -444,8 +652,12 @@ export function LessonWorkspace({
   const moveBlock = useCallback(
     (index: number, direction: -1 | 1) => {
       const current = scriptList
+      // R1-2: the start hat never moves, and nothing moves above it — the
+      // first block of a program is always the start event.
+      if (current[index]?.type === DEMO_HAT) return
       const target = index + direction
       if (target < 0 || target >= current.length) return
+      if (target === 0 && current[0]?.type === DEMO_HAT) return
       const next = [...current]
       const [moved] = next.splice(index, 1)
       next.splice(target, 0, moved)
@@ -486,6 +698,17 @@ export function LessonWorkspace({
   }, [])
 
   const handleNew = useCallback(() => {
+    if (editorSlot) {
+      const init = initialScriptRef.current
+      editorDataRef.current = init
+      setEditorInitial(init)
+      setSlotResetKey((k) => k + 1)
+      setJudgment(null)
+      setJudgmentStale(false)
+      setSaveState('unsaved')
+      scheduleAutosave()
+      return
+    }
     if (!isBlockly) {
       setNotice('Scratch 演示：新建需导入工程，空白工程不受支持')
       return
@@ -496,9 +719,20 @@ export function LessonWorkspace({
     setJudgment(null)
     setJudgmentStale(false)
     setSaveState('unsaved')
-  }, [isBlockly, initialScript, applyScriptEdit])
+  }, [isBlockly, initialScript, applyScriptEdit, editorSlot, scheduleAutosave])
 
   const handleResetInitial = useCallback(() => {
+    if (editorSlot) {
+      const init = initialScriptRef.current
+      editorDataRef.current = init
+      setEditorInitial(init)
+      setSlotResetKey((k) => k + 1)
+      setJudgment(null)
+      setJudgmentStale(false)
+      setSaveState('unsaved')
+      scheduleAutosave()
+      return
+    }
     if (!isBlockly) {
       setNotice('Scratch 演示：恢复初始需重新导入工程')
       return
@@ -508,9 +742,22 @@ export function LessonWorkspace({
     )
     setJudgment(null)
     setJudgmentStale(false)
-  }, [isBlockly, initialScript, applyScriptEdit])
+  }, [isBlockly, initialScript, applyScriptEdit, editorSlot, scheduleAutosave])
 
   const handleExport = useCallback(() => {
+    if (editorSlot) {
+      const blob = new Blob([JSON.stringify(editorDataRef.current ?? null, null, 2)], {
+        type: 'application/json',
+      })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${contract.lessonId}-data.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      setNotice('已导出作品数据')
+      return
+    }
     const entry = mountedAdapterRef.current
     if (!entry) return
     if (isBlockly) {
@@ -550,13 +797,27 @@ export function LessonWorkspace({
           setNotice(error instanceof Error ? error.message : '导出失败，原作品未变')
         })
     }
-  }, [contract.lessonId, isBlockly, isScratch])
+  }, [contract.lessonId, editorSlot, isBlockly, isScratch])
 
   const handleImportFile = useCallback(
     async (file: File) => {
       const entry = mountedAdapterRef.current
-      if (!entry) return
+      if (!entry && !editorSlot) return
       try {
+        if (editorSlot) {
+          const text = await file.text()
+          const parsed: unknown = JSON.parse(text)
+          editorDataRef.current = parsed
+          setEditorInitial(parsed)
+          setSlotResetKey((k) => k + 1)
+          setJudgment(null)
+          setJudgmentStale(false)
+          setSaveState('unsaved')
+          scheduleAutosave()
+          setNotice('已导入作品数据')
+          return
+        }
+        if (!entry) return
         if (isBlockly) {
           const text = await file.text()
           const parsed: unknown = JSON.parse(text)
@@ -589,7 +850,7 @@ export function LessonWorkspace({
         setNotice(error instanceof Error ? error.message : '导入失败，原作品未变')
       }
     },
-    [isBlockly, isScratch, refreshScriptList],
+    [editorSlot, isBlockly, isScratch, refreshScriptList, scheduleAutosave],
   )
 
   const stageWidth = stageZoom === 'small' ? 240 : stageZoom === 'large' ? 420 : 320
@@ -610,26 +871,82 @@ export function LessonWorkspace({
         <strong>当前步骤：</strong>
         {contract.step}
       </p>
+      {/* Course-info extension: drawer-only, never in the editing area. */}
+      {contract.methodSteps && contract.methodSteps.length > 0 && (
+        <div data-testid="ws-method-steps">
+          <strong>方法步骤：</strong>
+          <ol>
+            {contract.methodSteps.map((step, index) => (
+              <li key={index}>{step}</li>
+            ))}
+          </ol>
+        </div>
+      )}
+      {contract.scopeGap && (
+        <p data-testid="ws-scope-gap">
+          <strong>适用边界：</strong>
+          {contract.scopeGap}
+        </p>
+      )}
+      {contract.progress && (
+        <p data-testid="ws-progress">
+          <strong>课程进度：</strong>
+          {contract.progress.label} {contract.progress.current}/{contract.progress.total}
+        </p>
+      )}
+      {contract.activities && contract.activities.length > 0 && (
+        <div data-testid="ws-activities">
+          <strong>三层教学活动：</strong>
+          <ol>
+            {contract.activities.map((activity, index) => (
+              <li key={index}>
+                第{activity.level}层：{activity.title}——{activity.text}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
       <div>
         <strong>三级提示（按顺序揭示，不提前展示答案）：</strong>
         <ol>
-          {contract.hints.map((hint, index) => (
-            <li key={index}>
-              {revealedHints > index ? (
-                hint
-              ) : (
-                <button
-                  type="button"
-                  className="kc-action-surface kc-btn-outline kc-btn-sm"
-                  disabled={revealedHints < index}
-                  onClick={() => setRevealedHints(index + 1)}
-                  data-testid={`ws-hint-reveal-${index + 1}`}
-                >
-                  {revealedHints < index ? `第 ${index + 1} 级提示（需先看第 ${index} 级）` : `看第 ${index + 1} 级提示`}
-                </button>
-              )}
-            </li>
-          ))}
+          {contract.structuredHints && contract.structuredHints.length > 0
+            ? contract.structuredHints.map((hint, index) => (
+                <li key={index}>
+                  {revealedHints > index ? (
+                    <>
+                      <strong>{hint.title}：</strong>
+                      {hint.text}
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="kc-action-surface kc-btn-outline kc-btn-sm"
+                      disabled={revealedHints < index}
+                      onClick={() => setRevealedHints(index + 1)}
+                      data-testid={`ws-hint-reveal-${index + 1}`}
+                    >
+                      {revealedHints < index ? `第 ${index + 1} 级提示（需先看第 ${index} 级）` : `看第 ${index + 1} 级提示`}
+                    </button>
+                  )}
+                </li>
+              ))
+            : contract.hints.map((hint, index) => (
+                <li key={index}>
+                  {revealedHints > index ? (
+                    hint
+                  ) : (
+                    <button
+                      type="button"
+                      className="kc-action-surface kc-btn-outline kc-btn-sm"
+                      disabled={revealedHints < index}
+                      onClick={() => setRevealedHints(index + 1)}
+                      data-testid={`ws-hint-reveal-${index + 1}`}
+                    >
+                      {revealedHints < index ? `第 ${index + 1} 级提示（需先看第 ${index} 级）` : `看第 ${index + 1} 级提示`}
+                    </button>
+                  )}
+                </li>
+              ))}
         </ol>
         <p>完整参考实现只在事后节点出现，本演示不提供。</p>
       </div>
@@ -647,7 +964,7 @@ export function LessonWorkspace({
           onClick={() => insertBlock({ type: DEMO_MOVE_RIGHT, steps: 50 })}
           data-testid="ws-drawer-move-right"
         >
-          ➡ 向右走 50 步
+          向右走 50 步
         </button>
         <button
           type="button"
@@ -656,7 +973,7 @@ export function LessonWorkspace({
           onClick={() => insertBlock({ type: DEMO_MOVE_LEFT, steps: 50 })}
           data-testid="ws-drawer-move-left"
         >
-          ⬅ 向左走 50 步
+          向左走 50 步
         </button>
         <button
           type="button"
@@ -671,7 +988,7 @@ export function LessonWorkspace({
           }
           data-testid="ws-drawer-repeat"
         >
-          ↻ 重复 3 次（向右走 50 步）
+          重复 3 次（向右走 50 步）
         </button>
       </div>
     </div>
@@ -723,7 +1040,7 @@ export function LessonWorkspace({
               onClick={() => moveBlock(index, -1)}
               data-testid={`ws-script-up-${index}`}
             >
-              ↑
+              上移
             </button>{' '}
             <button
               type="button"
@@ -732,7 +1049,7 @@ export function LessonWorkspace({
               onClick={() => moveBlock(index, 1)}
               data-testid={`ws-script-down-${index}`}
             >
-              ↓
+              下移
             </button>{' '}
             <button
               type="button"
@@ -740,7 +1057,7 @@ export function LessonWorkspace({
               onClick={() => removeBlockAt([index])}
               data-testid={`ws-script-delete-${index}`}
             >
-              ✕
+              删除
             </button>
             {block.type === DEMO_REPEAT && (block.body ?? []).length > 0 && (
               <ol>
@@ -770,7 +1087,7 @@ export function LessonWorkspace({
                       onClick={() => removeBlockAt([index, childIndex])}
                       data-testid={`ws-script-body-delete-${index}-${childIndex}`}
                     >
-                      ✕
+                      删除
                     </button>
                   </li>
                 ))}
@@ -786,7 +1103,7 @@ export function LessonWorkspace({
     <section className="ws-stage" data-panel="stage" data-testid="ws-stage-panel">
       <div className="ws-stage-head">
         <h2>作品舞台</h2>
-        <span className="ws-stage-state-pill">{engineState.running ? '● 运行中' : '○ 未运行'}</span>
+        <span className="ws-stage-state-pill">{engineState.running ? '运行中' : '未运行'}</span>
       </div>
       <div
         className="ws-stage-box"
@@ -797,7 +1114,9 @@ export function LessonWorkspace({
           overflow: 'hidden',
         }}
       >
-        {isScratch ? (
+        {StageSlotView ? (
+          <StageSlotView lessonId={contract.lessonId} state={engineState} running={engineState.running} />
+        ) : isScratch ? (
           <div ref={scratchMountRef} data-testid="ws-scratch-mount" style={{ width: '100%', height: '100%' }} />
         ) : (
           <>
@@ -831,7 +1150,7 @@ export function LessonWorkspace({
           onClick={handleRunToggle}
           data-testid="ws-run-toggle"
         >
-          {engineState.running ? '■ 停止' : '▶ 运行作品'}
+          {engineState.running ? '停止' : '运行作品'}
         </button>
         <span className="ws-zoom-group">
           舞台缩放（只改列宽与舞台高度，不重建引擎）：
@@ -878,7 +1197,23 @@ export function LessonWorkspace({
   const scriptPanel = (
     <section className="ws-script" data-panel="script" data-testid="ws-script-panel">
       <h2>脚本工作区</h2>
-      {isBlockly && (
+      {EditorSlotView ? (
+        editorInitialLesson === contract.lessonId ? (
+          <div data-testid="ws-editor-slot">
+            <EditorSlotView
+              key={`${contract.lessonId}-${slotResetKey}`}
+              lessonId={contract.lessonId}
+              initial={editorInitial}
+              onChange={handleEditorSlotChange}
+              editable
+            />
+          </div>
+        ) : (
+          <p>正在加载作品…</p>
+        )
+      ) : (
+        <>
+          {isBlockly && (
         <>
           <div className="ws-palette">
             <div className="ws-palette-head">
@@ -908,7 +1243,7 @@ export function LessonWorkspace({
               onClick={handleRunToggle}
               data-testid="ws-run-script"
             >
-              {engineState.running ? '■ 停止' : '▶ 运行作品'}
+              {engineState.running ? '停止' : '运行作品'}
             </button>
           </div>
         </>
@@ -929,12 +1264,14 @@ export function LessonWorkspace({
               onClick={handleRunToggle}
               data-testid="ws-run-script"
             >
-              {engineState.running ? '■ 停止' : '▶ 运行作品'}
+              {engineState.running ? '停止' : '运行作品'}
             </button>
           </div>
         </>
       )}
-      {isSummary && <p>摘要编辑尚未接入（4 号接入中）。</p>}
+          {isSummary && <p>摘要编辑尚未接入（4 号接入中）。</p>}
+        </>
+      )}
     </section>
   )
 
@@ -951,7 +1288,7 @@ export function LessonWorkspace({
     )
   }
 
-  if (isSummary) {
+  if (isSummary && !EditorSlotView) {
     return (
       <div className="ws-root" data-testid="ws-root">
         <style>{`
@@ -1109,15 +1446,18 @@ export function LessonWorkspace({
           任务
         </button>
         {/* Stage show/hide lives in the topbar, NOT inside the stage panel:
-            a switch hidden by its own action could never be clicked back. */}
-        <button
-          type="button"
-          className="kc-action-surface kc-btn-outline kc-btn-sm"
-          onClick={() => setStageVisible((v) => !v)}
-          data-testid="ws-stage-toggle"
-        >
-          {stageVisible ? '隐藏舞台' : '显示舞台'}
-        </button>
+            a switch hidden by its own action could never be clicked back.
+            Stage-less courses (hasStage === false) have no stage to toggle. */}
+        {hasStage && (
+          <button
+            type="button"
+            className="kc-action-surface kc-btn-outline kc-btn-sm"
+            onClick={() => setStageVisible((v) => !v)}
+            data-testid="ws-stage-toggle"
+          >
+            {stageVisible ? '隐藏舞台' : '显示舞台'}
+          </button>
+        )}
         {onLessonSwitch && (
           <button
             type="button"
@@ -1130,27 +1470,37 @@ export function LessonWorkspace({
         )}
         {fileMenuOpen && (
           <div data-testid="ws-file-menu">
-            <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => closeMenuAnd(handleNew)} data-testid="ws-file-new">
-              新建
-            </button>{' '}
-            <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => closeMenuAnd(handleSave)} data-testid="ws-file-save">
-              保存作品
-            </button>{' '}
-            <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => closeMenuAnd(handleExport)} data-testid="ws-file-export">
-              导出
-            </button>{' '}
-            <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => { setFileMenuOpen(false); fileInputRef.current?.click() }} data-testid="ws-file-import">
-              导入
-            </button>{' '}
-            <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => closeMenuAnd(handleResetInitial)} data-testid="ws-file-reset">
-              恢复初始
-            </button>
+            {showFile('canNew') && (
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => closeMenuAnd(handleNew)} data-testid="ws-file-new">
+                新建
+              </button>
+            )}{' '}
+            {showFile('canSave') && (
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => closeMenuAnd(handleSave)} data-testid="ws-file-save">
+                保存作品
+              </button>
+            )}{' '}
+            {showFile('canExport') && (
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => closeMenuAnd(handleExport)} data-testid="ws-file-export">
+                导出
+              </button>
+            )}{' '}
+            {showFile('canImport') && (
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => { setFileMenuOpen(false); fileInputRef.current?.click() }} data-testid="ws-file-import">
+                导入
+              </button>
+            )}{' '}
+            {showFile('canReset') && (
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => closeMenuAnd(handleResetInitial)} data-testid="ws-file-reset">
+                恢复初始
+              </button>
+            )}
           </div>
         )}
         <input
           ref={fileInputRef}
           type="file"
-          accept={isBlockly ? '.json,application/json' : '.sb3'}
+          accept={editorSlot || isBlockly ? '.json,application/json' : '.sb3'}
           style={{ display: 'none' }}
           data-testid="ws-file-input"
           onChange={(event) => {
@@ -1196,12 +1546,18 @@ export function LessonWorkspace({
 
       <nav className="ws-tabs" data-testid="ws-tabs">
         {(
-          [
-            ['stage', '舞台'],
-            ['blocks', '积木'],
-            ['script', '脚本'],
-            ['task', '任务'],
-          ] as Array<[TabId, string]>
+          (hasStage
+            ? [
+                ['stage', '舞台'],
+                ['blocks', '积木'],
+                ['script', '脚本'],
+                ['task', '任务'],
+              ]
+            : [
+                ['blocks', '积木'],
+                ['script', '脚本'],
+                ['task', '任务'],
+              ]) as Array<[TabId, string]>
         ).map(([tab, label]) => (
           <button
             key={tab}
@@ -1224,14 +1580,22 @@ export function LessonWorkspace({
         {/* The stage panel always stays in the DOM: hiding it only sets
             display:none, so the Scratch iframe (and the Blockly mount in the
             script panel) is never destroyed by a visibility switch. */}
-        <div
-          className={`ws-panel ws-stage-wrap ${activeTab === 'stage' ? 'ws-active' : ''}`}
-          style={stageVisible ? undefined : { display: 'none' }}
-        >
-          {stagePanel}
-        </div>
-        {!stageVisible && <p data-testid="ws-stage-hidden-note">舞台已隐藏（脚本不受影响）。</p>}
-        <div className={`ws-panel ws-roles-wrap ${activeTab === 'stage' ? 'ws-active' : ''}`}>{rolesPanel}</div>
+        {hasStage && (
+          <div
+            className={`ws-panel ws-stage-wrap ${activeTab === 'stage' ? 'ws-active' : ''}`}
+            style={stageVisible ? undefined : { display: 'none' }}
+          >
+            {stagePanel}
+          </div>
+        )}
+        {hasStage && !stageVisible && <p data-testid="ws-stage-hidden-note">舞台已隐藏（脚本不受影响）。</p>}
+        {/* Demo roles are demo content: a course that brings its own stage
+            renders its own roles UI inside the stage slot, never these.
+            Roles belong to the stage area, so a stageless course
+            (hasStage === false) renders no roles column either. */}
+        {hasStage && !StageSlotView && (
+          <div className={`ws-panel ws-roles-wrap ${activeTab === 'stage' ? 'ws-active' : ''}`}>{rolesPanel}</div>
+        )}
         <div className={`ws-panel ws-blocks-panel ${activeTab === 'blocks' ? 'ws-active' : ''}`}>
           <section data-testid="ws-blocks-panel">
             <h2>积木素材</h2>
@@ -1255,13 +1619,16 @@ export function LessonWorkspace({
         {judgmentStale && <p data-testid="ws-judgment-stale">旧判定已失效，修改后请重新运行</p>}
         {judgment ? (
           <>
-            <p data-testid="ws-feedback-stage">{judgment.stage.line}</p>
-            <p data-testid="ws-feedback-task">{judgment.task.line}</p>
-            <p data-testid="ws-feedback-knowledge">{judgment.knowledge.line}</p>
+            {judgment.layers.map((layer) => (
+              <p key={layer.id} data-testid={`ws-feedback-${layer.id}`}>
+                {layer.detail}
+              </p>
+            ))}
             <p data-testid="ws-feedback-conclusion">{judgment.conclusion}</p>
           </>
         ) : (
-          !judgmentStale && <p>尚未运行：运行后这里会显示舞台结果、任务判定、知识证据三行。</p>
+          !judgmentStale &&
+          !EditorSlotView && <p>尚未运行：运行后这里会显示舞台结果、任务判定、知识证据三行。</p>
         )}
       </section>
     </div>

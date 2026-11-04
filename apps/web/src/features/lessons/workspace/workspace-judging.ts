@@ -20,6 +20,7 @@
 
 import type { LessonContract } from './lesson-contract'
 import type { EngineState } from './workspace-adapters'
+import type { JudgmentResult } from './workspace-slots'
 import type { DemoRunTrace } from './blockly-adapter'
 
 export type JudgeLayer = {
@@ -100,4 +101,23 @@ export function buildJudgment(
 /** Convenience: build a trace from a demo adapter run result. */
 export function traceFromDemo(trace: DemoRunTrace): RunTraceInput {
   return { didMove: trace.didMove, usedRepeat: trace.usedRepeat, finalX: trace.finalX }
+}
+
+/**
+ * Convert the demo three-layer judgment into the generic display shape.
+ * Layer ids map to the shell's existing feedback testids
+ * (ws-feedback-stage / ws-feedback-task / ws-feedback-knowledge), so the
+ * demo display is unchanged; adapters that return a JudgmentResult
+ * directly use their own layer ids instead.
+ */
+export function toJudgmentResult(judgment: ThreeLayerJudgment): JudgmentResult {
+  return {
+    layers: [
+      { id: 'stage', label: '舞台结果', passed: judgment.stage.passed, detail: judgment.stage.line },
+      { id: 'task', label: '任务判定', passed: judgment.task.passed, detail: judgment.task.line },
+      { id: 'knowledge', label: '知识证据', passed: judgment.knowledge.passed, detail: judgment.knowledge.line },
+    ],
+    passed: judgment.passed,
+    conclusion: judgment.conclusion,
+  }
 }

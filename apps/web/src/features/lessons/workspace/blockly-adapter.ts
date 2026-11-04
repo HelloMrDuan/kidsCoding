@@ -32,7 +32,13 @@ import {
 } from '@/features/lessons/blockly/register-kids-blocks'
 import { REPEAT_TIMES_OPTIONS } from '@/features/lessons/blockly/program-tree'
 
+import {
+  emptySelectionState,
+  updateBlockSelection,
+  type SelectionState,
+} from './block-selection'
 import type { EngineAdapter, EngineState, RunEvent } from './workspace-adapters'
+import type { FileCapabilities } from './workspace-slots'
 
 export const DEMO_HAT = 'when_start'
 export const DEMO_REPEAT = 'repeat_times'
@@ -252,6 +258,9 @@ export class BlocklyAdapter implements EngineAdapter {
   private cachedScript: DemoBlock[] = []
   private changeListeners = new Set<() => void>()
   private blocklyChangeListener: ((e: Blockly.Events.Abstract) => void) | null = null
+  /** R2-2: self-observed container resize (tablet rotation, panel collapse). */
+  private resizeObserver: ResizeObserver | null = null
+  private resizeRaf: number | null = null
 
   constructor(options: BlocklyAdapterOptions = {}) {
     this.allowedBlocks = options.allowedBlocks ?? [...DEMO_ALLOWED_BLOCKS]
@@ -293,6 +302,57 @@ export class BlocklyAdapter implements EngineAdapter {
     return this.lastRunError
   }
 
+  /**
+   * Shell-owned selection tracking (R1): the adapter keeps its own selected
+   * block id, updated only by explicit Blockly selection events (see
+   * block-selection.ts). The shell never trusts Blockly's focus-fragile
+   * getSelected() directly, so toolbar clicks cannot silently drop the
+   * selection that move/edit/delete act on.
+   */
+  private selectionState: SelectionState = emptySelectionState()
+
+  private blockExists(id: string): boolean {
+    try {
+      return this.workspace?.getBlockById(id) != null
+    } catch {
+      return false
+    }
+  }
+
+  getSelectedBlockId(): string | null {
+    const id = this.selectionState.selectedId
+    if (id && !this.blockExists(id)) {
+      this.selectionState = updateBlockSelection(this.selectionState, { kind: 'blockGone' }, (x) => this.blockExists(x))
+      return null
+    }
+    return id
+  }
+
+  selectBlockById(id: string) {
+    try {
+      const block = this.workspace?.getBlockById(id) as { select?: () => void } | null | undefined
+      if (block && typeof block.select === 'function') block.select()
+    } catch {
+      // Selecting a missing block is a no-op; the tracked id stays as-is
+      // until the next selection event corrects it.
+    }
+  }
+
+  /** Adapter-owned draft validation (R4): the demo tree model must validate. */
+  validateDraft(script: unknown): boolean {
+    try {
+      validateDemoBlocks(script)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /** The demo blockly adapter supports every file operation. */
+  getFileCapabilities(): FileCapabilities {
+    return { canNew: true, canSave: true, canExport: true, canImport: true, canReset: true }
+  }
+
   mount(el: HTMLElement) {
     if (this.workspace) this.unmount()
     registerKidsBlocks()
@@ -307,7 +367,39 @@ export class BlocklyAdapter implements EngineAdapter {
       zoom: { controls: true, wheel: true, startScale: 0.9, maxScale: 2, minScale: 0.4, scaleSpeed: 1.1 },
     })
     this.workspace = workspace
-    this.blocklyChangeListener = () => {
+    this.blocklyChangeListener = (event) => {
+      // R1: route selection events into the shell-owned selection tracker
+      // BEFORE notifying listeners. Duck-typed on purpose: the listener
+      // receives Blockly's own event objects, and only 'selected' / 'click'
+      // carry selection information.
+      try {
+        const e = event as unknown as {
+          type?: string
+          newElementId?: string | null
+          targetType?: string
+          blockId?: string | null
+        }
+        if (e && e.type === 'selected') {
+          this.selectionState = updateBlockSelection(
+            this.selectionState,
+            { kind: 'selected', newElementId: e.newElementId ?? null },
+            (id) => this.blockExists(id),
+          )
+        } else if (e && e.type === 'click') {
+          const targetType =
+            e.targetType === 'block' || e.targetType === 'workspace' || e.targetType === 'zoom_controls'
+              ? e.targetType
+              : undefined
+          this.selectionState = updateBlockSelection(
+            this.selectionState,
+            { kind: 'click', targetType, blockId: e.blockId ?? null },
+            (id) => this.blockExists(id),
+          )
+        }
+      } catch {
+        // Selection tracking never breaks editing; the program cache below
+        // is the authoritative path.
+      }
       // Refresh the cached script so getScript() reflects live drags even
       // between explicit reads; failures here never break the workspace.
       try {
@@ -318,6 +410,23 @@ export class BlocklyAdapter implements EngineAdapter {
       for (const cb of this.changeListeners) cb()
     }
     workspace.addChangeListener(this.blocklyChangeListener)
+    // R2-2: observe the mount element itself, so container resizes the
+    // shell does not know about (tablet rotation, panel-collapse animation)
+    // still re-measure Blockly. Guarded: jsdom has no ResizeObserver.
+    if (typeof ResizeObserver !== 'undefined') {
+      try {
+        this.resizeObserver = new ResizeObserver(() => {
+          if (this.resizeRaf !== null) cancelAnimationFrame(this.resizeRaf)
+          this.resizeRaf = requestAnimationFrame(() => {
+            this.resizeRaf = null
+            this.handleVisible()
+          })
+        })
+        this.resizeObserver.observe(el)
+      } catch {
+        this.resizeObserver = null
+      }
+    }
     if (this.cachedScript.length > 0) {
       try {
         this.buildWorkspace(this.cachedScript)
@@ -331,6 +440,19 @@ export class BlocklyAdapter implements EngineAdapter {
     this.stopTimer()
     this.running = false
     this.onEvent = null
+    if (this.resizeObserver) {
+      try {
+        this.resizeObserver.disconnect()
+      } catch {
+        // Disconnect failure is harmless on teardown.
+      }
+      this.resizeObserver = null
+    }
+    if (this.resizeRaf !== null) {
+      cancelAnimationFrame(this.resizeRaf)
+      this.resizeRaf = null
+    }
+    this.selectionState = emptySelectionState()
     if (this.workspace) {
       if (this.blocklyChangeListener) {
         this.workspace.removeChangeListener(this.blocklyChangeListener)
