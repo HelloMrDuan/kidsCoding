@@ -649,7 +649,9 @@ jobs:
       - name: Install real Chrome for browser E2E
         run: npx playwright install chrome --with-deps
       - name: Run G2-U3-L02 real Scratch VM matrix and three-viewport classroom specs with real Chrome
-        run: npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom.spec.ts --project=desktop --workers=2 --trace=retain-on-failure --output=test-results/g2-u3-l02
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g2-u3-l02/junit.xml
+        run: npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom.spec.ts --project=desktop --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l02
       - uses: actions/upload-artifact@v4
         if: always()
         with:
