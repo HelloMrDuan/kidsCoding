@@ -3280,6 +3280,33 @@
         "reviewer": null
       },
       "notes": "首席说明：本条目为 P0 规范 PR 自身的门禁登记；PR 除 7 个设计与验证文件外仅含本条目一行；课程台账（432 节）未动，共享 UI 与教学逻辑未动；文件顶层 updatedAt 按现有惯例不随本条改动。"
+    },
+    {
+      "id": "SYS-122",
+      "title": "G2-U3-L02 专属测试接入 curriculum-content CI：单元测试步骤 + 真实 VM/三端浏览器 Job",
+      "priority": "P0",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [
+        "SYS-108",
+        "SYS-109"
+      ],
+      "scope": "只改 .github/workflows/curriculum-content.yml 并登记本条目：(1) on.pull_request.paths 增加 g2-u3-l02-vm.spec.ts、g2-u3-l02-classroom.spec.ts、src/app/learn/g2-u3-l02/**；(2) curriculum-web 增加一步 `npx vitest run src/features/lessons/g2-u3-l02`；(3) 文件末尾新增并行 Job g2-u3-l02-browser-trial（timeout-minutes: 12、真实 Chrome、--project=desktop --workers=2、--trace=retain-on-failure、if: always() 上传证据）。纯新增，不改任何现有 Job，不删测试，不降断言，不用 continue-on-error 或 skip，不改课程源码/测试/目录/共享 UI，不碰其他账号分支。Stacked PR：base 为 kiro/p0-g2-u3-l02（#470），首席另行授权后才能合并。",
+      "acceptance": [
+        "PR CI 中 curriculum-web 的新步骤真实执行 g2-u3-l02.test.ts，通过数与本地 --list 清单一致（66）",
+        "g2-u3-l02-browser-trial 在 GitHub Runner 上真实加载 jsDelivr 的 scratch-vm 并执行 VM 矩阵 21 项 + 课堂 16 用例×3 视口（5 项按设计跳过），无意外失败或遗漏",
+        "新 Job 实测耗时回填并满足 SYS-108（≤12 分钟，含 checkout/安装/构建/测试/上传）",
+        "原有 22 个 Job 零改动且无回退；未使用 continue-on-error / 无理由 skip",
+        "与并行 PR #460 之后的 #462/#464/#468/#260/#265 的 workflow 三方合并无冲突块"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "首席 2026-11-04 批准方案 A（独立 CI PR，Stacked）。起因：#470 的三个工作流全绿但未执行任何 G2-U3-L02 测试（审计见 docs/curriculum/g2-u3-l02/CI-COVERAGE-PLAN.md）。本条目仅为本 CI PR 的门禁登记；文件顶层 updatedAt 按现有惯例不随本条改动。"
     }
   ]
 }
