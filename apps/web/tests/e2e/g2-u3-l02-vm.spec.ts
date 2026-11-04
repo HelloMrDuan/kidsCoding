@@ -121,7 +121,7 @@ test.describe('G2-U3-L02 真实 Scratch VM：三层判定矩阵', () => {
     expect(j.stage.passed).toBe(true)
     expect(j.task.passed).toBe(true)
     expect(j.knowledge.passed).toBe(false)
-    expect(j.passed).toBe(false)
+    expect(j.passed, 'DRILL: 故意写错的期望，用于验证 CI 失败时会上传 trace').toBe(true)
   })
 
   test('R3/R4 参数错误与移动了但不够：没接住', async ({page}) => {
