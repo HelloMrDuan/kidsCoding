@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { BASKET_NAME, compileProject, FRUIT_NAME, L02_ASSETS } from './compile'
-import { L02_CONTENT, L02_CONTRACT, validateL02Contract } from './contract'
+import { L02_CONTENT, L02_CONTRACT, L02_DEMO_REPEAT, L02_DEMO_STEP, validateL02Contract } from './contract'
 import { isTraceCurrent, judgeRun, type BasketMove, type RunTrace } from './judge'
 import { fruitFallRepeats, framesToLand, L02_LEVEL_ORDER, L02_LEVELS, L02_PARAMS, type LevelId } from './params'
 import { programFingerprint, validateProgram, type Block, type Program } from './program'
@@ -32,8 +32,9 @@ function trace(levelId: LevelId, program: Program, over: Partial<RunTrace> & { b
 const loopMoves = (n: number, dx: number): BasketMove[] => Array.from({ length: n }, (_, i) => ({ frame: i + 1, dx, inLoop: true }))
 
 describe('参数与契约', () => {
-  it('参数未经裁定时必须标记为 proposed', () => {
-    expect(L02_PARAMS.rulingStatus).toBe('proposed')
+  it('参数状态是“首席批准的试点运行参数”，不是已验证的正式参数', () => {
+    expect(L02_PARAMS.rulingStatus).toBe('pilot-approved')
+    expect(L02_PARAMS.rulingStatus).not.toBe('approved')
   })
 
   it('契约字段完整：恰 5 条目标、3 级提示、draftKey 绑定本课、教学定向', () => {
@@ -200,7 +201,7 @@ describe('三层判定（合成轨迹；对应 ACCEPTANCE R1~R7）', () => {
     expect(j.task.passed).toBe(true)
     expect(j.knowledge.passed).toBe(false)
     expect(j.passed).toBe(false)
-    expect(j.knowledge.line).toContain('不能写“已经会用重复”')
+    expect(j.knowledge.line).toContain('没有满足循环应用要求')
   })
 
   it('R3 参数错误：没接住，结论未合格', () => {
@@ -225,12 +226,13 @@ describe('三层判定（合成轨迹；对应 ACCEPTANCE R1~R7）', () => {
     expect(j.task.passed).toBe(true)
   })
 
-  it('R6 循环版：任务和知识都通过，才出现“满足了本节要求”，且不宣称已掌握', () => {
+  it('R6 循环版：任务和知识都通过，才出现“任务达标，也满足了循环应用要求”，且不宣称已掌握', () => {
     const j = judgeRun(trace('solve', flag(repeat(3, move(50))), { basketX: 150, moves: loopMoves(3, 50) }), level)
     if (j.status !== 'judged') throw new Error('应当判定')
     expect(j.passed).toBe(true)
-    expect(j.conclusion).toContain('满足了本节')
-    expect(j.conclusion).toContain('不代表已经完全掌握')
+    expect(j.conclusion).toContain('任务达标，也满足了循环应用要求')
+    expect(j.conclusion).not.toContain('掌握')
+    expect(j.understanding).toContain('需要进一步解释或练习')
   })
 
   it('偶然接住：循环只走了 20，其余靠普通积木，知识不通过', () => {
@@ -291,7 +293,7 @@ describe('三层判定（合成轨迹；对应 ACCEPTANCE R1~R7）', () => {
   it('失败反馈写明哪一层未通过', () => {
     const j = judgeRun(trace('solve', flag(), { basketX: 0, moves: [] }), level)
     if (j.status !== 'judged') throw new Error('应当判定')
-    expect(j.conclusion).toContain('任务判定')
+    expect(j.conclusion).toContain('任务结果')
     expect(j.conclusion).toContain('知识证据')
   })
 })
@@ -438,4 +440,182 @@ describe('事后参考做法', () => {
   it('用孩子自己的脚本生成描述，而不是写死的标准答案', () => {
     expect(describeProgram(flag(repeat(4, move(40))))).toBe('当绿旗被点击\n　重复执行 4 次\n　　将 x 坐标增加 40')
   })
+})
+
+describe('首席批准的试点参数（快照：改数值必须有意识地改这条测试）', () => {
+  it('舞台、起点、容差、程序限制、知识证据阈值与批准清单一致', () => {
+    expect({
+      basketStartX: L02_PARAMS.basketStartX, basketY: L02_PARAMS.basketY, fruitStartY: L02_PARAMS.fruitStartY,
+      catchTolerance: L02_PARAMS.catchTolerance,
+      maxRepeatTimes: L02_PARAMS.maxRepeatTimes, minRepeatTimes: L02_PARAMS.minRepeatTimes,
+      maxMoveDx: L02_PARAMS.maxMoveDx, minMoveDx: L02_PARAMS.minMoveDx,
+      maxBlocks: L02_PARAMS.maxBlocks, maxNesting: L02_PARAMS.maxNesting,
+      minLoopIterations: L02_PARAMS.minLoopIterations, minLoopShare: L02_PARAMS.minLoopShare,
+    }).toEqual({
+      basketStartX: 0, basketY: -130, fruitStartY: 150,
+      catchTolerance: 40,
+      maxRepeatTimes: 20, minRepeatTimes: 1,
+      maxMoveDx: 100, minMoveDx: -100,
+      maxBlocks: 12, maxNesting: 2,
+      minLoopIterations: 2, minLoopShare: 0.5,
+    })
+  })
+
+  it('关卡：探索 x=100、独立 x=150、迁移 x=-100、加速 30/帧；其余下落速度 10/帧', () => {
+    expect(L02_LEVELS.explore).toMatchObject({ fruitX: 100, fallSpeed: 10, layer: 1 })
+    expect(L02_LEVELS.solve).toMatchObject({ fruitX: 150, fallSpeed: 10, layer: 2 })
+    expect(L02_LEVELS.transferLeft).toMatchObject({ fruitX: -100, fallSpeed: 10, layer: 3 })
+    expect(L02_LEVELS.transferFast).toMatchObject({ fruitX: 150, fallSpeed: 30, layer: 3 })
+    expect(framesToLand(L02_LEVELS.solve)).toBe(28)
+    expect(framesToLand(L02_LEVELS.transferFast)).toBe(10)
+  })
+
+  it('探索关失败示例是 2×20：篮子停在 40，与水果 100 相差 60', () => {
+    expect(L02_DEMO_REPEAT).toBe(2)
+    expect(L02_DEMO_STEP).toBe(20)
+    const x = L02_PARAMS.basketStartX + L02_DEMO_REPEAT * L02_DEMO_STEP
+    expect(Math.abs(L02_LEVELS.explore.fruitX - x)).toBe(60)
+    expect(Math.abs(L02_LEVELS.explore.fruitX - x)).toBeGreaterThan(L02_PARAMS.catchTolerance)
+  })
+
+  it('所有关卡的坐标都在 Scratch 舞台范围内，下落速度是能整除落差的正整数', () => {
+    for (const id of L02_LEVEL_ORDER) {
+      const l = L02_LEVELS[id]
+      expect(Math.abs(l.fruitX)).toBeLessThanOrEqual(240)
+      expect(Number.isInteger(l.fallSpeed) && l.fallSpeed > 0).toBe(true)
+    }
+    expect(Math.abs(L02_PARAMS.basketY)).toBeLessThanOrEqual(180)
+    expect(L02_PARAMS.fruitStartY).toBeLessThanOrEqual(180)
+    expect(L02_PARAMS.basketStartX + L02_PARAMS.maxRepeatTimes * L02_PARAMS.maxMoveDx).toBeGreaterThan(240) // 越界移动由 Scratch 舞台边界处理，不在本课范围
+  })
+})
+
+describe('程序限制的恰好边界（正向与反向）', () => {
+  const ok = (p: unknown) => validateProgram(p)
+  it('重复次数：1 与 20 合法；0、21、1.5、NaN 非法', () => {
+    expect(ok(flag(repeat(1, move(1))))).toEqual([])
+    expect(ok(flag(repeat(20, move(1))))).toEqual([])
+    for (const bad of [0, 21, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY]) expect(ok(flag(repeat(bad, move(1)))), String(bad)).not.toEqual([])
+  })
+
+  it('x 增加量：-100 与 100 合法（包括 0）；±101、小数、NaN 非法', () => {
+    for (const good of [-100, -1, 0, 1, 100]) expect(ok(flag(move(good))), String(good)).toEqual([])
+    for (const bad of [-101, 101, 0.5, Number.NaN, Number.NEGATIVE_INFINITY]) expect(ok(flag(move(bad))), String(bad)).not.toEqual([])
+  })
+
+  it('积木总数（不含绿旗）：12 块合法，13 块非法；分散在多个循环里也一起计数', () => {
+    expect(ok(flag(...Array.from({ length: 12 }, () => move(1))))).toEqual([])
+    expect(ok(flag(...Array.from({ length: 13 }, () => move(1))))).not.toEqual([])
+    expect(ok(flag(repeat(2, ...Array.from({ length: 11 }, () => move(1)))))).toEqual([]) // 1 个重复 + 11 个移动 = 12
+    expect(ok(flag(repeat(2, ...Array.from({ length: 12 }, () => move(1)))))).not.toEqual([]) // 13
+    expect(ok({ scripts: [{ hat: 'flag', body: Array.from({ length: 6 }, () => move(1)) }, { hat: 'flag', body: Array.from({ length: 7 }, () => move(1)) }] })).not.toEqual([]) // 6 + 7 = 13
+  })
+
+  it('嵌套深度：2 层重复合法，3 层非法', () => {
+    expect(ok(flag(repeat(2, repeat(2, move(1)))))).toEqual([])
+    expect(ok(flag(repeat(2, repeat(2, repeat(2, move(1))))))).not.toEqual([])
+  })
+
+  it('脚本条数：3 条合法，4 条非法', () => {
+    const script = { hat: 'flag' as const, body: [move(1)] }
+    expect(ok({ scripts: [script, script, script] })).toEqual([])
+    expect(ok({ scripts: [script, script, script, script] })).not.toEqual([])
+  })
+
+  it('最大合法程序可以编译，且编译结果的块数 = 积木数 + 帽子数', () => {
+    const p = flag(repeat(20, ...Array.from({ length: 11 }, () => move(100))))
+    const project = compileProject(p, L02_LEVELS.solve)
+    expect(Object.keys(project.targets[1].blocks)).toHaveLength(13) // 1 帽子 + 1 重复 + 11 移动
+  })
+})
+
+describe('三层结果的恰好边界', () => {
+  const level = L02_LEVELS.solve
+  const judged = (basketX: number, moves: BasketMove[]) => {
+    const j = judgeRun(trace('solve', flag(), { basketX, moves }), level)
+    if (j.status !== 'judged') throw new Error('应当判定')
+    return j
+  }
+
+  it('容差：相差恰好 40 接到，41 没接到（两侧对称）', () => {
+    const noLoop = (x: number): BasketMove[] => [{ frame: 1, dx: x, inLoop: false }]
+    expect(judged(110, noLoop(110)).stage.passed).toBe(true) // 150-110 = 40
+    expect(judged(190, noLoop(190)).stage.passed).toBe(true) // 190-150 = 40
+    expect(judged(109, noLoop(109)).stage.passed).toBe(false)
+    expect(judged(191, noLoop(191)).stage.passed).toBe(false)
+    expect(judged(109, noLoop(109)).stage.line).toContain('相差 41')
+  })
+
+  it('篮子没有移动：即使起点就在容差内也不算任务达标（本课水果 x 都离起点超过容差，用左右关验证“没移动”分支）', () => {
+    const j = judgeRun(trace('solve', flag(), { basketX: 0, moves: [] }), level)
+    if (j.status !== 'judged') throw new Error('应当判定')
+    expect(j.task.line).toContain('篮子没有移动')
+    // 构造“起点已在容差内”的关卡：水果 x=30，篮子不动
+    const near = { ...level, fruitX: 30 }
+    const t = trace('solve', flag(), { basketX: 0, moves: [] })
+    const jn = judgeRun({ ...t, landing: { ...t.landing!, fruitX: 30 }, start: { basketX: 0, fruitX: 30 } }, near)
+    if (jn.status !== 'judged') throw new Error('应当判定')
+    expect(jn.stage.passed).toBe(true) // 舞台上确实接到了
+    expect(jn.task.passed).toBe(false) // 但篮子没移动，任务不达标
+  })
+
+  it('循环次数：循环里的移动执行 1 次不满足，2 次满足', () => {
+    expect(judged(150, loopMoves(1, 150)).knowledge.passed).toBe(false)
+    expect(judged(150, loopMoves(2, 75)).knowledge.passed).toBe(true)
+  })
+
+  it('循环占比：恰好 50% 满足，低于 50% 不满足', () => {
+    const mixed = (loopDx: number, otherDx: number): BasketMove[] => [...loopMoves(2, loopDx), { frame: 3, dx: otherDx, inLoop: false }]
+    expect(judged(160, mixed(40, 80)).knowledge.passed).toBe(true) // 80 / 160 = 50%
+    expect(judged(160, mixed(39, 82)).knowledge.passed).toBe(false) // 78 / 160 = 48.75%
+    expect(judged(160, mixed(41, 78)).knowledge.passed).toBe(true) // 82 / 160
+  })
+
+  it('循环里的 0 步移动不算“执行了移动”：1 次有效 + 1 次 0 步，只数 1 次，次数不够', () => {
+    const moves: BasketMove[] = [
+      { frame: 1, dx: 150, inLoop: true },
+      { frame: 2, dx: 0, inLoop: true },
+    ]
+    // 没有 0 步过滤时会数成 2 次、占比 100%，错误地通过；有过滤时只有 1 次有效移动。
+    expect(judged(150, moves).knowledge.passed).toBe(false)
+    expect(judged(150, [...moves, { frame: 3, dx: 0, inLoop: true }]).knowledge.passed).toBe(false)
+    expect(judged(150, [{ frame: 1, dx: 75, inLoop: true }, { frame: 2, dx: 0, inLoop: true }, { frame: 3, dx: 75, inLoop: true }]).knowledge.passed).toBe(true)
+  })
+
+  it('落地帧恰好等于移动帧时这一步算数；晚一帧不算（用它决定占比，才区分得出）', () => {
+    const landFrame = framesToLand(level)
+    // 循环 2×40 = 80；落地帧上又有一步“循环外的 −90”。
+    //  算数：总位移 = 80 − 90 = −10，方向与循环（+80）相反 → 知识证据不通过。
+    //  若这一步被错误地排除：总位移 = 80，循环占 100% → 会错误地通过。
+    const onLanding: BasketMove[] = [...loopMoves(2, 40), { frame: landFrame, dx: -90, inLoop: false }]
+    expect(judged(-10, onLanding).knowledge.passed).toBe(false)
+    // 晚一帧的同一步不进入统计：总位移 = 80，循环占 100% → 通过。
+    const afterLanding: BasketMove[] = [...loopMoves(2, 40), { frame: landFrame + 1, dx: -90, inLoop: false }]
+    expect(judged(80, afterLanding).knowledge.passed).toBe(true)
+  })
+})
+
+describe('反馈措辞统一，且任何结果都不宣称“已掌握”', () => {
+  const level = L02_LEVELS.solve
+  const scenarios: Array<[string, number, BasketMove[]]> = [
+    ['空程序', 0, []],
+    ['无循环接到', 130, [{ frame: 1, dx: 130, inLoop: false }]],
+    ['循环接到', 150, loopMoves(3, 50)],
+    ['循环不够', 30, loopMoves(3, 10)],
+    ['偶然接到', 150, [...loopMoves(2, 10), { frame: 3, dx: 130, inLoop: false }]],
+  ]
+  for (const [name, x, moves] of scenarios) {
+    it(`${name}：三行标签固定为 舞台结果/任务结果/知识证据，并附“需要进一步解释或练习”`, () => {
+      const j = judgeRun(trace('solve', flag(), { basketX: x, moves }), level)
+      if (j.status !== 'judged') throw new Error('应当判定')
+      expect(j.stage.line.startsWith('舞台结果：')).toBe(true)
+      expect(j.task.line.startsWith('任务结果：')).toBe(true)
+      expect(j.knowledge.line.startsWith('知识证据：')).toBe(true)
+      expect(j.understanding).toContain('需要进一步解释或练习')
+      const all = [j.stage.line, j.task.line, j.knowledge.line, j.conclusion, j.understanding].join('\n')
+      expect(all).not.toContain('任务判定')
+      expect(all).not.toMatch(/已(经)?掌握|学会了|完全掌握/)
+      expect(all).not.toContain('接住了') // 统一为“接到了水果/没接到水果”
+    })
+  }
 })

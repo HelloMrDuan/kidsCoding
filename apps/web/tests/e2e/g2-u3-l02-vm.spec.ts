@@ -10,7 +10,7 @@ import {expect, test, type Page} from '@playwright/test'
 import {routeLocalScratchVm} from './scratch-g2-helpers'
 import {compileProject} from '../../src/features/lessons/g2-u3-l02/compile'
 import {judgeRun, type RunJudgment, type RunTrace} from '../../src/features/lessons/g2-u3-l02/judge'
-import {L02_LEVELS, framesToLand, type LevelId} from '../../src/features/lessons/g2-u3-l02/params'
+import {L02_LEVELS, L02_PARAMS, framesToLand, type LevelId} from '../../src/features/lessons/g2-u3-l02/params'
 import {programFingerprint, type Block, type Program} from '../../src/features/lessons/g2-u3-l02/program'
 
 const PUBLIC_DIR = join(__dirname, '..', '..', 'public')
@@ -262,6 +262,83 @@ test.describe('G2-U3-L02 真实 Scratch VM：三层判定矩阵', () => {
     expect(judged(first).passed).toBe(true)
     expect(again.trace.landing).toEqual(first.trace.landing)
     expect(again.trace.basketMoves).toEqual(first.trace.basketMoves)
+  })
+
+  test('真实 VM 的容差边界：相差 40 接到，41 没接到（两侧）', async ({page}) => {
+    const at = async (program: Program, levelId: LevelId = 'solve') => judged(await run(page, program, levelId))
+    expect((await at(flag(move(100), move(10)))).stage.passed).toBe(true) // 110，相差 40
+    expect((await at(flag(move(100), move(9)))).stage.passed).toBe(false) // 109，相差 41
+    expect((await at(flag(move(100), move(90)))).stage.passed).toBe(true) // 190，相差 40
+    expect((await at(flag(move(100), move(91)))).stage.passed).toBe(false) // 191，相差 41
+    expect((await at(flag(move(100), move(9)))).stage.line).toContain('相差 41')
+  })
+
+  test('真实 VM 的知识证据边界：循环次数 1 vs 2；循环占比恰好 50% vs 低于 50%', async ({page}) => {
+    const k = async (program: Program) => judged(await run(page, program, 'solve')).knowledge.passed
+    expect(await k(flag(repeat(1, move(100)), move(50)))).toBe(false) // 循环只执行 1 次
+    expect(await k(flag(repeat(2, move(50)), move(50)))).toBe(true) // 循环 100 / 总 150
+    expect(await k(flag(repeat(2, move(40)), move(80)))).toBe(true) // 80 / 160 = 恰好 50%
+    expect(await k(flag(repeat(2, move(39)), move(82)))).toBe(false) // 78 / 160 = 48.75%
+    expect(await k(flag(repeat(2, move(0)), move(100), move(50)))).toBe(false) // 0 步的循环不算
+  })
+
+  test('真实 VM 的程序上限：最大合法程序能跑；超过 12 块 / 嵌套 3 层 / 4 条脚本 / 越界数值被沙箱拒绝', async ({page}) => {
+    const level = L02_LEVELS.solve
+    // 合法的最大值：次数 20、移动 ±100、12 块（不含绿旗）、嵌套 2、3 条脚本
+    const maxBlocks = flag(...Array.from({length: L02_PARAMS.maxBlocks}, () => move(1)))
+    expect((await run(page, maxBlocks, 'solve')).trace.endedBy).toBe('landed')
+    expect((await run(page, flag(repeat(L02_PARAMS.maxRepeatTimes, move(L02_PARAMS.maxMoveDx))), 'solve')).trace.endedBy).toBe('landed')
+    expect((await run(page, flag(repeat(2, move(L02_PARAMS.minMoveDx))), 'solve')).trace.endedBy).toBe('landed')
+    expect((await run(page, flag(repeat(2, repeat(2, move(1)))), 'solve')).trace.endedBy).toBe('landed') // 嵌套 2
+    const three: Program = {scripts: [{hat: 'flag', body: [move(1)]}, {hat: 'flag', body: [move(1)]}, {hat: 'flag', body: [move(1)]}]}
+    expect((await run(page, three, 'solve')).trace.endedBy).toBe('landed')
+
+    type B = Record<string, {opcode: string; next: string | null; parent: string | null; topLevel: boolean; shadow: boolean; inputs: Record<string, unknown>; fields: Record<string, unknown>; x?: number; y?: number}>
+    const send = async (project: unknown) => {
+      const id = nextRunId++
+      return page.evaluate(async ({project, id, level}) => {
+        const w = window as unknown as {post: (m: unknown) => void; waitFor: (t: (m: {kind: string; id: number}) => boolean) => Promise<{kind: string; error?: string}>}
+        w.post({kind: 'RUN', id, levelId: 'solve', level, fingerprint: 'x', frameMs: 0, project})
+        return w.waitFor(m => (m.kind === 'REJECTED' || m.kind === 'RUN_DONE' || m.kind === 'ERROR') && m.id === id)
+      }, {project, id, level})
+    }
+    const copy = (p: Program) => JSON.parse(JSON.stringify(compileProject(p, level)))
+    const blocksOf = (project: {targets: Array<{blocks: unknown}>}) => project.targets[1].blocks as B
+
+    // 13 块：先编译 12 块的合法程序，再手工在链尾追加第 13 块
+    const p13 = copy(maxBlocks)
+    const b13 = blocksOf(p13)
+    const tail = Object.entries(b13).find(([, b]) => b.next === null && b.opcode === 'motion_changexby')![0]
+    b13.bkExtra = {opcode: 'motion_changexby', next: null, parent: tail, topLevel: false, shadow: false, inputs: {DX: [1, [4, '1']]}, fields: {}}
+    b13[tail].next = 'bkExtra'
+    expect((await send(p13)).kind).toBe('REJECTED')
+
+    // 嵌套 3 层：在最内层重复里再插一层重复
+    const pNest = copy(flag(repeat(2, repeat(2, move(1)))))
+    const bn = blocksOf(pNest)
+    const [innerRepeat] = Object.entries(bn).filter(([, b]) => b.opcode === 'control_repeat' && (b.inputs.SUBSTACK as unknown[] | undefined))[1]
+    const mv = Object.entries(bn).find(([, b]) => b.opcode === 'motion_changexby')![0]
+    bn.bkNest = {opcode: 'control_repeat', next: null, parent: innerRepeat, topLevel: false, shadow: false, inputs: {TIMES: [1, [6, '2']], SUBSTACK: [2, mv]}, fields: {}}
+    bn[innerRepeat].inputs.SUBSTACK = [2, 'bkNest']
+    bn[mv].parent = 'bkNest'
+    expect((await send(pNest)).kind).toBe('REJECTED')
+
+    // 4 条脚本：再加一个帽子
+    const pHats = copy(three)
+    blocksOf(pHats).bkHat4 = {opcode: 'event_whenflagclicked', next: null, parent: null, topLevel: true, shadow: false, inputs: {}, fields: {}, x: 0, y: 900}
+    expect((await send(pHats)).kind).toBe('REJECTED')
+
+    // 数值越界：21 次、移动 ±101
+    const pRep = copy(flag(repeat(20, move(1))))
+    Object.values(blocksOf(pRep)).find(b => b.opcode === 'control_repeat')!.inputs.TIMES = [1, [6, '21']]
+    expect((await send(pRep)).kind).toBe('REJECTED')
+    for (const bad of ['101', '-101']) {
+      const pDx = copy(flag(move(1)))
+      Object.values(blocksOf(pDx)).find(b => b.opcode === 'motion_changexby')!.inputs.DX = [1, [4, bad]]
+      expect((await send(pDx)).kind, `dx=${bad}`).toBe('REJECTED')
+    }
+    // 拒绝之后沙箱仍然可用
+    expect(judged(await run(page, flag(repeat(3, move(50))), 'solve')).passed).toBe(true)
   })
 
   test('沙箱拒绝本课范围之外的积木、越界参数和被改过的水果脚本（失败保持安全）', async ({page}) => {

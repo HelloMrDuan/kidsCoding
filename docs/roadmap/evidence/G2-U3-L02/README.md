@@ -1,8 +1,10 @@
 # G2-U3-L02《接住掉落水果》测试证据
 
 规范版本：`p0-kitten-workspace-v1.0`（main `754f7f43`，PR #467）。
-范围标注：**教学定向**。教学参数状态：**proposed，待首席裁定**（见 `docs/curriculum/g2-u3-l02/TEACHING-PLAN.md`）。
-本文只记录本地真实运行的证据；PR / main CI 结果在 PR 页面查看，本文不预填。
+范围标注：**教学定向**。教学参数状态：**pilot-approved**（首席 2026-11-03 批准为试点运行参数，**不代表儿童教学效果已验证**；见 `docs/curriculum/g2-u3-l02/TEACHING-PLAN.md` 第八节）。
+本文区分两类证据：**本地真实运行**（下面各节）与 **GitHub Actions**（第七节）。两者不能互相代替。
+
+> ⚠ **重要更正**：PR #470 页面上的 3 个工作流虽然显示 success，但其中**没有任何 Job 执行本课的单元测试或 E2E**（原因见第七节与 `docs/curriculum/g2-u3-l02/CI-COVERAGE-PLAN.md`）。因此那些 success 不能作为本课测试通过的证据。本课测试结果目前**只有本地运行证据**，需要首席授权 CI 补丁后才有 GitHub Actions 证据。
 
 ## 一、运行环境与限制（如实）
 
@@ -24,15 +26,19 @@ npx vitest run src/features/lessons/g2-u3-l02
 npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom.spec.ts   # 三个 project: desktop / tablet / phone
 ```
 
-最近一次本地完整运行：
+最近一次本地完整运行（与仓库 CI 一致：单个 `desktop` project；三个视口由 spec 自己设置）：
 
-- Vitest：45 / 45 通过。
-- Playwright：**97 通过，5 跳过，0 失败**（总计 102 项，约 3.0 分钟）。
-  - 5 个跳过：真实指针拖放 2 项（平板、手机项目按设计跳过，只在桌面验证）+ 证据截图 3 项（未设置 `L02_SHOT_DIR` 时跳过）。
+- Vitest：**66 / 66 通过**。其中包含“首席批准数值”快照、各上限的恰好边界、三层结果的恰好边界、措辞一致性（任何结果都不出现“已掌握 / 任务判定 / 接住了”）。
+- Playwright：
+  - `g2-u3-l02-vm.spec.ts`：**21 / 21 通过**（真实 Scratch VM）。
+  - `g2-u3-l02-classroom.spec.ts`：**43 通过，5 跳过，0 失败**（16 个用例标题 × [desktop / tablet / phone] = 48 个实例）。
+  - 5 个跳过：真实指针拖放在 tablet / phone 视口跳过 2 项（只在桌面验证）+ 证据截图 3 项（未设置 `L02_SHOT_DIR`）。
+- **变异检验**（为证明边界测试不是“怎么都过”）：把判定与限制里的比较符 / 阈值故意改错，测试必须失败。单元层 11 个变异（容差 `<=`→`<`、占比 `>=`→`>`、循环次数、落地帧、0 步过滤、积木 / 嵌套 / dx / 次数上限、容差 40→41、速度 30→20）与沙箱层 6 个变异（积木 12→13、嵌套 2→3、脚本 3→4、次数 20→21、dx ±100→±101）**全部被抓到**，随后已还原。
+  - 检验中发现并修复了 2 个“漏网”：最初的“落地帧恰好”与“0 步循环”两个用例在变异下仍通过，说明它们没有真正约束行为；已重写为能区分的构造。
 - ESLint：本 PR 新增文件 0 error、0 warning。
 - `tsc --noEmit`：本 PR 新增文件 0 error。仓库其他既有文件有 63 条类型错误（如 `kc-scenes-register.test.ts`），在 main 上已存在，本 PR 未触碰。
 
-## 三、真实 Scratch VM 行为矩阵（`g2-u3-l02-vm.spec.ts`，18 项）
+## 三、真实 Scratch VM 行为矩阵（`g2-u3-l02-vm.spec.ts`，21 项）
 
 直接把 `compile.ts` 编译出的 Scratch 工程送进沙箱 iframe，真实 VM 逐帧运行，再用 `judge.ts` 判定。没有任何积木模拟器。
 
@@ -54,8 +60,11 @@ npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom
 | 落地后才执行的积木 | 不计入 |
 | 运行中停止 | `endedBy=stopped`，不判定；重跑与首次一致 |
 | 沙箱拒绝 8 类坏输入 | 非白名单 opcode、移动量越界、重复次数越界、水果脚本被改速度、带变量、带声音、篮子起点被改、造型换成未知素材，均 `REJECTED`；拒绝后沙箱仍可用 |
+| 容差恰好边界（真实 VM） | 相差 40 接到、41 没接到（左右两侧对称：110 / 109 / 190 / 191） |
+| 知识证据恰好边界（真实 VM） | 循环只执行 1 次不满足；循环占比恰好 50%（80/160）满足，48.75% 不满足；0 步循环不算 |
+| 程序上限（真实 VM） | 最大合法程序能跑：12 块、次数 20、移动 ±100、嵌套 2、3 条脚本；13 块、嵌套 3、4 条脚本、次数 21、移动 ±101 均被沙箱拒绝 |
 
-## 四、课堂浏览器测试（`g2-u3-l02-classroom.spec.ts`，每个 project 14 项，桌面另有拖放 1 项）
+## 四、课堂浏览器测试（`g2-u3-l02-classroom.spec.ts`，16 个用例 × 三个视口）
 
 首屏五要素；提示 1→2→3 逐级揭示且开始前不出现完整答案；第一层不写预测不能运行、预测与真实结果对比；第二层空脚本 / 只有绿旗 / 错误数字 / 正确数字；改脚本后旧结果立即清除、已通过的关卡变回未通过；舞台真实坐标；保存与刷新恢复；保存失败显示“未能保存”；迁移左边、迁移更快；切换关卡不污染；运行中停止；文件菜单保存 / 导出 / 导入 / 重新开始、导入错课节作品被拒；角色管理只读查看水果脚本；溢出、遮挡与触摸尺寸。
 
@@ -79,5 +88,19 @@ npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom
 - 手机端真实指针拖放：手机上走“添加积木”点击插入，没有验证 Blockly 触摸拖放。
 - 独立人工教研、真实儿童试学、监护人同意流程。
 - 共享 `LessonWorkspace`（#469）接入：本页是课程自带的临时承载页，见 PR 说明。
-- CI 中的 vitest 清单、`g2-u3-browser-trial` 的 spec 清单与 `paths` 过滤器未包含本课新文件（共享 CI 归首席）。
-- 教学参数全部为 `proposed`，未裁定。
+- **GitHub Actions 尚未执行本课任何测试**（见第七节）。
+- 教学参数是首席批准的**试点运行参数**，没有儿童教学效果证据。
+- 目录 / 详细课程 / 素材需求中仍有与新定位矛盾的文字（清单见 `TEACHING-PLAN.md` 第八节），属首席受控文件，未改。
+
+## 七、GitHub Actions 实际覆盖情况（审计结论）
+
+PR #470 head `e6c25688` 的三个运行均 success：`41601966985`（task accountability）、`41601967006`（deploy-pipeline）、`41601967049`（curriculum content checks，23 个 Job）。
+
+**但这些运行没有执行本课测试：**
+
+- `curriculum-web` 的 Vitest 步骤是显式文件清单，不含 `src/features/lessons/g2-u3-l02`。
+- `g2-u3-browser-trial` 只跑 `scratch-g2-u3.spec.ts`（L01）。
+- 没有任何 Job 引用 `g2-u3-l02-vm.spec.ts` 或 `g2-u3-l02-classroom.spec.ts`。
+- `on.pull_request.paths` 没有两个新 spec 与新路由（工作流之所以被触发，是因为改动命中了宽泛的 `features/lessons/**` 与 `public/**`）。
+
+所以：**本课目前没有 GitHub Actions 层面的测试证据。** 最小改造补丁已验证可应用并附在 `docs/curriculum/g2-u3-l02/ci-coverage.proposed.patch`，等待首席授权后另行落地；落地后第一次真实运行的各步骤耗时需回填到 `CI-COVERAGE-PLAN.md`。

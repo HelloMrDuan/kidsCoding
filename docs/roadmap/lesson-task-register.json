@@ -1711,8 +1711,8 @@
       "title": "接住掉落水果",
       "trackId": "G2",
       "unitId": "G2-U3",
-      "focusConcept": "侦测",
-      "plannedLearningOutcome": "能使用侦测解释并完成「接住掉落水果」中的关键操作，并展示可运行的结果或设计证据。",
+      "focusConcept": "坐标读取与位置对准",
+      "plannedLearningOutcome": "能读取水果的 x 坐标，算出篮子要移动的方向和距离，用「重复执行」把篮子对准落点接住水果，并展示可运行的结果与运行证据。",
       "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
@@ -1720,7 +1720,7 @@
         "G2-U3-L01"
       ],
       "acceptance": [
-        "以真实执行器完成本课的指定知识点「侦测」，不得用静态播放代替",
+        "以真实执行器完成本课的指定知识点「坐标读取与位置对准」，不得用静态播放代替",
         "至少两种目标不同的亲手练习，以及一条实际错误或边界测试",
         "有分层纠错、可修改的原创作品与关闭重开验证",
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
@@ -1732,7 +1732,7 @@
         "realE2E": "apps/web/tests/e2e/g2-u3-l02-vm.spec.ts（真实 scratch-vm 行为矩阵）+ apps/web/tests/e2e/g2-u3-l02-classroom.spec.ts（三端课堂）",
         "lessonReview": null
       },
-      "notes": "P0 样板 A（Draft PR #470，等待首席审核）。教学定向；教学参数 rulingStatus=proposed 待首席裁定，focusConcept 待首席决定是否改为位置侦测与对准。本地真实 scratch-vm + Chromium 三视口测试见 docs/roadmap/evidence/G2-U3-L02/README.md；PR/main CI 未出结果，无独立教研、无儿童试学、无真实设备。全量目录仍为 outline_not_playable，非已发布。"
+      "notes": "P0 样板 A（Draft PR #470，等待首席审核）。教学定向；首席 2026-11-03 裁定 focusConcept 为「坐标读取与位置对准」，教学参数为试点运行参数（rulingStatus=pilot-approved，不代表儿童教学效果已验证）。目录 full-catalog-v1.json / track-g2-detailed-lessons-v1.json / priority-asset-requirements-v1.json 中本课仍写「侦测」「鼠标跟随」「触碰」，属首席受控文件，见 PR #470 的矛盾清单。本地真实 scratch-vm + Chromium 三视口测试见 docs/roadmap/evidence/G2-U3-L02/README.md；PR/main CI 未出结果，无独立教研、无儿童试学、无真实设备。全量目录仍为 outline_not_playable，非已发布。"
     },
     {
       "id": "G2-U3-L03",

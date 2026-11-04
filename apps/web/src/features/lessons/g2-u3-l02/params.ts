@@ -1,15 +1,17 @@
 // G2-U3-L02《接住掉落水果》教学参数。
 //
-// 状态：提议，待首席裁定（docs/curriculum/g2-u3-l02/TEACHING-PLAN.md 第四、七节）。
-// 所有会影响教学判定的数值只能写在这个文件里；界面、判定、测试都从这里读取，
-// 不得在别处复制数字。裁定通过后只改本文件的值和 rulingStatus，不动其他文件。
+// 状态：首席于 2026-11-03 批准为【试点运行参数】（docs/curriculum/g2-u3-l02/TEACHING-PLAN.md 第八节）。
+// 试点参数只用于试点运行，不代表儿童教学效果已经验证；未经首席再次裁定不得改动数值。
+// 所有会影响教学判定的数值只能写在这个文件里；界面、判定、测试都从这里读取，不得在别处复制数字。
+// g2-u3-l02.test.ts 里有一条“已批准数值”快照测试，改数值必须同时有意识地改那条测试。
 
 export const L02_LESSON_ID = 'G2-U3-L02'
 
-export type RulingStatus = 'proposed' | 'approved'
+/** proposed：提议待裁定；pilot-approved：首席批准为试点运行参数；approved：经教学效果验证后的正式参数（目前没有）。 */
+export type RulingStatus = 'proposed' | 'pilot-approved' | 'approved'
 
 export const L02_PARAMS = {
-  rulingStatus: 'proposed' as RulingStatus,
+  rulingStatus: 'pilot-approved' as RulingStatus,
 
   // 舞台坐标（Scratch：x -240..240，y -180..180）
   basketStartX: 0,
@@ -24,6 +26,7 @@ export const L02_PARAMS = {
   minRepeatTimes: 1,
   maxMoveDx: 100,
   minMoveDx: -100,
+  /** 不含“当绿旗被点击”帽子积木。 */
   maxBlocks: 12,
   maxNesting: 2,
   maxScripts: 3,

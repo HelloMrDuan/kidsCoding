@@ -312,7 +312,7 @@ export function Classroom() {
           {judgment?.status === 'judged' && levelId === 'explore' && (
             <p data-testid="l2-pred-compare" className={styles.hint}>
               你预测篮子停在 x={predictionX || '？'}，{predictionCaught || '？'}；
-              真实结果是篮子停在 x={trace?.landing?.basketX}，{judgment.stage.passed ? '接住了' : '没接住'}。
+              真实结果是篮子停在 x={trace?.landing?.basketX}，{judgment.stage.passed ? '接到了水果' : '没接到水果'}。
             </p>
           )}
         </section>
@@ -532,7 +532,7 @@ export function Classroom() {
           {runNotice && <p className={styles.error} data-testid="l2-run-notice">{runNotice}</p>}
           {!trace || !judgment ? (
             <p className={styles.muted} data-testid="l2-feedback-empty">
-              {running ? '正在运行…' : '还没有这一次的结果。点“运行作品”，三层结果会一起出现。改了脚本，旧结果会马上清掉。'}
+              {running ? '正在运行…' : '还没有这一次的结果。点“运行作品”，舞台结果、任务结果、知识证据会一起出现。改了脚本，旧结果会马上清掉。'}
             </p>
           ) : judgment.status === 'not-judged' ? (
             <p className={styles.muted} data-testid="l2-not-judged">{judgment.reason}</p>
@@ -544,6 +544,7 @@ export function Classroom() {
               <div className={styles.conclusion} data-testid="l2-conclusion" data-passed={judgment.passed}>
                 {levelId === 'explore' ? '这一关是观察：对一对你的预测和真实结果。' : judgment.conclusion}
               </div>
+              <div className={styles.layerRow} data-testid="l2-understanding">{judgment.understanding}</div>
               {passed && nextLevel(levelId) && levelId !== 'explore' && (
                 <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} data-testid="l2-next-level" onClick={() => switchLevel(nextLevel(levelId)!)}>下一关</button>
               )}

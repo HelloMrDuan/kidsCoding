@@ -1,0 +1,52 @@
+--- a/.github/workflows/curriculum-content.yml	2026-11-03 07:02:07.714423313 +0000
++++ b/.github/workflows/curriculum-content.yml	2026-11-04 01:17:02.492341341 +0000
+@@ -53,6 +53,9 @@
+       - 'apps/web/tests/e2e/scratch-g2-u1.spec.ts'
+       - 'apps/web/tests/e2e/scratch-g2-u1-viewport.spec.ts'
+       - 'apps/web/tests/e2e/scratch-g2-u3.spec.ts'
++      - 'apps/web/tests/e2e/g2-u3-l02-vm.spec.ts'
++      - 'apps/web/tests/e2e/g2-u3-l02-classroom.spec.ts'
++      - 'apps/web/src/app/learn/g2-u3-l02/**'
+       - 'apps/web/tests/e2e/scratch-g2-helpers.ts'
+       - 'apps/web/src/features/lessons/playable-stage/**'
+       - 'apps/web/src/app/learn/lesson/**'
+@@ -146,6 +149,8 @@
+         run: npx vitest run src/features/ui/lesson-card.test.tsx src/features/ui/progress-track.test.tsx src/features/ui/story-dialog.test.tsx
+       - name: UX-101 component unit tests
+         run: npx vitest run src/features/lessons/adventure-map.test.tsx src/features/lessons/map-view.test.tsx
++      - name: G2-U3-L02 unit tests (contract, judging, params boundaries, draft, sandbox/TS parity)
++        run: npx vitest run src/features/lessons/g2-u3-l02
+ 
+   scratch-rls-postgres:
+     runs-on: ubuntu-latest
+@@ -274,6 +279,30 @@
+       - name: Run G2-U3 scratch spec with real Chrome
+         run: npx playwright test tests/e2e/scratch-g2-u3.spec.ts --project=desktop
+ 
++  g2-u3-l02-browser-trial:
++    runs-on: ubuntu-latest
++    timeout-minutes: 12
++    defaults:
++      run:
++        working-directory: apps/web
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '22'
++          cache: npm
++          cache-dependency-path: apps/web/package-lock.json
++      - run: npm ci
++      - name: Install real Chrome for browser E2E
++        run: npx playwright install chrome --with-deps
++      - name: Run G2-U3-L02 real Scratch VM matrix and three-viewport classroom specs with real Chrome
++        run: npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom.spec.ts --project=desktop --workers=2 --output=test-results/g2-u3-l02
++      - uses: actions/upload-artifact@v4
++        if: always()
++        with:
++          name: g2-u3-l02-chrome-evidence
++          path: apps/web/test-results/
++
+   g2-u1-viewport-trial:
+     runs-on: ubuntu-latest
+     timeout-minutes: 12

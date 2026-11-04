@@ -41,9 +41,9 @@ export const L02_CONTRACT: L02Contract = {
   ],
   engine: 'scratch-vm',
   judging: {
-    stageRule: '舞台结果：水果落到篮子高度那一帧，读取水果和篮子真实的 x，相差不超过篮子半宽算接住',
-    taskRule: '任务判定：篮子真实移动过，并且在那一帧接住了水果',
-    knowledgeRule: '知识证据：“重复执行”里的移动积木真实运行至少 2 次，并且重复贡献了篮子至少一半的位移',
+    stageRule: '舞台结果：水果落到篮子高度那一帧，读取水果和篮子真实的 x，相差不超过篮子半宽算接到水果',
+    taskRule: '任务结果：篮子真实移动过，并且在那一帧接到了水果，本次任务才算达标',
+    knowledgeRule: '知识证据：“重复执行”里的移动积木真实运行至少 2 次，并且重复贡献了篮子至少一半的位移；只说明本次程序满足循环应用要求，不等于已经掌握，理解需要进一步解释或练习',
     scopeLabel: '教学定向',
   },
   draftKey: `kidscoding-draft:${L02_LESSON_ID}`,

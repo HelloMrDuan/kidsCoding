@@ -1,4 +1,4 @@
-// 三层判定：舞台结果 / 任务判定 / 知识证据。
+// 三层结果：舞台结果 / 任务结果 / 知识证据（另附一条固定的“理解情况”说明）。
 // 输入是真实 Scratch VM 运行出来的 RunTrace（由沙箱观察 VM 得到），本模块是纯函数，
 // 不运行任何积木，也不逐块比对标准答案：只看行为。
 
@@ -30,8 +30,12 @@ export type RunTrace = {
 
 export type Layer = { passed: boolean; line: string }
 
+/** 系统无法判断学生是否理解的固定说明：每一次判定都展示，不因任务通过而省略。 */
+export const UNDERSTANDING_NOTE =
+  '理解情况：系统只能看到这一次运行的行为，看不出你是否明白为什么这样算——需要进一步解释或练习（比如换一个位置再做一次，或者对别人说一说你是怎么算的）。'
+
 export type RunJudgment =
-  | { status: 'judged'; stage: Layer; task: Layer; knowledge: Layer; passed: boolean; conclusion: string; level: LevelParams }
+  | { status: 'judged'; stage: Layer; task: Layer; knowledge: Layer; understanding: string; passed: boolean; conclusion: string; level: LevelParams }
   | { status: 'not-judged'; reason: string }
 
 export function judgeRun(trace: RunTrace, level: LevelParams): RunJudgment {
@@ -49,7 +53,7 @@ export function judgeRun(trace: RunTrace, level: LevelParams): RunJudgment {
   const stage: Layer = {
     passed: caught,
     line: `舞台结果：水果落下时（第 ${landing.frame} 帧），水果 x=${landing.fruitX}，篮子 x=${landing.basketX}，` +
-      `相差 ${diff}，篮子能接住的范围是 ${tolerance}，${caught ? '接住了' : '没接住'}`,
+      `相差 ${diff}，篮子能接住的范围是 ${tolerance}，${caught ? '接到了水果' : '没接到水果'}`,
   }
 
   // 只统计落地那一帧（含）之前真正发生的移动：落地后才执行的积木对这次结果没有影响。
@@ -60,34 +64,35 @@ export function judgeRun(trace: RunTrace, level: LevelParams): RunJudgment {
   const moved = landing.basketX !== trace.start.basketX
 
   const task: Layer = caught && moved
-    ? { passed: true, line: '任务判定：通过——篮子真的移动了，并且接住了水果' }
+    ? { passed: true, line: '任务结果：本次任务达标——篮子真的移动了，并且接到了水果' }
     : !moved
-      ? { passed: false, line: '任务判定：未通过——篮子没有移动' }
-      : { passed: false, line: `任务判定：未通过——篮子移动了，但离水果还差 ${diff - tolerance}（要在 ${tolerance} 以内）` }
+      ? { passed: false, line: '任务结果：本次任务未达标——篮子没有移动' }
+      : { passed: false, line: `任务结果：本次任务未达标——篮子移动了，但${landing.basketX < landing.fruitX ? '停在水果左边' : '停在水果右边'}，离水果还差 ${diff - tolerance}（要在 ${tolerance} 以内）` }
 
+  // 这两个条件只是本节“用重复执行移动篮子”这个行为目标的判定依据，不是对“学会了”的认定。
   const loopRan = loopMoves.length >= L02_PARAMS.minLoopIterations
   const sameDirection = netAll !== 0 && Math.sign(netLoop) === Math.sign(netAll)
   const loopCarries = netAll !== 0 && sameDirection && Math.abs(netLoop) >= Math.abs(netAll) * L02_PARAMS.minLoopShare
   const knowledgePassed = loopRan && loopCarries
   let knowledgeLine: string
   if (knowledgePassed) {
-    knowledgeLine = `知识证据：通过——“重复执行”里的移动一共让篮子走了 ${netLoop}（执行了 ${loopMoves.length} 次）`
+    knowledgeLine = `知识证据：本次程序满足循环应用要求——“重复执行”里的移动一共让篮子走了 ${netLoop}（执行了 ${loopMoves.length} 次）`
   } else if (loopMoves.length === 0) {
-    knowledgeLine = '知识证据：未通过——没有看到“重复执行”里的移动积木真正运行，不能写“已经会用重复”'
+    knowledgeLine = '知识证据：本次程序没有满足循环应用要求——没有看到“重复执行”里的移动积木真正运行'
   } else if (!loopRan) {
-    knowledgeLine = `知识证据：未通过——重复里的移动只执行了 ${loopMoves.length} 次，至少需要 ${L02_PARAMS.minLoopIterations} 次`
+    knowledgeLine = `知识证据：本次程序没有满足循环应用要求——重复里的移动只执行了 ${loopMoves.length} 次，至少需要 ${L02_PARAMS.minLoopIterations} 次`
   } else {
-    knowledgeLine = '知识证据：未通过——篮子大部分距离不是“重复执行”走出来的'
+    knowledgeLine = '知识证据：本次程序没有满足循环应用要求——篮子大部分距离不是“重复执行”走出来的'
   }
   const knowledge: Layer = { passed: knowledgePassed, line: knowledgeLine }
 
   const passed = task.passed && knowledge.passed
-  const failing = [task.passed ? null : '任务判定', knowledge.passed ? null : '知识证据'].filter(Boolean).join('、')
+  const failing = [task.passed ? null : '任务结果', knowledge.passed ? null : '知识证据'].filter(Boolean).join('、')
   const conclusion = passed
-    ? '结论：这次运行满足了本节的任务和知识要求（系统只能证明这一次运行的行为，不代表已经完全掌握）'
-    : `结论：这次运行还没达到要求——${failing}未通过`
+    ? '本次运行：任务达标，也满足了循环应用要求。这只说明这一次运行的行为。'
+    : `本次运行：还没达到要求——${failing}未通过。`
 
-  return { status: 'judged', stage, task, knowledge, passed, conclusion, level }
+  return { status: 'judged', stage, task, knowledge, understanding: UNDERSTANDING_NOTE, passed, conclusion, level }
 }
 
 /**
