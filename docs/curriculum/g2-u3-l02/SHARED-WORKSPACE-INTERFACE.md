@@ -1,10 +1,49 @@
 # G2-U3-L02 对共享 LessonWorkspace 的最小接口需求
 
 状态：**需求，提交给 2 号（负责 #469）与首席。** 本文件不修改任何共享文件。
-对象：PR #469（Draft），审阅时的 head `dc7157b99f00295d4dedf7f1140f6bdd24859317`（"Kitten-grade LessonWorkspace UI refactor"）。
+**2026-11-04 更新：已按 #469 `d3e3ad06` 的实际代码重新核对，见下面“最新对照”一节；第一节“现状”是基于旧 head `dc7157b9` 的历史记录，已过期。**
+对象：PR #469（Draft）。**当前核对的 head：`d3e3ad06d89f4557b267f772cd90e6751886275b`**（"three-engine shared slots + R1-R8 regression hardening"）；此前版本基于 `dc7157b9`，已过期。
 依据：#469 当前代码的真实结构（`workspace-adapters.ts`、`workspace-judging.ts`、`scratch-adapter.ts`、`lesson-workspace.tsx`）。按 AGENTS.md，#469 未合并，本文只是**对接口的需求**，不把它当已生效的规范，也不依赖它的代码。
 
-## 一、现状：为什么现在接不进去
+## 最新对照（2026-11-04，#469 head `d3e3ad06d89f4557b267f772cd90e6751886275b`，以实际代码为准）
+
+#469 在 `d3e3ad06`（"three-engine shared slots + R1-R8 regression hardening"）新增了 `workspace-slots.ts`，提供 `editorSlot` / `stageSlot` 两个可选插槽、通用 `RunTrace`、`JudgmentAdapter`。该提交没有改动 `.github/` 或任何台账。以下逐项对照本课需求（代码位置以该 head 为准）：
+
+| 需求 | #469 现状（代码证据） | 结论 |
+|---|---|---|
+| R1 脚本编辑槽 | `EditorSlotProps = {lessonId, initial, onChange, onSelectionChange?, editable}`，壳在 `lesson-workspace.tsx` 以 `<EditorSlotView key={`${lessonId}-${slotResetKey}`} …/>` 挂载 | **基本解决。** 重置由壳递增 `slotResetKey` 让槽位重新挂载实现，本课**不再需要** `resetKey` prop（本文早先版本提出的 `resetKey` 需求撤回）。 |
+| R1 移动端编辑控制 | `EditorSlotProps` 无 `ref` / `handleRef` / 命令接口；`onSelectionChange` 只能“向外报告选中”，不能“从外部驱动编辑” | **仍缺（缺口 A）。** |
+| R2 自定义舞台 | `StageSlotProps = {lessonId, state, running}`，`state: {x:number; score:number; running:boolean; frames?:number}`，壳传入 `engineState` | **仍缺（缺口 B）。** 只有一个 `x`，表达不了篮子与水果各自的 x / y。 |
+| R3 判定扩展 | `JudgmentAdapter.judge(trace, script): JudgmentResult`；`JudgmentResult` 的结论措辞归适配器，壳“不得写已掌握” | **方向正确，已采纳。** |
+| R3 运行轨迹字段 | `RunFrame = {frame, inLoop?, event: string}`；`RunTrace = {runId, lessonId, levelId?, landingFrame?, frames}`；全文无任何位移量字段 | **仍缺（缺口 C）。** 本课“循环贡献的位移占比 ≥ 50%”必须用每一步的 `dx`。 |
+| R4 失效 | 壳分配递增 `runId`；稳定指纹；判定不写入草稿；恢复后重新判定 | **已采纳。** |
+| R5 适配器扩展 | 采用“壳分配 `runId`”；没有 `runLevel / currentRunId` | **可适配，无需 2 号再改。** 本课适配器需改为接受壳给的 `runId`。 |
+| R6 草稿 | 判定不入草稿；“恢复提示不被自动保存覆盖”（`shouldAutosavePreservePrompt`） | **已采纳，与本课一致。** |
+
+### 三个仍需 2 号确认的缺口（精确描述）
+
+**缺口 A：移动端编辑控制。** 本课在手机上用“添加积木 / 上移 / 下移 / 删除 / 数字框”工具栏操作槽位内的 Blockly（Blockly 12 的选中会随键盘焦点丢失，所以选中状态必须由编辑器自管）。`EditorSlotProps` 没有从槽位外部驱动编辑的途径。两个可选方向，**由 2 号 / 首席择一**：
+- A1（推荐，不改共享契约）：工具栏由课程的 `editorSlot` 组件**自带**（渲染在槽位内部）。这要求壳给槽位足够的纵向空间，并且手机的“脚本”工作区里运行按钮仍与槽位同区可达。
+- A2：在 `EditorSlotProps` 增加一个可选的命令通道（例如 `register?: (api: EditorApi) => void`，`EditorApi = {addBlock, moveSelected, deleteSelected, setSelectedNumber}`），壳可以把这些命令放进共享的素材抽屉。
+
+**缺口 B：舞台状态不够。** 需要 `StageSlotProps.state` 可以携带课程自定义字段。建议最小改动：把 `state` 的类型改成可扩展（例如 `state: EngineState & { custom?: unknown }`），或增加 `stageData?: unknown` 由适配器填写。本课需要：`{basket:{x,y}, fruit:{x,y}}` 与素材（`assets`）。
+
+**缺口 C：`RunFrame` 缺位移量。** 需要每个“真实移动”帧携带数值位移，且仍保持通用。建议最小改动：给 `RunFrame` 增加可选的 `delta?: number`（通用含义：本帧让主角色 x 方向变化的量），本课映射为篮子的 `dx`。不要把 `dx` 编码进 `event: string`——那会让判定去解析文本。`landingFrame` 已有，足够表达“落地帧”。
+
+### 本课这一侧在集成时要做的适配
+
+1. 编辑器改为符合 `EditorSlotProps`：从 `initial` 重建脚本；每次编辑 `onChange(program)`。
+2. 适配器接受壳分配的 `runId`；`RunTrace` 映射：`frames[i] = {frame, inLoop, event:'move', delta: dx}`、`landingFrame`、再加课程自有字段（落地时的篮子 x / 水果 x）放在适配器自己的 trace 里，由本课 `judge` 使用。
+3. `judge.ts` 实现 `JudgmentAdapter`，输出 `JudgmentResult.layers = [stage, task, knowledge]`，并保留“理解情况：需要进一步解释或练习”（放入 `conclusion` 或 `methodEvidence`）。
+4. 删除 `ui/classroom.tsx`；保留 `script-editor.tsx`、`stage-view.tsx`、`vm-adapter.ts`、`judge.ts`、`state.ts`、`contract.ts`。
+5. **保留 SYS-122 覆盖的全部测试**：VM 矩阵 21 项、课堂 spec 16 个用例 × 三视口、单测 66 项。课堂 spec 的 `data-testid` 前缀会从 `l2-*` 换成共享壳的 `ws-*`，只换定位，不放宽断言、不删用例。
+
+---
+
+## 一（历史记录，已过期）、现状：为什么现在接不进去
+
+> 以下基于旧 head `dc7157b9`。其中“壳没有任何扩展槽”“判定入口只有 `{didMove, usedRepeat, finalX}`”等描述**已不再成立**。保留以便追溯需求的来由。
+
 
 | 事实（#469 head `dc7157b`） | 影响 |
 |---|---|
@@ -133,8 +172,16 @@ type EngineAdapterV2<Program, Trace, State> = EngineAdapter & {
 3. 桌面真实指针拖放、手机点击插入 / 上移 / 下移 / 删除 / 改数字、编辑后判定失效、迟到结果被丢弃、保存失败显示“未能保存”。
 4. 在 GitHub Actions 里实际执行（见 `CI-COVERAGE-PLAN.md`），不以本地结果代替。
 
-## 五、需要 2 号确认的问题
+## 五、仍需 2 号 / 首席确认的问题（仅列未解决项）
 
-1. R1–R5 采用“扩展 prop”还是“新增 `engine: 'scratch-vm-editor'` 的第四种引擎”？我方都能接，倾向前者（不改契约字段）。
-2. 壳按钮文字是否改为纯文字（见第一节最后一行）？
-3. 壳是否计划提供 Kitten 风格的“积木分类图标条 + 搜索框”？本课用 Blockly 自带的分类工具箱（事件 / 运动 / 控制三类），如果壳提供分类条，需要说明与 Blockly flyout 的关系，避免出现两套分类。
+以下原先提出的问题已被 `d3e3ad06` 解决，**不再重复提出**：编辑槽的存在与重置（`slotResetKey` remount）、判定不入草稿、`runId` 与指纹绑定、结论措辞归适配器、恢复提示不被自动保存覆盖、判定适配器接口。
+
+仍未解决：
+
+1. **缺口 A**（移动端编辑控制）：选 A1（工具栏由课程的 `editorSlot` 自带）还是 A2（`EditorSlotProps` 增加命令通道）。我方两种都能接，倾向 A1（不改共享契约），但需要壳在手机“脚本”工作区里给槽位足够空间，并保证运行按钮同区可达。
+2. **缺口 B**（舞台状态）：`StageSlotProps.state` 需要能承载课程自定义字段。
+3. **缺口 C**（轨迹位移量）：`RunFrame` 需要一个通用的可选 `delta?: number`。
+4. 壳按钮文字 `▶ 运行作品` / `■ 停止` 仍可能在缺字形的设备上显示为方框（本课在测试中已遇到并改为纯文字）；是否改为纯文字，由 2 号决定。
+5. 壳是否计划提供 Kitten 风格“积木分类图标条 + 搜索框”？本课用 Blockly 自带分类工具箱（事件 / 运动 / 控制三类），如果壳也提供分类条，请说明与 Blockly flyout 的关系，避免出现两套分类。
+
+以上均不阻塞 #471 的合并准备；它们只阻塞 G2-U3-L02 接入共享工作区。
