@@ -18,7 +18,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
-import { CharacterArt } from '@/features/lessons/playable-stage/character-art'
+import { CharacterArt, SceneBackdrop } from '@/features/lessons/playable-stage/character-art'
 
 import {
   DEMO_HAT,
@@ -96,6 +96,8 @@ export function LessonWorkspace({
   const [stageVisible, setStageVisible] = useState(true)
   const [stageZoom, setStageZoom] = useState<'small' | 'medium' | 'large'>('medium')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [goalExpanded, setGoalExpanded] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(true)
   const [revealedHints, setRevealedHints] = useState(0)
   const [selectedRole, setSelectedRole] = useState('fox')
   const [engineState, setEngineState] = useState<EngineState>({ x: 0, score: 0, running: false, frames: 0 })
@@ -277,6 +279,16 @@ export function LessonWorkspace({
       | undefined
     candidate?.handleVisible?.()
   }, [activeTab])
+
+  // Stage show/hide and zoom change the script column width (desktop) and
+  // the stage box height; re-measure Blockly so the canvas never stays
+  // clipped after a layout change.
+  useEffect(() => {
+    const candidate = mountedAdapterRef.current?.adapter as
+      | (EngineAdapter & { handleVisible?: () => void })
+      | undefined
+    candidate?.handleVisible?.()
+  }, [stageVisible, stageZoom])
 
   // Scratch readiness polling: the sandbox handshake is async; the shell polls
   // the adapter's honest ready/error accessors and never assumes ready.
@@ -626,42 +638,47 @@ export function LessonWorkspace({
 
   const drawer = (
     <div data-testid="ws-block-drawer">
-      <p>点积木插入脚本末尾（演示积木）：</p>
-      <button
-        type="button"
-        className="kc-action-surface kc-btn-outline kc-btn-sm"
-        onClick={() => insertBlock({ type: DEMO_MOVE_RIGHT, steps: 50 })}
-        data-testid="ws-drawer-move-right"
-      >
-        向右走 50 步
-      </button>{' '}
-      <button
-        type="button"
-        className="kc-action-surface kc-btn-outline kc-btn-sm"
-        onClick={() => insertBlock({ type: DEMO_MOVE_LEFT, steps: 50 })}
-        data-testid="ws-drawer-move-left"
-      >
-        向左走 50 步
-      </button>{' '}
-      <button
-        type="button"
-        className="kc-action-surface kc-btn-outline kc-btn-sm"
-        onClick={() =>
-          insertBlock({
-            type: DEMO_REPEAT,
-            times: 3,
-            body: [{ type: DEMO_MOVE_RIGHT, steps: 50 }],
-          })
-        }
-        data-testid="ws-drawer-repeat"
-      >
-        重复 3 次（向右走 50 步）
-      </button>
+      <p>点积木插入脚本末尾（演示积木，颜色与分类一致）：</p>
+      <div className="ws-palette-chips">
+        <button
+          type="button"
+          className="ws-palette-chip"
+          style={{ background: '#4c97ff' }}
+          onClick={() => insertBlock({ type: DEMO_MOVE_RIGHT, steps: 50 })}
+          data-testid="ws-drawer-move-right"
+        >
+          ➡ 向右走 50 步
+        </button>
+        <button
+          type="button"
+          className="ws-palette-chip"
+          style={{ background: '#4c97ff' }}
+          onClick={() => insertBlock({ type: DEMO_MOVE_LEFT, steps: 50 })}
+          data-testid="ws-drawer-move-left"
+        >
+          ⬅ 向左走 50 步
+        </button>
+        <button
+          type="button"
+          className="ws-palette-chip"
+          style={{ background: '#0fbdbd' }}
+          onClick={() =>
+            insertBlock({
+              type: DEMO_REPEAT,
+              times: 3,
+              body: [{ type: DEMO_MOVE_RIGHT, steps: 50 }],
+            })
+          }
+          data-testid="ws-drawer-repeat"
+        >
+          ↻ 重复 3 次（向右走 50 步）
+        </button>
+      </div>
     </div>
   )
 
   const scriptListPanel = isBlockly ? (
-    <div data-testid="ws-script-list">
+    <div className="ws-script-list-panel" data-testid="ws-script-list">
       <h3>脚本列表（可排序、删除、改参，均经适配器读写）</h3>
       {scriptList.length === 0 && <p>脚本为空：请从积木抽屉添加，或在编辑器中拖入积木。</p>}
       <ol>
@@ -767,15 +784,16 @@ export function LessonWorkspace({
 
   const stagePanel = (
     <section className="ws-stage" data-panel="stage" data-testid="ws-stage-panel">
-      <h2>作品舞台</h2>
+      <div className="ws-stage-head">
+        <h2>作品舞台</h2>
+        <span className="ws-stage-state-pill">{engineState.running ? '● 运行中' : '○ 未运行'}</span>
+      </div>
       <div
+        className="ws-stage-box"
         data-testid="ws-stage-box"
         style={{
           position: 'relative',
           height: stageHeight,
-          background: '#f3f6fb',
-          border: '1px solid #e7edf5',
-          borderRadius: 14,
           overflow: 'hidden',
         }}
       >
@@ -783,6 +801,7 @@ export function LessonWorkspace({
           <div ref={scratchMountRef} data-testid="ws-scratch-mount" style={{ width: '100%', height: '100%' }} />
         ) : (
           <>
+            <SceneBackdrop scene="forest" />
             <div
               style={{ position: 'absolute', left: `${stagePercent(engineState.x)}%`, bottom: 12, transform: 'translateX(-50%)' }}
               data-testid="ws-stage-character"
@@ -805,25 +824,27 @@ export function LessonWorkspace({
         篮子 x={engineState.x}，分数={engineState.score}，{engineState.running ? '运行中' : '未运行'}
         {isScratch && (scratchReady ? '，沙箱已就绪' : scratchError ? `，沙箱未就绪：${scratchError}` : '，沙箱握手中…')}
       </p>
-      <div>
+      <div className="ws-runbar">
         <button
           type="button"
-          className="kc-action-surface kc-btn-dark"
+          className={`kc-action-surface kc-btn-dark ${engineState.running ? 'ws-stop-btn' : 'ws-run-btn'}`}
           onClick={handleRunToggle}
           data-testid="ws-run-toggle"
         >
-          {engineState.running ? '停止' : '运行作品'}
-        </button>{' '}
-        <span>舞台缩放（只改列宽，不重建引擎）：</span>{' '}
-        <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('small')} data-testid="ws-zoom-small">
-          缩小
-        </button>{' '}
-        <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('medium')} data-testid="ws-zoom-medium">
-          正常
-        </button>{' '}
-        <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('large')} data-testid="ws-zoom-large">
-          放大
+          {engineState.running ? '■ 停止' : '▶ 运行作品'}
         </button>
+        <span className="ws-zoom-group">
+          舞台缩放（只改列宽与舞台高度，不重建引擎）：
+          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('small')} data-testid="ws-zoom-small">
+            缩小
+          </button>{' '}
+          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('medium')} data-testid="ws-zoom-medium">
+            正常
+          </button>{' '}
+          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('large')} data-testid="ws-zoom-large">
+            放大
+          </button>
+        </span>
       </div>
     </section>
   )
@@ -831,23 +852,26 @@ export function LessonWorkspace({
   const rolesPanel = (
     <section className="ws-roles" data-panel="roles" data-testid="ws-roles-panel">
       <h2>角色</h2>
-      <ul>
+      <ul className="ws-role-list">
         {DEMO_ROLES.map((role) => (
           <li key={role.id}>
             <button
               type="button"
-              className="kc-action-surface kc-btn-outline kc-btn-sm"
+              className="ws-role-card"
               aria-pressed={selectedRole === role.id}
               onClick={() => setSelectedRole(role.id)}
               data-testid={`ws-role-${role.id}`}
             >
-              {role.label}
-              {selectedRole === role.id ? '（已选中）' : ''}
+              <CharacterArt id={role.id as 'fox' | 'rabbit' | 'bird'} />
+              <span>
+                {role.label}
+                {selectedRole === role.id ? '（已选中）' : ''}
+              </span>
             </button>
           </li>
         ))}
       </ul>
-      <p>演示仅支持点选角色；角色增删与造型编辑为引擎接入工作，未冒充已实现。</p>
+      <p className="ws-role-note">演示仅支持点选角色；角色增删、造型编辑与背景管理为引擎接入工作，未冒充已实现。</p>
     </section>
   )
 
@@ -856,22 +880,35 @@ export function LessonWorkspace({
       <h2>脚本工作区</h2>
       {isBlockly && (
         <>
+          <div className="ws-palette">
+            <div className="ws-palette-head">
+              <h3>积木素材</h3>
+              <button
+                type="button"
+                className="kc-action-surface kc-btn-outline kc-btn-sm"
+                onClick={() => setPaletteOpen((v) => !v)}
+                data-testid="ws-palette-toggle"
+              >
+                {paletteOpen ? '收起' : '展开'}
+              </button>
+            </div>
+            {paletteOpen && drawer}
+          </div>
           <div
             ref={blocklyMountRef}
+            className="ws-blockly-mount"
             data-testid="ws-blockly-mount"
-            style={{ height: 420, border: '1px solid #e7edf5', borderRadius: 14 }}
           />
-          <p>分类工具箱在编辑器左侧（开始 / 移动 / 控制 / 更多），拖放、改参、垃圾桶删除均真实可用。</p>
-          {drawer}
+          <p>左侧为积木分类栏（开始 / 移动 / 控制 / 更多，颜色与积木一致），拖放、改参、垃圾桶删除均真实可用；下方脚本列表与画布同一程序。</p>
           {scriptListPanel}
-          <div>
+          <div className="ws-runbar">
             <button
               type="button"
-              className="kc-action-surface kc-btn-dark"
+              className={`kc-action-surface kc-btn-dark ${engineState.running ? 'ws-stop-btn' : 'ws-run-btn'}`}
               onClick={handleRunToggle}
               data-testid="ws-run-script"
             >
-              {engineState.running ? '停止' : '运行作品'}
+              {engineState.running ? '■ 停止' : '▶ 运行作品'}
             </button>
           </div>
         </>
@@ -885,14 +922,16 @@ export function LessonWorkspace({
           <p data-testid="ws-scratch-note">
             {scratchReady ? '沙箱已就绪。' : scratchError ? `沙箱未就绪：${scratchError}` : '沙箱握手中…'}
           </p>
-          <button
-            type="button"
-            className="kc-action-surface kc-btn-dark"
-            onClick={handleRunToggle}
-            data-testid="ws-run-script"
-          >
-            {engineState.running ? '停止' : '运行作品'}
-          </button>
+          <div className="ws-runbar">
+            <button
+              type="button"
+              className={`kc-action-surface kc-btn-dark ${engineState.running ? 'ws-stop-btn' : 'ws-run-btn'}`}
+              onClick={handleRunToggle}
+              data-testid="ws-run-script"
+            >
+              {engineState.running ? '■ 停止' : '▶ 运行作品'}
+            </button>
+          </div>
         </>
       )}
       {isSummary && <p>摘要编辑尚未接入（4 号接入中）。</p>}
@@ -950,21 +989,92 @@ export function LessonWorkspace({
       style={{ '--ws-stage-w': `${stageWidth}px` } as CSSProperties}
     >
       <style>{`
-        .ws-root { font-family: "PingFang SC","Microsoft YaHei",sans-serif; color: #18243a; }
-        .ws-topbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+        .ws-root { font-family: "PingFang SC","Microsoft YaHei",sans-serif; color: #18243a; box-sizing: border-box; }
+        .ws-root * { box-sizing: border-box; }
+        .ws-root h2 { font-size: 15px; margin: 0 0 8px; }
+        .ws-root h3 { font-size: 14px; margin: 0 0 8px; }
+        /* Top bar: one compact IDE bar (Kitten structure, KidsCoding V2 colours).
+           Teaching text never lives here; it lives in the goal strip + drawer. */
+        .ws-topbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: #152238; color: #fff; padding: 10px 12px; border-radius: 12px; margin-bottom: 12px; }
+        .ws-topbar h1 { color: #fff; }
+        .ws-topbar .kc-btn-outline { color: #fff; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.08); }
+        .ws-topbar [data-testid="ws-demo-badge"] { background: #ffab19; color: #18243a; font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 999px; }
+        .ws-topbar [data-testid="ws-save-chip"] { background: rgba(255,255,255,0.12); padding: 2px 10px; border-radius: 999px; font-size: 13px; }
+        .ws-topbar [data-testid="ws-save-message"] { font-size: 13px; opacity: 0.85; }
+        .ws-topbar [data-testid="ws-file-menu"] { background: #fff; color: #18243a; border: 1px solid #e7edf5; border-radius: 10px; padding: 8px; }
+        .ws-topbar [data-testid="ws-file-menu"] .kc-btn-outline { color: #18243a; border-color: #e7edf5; background: #fff; }
+        /* Goal strip: current goal + step + progress only; the full five
+           goals stay in the DOM (ws-goal5) and expand on one tap. */
+        .ws-goalstrip { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; }
+        .ws-goalstrip-current { font-size: 14px; margin: 0 0 4px; }
+        .ws-goalstrip-meta { color: #6f7d92; font-size: 13px; margin: 0; }
+        .ws-goal5-list { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: #3d4a5e; }
+        .ws-goal5-list.ws-goal5-collapsed li { display: none; }
+        /* Mobile tabs: a segmented control above the panels, never fixed over
+           the editor, so it can never cover Blockly. */
         .ws-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+        .ws-tabs .kc-btn-outline[aria-pressed="true"] { background: #2463eb; color: #fff; border-color: #2463eb; }
         .ws-grid { display: block; }
         .ws-panel { display: none; margin-bottom: 12px; }
         .ws-panel.ws-active { display: block; }
-        .ws-stage-hidden-note { display: none; }
+        .ws-panel > section { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 12px; }
+        /* Stage card: header row + scene box + run bar. */
+        .ws-stage-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .ws-stage-head h2 { margin: 0; }
+        .ws-stage-state-pill { font-size: 12px; background: #eef2f7; border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+        .ws-stage-box { position: relative; overflow: hidden; border: 1px solid #e7edf5; border-radius: 12px; background: #f3f6fb; }
+        .ws-stage-box .kc-scene-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .ws-stage-box [data-testid="ws-stage-character"], .ws-stage-box [data-testid="ws-stage-target"] { z-index: 1; }
+        /* CharacterArt carries only a viewBox; without an explicit size the
+           svg collapses to 0x0 inside the shrink-to-fit stage marker, which
+           is why the demo stage showed a backdrop but no character. */
+        .ws-stage-box [data-testid="ws-stage-character"] svg { width: 72px; height: 79px; display: block; }
+        .ws-runbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+        .ws-run-btn { background: #2ea043 !important; color: #fff !important; border-color: #2ea043 !important; font-weight: 700; }
+        .ws-stop-btn { background: #e5484d !important; color: #fff !important; border-color: #e5484d !important; font-weight: 700; }
+        .ws-zoom-group { display: inline-flex; gap: 4px; align-items: center; color: #6f7d92; font-size: 13px; }
+        /* Roles: real character thumbnails, selected ring, never text buttons. */
+        .ws-role-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+        .ws-role-card { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border: 2px solid #e7edf5; border-radius: 12px; background: #fff; cursor: pointer; }
+        .ws-role-card svg { width: 56px; height: 62px; }
+        .ws-role-card[aria-pressed="true"] { border-color: #2463eb; background: #eaf1fe; }
+        .ws-role-card span { font-size: 13px; color: #18243a; }
+        .ws-role-note { color: #6f7d92; font-size: 12px; margin: 8px 0 0; }
+        /* Script column: palette panel, Blockly canvas, script list, feedback. */
+        .ws-palette { border: 1px solid #e7edf5; border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; background: #fbfcfe; }
+        .ws-palette-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .ws-palette-head h3 { margin: 0; }
+        .ws-palette-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .ws-palette-chip { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 999px; color: #fff; font-weight: 700; padding: 8px 14px; cursor: pointer; min-height: 40px; }
+        .ws-blockly-mount { height: 360px; border: 1px solid #e7edf5; border-radius: 12px; overflow: hidden; }
+        .ws-blockly-mount .blocklyToolboxDiv { background: #fff; }
+        .ws-blockly-mount .blocklyFlyoutBackground { fill: #fbfcfe; }
+        .ws-script-list-panel { border: 1px solid #e7edf5; border-radius: 12px; padding: 10px 12px; margin-top: 12px; }
+        .ws-script-list-panel ol { padding-left: 20px; }
+        .ws-script-list-panel li { margin-bottom: 8px; }
+        .ws-script-list-panel input[type="number"], .ws-script-list-panel select { min-height: 36px; border: 1px solid #e7edf5; border-radius: 8px; padding: 4px 8px; }
+        .ws-feedback-card { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 12px; margin-top: 12px; }
+        .ws-feedback-card [data-testid="ws-feedback-conclusion"] { font-weight: 700; }
+        @media (max-width: 767px) {
+          .ws-tabs .kc-btn-outline, .ws-palette-chip { min-height: 44px; }
+          .ws-script-list-panel input[type="number"], .ws-script-list-panel select { min-height: 44px; }
+          .ws-script-list-panel .kc-btn-outline { min-height: 44px; }
+          .ws-role-list { flex-direction: row; }
+          .ws-role-card { min-width: 84px; }
+        }
         @media (min-width: 768px) {
           .ws-tabs { display: none; }
-          .ws-grid { display: grid; grid-template-columns: var(--ws-stage-w, 320px) 150px minmax(0, 1fr); gap: 12px; align-items: start; }
+          .ws-grid { display: grid; grid-template-columns: minmax(0, 1fr) 148px; gap: 12px; align-items: start; }
           .ws-panel { display: block; }
           .ws-blocks-panel { display: none; }
+          .ws-task-wrap { display: none; }
+          .ws-script-wrap { grid-column: 1 / -1; }
+          .ws-blockly-mount { height: 480px; }
         }
-        @media (min-width: 1440px) {
-          .ws-grid { grid-template-columns: var(--ws-stage-w, 320px) 150px minmax(0, 1fr); }
+        @media (min-width: 1280px) {
+          .ws-grid { grid-template-columns: var(--ws-stage-w, 320px) 148px minmax(0, 1fr); }
+          .ws-script-wrap { grid-column: auto; }
+          .ws-blockly-mount { height: 520px; }
         }
       `}</style>
 
@@ -1051,9 +1161,26 @@ export function LessonWorkspace({
         />
       </header>
 
-      <section>
-        <h2>首屏五要素</h2>
-        <ol data-testid="ws-goal5">
+      <section className="ws-goalstrip">
+        <p className="ws-goalstrip-current" data-testid="ws-goal-current">
+          <strong>当前目标：</strong>
+          {contract.goal5[0]}
+        </p>
+        <p className="ws-goalstrip-meta">
+          {contract.step} · {saveState === 'saved' ? '已保存到本机' : saveState === 'failed' ? '未能保存' : '未保存'}
+        </p>
+        <button
+          type="button"
+          className="kc-action-surface kc-btn-outline kc-btn-sm"
+          onClick={() => setGoalExpanded((v) => !v)}
+          data-testid="ws-goal-expand"
+        >
+          {goalExpanded ? '收起全部目标' : '展开全部 5 个目标'}
+        </button>
+        <ol
+          data-testid="ws-goal5"
+          className={goalExpanded ? 'ws-goal5-list' : 'ws-goal5-list ws-goal5-collapsed'}
+        >
           {contract.goal5.map((goal, index) => (
             <li key={index}>{goal}</li>
           ))}
@@ -1121,7 +1248,7 @@ export function LessonWorkspace({
         </div>
       </div>
 
-      <section data-testid="ws-feedback">
+      <section className="ws-feedback-card" data-testid="ws-feedback">
         <h2>反馈</h2>
         {runError && <p data-testid="ws-run-error">{runError}</p>}
         {notice && <p data-testid="ws-notice">{notice}</p>}

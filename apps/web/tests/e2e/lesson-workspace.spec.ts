@@ -141,6 +141,8 @@ test('lesson switch round-trip: A intact, B intact, no cross-lesson residue', as
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
   await page.getByRole('link', { name: '演示 B：送篮子到果园' }).click()
   await expect(page.getByTestId('ws-topbar').locator('h1')).toHaveText('演示：送篮子到果园')
+  // Goal strip shows only the current goal by default; expand for full text.
+  await page.getByTestId('ws-goal-expand').click()
   await expect(page.getByTestId('ws-goal5')).toContainText('果园')
   await expect(page.getByTestId('ws-goal5')).not.toContainText('接住')
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
@@ -148,6 +150,7 @@ test('lesson switch round-trip: A intact, B intact, no cross-lesson residue', as
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
   await page.getByRole('link', { name: '演示 A：接住掉落水果' }).click()
   await expect(page.getByTestId('ws-topbar').locator('h1')).toHaveText('演示：接住掉落水果')
+  await page.getByTestId('ws-goal-expand').click()
   await expect(page.getByTestId('ws-goal5')).toContainText('接住')
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3, { timeout: 10000 })
 })

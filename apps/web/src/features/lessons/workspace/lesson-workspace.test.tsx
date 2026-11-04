@@ -152,6 +152,45 @@ describe('LessonWorkspace shell (fake engine)', () => {
     expect(window.localStorage.getItem('kidscoding-draft:demo-a')).toMatch('when_start')
   })
 
+  it('goal strip shows only the current goal until expanded', () => {
+    const fake = new FakeAdapter()
+    render(
+      <LessonWorkspace
+        contract={DEMO_A.contract}
+        adapter={fake}
+        initialScript={DEMO_A.initialScript}
+      />,
+    )
+    expect(screen.getByTestId('ws-goal-current')).toHaveTextContent('今天学什么')
+    expect(screen.getByTestId('ws-goal5')).toHaveClass('ws-goal5-collapsed')
+    expect(screen.getByTestId('ws-goal5').querySelectorAll('li')).toHaveLength(5)
+    fireEvent.click(screen.getByTestId('ws-goal-expand'))
+    expect(screen.getByTestId('ws-goal5')).not.toHaveClass('ws-goal5-collapsed')
+  })
+
+  it('palette panel collapses and expands without losing the script', () => {
+    const fake = new FakeAdapter()
+    render(
+      <LessonWorkspace
+        contract={DEMO_A.contract}
+        adapter={fake}
+        initialScript={DEMO_A.initialScript}
+      />,
+    )
+    const scriptPanel = screen.getByTestId('ws-script-panel')
+    expect(
+      scriptPanel.querySelector('[data-testid="ws-drawer-move-right"]'),
+    ).not.toBeNull()
+    fireEvent.click(screen.getByTestId('ws-palette-toggle'))
+    expect(
+      scriptPanel.querySelector('[data-testid="ws-drawer-move-right"]'),
+    ).toBeNull()
+    fireEvent.click(screen.getByTestId('ws-palette-toggle'))
+    expect(
+      scriptPanel.querySelector('[data-testid="ws-drawer-move-right"]'),
+    ).not.toBeNull()
+  })
+
   it('the save-failure test hook reports 未能保存 and never 已保存到本机', () => {
     const fake = new FakeAdapter()
     render(
