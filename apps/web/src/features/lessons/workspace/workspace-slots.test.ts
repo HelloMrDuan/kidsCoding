@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { validateLessonContract } from './lesson-contract'
 import { DEMO_A } from './demo-contracts'
-import { judgmentAppliesTo, shouldAutosavePreservePrompt, stableFingerprint } from './workspace-slots'
+import {
+  judgmentAppliesTo,
+  shouldAutosavePreservePrompt,
+  stableFingerprint,
+  statesToRunFrames,
+  type RunTrace,
+} from './workspace-slots'
 import { buildJudgment } from './demo-judging'
 import { toJudgmentResult } from './workspace-judging'
 
@@ -71,5 +77,18 @@ describe('contract extension validation (additive)', () => {
       'progress 必须是 label 字符串与有限 current/total，且 total > 0',
     )
     expect(validateLessonContract({ ...DEMO_A.contract, hasStage: 'yes' })).toContain('hasStage 必须是布尔值')
+  })
+})
+
+describe('RunFrame §9 extension fields', () => {
+  it('converts snapshots to frames with signed dx/dy and keeps old traces valid', () => {
+    const frames = statesToRunFrames([{ x: 30 }, { x: 80 }, { x: 130 }, { x: 80 }], 'blockly-demo')
+    expect(frames.map((f) => f.dx)).toEqual([30, 50, 50, -50])
+    expect(frames.every((f) => f.dy === 0 && f.source === 'blockly-demo' && f.event === 'step')).toBe(true)
+    const trace: RunTrace = { runId: 7, lessonId: 'demo-a', frames }
+    expect(trace.frames).toHaveLength(4)
+    const oldTrace: RunTrace = { runId: 1, lessonId: 'demo-a', frames: [{ frame: 1, event: 'step' }] }
+    expect(oldTrace.frames[0].dx).toBeUndefined()
+    expect(stableFingerprint(trace)).toContain('blockly-demo')
   })
 })

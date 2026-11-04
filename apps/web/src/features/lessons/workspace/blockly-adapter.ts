@@ -45,7 +45,8 @@ import type {
   EngineState,
   RunEvent,
 } from './workspace-adapters'
-import type { FileCapabilities, JudgmentResult } from './workspace-slots'
+import type { FileCapabilities, JudgmentResult, RunTrace } from './workspace-slots'
+import { statesToRunFrames } from './workspace-slots'
 import { toJudgmentResult } from './workspace-judging'
 
 export const DEMO_HAT = 'when_start'
@@ -263,6 +264,8 @@ export class BlocklyAdapter implements EngineAdapter {
   private onEvent: ((e: RunEvent) => void) | null = null
   private lastTrace: DemoRunTrace | null = null
   private lastRunError: string | null = null
+  /** Incremented on every run() call; identifies the generic run trace. */
+  private runCount = 0
   private cachedScript: DemoBlock[] = []
   private changeListeners = new Set<() => void>()
   private blocklyChangeListener: ((e: Blockly.Events.Abstract) => void) | null = null
@@ -287,6 +290,23 @@ export class BlocklyAdapter implements EngineAdapter {
   /** Last computed run trace (didMove / usedRepeat / finalX), or null before any run. */
   getLastTrace(): DemoRunTrace | null {
     return this.lastTrace
+  }
+
+  /**
+   * §9 observation API (round 3): the last run as a generic RunTrace.
+   * Move frames carry signed dx (horizontal displacement of that step;
+   * dy is always 0 for this demo player) and source 'blockly-demo'.
+   * `inLoop` is not filled: frame snapshots cannot tell loop membership,
+   * and the demo never guesses it. Null before any run. This observes a
+   * run; it never judges one — judgment stays in getJudgmentResult.
+   */
+  getRunTrace(lessonId: string): RunTrace | null {
+    if (this.runCount === 0) return null
+    return {
+      runId: this.runCount,
+      lessonId,
+      frames: statesToRunFrames(this.frames, 'blockly-demo'),
+    }
   }
 
   /**
@@ -644,6 +664,7 @@ export class BlocklyAdapter implements EngineAdapter {
     this.frames = []
     this.lastTrace = null
     this.lastRunError = null
+    this.runCount += 1
     this.onEvent = onEvent
     const script = this.getScript()
     const result = runDemoProgram(script)

@@ -79,24 +79,33 @@ export default function WorkspaceDemoPage({
   return (
     <main className="min-h-screen bg-[var(--kc-canvas)]">
       <section className="kc-page-main">
-        {/* Slim demo strip OUTSIDE the IDE: plain text links, no buttons,
-            no topbar space — the IDE topbar is for course operations only. */}
-        <nav
-          aria-label="演示课程切换"
-          style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'baseline', marginBottom: 8, fontSize: 13, color: '#6f7d92' }}
+        {/* Round 3 §3.2: the demo switch lives in a collapsed <details>
+            test nav — one compact line, closed by default, never a
+            multi-row strip above the formal workspace. E2E navigates by
+            direct URL and opens this only for the lesson-switch case. */}
+        <details
+          data-testid="ws-demo-nav"
+          style={{ marginBottom: 4, fontSize: 13, color: '#6f7d92' }}
         >
-          <span>演示切换（测试用）：</span>
-          {DEMO_LINKS.map((link) => (
-            <Link
-              key={link.lessonId}
-              href={`/learn/workspace/${link.lessonId}`}
-              aria-current={link.lessonId === lessonId ? 'page' : undefined}
-              style={{ color: link.lessonId === lessonId ? '#18243a' : '#2463eb', fontWeight: link.lessonId === lessonId ? 700 : 400 }}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+          <summary style={{ cursor: 'pointer', listStyle: 'none' }}>
+            测试导航（仅测试用）
+          </summary>
+          <nav
+            aria-label="演示课程切换"
+            style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'baseline', marginTop: 4 }}
+          >
+            {DEMO_LINKS.map((link) => (
+              <Link
+                key={link.lessonId}
+                href={`/learn/workspace/${link.lessonId}`}
+                aria-current={link.lessonId === lessonId ? 'page' : undefined}
+                style={{ color: link.lessonId === lessonId ? '#18243a' : '#2463eb', fontWeight: link.lessonId === lessonId ? 700 : 400 }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </details>
         <LessonWorkspace
           contract={demo.contract}
           adapter={adapter}

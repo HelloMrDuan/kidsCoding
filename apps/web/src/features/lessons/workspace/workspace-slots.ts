@@ -58,6 +58,19 @@ export interface RunFrame {
   /** True when this frame ran inside a loop body; false/undefined otherwise. */
   inLoop?: boolean
   event: string
+  /**
+   * §9 extension (round 3): which surface produced the frame (e.g. the
+   * Blockly demo player). Optional; old traces without it stay valid.
+   */
+  source?: string
+  /**
+   * §9 extension (round 3): signed displacement of this frame relative to
+   * the previous frame (dx for horizontal, dy for vertical). The demo
+   * player moves horizontally only, so its dy is always 0. Optional;
+   * old traces without these fields stay valid.
+   */
+  dx?: number
+  dy?: number
 }
 
 /**
@@ -115,6 +128,15 @@ export interface StageSlotProps {
   /** Current engine state snapshot (x/score/running/frames), if any. */
   state: { x: number; score: number; running: boolean; frames?: number }
   running: boolean
+  /**
+   * §9 extension (round 3): course-owned multi-object stage state, passed
+   * through untouched by the shell. Adapters that expose getStageState()
+   * put any number of named objects here (positions, counts, flags) as
+   * plain data — never functions, never course judgment. The shell's own
+   * state line shows run state only; numeric/object state rendering
+   * belongs to the slot component. Absent = old adapters, unchanged.
+   */
+  stageState?: Record<string, number | string | boolean>
 }
 
 export type StageSlotComponent = ComponentType<StageSlotProps>
@@ -169,6 +191,34 @@ export function stableFingerprint(script: unknown): string {
 /** True when a displayed judgment still applies to the current program. */
 export function judgmentAppliesTo(judgedFingerprint: string, currentFingerprint: string): boolean {
   return judgedFingerprint === currentFingerprint
+}
+
+/**
+ * Convert consecutive engine-state snapshots into generic run frames.
+ * dx/dy are signed deltas against the previous snapshot (the first frame
+ * is measured against the run start, x = 0 / y = 0). `inLoop` cannot be
+ * derived from snapshots, so it stays undefined: adapters that know loop
+ * membership (e.g. #470's Scratch adapter) set it from their own trace.
+ * Pure function; used by the demo adapter's getRunTrace observation API.
+ */
+export function statesToRunFrames(
+  states: Array<{ x: number; y?: number }>,
+  source: string,
+): RunFrame[] {
+  let prevX = 0
+  let prevY = 0
+  return states.map((state, index) => {
+    const frame: RunFrame = {
+      frame: index + 1,
+      event: 'step',
+      source,
+      dx: state.x - prevX,
+      dy: (state.y ?? 0) - prevY,
+    }
+    prevX = state.x
+    prevY = state.y ?? 0
+    return frame
+  })
 }
 
 /**

@@ -97,4 +97,11 @@ export type EngineAdapter = {
   zoomIn?: () => void
   zoomOut?: () => void
   zoomReset?: () => void
+  /**
+   * §9 extension (round 3): course-owned multi-object stage state, passed
+   * through untouched to the stageSlot (see StageSlotProps.stageState).
+   * Plain data only (numbers, strings, booleans). Absent = the adapter
+   * has no extra stage objects; the shell renders run state only.
+   */
+  getStageState?: () => Record<string, number | string | boolean>
 }

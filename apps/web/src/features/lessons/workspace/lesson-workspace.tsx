@@ -6,14 +6,18 @@
  *
  * Layout: desktop shows stage + roles + icon rail + script on one screen
  * (the material zone is the Blockly flyout opened from the rail, so the
- * script column stays maximal); tablet puts stage + roles on top and
- * rail + script below; mobile switches tabs by visibility only (DOM kept,
- * adapter never remounted, script never reset). The shell renders ONLY
- * contract content plus adapter-owned slot content. Demo contracts are
- * labelled 演示. The shell never invents a judgment: it displays only
- * what an adapter returns, and with no adapter judgment it shows run
- * state alone. Editing the program after a run invalidates the previous
- * judgment (and it never auto-recovers, even if the edit is reverted).
+ * script column stays maximal); tablet is a dedicated single-column IDE
+ * (compact stage, horizontal roles strip, rail + script row) so the first
+ * screen shows stage and script together; mobile is a one-screen touch
+ * workspace (compact stage preview, run row, script, in-script drawer —
+ * no tab pages, so stage and script share the first screen). Panels stay
+ * in the DOM and the adapter is never remounted by any visibility switch.
+ * The shell renders ONLY contract content plus adapter-owned slot content.
+ * Demo contracts are labelled 演示. The shell never invents a judgment: it
+ * displays only what an adapter returns, and with no adapter judgment it
+ * shows run state alone. Editing the program after a run invalidates the
+ * previous judgment (and it never auto-recovers, even if the edit is
+ * reverted).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
@@ -114,7 +118,6 @@ function RailIcon({ label, color }: { label: string; color: string }) {
   )
 }
 
-type TabId = 'stage' | 'blocks' | 'script' | 'task'
 type SaveState = 'unsaved' | 'saved' | 'failed'
 
 const REPEAT_OPTIONS = [2, 3, 4, 5, 6, 8]
@@ -170,8 +173,11 @@ export function LessonWorkspace({
   )
   const showFile = (key: 'canNew' | 'canSave' | 'canExport' | 'canImport' | 'canReset') =>
     fileCaps[key] !== false
-  const [activeTab, setActiveTab] = useState<TabId>(hasStage ? 'stage' : 'script')
   const [stageVisible, setStageVisible] = useState(true)
+  // Roles strip: always visible on tablet/desktop (CSS forces it there);
+  // on phones it starts collapsed and opens from the stage-head toggle,
+  // so the first screen stays a programming screen, not a roles page.
+  const [rolesOpen, setRolesOpen] = useState(true)
   const [stageZoom, setStageZoom] = useState<'small' | 'medium' | 'large'>('medium')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [goalExpanded, setGoalExpanded] = useState(false)
@@ -225,8 +231,17 @@ export function LessonWorkspace({
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const editorDataRef = useRef<unknown>(undefined)
   const saveMessageRef = useRef<string | null>(null)
-  const activeTabRef = useRef(activeTab)
-  activeTabRef.current = activeTab
+  // Narrow-viewport defaults (effect, not initial state, so server and
+  // client render identically): the material palette starts collapsed
+  // below 1280px — on tablet and phone it opens on demand, so the script
+  // area reaches the first screen; the roles strip collapses below 768px
+  // only (tablet shows it unconditionally). Desktop keeps both open.
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 1280) setPaletteOpen(false)
+      if (window.innerWidth < 768) setRolesOpen(false)
+    }
+  }, [])
 
   const isBlockly = contract.engine === 'blockly'
   const isScratch = contract.engine === 'scratch-vm'
@@ -453,6 +468,14 @@ export function LessonWorkspace({
     }
     if (prevLessonRef.current === contract.lessonId) return
     const prevId = prevLessonRef.current
+    // C8 hardening (round 3): cancel the pending debounced autosave before
+    // the synchronous switch save below. Without this, the stale timer
+    // fires later and writes the NEW lesson's untouched initial script
+    // early (wrong lesson lifecycle, even though the key stays correct).
+    if (autosaveTimerRef.current !== null) {
+      clearTimeout(autosaveTimerRef.current)
+      autosaveTimerRef.current = null
+    }
     const entry = mountedAdapterRef.current
     if (editorSlot) {
       try {
@@ -477,21 +500,10 @@ export function LessonWorkspace({
     setSaveState('unsaved')
     setSaveMessageAndRef(null)
     setNotice(null)
-    setActiveTab(contract.hasStage === false ? 'script' : 'stage')
     if (editorSlot) loadEditorSlotData(contract, initialScript)
     else if (entry) loadIntoAdapter(contract, initialScript)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract.lessonId])
-
-  // When the script tab becomes visible, let the adapter re-measure (Blockly
-  // injected while hidden starts at zero size; see handleVisible).
-  useEffect(() => {
-    if (activeTab !== 'script') return
-    const candidate = mountedAdapterRef.current?.adapter as
-      | (EngineAdapter & { handleVisible?: () => void })
-      | undefined
-    candidate?.handleVisible?.()
-  }, [activeTab])
 
   // Stage show/hide and zoom change the script column width (desktop) and
   // the stage box height; re-measure Blockly so the canvas never stays
@@ -913,7 +925,10 @@ export function LessonWorkspace({
   )
 
   const stageWidth = stageZoom === 'small' ? 220 : stageZoom === 'large' ? 380 : 280
-  const stageHeight = stageZoom === 'small' ? 180 : stageZoom === 'large' ? 320 : 240
+  // Stage box height is NOT an inline style anymore: the ws-zoom-* class on
+  // the root lets CSS pick a compact height per viewport (phone preview
+  // ~150px, tablet ~210px, desktop 240px at medium zoom), so zoom stays a
+  // real control on every viewport instead of being overridden.
   // Icon rail + search data, probed from the adapter each render (the
   // Blockly adapter answers from its static toolbox builder, so this
   // works before mount too). Absent = no rail, no search box, never fake.
@@ -1180,29 +1195,41 @@ export function LessonWorkspace({
     <section className="ws-stage" data-panel="stage" data-testid="ws-stage-panel">
       <div className="ws-stage-head">
         <h2>作品舞台</h2>
-        <span className="ws-stage-state-pill">{engineState.running ? '运行中' : '未运行'}</span>
+        {/* §9 round 3: the shell's own state display shows run state only.
+            Positions, scores, and multi-object state belong to the slot
+            component (the demo renders its own ws-demo-stage-state pill).
+            The old paragraph below the box duplicated this pill and cost
+            a full row on every viewport, so the pill carries the testid. */}
+        <span data-testid="ws-stage-state" className="ws-stage-state-pill">{engineState.running ? '运行中' : '未运行'}{isScratch && (scratchReady ? '，沙箱已就绪' : scratchError ? `，沙箱未就绪：${scratchError}` : '，沙箱握手中…')}</span>
+        {/* Phone roles entry: the roles strip starts collapsed on phones
+            (see the mount effect) and opens here. Tablet/desktop show the
+            strip unconditionally, so this button hides there via CSS. */}
+        {RolesSlotView && (
+          <button
+            type="button"
+            className="kc-action-surface kc-btn-outline kc-btn-sm ws-roles-toggle"
+            onClick={() => setRolesOpen((v) => !v)}
+            aria-pressed={rolesOpen}
+            data-testid="ws-roles-toggle"
+          >
+            {rolesOpen ? '收起角色' : '展开角色'}
+          </button>
+        )}
       </div>
-      <div
-        className="ws-stage-box"
-        data-testid="ws-stage-box"
-        style={{
-          position: 'relative',
-          height: stageHeight,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="ws-stage-box" data-testid="ws-stage-box">
         {StageSlotView ? (
-          <StageSlotView lessonId={contract.lessonId} state={engineState} running={engineState.running} />
+          <StageSlotView
+            lessonId={contract.lessonId}
+            state={engineState}
+            running={engineState.running}
+            stageState={adapter.getStageState?.()}
+          />
         ) : isScratch ? (
           <div ref={scratchMountRef} data-testid="ws-scratch-mount" style={{ width: '100%', height: '100%' }} />
         ) : (
           <p>舞台尚未接入：本课程未提供舞台组件。</p>
         )}
       </div>
-      <p data-testid="ws-stage-state">
-        x={engineState.x}，分数={engineState.score}，{engineState.running ? '运行中' : '未运行'}
-        {isScratch && (scratchReady ? '，沙箱已就绪' : scratchError ? `，沙箱未就绪：${scratchError}` : '，沙箱握手中…')}
-      </p>
       <div className="ws-runbar">
         <button
           type="button"
@@ -1451,7 +1478,7 @@ export function LessonWorkspace({
 
   return (
     <div
-      className={`ws-root${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}`}
+      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}`}
       data-testid="ws-root"
       style={{ '--ws-stage-w': `${stageWidth}px` } as CSSProperties}
     >
@@ -1470,26 +1497,34 @@ export function LessonWorkspace({
         .ws-topbar [data-testid="ws-save-message"] { font-size: 13px; opacity: 0.85; }
         .ws-topbar [data-testid="ws-file-menu"] { background: #fff; color: #18243a; border: 1px solid #e7edf5; border-radius: 10px; padding: 8px; }
         .ws-topbar [data-testid="ws-file-menu"] .kc-btn-outline { color: #18243a; border-color: #e7edf5; background: #fff; }
-        /* Goal strip: current goal + step + progress only; the full five
-           goals stay in the DOM (ws-goal5) and expand on one tap. */
-        .ws-goalstrip { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; }
-        .ws-goalstrip-current { font-size: 14px; margin: 0 0 4px; }
+        /* Goal strip: current goal + step + progress only, one compact
+           flex row (full five goals stay in the DOM and expand on tap). */
+        .ws-goalstrip { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+        .ws-goalstrip-current { font-size: 14px; margin: 0; flex: 1 1 220px; }
         .ws-goalstrip-meta { color: #6f7d92; font-size: 13px; margin: 0; }
-        .ws-goal5-list { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: #3d4a5e; }
+        .ws-goal5-list { margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: #3d4a5e; flex-basis: 100%; }
         .ws-goal5-list.ws-goal5-collapsed li { display: none; }
-        /* Mobile tabs: a segmented control above the panels, never fixed over
-           the editor, so it can never cover Blockly. */
-        .ws-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-        .ws-tabs .kc-btn-outline[aria-pressed="true"] { background: #2463eb; color: #fff; border-color: #2463eb; }
         .ws-grid { display: block; }
         .ws-panel { display: none; margin-bottom: 12px; }
-        .ws-panel.ws-active { display: block; }
+        /* Round 3 one-screen phones: stage + script share the screen;
+           roles only when opened, task only in the drawer. */
+        .ws-stage-wrap, .ws-script-wrap { display: block; }
+        .ws-roles-wrap.ws-roles-open { display: block; }
         .ws-panel > section { background: #fff; border: 1px solid #e7edf5; border-radius: 12px; padding: 12px; }
         /* Stage card: header row + scene box + run bar. */
         .ws-stage-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .ws-stage-head h2 { margin: 0; }
         .ws-stage-state-pill { font-size: 12px; background: #eef2f7; border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+        /* The stage-hidden note is a direct grid child: without a span it
+           lands in the 56px rail column on tablet and wraps per character. */
+        [data-testid="ws-stage-hidden-note"] { grid-column: 1 / -1; margin: 0 0 12px; }
         .ws-stage-box { position: relative; overflow: hidden; border: 1px solid #e7edf5; border-radius: 12px; background: #f3f6fb; }
+        /* Stage height by zoom class x viewport (round 3): no inline
+           height anymore, so zoom stays a real control everywhere.
+           Phone preview ~140px, tablet ~200px, desktop 240px (medium). */
+        .ws-zoom-small .ws-stage-box { height: 120px; }
+        .ws-zoom-medium .ws-stage-box { height: 140px; }
+        .ws-zoom-large .ws-stage-box { height: 200px; }
         .ws-stage-box .kc-scene-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; }
         .ws-stage-box [data-testid="ws-stage-character"], .ws-stage-box [data-testid="ws-stage-target"] { z-index: 1; }
         /* CharacterArt carries only a viewBox; without an explicit size the
@@ -1514,7 +1549,6 @@ export function LessonWorkspace({
         .ws-palette-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
         .ws-palette-chip { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 999px; color: #fff; font-weight: 700; padding: 8px 14px; cursor: pointer; min-height: 40px; }
         .ws-blockly-mount { height: 360px; border: 1px solid #e7edf5; border-radius: 12px; overflow: hidden; }
-        .ws-blockly-mount .blocklyToolboxDiv { background: #fff; }
         .ws-blockly-mount .blocklyFlyoutBackground { fill: #fbfcfe; }
         .ws-script-list-panel { border: 1px solid #e7edf5; border-radius: 12px; padding: 10px 12px; margin-top: 12px; }
         .ws-script-list-panel ol { padding-left: 20px; }
@@ -1545,33 +1579,68 @@ export function LessonWorkspace({
            instead of the old narrow textbox. */
         .ws-editor-slot textarea { width: 100%; min-height: 280px; box-sizing: border-box; }
         @media (max-width: 767px) {
-          .ws-tabs .kc-btn-outline, .ws-palette-chip { min-height: 44px; }
+          .ws-palette-chip { min-height: 44px; }
           .ws-script-list-panel input[type="number"], .ws-script-list-panel select { min-height: 44px; }
           .ws-script-list-panel .kc-btn-outline { min-height: 44px; }
+          /* Phone topbar: tighter; the step line lives in the goal strip
+             already, so the topbar copy is redundant here. */
+          .ws-topbar { padding: 4px 8px; }
+          .ws-topbar h1 { font-size: 16px !important; }
+          /* Phone first-screen budget (measured 857px svg top, need
+             < 812 and genuinely above the bottom nav): tighten every
+             block above the mount — goal strip fits meta + button on
+             one row, panels lose 4px padding, sticky/search/palette
+             gaps shrink. No content or control is removed. */
+          .ws-goalstrip { padding: 4px 8px; gap: 4px 8px; }
+          .ws-goalstrip-current { font-size: 13px; }
+          .ws-goalstrip-meta { font-size: 12px; }
+          .ws-goalstrip .kc-btn { padding: 4px 8px; }
+          .ws-panel > section { padding: 6px; }
+          .ws-runbar { margin-top: 4px; }
+          .ws-search-row { margin-bottom: 4px; }
+          .ws-palette { margin-bottom: 6px; }
           .ws-role-list { flex-direction: row; }
           .ws-role-card { min-width: 84px; }
+          .ws-role-card svg { width: 44px; height: 48px; }
           .ws-rail-wrap { display: none !important; }
           /* Mobile sticky action row: in-flow sticky at the top of the
              script panel content — never a fixed overlay on the editor. */
-          .ws-sticky-actions { position: sticky; top: 0; z-index: 5; background: #fff; padding: 8px 0; display: flex; gap: 8px; align-items: center; }
+          .ws-sticky-actions { position: sticky; top: 0; z-index: 5; background: #fff; padding: 2px 0; display: flex; gap: 8px; align-items: center; }
+        }
+        @media (max-width: 479px) {
+          /* The step line duplicates the goal strip meta; hide the topbar
+             copy on the narrowest phones to save a wrapped row. */
+          .ws-topbar [data-testid="ws-step-meta"] { display: none; }
         }
         @media (min-width: 768px) {
-          .ws-tabs { display: none; }
           .ws-sticky-actions { display: none; }
+          .ws-roles-toggle { display: none; }
           .ws-grid { display: grid; gap: 12px; align-items: start; }
           .ws-panel { display: block; }
-          .ws-blocks-panel { display: none; }
           .ws-task-wrap { display: none; }
           .ws-script-wrap { grid-column: 1 / -1; }
           .ws-blockly-mount { height: 480px; }
-          /* Tablet without rail: stage + roles row, script full row. */
-          .ws-grid { grid-template-columns: minmax(0, 1fr) 120px; }
-          /* Tablet with rail: stage + roles row, rail + script row. */
-          .ws-grid.ws-has-rail { grid-template-columns: 56px minmax(0, 1fr) 120px; }
-          .ws-grid.ws-has-rail .ws-stage-wrap { grid-column: 1 / 3; }
-          .ws-grid.ws-has-rail .ws-roles-wrap { grid-column: 3; }
-          .ws-grid.ws-has-rail .ws-rail-wrap { grid-column: 1; grid-row: 2; }
-          .ws-grid.ws-has-rail .ws-script-wrap { grid-column: 2 / 4; grid-row: 2; }
+          /* Tablet zoom heights (round 3): compact stage, ~200px medium. */
+          .ws-zoom-small .ws-stage-box { height: 160px; }
+          .ws-zoom-medium .ws-stage-box { height: 200px; }
+          .ws-zoom-large .ws-stage-box { height: 280px; }
+          /* Tablet single-column IDE (round 3): stage row, horizontal
+             roles strip, then rail + script row. Auto-placement puts the
+             rail/script row after the strip with no pinned row numbers,
+             so a rail course without roles still lays out correctly. */
+          .ws-grid { grid-template-columns: minmax(0, 1fr); }
+          .ws-grid.ws-has-rail { grid-template-columns: 56px minmax(0, 1fr); }
+          .ws-grid.ws-has-rail .ws-stage-wrap { grid-column: 1 / -1; }
+          .ws-grid.ws-has-rail .ws-roles-wrap { grid-column: 1 / -1; }
+          .ws-grid.ws-has-rail .ws-script-wrap { grid-column: 2; }
+          .ws-role-list { flex-direction: row; flex-wrap: wrap; }
+          .ws-role-card { flex-direction: row; gap: 8px; padding: 4px 8px; width: auto; }
+          .ws-role-card svg { width: 36px; height: 40px; }
+          /* Tablet first-screen budget (measured 1074px svg top, need
+             < 1024): goal strip loses 2px padding; the rest comes from
+             the collapsed palette default, the removed state paragraph,
+             and the 200px stage above. */
+          .ws-goalstrip { padding: 6px 10px; }
           /* Summary wide: task text left, editor right, feedback below.
              Both placements pin row 1 explicitly: with only columns
              pinned, the grid auto-placement cursor (advanced past the
@@ -1595,6 +1664,14 @@ export function LessonWorkspace({
           .ws-grid.ws-has-rail .ws-script-wrap { grid-column: auto; grid-row: auto; }
           .ws-script-wrap { grid-column: auto; }
           .ws-blockly-mount { height: 600px; }
+          /* Desktop zoom heights (unchanged values, now via classes). */
+          .ws-zoom-small .ws-stage-box { height: 180px; }
+          .ws-zoom-medium .ws-stage-box { height: 240px; }
+          .ws-zoom-large .ws-stage-box { height: 320px; }
+          /* Desktop roles return to a vertical column. */
+          .ws-role-list { flex-direction: column; flex-wrap: nowrap; }
+          .ws-role-card { flex-direction: column; gap: 2px; padding: 8px 4px; width: 100%; }
+          .ws-role-card svg { width: 56px; height: 62px; }
           /* Summary wide on desktop: wider task column, taller editor. */
           .ws-summary-wide .ws-grid { grid-template-columns: 340px minmax(0, 1fr); }
           .ws-summary-wide .ws-editor-slot textarea { min-height: 420px; }
@@ -1617,16 +1694,12 @@ export function LessonWorkspace({
         >
           文件
         </button>
+        {/* Full teaching content lives in the drawer on every viewport now
+            that the tab pages are gone; the task button is its entry. */}
         <button
           type="button"
           className="kc-action-surface kc-btn-outline kc-btn-sm"
-          onClick={() => {
-            if (typeof window !== 'undefined' && window.innerWidth < 768) {
-              setActiveTab('task')
-            } else {
-              setDrawerOpen((v) => !v)
-            }
-          }}
+          onClick={() => setDrawerOpen((v) => !v)}
           data-testid="ws-task-button"
         >
           任务
@@ -1730,52 +1803,12 @@ export function LessonWorkspace({
         </section>
       )}
 
-      <nav className="ws-tabs" data-testid="ws-tabs">
-        {(
-          // Slot courses edit through their slot component: no blocks tab
-          // (the drawer chips would silently do nothing without a mounted
-          // adapter). Imperative courses keep the previous four tabs.
-          (EditorSlotView
-            ? hasStage
-              ? [
-                  ['stage', '舞台'],
-                  ['script', '脚本'],
-                  ['task', '任务'],
-                ]
-              : [
-                  ['script', '脚本'],
-                  ['task', '任务'],
-                ]
-            : hasStage
-              ? [
-                  ['stage', '舞台'],
-                  ['blocks', '积木'],
-                  ['script', '脚本'],
-                  ['task', '任务'],
-                ]
-              : [
-                  ['blocks', '积木'],
-                  ['script', '脚本'],
-                  ['task', '任务'],
-                ]) as Array<[TabId, string]>
-        ).map(([tab, label]) => (
-          <button
-            key={tab}
-            type="button"
-            className="kc-action-surface kc-btn-outline kc-btn-sm"
-            aria-pressed={activeTab === tab}
-            onClick={() => setActiveTab(tab)}
-            data-testid={`ws-tab-${tab}`}
-          >
-            {label}
-          </button>
-        ))}
-      </nav>
-
-      {/* Mobile: only the active panel shows; desktop/tablet: grid shows all.
-          The mount divs stay in the DOM either way — tab switches never
-          remount the adapter. The ws-active class is applied on mobile only
-          via the tab state; on >=768px CSS forces all panels visible. */}
+      {/* Round 3: no tab pages anymore. On phones the stage preview and
+          the script share one screen (stage collapses via the topbar
+          toggle, roles via the stage-head toggle, full teaching content
+          via the task drawer); on tablet/desktop the grid lays panels
+          out. The mount divs stay in the DOM either way — visibility
+          switches never remount the adapter. */}
       <div
         className={`ws-grid${hasStage && RolesSlotView ? ' ws-has-roles' : ''}${railOn ? ' ws-has-rail' : ''}`}
         data-testid="ws-grid"
@@ -1785,7 +1818,7 @@ export function LessonWorkspace({
             script panel) is never destroyed by a visibility switch. */}
         {hasStage && (
           <div
-            className={`ws-panel ws-stage-wrap ${activeTab === 'stage' ? 'ws-active' : ''}`}
+            className="ws-panel ws-stage-wrap"
             style={stageVisible ? undefined : { display: 'none' }}
           >
             {stagePanel}
@@ -1794,31 +1827,26 @@ export function LessonWorkspace({
         {hasStage && !stageVisible && <p data-testid="ws-stage-hidden-note">舞台已隐藏（脚本不受影响）。</p>}
         {/* Roles are course content: only a rolesSlot renders them, never
             the shell. Roles belong to the stage area, so a stageless
-            course (hasStage === false) renders no roles column either. */}
+            course (hasStage === false) renders no roles column either.
+            On phones the strip starts collapsed (ws-roles-open absent);
+            tablet/desktop force it visible via CSS. */}
         {hasStage && RolesSlotView && (
-          <div className={`ws-panel ws-roles-wrap ${activeTab === 'stage' ? 'ws-active' : ''}`}>
+          <div className={`ws-panel ws-roles-wrap${rolesOpen ? ' ws-roles-open' : ''}`}>
             <section className="ws-roles" data-panel="roles" data-testid="ws-roles-panel">
               <h2>角色</h2>
               <RolesSlotView lessonId={contract.lessonId} />
             </section>
           </div>
         )}
-        {/* Icon rail: shell-rendered category column. On mobile it is
-            hidden by CSS; the blocks tab drawer + search serve there. */}
+        {/* Icon rail: shell-rendered category column. On phones it is
+            hidden by CSS; the in-script palette drawer + search serve
+            there. The old blocks tab panel is gone: its drawer chips live
+            in the script panel's palette on every viewport. */}
         {railOn && (
-          <div className="ws-panel ws-rail-wrap ws-active">{iconRail}</div>
+          <div className="ws-panel ws-rail-wrap">{iconRail}</div>
         )}
-        {!EditorSlotView && (
-          <div className={`ws-panel ws-blocks-panel ${activeTab === 'blocks' ? 'ws-active' : ''}`}>
-            <section data-testid="ws-blocks-panel">
-              <h2>积木素材</h2>
-              {drawer}
-              <p>点积木插入脚本末尾；脚本区内也可直接操作。</p>
-            </section>
-          </div>
-        )}
-        <div className={`ws-panel ws-script-wrap ${activeTab === 'script' ? 'ws-active' : ''}`}>{scriptPanel}</div>
-        <div className={`ws-panel ws-task-wrap ${activeTab === 'task' ? 'ws-active' : ''}`}>
+        <div className="ws-panel ws-script-wrap">{scriptPanel}</div>
+        <div className="ws-panel ws-task-wrap">
           <section data-testid="ws-task-panel">
             <h2>任务</h2>
             {taskContent}

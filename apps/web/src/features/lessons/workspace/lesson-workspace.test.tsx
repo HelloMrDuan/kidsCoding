@@ -1,5 +1,5 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DEMO_A, DEMO_B } from './demo-contracts'
 import { buildJudgment } from './demo-judging'
@@ -173,6 +173,10 @@ describe('LessonWorkspace shell (fake engine)', () => {
   })
 
   it('palette panel collapses and expands without losing the script', () => {
+    // Desktop width: the palette starts open at >= 1280px (jsdom
+    // defaults to 1024, where round 3 starts it collapsed).
+    const prevWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', { value: 1440, configurable: true })
     const fake = new FakeAdapter()
     render(
       <LessonWorkspace
@@ -193,6 +197,7 @@ describe('LessonWorkspace shell (fake engine)', () => {
     expect(
       scriptPanel.querySelector('[data-testid="ws-drawer-move-right"]'),
     ).not.toBeNull()
+    Object.defineProperty(window, 'innerWidth', { value: prevWidth, configurable: true })
   })
 
   it('the save-failure test hook reports 未能保存 and never 已保存到本机', () => {
@@ -354,7 +359,10 @@ describe('LessonWorkspace shell: slots + R1–R8 regressions', () => {
     expect(screen.getByTestId('ws-script-item-0')).toHaveTextContent('开始时')
     // A legal move still works: append, then move the middle block down.
     // The drawer renders twice in the DOM (palette + blocks panel), so scope
-    // to the script panel like the palette test does.
+    // to the script panel like the palette test does. The palette starts
+    // collapsed at jsdom's 1024px width (round 3: collapsed below 1280px),
+    // so open it first — the same tap a tablet user makes.
+    fireEvent.click(screen.getByTestId('ws-palette-toggle'))
     const drawerButton = screen
       .getByTestId('ws-script-panel')
       .querySelector('[data-testid="ws-drawer-move-right"]') as HTMLElement
@@ -488,5 +496,132 @@ describe('LessonWorkspace shell: slots + R1–R8 regressions', () => {
       />,
     )
     expect(screen.getByTestId('ws-summary-textarea')).toHaveValue('今天学了循环')
+  })
+})
+
+/**
+ * Round 3: §9 stage-state pass-through, C2 cumulative structured hints,
+ * C8 switch-time autosave cancellation, phone-first collapsed defaults.
+ */
+describe('LessonWorkspace round 3 (slots, hints, switch flush, phone defaults)', () => {
+  it('passes adapter stageState through untouched and keeps the shell state line run-only', () => {
+    class StageStateFake extends FakeAdapter {
+      getStageState() {
+        return { apples: 3, mode: 'orchard', ripe: true }
+      }
+    }
+    // The slot renders the passed-through state as text, so the assertion
+    // reads the DOM instead of mutating an outer variable during render.
+    function CaptureStage(props: {
+      lessonId: string
+      state: { x: number; score: number; running: boolean; frames?: number }
+      running: boolean
+      stageState?: Record<string, number | string | boolean>
+    }) {
+      return <div data-testid="ws-capture-stage">{JSON.stringify(props.stageState ?? null)}</div>
+    }
+    const fake = new StageStateFake()
+    render(
+      <LessonWorkspace
+        contract={DEMO_A.contract}
+        adapter={fake}
+        initialScript={DEMO_A.initialScript}
+        stageSlot={CaptureStage}
+      />,
+    )
+    expect(screen.getByTestId('ws-capture-stage')).toHaveTextContent(
+      '{"apples":3,"mode":"orchard","ripe":true}',
+    )
+    expect(screen.getByTestId('ws-stage-state')).toHaveTextContent('未运行')
+    expect(screen.getByTestId('ws-stage-state')).not.toHaveTextContent('x=')
+  })
+
+  it('reveals structured hints cumulatively: level N shows 1..N, never later levels', () => {
+    const fake = new FakeAdapter()
+    render(
+      <LessonWorkspace
+        contract={{
+          ...DEMO_A.contract,
+          structuredHints: [
+            { level: 1, title: '方向', text: '先看水果位置再决定' },
+            { level: 2, title: '积木', text: '用移动积木走过去' },
+            { level: 3, title: '检查', text: '运行后看差值' },
+          ],
+        }}
+        adapter={fake}
+        initialScript={DEMO_A.initialScript}
+      />,
+    )
+    expect(screen.getByTestId('ws-hint-reveal-2')).toBeDisabled()
+    expect(screen.getByTestId('ws-hint-reveal-3')).toBeDisabled()
+    fireEvent.click(screen.getByTestId('ws-hint-reveal-1'))
+    expect(screen.getByText(/先看水果位置再决定/)).toBeInTheDocument()
+    expect(screen.queryByText(/用移动积木走过去/)).toBeNull()
+    expect(screen.getByTestId('ws-hint-reveal-2')).not.toBeDisabled()
+    fireEvent.click(screen.getByTestId('ws-hint-reveal-2'))
+    expect(screen.getByText(/先看水果位置再决定/)).toBeInTheDocument()
+    expect(screen.getByText(/用移动积木走过去/)).toBeInTheDocument()
+    expect(screen.queryByText(/运行后看差值/)).toBeNull()
+  })
+
+  it('cancelling a pending autosave on lesson switch never writes the new lesson early', () => {
+    vi.useFakeTimers()
+    try {
+      const fake = new FakeAdapter()
+      const { rerender } = render(
+        <LessonWorkspace
+          contract={DEMO_A.contract}
+          adapter={fake}
+          initialScript={DEMO_A.initialScript}
+        />,
+      )
+      act(() => {
+        fake.script = [{ type: 'when_start' }, { type: 'ws_move_right', steps: 42 }]
+        fake.emitChange()
+      })
+      // Switch before the 1s debounce fires: the switch saves A synchronously.
+      rerender(
+        <LessonWorkspace
+          contract={DEMO_B.contract}
+          adapter={fake}
+          initialScript={DEMO_B.initialScript}
+        />,
+      )
+      act(() => {
+        vi.advanceTimersByTime(5000)
+      })
+      expect(window.localStorage.getItem('kidscoding-draft:demo-a')).toContain('"steps":42')
+      expect(window.localStorage.getItem('kidscoding-draft:demo-b')).toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('collapses palette and roles on narrow phones at mount; toggles reopen them', () => {
+    const prevWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', { value: 375, configurable: true })
+    try {
+      const fake = new FakeAdapter()
+      function Roles(props: { lessonId: string }) {
+        void props.lessonId
+        return <div data-testid="ws-roles-dummy" />
+      }
+      render(
+        <LessonWorkspace
+          contract={DEMO_A.contract}
+          adapter={fake}
+          initialScript={DEMO_A.initialScript}
+          rolesSlot={Roles}
+        />,
+      )
+      expect(screen.queryByTestId('ws-drawer-move-right')).toBeNull()
+      expect(screen.getByTestId('ws-roles-toggle')).toHaveAttribute('aria-pressed', 'false')
+      fireEvent.click(screen.getByTestId('ws-roles-toggle'))
+      expect(screen.getByTestId('ws-roles-toggle')).toHaveAttribute('aria-pressed', 'true')
+      fireEvent.click(screen.getByTestId('ws-palette-toggle'))
+      expect(screen.queryByTestId('ws-drawer-move-right')).not.toBeNull()
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { value: prevWidth, configurable: true })
+    }
   })
 })

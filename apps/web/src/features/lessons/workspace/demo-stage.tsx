@@ -36,6 +36,25 @@ export function createDemoStage(fruitX: number): StageSlotComponent {
     return (
       <>
         <SceneBackdrop scene="forest" />
+        {/* Demo-owned numeric state: the shell's own state line shows run
+            state only (§9 round 3), so the demo renders its own position
+            and score here, inside the slot — never in the shared shell. */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            zIndex: 2,
+            background: 'rgba(255,255,255,0.88)',
+            borderRadius: 999,
+            padding: '2px 10px',
+            fontSize: 12,
+            color: '#18243a',
+          }}
+          data-testid="ws-demo-stage-state"
+        >
+          x={state.x}，分数={state.score}
+        </div>
         <div
           style={{
             position: 'absolute',
