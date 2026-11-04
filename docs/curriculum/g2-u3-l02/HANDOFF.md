@@ -1,0 +1,99 @@
+# G2-U3-L02 交接说明（3 号 Kiro → 后续集成）
+
+更新：2026-11-04。本文自包含：读完即可接手，不依赖任何会话记忆。
+范围：课程 PR #470、CI PR #471、共享工作区 PR #469。**三个 PR 均为 Draft，均未合并，main 仍为 `754f7f43`。**
+
+## 一、一页纸状态
+
+| 项 | 状态 |
+|---|---|
+| 课程 #470 | Draft。分支 `kiro/p0-g2-u3-l02`。教学参数 `pilot-approved`（试点运行参数，**不代表儿童教学效果已验证**）。本地真实 `scratch-vm` + Chromium：单测 66、VM 矩阵 21、课堂 15 个行为用例 × 3 视口。 |
+| CI #471 | Draft，Stacked on #470（base=`kiro/p0-g2-u3-l02`）。分支 `kiro/ci-g2-u3-l02-coverage`，HEAD `add3161`，台账 `SYS-122` 为 `in_review`。GitHub Actions 已真实执行本课测试并通过（单测 66；浏览器 Job 69 个用例 = 64 passed / 5 skipped / 0 failed；约 5.2 分钟）。失败演练已做（trace / junit / error-context 会上传）。 |
+| 共享 #469 | Draft。head `d3e3ad06`。有 `editorSlot` / `stageSlot` / 通用 `RunTrace`，但**对本课仍不足**（见第三节）。 |
+| 过渡课堂 | `ui/classroom.tsx` 是**临时承载页**，不再继续开发；等 #469 稳定后整体迁入共享工作区。 |
+
+## 二、首席裁定记录（2026-11-04，必须遵守）
+
+1. **PR 保持独立**：#470 只负责 G2-U3-L02；#471 只负责 SYS-122。**不授权 #471 合入 #470 分支**；**不在 #470 正文声明 SYS-122**；**不为绕过任务门禁修改既有校验逻辑**。
+2. **SYS-122 `mergeCommit`**：仅在 #471 真正合入 main 后，使用它实际的合并 SHA；`evidence.pr` 保留 #471；**不预填、不提前标 `completed`**。
+3. **移动端编辑接口选 A1**：上移 / 下移 / 删除 / 参数修改由**课程自己的 `EditorSlot`** 实现；共享壳只负责挂载、布局、可见性切换、生命周期、状态同步；**不为单节课新增全局命令通道**。
+4. **舞台状态**：共享 `StageSlot` 要支持**类型安全的课程专属对象状态**；不能用单个 `x/score` 描述所有课程；**不得把 `basketX`、`fruitX` 等本课字段写进共享核心**。
+5. **RunTrace**：同意扩展通用轨迹，须保留：运行序号、帧号、事件类型、积木 / 事件来源、是否处于循环内、**有方向的位移增量**。课程自行计算位移贡献比例；**不得把本课教学阈值引入共享层**。
+6. **#470 正式合并前必须具备有效的课程 CI 覆盖**：不能让没有执行本课测试的通用工作流充当完整验收依据。候选代码的 CI 证据可继续使用 #471 的 Stacked 运行；若需要变更合并顺序，**必须重新提交门禁兼容方案**，不得擅自合并。
+7. 不再重复做故障注入；不修改共享 workflow；不合并任何 PR；不再开发第二套课堂 UI；不无目的增加测试。
+
+## 三、#469 接口是否足以完成集成（截至 `d3e3ad06` 实际代码核对）
+
+**结论：目前不足。** 已满足的不再重复提出：编辑槽存在与重置（壳以 `key={lessonId-slotResetKey}` 让槽位 remount）、判定不入草稿、`runId` 与指纹绑定、结论措辞归适配器、恢复提示不被自动保存覆盖、`JudgmentAdapter`。
+
+仍缺（依据 2026-11-04 首席裁定）：
+
+| 缺口 | 现状 | 需要 2 号落实 |
+|---|---|---|
+| 舞台状态 | `StageSlotProps.state` 固定 `{x, score, running, frames?}` | 泛型 / 类型安全的课程专属状态 |
+| `RunTrace` | `RunFrame = {frame, inLoop?, event: string}`，无位移、无来源 | 加有方向的位移增量与积木 / 事件来源（结构化，**不要塞进 `event` 字符串**） |
+| 移动端编辑 | 无外部驱动通道 | **不需要共享层改动**：按 A1，工具栏由本课 `EditorSlot` 自带。只需壳给槽位足够空间，运行按钮与槽位同区可达 |
+
+分析细节与代码位置见 `SHARED-WORKSPACE-INTERFACE.md`。**2 号落实前不要开始集成**；如果 2 号已经解决，不要重复提出。
+
+## 四、#470 的集成修改清单（共享接口稳定之后再做）
+
+课程目录 `apps/web/src/features/lessons/g2-u3-l02/`（13 个文件，约 2749 行）。
+
+| 文件 | 集成时的处理 |
+|---|---|
+| `ui/classroom.tsx`（571 行） | **删除**。布局、顶栏、文件菜单、任务抽屉、反馈区、角色列、三端切换全部交给共享壳。其中的**工具栏**（添加积木 / 上移 / 下移 / 删除 / 数字框）迁入 `script-editor.tsx`（A1）。 |
+| `ui/classroom.module.css` | 仅保留编辑器 / 舞台内部需要的样式，不得新增全局 token。其余删除。 |
+| `ui/script-editor.tsx` | 改成符合 `EditorSlotProps`：从 `initial` 重建脚本；每次编辑 `onChange(program)`；内含移动端工具栏；remount 时完整还原。保留“选中状态按 ID 自管”（Blockly 12 的选中随键盘焦点丢失）。 |
+| `ui/stage-view.tsx` | 改成 `StageSlot` 组件，状态类型 `S = { basket:{x,y}, fruit:{x,y}, assets }` **放在课程目录里**，不进共享核心。 |
+| `vm-adapter.ts` | 改为接受壳分配的 `runId`；通用 `RunTrace` 映射：`frames[i] = {frame, inLoop, event:'move', 位移增量, 来源}`、`landingFrame`；落地时篮子 x / 水果 x 保留在适配器自己的 trace 里。 |
+| `judge.ts` | 实现 `JudgmentAdapter`：输出 `layers = [stage, task, knowledge]` + “理解情况”；循环位移占比由本课自己从轨迹计算。**阈值只在 `params.ts`。** |
+| `state.ts` / `contract.ts` / `params.ts` / `program.ts` / `compile.ts` / `reference.ts` | 基本不动（纯逻辑）。草稿信封与 `kidscoding-draft:G2-U3-L02` 已与共享一致。 |
+| `app/learn/g2-u3-l02/page.tsx` | 改为渲染共享壳 + 本课的 `editorSlot` / `stageSlot` / 适配器 / 契约；或下线并改用共享路由，需首席定。 |
+| `public/scratch-g2-u3-l02-sandbox.html` | **不动**（真实 VM 沙箱，已有 8 类拒绝测试和 6 个变异检验）。 |
+
+## 五、必须保留的测试（禁止因 UI 集成删除或弱化）
+
+| 套件 | 数量 | 集成时的变化 |
+|---|---|---|
+| `g2-u3-l02.test.ts`（Vitest） | 66 | 不变（纯逻辑）；若适配 `JudgmentAdapter` 改了 `judge` 的签名，只改调用方式，**不改期望值**。 |
+| `g2-u3-l02-vm.spec.ts`（真实 VM 矩阵） | 21 | **不变**（只依赖沙箱与 `compile` / `judge`，不依赖页面）。 |
+| `g2-u3-l02-classroom.spec.ts` | 15 个行为用例 + 1 个按 `L02_SHOT_DIR` 启用的截图用例；× [desktop / tablet / phone] 三视口 = 48 个实例，其中 5 个按设计跳过 | 用到 **51 个不同的 `l2-*` testid（外加 3 个动态拼接）**，需要映射到共享壳的定位。**只换定位，不放宽断言，不删用例。** |
+
+用例清单（15 个行为用例）：首屏五要素；答案不提前 + 提示逐级；第一层预测；第二层（空 / 只有绿旗 / 错 / 对 / 改后失效）；舞台读 VM 状态且重跑不叠加；保存与刷新恢复；保存失败显示“未能保存”；迁移左边；迁移更快；切关不污染；运行中停止；文件菜单与导入拒绝；角色管理；溢出与遮挡；桌面真实指针拖放。
+
+集成后必须重新验证：Scratch VM 行为、Blockly 编辑、`RunTrace` 判定、移动端积木操作、保存与恢复、运行结果失效、三端真实浏览器 E2E、**完整 GitHub Actions（且必须是执行了本课测试的那一套）**。
+
+## 六、CI 与 Task-ID 的合并顺序（实测结论，详见 `CI-COVERAGE-PLAN.md` 第四节）
+
+1. **#471 不能在 #470 之前单独合入 main**：main 上没有本课文件，#471 新增的 `vitest run src/features/lessons/g2-u3-l02` 与 `playwright test tests/e2e/g2-u3-l02-*.spec.ts` 都会 exit 1。不得用“文件不存在就跳过”规避。
+2. 顺序只能是：候选证据（#471 Stacked 运行）→ #470 合入 main → #471 改基到 main 并合入。
+3. #470 合入 main 的方式决定 #471 是否要改写历史：**merge commit** → 直接 retarget，门禁通过；**squash / rebase-merge** → `unknown task ID SYS-122`，需把 #471 的 3 个提交 cherry-pick 到新 main（实测无冲突、门禁通过），这需要**强制推送**（须首席授权）或**另开新分支 + 新 PR** 并关闭 #471。
+4. **#470 的 CI 不覆盖本课测试**（base 是 main，main 的 workflow 不含本课 Job）。本课测试证据只存在于 #471 的运行里。
+5. **刷新规程**（让 #471 的证据对应 #470 的最新候选 HEAD）：#470 每次出现可执行代码变化后，把课程分支**普通 merge** 进 `kiro/ci-g2-u3-l02-coverage`（不强推），等 #471 的 CI 跑完。实测：#471 相对课程分支的 diff 仍是 2 个文件 / +64，门禁通过。**当前**：#470 在 `21dbf83`，#471 的基线是 `429f2f6`，差异仅一个纯文档提交，已有证据仍有效；**#470 最终合并前必须刷新一次**。
+6. 如果 2 号 / 首席要求改变这个顺序，**重新提交门禁兼容方案**，不要擅自合并。已知的门禁约束：`scripts/check-task-ledger.py` 要求声明的 Task-ID 集合与实际改动的台账条目集合完全一致；合并 #471 进 #470 会使 #470 的改动集合多出 `SYS-122`。
+
+## 七、环境与复现（本地证据怎么来的）
+
+- 本沙箱环境访问不到 jsDelivr 和 Playwright 浏览器下载域。本地用 npm 同版本包（`scratch-vm@5.0.300`、`scratch-storage@4.0.0`）经 `SCRATCH_VM_LOCAL_CDN=1` 覆盖，浏览器是 npm 的 Chromium 153（不是 CI 的 Chrome 稳定版）。
+- 该 Chromium 没有中文字体；用 `L02_CJK_FONT_FILE` 指向 woff2 字体注入（仅测试用，CI 不设置）。
+- 本机 Node 22.23 与 Playwright 1.58 / Next 的 PostCSS 加载有兼容问题，用 `NODE_OPTIONS=--no-experimental-require-module` 绕过。
+- 这些只影响本地复现，**权威证据是 GitHub Actions**（#471 的运行）。
+
+## 八、已知限制与未验证（不得宣称）
+
+- 真实手机 / 平板触摸、Safari、Firefox、Chrome 稳定版、手机上的真实触摸拖放均未验证；独立人工教研、儿童试学均未做。
+- CI 上 Chrome 渲染的中文字体效果没有人工看过。
+- 系统只能证明“这一次运行的行为”，**不能证明学生理解**；界面固定写“需要进一步解释或练习”，任何结果都不写“已掌握”。
+- 课程目录 JSON（`full-catalog-v1.json`、`track-g2-detailed-lessons-v1.json`、`priority-asset-requirements-v1.json`）仍写“侦测 / 鼠标跟随 / 触碰计分”，与批准的“坐标读取与位置对准”矛盾；这些是首席受控文件，**未改**。清单见 `TEACHING-PLAN.md` 第八节。L02（读取坐标、计算位移、对准落点）与 L04（碰撞与计分）的边界也写在那里，供课程架构负责人修订。
+- 既有全局缺口（非本课特有）：`apps/web/package.json`、`playwright.config.ts`、`next.config.ts` 的变更不会触发 `curriculum-content.yml`。
+- 观察到的既有偶发失败：`scratch-real-vm-shard-s4`（G3-U1-L02 云端保存恢复用例）在近 30 次运行里有 3 次失败；与本课无关，推断为 CDN 偶发，未证明根因。
+
+## 九、未解决的阻塞
+
+| 阻塞 | 负责 |
+|---|---|
+| `StageSlot` 课程专属类型安全状态；`RunTrace` 位移增量与来源 | 2 号（#469） |
+| #470 合入 main 的方式（merge commit / squash / rebase）与是否授权强制推送 #471 | 首席 |
+| 目录 JSON 与 `LESSON-CONTRACT.md` 示例里与新定位矛盾的文字 | 首席 / 课程架构负责人 |
+| 独立审核、儿童试学、真实设备验证 | 首席 / 教研 |
