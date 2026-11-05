@@ -3310,6 +3310,33 @@
         "reviewer": null
       },
       "notes": "演示契约（demo-a/demo-b/demo-scratch）均为演示 fixture，水果 x=200/阈值 80 为规范已公布演示值，非正式教学参数；Task-ID 按 OPS-018/019 先例新立，首席可重新指定编号；E2E workflow 接线归首席另立任务，不在本 PR 改动；Scratch VM 本机沙箱未就绪（CDN 依赖）与演示舞台渲染、演示移动积木、分类图标条等缺口见 PR 正文，待首席裁定。"
+    },
+    {
+      "id": "SPEC-002",
+      "title": "P0 工作区规范 v1.0 → v1.1 修订：结构化提示、共享插槽、草稿与判定语义入规范文本",
+      "priority": "P0",
+      "category": "SPEC",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-020"
+      ],
+      "scope": "仅规范文本：docs/product/p0-kitten-workspace/ 下 DESIGN.md、LESSON-CONTRACT.md、WORKSPACE-API.md、OWNERSHIP.md、ACCEPTANCE.md 版本行 v1.0 → v1.1 并追加 v1.1 章节；TEST-EVIDENCE.md 与 PROTOTYPE.html 仍为 v1.0 证据不动；不改代码、不改课程台账（432 节）、不改共享 CI、不新增布局/token/正式课程参数；内容全部取自已合并实现 OPS-020（PR #469，合并 651ae7f3），不发明新语义。",
+      "acceptance": [
+        "5 个规范文件版本行均为 p0-kitten-workspace-v1.1，新增章节与 #469 合并代码一致",
+        "任务门禁通过（声明条目与改动条目完全一致）",
+        "PR 合并后主线 CI 通过"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "首席独立复核 OPS-020：vitest 84/84、E2E 32 项（见 #469 审核）"
+        ],
+        "reviewer": null
+      },
+      "notes": "本修订 PR 保持待审，等 duan 最终合并批准，不由首席自行合并（改动冻结规范文本）；与 OPS-021（#473）同改产品台账，须串行：关账 #474 → 本修订 → #473 变基。"
     }
+
   ]
 }
