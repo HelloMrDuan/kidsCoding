@@ -466,6 +466,17 @@ export function LessonWorkspace({
       return () => {
         if (autosaveTimerRef.current !== null) clearTimeout(autosaveTimerRef.current)
         runGenRef.current += 1
+        // F3: best-effort stop of the live run target before the slot data
+        // is saved; a summary course with a runAdapter may still hold one.
+        const liveTarget = runTargetRef.current
+        runTargetRef.current = null
+        if (liveTarget && engineStateRef.current.running) {
+          try {
+            liveTarget.stop()
+          } catch {
+            // Best effort; the run is abandoned either way.
+          }
+        }
         try {
           saveDraftToLocal(contractRef.current.lessonId, editorDataRef.current ?? null)
         } catch {
@@ -529,6 +540,18 @@ export function LessonWorkspace({
       if (maybeListener && changeListener) maybeListener.removeChangeListener?.(changeListener)
       if (autosaveTimerRef.current !== null) clearTimeout(autosaveTimerRef.current)
       runGenRef.current += 1
+      // F3: best-effort stop of the live run target before the adapter is
+      // unmounted. The generation bump above drops any event the stop
+      // itself fires, and unmount() alone does not promise to end a run.
+      const liveTarget = runTargetRef.current
+      runTargetRef.current = null
+      if (liveTarget && engineStateRef.current.running) {
+        try {
+          liveTarget.stop()
+        } catch {
+          // Best effort; the run is abandoned either way.
+        }
+      }
       try {
         // Slot courses save the slot's data, never the adapter script:
         // the slot owns the session; the adapter is only the run target.
@@ -584,6 +607,21 @@ export function LessonWorkspace({
     prevLessonRef.current = contract.lessonId
     // A lesson switch invalidates every in-flight run event (R3).
     runGenRef.current += 1
+    // F3: best-effort stop of the old run target on lesson switch. The
+    // generation bump above already drops any synchronous 'stopped' event
+    // the stop itself fires, so it can never display on the new lesson.
+    // The ref and the displayed running flag are cleared with it, so no
+    // stale target or state survives into the new lesson.
+    const oldTarget = runTargetRef.current
+    runTargetRef.current = null
+    if (oldTarget && engineStateRef.current.running) {
+      try {
+        oldTarget.stop()
+      } catch {
+        // Best effort; the run is abandoned either way.
+      }
+    }
+    setEngineState((prev) => (prev.running ? { ...prev, running: false } : prev))
     setJudgment(null)
     setJudgmentStale(false)
     setRunError(null)
@@ -732,14 +770,20 @@ export function LessonWorkspace({
 
   /** OPS-022 stop branch: shared by the shell buttons and shell.stop. */
   const handleRunStop = useCallback(() => {
-    const target = resolveRunTarget()
-    if (!target) return
     if (!engineStateRef.current.running) return
+    // F2: stop the target that actually started the run (runTargetRef),
+    // never the current prop — the runAdapter may have changed mid-run,
+    // and stopping the new target would leave the old run live. Fall back
+    // to the current resolution only when no run was recorded (e.g. the
+    // Scratch poller reported a running state the shell never started).
+    const target = runTargetRef.current ?? resolveRunTarget()
+    if (!target) return
     // R3: stop invalidates the run generation first, so a late 'finished'
     // from the stopped run can never display a stale pass afterwards.
     // Clearing the displayed judgment here is defence-in-depth on top of
     // the generation guard (the start branch already clears on run).
     runGenRef.current += 1
+    runTargetRef.current = null
     try {
       target.stop()
     } catch {
