@@ -7,11 +7,18 @@
  * 损坏草稿：解析失败或结构不对 → 默认空编辑区，不崩溃。
  * 恢复默认：清空编辑区与提示级数，回到未做状态。
  * 本课没有污染资格概念；刷新恢复的是编辑文本本身。
+ *
+ * 草稿键已改为规范格式 kidscoding-draft:A1-U3-L03（与契约一致）；
+ * 旧键 a1-u3-l03-draft-v1 不再读写（#464 未合并，无真实学生草稿可迁移）。
+ * hintLevel 只为旧草稿兼容保留：外壳抽屉揭示态不回写草稿，插槽不显示它。
+ * localStorage store 机器仍为旧独立课堂保留；路由切到统一工作区时删除，
+ * 外壳信封草稿接管保存与恢复。
  */
 
 import { useSyncExternalStore } from 'react'
+import { L03_DRAFT_KEY } from './a1-u3-l03-contract'
 
-export const L03_DRAFT_KEY = 'a1-u3-l03-draft-v1'
+export { L03_DRAFT_KEY }
 
 export type L03Draft = {
   version: 1
@@ -21,6 +28,38 @@ export type L03Draft = {
 
 export function emptyDraft(): L03Draft {
   return { version: 1, jsonText: '', hintLevel: 0 }
+}
+
+/**
+ * 外壳信封解包后的草稿整形（与 L02 同款）：
+ * - 有效草稿原样返回（hintLevel 缺失补 0，非法值回落 0）；
+ * - 无效草稿（非对象 / version 非 1 / jsonText 非字符串 / hintLevel 非法）
+ *   回落为空草稿，不抛错。
+ */
+export function isValidDraftShape(value: unknown): value is L03Draft {
+  if (!value || typeof value !== 'object') return false
+  const draft = value as Partial<L03Draft>
+  if (draft.version !== 1) return false
+  if (typeof draft.jsonText !== 'string') return false
+  if (
+    draft.hintLevel !== undefined &&
+    (typeof draft.hintLevel !== 'number' || ![0, 1, 2, 3].includes(draft.hintLevel))
+  ) {
+    return false
+  }
+  return true
+}
+
+export function coerceDraft(value: unknown): L03Draft {
+  if (!isValidDraftShape(value)) return emptyDraft()
+  const draft = value as Partial<L03Draft>
+  return {
+    version: 1,
+    jsonText: draft.jsonText ?? '',
+    hintLevel: ([0, 1, 2, 3].includes(draft.hintLevel as number)
+      ? draft.hintLevel
+      : 0) as L03Draft['hintLevel'],
+  }
 }
 
 export function serializeDraft(draft: L03Draft): string {
