@@ -18,6 +18,22 @@ import { ScriptEditor, type EditorHandle, type Selection } from './script-editor
 import { TaskPanel } from './task-panel'
 import { useSession } from './use-session'
 
+/**
+ * 壳的控制通道（OPS-022，#480 的 `ShellControl`）：槽位自己的工具栏通过它调用壳的运行 / 停止 / 保存，
+ * 并读到壳的运行与保存状态。槽位不自己维护第二套运行或保存状态机，也不直接读写草稿键。
+ * #480 合并后 `EditorSlotProps.shell` 就是共享的 `ShellControl`；在此之前用结构相同的本地类型，字段一一对应。
+ */
+export type ShellControlLike = {
+  run: () => void
+  stop: () => void
+  save: () => void
+  running: boolean
+  saveState: 'unsaved' | 'saved' | 'failed'
+  judgment: unknown
+}
+
+const SAVE_STATE_TEXT: Record<ShellControlLike['saveState'], string> = { unsaved: '未保存', saved: '已保存到本机', failed: '未能保存' }
+
 export type EditorSlotOptions = {
   embedLevelNav?: boolean
   embedTaskPanel?: boolean
@@ -26,8 +42,8 @@ export type EditorSlotOptions = {
 }
 
 export function L02EditorSlot({
-  session, initial, onChange, onSelectionChange, editable, embedLevelNav, embedTaskPanel, renderToolbarExtra,
-}: EditorSlotProps & EditorSlotOptions & { session: L02Session }) {
+  session, initial, onChange, onSelectionChange, editable, shell, embedLevelNav, embedTaskPanel, renderToolbarExtra,
+}: EditorSlotProps & EditorSlotOptions & { session: L02Session; shell?: ShellControlLike }) {
   const { snap, view } = useSession(session)
   const [selection, setSelection] = useState<Selection>(null)
   const editorRef = useRef<EditorHandle>(null)
@@ -104,6 +120,18 @@ export function L02EditorSlot({
                 onChange={e => { const v = e.target.value; if (v !== '' && v !== '-') editorRef.current?.setSelectedNumber(Number(v)) }} />
             </label>
             {renderToolbarExtra?.()}
+            {shell && (
+              <>
+                <button type="button" className={`${styles.btn} ${shell.running ? styles.btnStop : styles.btnPrimary}`}
+                  data-testid="l2-shell-run" data-running={shell.running}
+                  disabled={!shell.running && view.runDisabled} title={!shell.running && view.runDisabled ? view.runReason : undefined}
+                  onClick={() => (shell.running ? shell.stop() : shell.run())}>
+                  {shell.running ? '停止' : '运行作品'}
+                </button>
+                <button type="button" className={styles.btn} data-testid="l2-shell-save" onClick={() => shell.save()}>保存</button>
+                <span className={styles.muted} data-testid="l2-shell-save-state" data-state={shell.saveState}>{SAVE_STATE_TEXT[shell.saveState]}</span>
+              </>
+            )}
           </div>
           {snap.paletteOpen && (
             <div className={styles.palette} data-testid="l2-palette" role="group" aria-label="素材抽屉：点一下就加到脚本里">

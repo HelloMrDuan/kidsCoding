@@ -403,7 +403,7 @@ test.describe('G2-U3-L02 真实 Scratch VM：共享 RunTrace 映射与课程判�
       const shared = toSharedRunTrace(r.trace)
       expect(judgeSharedTrace(shared), label).toEqual(direct)
       // 共享轨迹按帧累加 dx 还原的落点，必须等于 VM 在落地那一帧读到的篮子 x（没有边缘限位带来的偏差）
-      const landed = shared.frames.filter(f => f.frame <= shared.landingFrame!).reduce((sum, f) => sum + (f.dx ?? 0), L02_PARAMS.basketStartX)
+      const landed = shared.frames.filter(f => f.frame <= shared.landingFrame!).reduce<number>((sum, f) => sum + (f.dx ?? 0), L02_PARAMS.basketStartX)
       expect(landed, label).toBe(r.trace.landing!.basketX)
     }
   })
