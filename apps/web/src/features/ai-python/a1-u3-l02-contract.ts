@@ -192,7 +192,7 @@ export const L02_WORKSPACE_CONTRACT: LessonContract = {
   judging: {
     stageRule: '检查结果：五项检查逐项判定——漏要点、添内容、改原意、抽取规范、来源核验。',
     taskRule: '任务判定：五项全部通过为合格，否则为未合格并列出未通过项名。',
-    knowledgeRule: '知识证据：方法证据——要点覆盖、来源构成、是否独立完成（非照搬候选）。',
+    knowledgeRule: '知识证据：方法证据——要点覆盖与来源构成（独立完成不在此项的核验范围内，不宣称已核验）。',
     scopeLabel: L02_CONTRACT.scopeLabel,
   },
   draftKey: L02_CONTRACT.draftKey as `kidscoding-draft:${string}`,
