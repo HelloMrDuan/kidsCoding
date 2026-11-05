@@ -19,6 +19,7 @@
  *   本次摘要合格，不等于完全掌握摘要能力；页面任何位置不写“已掌握”。
  */
 
+import type { LessonContract } from '../lessons/workspace/lesson-contract'
 import type { SummaryParagraph, SummaryPoint } from './u3-local-engines'
 
 export const L02_LESSON_ID = 'A1-U3-L02'
@@ -155,3 +156,60 @@ export const PREDICTION_CANDIDATES: PredictionCandidate[] = [
     customTexts: ['黄苹果最甜。'],
   },
 ]
+
+/* ------------------------------------------------------------------ */
+/* 统一工作区契约翻译：L02Contract → 共享 LessonContract              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 正式集成用的共享工作区契约。翻译规则（外壳只渲染契约内容）：
+ * - goal5 / brief / step / engine / draftKey 直通；
+ * - hints（结构化 { level, title, text }）→ 外壳 structuredHints 直通，
+ *   同时压平为 [string, string, string] 满足外壳必填 hints 校验；
+ * - judging 三规则由本课语义书写（规则文本，无演示数字目标）；
+ * - methodSteps / scopeGap 进外壳抽屉（仅抽屉渲染，不进编辑区）；
+ * - activities 为三层教学活动（预测 / 独立 / 迁移），事实核对与总结
+ *   仍在插槽内，不占 activities 名额；
+ * - hasStage: false：本课无舞台与角色列，外壳渲染宽摘要布局；
+ * - fileCapabilities 全开：外壳对插槽课已实现新建/保存/导出/导入/
+ *   恢复初始，全部真实可用，不隐藏。
+ * - 课节进度是动态的（揭示数、检查状态），外壳 progress 是静态值，
+ *   故不填 progress；进度明细保留在插槽总结页。
+ * 翻译结果必须通过共享 validateLessonContract（单测锁定）。
+ */
+export const L02_WORKSPACE_CONTRACT: LessonContract = {
+  lessonId: L02_CONTRACT.lessonId,
+  title: L02_CONTRACT.title,
+  goal5: L02_CONTRACT.goal5,
+  brief: L02_CONTRACT.brief,
+  step: L02_CONTRACT.step,
+  hints: L02_CONTRACT.hints.map((hint) => `${hint.title}：${hint.text}`) as [
+    string,
+    string,
+    string,
+  ],
+  engine: 'summary',
+  judging: {
+    stageRule: '检查结果：五项检查逐项判定——漏要点、添内容、改原意、抽取规范、来源核验。',
+    taskRule: '任务判定：五项全部通过为合格，否则为未合格并列出未通过项名。',
+    knowledgeRule: '知识证据：方法证据——要点覆盖、来源构成、是否独立完成（非照搬候选）。',
+    scopeLabel: L02_CONTRACT.scopeLabel,
+  },
+  draftKey: L02_CONTRACT.draftKey as `kidscoding-draft:${string}`,
+  structuredHints: L02_CONTRACT.hints,
+  methodSteps: L02_CONTRACT.methodSteps,
+  scopeGap: L02_CONTRACT.scopeGap,
+  activities: [
+    { level: 1, title: '探索预测', text: '比较三份候选摘要，先预测合格与否及最先违反项，再揭示真实检查结果。' },
+    { level: 2, title: '独立摘要', text: '只给课文、目标和工具，自己选句、组织、自加句实验并检查。' },
+    { level: 3, title: '迁移创作', text: '换一篇新课文《整理书包》，用同样方法写摘要并接受同一套五项检查。' },
+  ],
+  fileCapabilities: {
+    canNew: true,
+    canSave: true,
+    canExport: true,
+    canImport: true,
+    canReset: true,
+  },
+  hasStage: false,
+}
