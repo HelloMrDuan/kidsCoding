@@ -108,6 +108,29 @@ export interface FileCapabilities {
   canReset?: boolean
 }
 
+/**
+ * Shell control surface (OPS-022, contract §3): the channel through which
+ * a slot's own toolbar drives the shell's run/stop/save and observes
+ * run/save/judgment state. This is a direct callback prop, NOT a command
+ * bus: the slot must not build a second run/save state machine and must
+ * not read/write draft keys directly. Absent = old behavior (edit only,
+ * e.g. Summary).
+ */
+export interface ShellControl {
+  /** Shell run toggle (same entry as the shell's own run button). */
+  run: () => void
+  /** Shell stop branch only: a no-op when nothing is running. */
+  stop: () => void
+  /** Shell explicit save (same entry as the shell's own save button). */
+  save: () => void
+  /** Shell's current running state, updated on every shell re-render. */
+  running: boolean
+  /** Shell's current save state. */
+  saveState: 'unsaved' | 'saved' | 'failed'
+  /** Adapter-returned current judgment, or null; the shell never invents one. */
+  judgment: JudgmentResult | null
+}
+
 /** Props the shell passes to a React editor slot component. */
 export interface EditorSlotProps {
   lessonId: string
@@ -118,6 +141,8 @@ export interface EditorSlotProps {
   /** Optional selection reporting (block id, text range, etc.). */
   onSelectionChange?: (selection: unknown) => void
   editable: boolean
+  /** Shell control surface (OPS-022). Absent = edit only. */
+  shell?: ShellControl
 }
 
 export type EditorSlotComponent = ComponentType<EditorSlotProps>
