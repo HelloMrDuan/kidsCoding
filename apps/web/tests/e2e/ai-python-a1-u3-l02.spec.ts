@@ -10,19 +10,61 @@ async function gotoIndependent(page: import('@playwright/test').Page) {
   await page.getByTestId('ai-u3-l02-tab-independent').click()
 }
 
-test.describe('A1-U3-L02 lesson page (P0 contract classroom)', () => {
-  test('goal bar shows five contract items and no API claim', async ({ page }) => {
+async function openFileMenu(page: import('@playwright/test').Page) {
+  await page.getByTestId('ws-file-menu-button').click()
+}
+
+async function resetViaFileMenu(page: import('@playwright/test').Page) {
+  await openFileMenu(page)
+  await page.getByTestId('ws-file-reset').click()
+}
+
+async function waitForShellSaved(page: import('@playwright/test').Page) {
+  // Shell autosave is debounced (1000ms); only reload after the chip says saved,
+  // otherwise a reload can drop the last edit before the timer fires.
+  await expect(page.getByTestId('ws-save-chip')).toContainText('已保存到本机')
+}
+
+test.describe('A1-U3-L02 lesson page (unified LessonWorkspace integration)', () => {
+  test('shell goal strip shows five contract items and no API claim', async ({ page }) => {
     test.setTimeout(150_000)
     await page.goto(ROUTE)
-    await expect(page.getByTestId('ai-u3-l02-lesson-heading')).toContainText('实现文本摘要')
-    const goalBar = page.getByTestId('ai-u3-l02-goal-bar')
-    await expect(goalBar).toContainText('今天学什么：忠实摘要')
-    await expect(goalBar).toContainText('要解决什么问题：从短文里挑出 3 句要点')
-    await expect(goalBar).toContainText('学完能做什么：判断一句摘要是否忠实')
-    await expect(goalBar).toContainText('尚未建成')
-    await expect(goalBar).toContainText('不调用外部模型')
-    await expect(goalBar).not.toContainText('通过 API 自动生成摘要')
-    await expect(goalBar).not.toContainText('已掌握')
+    await expect(page.getByTestId('ws-topbar')).toContainText('实现文本摘要')
+    await page.getByTestId('ws-goal-expand').click()
+    const goal5 = page.getByTestId('ws-goal5')
+    await expect(goal5).toContainText('今天学什么：忠实摘要')
+    await expect(goal5).toContainText('要解决什么问题：从短文里挑出 3 句要点')
+    await expect(goal5).toContainText('学完能做什么：判断一句摘要是否忠实')
+    await expect(goal5).toContainText('尚未建成')
+    await expect(goal5).toContainText('不调用外部模型')
+    await expect(goal5).not.toContainText('通过 API 自动生成摘要')
+    await expect(page.getByText('已掌握')).toHaveCount(0)
+  })
+
+  test('shell task drawer shows method steps, scope gap and three-layer activities', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await page.getByTestId('ws-task-button').click()
+    const drawer = page.getByTestId('ws-task-drawer')
+    await expect(drawer).toBeVisible()
+    // taskContent renders in both the drawer and the grid task panel by
+    // shell design, so drawer assertions must be drawer-scoped.
+    await expect(drawer.getByTestId('ws-method-steps')).toContainText('找主题句')
+    await expect(drawer.getByTestId('ws-scope-gap')).toContainText('尚未建成')
+    await expect(drawer.getByTestId('ws-activities')).toContainText('探索预测')
+    await expect(drawer.getByTestId('ws-activities')).toContainText('独立摘要')
+    await expect(drawer.getByTestId('ws-activities')).toContainText('迁移创作')
+  })
+
+  test('shell file menu offers all five file operations for the slot course', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await openFileMenu(page)
+    await expect(page.getByTestId('ws-file-new')).toBeVisible()
+    await expect(page.getByTestId('ws-file-save')).toBeVisible()
+    await expect(page.getByTestId('ws-file-export')).toBeVisible()
+    await expect(page.getByTestId('ws-file-import')).toBeVisible()
+    await expect(page.getByTestId('ws-file-reset')).toBeVisible()
   })
 
   test('prediction: correct verdict and failed check are confirmed on reveal', async ({ page }) => {
@@ -88,6 +130,21 @@ test.describe('A1-U3-L02 lesson page (P0 contract classroom)', () => {
     await expect(page.getByTestId('ai-u3-l02-post-predict-result')).toContainText('你猜对了')
   })
 
+  test('edit after a check clears the slot judgment until the next check', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await gotoIndependent(page)
+    await page.getByTestId('ai-u3-l02-pick-P1-1').check()
+    await page.getByTestId('ai-u3-l02-pick-P3-1').check()
+    await page.getByTestId('ai-u3-l02-pick-P4-1').check()
+    await page.getByTestId('ai-u3-l02-check-summary').click()
+    await expect(page.getByTestId('ai-u3-l02-summary-verdict')).toContainText('合格：五项全部通过')
+    await page.getByTestId('ai-u3-l02-pick-P1-1').uncheck()
+    await expect(page.getByTestId('ai-u3-l02-summary-checks')).toHaveCount(0)
+    await page.getByTestId('ai-u3-l02-check-summary').click()
+    await expect(page.getByTestId('ai-u3-l02-summary-verdict')).toContainText('未合格')
+  })
+
   test('examples stay locked until the first independent check', async ({ page }) => {
     test.setTimeout(150_000)
     await page.goto(ROUTE)
@@ -114,8 +171,7 @@ test.describe('A1-U3-L02 lesson page (P0 contract classroom)', () => {
     await page.getByTestId('ai-u3-l02-add-custom').click()
     await expect(page.getByTestId('ai-u3-l02-custom-notice')).toContainText('最多 5 句，已达上限')
     await expect(page.getByTestId('ai-u3-l02-entries')).not.toContainText('自加句6。')
-    await page.getByTestId('ai-u3-l02-tab-summary').click()
-    await page.getByTestId('ai-u3-l02-reset').click()
+    await resetViaFileMenu(page)
     await gotoIndependent(page)
     await page.getByTestId('ai-u3-l02-custom-input').fill('x'.repeat(201))
     await page.getByTestId('ai-u3-l02-add-custom').click()
@@ -208,19 +264,22 @@ test.describe('A1-U3-L02 lesson page (P0 contract classroom)', () => {
     await expect(page.getByTestId('ai-u3-l02-fact-result-U1')).toContainText('正确：无依据推断')
   })
 
-  test('task drawer holds progressive hints without revealing them all at once', async ({ page }) => {
+  test('shell task drawer reveals hints in order, never all at once', async ({ page }) => {
     test.setTimeout(150_000)
     await page.goto(ROUTE)
-    await page.getByTestId('ai-u3-l02-drawer-toggle').click()
-    await expect(page.getByTestId('ai-u3-l02-drawer')).toBeVisible()
-    await page.getByTestId('ai-u3-l02-hint-1').click()
-    await expect(page.getByTestId('ai-u3-l02-hint-text')).toContainText('先读每段第一句找要点')
-    await expect(page.getByTestId('ai-u3-l02-hint-text')).not.toContainText('对照清单')
-    await page.getByTestId('ai-u3-l02-hint-3').click()
-    await expect(page.getByTestId('ai-u3-l02-hint-text')).toContainText('对照清单')
+    await page.getByTestId('ws-task-button').click()
+    const drawer = page.getByTestId('ws-task-drawer')
+    await expect(drawer).toBeVisible()
+    await expect(drawer.getByTestId('ws-hint-reveal-3')).toBeDisabled()
+    await drawer.getByTestId('ws-hint-reveal-1').click()
+    await expect(drawer).toContainText('先读每段第一句找要点')
+    await expect(drawer).not.toContainText('对照清单')
+    await drawer.getByTestId('ws-hint-reveal-2').click()
+    await drawer.getByTestId('ws-hint-reveal-3').click()
+    await expect(drawer).toContainText('对照清单')
   })
 
-  test('draft saves and restores across reload; restore-default clears', async ({ page }) => {
+  test('shell draft saves and restores across reload; file-menu reset clears', async ({ page }) => {
     test.setTimeout(150_000)
     await page.goto(ROUTE)
     await gotoIndependent(page)
@@ -233,7 +292,9 @@ test.describe('A1-U3-L02 lesson page (P0 contract classroom)', () => {
     await page.getByTestId('ai-u3-l02-transfer-pick-T1-1').check()
     await page.getByTestId('ai-u3-l02-tab-summary').click()
     await page.getByTestId('ai-u3-l02-method-summary').fill('先找主题句，再删重复，再排序。')
+    await waitForShellSaved(page)
     await page.reload()
+    await expect(page.getByTestId('ws-save-message')).toContainText('已恢复草稿')
     await gotoIndependent(page)
     await expect(page.getByTestId('ai-u3-l02-pick-P1-1')).toBeChecked()
     await expect(page.getByTestId('ai-u3-l02-entries')).toContainText('自加：黄苹果最甜。')
@@ -243,7 +304,7 @@ test.describe('A1-U3-L02 lesson page (P0 contract classroom)', () => {
     await expect(page.getByTestId('ai-u3-l02-transfer-pick-T1-1')).toBeChecked()
     await page.getByTestId('ai-u3-l02-tab-summary').click()
     await expect(page.getByTestId('ai-u3-l02-method-summary')).toHaveValue('先找主题句，再删重复，再排序。')
-    await page.getByTestId('ai-u3-l02-reset').click()
+    await resetViaFileMenu(page)
     await gotoIndependent(page)
     await expect(page.getByTestId('ai-u3-l02-pick-P1-1')).not.toBeChecked()
     await page.getByTestId('ai-u3-l02-tab-facts').click()
@@ -257,6 +318,14 @@ test.describe('A1-U3-L02 lesson page (P0 contract classroom)', () => {
     await page.getByTestId('ai-u3-l02-pick-P1-1').check()
     await page.getByTestId('ai-u3-l02-tab-transfer').click()
     await page.getByTestId('ai-u3-l02-transfer-pick-T1-1').check()
+    await waitForShellSaved(page)
+    const stored = await page.evaluate(() => {
+      const raw = window.localStorage.getItem('kidscoding-draft:A1-U3-L02')
+      return raw ? JSON.parse(raw) : null
+    })
+    expect(stored.lessonId).toBe('A1-U3-L02')
+    expect(stored.script.selected).toContain('P1-1')
+    expect(stored.script.transferSelected).toContain('T1-1')
     const keys = await page.evaluate(() =>
       Object.keys(window.localStorage).filter((key) => key.startsWith('kidscoding-draft:')),
     )
@@ -275,7 +344,7 @@ test.describe('A1-U3-L02 narrow screen', () => {
   test('375px: no horizontal overflow before or after interaction', async ({ page }) => {
     test.setTimeout(150_000)
     await page.goto(ROUTE)
-    await expect(page.getByTestId('ai-u3-l02-lesson-heading')).toBeVisible()
+    await expect(page.getByTestId('ws-topbar')).toContainText('实现文本摘要')
     expect(await overflow(page)).toBe(false)
     await page.getByTestId('ai-u3-l02-tab-independent').tap()
     await page.getByTestId('ai-u3-l02-pick-P1-1').tap()
