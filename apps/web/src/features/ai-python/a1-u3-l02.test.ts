@@ -16,7 +16,10 @@ import {
   judgeFact,
   judgePrediction,
 } from './a1-u3-l02'
-import { L02_CONTRACT, TRANSFER_PASSAGE, TRANSFER_POINTS } from './a1-u3-l02-contract'
+import { SummaryAdapter, buildSummaryJudgment } from './a1-u3-l02-adapter'
+import { L02_CONTRACT, L02_WORKSPACE_CONTRACT, TRANSFER_PASSAGE, TRANSFER_POINTS } from './a1-u3-l02-contract'
+import { emptyDraft } from './a1-u3-l02-draft'
+import { validateLessonContract } from '../lessons/workspace/lesson-contract'
 import {
   SUMMARY_PASSAGE,
   checkSummary,
@@ -217,5 +220,105 @@ describe('A1-U3-L02 P0 content contract', () => {
     expect(judgePrediction(b, '未合格', '抽取规范')).toBe(true)
     expect(judgePrediction(b, '未合格', '添内容')).toBe(false)
     expect(judgePrediction(b, '合格', '')).toBe(false)
+  })
+})
+
+describe('A1-U3-L02 unified workspace integration (SummaryAdapter + contract translation)', () => {
+  it('the workspace contract passes the shared shell validation', () => {
+    expect(validateLessonContract(L02_WORKSPACE_CONTRACT)).toEqual([])
+  })
+
+  it('the translation keeps goal5, brief, step, engine, draft key and honest scope', () => {
+    expect(L02_WORKSPACE_CONTRACT.lessonId).toBe('A1-U3-L02')
+    expect(L02_WORKSPACE_CONTRACT.goal5).toEqual(L02_CONTRACT.goal5)
+    expect(L02_WORKSPACE_CONTRACT.brief).toBe(L02_CONTRACT.brief)
+    expect(L02_WORKSPACE_CONTRACT.step).toBe(L02_CONTRACT.step)
+    expect(L02_WORKSPACE_CONTRACT.engine).toBe('summary')
+    expect(L02_WORKSPACE_CONTRACT.draftKey).toBe('kidscoding-draft:A1-U3-L02')
+    expect(L02_WORKSPACE_CONTRACT.scopeGap).toBe(L02_CONTRACT.scopeGap)
+    expect(L02_WORKSPACE_CONTRACT.methodSteps).toEqual(L02_CONTRACT.methodSteps)
+  })
+
+  it('structured hints survive the translation and plain hints are flattened, not invented', () => {
+    expect(L02_WORKSPACE_CONTRACT.structuredHints).toEqual(L02_CONTRACT.hints)
+    expect(L02_WORKSPACE_CONTRACT.hints).toEqual([
+      '一级提示：方向：先读每段第一句找要点。',
+      '二级提示：方法：同一要点只留第一次出现的那句。',
+      '三级提示：对照：对照清单（三项要点齐全、无重复、无离题）。',
+    ])
+  })
+
+  it('judging rules are rule texts with no demo numeric target, and the lesson is stageless', () => {
+    expect(L02_WORKSPACE_CONTRACT.judging.target).toBeUndefined()
+    expect(L02_WORKSPACE_CONTRACT.judging.scopeLabel).toBe('教学定向')
+    expect(L02_WORKSPACE_CONTRACT.judging.stageRule).toContain('五项检查')
+    expect(L02_WORKSPACE_CONTRACT.judging.taskRule).toContain('五项全部通过为合格')
+    expect(L02_WORKSPACE_CONTRACT.hasStage).toBe(false)
+    expect(L02_WORKSPACE_CONTRACT.demo).toBeUndefined()
+  })
+
+  it('file capabilities are all true: the shell implements all five for slot courses', () => {
+    expect(new SummaryAdapter().getFileCapabilities()).toEqual({
+      canNew: true,
+      canSave: true,
+      canExport: true,
+      canImport: true,
+      canReset: true,
+    })
+  })
+
+  it('adapter independent check passes the theme triple with a three-layer judgment', () => {
+    const adapter = new SummaryAdapter({
+      ...emptyDraft(),
+      selected: ['P1-1', 'P3-1', 'P4-1'],
+    })
+    const judgment = adapter.checkIndependent()
+    expect(judgment.passed).toBe(true)
+    expect(judgment.conclusion).toBe('结论：本次摘要合格。')
+    expect(judgment.conclusion).not.toContain('已掌握')
+    expect(judgment.layers.map((layer) => layer.id)).toEqual(['stage', 'task', 'knowledge'])
+    expect(judgment.layers[1].detail).toContain('合格：五项全部通过')
+    expect(judgment.methodEvidence).toContain('要点覆盖 A、B、C')
+    expect(adapter.getJudgmentResult()).toBe(judgment)
+    expect(adapter.getSummaryState()).toEqual({
+      checked: true,
+      passedCount: 5,
+      totalChecks: 5,
+      verdict: '合格',
+    })
+  })
+
+  it('adapter transfer check fails a missing point and names it', () => {
+    const adapter = new SummaryAdapter({ ...emptyDraft(), transferSelected: ['T1-1', 'T2-1'] })
+    const judgment = adapter.checkTransfer()
+    expect(judgment.passed).toBe(false)
+    expect(judgment.layers[1].detail).toContain('未合格')
+    expect(judgment.layers[1].detail).toContain('漏要点')
+    expect(adapter.getSummaryState().verdict).toBe('未合格')
+  })
+
+  it('adapter judgment is never written into the draft and stop/run do not invent results', () => {
+    const adapter = new SummaryAdapter({ ...emptyDraft(), selected: ['P1-1', 'P3-1', 'P4-1'] })
+    expect(adapter.getJudgmentResult()).toBeNull()
+    expect(adapter.getSummaryState()).toEqual({
+      checked: false,
+      passedCount: 0,
+      totalChecks: 5,
+      verdict: null,
+    })
+    adapter.stop()
+    expect(adapter.getJudgmentResult()).toBeNull()
+    expect(adapter.getScript()).toEqual({ ...emptyDraft(), selected: ['P1-1', 'P3-1', 'P4-1'] })
+    const events: string[] = []
+    adapter.run((event) => events.push(event.kind))
+    expect(events).toEqual(['finished'])
+    expect(adapter.getJudgmentResult()).toBeNull()
+    expect(adapter.getState()).toEqual({ x: 0, score: 0, running: false, frames: 0 })
+  })
+
+  it('buildSummaryJudgment maps an empty check list to not-passed, never to a pass', () => {
+    const judgment = buildSummaryJudgment([], '方法证据：无。')
+    expect(judgment.passed).toBe(false)
+    expect(judgment.layers[0].detail).toContain('尚未检查')
   })
 })
