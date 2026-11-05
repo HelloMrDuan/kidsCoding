@@ -357,8 +357,27 @@ export function LessonWorkspace({
       let loaded: unknown = null
       let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
-        loaded = draft.data
-        fromDraft = true
+        // OPS-022 chief review: validate the stored slot draft exactly like
+        // the adapter path does (loadIntoAdapter). Summary courses have no
+        // adapter concept, so they never validate against an adapter; an
+        // adapter without validateDraft accepts the draft (?? true). A
+        // throwing validator counts as invalid (fail-closed). An invalid
+        // draft falls back to the initial script below, is never reported
+        // as restored/saved, and is never overwritten or deleted here.
+        let valid = true
+        if (!isSummary) {
+          try {
+            valid = adapter.validateDraft?.(draft.data) ?? true
+          } catch {
+            valid = false
+          }
+        }
+        if (valid) {
+          loaded = draft.data
+          fromDraft = true
+        } else if (targetInitial !== undefined && targetInitial !== null) {
+          loaded = targetInitial
+        }
       } else if (targetInitial !== undefined && targetInitial !== null) {
         loaded = targetInitial
       }
@@ -375,7 +394,7 @@ export function LessonWorkspace({
         setSaveMessageAndRef(null)
       }
     },
-    [setSaveMessageAndRef],
+    [adapter, isSummary, setSaveMessageAndRef],
   )
 
   const loadIntoAdapter = useCallback(
