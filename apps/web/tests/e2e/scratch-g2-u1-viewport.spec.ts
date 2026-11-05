@@ -21,18 +21,12 @@
  * transitions (flag registers a run, Stop ends it) plus the lesson's own
  * VM outcome -- never a return to the loaded text.
  *
- * Local runs behind a proxy that cannot reach jsDelivr may set
- * SCRATCH_VM_LOCAL_CDN=1 to serve the pinned scratch-vm / scratch-storage
- * bundles from local copies (routeLocalScratchVm in scratch-g2-helpers.ts);
- * CI never sets it and uses the real CDN.
+ * The VM runtime is self-hosted from the app's own origin (OPS-024),
+ * so no CDN reachability is needed for these specs.
  */
 import {expect, test, type Page, type TestInfo} from '@playwright/test'
 import {writeFile} from 'node:fs/promises'
-import {openG2Lab, routeLocalScratchVm, spriteState, stageSprite} from './scratch-g2-helpers'
-
-test.beforeEach(async ({page}, testInfo) => {
-  await routeLocalScratchVm(page)
-})
+import {openG2Lab, spriteState, stageSprite} from './scratch-g2-helpers'
 
 const L01 = 'G2-U1-L01'
 const L02 = 'G2-U1-L02'
