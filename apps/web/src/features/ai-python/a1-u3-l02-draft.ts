@@ -7,8 +7,9 @@
  * 不存：五项检查结果与核对正误——刷新后须重新检查、重新核对才出结果。
  * 恢复默认：清空全部课堂选择，回到未做状态。
  *
- * 与 U1-L06 草稿同一模式：localStorage 单键、防御解析、损坏降级、
- * 写入失败返回 false（由页面提示“未能保存”，不悄悄丢修改）。
+ * 与 U1-L06 草稿同一模式：单键、防御解析、损坏降级；但写入方已改为
+ * 共享 LessonWorkspace（信封写同一键），本模块不再直接碰 localStorage。
+ * 保存失败由外壳保存 chip 与保存消息提示（未能保存），不悄悄丢修改。
  * 本课没有“污染资格”概念，不设污染标志；不要把 L06 的资格规则搬过来。
  *
  * 草稿键（P0 契约格式）：kidscoding-draft:A1-U3-L02。旧 #462 草稿键
@@ -159,65 +160,52 @@ export function restoreDefaultDraft(): L02Draft {
   return emptyDraft()
 }
 
-/** 写入失败返回 false，不抛错；调用方负责向学生提示“未能保存”。 */
-export function saveDraft(draft: L02Draft): boolean {
-  try {
-    if (typeof window === 'undefined' || !window.localStorage) return false
-    window.localStorage.setItem(L02_DRAFT_KEY, serializeDraft(draft))
-    return true
-  } catch {
-    return false
-  }
-}
+/**
+ * 外壳信封说明（集成后）：草稿的唯一写入方是共享 LessonWorkspace，
+ * 它以信封 { lessonId, savedAt, script, version } 写同一键
+ * kidscoding-draft:A1-U3-L02。本模块不再直接写 localStorage——
+ * 直接写裸对象会与外壳信封互相覆盖（外壳读裸对象判格式无效，
+ * 本模块读信封也判格式无效），旧的裸写路径因此删除。
+ * 本模块只保留纯函数：解析（字段级降级）、序列化、恢复默认、
+ * 以及把外壳传来的任意 initial 值规整为合法草稿。
+ */
 
-function readStoredRaw(): string | null {
-  try {
-    if (typeof window === 'undefined' || !window.localStorage) return null
-    return window.localStorage.getItem(L02_DRAFT_KEY)
-  } catch {
-    return null
-  }
-}
-
-let cachedDraft: L02Draft | null = null
-const listeners = new Set<() => void>()
-
-function loadDraft(): L02Draft {
-  if (cachedDraft === null) cachedDraft = parseDraft(readStoredRaw())
-  return cachedDraft
-}
-
-export function subscribeDraft(listener: () => void): () => void {
-  listeners.add(listener)
-  const onStorage = (event: StorageEvent) => {
-    if (event.key === L02_DRAFT_KEY) {
-      cachedDraft = parseDraft(event.newValue)
-      listeners.forEach((fn) => fn())
+/**
+ * 把外壳传来的任意 initial 值规整为合法草稿：字符串走 parseDraft，
+ * 对象走序列化后再解析（非法字段同样降级），其余回默认草稿。
+ * 外壳导入（文件菜单导入）与旧裸草稿都经此规整，不抛错。
+ */
+export function coerceDraft(value: unknown): L02Draft {
+  if (typeof value === 'string') return parseDraft(value)
+  if (value !== null && typeof value === 'object') {
+    try {
+      return parseDraft(JSON.stringify(value))
+    } catch {
+      return emptyDraft()
     }
   }
-  window.addEventListener('storage', onStorage)
-  return () => {
-    listeners.delete(listener)
-    window.removeEventListener('storage', onStorage)
-  }
+  return emptyDraft()
 }
 
-export function getDraftSnapshot(): L02Draft {
-  return loadDraft()
-}
-
-const SERVER_DRAFT: L02Draft = emptyDraft()
-
-export function getServerDraftSnapshot(): L02Draft {
-  return SERVER_DRAFT
-}
-
-/** 写草稿并通知同页订阅者（storage 事件不触发同页监听，须手动通知）。 */
-export function storeDraft(draft: L02Draft): boolean {
-  const ok = saveDraft(draft)
-  if (ok) {
-    cachedDraft = draft
-    listeners.forEach((fn) => fn())
-  }
-  return ok
+/** 严格形状校验（适配器 validateDraft 用）：不降级，只判真假。 */
+export function isValidDraftShape(value: unknown): boolean {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false
+  const v = value as Record<string, unknown>
+  return (
+    v.version === 1 &&
+    Array.isArray(v.selected) &&
+    Array.isArray(v.custom) &&
+    v.facts !== null &&
+    typeof v.facts === 'object' &&
+    !Array.isArray(v.facts) &&
+    (v.hintLevel === 0 || v.hintLevel === 1 || v.hintLevel === 2 || v.hintLevel === 3) &&
+    Array.isArray(v.revealed) &&
+    Array.isArray(v.transferSelected) &&
+    typeof v.transferChecked === 'boolean' &&
+    typeof v.hasChecked === 'boolean' &&
+    v.errorExplanations !== null &&
+    typeof v.errorExplanations === 'object' &&
+    !Array.isArray(v.errorExplanations) &&
+    typeof v.methodSummary === 'string'
+  )
 }
