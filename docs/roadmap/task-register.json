@@ -3286,7 +3286,7 @@
       "title": "P0 LessonWorkspace 共享工作区外壳与引擎适配器（演示）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "新增共享工作区（apps/web/src/features/lessons/workspace/：契约类型、EngineAdapter 接口、BlocklyAdapter、ScratchVMAdapter、规范键草稿、三层判定、外壳组件、演示契约）与演示路由（apps/web/src/app/learn/workspace/[lessonId]）及 E2E（apps/web/tests/e2e/lesson-workspace.spec.ts）；演示契约均标演示、只用规范已公布演示值；不改规范目录、不改课程台账（432 节）、不改共享 CI、不改任何现有课堂与 G2/A1 课程文件。",
       "acceptance": [
@@ -3299,15 +3299,47 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/469",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "651ae7f39361484d35b88a6bcc91d3767e661ecb",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41953458185",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41953458024",
         "tests": [
-          "vitest src/features/lessons/workspace/ 41/41（本地复核）",
-          "Playwright lesson-workspace.spec.ts 9/9（本地生产构建、stock chromium）"
+          "首席独立复核：vitest src/features/lessons/workspace/ 84/84（本地；作者原 41/41 为中间头数字，已订正）",
+          "首席独立复核：Playwright lesson-workspace.spec.ts 生产构建、stock chromium：桌面 31 通过 + 1 跳过（触摸用例需移动端），移动端触摸 1 通过，合计 32 项覆盖（作者原 9/9 为初始演示头数字，已订正）",
+          "PR #469 门禁：33 成功 + 3 跳过、0 失败；main CI 课程 41953458185、任务 41953458024 均 success"
         ],
         "reviewer": null
       },
       "notes": "演示契约（demo-a/demo-b/demo-scratch）均为演示 fixture，水果 x=200/阈值 80 为规范已公布演示值，非正式教学参数；Task-ID 按 OPS-018/019 先例新立，首席可重新指定编号；E2E workflow 接线归首席另立任务，不在本 PR 改动；Scratch VM 本机沙箱未就绪（CDN 依赖）与演示舞台渲染、演示移动积木、分类图标条等缺口见 PR 正文，待首席裁定。"
+    },
+    {
+      "id": "OPS-021",
+      "title": "P0 LessonWorkspace E2E 接入 GitHub Actions（独立接线）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": ["OPS-020"],
+      "scope": "只新增一个 workflow（.github/workflows/lesson-workspace-e2e.yml）与一个专用 Playwright 配置（apps/web/playwright.workspace.config.ts），在 GitHub Actions 里真实运行 apps/web/tests/e2e/lesson-workspace.spec.ts：桌面 1440×900、平板 768×1024、手机 375×812 三项目，含门禁一交集可视高度断言（平板 ≥300、手机 ≥220）；失败 trace、截图与 JUnit 随 test-results 上传；workflow 含 pull_request 与 main push 双触发（路径过滤相同）；不改任何已有 workflow/job，不改工作区代码，不改课程与台账（432 节）。",
+      "acceptance": [
+        "接线 PR 头上 lesson-workspace-e2e job 真实变绿（非本地通过冒充）",
+        "三项目全部执行：桌面、平板、手机",
+        "交集可视高度断言在 CI 内执行：平板 ≥300、手机 ≥220，桌面无新阈值",
+        "失败时 trace、截图与 JUnit 随 test-results 上传（if: always()）",
+        "main push（路径命中时）触发本 job",
+        "已有 workflow/job、#469 工作区代码、#470/#468、课程文件均未动"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/473",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "本地：专用配置 playwright.workspace.config.ts 跑 lesson-workspace.spec.ts：94 通过 / 2 跳过 / 0 失败（生产构建、stock chromium、端口 3100、4.7 分钟；父代理独立重跑 94 通过 / 2 跳过 / 0 失败、4.3 分钟）",
+          "本地：test-results/ 含 junit.xml（96 用例、0 失败、2 跳过）与 7 张 spec 截图",
+          "本地：scripts/check-task-ledger.py TASK_VALIDATE_PR=1 校验通过（111 产品任务、432 课、changed == {OPS-021}）",
+          "CI：以改基后新头真实运行为准，旧头 job 变绿证据（运行 41950828494）不沿用"
+        ],
+        "reviewer": null
+      },
+      "notes": "基底为 main（#469 已于 2026-11-05 合并，合并 SHA 651ae7f3；#473 由原 #469 分支基底改基至 main，不重复带入 OPS-020）；接线 PR 合并进主线后，须确认主线 push 触发新 job 变绿，再按任务制度办理关账，不提前标 completed；本地通过不等于 CI 覆盖，CI 证据以新头 job 结论为准。"
     }
   ]
 }
