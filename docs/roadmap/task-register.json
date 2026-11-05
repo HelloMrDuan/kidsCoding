@@ -3367,20 +3367,22 @@
       },
       "notes": "本修订 PR 经 #473 合并后重建（旧 #475 基底 1ab6cd87 已过期，台账追加位置与 OPS-021 冲突）；合并须满足自身审核与 CI 门禁；与 OPS-022（#476）同改产品台账，合并须串行：#473 → 本修订 → OPS-022 登记重建。"
     },
-    {
+        {
       "id": "OPS-022",
-      "title": "P0 共享外壳移动端编辑控制缺口（Gap A）：槽位外部驱动通道 + 链路与演示渗入复核",
+      "title": "P0 共享 LessonWorkspace 的 EditorSlot 与运行适配器兼容性修复（D1 + Gap A）",
       "priority": "P0",
       "category": "OPS",
       "status": "in_progress",
       "dependencies": [
         "OPS-020"
       ],
-      "scope": "只改共享外壳 apps/web/src/features/lessons/workspace/ 及配套单测/E2E：给 EditorSlotProps 增加可选外部驱动通道（register 命令通道，旧槽位行为不变）；同时复核挂载/运行/停止/判定链路（世代号、停止失效、判定永不进草稿、插槽双通道分工）与正式课程演示渗入（正式路由不得 import 演示契约/舞台/判定，正式契约不得带演示数字目标，fileCapabilities 须显式声明）；不改正式课程文件、不改其他台账条目、不重设计 UI、不以临时 hack 绕过缺陷。3 号 #470 独立课堂保持可用，正式集成在修复合并后做。",
+      "scope": "只改共享外壳 apps/web/src/features/lessons/workspace/ 及配套单测/E2E，统一解决共享 EditorSlot 集成接口问题：D1——EditorSlot + scratch-vm 时适配器无法挂载、运行按钮空转（壳的挂载 effect 遇 editorSlot 直接返回，mountedAdapterRef 恒为 null，运行按钮读不到适配器；3 号复现见 #470 分支 shared-shell-defects.test.tsx 与 SHARED-SHELL-DEFECTS.md）；Gap A——正式课程手机端添加/上移/下移/删除/改参数的可靠操作通道（EditorSlotProps 至今只有向外报告选中的 onSelectionChange，无外部驱动通道）。二者同属 EditorSlot 集成接口，优先使用现有 OPS-022，不重复立任务。D2 演示积木污染属于另一条未采用的 Blockly 集成路径，按 2026-11-05 首席裁定当前不扩大修复范围，不在本任务内处理。不改正式课程文件、不改其他台账条目、不重设计 UI、不以临时 hack 或 DOM 事件劫持绕过缺陷。",
       "acceptance": [
+        "D1 复现测试修复前失败、修复后通过（shared-shell-defects.test.tsx 中 D1 两条 it.fails 去标记后直接通过；对照用例保持通过）",
+        "React EditorSlot 与运行适配器可同时工作：挂载、运行、停止、判定、自动保存、失效通知正常",
+        "Summary 及现有 Blockly 课程兼容，无回归",
+        "手机编辑操作可靠，不依赖 DOM 事件劫持",
         "Gap A 复现测试在缺口下失败、修复后通过（含手机工具栏五操作与 Blockly 焦点丢失场景）",
-        "链路五项逐项有代码与运行证据（挂载、运行、停止、判定、插槽双通道）",
-        "演示渗入排查零渗入，或渗入已随修复清除",
         "OPS-020 的 84 项单测与 32 项 E2E 无回归",
         "任务门禁通过，PR 合并后主线 CI 通过"
       ],
@@ -3391,7 +3393,7 @@
         "tests": [],
         "reviewer": null
       },
-      "notes": "登记重建：旧 #476 基底 1ab6cd87 已过期（#473、#477 先后合并，台账追加位置冲突），本登记以 #477 合并后主线为基重建；分工：2 号负责共享外壳实现，3 号提供复现测试与课程需求，首席验收；开发简报（可转发）见首席工作区 hidden_files/ops022-dev-brief.md；实现另立 PR，不在本登记 PR 内写代码。"
+      "notes": "登记重建：旧 #476 仅登记移动端 Gap A 且基底过期（mergeable dirty，不可合并），本登记以 #477 合并后主线为基重建并按 2026-11-05 首席裁定统一定义为 D1 + Gap A；分工：2 号负责共享外壳实现（按 3 号复现测试修复 D1），3 号提供复现测试与课程需求（已在 #470），首席验收；D2 不在本任务范围；实现另立 PR，不在本登记 PR 内写代码。"
     }
 
   ]
