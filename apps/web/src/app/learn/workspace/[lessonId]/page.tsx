@@ -79,10 +79,14 @@ export default function WorkspaceDemoPage({
   return (
     <main className="min-h-screen bg-[var(--kc-canvas)]">
       {/* Round 4: the test-only demo nav is hidden on phones (it stays in
-          the DOM and stays usable on tablet/desktop, where the E2E
+          the DOM and stays usable on desktop, where the E2E
           lesson-switch cases run). It costs a full row above the editor
-          on a 375px first screen and is not product UI. */}
-      <style>{`@media (max-width: 767px) { [data-testid="ws-demo-nav"] { display: none; } }`}</style>
+          on a 375px first screen and is not product UI.
+          Gate 1: also hidden on tablets (<= 1023px), where it costs
+          24px of first-screen height above the canvas. Tablet demo
+          switching still works by direct URL; no E2E case opens the
+          nav below 1440px. */}
+      <style>{`@media (max-width: 1023px) { [data-testid="ws-demo-nav"] { display: none; } }`}</style>
       <section className="kc-page-main">
         {/* Round 3 §3.2: the demo switch lives in a collapsed <details>
             test nav — one compact line, closed by default, never a

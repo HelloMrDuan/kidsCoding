@@ -96,7 +96,10 @@ test('tablet 768 first screen: stage + script + rail + run + task entry, compact
   expect(svgBox!.y).toBeLessThan(1024)
   // Round 4 strengthening: tablet canvas >= 300px tall, and a real
   // rendered block fully inside the 1024px viewport.
-  expect(svgBox!.height).toBeGreaterThanOrEqual(300)
+  // Gate 1: visible height is the viewport ∩ canvas rect, NOT the
+  // canvas's own height (which extends past the fold).
+  const tabletVisible = Math.max(0, Math.min(1024, svgBox!.y + svgBox!.height) - Math.max(0, svgBox!.y))
+  expect(tabletVisible).toBeGreaterThanOrEqual(300)
   const firstBlockBox = await page.locator('.blocklyBlockCanvas .blocklyDraggable').first().boundingBox()
   expect(firstBlockBox).not.toBeNull()
   expect(firstBlockBox!.y).toBeGreaterThanOrEqual(svgBox!.y)
@@ -201,7 +204,10 @@ test('mobile 375 first screen: stage preview + script + run + drawer entry + sea
   // Round 4 strengthening: the canvas itself must be tall enough to work
   // in (>= 220px), and a real rendered block must sit fully above the
   // bottom nav — not merely inside the 812px viewport behind it.
-  expect(svgBox!.height).toBeGreaterThanOrEqual(220)
+  // Gate 1: visible height is the viewport ∩ canvas rect, NOT the
+  // canvas's own height.
+  const mobileVisible = Math.max(0, Math.min(812, svgBox!.y + svgBox!.height) - Math.max(0, svgBox!.y))
+  expect(mobileVisible).toBeGreaterThanOrEqual(220)
   const firstBlockBox = await page.locator('.blocklyBlockCanvas .blocklyDraggable').first().boundingBox()
   expect(firstBlockBox).not.toBeNull()
   expect(firstBlockBox!.y).toBeGreaterThanOrEqual(svgBox!.y)
@@ -668,10 +674,10 @@ test('summary tablet + mobile: editor stays wide, task via drawer, type/save/res
 
 /* ---------------- Round 4: approved-layout implementation ---------------- */
 
-test('round4 layout budget default: stage/run/materials/task in view, svg height targets, first block fully in view', async ({
+test('gate1 layout budget default: stage/run/materials/task in view, visible-height targets, first block fully in view', async ({
   page,
 }) => {
-  for (const [width, height, minSvg] of [
+  for (const [width, height, minVisible] of [
     [1440, 900, 0],
     [768, 1024, 300],
     [375, 812, 220],
@@ -692,7 +698,11 @@ test('round4 layout budget default: stage/run/materials/task in view, svg height
     const svgBox = await page.getByTestId('ws-blockly-mount').locator('svg.blocklySvg').boundingBox()
     expect(svgBox).not.toBeNull()
     expect(svgBox!.y).toBeLessThan(height)
-    expect(svgBox!.height).toBeGreaterThanOrEqual(minSvg)
+    // Gate 1: visible height is the viewport ∩ canvas rect, NOT the
+    // canvas's own height. Thresholds unchanged (desktop 0 = no new
+    // threshold, tablet 300, mobile 220).
+    const visibleHeight = Math.max(0, Math.min(height, svgBox!.y + svgBox!.height) - Math.max(0, svgBox!.y))
+    expect(visibleHeight).toBeGreaterThanOrEqual(minVisible)
     const firstBlockBox = await page.locator('.blocklyBlockCanvas .blocklyDraggable').first().boundingBox()
     expect(firstBlockBox).not.toBeNull()
     expect(firstBlockBox!.y).toBeGreaterThanOrEqual(svgBox!.y)

@@ -1704,6 +1704,30 @@ export function LessonWorkspace({
           .ws-topbar { padding: 4px 6px; gap: 4px; }
           .ws-topbar h1 { font-size: 15px !important; }
           .ws-topbar .kc-btn-sm { padding: 4px 8px; }
+          /* Gate 1 visible-height budget (<= 1023px): compress only
+             non-core vertical space above the canvas. No control is
+             removed, no threshold is lowered, and the stage keeps its
+             approved heights (tablet 200px medium, phone 140px medium).
+             Note: the older ws-goalstrip kc-btn rule below never
+             matched — the expand button carries kc-btn-sm, not
+             kc-btn — so the padding cut below uses the real class. */
+          .ws-goal5-list.ws-goal5-collapsed { margin-top: 0; }
+          .ws-goalstrip .kc-btn-sm { padding: 4px 8px; }
+          .ws-topbar { margin-bottom: 8px; }
+          .ws-goalstrip { padding: 4px 10px; margin-bottom: 8px; }
+        }
+        /* Gate 1 tablet-only budget (768–1023px): compress the rows
+           above the canvas. The stage keeps medium 200px; every pixel
+           below comes from panel/section spacing, not from the stage. */
+        @media (min-width: 768px) and (max-width: 1023px) {
+          .ws-panel > section { padding: 8px 12px; }
+          .ws-panel { margin-bottom: 6px; }
+          .ws-grid { gap: 8px; }
+          .ws-role-note { margin-top: 4px; }
+          .ws-search-row input { min-height: 36px; }
+          .ws-search-row { margin-bottom: 4px; }
+          .ws-palette { padding: 6px 12px; margin-bottom: 6px; }
+          .ws-runbar { margin-top: 4px; }
         }
         @media (max-width: 767px) {
           /* Mobile goal strip: one row (ellipsised goal + expand button).
@@ -1715,10 +1739,15 @@ export function LessonWorkspace({
           .ws-goalstrip-meta { display: none; }
           .ws-search-row { margin-bottom: 2px; }
           .ws-search-row input { min-height: 36px; }
-          .ws-palette { padding: 6px 8px; margin-bottom: 4px; }
+          .ws-palette { padding: 4px 8px; margin-bottom: 2px; }
           .ws-panel { margin-bottom: 4px; }
           .ws-panel > section { padding: 4px 6px; }
           .ws-runbar { margin-top: 2px; }
+          /* Gate 1 phone budget (<= 767px): the stage-head toggle is
+             the tallest head item; its padding cut keeps every control
+             (run/stop stay full size). Palette trims are vertical only. */
+          .ws-stage-head .kc-btn-sm { padding: 4px 8px; }
+          .ws-topbar { gap: 2px; }
         }
         @media (min-width: 1280px) {
           /* Desktop: stage + roles + rail + script, only the present
