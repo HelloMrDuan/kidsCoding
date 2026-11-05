@@ -3328,7 +3328,7 @@
         "任务门禁通过（声明条目与改动条目完全一致），实现 PR 合并后主线 CI 通过才可关账"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/476",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
