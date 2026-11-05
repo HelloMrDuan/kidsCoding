@@ -3316,7 +3316,7 @@
       "title": "P0 共享外壳移动端编辑控制缺口（Gap A）：槽位外部驱动通道",
       "priority": "P0",
       "category": "OPS",
-      "status": "todo",
+      "status": "in_progress",
       "dependencies": [
         "OPS-020"
       ],
