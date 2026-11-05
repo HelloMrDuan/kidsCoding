@@ -3340,6 +3340,61 @@
         "reviewer": null
       },
       "notes": "基底为 main（#469 已于 2026-11-05 合并，合并 SHA 651ae7f3；#473 由原 #469 分支基底改基至 main，不重复带入 OPS-020）；接线 PR 合并进主线后，须确认主线 push 触发新 job 变绿，再按任务制度办理关账，不提前标 completed；本地通过不等于 CI 覆盖，CI 证据以新头 job 结论为准。"
+    },
+    {
+      "id": "SPEC-002",
+      "title": "P0 工作区规范 v1.0 → v1.1 修订：结构化提示、共享插槽、草稿与判定语义入规范文本",
+      "priority": "P0",
+      "category": "SPEC",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-020"
+      ],
+      "scope": "仅规范文本：docs/product/p0-kitten-workspace/ 下 DESIGN.md、LESSON-CONTRACT.md、WORKSPACE-API.md、OWNERSHIP.md、ACCEPTANCE.md 版本行 v1.0 → v1.1 并追加 v1.1 章节；TEST-EVIDENCE.md 与 PROTOTYPE.html 仍为 v1.0 证据不动；不改代码、不改课程台账（432 节）、不改共享 CI、不新增布局/token/正式课程参数；内容全部取自已合并实现 OPS-020（PR #469，合并 651ae7f3），不发明新语义。",
+      "acceptance": [
+        "5 个规范文件版本行均为 p0-kitten-workspace-v1.1，新增章节与 #469 合并代码一致",
+        "任务门禁通过（声明条目与改动条目完全一致）",
+        "PR 合并后主线 CI 通过"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/477",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "首席独立复核 OPS-020：vitest 84/84、E2E 32 项（见 #469 审核）"
+        ],
+        "reviewer": null
+      },
+      "notes": "本修订 PR 经 #473 合并后重建（旧 #475 基底 1ab6cd87 已过期，台账追加位置与 OPS-021 冲突）；合并须满足自身审核与 CI 门禁；与 OPS-022（#476）同改产品台账，合并须串行：#473 → 本修订 → OPS-022 登记重建。"
+    },
+        {
+      "id": "OPS-022",
+      "title": "P0 共享 LessonWorkspace 的 EditorSlot 与运行适配器兼容性修复（D1 + Gap A）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_progress",
+      "dependencies": [
+        "OPS-020"
+      ],
+      "scope": "只改共享外壳 apps/web/src/features/lessons/workspace/ 及配套单测/E2E，统一解决共享 EditorSlot 集成接口问题：D1——EditorSlot + scratch-vm 时适配器无法挂载、运行按钮空转（壳的挂载 effect 遇 editorSlot 直接返回，mountedAdapterRef 恒为 null，运行按钮读不到适配器；3 号复现见 #470 分支 shared-shell-defects.test.tsx 与 SHARED-SHELL-DEFECTS.md）；Gap A——正式课程手机端添加/上移/下移/删除/改参数的可靠操作通道（EditorSlotProps 至今只有向外报告选中的 onSelectionChange，无外部驱动通道）。二者同属 EditorSlot 集成接口，优先使用现有 OPS-022，不重复立任务。D2 演示积木污染属于另一条未采用的 Blockly 集成路径，按 2026-11-05 首席裁定当前不扩大修复范围，不在本任务内处理。不改正式课程文件、不改其他台账条目、不重设计 UI、不以临时 hack 或 DOM 事件劫持绕过缺陷。",
+      "acceptance": [
+        "D1 复现测试修复前失败、修复后通过（shared-shell-defects.test.tsx 中 D1 两条 it.fails 去标记后直接通过；对照用例保持通过）",
+        "React EditorSlot 与运行适配器可同时工作：挂载、运行、停止、判定、自动保存、失效通知正常",
+        "Summary 及现有 Blockly 课程兼容，无回归",
+        "手机编辑操作可靠，不依赖 DOM 事件劫持",
+        "Gap A 复现测试在缺口下失败、修复后通过（含手机工具栏五操作与 Blockly 焦点丢失场景）",
+        "OPS-020 的 84 项单测与 32 项 E2E 无回归",
+        "任务门禁通过，PR 合并后主线 CI 通过"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/479",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "登记重建：旧 #476 仅登记移动端 Gap A 且基底过期（mergeable dirty，不可合并），本登记以 #477 合并后主线为基重建并按 2026-11-05 首席裁定统一定义为 D1 + Gap A；分工：2 号负责共享外壳实现（按 3 号复现测试修复 D1），3 号提供复现测试与课程需求（已在 #470），首席验收；D2 不在本任务范围；实现另立 PR，不在本登记 PR 内写代码。"
     }
+
   ]
 }
