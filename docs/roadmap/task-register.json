@@ -3438,7 +3438,7 @@
       "title": "P0 共享 LessonWorkspace 的 EditorSlot 与运行适配器兼容性修复（D1 + Gap A）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-020"
       ],
@@ -3454,9 +3454,14 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/480",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "mergeCommit": "17229f95471ed9e2ba1d342bf9aff6444facb22c",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41998615519",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41998615548",
+        "tests": [
+          "PR #480 门禁：37 项检查 34 成功 + 3 跳过、0 失败（头 541488d4）",
+          "首席独立复核（2026-11-05）：壳侧 Vitest 93/93；D1 复现去标记后两条全过；E2E 三端本地 97 通过 / 2 跳过 / 0 失败（含新增槽位容器高度用例）",
+          "main CI 课程 41998615519、追踪 41998615548、deploy-pipeline 41998615573 均 success（主线头 0a913c6c）"
+        ],
         "reviewer": null
       },
       "notes": "登记重建：旧 #476 仅登记移动端 Gap A 且基底过期（mergeable dirty，不可合并），本登记以 #477 合并后主线为基重建并按 2026-11-05 首席裁定统一定义为 D1 + Gap A；分工：2 号负责共享外壳实现（按 3 号复现测试修复 D1），3 号提供复现测试与课程需求（已在 #470），首席验收；D2 不在本任务范围；实现另立 PR，不在本登记 PR 内写代码。实现 PR：#480（Draft，分支 muse-c/ops-022-slot-channel）；本地 Vitest 93/93、E2E 97/2/0、D1 复现去标记通过。"
@@ -3466,7 +3471,7 @@
       "title": "Scratch VM CI 稳定性治理：固定版本运行时自托管，CI 不依赖外部 CDN",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "SYS-109"
       ],
@@ -3480,9 +3485,13 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/485",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "mergeCommit": "0a913c6cd70e3ba580f953bff541d7b9458de4e3",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41998615519",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41998615548",
+        "tests": [
+          "PR #485 门禁：32 项检查 30 成功 + 2 跳过、0 失败（头 0204a304；新增 scratch-vm-local Job success）",
+          "main CI 课程 41998615519、追踪 41998615548、deploy-pipeline 41998615573 均 success（主线头 0a913c6c）"
+        ],
         "reviewer": null
       },
       "notes": "根因：两份沙箱 HTML 在运行时从 jsDelivr 拉固定版本 VM（package.json 完全无 scratch 依赖，npm ci 装不到本地）；60 秒是测试等待超时，不是 VM 定时器。S2 单独失败、其余分片全过，符合外部下载抖动。OPS-023 已被 #483 占用，故取 OPS-024。"
