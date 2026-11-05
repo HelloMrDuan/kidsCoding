@@ -9084,7 +9084,7 @@
       "unitId": "A1-U3",
       "focusConcept": "API",
       "plannedLearningOutcome": "能使用API解释并完成「实现文本摘要」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -9097,13 +9097,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/462",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "开发中（Draft PR #462，未合并、未发布）：复用 U3 本地试点已发表的合成课文与本地判定引擎，课堂含动手摘要三项检查、事实核对（原文事实/合理概括/无依据推断）、正反例、三级提示与本机草稿保存恢复；生成式摘要只一句话方向，不调用外部模型；V2 品牌 token 已应用于本页（以代码与三端截图为准），视觉符合性待独立视觉复核，不宣称通过；独立人工教研与儿童试学仍在发布门禁内。三端截图已实测（本地真实 Chrome，375/768/1440 均无横向溢出；CI 以专属 Job 为准）。首席复核后整改：抽取规范（3–5句且每要点至多一句）与结构化来源核验（逐字比对所标来源，无来源句不通过），练习A新增自加句触发路径；本地Vitest 17/17、E2E 10/10，三端均无溢出。最小收敛：五项全过 verdict、自加句错误实验声明、数字规则与来源核验区分、自加句上限（5句/200字）与可见超限提示、损坏草稿丢弃超长句；本地Vitest 18/18、E2E 12/12，三端均无溢出。"
     },
     {
       "id": "A1-U3-L03",
