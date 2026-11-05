@@ -3466,7 +3466,7 @@
       "title": "Scratch VM CI 稳定性治理：固定版本运行时自托管，CI 不依赖外部 CDN",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "SYS-109"
       ],
@@ -3479,7 +3479,7 @@
         "新增 scratch-vm-local Job 在 GitHub Actions 通过；任务门禁通过，PR 合并后主线 CI 通过"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/485",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
