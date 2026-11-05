@@ -71,7 +71,7 @@ Scratch 课程需要“React 编辑槽 + 适配器挂载真实 VM + 壳的运行
 
 ---
 
-## 联合验收结果：#470（课程侧）+ #480（`68eec75a`，OPS-022 实现）
+## 联合验收结果：#470（课程侧）+ #480（先在 `68eec75a`，随后在首席复核后的 `f85524fc` 重跑）
 
 在独立的临时集成工作区验证（`git worktree`：#480 的 head + 本分支的课程代码和新增 spec；不合并 main，不改动 #470 与 #480 任何一个分支）。
 浏览器是 npm 的 Chromium 153（不是 CI 的 Chrome 稳定版），Scratch VM 来自 npm 的 `scratch-vm@5.0.300`。以下是本地真实运行结果，**不是 GitHub Actions**。
@@ -80,9 +80,9 @@ Scratch 课程需要“React 编辑槽 + 适配器挂载真实 VM + 壳的运行
 |---|---|
 | D1 两条复现去掉 `it.fails` | **通过**（`port.mounts === 1`、点击壳运行按钮 `port.runs.length === 1`）；对照用例通过 |
 | D2 两条 | 保持 `it.fails`，按期望失败（即“通过”）；本轮不修 |
-| Vitest（`src/features/lessons/g2-u3-l02` + `src/features/lessons/workspace`） | 14 个文件，**226 通过 + 2 个预期失败（D2）**，0 失败 |
+| Vitest（`src/features/lessons/g2-u3-l02` + `src/features/lessons/workspace`） | `68eec75a`：14 个文件，226 通过 + 2 预期失败（D2）；`f85524fc`（新增“槽位恢复草稿时校验”）：15 个文件，**231 通过 + 2 个预期失败（D2）**，0 失败 |
 | Gap A 真实 E2E（`g2-u3-l02-shell-gap-a.spec.ts`，真实共享壳 + 真实 `EditorSlot` + 真实 Blockly + 真实 VM） | 7 个场景 × [desktop 1440 / phone 375] = **14 个实例，14 通过** |
-| 同一批运行里的真实 VM 矩阵 `g2-u3-l02-vm.spec.ts` | 22 通过（与本批合计 36 通过） |
+| 同一批运行里的真实 VM 矩阵 `g2-u3-l02-vm.spec.ts` | 22 通过（与本批合计 36 通过）；`68eec75a` 与 `f85524fc` 两个 head 上结果相同 |
 
 **Gap A 的 7 个场景**（手机视口用触摸 `tap`，桌面用鼠标）：
 1. 添加 / 上移 / 下移 / 删除 / 改数字 五项操作，全部作用于同一个 Blockly 工作区，并能经壳的运行按钮运行通过；
