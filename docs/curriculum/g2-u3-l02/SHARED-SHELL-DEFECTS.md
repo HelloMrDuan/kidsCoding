@@ -1,5 +1,7 @@
 # 共享 LessonWorkspace 的缺陷与 G2-U3-L02 需要 2 号落实的接口
 
+> **状态更新**：D1 已由 OPS-022（#480）修复，本课已完成正式接线，`shared-shell-defects.test.tsx` 里 D1 的两条已取消 `it.fails` 并直接通过；D2 保持 expected-fail（本课不走那条路线）。下面的内容是缺陷当时的记录与联合验收结果。
+
 对象：main `651ae7f39361484d35b88a6bcc91d3767e661ecb`（PR #469 已合并）里的
 `apps/web/src/features/lessons/workspace/lesson-workspace.tsx`（行号以该提交为准）。
 首席已确认缺陷成立。**本课不绕过它**：没有修改共享文件，没有改 engine 语义，没有借用演示积木，没有劫持 DOM 事件。
