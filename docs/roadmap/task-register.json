@@ -3340,6 +3340,33 @@
         "reviewer": null
       },
       "notes": "基底为 main（#469 已于 2026-11-05 合并，合并 SHA 651ae7f3；#473 由原 #469 分支基底改基至 main，不重复带入 OPS-020）；接线 PR 合并进主线后，须确认主线 push 触发新 job 变绿，再按任务制度办理关账，不提前标 completed；本地通过不等于 CI 覆盖，CI 证据以新头 job 结论为准。"
+    },
+    {
+      "id": "SPEC-002",
+      "title": "P0 工作区规范 v1.0 → v1.1 修订：结构化提示、共享插槽、草稿与判定语义入规范文本",
+      "priority": "P0",
+      "category": "SPEC",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-020"
+      ],
+      "scope": "仅规范文本：docs/product/p0-kitten-workspace/ 下 DESIGN.md、LESSON-CONTRACT.md、WORKSPACE-API.md、OWNERSHIP.md、ACCEPTANCE.md 版本行 v1.0 → v1.1 并追加 v1.1 章节；TEST-EVIDENCE.md 与 PROTOTYPE.html 仍为 v1.0 证据不动；不改代码、不改课程台账（432 节）、不改共享 CI、不新增布局/token/正式课程参数；内容全部取自已合并实现 OPS-020（PR #469，合并 651ae7f3），不发明新语义。",
+      "acceptance": [
+        "5 个规范文件版本行均为 p0-kitten-workspace-v1.1，新增章节与 #469 合并代码一致",
+        "任务门禁通过（声明条目与改动条目完全一致）",
+        "PR 合并后主线 CI 通过"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/477",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "首席独立复核 OPS-020：vitest 84/84、E2E 32 项（见 #469 审核）"
+        ],
+        "reviewer": null
+      },
+      "notes": "本修订 PR 经 #473 合并后重建（旧 #475 基底 1ab6cd87 已过期，台账追加位置与 OPS-021 冲突）；合并须满足自身审核与 CI 门禁；与 OPS-022（#476）同改产品台账，合并须串行：#473 → 本修订 → OPS-022 登记重建。"
     }
+
   ]
 }
