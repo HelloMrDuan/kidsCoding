@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
   L03_DRAFT_KEY,
+  coerceDraft,
   emptyDraft,
+  isValidDraftShape,
   parseDraft,
   restoreDefaultDraft,
   saveDraft,
@@ -30,6 +32,31 @@ describe('A1-U3-L03 draft save/restore', () => {
 
   it('restore-default empties everything', () => {
     expect(restoreDefaultDraft()).toEqual(emptyDraft())
+  })
+
+  it('the draft key follows the spec envelope format', () => {
+    expect(L03_DRAFT_KEY).toBe('kidscoding-draft:A1-U3-L03')
+  })
+
+  it('coerceDraft keeps valid drafts and degrades damaged ones to defaults', () => {
+    const valid = {
+      version: 1 as const,
+      jsonText: '{"名称": "苹果"}',
+      hintLevel: 2 as const,
+    }
+    expect(coerceDraft(valid)).toEqual(valid)
+    expect(isValidDraftShape(valid)).toBe(true)
+    expect(coerceDraft({ version: 1, jsonText: '{"名称": "苹果"}' })).toEqual({
+      version: 1,
+      jsonText: '{"名称": "苹果"}',
+      hintLevel: 0,
+    })
+    expect(coerceDraft(null)).toEqual(emptyDraft())
+    expect(coerceDraft('not an object')).toEqual(emptyDraft())
+    expect(coerceDraft({ version: 2, jsonText: '{}' })).toEqual(emptyDraft())
+    expect(coerceDraft({ version: 1, jsonText: 42 })).toEqual(emptyDraft())
+    expect(coerceDraft({ version: 1, jsonText: '{}', hintLevel: 9 })).toEqual(emptyDraft())
+    expect(isValidDraftShape({ version: 1, jsonText: '{}', hintLevel: 9 })).toBe(false)
   })
 
   it('saveDraft persists when a window exists and never throws', () => {
