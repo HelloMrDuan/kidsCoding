@@ -364,6 +364,26 @@ test.describe('A1-U3-L02 lesson page (unified LessonWorkspace integration)', () 
   })
 })
 
+test.describe('A1-U3-L02 tablet screen', () => {
+  test.use({ viewport: { width: 768, height: 1024 }, hasTouch: true })
+  test('768px: no horizontal overflow before or after interaction', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await expect(page.getByTestId('ws-topbar')).toContainText('实现文本摘要')
+    expect(await overflow(page)).toBe(false)
+    await page.getByTestId('ai-u3-l02-tab-independent').tap()
+    await page.getByTestId('ai-u3-l02-pick-P1-1').tap()
+    await page.getByTestId('ai-u3-l02-check-summary').tap()
+    await expect(page.getByTestId('ai-u3-l02-summary-checks')).toBeVisible()
+    expect(await overflow(page)).toBe(false)
+    await page.getByTestId('ai-u3-l02-tab-transfer').tap()
+    await page.getByTestId('ai-u3-l02-transfer-pick-T1-1').tap()
+    await page.getByTestId('ai-u3-l02-transfer-check').tap()
+    await expect(page.getByTestId('ai-u3-l02-transfer-checks')).toBeVisible()
+    expect(await overflow(page)).toBe(false)
+  })
+})
+
 test.describe('A1-U3-L02 narrow screen', () => {
   test.use({ viewport: { width: 375, height: 812 }, hasTouch: true, isMobile: true })
   test('375px: no horizontal overflow before or after interaction', async ({ page }) => {
