@@ -472,3 +472,123 @@ for (const vp of VIEWPORTS) {
   })
 }
 
+// ---- 槽位验证页：按共享壳的调用方式使用本课的 EngineAdapter 与三个槽位 ---------------------------
+// /learn/g2-u3-l02/embed 用共享的 EditorSlotProps / StageSlotProps / RolesSlotProps、共享 workspace-draft 草稿，
+// 运行走 LessonL02Adapter.run()。真实 Scratch VM、真实 Blockly、真实 localStorage。它不是 LessonWorkspace：
+// 共享壳的缺陷（见 docs/curriculum/g2-u3-l02/SHARED-SHELL-DEFECTS.md）阻止最终接线，本页只证明课程侧接口就绪。
+const EMBED_URL = '/learn/g2-u3-l02/embed'
+const DRAFT_KEY = 'kidscoding-draft:G2-U3-L02'
+
+async function openEmbed(page: Page, opts: {fresh?: boolean} = {}) {
+  await injectCjkFont(page)
+  await routeLocalScratchVm(page)
+  if (opts.fresh !== false) await page.addInitScript(() => { if (!sessionStorage.getItem('l2-keep')) localStorage.removeItem('kidscoding-draft:G2-U3-L02') })
+  await page.goto(EMBED_URL)
+  await expect(page.getByTestId('l2-engine-status')).toHaveText('Scratch VM 已就绪', {timeout: 60_000})
+}
+
+async function embedAdd(page: Page, type: 'flag' | 'move' | 'repeat') {
+  if (!(await page.getByTestId('l2-palette').isVisible())) await page.getByTestId('l2-add-block').click()
+  await page.getByTestId(`l2-add-${type}`).click()
+}
+
+const programAttr = async (page: Page) => (await page.getByTestId('l2-script-host').getAttribute('data-program'))!
+const draftKeys = (page: Page) => page.evaluate(() => Object.keys(localStorage).filter(k => k.startsWith('kidscoding-draft')))
+
+for (const vp of VIEWPORTS.filter(v => v.name !== 'tablet')) {
+  test.describe(`[${vp.name}]`, () => {
+    test.use({viewport: {...vp.viewport}, hasTouch: vp.hasTouch, isMobile: vp.isMobile})
+    test.describe('G2-U3-L02 槽位验证页（适配器 + 三个槽位 + 共享草稿）', () => {
+      test.setTimeout(150_000)
+
+      test('第一关：没预测不能运行；预测后经适配器运行，结论是“观察”，舞台与引擎状态来自真实 VM', async ({page}) => {
+        await openEmbed(page)
+        await expect(page.getByTestId('l2-run')).toBeDisabled()
+        await expect(page.getByTestId('l2-run-reason')).toContainText('预测')
+        await page.getByTestId('l2-pred-x').fill('40')
+        await page.getByTestId('l2-pred-caught-no').check()
+        await expect(page.getByTestId('l2-run')).toBeEnabled()
+        await page.getByTestId('l2-run').click()
+        await expect(page.getByTestId('l2-conclusion')).toBeVisible({timeout: 30_000})
+        await expect(page.getByTestId('l2-conclusion')).toHaveText('这一关是观察：对一对你的预测和真实结果。')
+        await expect(page.getByTestId('l2-stage')).toHaveAttribute('data-basket-x', '40')
+        await expect(page.getByTestId('l2-embed-engine-state')).toContainText('x=40 score=0')
+        await expect(page.getByTestId('l2-layer-stage')).toContainText('舞台结果：')
+        await expect(page.getByTestId('l2-layer-task')).toContainText('任务结果：')
+        await expect(page.getByTestId('l2-layer-knowledge')).toContainText('知识证据：')
+        await expect(page.getByTestId('l2-understanding')).toContainText('需要进一步解释或练习')
+        await expect(page.getByTestId('l2-feedback')).not.toContainText(/已(经)?掌握/)
+        // 草稿由共享 workspace-draft 写入：一课一键，信封带 version，不含运行结果
+        await expect(page.getByTestId('l2-save-chip')).toContainText('已保存', {timeout: 10_000})
+        expect(await draftKeys(page)).toEqual([DRAFT_KEY])
+        const env = JSON.parse((await page.evaluate(k => localStorage.getItem(k), DRAFT_KEY))!)
+        expect(env).toMatchObject({lessonId: 'G2-U3-L02', version: 1})
+        expect(Object.keys(env.script).sort()).toEqual(['levelId', 'predictions', 'programs', 'version'])
+        expect(JSON.stringify(env)).not.toMatch(/landing|passedAt|basketMoves/)
+      })
+
+      test('第二关：用槽位自带的工具栏搭程序，经适配器运行通过；删除是编辑；刷新后草稿恢复、结果不恢复；四关只有一个草稿键', async ({page}) => {
+        await openEmbed(page)
+        await page.getByTestId('l2-level-solve').click()
+        await expect(page.getByTestId('l2-embed-root')).toHaveAttribute('data-level', 'solve')
+        await embedAdd(page, 'flag')
+        await embedAdd(page, 'repeat')
+        await setSelectedNumber(page, 3)
+        await embedAdd(page, 'move')
+        await setSelectedNumber(page, 50)
+        await page.getByTestId('l2-run').click()
+        await expect(page.getByTestId('l2-conclusion')).toBeVisible({timeout: 30_000})
+        await expect(page.getByTestId('l2-conclusion')).toHaveAttribute('data-passed', 'true')
+        for (const id of ['stage', 'task', 'knowledge']) await expect(page.getByTestId(`l2-layer-${id}`)).toHaveAttribute('data-passed', 'true')
+        await expect(page.getByTestId('l2-stage')).toHaveAttribute('data-basket-x', '150')
+        await expect(page.getByTestId('l2-embed-engine-state')).toContainText('x=150 score=1')
+        // 选中“移动”后删除：这是编辑，旧结果立即清除；再运行就不再通过
+        await expect(page.getByTestId('l2-delete')).toBeEnabled()
+        await page.getByTestId('l2-delete').click()
+        await expect(page.getByTestId('l2-feedback-empty')).toBeVisible()
+        await page.getByTestId('l2-run').click()
+        await expect(page.getByTestId('l2-conclusion')).toHaveAttribute('data-passed', 'false', {timeout: 30_000})
+        // 角色槽位：点水果看到只读脚本，再回到篮子，篮子脚本不变
+        const before = await programAttr(page)
+        await page.getByTestId('l2-role-fruit').click()
+        await expect(page.getByTestId('l2-fruit-script')).toBeVisible()
+        await page.getByTestId('l2-role-basket').click()
+        expect(await programAttr(page)).toBe(before)
+        // 刷新：关卡与脚本从草稿恢复，旧结果不恢复
+        await expect(page.getByTestId('l2-save-chip')).toContainText('已保存', {timeout: 10_000})
+        await page.evaluate(() => sessionStorage.setItem('l2-keep', '1'))
+        await page.reload()
+        await expect(page.getByTestId('l2-engine-status')).toHaveText('Scratch VM 已就绪', {timeout: 60_000})
+        await expect(page.getByTestId('l2-embed-root')).toHaveAttribute('data-level', 'solve')
+        await expect(page.getByTestId('l2-save-chip')).toHaveText('已恢复草稿')
+        expect(await programAttr(page)).toBe(before)
+        await expect(page.getByTestId('l2-feedback-empty')).toBeVisible()
+        // 走完四关：仍然只有一个草稿键，不拆成四个课节
+        for (const id of ['transferLeft', 'transferFast', 'explore', 'solve']) await page.getByTestId(`l2-level-${id}`).click()
+        expect(await draftKeys(page)).toEqual([DRAFT_KEY])
+      })
+
+      test('不合法或损坏的草稿：不恢复、起点正常、不覆盖已存的内容', async ({page}) => {
+        const bad = JSON.stringify({lessonId: 'G2-U3-L02', savedAt: 'x', script: {version: 2, levelId: 'solve'}})
+        await page.addInitScript(([key, value]) => {
+          if (!sessionStorage.getItem('l2-seeded')) {
+            sessionStorage.setItem('l2-seeded', '1')
+            localStorage.setItem(key, value)
+          }
+        }, [DRAFT_KEY, bad])
+        await openEmbed(page, {fresh: false})
+        await expect(page.getByTestId('l2-embed-root')).toHaveAttribute('data-level', 'explore')
+        await expect(page.getByTestId('l2-save-chip')).toContainText('未能恢复')
+        await page.waitForTimeout(800) // 没有编辑就没有自动保存：存储里的东西原样不动
+        expect(await page.evaluate(k => localStorage.getItem(k), DRAFT_KEY)).toBe(bad)
+        // 文件本身损坏
+        await page.evaluate(k => localStorage.setItem(k, '{坏的'), DRAFT_KEY)
+        await page.reload()
+        await expect(page.getByTestId('l2-engine-status')).toHaveText('Scratch VM 已就绪', {timeout: 60_000})
+        await expect(page.getByTestId('l2-save-chip')).toContainText('未能恢复')
+        await expect(page.getByTestId('l2-embed-root')).toHaveAttribute('data-level', 'explore')
+        expect(await page.evaluate(k => localStorage.getItem(k), DRAFT_KEY)).toBe('{坏的')
+      })
+    })
+  })
+}

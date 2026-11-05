@@ -12,6 +12,7 @@ import {compileProject} from '../../src/features/lessons/g2-u3-l02/compile'
 import {judgeRun, type RunJudgment, type RunTrace} from '../../src/features/lessons/g2-u3-l02/judge'
 import {L02_LEVELS, L02_PARAMS, framesToLand, type LevelId} from '../../src/features/lessons/g2-u3-l02/params'
 import {programFingerprint, type Block, type Program} from '../../src/features/lessons/g2-u3-l02/program'
+import {judgeSharedTrace, toJudgmentResult, toSharedRunTrace} from '../../src/features/lessons/g2-u3-l02/lesson-adapter'
 
 const PUBLIC_DIR = join(__dirname, '..', '..', 'public')
 let server: Server
@@ -372,5 +373,38 @@ test.describe('G2-U3-L02 真实 Scratch VM：三层判定矩阵', () => {
     }
     // 拒绝之后沙箱仍然可用
     expect(judged(await run(page, flag(repeat(3, move(50))), 'solve')).passed).toBe(true)
+  })
+})
+
+test.describe('G2-U3-L02 真实 Scratch VM：共享 RunTrace 映射与课程判定等价', () => {
+  test.setTimeout(180_000)
+  test.beforeEach(async ({page}) => { await ready(page) })
+
+  test('真实 VM 轨迹经 toSharedRunTrace → judgeSharedTrace，与直接 judgeRun 的结果一致；还原的落点等于 VM 里篮子的真实 x', async ({page}) => {
+    const cases: Array<[LevelId, Program]> = [
+      ['solve', flag(repeat(3, move(50)))],
+      ['solve', flag(repeat(3, move(10)))],
+      ['solve', flag(move(100), move(50))],
+      ['solve', flag(move(50), repeat(2, move(50)))],
+      ['solve', flag(repeat(3, move(-50)))],
+      ['solve', flag()],
+      ['transferLeft', flag(repeat(5, move(-20)))],
+      ['transferLeft', flag(repeat(5, move(20)))],
+      ['transferFast', flag(repeat(3, move(50)))],
+      ['transferFast', flag(repeat(15, move(10)))],
+      ['explore', flag(repeat(2, move(20)))],
+      ['solve', flag(repeat(20, move(100)), repeat(20, move(-100)))],
+    ]
+    for (const [levelId, program] of cases) {
+      const r = await run(page, program, levelId)
+      const label = `${levelId} ${JSON.stringify(program)}`
+      expect(r.trace.endedBy, label).toBe('landed')
+      const direct = toJudgmentResult(r.judgment, levelId)
+      const shared = toSharedRunTrace(r.trace)
+      expect(judgeSharedTrace(shared), label).toEqual(direct)
+      // 共享轨迹按帧累加 dx 还原的落点，必须等于 VM 在落地那一帧读到的篮子 x（没有边缘限位带来的偏差）
+      const landed = shared.frames.filter(f => f.frame <= shared.landingFrame!).reduce((sum, f) => sum + (f.dx ?? 0), L02_PARAMS.basketStartX)
+      expect(landed, label).toBe(r.trace.landing!.basketX)
+    }
   })
 })

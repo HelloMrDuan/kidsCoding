@@ -5,6 +5,12 @@
 对象：PR #469（Draft）。**当前核对的 head：`d3e3ad06d89f4557b267f772cd90e6751886275b`**（"three-engine shared slots + R1-R8 regression hardening"）；此前版本基于 `dc7157b9`，已过期。
 依据：#469 当前代码的真实结构（`workspace-adapters.ts`、`workspace-judging.ts`、`scratch-adapter.ts`、`lesson-workspace.tsx`）。按 AGENTS.md，#469 未合并，本文只是**对接口的需求**，不把它当已生效的规范，也不依赖它的代码。
 
+## 最新（#469 已合并进 main `651ae7f3`）：以本节为准，下面的对照与历史记录已过期
+
+- 缺口 B（舞台状态）已由 `StageSlotProps.stageState`（`Record<string, number|string|boolean>`）解决；缺口 C 已由 `RunFrame.source/dx/dy` 解决；`RolesSlotProps` 已提供；缺口 A 按首席裁定 A1，由本课 `EditorSlot` 自带工具栏。**这三项本课侧都已实现并有测试**（`lesson-adapter.ts`、`stage-state.ts`、`ui/*-slot.tsx`、`toSharedRunTrace`）。
+- 现在唯一阻塞最终接线的是新缺陷 **D1**（`scratch-vm` + `editorSlot` 时适配器不被 mount，壳的运行按钮不调用 `adapter.run`），以及只影响命令式 Blockly 路线的 D2。精确位置、复现测试、最小修改建议、本课已完成的接口清单与对 2 号的请求，全部在 `SHARED-SHELL-DEFECTS.md`。
+- 本课不修改共享文件，也不绕过缺陷。
+
 ## 最新对照（2026-11-04，#469 head `d3e3ad06d89f4557b267f772cd90e6751886275b`，以实际代码为准）
 
 #469 在 `d3e3ad06`（"three-engine shared slots + R1-R8 regression hardening"）新增了 `workspace-slots.ts`，提供 `editorSlot` / `stageSlot` 两个可选插槽、通用 `RunTrace`、`JudgmentAdapter`。该提交没有改动 `.github/` 或任何台账。以下逐项对照本课需求（代码位置以该 head 为准）：

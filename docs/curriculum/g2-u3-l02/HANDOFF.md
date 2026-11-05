@@ -1,7 +1,30 @@
 # G2-U3-L02 交接说明（3 号 Kiro → 后续集成）
 
 更新：2026-11-04。本文自包含：读完即可接手，不依赖任何会话记忆。
-范围：课程 PR #470、CI PR #471、共享工作区 PR #469。**三个 PR 均为 Draft，均未合并，main 仍为 `754f7f43`。**
+范围：课程 PR #470、CI PR #471、共享工作区 PR #469。**#470、#471 为 Draft、未合并；#469 已合并，main 为 `651ae7f3`（见下面“最新状态”）。第一节起为历史记录，以“最新状态”为准。**
+
+## 最新状态（#469 已合并进 main `651ae7f3` 之后；本节优先于下面的第一、三、四、五、九节）
+
+**最终接线没有完成，也不能宣称完成。** 课程侧已经做到“槽位就绪”，被共享壳的缺陷 D1 挡住（详见 `SHARED-SHELL-DEFECTS.md`）。
+
+| 项 | 状态 |
+|---|---|
+| 共享壳 | #469 已合并（main `651ae7f3`）。`StageSlotProps.stageState`（字典）、`RolesSlot`、`RunFrame.source/dx/dy` 都已经在 main，原先的缺口 B、C 已解决。**新缺陷 D1**：`scratch-vm` + `editorSlot` 时适配器不被 mount，壳的运行按钮点击不调用 `adapter.run`。首席已确认。 |
+| 本课已完成（课程侧） | `session.ts`（唯一课堂状态）、`lesson-adapter.ts`（`LessonL02Adapter implements EngineAdapter`）、`stage-state.ts`、`ui/editor-slot.tsx` / `stage-slot.tsx` / `roles-slot.tsx` / `slots.tsx`（`createL02Slots`）、`ui/level-nav.tsx` / `task-panel.tsx` / `feedback-panel.tsx`。过渡页 `ui/classroom.tsx` 现在只是这些部件的组合，行为与原来一致（原有用例全部原样通过）。 |
+| 验证页 | `/learn/g2-u3-l02/embed`（`ui/embed-classroom.tsx`）：按共享壳的调用方式使用适配器、三个槽位和共享 `workspace-draft`。**不是产品页，也不是 `LessonWorkspace`。** 共享壳修好后由 `LessonWorkspace` 替代，届时删除该页与 `classroom.tsx`。 |
+| 保留不变 | 真实 Scratch VM、四关、预测输入、三层判定与措辞（舞台结果/任务结果/知识证据 + “理解情况…需要进一步解释或练习”，不写“已掌握”）、手机上移/下移/删除/改数字（A1，工具栏在 `EditorSlot` 内）、一课一键草稿 `kidscoding-draft:G2-U3-L02`（四关在同一份草稿里）。 |
+| 测试（本地真实运行） | Vitest `src/features/lessons/g2-u3-l02`：**131 通过 + 4 个预期失败（`it.fails`，共享壳缺陷复现）**（原 66 + 会话 32 + 适配器 32 + 缺陷复现 5）。Playwright desktop project：**76 个实例，71 通过 / 5 按设计跳过 / 0 失败**（VM 矩阵 22 = 原 21 + 1 个共享轨迹等价；课堂 54 = 原 48 + 槽位验证页 6）。原有测试一行未删（对 `tests/` 的 diff 只有新增）。 |
+| 下一步（共享壳修复进入 main 后） | 1) 去掉 `shared-shell-defects.test.tsx` 里 D1 两条 `it.fails` 的标记，应直接通过；2) 页面 `app/learn/g2-u3-l02/page.tsx` 改为渲染 `LessonWorkspace`（契约 `L02_CONTRACT`，`editorSlot/stageSlot/rolesSlot` 来自 `createL02Slots(adapter, {embedLevelNav:true, embedTaskPanel:true, embedEngineStatus:true})`）；3) 课堂 spec 的 `l2-*` 定位换成 `ws-*`，不放宽断言、不删用例；4) 删除 `classroom.tsx` 和验证页；5) 重跑完整 CI，并按第六节刷新 #471 证据。 |
+
+### 新发现：#471 改基到新 main 时台账尾部冲突
+
+main 现在包含 OPS-020（`docs/roadmap/task-register.json` 尾部追加）。把 #471 的提交 cherry-pick 到新 main 时，`SYS-122` 与 `OPS-020` 都追加在文件尾部，产生冲突（冲突标记在尾部）。这是 AGENTS.md 第 9 节说的“台账尾部追加是串行瓶颈”：需要以新 main 为基重建 #471，**保留两个条目**，不得以解决冲突为名覆盖他人条目。我只做了模拟，没有改动 #471，也没有测试解决后门禁是否通过。这是 #471 自己的合并动作，需首席授权后再做。
+
+### #470 / #471 的 CI 关系（不变）
+
+新增的 E2E 都放进了 SYS-122 已经执行的两个 spec 文件，新增的 Vitest 都在 `src/features/lessons/g2-u3-l02/` 下，所以 #471 的 workflow 命令不用改就能覆盖它们。#471 的证据对应的是旧候选 HEAD，**#470 最终合并前必须按第六节刷新一次**；本次没有刷新。
+
+---
 
 ## 一、一页纸状态
 
