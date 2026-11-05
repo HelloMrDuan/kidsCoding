@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { SummaryAdapter } from './a1-u3-l02-adapter'
 import {
   L02_DRAFT_KEY,
+  coerceDraft,
   emptyDraft,
+  isValidDraftShape,
   parseDraft,
   restoreDefaultDraft,
-  saveDraft,
   serializeDraft,
 } from './a1-u3-l02-draft'
 
@@ -106,13 +108,44 @@ describe('A1-U3-L02 draft save/restore', () => {
     expect(restoreDefaultDraft()).toEqual(emptyDraft())
   })
 
-  it('saveDraft persists when a window exists and never throws', () => {
+  it('coerceDraft normalizes shell initial values without throwing', () => {
+    // Object form (shell envelope-unwrapped data or imported JSON).
+    expect(coerceDraft({ version: 1, selected: ['P1-1'], custom: [], facts: {}, hintLevel: 0 })).toMatchObject({
+      selected: ['P1-1'],
+    })
+    // String form (serialized draft).
+    expect(coerceDraft(serializeDraft({ ...emptyDraft(), selected: ['P3-1'] }))).toMatchObject({
+      selected: ['P3-1'],
+    })
+    // Damaged or absent values degrade to the empty draft, never throw.
+    expect(coerceDraft('not json')).toEqual(emptyDraft())
+    expect(coerceDraft(null)).toEqual(emptyDraft())
+    expect(coerceDraft(undefined)).toEqual(emptyDraft())
+    expect(coerceDraft({ version: 2, selected: ['P1-1'] })).toEqual(emptyDraft())
+  })
+
+  it('isValidDraftShape is strict: valid drafts pass, degraded shapes fail', () => {
+    expect(isValidDraftShape(emptyDraft())).toBe(true)
+    expect(isValidDraftShape({ ...emptyDraft(), version: 2 })).toBe(false)
+    expect(isValidDraftShape({ ...emptyDraft(), selected: 'P1-1' })).toBe(false)
+    expect(isValidDraftShape({ ...emptyDraft(), hintLevel: 9 })).toBe(false)
+    expect(isValidDraftShape(null)).toBe(false)
+    expect(isValidDraftShape('x')).toBe(false)
+  })
+
+  it('SummaryAdapter holds draft data: loadScript/getScript round-trip, validateDraft gate', () => {
+    const adapter = new SummaryAdapter()
+    expect(adapter.getScript()).toEqual(emptyDraft())
+    expect(adapter.validateDraft(emptyDraft())).toBe(true)
     const draft = { ...emptyDraft(), selected: ['P1-1'], custom: ['黄苹果最甜。'] }
-    expect(() => saveDraft(draft)).not.toThrow()
-    if (typeof window !== 'undefined' && window.localStorage) {
-      expect(saveDraft(draft)).toBe(true)
-      expect(window.localStorage.getItem(L02_DRAFT_KEY)).toBe(serializeDraft(draft))
-      window.localStorage.removeItem(L02_DRAFT_KEY)
-    }
+    adapter.loadScript(draft)
+    expect(adapter.getScript()).toEqual(draft)
+    // Invalid input degrades to the empty draft instead of corrupting state.
+    adapter.loadScript({ version: 9, selected: ['P1-1'] })
+    expect(adapter.getScript()).toEqual(emptyDraft())
+    expect(adapter.validateDraft({ version: 9 })).toBe(false)
+    // Serialized input is accepted through the same degradation path.
+    adapter.loadScript(serializeDraft(draft))
+    expect(adapter.getScript()).toEqual(draft)
   })
 })
