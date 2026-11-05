@@ -3310,6 +3310,34 @@
         "reviewer": null
       },
       "notes": "演示契约（demo-a/demo-b/demo-scratch）均为演示 fixture，水果 x=200/阈值 80 为规范已公布演示值，非正式教学参数；Task-ID 按 OPS-018/019 先例新立，首席可重新指定编号；E2E workflow 接线归首席另立任务，不在本 PR 改动；Scratch VM 本机沙箱未就绪（CDN 依赖）与演示舞台渲染、演示移动积木、分类图标条等缺口见 PR 正文，待首席裁定。"
+    },
+    {
+      "id": "OPS-022",
+      "title": "P0 共享外壳移动端编辑控制缺口（Gap A）：槽位外部驱动通道",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "todo",
+      "dependencies": [
+        "OPS-020"
+      ],
+      "scope": "只改共享外壳（apps/web/src/features/lessons/workspace/：EditorSlotProps 增加可选外部驱动通道，例如 register 命令通道 addBlock/moveSelected/deleteSelected/setSelectedNumber，或经复现测试证明槽内工具栏已满足时的等效方案）与配套单测/E2E；不改课程文件、不改 #470/#468 样板文件、不改其他台账条目、不改 workflow。缺口来源：3号接口分析（docs/curriculum/g2-u3-l02/SHARED-WORKSPACE-INTERFACE.md，2026-11-04 对 #469 d3e3ad06 实证）之缺口 A；缺口 B（舞台多对象透传）与缺口 C（RunFrame dx/dy）已在 #469 合并实现 §9 扩展中解决，不在本任务重做。",
+      "acceptance": [
+        "3号交付移动端复现测试：工具栏添加/上移/下移/删除/改数字驱动槽位内编辑器（含 Blockly 焦点丢失场景），缺口下失败、修复后通过",
+        "槽位外部驱动通道为可选扩展：无通道的旧槽位行为不变，#469 单测与三端 E2E 无回归",
+        "2号实现、3号复现测试与课程需求、首席验收；G2 课堂迁入共享外壳本身属 #470 集成工作，不在本任务内",
+        "任务门禁通过（声明条目与改动条目完全一致），实现 PR 合并后主线 CI 通过才可关账"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "待交付：3号移动端复现测试（缺口下失败、修复后通过）"
+        ],
+        "reviewer": null
+      },
+      "notes": "分工：2号修复（共享外壳侧），3号提供复现测试与课程需求（工具栏操作清单与 Blockly 焦点丢失约束），首席验收；本条目为分配登记 PR（仅新增本条），实现另立 PR，不与 OPS-020 关账（#474 已合并）与 SPEC-002（#475 待审）混合；与 #475 同改产品台账，合并须串行：#475 先合，本登记 PR 再变基。"
     }
+
   ]
 }
