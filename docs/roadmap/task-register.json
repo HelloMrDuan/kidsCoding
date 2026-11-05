@@ -3372,7 +3372,7 @@
       "title": "P0 共享 LessonWorkspace 的 EditorSlot 与运行适配器兼容性修复（D1 + Gap A）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "OPS-020"
       ],

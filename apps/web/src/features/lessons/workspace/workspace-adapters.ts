@@ -70,6 +70,35 @@ export interface BlockInventoryItem {
   categoryId: string
 }
 
+/**
+ * Independent run adapter (OPS-022, contract §2): lets a React editor-slot
+ * course run without mounting an imperative adapter. The shell passes the
+ * slot's current data (the same value save/judgment use) as `program`, so
+ * a run can never execute a stale program while saving a newer one.
+ * No DOM mount is involved; the shell owns the editor surface, the
+ * adapter owns execution only. Plain EngineAdapter instances are NOT
+ * accepted here: their run() reads their own editor, which a slot course
+ * does not have.
+ */
+export type SlotRunAdapter = {
+  /**
+   * Execute the shell's current script data. Pure execution: never writes
+   * drafts, never writes judgments, never touches shell state. At most
+   * one live run; a new run replaces (and stops) the previous one.
+   */
+  runProgram: (program: unknown, onEvent: (e: RunEvent) => void) => void
+  /** Synchronously cancel pending playback and pending events. */
+  stop: () => void
+  /** Same shape as EngineState. Must not throw (the shell keeps the last state on error). */
+  getState: () => EngineState
+  /** Adapter-owned judgment; absent = run state alone, never an invented conclusion. */
+  getJudgmentResult?: () => JudgmentResult | null
+  /** Course multi-object stage state, passed through untouched to the stageSlot. */
+  getStageState?: () => Record<string, number | string | boolean>
+  /** Error text only; absent = no extra error on stop. */
+  getLastRunError?: () => string | null
+}
+
 export type EngineAdapter = {
   mount: (el: HTMLElement) => void
   unmount: () => void
