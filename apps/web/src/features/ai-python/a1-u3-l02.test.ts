@@ -1,3 +1,4 @@
+import { validateLessonContract } from '../lessons/workspace/lesson-contract'
 import { describe, expect, it } from 'vitest'
 import {
   BAD_SUMMARIES,
@@ -95,6 +96,15 @@ describe('A1-U3-L02 lesson content (reuses the U3 pilot engine)', () => {
     const custom = buildDraftSummary(['P1-1', 'P3-1', 'P4-1'], ['训练集共 30 条。'])
     const checks = checkDraftSummary(custom)
     expect(checks.find((c) => c.name === '改原意')?.passed).toBe(false)
+    expect(checks.find((c) => c.name === '来源核验')?.passed).toBe(false)
+  })
+
+  it('reverse: a custom sentence reusing a passage digit passes meaning but fails source check', () => {
+    // 24→6 类回归：数字 6 在原文出现（“6 条测试”），改原意应通过；
+    // 但整句不是原文原句，来源核验应失败。两项分叉须分别锁定。
+    const custom = buildDraftSummary(['P1-1', 'P3-1', 'P4-1'], ['训练集共 6 条。'])
+    const checks = checkDraftSummary(custom)
+    expect(checks.find((c) => c.name === '改原意')?.passed).toBe(true)
     expect(checks.find((c) => c.name === '来源核验')?.passed).toBe(false)
   })
 
@@ -223,14 +233,10 @@ describe('A1-U3-L02 P0 content contract', () => {
 })
 
 describe('A1-U3-L02 unified workspace integration (SummaryAdapter + contract translation)', () => {
-  it('the workspace contract satisfies the shared shell shape (no shell value import)', () => {
-    // Deliberately no value import from the shared shell here: deploy.yml
-    // runs the full suite on push with a branch-only checkout, and this
-    // branch predates the #469 workspace merge on main, so a shell import
-    // fails resolution there. The shell's own validateLessonContract was
-    // run against this contract locally (returns []) and runs again in the
-    // curriculum merge-commit job; this test locks the contract shape that
-    // validation checks, field by field.
+  it('the workspace contract passes the shared shell validation', () => {
+    // #478 基线 c36dd64e 已含 #469 外壳，直接 import 共享校验并断言通过；
+    // 同时锁定契约形状（字段逐项），与校验逐项对应。
+    expect(validateLessonContract(L02_WORKSPACE_CONTRACT)).toEqual([])
     const c = L02_WORKSPACE_CONTRACT
     expect(c.lessonId).toBe('A1-U3-L02')
     expect(c.title.length).toBeGreaterThan(0)
