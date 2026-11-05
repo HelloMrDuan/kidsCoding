@@ -364,6 +364,7 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
                         </select>
                         <select
                           data-testid={`ai-u3-l02-predict-failed-${item.candidate.id}`}
+                          disabled={!prediction}
                           value={prediction?.firstFailed ?? ''}
                           onChange={(event) => {
                             if (!prediction) return
@@ -826,9 +827,9 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
               <p data-testid="ai-u3-l02-draft-status" className="mt-3 text-sm leading-7 text-[#6f7d92]">
                 本机草稿状态：已选 {draft.selected.length} 句，自加 {draft.custom.length} 句；迁移已选{' '}
                 {draft.transferSelected.length} 句；事实核对已选 {Object.values(draft.facts).filter(Boolean).length} /{' '}
-                {FACT_STATEMENTS.length} 条；预测已揭示 {draft.revealed.length} / 3 份；提示已揭示到{' '}
-                {draft.hintLevel === 0 ? '未揭示' : `${draft.hintLevel} 级`}；方法总结
+                {FACT_STATEMENTS.length} 条；预测已揭示 {draft.revealed.length} / 3 份；方法总结
                 {draft.methodSummary.trim() !== '' ? '已写' : '未写'}。
+                （三级提示由外壳任务抽屉揭示，不在这里计数。）
               </p>
               <p className="mt-2 text-sm leading-7 text-[#6f7d92]">
                 要清空全部选择，用顶部文件菜单里的“恢复初始”。
