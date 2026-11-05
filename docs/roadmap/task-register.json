@@ -3280,6 +3280,34 @@
         "reviewer": null
       },
       "notes": "首席说明：本条目为 P0 规范 PR 自身的门禁登记；PR 除 7 个设计与验证文件外仅含本条目一行；课程台账（432 节）未动，共享 UI 与教学逻辑未动；文件顶层 updatedAt 按现有惯例不随本条改动。"
+    },
+    {
+      "id": "OPS-020",
+      "title": "P0 LessonWorkspace 共享工作区外壳与引擎适配器（演示）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "新增共享工作区（apps/web/src/features/lessons/workspace/：契约类型、EngineAdapter 接口、BlocklyAdapter、ScratchVMAdapter、规范键草稿、三层判定、外壳组件、演示契约）与演示路由（apps/web/src/app/learn/workspace/[lessonId]）及 E2E（apps/web/tests/e2e/lesson-workspace.spec.ts）；演示契约均标演示、只用规范已公布演示值；不改规范目录、不改课程台账（432 节）、不改共享 CI、不改任何现有课堂与 G2/A1 课程文件。",
+      "acceptance": [
+        "外壳按 p0-kitten-workspace-v1.0 渲染：契约驱动、桌面/平板/手机三端布局、任务抽屉与三级提示按序揭示、文件菜单、保存失败 fail-closed",
+        "BlocklyAdapter 基于真实 Blockly 工作区：拖放、改参、重排、删除、重复真展开、80 步上限、运行前复位、停止可中断、分数不叠加",
+        "ScratchVMAdapter 基于现有沙箱 iframe 协议：挂载握手超时诚实报错、运行/停止、快照状态，不虚构分数与判定",
+        "草稿键 kidscoding-draft:{lessonId}，64KB 拒超不截断，损坏/错课拒绝且不覆盖好草稿，切换先存后取，编辑后旧判定失效",
+        "三层判定行为判定不比对积木序列，已完成/已掌握仅当任务与知识同过",
+        "三端真实浏览器 E2E 通过（1440/768/375）与单元测试通过，PR 门禁通过"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/469",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "vitest src/features/lessons/workspace/ 41/41（本地复核）",
+          "Playwright lesson-workspace.spec.ts 9/9（本地生产构建、stock chromium）"
+        ],
+        "reviewer": null
+      },
+      "notes": "演示契约（demo-a/demo-b/demo-scratch）均为演示 fixture，水果 x=200/阈值 80 为规范已公布演示值，非正式教学参数；Task-ID 按 OPS-018/019 先例新立，首席可重新指定编号；E2E workflow 接线归首席另立任务，不在本 PR 改动；Scratch VM 本机沙箱未就绪（CDN 依赖）与演示舞台渲染、演示移动积木、分类图标条等缺口见 PR 正文，待首席裁定。"
     }
   ]
 }
