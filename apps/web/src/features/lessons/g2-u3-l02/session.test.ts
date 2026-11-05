@@ -383,3 +383,42 @@ describe('编辑、切换与草稿', () => {
     expect(session.getSnapshot().editorKey).toBe(key)
   })
 })
+
+describe('槽位挂载与恢复初始', () => {
+  it('isPristine：刚创建是起点；有任何作品内容后不是；resetAll 之后又是', () => {
+    const { session } = setup()
+    expect(session.isPristine()).toBe(true)
+    toSolve(session)
+    expect(session.isPristine()).toBe(false)
+    session.setRole('fruit')
+    session.resetAll()
+    expect(session.isPristine()).toBe(true)
+    expect(session.getSnapshot().role).toBe('basket')
+    expect(session.getSnapshot().hints.explore).toBe(0)
+  })
+
+  it('resetAll：所有关卡的脚本、预测、关卡位置都回到起点，运行结果清掉，并停止运行', async () => {
+    const { port, session } = setup()
+    toSolve(session)
+    session.setPrediction({ x: '40', caught: '接不住' })
+    const p = session.run()
+    port.land(150, loopMoves(3, 50))
+    await p
+    expect(session.getSnapshot().trace).not.toBeNull()
+    const key = session.getSnapshot().editorKey
+    session.resetAll()
+    const s = session.getSnapshot()
+    expect(s.state.levelId).toBe('explore')
+    expect(s.state.programs.solve.scripts).toHaveLength(0)
+    expect(s.state.predictions).toEqual({})
+    expect(s.trace).toBeNull()
+    expect(s.editorKey).toBeGreaterThan(key)
+  })
+
+  it('noteSlotMounted：第一次挂载返回 false，之后每次再挂载返回 true（壳的恢复初始 / 导入会让槽位重新挂载）', () => {
+    const { session } = setup()
+    expect(session.noteSlotMounted()).toBe(false)
+    expect(session.noteSlotMounted()).toBe(true)
+    expect(session.noteSlotMounted()).toBe(true)
+  })
+})

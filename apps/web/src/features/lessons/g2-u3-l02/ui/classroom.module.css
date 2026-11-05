@@ -165,3 +165,29 @@
   .drawer { width: 100vw; }
   .menu { right: auto; left: 0; }
 }
+
+/* 编辑槽位内嵌的任务栏（CollapsibleTaskPanel）：桌面 / 平板不折叠，手机默认折叠成一行 */
+.taskFold { margin-bottom: 8px; }
+.taskBar { display: none; }
+.taskBarText { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.taskBarText[data-needs-prediction='true'] { color: var(--kc-brand, #1d4ed8); }
+@media (max-width: 640px) {
+  .taskBar { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 2px 0; }
+  .taskFold .taskFoldBody { display: none; }
+  .taskFold[data-open='true'] .taskFoldBody { display: block; }
+}
+
+/* 槽位工具栏里的壳控制（运行 / 停止 / 保存）：≥768px 显示；手机上壳自己的粘性运行行一直在视口顶部，
+   这里再放一份只会把积木编辑区挤出首屏，所以手机隐藏。 */
+.shellCtl { display: contents; }
+@media (max-width: 767px) {
+  .shellCtl { display: none; }
+}
+
+/* 手机：工具栏五个控件排成一行（添加 / 上移 / 下移 / 删除 / 数字），触控目标高度仍是 40px */
+@media (max-width: 640px) {
+  .toolbar { flex-wrap: nowrap; gap: 4px; }
+  .toolbar .btn { padding-left: 8px; padding-right: 8px; white-space: nowrap; }
+  .toolbar .numLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .toolbar input[type='number'] { width: 60px; }
+}

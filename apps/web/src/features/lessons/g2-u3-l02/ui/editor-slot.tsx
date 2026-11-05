@@ -15,7 +15,7 @@ import { toDraft } from '../state'
 import styles from './classroom.module.css'
 import { LevelNav } from './level-nav'
 import { ScriptEditor, type EditorHandle, type Selection } from './script-editor'
-import { TaskPanel } from './task-panel'
+import { CollapsibleTaskPanel } from './task-panel'
 import { useSession } from './use-session'
 
 /**
@@ -51,19 +51,38 @@ export function L02EditorSlot({
   const lastEmitted = useRef<string>(JSON.stringify(toDraft(session.getSnapshot().state)))
   useEffect(() => { onChangeRef.current = onChange })
 
-  // 初始内容（草稿恢复）：只在挂载时载入一次；不合法就忽略，保持课程起点，不覆盖好草稿。
+  // 初始内容。壳在三种情况下重新挂载本槽位：
+  //   1) 打开页面：initial 是已校验的草稿，或没有草稿（undefined）；
+  //   2) 壳的“恢复初始”：initial 是 undefined，但会话里已经有作品 → 整体回到课程起点，并把起点回传给壳；
+  //   3) 壳的“导入作品”：initial 是用户选的任意 JSON（壳不校验）→ 合法就载入；不合法就保持原作品不变，
+  //      把当前作品回传给壳（避免壳的自动保存把无效内容写进草稿），并在槽位里如实显示导入失败。
   const hydrated = useRef(false)
+  const [importError, setImportError] = useState<string | null>(null)
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (hydrated.current) return
     hydrated.current = true
-    if (initial === undefined || initial === null) return
+    const remount = session.noteSlotMounted()
+    if (initial === undefined || initial === null) {
+      // 第一次挂载且没有草稿：会话本来就是起点（或由调用方预先设好），不动它；
+      // 再次挂载且 initial 为空 = 壳的“恢复初始”。
+      if (remount && !session.isPristine()) {
+        session.resetAll()
+        lastEmitted.current = JSON.stringify(session.draft())
+        onChangeRef.current(session.draft())
+      }
+      return
+    }
     try {
       session.loadDraft(initial)
-      lastEmitted.current = JSON.stringify(session.draft()) // 恢复不算编辑，不回传
+      lastEmitted.current = JSON.stringify(session.draft()) // 恢复 / 导入成功不算编辑，不回传
     } catch {
-      /* 壳用 validateDraft 先过滤；这里兜底，保持起点 */
+      lastEmitted.current = JSON.stringify(session.draft())
+      onChangeRef.current(session.draft())
+      setImportError('导入失败：这不是“接住掉落水果”的作品，原作品没有改变')
     }
   }, [initial, session])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // 作品变化（脚本、预测、关卡）才回传；运行结果、帧、提示不回传。
   useEffect(() => {
@@ -114,14 +133,14 @@ export function L02EditorSlot({
             <button type="button" className={styles.btn} data-testid="l2-delete" disabled={!selection}
               onClick={() => editorRef.current?.deleteSelected()} aria-label="删除选中的积木">删除</button>
             <label>
-              数字
+              <span className={styles.numLabel}>数字</span>
               <input type="number" inputMode="numeric" data-testid="l2-number" disabled={selection?.value == null}
                 value={selection?.value ?? ''} aria-label="选中积木的数字"
                 onChange={e => { const v = e.target.value; if (v !== '' && v !== '-') editorRef.current?.setSelectedNumber(Number(v)) }} />
             </label>
             {renderToolbarExtra?.()}
             {shell && (
-              <>
+              <span className={styles.shellCtl} data-testid="l2-shell-ctl">
                 <button type="button" className={`${styles.btn} ${shell.running ? styles.btnStop : styles.btnPrimary}`}
                   data-testid="l2-shell-run" data-running={shell.running}
                   disabled={!shell.running && view.runDisabled} title={!shell.running && view.runDisabled ? view.runReason : undefined}
@@ -130,7 +149,7 @@ export function L02EditorSlot({
                 </button>
                 <button type="button" className={styles.btn} data-testid="l2-shell-save" onClick={() => shell.save()}>保存</button>
                 <span className={styles.muted} data-testid="l2-shell-save-state" data-state={shell.saveState}>{SAVE_STATE_TEXT[shell.saveState]}</span>
-              </>
+              </span>
             )}
           </div>
           {snap.paletteOpen && (
@@ -158,9 +177,13 @@ export function L02EditorSlot({
 
   return (
     <Fragment>
+      {importError && <p className={styles.error} role="alert" data-testid="l2-import-error">{importError}</p>}
       {embedLevelNav && <LevelNav session={session} />}
-      {embedTaskPanel && <TaskPanel session={session} />}
+      {embedTaskPanel && <CollapsibleTaskPanel session={session} />}
       {body}
+      {/* 壳只显示三层结果；没有判定的原因（被停止、没落地、运行没完成）由课程自己如实告诉学生 */}
+      {snap.notice && <p className={styles.error} role="status" data-testid="l2-run-notice">{snap.notice}</p>}
+      {view.judgment?.status === 'not-judged' && <p className={styles.muted} role="status" data-testid="l2-not-judged">{view.judgment.reason}</p>}
     </Fragment>
   )
 }

@@ -17,22 +17,18 @@ import type {
   FileCapabilities, JudgmentAdapter, JudgmentResult, RunFrame, RunTrace as SharedRunTrace,
 } from '../workspace/workspace-slots'
 
-const LABEL_PREFIX: Record<'stage' | 'task' | 'knowledge', string> = {
-  stage: '舞台结果：',
-  task: '任务结果：',
-  knowledge: '知识证据：',
-}
-
-function stripLabel(line: string, id: keyof typeof LABEL_PREFIX): string {
-  const prefix = LABEL_PREFIX[id]
-  return line.startsWith(prefix) ? line.slice(prefix.length) : line
-}
-
-/** 课程判定 → 共享 JudgmentResult（只换形状，措辞原样来自 judge.ts）。未判定返回 null。 */
+/**
+ * 课程判定 → 共享 JudgmentResult。措辞原样来自 judge.ts，只换形状。未判定返回 null。
+ *
+ * 共享壳只显示每层的 `detail` 和 `conclusion`（不显示 `label`，也不显示 `methodEvidence`），
+ * 而首席统一的措辞要求学生看到“舞台结果：/任务结果：/知识证据：”前缀和固定的“理解情况…需要进一步解释或练习”。
+ * 所以这里：`detail` 是带前缀的完整一行；“理解情况”说明并入 `conclusion`，不再单独放 `methodEvidence`（避免壳以后显示它时重复）。
+ */
 export function toJudgmentResult(judgment: RunJudgment | null, levelId: LevelId): JudgmentResult | null {
   if (!judgment || judgment.status !== 'judged') return null
-  const row = (id: keyof typeof LABEL_PREFIX, label: string, layer: { passed: boolean; line: string }) =>
-    ({ id, label, passed: layer.passed, detail: stripLabel(layer.line, id) })
+  const row = (id: 'stage' | 'task' | 'knowledge', label: string, layer: { passed: boolean; line: string }) =>
+    ({ id, label, passed: layer.passed, detail: layer.line })
+  const verdict = levelId === 'explore' ? '这一关是观察：对一对你的预测和真实结果。' : judgment.conclusion
   return {
     layers: [
       row('stage', '舞台结果', judgment.stage),
@@ -40,8 +36,7 @@ export function toJudgmentResult(judgment: RunJudgment | null, levelId: LevelId)
       row('knowledge', '知识证据', judgment.knowledge),
     ],
     passed: judgment.passed,
-    conclusion: levelId === 'explore' ? '这一关是观察：对一对你的预测和真实结果。' : judgment.conclusion,
-    methodEvidence: judgment.understanding,
+    conclusion: `${verdict}\n${judgment.understanding}`,
   }
 }
 
@@ -91,7 +86,7 @@ export function judgeSharedTrace(trace: SharedRunTrace): JudgmentResult | null {
 
 export const l02JudgmentAdapter: JudgmentAdapter = {
   judge(trace) {
-    return judgeSharedTrace(trace) ?? { layers: [], passed: false, conclusion: '这一次没有落地，不判定。', methodEvidence: UNDERSTANDING_NOTE }
+    return judgeSharedTrace(trace) ?? { layers: [], passed: false, conclusion: `这一次没有落地，不判定。\n${UNDERSTANDING_NOTE}` }
   },
 }
 

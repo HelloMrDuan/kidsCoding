@@ -239,7 +239,7 @@ describe('run / stop 契约', () => {
 })
 
 describe('getJudgmentResult：共享 JudgmentResult 形状', () => {
-  it('三层 id/label 固定，detail 不重复标签，conclusion 与 methodEvidence 来自课程判定', async () => {
+  it('三层 id/label 固定；壳只显示 detail 和 conclusion，所以 detail 带“舞台结果：”等前缀，conclusion 含固定的“理解情况”说明', async () => {
     const { adapter, port } = setup()
     ready(adapter)
     adapter.run(() => {})
@@ -248,12 +248,14 @@ describe('getJudgmentResult：共享 JudgmentResult 形状', () => {
     const r = adapter.getJudgmentResult()!
     expect(r.layers.map(l => [l.id, l.label])).toEqual([['stage', '舞台结果'], ['task', '任务结果'], ['knowledge', '知识证据']])
     for (const l of r.layers) {
-      expect(l.detail.startsWith(l.label)).toBe(false)
+      expect(l.detail.startsWith(`${l.label}：`), l.id).toBe(true)
       expect(typeof l.passed).toBe('boolean')
     }
     expect(r.passed).toBe(true)
     expect(r.conclusion).toContain('这只说明这一次运行的行为')
-    expect(r.methodEvidence).toContain('需要进一步解释或练习')
+    expect(r.conclusion).toContain('理解情况：')
+    expect(r.conclusion).toContain('需要进一步解释或练习')
+    expect(r.methodEvidence).toBeUndefined() // 壳不显示它，说明并入 conclusion
     expect(JSON.stringify(r)).not.toContain('已掌握')
   })
 
@@ -264,7 +266,9 @@ describe('getJudgmentResult：共享 JudgmentResult 形状', () => {
     port.land(40, loopMoves(2, 20))
     await flush()
     const r = adapter.getJudgmentResult()!
-    expect(r.conclusion).toBe('这一关是观察：对一对你的预测和真实结果。')
+    expect(r.conclusion.startsWith('这一关是观察：对一对你的预测和真实结果。')).toBe(true)
+    expect(r.conclusion).toContain('需要进一步解释或练习')
+    expect(r.conclusion).not.toContain('达标')
   })
 
   it('改脚本后旧判定立刻消失', async () => {
@@ -413,6 +417,7 @@ describe('共享 RunTrace 互转', () => {
     expect(none.passed).toBe(false)
     expect(none.layers).toEqual([])
     expect(none.conclusion).toContain('不判定')
+    expect(none.conclusion).toContain('需要进一步解释或练习')
     expect(stableFingerprint(SOLVE)).toBeTruthy()
   })
 })

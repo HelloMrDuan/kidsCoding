@@ -52,14 +52,14 @@ describe('D1：scratch-vm 引擎 + editorSlot —— 运行按钮不调用 adapt
     expect(port.runs).toHaveLength(1) // 对照：这条路径上壳确实调用了 adapter.run
   })
 
-  it.fails('应有行为：给了 editorSlot，壳仍然 mount 适配器（课程的真实 VM 沙箱要挂载）', () => {
+  it('应有行为：给了 editorSlot，壳仍然 mount 适配器（课程的真实 VM 沙箱要挂载）', () => {
     const { port, adapter } = readyAdapter()
     const { EditorSlot, StageSlot, RolesSlot } = createL02Slots(adapter, { embedLevelNav: true, embedTaskPanel: true })
     render(<LessonWorkspace contract={contractFor('scratch-vm')} adapter={adapter} editorSlot={EditorSlot} stageSlot={StageSlot} rolesSlot={RolesSlot} />)
     expect(port.mounts).toBe(1) // 现状：0（lesson-workspace.tsx 的 editorSlot 分支提前 return，没有 mount）
   })
 
-  it.fails('应有行为：点击壳的运行按钮，调用 adapter.run（课程的 VM 开始运行）', () => {
+  it('应有行为：点击壳的运行按钮，调用 adapter.run（课程的 VM 开始运行）', () => {
     const { port, adapter } = readyAdapter()
     const { EditorSlot, StageSlot, RolesSlot } = createL02Slots(adapter, { embedLevelNav: true, embedTaskPanel: true })
     render(<LessonWorkspace contract={contractFor('scratch-vm')} adapter={adapter} editorSlot={EditorSlot} stageSlot={StageSlot} rolesSlot={RolesSlot} />)

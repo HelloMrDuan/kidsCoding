@@ -92,6 +92,7 @@ export class L02Session {
   private readonly listeners = new Set<() => void>()
   private frameTap: ((f: FrameInfo) => void) | null = null
   private runToken = 0
+  private slotMounts = 0
 
   constructor(private readonly port: VmPort) {
     this.snap = {
@@ -162,6 +163,23 @@ export class L02Session {
     if (!r.state) return { restored: false, reason: r.reason }
     this.replaceState(r.state, false)
     return { restored: true, reason: null }
+  }
+
+  /** 编辑槽位每挂载一次调用一次；返回这是不是“再次挂载”（壳的恢复初始 / 导入 / 切换会让槽位重新挂载）。 */
+  noteSlotMounted(): boolean {
+    this.slotMounts += 1
+    return this.slotMounts > 1
+  }
+
+  /** 还没有任何作品内容（刚打开、或刚重置）：关卡在探索关、没有脚本、没有预测。 */
+  isPristine(): boolean {
+    return JSON.stringify(this.draft()) === JSON.stringify(toDraft(initialState()))
+  }
+
+  /** 恢复到课程起点（共享壳的“恢复初始”）：所有关卡的脚本和预测都清空，回到探索关。 */
+  resetAll(): void {
+    this.replaceState(initialState(), true)
+    this.patch({ role: 'basket', hints: { ...NO_HINTS } })
   }
 
   /** 导出文件内容的校验与载入（调用方先检查文件大小）。 */

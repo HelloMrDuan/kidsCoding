@@ -1,10 +1,8 @@
 // G2-U3-L02 × 共享 LessonWorkspace：Gap A 课程侧真实验证（OPS-022）。
-// 被测对象：共享壳（含 #480 的 D1 修复与 ShellControl）+ 本课真实的 EditorSlot（真实 Blockly）+ 真实 Scratch VM 沙箱，页面 /learn/g2-u3-l02（正式接线后的页面）。
+// 被测对象：共享壳（含 #480 的 D1 修复与 ShellControl）+ 本课真实的 EditorSlot（真实 Blockly）+ 真实 Scratch VM 沙箱，页面 /learn/g2-u3-l02。
 // 验证手机上不靠 DOM 事件劫持、不靠全局命令通道也能可靠操作：添加 / 上移 / 下移 / 删除 / 改数字，
 // 并覆盖 Blockly 焦点丢失、重新选择、运行后修改、草稿恢复。手机视口用触摸点按（tap），桌面用鼠标点击。
-// 本文件依赖 OPS-022（#480）的壳。#480 合并并完成正式接线之前，/learn/g2-u3-l02 还是过渡课堂页，所以本文件默认跳过；
-// 在“#470 + #480”集成工作区里设置 L02_SHELL_WIRED=1 运行。正式接线时删除下面这个开关，使它成为常规用例。
-// 没有 #480 的壳时（D1），本文件在页面打开就失败（适配器从未挂载，引擎永远不就绪）。
+// 本文件依赖 OPS-022（#480）的共享壳：没有它，适配器从未挂载、引擎永远不就绪（D1），本文件在页面打开时就失败。
 import {readFileSync} from 'node:fs'
 import {expect, test, type Locator, type Page, type TestInfo} from '@playwright/test'
 import {routeLocalScratchVm} from './scratch-g2-helpers'
@@ -99,6 +97,28 @@ async function buildSolve(page: Page, info: TestInfo) {
 }
 
 /** 壳自己的运行按钮：手机用脚本区里的粘性运行行，桌面用舞台下方的运行条。 */
+/**
+ * ShellControl 的入口。≥768px：槽位工具栏里有运行 / 停止 / 保存（走 props.shell，和壳是同一入口）。
+ * 手机：壳自己的粘性运行行始终在视口顶部，槽位里再放一份只会把积木编辑区挤出首屏（首席的手机布局裁定），
+ * 所以槽位的副本在手机上隐藏；手机用壳的粘性运行行和文件菜单驱动同一套运行 / 停止 / 保存。
+ */
+function controls(page: Page, info: TestInfo) {
+  const phone = isPhone(info)
+  return {
+    phone,
+    run: page.getByTestId(phone ? 'ws-sticky-run' : 'l2-shell-run'),
+    saveState: page.getByTestId(phone ? 'ws-sticky-save' : 'l2-shell-save-state'),
+    save: async () => {
+      if (phone) {
+        await page.getByTestId('ws-file-menu-button').click()
+        await page.getByTestId('ws-file-save').click()
+      } else {
+        await press(page.getByTestId('l2-shell-save'), info)
+      }
+    },
+  }
+}
+
 const runViaShell = (page: Page, info: TestInfo) => press(page.getByTestId(isPhone(info) ? 'ws-sticky-run' : 'ws-run-toggle'), info)
 
 async function runAndWait(page: Page, info: TestInfo) {
@@ -109,7 +129,6 @@ async function runAndWait(page: Page, info: TestInfo) {
 for (const vp of VIEWPORTS) {
   test.describe(`[${vp.name}]`, () => {
     test.use({viewport: {...vp.viewport}, hasTouch: vp.hasTouch, isMobile: vp.isMobile})
-    test.skip(!process.env.L02_SHELL_WIRED, '需要 #480 的共享壳 + 正式接线的页面；在集成工作区设置 L02_SHELL_WIRED=1')
     test.describe('G2-U3-L02 共享壳内的 Gap A：真实 EditorSlot + Blockly 的五项编辑操作', () => {
       test.setTimeout(150_000)
 
@@ -273,21 +292,24 @@ for (const vp of VIEWPORTS) {
         await open(page)
         await goSolve(page, info)
         await buildSolve(page, info)
-        const slotRun = page.getByTestId('l2-shell-run')
+        const c = controls(page, info)
+        const slotRun = c.run
         const shellRun = page.getByTestId('ws-run-toggle')
+        if (c.phone) await expect(page.getByTestId('l2-shell-ctl')).toBeHidden() // 手机不重复放运行 / 保存，积木编辑区留在首屏
+        else await expect(page.getByTestId('l2-shell-ctl')).toBeVisible()
         await expect(slotRun).toHaveText('运行作品')
-        await expect(page.getByTestId('l2-shell-save-state')).toHaveText('未保存')
-        // 槽位按钮运行：壳的运行按钮同时变成“停止”，结束后一起回到“运行作品”，判定由壳展示
+        await expect(c.saveState).toContainText('未保存')
+        // 运行：壳的运行按钮同时变成“停止”，结束后一起回到“运行作品”，判定由壳展示
         await press(slotRun, info)
-        await expect(slotRun).toHaveAttribute('data-running', 'true')
         await expect(shellRun).toHaveText('停止')
+        await expect(slotRun).toHaveText('停止')
         await expect(page.getByTestId('ws-feedback-conclusion')).toBeVisible({timeout: 30_000})
         await expect(slotRun).toHaveText('运行作品')
         await expect(shellRun).toHaveText('运行作品')
         await expect(page.getByTestId('ws-feedback-stage')).toContainText('接到了水果')
-        // 槽位按钮停止：运行中点它，运行被停掉，不产生判定，脚本保留
+        // 运行中点停止：运行被停掉，不产生判定，脚本保留
         await press(slotRun, info)
-        await expect(slotRun).toHaveAttribute('data-running', 'true')
+        await expect(slotRun).toHaveText('停止')
         await press(slotRun, info)
         await expect(slotRun).toHaveText('运行作品', {timeout: 15_000})
         await expect(shellRun).toHaveText('运行作品')
@@ -296,14 +318,14 @@ for (const vp of VIEWPORTS) {
         // 停止之后能再次运行并得到判定（没有残留的旧运行）
         await runAndWait(page, info)
         await expect(page.getByTestId('ws-feedback-stage')).toContainText('接到了水果')
-        // 从壳的按钮停止同样有效，槽位按钮随之回到“运行作品”
+        // 从壳的运行区停止同样有效，另一个入口随之回到“运行作品”
         await press(shellRun, info)
-        await expect(slotRun).toHaveAttribute('data-running', 'true')
+        await expect(slotRun).toHaveText('停止')
         await press(shellRun, info)
         await expect(slotRun).toHaveText('运行作品', {timeout: 15_000})
-        // 保存：槽位的保存按钮 = 壳的显式保存；状态与壳的保存标签一致
-        await press(page.getByTestId('l2-shell-save'), info)
-        await expect(page.getByTestId('l2-shell-save-state')).toHaveText('已保存到本机')
+        // 保存：显式保存 = 壳的显式保存；状态与壳的保存标签一致
+        await c.save()
+        await expect(c.saveState).toContainText('已保存到本机')
         await expect(page.getByTestId('ws-save-chip')).toContainText('已保存到本机')
         const saved = JSON.parse((await page.evaluate(k => localStorage.getItem(k), DRAFT_KEY))!)
         expect(saved).toMatchObject({lessonId: 'G2-U3-L02'})
@@ -313,7 +335,7 @@ for (const vp of VIEWPORTS) {
         await selectBlock(page, info, '将 x 坐标增加', 0)
         await setNumber(page, 40)
         await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0)
-        await expect(page.getByTestId('l2-shell-save-state')).toHaveText('已保存到本机', {timeout: 10_000}) // 自动保存后与壳一致
+        await expect(c.saveState).toContainText('已保存到本机', {timeout: 10_000}) // 自动保存后与壳一致
       })
 
       test('ShellControl 保存失败：存储写入失败时槽位与壳都显示“未能保存”，不显示“已保存”', async ({page}, info) => {
@@ -328,11 +350,12 @@ for (const vp of VIEWPORTS) {
         await open(page)
         await goSolve(page, info)
         await addBlock(page, info, 'flag')
-        await press(page.getByTestId('l2-shell-save'), info)
-        await expect(page.getByTestId('l2-shell-save-state')).toHaveText('未能保存')
-        await expect(page.getByTestId('l2-shell-save-state')).toHaveAttribute('data-state', 'failed')
+        const c = controls(page, info)
+        await c.save()
+        await expect(c.saveState).toContainText('未能保存')
         await expect(page.getByTestId('ws-save-chip')).toContainText('未能保存')
         await expect(page.getByTestId('ws-save-chip')).not.toContainText('已保存')
+        await expect(c.saveState).not.toContainText('已保存')
       })
     })
   })
