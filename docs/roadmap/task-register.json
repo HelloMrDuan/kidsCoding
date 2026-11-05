@@ -3387,13 +3387,13 @@
         "任务门禁通过，PR 合并后主线 CI 通过"
       ],
       "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/479",
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/480",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
         "reviewer": null
       },
-      "notes": "登记重建：旧 #476 仅登记移动端 Gap A 且基底过期（mergeable dirty，不可合并），本登记以 #477 合并后主线为基重建并按 2026-11-05 首席裁定统一定义为 D1 + Gap A；分工：2 号负责共享外壳实现（按 3 号复现测试修复 D1），3 号提供复现测试与课程需求（已在 #470），首席验收；D2 不在本任务范围；实现另立 PR，不在本登记 PR 内写代码。"
+      "notes": "登记重建：旧 #476 仅登记移动端 Gap A 且基底过期（mergeable dirty，不可合并），本登记以 #477 合并后主线为基重建并按 2026-11-05 首席裁定统一定义为 D1 + Gap A；分工：2 号负责共享外壳实现（按 3 号复现测试修复 D1），3 号提供复现测试与课程需求（已在 #470），首席验收；D2 不在本任务范围；实现另立 PR，不在本登记 PR 内写代码。实现 PR：#480（Draft，分支 muse-c/ops-022-slot-channel）；本地 Vitest 93/93、E2E 97/2/0、D1 复现去标记通过。"
     }
 
   ]
