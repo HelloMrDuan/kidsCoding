@@ -1,0 +1,50 @@
+name: LessonWorkspace E2E (shared workspace spec)
+
+# Minimal wiring for apps/web/tests/e2e/lesson-workspace.spec.ts (P0 gate 2).
+# Additive only: no existing workflow or job is modified here. The spec runs
+# against stock Chromium (no channel) through the dedicated config, so this
+# job installs `chromium` where the repo's other E2E jobs install `chrome`
+# for their channel-based configs. Node version, npm cache and npm ci mirror
+# the E2E jobs in .github/workflows/curriculum-content.yml.
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/features/lessons/workspace/**'
+      - 'apps/web/src/app/learn/workspace/**'
+      - 'apps/web/tests/e2e/lesson-workspace.spec.ts'
+      - 'apps/web/playwright.workspace.config.ts'
+      - '.github/workflows/lesson-workspace-e2e.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/src/features/lessons/workspace/**'
+      - 'apps/web/src/app/learn/workspace/**'
+      - 'apps/web/tests/e2e/lesson-workspace.spec.ts'
+      - 'apps/web/playwright.workspace.config.ts'
+      - '.github/workflows/lesson-workspace-e2e.yml'
+
+jobs:
+  lesson-workspace-e2e:
+    name: lesson-workspace E2E (desktop + tablet + mobile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install stock Chromium for Playwright
+        run: npx playwright install chromium --with-deps
+      - name: Run lesson-workspace spec (desktop + tablet + mobile)
+        run: npx playwright test --config=playwright.workspace.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lesson-workspace-e2e-evidence
+          path: apps/web/test-results/
