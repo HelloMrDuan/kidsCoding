@@ -3286,7 +3286,7 @@
       "title": "P0 LessonWorkspace 共享工作区外壳与引擎适配器（演示）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "新增共享工作区（apps/web/src/features/lessons/workspace/：契约类型、EngineAdapter 接口、BlocklyAdapter、ScratchVMAdapter、规范键草稿、三层判定、外壳组件、演示契约）与演示路由（apps/web/src/app/learn/workspace/[lessonId]）及 E2E（apps/web/tests/e2e/lesson-workspace.spec.ts）；演示契约均标演示、只用规范已公布演示值；不改规范目录、不改课程台账（432 节）、不改共享 CI、不改任何现有课堂与 G2/A1 课程文件。",
       "acceptance": [
@@ -3299,11 +3299,13 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/469",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "651ae7f39361484d35b88a6bcc91d3767e661ecb",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41953458185",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41953458024",
         "tests": [
-          "vitest src/features/lessons/workspace/ 41/41（本地复核）",
-          "Playwright lesson-workspace.spec.ts 9/9（本地生产构建、stock chromium）"
+          "首席独立复核：vitest src/features/lessons/workspace/ 84/84（本地；作者原 41/41 为中间头数字，已订正）",
+          "首席独立复核：Playwright lesson-workspace.spec.ts 生产构建、stock chromium：桌面 31 通过 + 1 跳过（触摸用例需移动端），移动端触摸 1 通过，合计 32 项覆盖（作者原 9/9 为初始演示头数字，已订正）",
+          "PR #469 门禁：33 成功 + 3 跳过、0 失败；main CI 课程 41953458185、任务 41953458024 均 success"
         ],
         "reviewer": null
       },
