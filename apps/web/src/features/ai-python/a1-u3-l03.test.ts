@@ -7,6 +7,12 @@ import {
   fieldErrorsFor,
   validateRecordText,
 } from './a1-u3-l03'
+import { JsonAdapter, buildJsonJudgment } from './a1-u3-l03-adapter'
+import {
+  L03_CONTRACT,
+  L03_DRAFT_KEY,
+  L03_WORKSPACE_CONTRACT_FIELDS,
+} from './a1-u3-l03-contract'
 import { validateFruitRecord } from './u3-local-engines'
 
 describe('A1-U3-L03 lesson layer (reuses the U3 pilot validator)', () => {
@@ -114,5 +120,109 @@ describe('A1-U3-L03 lesson layer (reuses the U3 pilot validator)', () => {
   it('hints have three levels and the lesson has three steps', () => {
     expect(HINTS.map((h) => h.level)).toEqual([1, 2, 3])
     expect(LESSON_STEPS).toHaveLength(3)
+  })
+})
+
+describe('A1-U3-L03 workspace integration (contract fields + JsonAdapter)', () => {
+  it('the lesson contract names the lesson honestly and uses the spec draft key', () => {
+    expect(L03_CONTRACT.lessonId).toBe('A1-U3-L03')
+    expect(L03_CONTRACT.title).toBe('结构化JSON输出')
+    expect(L03_CONTRACT.goal5).toHaveLength(5)
+    expect(L03_CONTRACT.scopeLabel).toBe('教学定向')
+    expect(L03_CONTRACT.scopeGap).toContain('不等于完全掌握')
+    expect(L03_DRAFT_KEY).toBe('kidscoding-draft:A1-U3-L03')
+    expect(L03_CONTRACT.draftKey).toBe(L03_DRAFT_KEY)
+  })
+
+  it('workspace fields translate the contract without an engine value', () => {
+    // 引擎值待首席裁定（共享壳尚无 JSON 校验引擎值，不能冒用 'summary'）。
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.lessonId).toBe('A1-U3-L03')
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.goal5).toHaveLength(5)
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.hints).toHaveLength(3)
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.structuredHints).toHaveLength(3)
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.methodSteps).toHaveLength(3)
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.activities).toHaveLength(3)
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.hasStage).toBe(false)
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.fileCapabilities).toEqual({
+      canNew: true,
+      canSave: true,
+      canExport: true,
+      canImport: true,
+      canReset: true,
+    })
+    expect(L03_WORKSPACE_CONTRACT_FIELDS.judging.knowledgeRule).toContain('不核验记录真假')
+    expect('engine' in L03_WORKSPACE_CONTRACT_FIELDS).toBe(false)
+  })
+
+  it('a correct record builds a three-layer pass judgment', () => {
+    const draft = {
+      version: 1 as const,
+      jsonText: '{"名称": "苹果", "颜色": "红", "重量": 182, "直径": 7.6}',
+      hintLevel: 0 as const,
+    }
+    const judgment = buildJsonJudgment(validateRecordText(draft.jsonText), draft)
+    expect(judgment.passed).toBe(true)
+    expect(judgment.layers.map((l) => l.id)).toEqual(['stage', 'task', 'knowledge'])
+    expect(judgment.conclusion).toContain('本次记录合格')
+    expect(judgment.layers[0].detail).toContain('五项全部通过')
+    expect(judgment.methodEvidence).toContain('必填 3 项已写 3 项')
+    expect(judgment.conclusion).not.toContain('已掌握')
+  })
+
+  it('a type error builds a fail judgment naming the failed check', () => {
+    const draft = {
+      version: 1 as const,
+      jsonText: '{"名称": "苹果", "颜色": "红", "重量": "182"}',
+      hintLevel: 0 as const,
+    }
+    const judgment = buildJsonJudgment(validateRecordText(draft.jsonText), draft)
+    expect(judgment.passed).toBe(false)
+    expect(judgment.layers[1].detail).toContain('未合格')
+    expect(judgment.layers[1].detail).toContain('类型正确')
+    expect(judgment.layers[0].detail).toContain('五项中通过 4 项')
+  })
+
+  it('broken JSON fails at parse, never as a five-check pass', () => {
+    const draft = { version: 1 as const, jsonText: '{bad', hintLevel: 0 as const }
+    const judgment = buildJsonJudgment(validateRecordText(draft.jsonText), draft)
+    expect(judgment.passed).toBe(false)
+    expect(judgment.layers[0].detail).toContain('JSON 格式错误')
+    expect(judgment.methodEvidence).toContain('先修 JSON 格式')
+  })
+
+  it('JsonAdapter: checkRecord stores the judgment and loadScript clears it', () => {
+    const adapter = new JsonAdapter()
+    adapter.loadScript({
+      version: 1,
+      jsonText: '{"名称": "苹果", "颜色": "红", "重量": 182}',
+      hintLevel: 0,
+    })
+    expect(adapter.getJudgmentResult()).toBeNull()
+    const judgment = adapter.checkRecord()
+    expect(judgment.passed).toBe(true)
+    expect(adapter.getJudgmentResult()).toBe(judgment)
+    expect(adapter.getJsonState()).toEqual({
+      checked: true,
+      passedCount: 5,
+      totalChecks: 5,
+      verdict: '结论：本次记录合格。',
+    })
+    adapter.loadScript({ version: 1, jsonText: '{"名称": "苹果"}', hintLevel: 0 })
+    expect(adapter.getJudgmentResult()).toBeNull()
+    expect(adapter.getJsonState().checked).toBe(false)
+    expect(adapter.getJsonState().passedCount).toBe(0)
+    expect(adapter.checkRecord().passed).toBe(false)
+    expect(adapter.getJsonState().passedCount).toBeLessThan(5)
+  })
+
+  it('JsonAdapter: run fires finished immediately, stop is a no-op, validateDraft is strict shape', () => {
+    const adapter = new JsonAdapter()
+    const events: string[] = []
+    adapter.run((event) => events.push(event.kind))
+    expect(events).toEqual(['finished'])
+    expect(() => adapter.stop()).not.toThrow()
+    expect(adapter.validateDraft({ version: 1, jsonText: '{}', hintLevel: 0 })).toBe(true)
+    expect(adapter.validateDraft({ version: 1, jsonText: 42 })).toBe(false)
+    expect(adapter.validateDraft(null)).toBe(false)
   })
 })
