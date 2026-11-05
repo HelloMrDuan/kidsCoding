@@ -118,6 +118,7 @@ function methodEvidenceForTransfer(draft: L02Draft): string {
 export class SummaryAdapter implements EngineAdapter {
   private draft: L02Draft
   private lastJudgment: JudgmentResult | null = null
+  private lastPassedCount = 0
 
   constructor(initial?: unknown) {
     this.draft = initial === undefined ? emptyDraft() : coerceDraft(initial)
@@ -136,6 +137,7 @@ export class SummaryAdapter implements EngineAdapter {
   loadScript(script: unknown): void {
     this.draft = coerceDraft(script)
     this.lastJudgment = null
+    this.lastPassedCount = 0
   }
 
   /** 读取当前草稿全量：外壳保存与课节切换的数据来源。 */
@@ -162,22 +164,20 @@ export class SummaryAdapter implements EngineAdapter {
   /** 独立摘要检查：同一套五项检查，返回共享判定（不写进草稿）。 */
   checkIndependent(): JudgmentResult {
     const summary = buildDraftSummary(this.draft.selected, this.draft.custom)
-    const judgment = buildSummaryJudgment(
-      checkDraftSummary(summary),
-      methodEvidenceForIndependent(this.draft),
-    )
+    const checks = checkDraftSummary(summary)
+    const judgment = buildSummaryJudgment(checks, methodEvidenceForIndependent(this.draft))
     this.lastJudgment = judgment
+    this.lastPassedCount = checks.filter((check) => check.passed).length
     return judgment
   }
 
   /** 迁移摘要检查：同一套五项检查，返回共享判定（不写进草稿）。 */
   checkTransfer(): JudgmentResult {
     const summary = buildTransferSummary(this.draft.transferSelected)
-    const judgment = buildSummaryJudgment(
-      checkTransferSummary(summary),
-      methodEvidenceForTransfer(this.draft),
-    )
+    const checks = checkTransferSummary(summary)
+    const judgment = buildSummaryJudgment(checks, methodEvidenceForTransfer(this.draft))
     this.lastJudgment = judgment
+    this.lastPassedCount = checks.filter((check) => check.passed).length
     return judgment
   }
 
@@ -213,10 +213,11 @@ export class SummaryAdapter implements EngineAdapter {
     if (this.lastJudgment === null) {
       return { checked: false, passedCount: 0, totalChecks: SUMMARY_TOTAL_CHECKS, verdict: null }
     }
-    const passedCount = this.lastJudgment.layers[0]?.detail.match(/通过 (\d+) 项/)
+    // Passed count comes from the stored check result, never parsed back
+    // out of a display sentence: the layer text is wording, not data.
     return {
       checked: true,
-      passedCount: passedCount ? Number(passedCount[1]) : 0,
+      passedCount: this.lastPassedCount,
       totalChecks: SUMMARY_TOTAL_CHECKS,
       verdict: this.lastJudgment.passed ? '合格' : '未合格',
     }
