@@ -1,21 +1,9 @@
 import { expect, test } from '@playwright/test'
-import {readFileSync} from 'node:fs'
 import {readFile} from 'node:fs/promises'
 import {deflateRawSync,inflateRawSync} from 'node:zlib'
 
-// Local-only CDN workaround (same as the UX-401/402/403 specs): this
-// sandbox's browser tunnel cannot reach jsDelivr, so when
-// SCRATCH_VM_LOCAL_CDN=1 the pinned production script (scratch-vm@5.0.300,
-// downloaded verbatim) is served from a local file via route interception.
-// CI never sets this variable and always exercises the real CDN path.
-test.beforeEach(async ({page}) => {
-  if (process.env.SCRATCH_VM_LOCAL_CDN !== '1') return
-  const vmCode = readFileSync(process.env.SCRATCH_VM_LOCAL_FILE ?? '/tmp/scratch-local/scratch-vm.min.js')
-  await page.route('https://cdn.jsdelivr.net/**', (route) =>
-    route.fulfill({ body: vmCode, contentType: 'application/javascript' }),
-  )
-})
-
+// OPS-024: the Scratch VM runtime is self-hosted from the app's own
+// origin, so no CDN workaround is needed in any spec.
 // Minimal ZIP reader/writer for one TQ-006 test: it re-packs the checked-in
 // sample with a single project.json field changed, without a zip dependency.
 const CRC_TABLE = (() => {
@@ -289,12 +277,6 @@ test('account cloud buttons save an actual Scratch VM sb3 and restore it in a fr
       draft:{lessonId:'G3-U1-L02',archiveBase64:stored,updatedAt:'2026-10-10T16:00:00Z'},
     }}))
     const other=await separateDevice.newPage()
-    if (process.env.SCRATCH_VM_LOCAL_CDN === '1') {
-      const vmCode = readFileSync(process.env.SCRATCH_VM_LOCAL_FILE ?? '/tmp/scratch-local/scratch-vm.min.js')
-      await other.route('https://cdn.jsdelivr.net/**', (route) =>
-        route.fulfill({ body: vmCode, contentType: 'application/javascript' }),
-      )
-    }
     await other.goto('/learn/scratch-lab/G3-U1-L02')
     await expect(other.getByTestId('scratch-green-flag')).toBeEnabled({timeout:60_000})
     await expect(other.getByTestId('scratch-edit-spawn-count')).toHaveValue('10')

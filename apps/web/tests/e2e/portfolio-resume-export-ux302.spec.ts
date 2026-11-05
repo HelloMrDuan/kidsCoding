@@ -4,17 +4,8 @@ import { readFile } from 'node:fs/promises'
 
 // UX-302: open -> continue editing -> save -> reopen -> export, plus delete,
 // upload-conflict and corrupt-data recovery. Seeds are local-only (localStorage
-// and IndexedDB); no real Supabase account is needed. The Scratch lab restore
-// test reuses the UX-401/402/403 local-CDN pattern: CI never sets
-// SCRATCH_VM_LOCAL_CDN and always exercises the real CDN path.
-test.beforeEach(async ({ page }) => {
-  if (process.env.SCRATCH_VM_LOCAL_CDN !== '1') return
-  const vmCode = readFileSync(process.env.SCRATCH_VM_LOCAL_FILE ?? '/tmp/scratch-local/scratch-vm.min.js')
-  await page.route('https://cdn.jsdelivr.net/**', (route) =>
-    route.fulfill({ body: vmCode, contentType: 'application/javascript' }),
-  )
-})
-
+// and IndexedDB); no real Supabase account is needed. OPS-024: the Scratch VM
+// runtime is self-hosted from the app's own origin, so no CDN is involved.
 const PYTHON_DRAFT_KEY = 'kids-python-local-practice-v1:P0-U1-L02'
 const PYTHON_CODE = 'def greet(name):\n    return "你好，" + name'
 const PYTHON_EDITED = 'def greet(name):\n    return "你好呀，" + name'

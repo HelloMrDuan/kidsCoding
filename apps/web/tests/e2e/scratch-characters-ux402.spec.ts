@@ -2,24 +2,10 @@
 // programs, separate runs, save/reload, negative cases, single-character
 // compatibility. Uses the real Scratch VM in a real browser.
 //
-// Local-only CDN workaround (same as the UX-401 spec): this sandbox's
-// browser tunnel cannot reach jsDelivr, so when SCRATCH_VM_LOCAL_CDN=1 the
-// pinned production script (scratch-vm@5.0.300, downloaded verbatim) is
-// served from a local file via route interception. CI never sets this
-// variable and always exercises the real CDN path.
+// OPS-024: the Scratch VM runtime is self-hosted from the app's own origin;
+// no CDN workaround is needed.
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
-
-const LOCAL_VM_FILE =
-  process.env.SCRATCH_VM_LOCAL_FILE ?? '/tmp/scratch-local/scratch-vm.min.js'
-
-async function maybeInterceptLocalCdn(page: Page) {
-  if (process.env.SCRATCH_VM_LOCAL_CDN !== '1') return
-  const vmCode = readFileSync(LOCAL_VM_FILE)
-  await page.route('https://cdn.jsdelivr.net/**', (route) =>
-    route.fulfill({ body: vmCode, contentType: 'application/javascript' }),
-  )
-}
 
 async function waitForLoaded(page: Page) {
   await expect(page.getByTestId('scratch-vm-status')).toContainText('已加载项目', {
@@ -48,7 +34,6 @@ async function applyProgram(page: Page, spawn: string, fall: string) {
 }
 
 test('two characters load with independent programs and a character area', async ({ page }) => {
-  await maybeInterceptLocalCdn(page)
   await page.goto('/learn/scratch-lab/G3-U1-L02')
   await waitForLoaded(page)
   await expect(page.getByTestId('scratch-character-list')).toBeVisible()
@@ -62,7 +47,6 @@ test('two characters load with independent programs and a character area', async
 })
 
 test('switching characters swaps the editor to that character program', async ({ page }) => {
-  await maybeInterceptLocalCdn(page)
   await page.goto('/learn/scratch-lab/G3-U1-L02')
   await waitForLoaded(page)
   await selectCharacter(page, '星星')
@@ -78,7 +62,6 @@ test('switching characters swaps the editor to that character program', async ({
 
 test('editing one character never overwrites the other', async ({ page }) => {
   test.setTimeout(180_000)
-  await maybeInterceptLocalCdn(page)
   await page.goto('/learn/scratch-lab/G3-U1-L02')
   await waitForLoaded(page)
   await applyProgram(page, '4', '18')
@@ -97,7 +80,6 @@ test('editing one character never overwrites the other', async ({ page }) => {
 
 test('each character runs separately on the real VM', async ({ page }) => {
   test.setTimeout(180_000)
-  await maybeInterceptLocalCdn(page)
   await page.goto('/learn/scratch-lab/G3-U1-L02')
   await waitForLoaded(page)
   await characterCard(page, '星星').getByTestId('scratch-run-character').click()
@@ -120,7 +102,6 @@ test('each character runs separately on the real VM', async ({ page }) => {
 
 test('save, reload and reimport restore both characters', async ({ page }) => {
   test.setTimeout(180_000)
-  await maybeInterceptLocalCdn(page)
   await page.goto('/learn/scratch-lab/G3-U1-L02')
   await waitForLoaded(page)
   await applyProgram(page, '4', '18')
@@ -160,7 +141,6 @@ test('illegal projects are refused with specific reasons and the good project su
   page,
 }) => {
   test.setTimeout(180_000)
-  await maybeInterceptLocalCdn(page)
   await page.goto('/learn/scratch-lab/G3-U1-L02')
   await waitForLoaded(page)
   const cases: Array<[string, string]> = [
@@ -180,7 +160,6 @@ test('illegal projects are refused with specific reasons and the good project su
 
 test('single-character old project still loads and runs', async ({ page }) => {
   test.setTimeout(180_000)
-  await maybeInterceptLocalCdn(page)
   await page.goto('/learn/scratch-lab/G3-U1-L02')
   await waitForLoaded(page)
   await page.getByTestId('scratch-import-sb3').setInputFiles('tests/e2e/fixtures/scratch-single-character.sb3')
@@ -201,7 +180,6 @@ test('three viewports: character area and editor hold at 1440, 768 and 375', asy
     'viewport sizes are driven explicitly; desktop project suffices',
   )
   test.setTimeout(120_000)
-  await maybeInterceptLocalCdn(page)
   await page.goto('/learn/scratch-lab/G3-U1-L02')
   await waitForLoaded(page)
   for (const [width, height] of [

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node ./scripts/copy-blockly-media.mjs",
+    "predev": "node ./scripts/copy-blockly-media.mjs && node ./scripts/copy-scratch-vm.mjs",
     "dev": "next dev",
-    "prebuild": "node ./scripts/copy-blockly-media.mjs",
+    "prebuild": "node ./scripts/copy-blockly-media.mjs && node ./scripts/copy-scratch-vm.mjs",
     "build": "next build --webpack",
     "start": "next start",
     "env:check": "node ./scripts/env-check.mjs",
@@ -25,6 +25,8 @@
     "next": "^16.2.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "scratch-storage": "4.0.0",
+    "scratch-vm": "5.0.300",
     "stripe": "^21.0.1"
   },
   "devDependencies": {
