@@ -47,6 +47,7 @@ import {
 import {
   MAX_CUSTOM_COUNT,
   MAX_CUSTOM_LENGTH,
+  MAX_METHOD_SUMMARY_LENGTH,
   coerceDraft,
   type L02Draft,
 } from './a1-u3-l02-draft'
@@ -293,7 +294,7 @@ export function SummaryEditorSlot({ initial, onChange, editable, onJudgment }: S
     return (
       <div data-testid="ai-u3-l02-slot-readonly">
         <p className="text-sm leading-7 text-[#6f7d92]">
-          只读模式：本课当前不可编辑，仅可阅读课文与已写摘要。
+          只读模式：本课当前不可编辑，仅可阅读课文与已选摘要。
         </p>
         <PassagePanel
           passage={SUMMARY_PASSAGE}
@@ -475,9 +476,9 @@ export function SummaryEditorSlot({ initial, onChange, editable, onJudgment }: S
 
           {tab === 'independent' && (
             <div>
-              <h2 className="text-lg font-black text-[#18243a]">自己写摘要</h2>
+              <h2 className="text-lg font-black text-[#18243a]">自己选摘要</h2>
               <p className="mt-1 text-sm leading-7 text-[#6f7d92]">
-                只给你课文、目标和工具，不提前给完整答案。勾选进摘要的句子，也可自加一句自己的话；点“检查摘要”看五项检查，最终合格必须五项全部通过。本课 3 个要点，标准摘要 3 句；全文照搬、要点重复、无来源的句子都会被判违规。
+                只给你课文、目标和工具，不提前给完整答案。勾选进摘要的句子，也可自加一句自己的话；点“检查摘要”看五项检查，最终合格必须五项全部通过。本课 3 个要点，标准摘要 3 句；全文照搬、要点重复、无来源的句子都会被判违规。检查看的是要点齐全、无重复、无离题，不区分主题句和细节句：选主题句是找要点的方法，选细节句只要要点对、来源真，同样合格。
               </p>
               <div className="mt-3 space-y-2">
                 {SUMMARY_PASSAGE.map((paragraph) =>
@@ -681,7 +682,7 @@ export function SummaryEditorSlot({ initial, onChange, editable, onJudgment }: S
 
           {tab === 'transfer' && (
             <div>
-              <h2 className="text-lg font-black text-[#18243a]">换一篇课文，再写一次</h2>
+              <h2 className="text-lg font-black text-[#18243a]">换一篇课文，再选一次</h2>
               <p className="mt-1 text-sm leading-7 text-[#6f7d92]">
                 方法不变，课文换了：找每段第一句（主题句）、同一要点只留一句、按 A → B → C
                 的顺序排。没有参考答案，自己把方法搬过来；点“检查迁移摘要”看同一套五项检查。
@@ -840,7 +841,7 @@ export function SummaryEditorSlot({ initial, onChange, editable, onJudgment }: S
             <div>
               <h2 className="text-lg font-black text-[#18243a]">本课总结</h2>
               <p className="mt-1 text-sm leading-7 text-[#6f7d92]">
-                只针对本课：忠实摘要 = 只写原文有的要点，不添不改；方法三步是找主题句、删重复、按要点重组；检查五项是漏要点、添内容、改原意、抽取规范、来源核验。
+                只针对本课：忠实摘要 = 只用原文有的要点，不添不改；方法三步是找主题句、删重复、按要点重组；检查五项是漏要点、添内容、改原意、抽取规范、来源核验。
               </p>
               <ul className="mt-2 space-y-1">
                 {L02_CONTRACT.methodSteps.map((step) => (
@@ -850,7 +851,7 @@ export function SummaryEditorSlot({ initial, onChange, editable, onJudgment }: S
                 ))}
               </ul>
               <p className="mt-2 text-sm leading-7 text-[#6f7d92]">
-                一次检查全过只表示本次摘要合格，不等于完全掌握；换一篇课文还能写对，才算真正会了。生成式摘要只一句话方向，本课不调用外部模型；清除浏览器数据会丢草稿。
+                一次检查全过只表示本次摘要合格，不等于完全掌握；换一篇课文还能选对，才算真正会了。生成式摘要只一句话方向，本课不调用外部模型；清除浏览器数据会丢草稿。
               </p>
               <label className="mt-3 block text-sm leading-7 text-[#18243a]">
                 用一句话写下你学会的摘要方法：
@@ -858,6 +859,7 @@ export function SummaryEditorSlot({ initial, onChange, editable, onJudgment }: S
                   type="text"
                   data-testid="ai-u3-l02-method-summary"
                   value={draft.methodSummary}
+                  maxLength={MAX_METHOD_SUMMARY_LENGTH}
                   onChange={(event) => persist({ ...draft, methodSummary: event.target.value })}
                   placeholder="例如：先找每段第一句，同一要点只留一句，再按要点顺序排。"
                   className="mt-1 w-full rounded-[14px] border border-[#e7edf5] bg-white px-3 py-2 text-sm text-[#18243a]"
