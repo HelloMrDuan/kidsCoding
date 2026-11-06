@@ -10,7 +10,7 @@
 
 | 项 | 实际情况 |
 |---|---|
-| Scratch VM | 真实 `scratch-vm@5.0.300` + `scratch-storage@4.0.0`（与 `scratch-g2-sandbox.html` 同版本）。本沙箱环境访问不到 jsDelivr（HTTP 403），所以用 npm 拉取同版本包，经 `SCRATCH_VM_LOCAL_CDN=1`（仓库既有的本地覆盖机制）在测试里替代 CDN。CI 仍走真实 jsDelivr。 |
+| Scratch VM | 真实 `scratch-vm@5.0.300` + `scratch-storage@4.0.0`，由应用自己的源站提供（OPS-024：`prebuild` 把 npm 包复制到 `public/scratch-vm/`），本课沙箱与 `scratch-g2-sandbox.html` 同一路径、同一套收紧的 CSP（`script-src 'self'`、`connect-src 'none'`），不再走 jsDelivr，测试里也没有任何 CDN 变通。 |
 | 浏览器 | Chromium 153（来自 npm `@sparticuz/chromium`），headless，`--no-sandbox`。仓库既有 CI 用 `channel: 'chrome'`；本地没有 Chrome 可下载（Playwright 下载域被屏蔽），所以结果是 **Chromium 153，不是 Chrome 稳定版**。 |
 | 中文字体 | 该 Chromium 没有 CJK 字体，汉字会渲染成空白，宽度也不对。用 `L02_CJK_FONT_FILE` 注入 Noto Sans SC（仅测试注入，产品代码不含）。不设置该变量时（CI）不注入。 |
 | Node | 本机 Node 22.23.4 与 Playwright 1.58 / Next 的 PostCSS 加载有已知兼容问题，本地用 `NODE_OPTIONS=--no-experimental-require-module` 绕过；与本 PR 代码无关。 |
@@ -23,16 +23,18 @@
 
 ```
 npx vitest run src/features/lessons/g2-u3-l02
-npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom.spec.ts   # 三个 project: desktop / tablet / phone
+npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom.spec.ts tests/e2e/g2-u3-l02-shell-gap-a.spec.ts --project=desktop   # 三个视口由 spec 自己设置
 ```
 
 最近一次本地完整运行（与仓库 CI 一致：单个 `desktop` project；三个视口由 spec 自己设置）：
 
-- Vitest：**66 / 66 通过**。其中包含“首席批准数值”快照、各上限的恰好边界、三层结果的恰好边界、措辞一致性（任何结果都不出现“已掌握 / 任务判定 / 接住了”）。
+- Vitest（正式接线后，`src/features/lessons/g2-u3-l02`）：**137 通过 + 2 个预期失败（共享壳缺陷 D2，保持原状）**；加上共享 `workspace/` 一起跑：16 个文件 239 通过 + 2 预期失败。原来的 66 项在其中，包含“首席批准数值”快照、各上限的恰好边界、三层结果的恰好边界、措辞一致性（任何结果都不出现“已掌握 / 任务判定 / 接住了”）。
 - Playwright：
-  - `g2-u3-l02-vm.spec.ts`：**21 / 21 通过**（真实 Scratch VM）。
-  - `g2-u3-l02-classroom.spec.ts`：**43 通过，5 跳过，0 失败**（16 个用例标题 × [desktop / tablet / phone] = 48 个实例）。
-  - 5 个跳过：真实指针拖放在 tablet / phone 视口跳过 2 项（只在桌面验证）+ 证据截图 3 项（未设置 `L02_SHOT_DIR`）。
+  - `g2-u3-l02-vm.spec.ts`：**22 / 22 通过**（真实 Scratch VM；原 21 + 共享 RunTrace 映射与直接判定等价 1）。
+  - `g2-u3-l02-classroom.spec.ts`（正式路由 `/learn/g2-u3-l02` = 共享 LessonWorkspace + 本课适配器与三个槽位）：61 个实例；原 16 个用例标题全部保留（定位从 `l2-*` 换成壳的 `ws-*`，壳语义不同处在用例注释里说明），另加 自托管 VM（jsDelivr 被拦截仍能运行且零 CDN 请求）、手机默认首屏、原验证页的 3 个草稿与适配器用例。
+  - `g2-u3-l02-shell-gap-a.spec.ts`：14 个实例（7 场景 × 桌面 / 手机 375×812，真实触摸点按）：五项编辑操作、Blockly 焦点丢失、重新选择、运行后修改、草稿恢复、ShellControl 运行/停止/保存、保存失败。
+  - 三个文件合计 97 个实例：本地 87 通过 / 10 按设计跳过 / 0 失败（真实 Chromium 153）。**GitHub Actions 真实 Chrome 的结果见 PR #471，这里不预填。**
+  - 10 个按设计跳过：真实指针拖放在 tablet / phone 跳过 2、证据截图 3（未设置 `L02_SHOT_DIR`）、手机首屏用例在桌面 / 平板跳过 2、草稿与适配器用例不跑平板 3。
 - **变异检验**（为证明边界测试不是“怎么都过”）：把判定与限制里的比较符 / 阈值故意改错，测试必须失败。单元层 11 个变异（容差 `<=`→`<`、占比 `>=`→`>`、循环次数、落地帧、0 步过滤、积木 / 嵌套 / dx / 次数上限、容差 40→41、速度 30→20）与沙箱层 6 个变异（积木 12→13、嵌套 2→3、脚本 3→4、次数 20→21、dx ±100→±101）**全部被抓到**，随后已还原。
   - 检验中发现并修复了 2 个“漏网”：最初的“落地帧恰好”与“0 步循环”两个用例在变异下仍通过，说明它们没有真正约束行为；已重写为能区分的构造。
 - ESLint：本 PR 新增文件 0 error、0 warning。
@@ -64,13 +66,13 @@ npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom
 | 知识证据恰好边界（真实 VM） | 循环只执行 1 次不满足；循环占比恰好 50%（80/160）满足，48.75% 不满足；0 步循环不算 |
 | 程序上限（真实 VM） | 最大合法程序能跑：12 块、次数 20、移动 ±100、嵌套 2、3 条脚本；13 块、嵌套 3、4 条脚本、次数 21、移动 ±101 均被沙箱拒绝 |
 
-## 四、课堂浏览器测试（`g2-u3-l02-classroom.spec.ts`，16 个用例 × 三个视口）
+## 四、课堂浏览器测试（`g2-u3-l02-classroom.spec.ts`，正式路由，三个视口）
 
 首屏五要素；提示 1→2→3 逐级揭示且开始前不出现完整答案；第一层不写预测不能运行、预测与真实结果对比；第二层空脚本 / 只有绿旗 / 错误数字 / 正确数字；改脚本后旧结果立即清除、已通过的关卡变回未通过；舞台真实坐标；保存与刷新恢复；保存失败显示“未能保存”；迁移左边、迁移更快；切换关卡不污染；运行中停止；文件菜单保存 / 导出 / 导入 / 重新开始、导入错课节作品被拒；角色管理只读查看水果脚本；溢出、遮挡与触摸尺寸。
 
 桌面真实指针拖放：从分类面板按住拖出三块 → 用 `data-program` 断言结构是“绿旗 → 重复 → 里面一块移动” → 改参数 → 运行通过（篮子停在 x=150）→ 把移动积木拖进垃圾桶 → 脚本结构变为“重复里面为空” → 旧结果清除 → 重新运行变成未通过。
 
-截图（本地真实 Chromium，1440 / 768 / 375）：`screenshots/{desktop,tablet,phone}-{1-first-visit,2-solve-fail,3-solve-pass}.png`。
+截图（正式 LessonWorkspace 路由，本地真实 Chromium，1440 / 768 / 375；2026-11 接线后重新生成）：`screenshots/{desktop,tablet,phone}-{1-first-visit,2-solve-fail,3-solve-pass}.png`。
 这些截图只证明布局和内容，不代替真实设备上的触摸手感。
 
 ## 五、测试发现并已修复的缺陷（保留记录）
