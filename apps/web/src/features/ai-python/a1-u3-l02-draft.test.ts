@@ -22,7 +22,7 @@ describe('A1-U3-L02 draft save/restore', () => {
       custom: ['黄苹果最甜。'],
       facts: { F1: '原文事实' as const, U1: '无依据推断' as const },
       hintLevel: 2 as const,
-      predictions: { 'pred-a': { verdict: '合格' as const, firstFailed: '' } },
+      predictions: { 'pred-a': { verdict: '合格' as const, firstFailed: '' as const } },
       revealed: ['pred-a'],
       transferSelected: ['T1-1', 'T2-1'],
       transferChecked: true,
@@ -82,6 +82,32 @@ describe('A1-U3-L02 draft save/restore', () => {
     expect(restored.custom).toEqual(['黄苹果最甜。', 'a', 'b', 'c', 'd'])
     expect(restored.facts).toEqual({ F1: '原文事实', G1: '合理概括' })
     expect(restored.hintLevel).toBe(0)
+  })
+
+  it('truncates an over-long method summary on read (3号 probe: 1M chars)', () => {
+    const restored = parseDraft(
+      JSON.stringify({
+        version: 1,
+        selected: [],
+        custom: [],
+        facts: {},
+        hintLevel: 0,
+        methodSummary: 'x'.repeat(1000000),
+      }),
+    )
+    expect(restored.methodSummary).toBe('x'.repeat(200))
+    expect(restored.methodSummary.length).toBe(200)
+    const kept = parseDraft(
+      JSON.stringify({
+        version: 1,
+        selected: [],
+        custom: [],
+        facts: {},
+        hintLevel: 0,
+        methodSummary: '先找主题句，再删重复，再排序。',
+      }),
+    )
+    expect(kept.methodSummary).toBe('先找主题句，再删重复，再排序。')
   })
 
   it('drops over-long custom sentences on read (safe degradation)', () => {
