@@ -210,6 +210,18 @@ export function assessDeep(deep, expectedKidsSha, opts = {}) {
       `running kids image ${deep.kidsImageSha} != recorded deployed SHA ${deep.kidsSha}`,
     );
   }
+  // Deployment-version verdict, decoupled from lifecycle health
+  // (2026-11-06 fix): the expected GitHub head may be UNKNOWN when
+  // the lookup failed or was rate-limited. That must never silently
+  // pass the comparison, and it must never block the lifecycle
+  // verdict either — it is reported separately as shaCheck.
+  //   ok      — live (or fresh-cached) expected head matches the
+  //             deployed SHA and the running image.
+  //   drift   — expected head is known and the deployed SHA or the
+  //             running image disagrees with it (strict, unchanged).
+  //   unknown — expected head unavailable (fetch failed / rate-limited /
+  //             deployed SHA unreadable): no comparison was possible.
+  let shaCheck = 'unknown';
   if (expectedKidsSha) {
     if (!deep.kidsSha) {
       problems.push('kids deployed SHA unreadable on the machine');
@@ -217,14 +229,18 @@ export function assessDeep(deep, expectedKidsSha, opts = {}) {
       problems.push(
         `kids SHA mismatch: deployed ${deep.kidsSha} != expected GitHub head ${expectedKidsSha}`,
       );
+      shaCheck = 'drift';
+    } else {
+      shaCheck = 'ok';
     }
     if (deep.kidsImageSha && deep.kidsImageSha !== expectedKidsSha) {
       problems.push(
         `running kids image ${deep.kidsImageSha} != expected GitHub head ${expectedKidsSha}`,
       );
+      shaCheck = 'drift';
     }
   }
-  return { ...deep, healthy: problems.length === 0, problems };
+  return { ...deep, healthy: problems.length === 0, problems, shaCheck };
 }
 
 /**
@@ -245,7 +261,16 @@ export function verdictFor({ state, action, deep, errorClass }) {
   if (action === 'blocked') return 'BLOCKED_STATE';
   if (action === 'observe') return 'STOPPED_MANUAL';
   if (action === 'held') return 'HELD';
-  if (deep) return deep.healthy ? 'OK' : 'APP_FAULT';
+  if (deep) {
+    if (!deep.healthy) return 'APP_FAULT';
+    // Healthy endpoints + containers, but the deployment version
+    // could NOT be verified (expected GitHub head unknown): the
+    // lifecycle verdict is LIFECYCLE_OK — the monitor is alive and
+    // the machine is serving — while `OK` stays reserved for runs
+    // whose expected SHA was verified live or from a fresh cache.
+    // lastHealthyAt is only set on 'OK'; see core.mjs finish().
+    return deep.shaCheck === 'unknown' ? 'LIFECYCLE_OK' : 'OK';
+  }
   if (action === 'wait') return 'IN_TRANSITION';
   if (state === 'running') return 'OK';
   return 'IN_TRANSITION';
@@ -263,11 +288,14 @@ export const FAILING_VERDICTS = new Set([
 
 /**
  * Did the watchdog itself complete its job this run? Any non-failing
- * verdict (OK, STOPPED_MANUAL, HELD, IN_TRANSITION) means the monitor
- * ran correctly and reported honestly; every BLOCKED_* / APP_FAULT
- * verdict means it did not. The Cloudflare status record uses this to
- * maintain lastSuccessAt, which the Muse backup layer reads to judge
- * whether the primary monitor is alive.
+ * verdict (OK, LIFECYCLE_OK, STOPPED_MANUAL, HELD, IN_TRANSITION,
+ * COOLDOWN_WAIT) means the monitor ran correctly and reported
+ * honestly; every BLOCKED_* / APP_FAULT verdict means it did not.
+ * The Cloudflare status record uses this to maintain lastSuccessAt,
+ * which the Muse backup layer reads to judge whether the primary
+ * monitor is alive. LIFECYCLE_OK counts as success for liveness —
+ * the machine is running and serving — but it deliberately does NOT
+ * set lastHealthyAt: only a deployment-verified 'OK' does that.
  */
 export function isRunSuccess(verdict) {
   return !FAILING_VERDICTS.has(verdict);

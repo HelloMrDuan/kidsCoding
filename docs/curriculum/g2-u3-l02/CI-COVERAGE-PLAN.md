@@ -77,9 +77,9 @@
 
 | 套件 | 数量（以本地实际运行报告为准） |
 |---|---|
-| Vitest `src/features/lessons/g2-u3-l02/`（4 个文件，含 2 个 D2 `it.fails` 预期失败） | 136 通过 + 2 预期失败 = 138（正式接线后；原 `g2-u3-l02.test.ts` 为 66） |
+| Vitest `src/features/lessons/g2-u3-l02/`（4 个文件，含 2 个 D2 `it.fails` 预期失败） | 137 通过 + 2 预期失败 = 139（正式接线后；原 `g2-u3-l02.test.ts` 为 66） |
 | Playwright `g2-u3-l02-vm.spec.ts` | 22（原 21 + 共享轨迹等价 1；desktop project 下 1 倍） |
-| Playwright `g2-u3-l02-classroom.spec.ts` | 16 个用例标题 × 3 视口 = 48 个实例，其中 5 个按设计跳过（拖放仅桌面 2 个 + 证据截图 3 个）→ 43 个执行；正式接线后：课堂 spec 共 60 个实例（验证页用例迁到正式页面，另加手机首屏用例）；另有 `g2-u3-l02-shell-gap-a.spec.ts` 14 个实例（**不在 #471 的命令里**，见 HANDOFF）。VM 矩阵 22。三个文件合计 96 个实例，本地 86 通过 / 10 按设计跳过。以上为本地数；GitHub Actions 尚未用新增测试重跑（#471 的证据是旧候选 HEAD，需按 HANDOFF 第六节刷新） |
+| Playwright `g2-u3-l02-classroom.spec.ts` | 16 个用例标题 × 3 视口 = 48 个实例，其中 5 个按设计跳过（拖放仅桌面 2 个 + 证据截图 3 个）→ 43 个执行；正式接线后：课堂 spec 共 63 个实例（验证页用例迁到正式页面，另加手机首屏用例）；另有 `g2-u3-l02-shell-gap-a.spec.ts` 14 个实例（**不在 #471 的命令里**，见 HANDOFF）。VM 矩阵 22。三个文件合计 99 个实例，本地 89 通过 / 10 按设计跳过。以上为本地数；GitHub Actions 尚未用新增测试重跑（#471 的证据是旧候选 HEAD，需按 HANDOFF 第六节刷新） |
 
 ## 四、首席裁定（2026-11-04）与合并顺序
 

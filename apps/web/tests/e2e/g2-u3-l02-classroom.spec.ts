@@ -462,6 +462,11 @@ for (const vp of VIEWPORTS) {
       expect(bar.height).toBeLessThanOrEqual(56)
       await expect(page.getByTestId('l2-task-bar-text')).toContainText('现在要做')
       await expect(page.getByTestId('l2-task-fold-body')).toBeHidden()
+      // 证据截图：只截视口（不是整页），就是孩子不滚动时看到的第一屏。只有设置了 L02_SHOT_DIR 才保存。
+      if (process.env.L02_SHOT_DIR) {
+        await page.evaluate(() => window.scrollTo(0, 0))
+        await page.screenshot({path: `${process.env.L02_SHOT_DIR}/phone-4-solve-first-screen.png`})
+      }
       // 展开后任务说明、三级提示按钮都在；第一关的预测输入也在
       await openTask(page, info)
       await expect(page.getByTestId('l2-next-hint')).toBeVisible()

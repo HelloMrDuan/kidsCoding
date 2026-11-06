@@ -294,15 +294,20 @@ test('lock held by another run -> LOCKED, zero API calls, liveness untouched', a
   assert.ok(status.lastLockSkipAt);
 });
 
-test('expected SHA unavailable -> BLOCKED_MONITOR; never silently skip three-way check', async () => {
+test('expected SHA unavailable -> LIFECYCLE_OK with shaCheck unknown (decoupled); never OK, never a silent pass', async () => {
   const store = makeStore();
   const clock = makeClock();
   const api = makeApi({ states: ['running'] });
   const rec = await runWatchdog(depsFor({ api, store, clock, sha: null }));
-  assert.equal(rec.verdict, 'BLOCKED_MONITOR');
+  assert.equal(rec.verdict, 'LIFECYCLE_OK');
+  assert.equal(rec.shaCheck, 'unknown');
+  assert.equal(rec.deploymentVerdict, 'unknown');
+  assert.equal(api.calls.exec, 1, 'SHA failure must not triple-retry the deep check');
   const status = await store.get('status');
-  assert.equal(status.lastHealthyAt, undefined);
-  assert.equal(status.lastVerdict, 'BLOCKED_MONITOR');
+  assert.equal(status.lastVerdict, 'LIFECYCLE_OK');
+  assert.equal(status.lastShaCheck, 'unknown');
+  assert.ok(status.lastSuccessAt, 'monitor liveness must advance');
+  assert.equal(status.lastHealthyAt, undefined, 'deployment-unverified runs never set lastHealthyAt');
 });
 
 test('unknown machine state -> BLOCKED_STATE, no resume', async () => {
