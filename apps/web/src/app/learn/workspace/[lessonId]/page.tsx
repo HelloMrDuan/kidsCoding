@@ -47,8 +47,15 @@ export default function WorkspaceDemoPage({
   if (!demo) notFound()
 
   const engine = demo.contract.engine
-  // Stable per engine; the shell additionally stabilizes the mounted adapter
-  // by engine kind, so a fresh instance on re-render never remounts it.
+  // Stable per lesson: adapter instances carry per-lesson state (the
+  // Blockly stageTarget, the Scratch lastState), so two lessons must
+  // never share one instance even when engine + target match (compat
+  // defects 2b/4a: a shared Scratch adapter's poller writes the old
+  // lesson's state into the new one, and a shared Blockly adapter
+  // judges the new lesson by the old lesson's target). A new instance
+  // (a different lesson) makes the shell unmount the old adapter and
+  // mount the new one (OPS-023), while the same instance on re-render
+  // never remounts.
   const adapter: EngineAdapter = useMemo(() => {
     if (engine === 'blockly') {
       return new BlocklyAdapter({ stageTarget: demo.contract.judging.target })
@@ -60,7 +67,7 @@ export default function WorkspaceDemoPage({
     // renders the honest summary note and never mounts this.
     return new BlocklyAdapter()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engine, demo.contract.judging.target?.fruitX, demo.contract.judging.target?.threshold])
+  }, [lessonId, engine, demo.contract.judging.target?.fruitX, demo.contract.judging.target?.threshold])
 
   const testFailSave = sp.demoFailSave === '1'
 
