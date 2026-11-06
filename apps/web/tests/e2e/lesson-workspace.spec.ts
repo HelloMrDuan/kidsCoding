@@ -614,6 +614,9 @@ test('summary wide layout: task left, editor wide, honest empty feedback, no sta
   expect(await page.getByTestId('ws-roles-panel').count()).toBe(0)
   expect(await page.getByTestId('ws-run-script').count()).toBe(0)
   await expect(page.getByTestId('ws-feedback')).toContainText('暂无检查结果')
+  // OPS-025 (#481): the feedback placeholder must never call a formal
+  // lesson "本演示" — a slot lesson's judgment lives with its own check.
+  await expect(page.getByTestId('ws-feedback')).not.toContainText('本演示')
 })
 
 test('summary demo: React editor slot mounts, types, saves, restores; no stage or run button', async ({

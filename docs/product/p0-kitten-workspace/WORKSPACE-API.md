@@ -74,6 +74,7 @@
 |---|---|
 | 编辑器插槽 / 舞台插槽 / 角色插槽 | 适配器不得自行挂载 React 内容（禁 `createRoot`）；需 React 编辑器的适配器以 EditorSlot 组件交外壳渲染；舞台插槽只收 `stageState` 纯数据（数字 / 字符串 / 布尔），外壳原样透传、不解释 |
 | `getJudgmentResult()` | 适配器自有通用判定；存在时外壳直接展示，不再走演示三层构造器；缺失时外壳不编造结论 |
+| `onJudgment(j)`（OPS-025，#481） | 插槽可选判定上报：无运行事件的插槽课在自有检查处上报 `JudgmentResult \| null`，外壳直接展示上报的判定，不重算成绩；上报 null 表示判定失效（与编辑后失效语义一致）；无上报时反馈卡只显示中性占位文案，永不写“本演示不作判定” |
 | `getSelectedBlockId()` / `selectBlockById()` | 外壳自有选中态追踪，不直接信任 Blockly 易失焦的 `getSelected()` |
 | `validateDraft()` | 适配器自有草稿校验；恢复校验失败时回初始脚本，永不覆盖好草稿 |
 | `getBlockCategories()` / `selectCategory()`、`getBlockInventory()` / `insertBlock()` | 数据驱动图标栏与积木搜索：外壳按适配器自有清单渲染、经适配器真实编辑器 API 插入；无此能力的适配器不得出现假分类与假搜索框 |
