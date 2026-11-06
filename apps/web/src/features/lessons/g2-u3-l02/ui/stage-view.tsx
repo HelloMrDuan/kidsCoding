@@ -3,9 +3,10 @@
 // 舞台：按 Scratch VM 回传的角色真实坐标画出果园、篮子、水果。
 // 沙箱没有渲染器，所以画面是这里按坐标绘制的原创 SVG；位置全部来自 VM，不在页面里自己算。
 
+import type { StagePositions } from '../stage-state'
 import type { SandboxAssets } from '../vm-adapter'
 
-export type StagePositions = { basket: { x: number; y: number }; fruit: { x: number; y: number } }
+export type { StagePositions }
 
 const WIDTH = 480
 const HEIGHT = 360

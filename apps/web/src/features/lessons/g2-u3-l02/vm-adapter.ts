@@ -22,7 +22,23 @@ export const READY_TIMEOUT_MS = 15000
 
 export type SandboxAssets = { backdrop: string; basket: string; fruit: string }
 
-export class ScratchL02Adapter {
+export type VmStatus = { ready: boolean; error: string | null; assets: SandboxAssets | null }
+
+/**
+ * 课程会话（session.ts）依赖的虚拟机端口。生产实现是下面的 ScratchL02Adapter（iframe 里的真实 Scratch VM）；
+ * 单元测试用假端口，只验证会话的状态机，不冒充 VM 的运行结果。
+ */
+export interface VmPort {
+  mount(el: HTMLElement): void
+  unmount(): void
+  getStatus(): VmStatus
+  subscribe(handlers: { ready?: () => void; frame?: (f: FrameInfo) => void }): void
+  runLevel(levelId: LevelId, program: Program, frameMs?: number): Promise<RunTrace>
+  stop(): void
+  currentRunId(): number
+}
+
+export class ScratchL02Adapter implements VmPort {
   private iframe: HTMLIFrameElement | null = null
   private pingTimer: ReturnType<typeof setInterval> | null = null
   private readyTimer: ReturnType<typeof setTimeout> | null = null
@@ -40,7 +56,7 @@ export class ScratchL02Adapter {
   private onReadyChange: (() => void) | null = null
 
   /** 沙箱握手情况：ready=true 才能运行；loadError 非空时界面必须如实显示。 */
-  getStatus(): { ready: boolean; error: string | null; assets: SandboxAssets | null } {
+  getStatus(): VmStatus {
     return { ready: this.ready, error: this.loadError, assets: this.assets }
   }
 

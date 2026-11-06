@@ -1,14 +1,10 @@
 import {expect, test} from '@playwright/test'
 import {readFile} from 'node:fs/promises'
-import {mutateSb3, openG2Lab, unzip, routeLocalScratchVm, selectTarget, spriteState, stageSprite} from './scratch-g2-helpers'
+import {mutateSb3, openG2Lab, unzip, selectTarget, spriteState, stageSprite} from './scratch-g2-helpers'
 
 // G2-U1 lessons on the real Scratch VM (scratch-vm@5.0.300 in a sandboxed
 // iframe). No VM mocks: every task state below comes from VM SAY events,
 // VM target coordinates and the VM's own .sb3 serializer.
-test.beforeEach(async ({page}) => {
-  await routeLocalScratchVm(page)
-})
-
 const L01 = 'G2-U1-L01'
 const L01_SAMPLE = 'public/scratch-samples/g2-u1-l01-park-friends.sb3.b64'
 

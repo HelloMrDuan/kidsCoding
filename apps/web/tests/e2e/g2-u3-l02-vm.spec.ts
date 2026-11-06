@@ -2,16 +2,16 @@
 // 在真实浏览器里加载 public/scratch-g2-u3-l02-sandbox.html（内含真实 scratch-vm@5.0.300），
 // 用 compile.ts 把学生脚本编译成 Scratch 工程送进去逐帧运行，再用 judge.ts 判定。
 // 不含任何积木模拟器：移动、循环展开、落地时机全部来自 VM。
-// 本地没有 jsDelivr 时：SCRATCH_VM_LOCAL_CDN=1 并用 SCRATCH_VM_LOCAL_FILE / SCRATCH_STORAGE_LOCAL_FILE 指向本地副本。
+// VM 运行时由 OPS-024 自托管：prebuild 把 npm 里的 scratch-vm / scratch-storage 复制到 public/scratch-vm/，本文件的静态服务器从那里提供。
 import {createServer, type Server} from 'node:http'
 import {readFileSync} from 'node:fs'
 import {join} from 'node:path'
 import {expect, test, type Page} from '@playwright/test'
-import {routeLocalScratchVm} from './scratch-g2-helpers'
 import {compileProject} from '../../src/features/lessons/g2-u3-l02/compile'
 import {judgeRun, type RunJudgment, type RunTrace} from '../../src/features/lessons/g2-u3-l02/judge'
 import {L02_LEVELS, L02_PARAMS, framesToLand, type LevelId} from '../../src/features/lessons/g2-u3-l02/params'
 import {programFingerprint, type Block, type Program} from '../../src/features/lessons/g2-u3-l02/program'
+import {judgeSharedTrace, toJudgmentResult, toSharedRunTrace} from '../../src/features/lessons/g2-u3-l02/lesson-adapter'
 
 const PUBLIC_DIR = join(__dirname, '..', '..', 'public')
 let server: Server
@@ -28,6 +28,13 @@ test.beforeAll(async () => {
     if (url === '/scratch-g2-u3-l02-sandbox.html') {
       res.setHeader('content-type', 'text/html; charset=utf-8')
       res.end(readFileSync(join(PUBLIC_DIR, 'scratch-g2-u3-l02-sandbox.html')))
+      return
+    }
+    // 自托管的 VM 运行时（与沙箱页面里的 <script src="/scratch-vm/…"> 对应）；只放行这两个固定文件名。
+    const vm = /^\/scratch-vm\/(scratch-vm\.js|scratch-storage\.min\.js)$/.exec(url)
+    if (vm) {
+      res.setHeader('content-type', 'text/javascript; charset=utf-8')
+      res.end(readFileSync(join(PUBLIC_DIR, 'scratch-vm', vm[1])))
       return
     }
     res.statusCode = 404
@@ -71,10 +78,9 @@ let nextRunId = 1000
 type RunResult = {trace: RunTrace; judgment: RunJudgment; frames: Array<{frame: number; basket: {x: number; y: number}; fruit: {x: number; y: number}}>}
 
 async function ready(page: Page) {
-  await routeLocalScratchVm(page)
   await page.goto(`${origin}/host.html`)
   const hello = await page.evaluate(() => (window as unknown as {ready: () => Promise<{available: boolean}>}).ready())
-  expect(hello.available, 'Scratch VM 没有加载：需要网络访问 jsDelivr，或设置 SCRATCH_VM_LOCAL_CDN=1').toBe(true)
+  expect(hello.available, 'Scratch VM 没有加载：public/scratch-vm/ 不存在或不完整（先运行 npm run build 或 node scripts/copy-scratch-vm.mjs）').toBe(true)
 }
 
 async function run(page: Page, program: Program, levelId: LevelId, frameMs = 0): Promise<RunResult> {
@@ -372,5 +378,38 @@ test.describe('G2-U3-L02 真实 Scratch VM：三层判定矩阵', () => {
     }
     // 拒绝之后沙箱仍然可用
     expect(judged(await run(page, flag(repeat(3, move(50))), 'solve')).passed).toBe(true)
+  })
+})
+
+test.describe('G2-U3-L02 真实 Scratch VM：共享 RunTrace 映射与课程判定等价', () => {
+  test.setTimeout(180_000)
+  test.beforeEach(async ({page}) => { await ready(page) })
+
+  test('真实 VM 轨迹经 toSharedRunTrace → judgeSharedTrace，与直接 judgeRun 的结果一致；还原的落点等于 VM 里篮子的真实 x', async ({page}) => {
+    const cases: Array<[LevelId, Program]> = [
+      ['solve', flag(repeat(3, move(50)))],
+      ['solve', flag(repeat(3, move(10)))],
+      ['solve', flag(move(100), move(50))],
+      ['solve', flag(move(50), repeat(2, move(50)))],
+      ['solve', flag(repeat(3, move(-50)))],
+      ['solve', flag()],
+      ['transferLeft', flag(repeat(5, move(-20)))],
+      ['transferLeft', flag(repeat(5, move(20)))],
+      ['transferFast', flag(repeat(3, move(50)))],
+      ['transferFast', flag(repeat(15, move(10)))],
+      ['explore', flag(repeat(2, move(20)))],
+      ['solve', flag(repeat(20, move(100)), repeat(20, move(-100)))],
+    ]
+    for (const [levelId, program] of cases) {
+      const r = await run(page, program, levelId)
+      const label = `${levelId} ${JSON.stringify(program)}`
+      expect(r.trace.endedBy, label).toBe('landed')
+      const direct = toJudgmentResult(r.judgment, levelId)
+      const shared = toSharedRunTrace(r.trace)
+      expect(judgeSharedTrace(shared), label).toEqual(direct)
+      // 共享轨迹按帧累加 dx 还原的落点，必须等于 VM 在落地那一帧读到的篮子 x（没有边缘限位带来的偏差）
+      const landed = shared.frames.filter(f => f.frame <= shared.landingFrame!).reduce<number>((sum, f) => sum + (f.dx ?? 0), L02_PARAMS.basketStartX)
+      expect(landed, label).toBe(r.trace.landing!.basketX)
+    }
   })
 })

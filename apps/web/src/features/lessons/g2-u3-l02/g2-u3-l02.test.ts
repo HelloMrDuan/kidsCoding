@@ -161,9 +161,28 @@ describe('沙箱常量与 TypeScript 一致（防止两边数字漂移）', () =
     for (const [key, id] of Object.entries(L02_ASSETS)) expect(html).toContain(`${key}: '${id}'`)
   })
 
-  it('沙箱固定 scratch-vm@5.0.300 与 scratch-storage@4.0.0（和 G2 沙箱同版本）', () => {
-    expect(html).toContain('scratch-vm@5.0.300/dist/web/scratch-vm.min.js')
-    expect(html).toContain('scratch-storage@4.0.0/dist/web/scratch-storage.min.js')
+  it('沙箱固定 scratch-vm@5.0.300 与 scratch-storage@4.0.0（和 G2 沙箱同版本、同一个自托管位置，不走 CDN）', () => {
+    // OPS-024：VM 由应用源站提供（prebuild 把 npm 包复制到 public/scratch-vm/）。版本固定在 package.json 里。
+    const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8')) as { dependencies?: Record<string, string> }
+    expect(pkg.dependencies?.['scratch-vm']).toBe('5.0.300')
+    expect(pkg.dependencies?.['scratch-storage']).toBe('4.0.0')
+    const g2 = readFileSync(join(process.cwd(), 'public', 'scratch-g2-sandbox.html'), 'utf8')
+    for (const src of ['/scratch-vm/scratch-vm.js', '/scratch-vm/scratch-storage.min.js']) {
+      expect(html).toContain(`<script src="${src}"></script>`)
+      expect(g2).toContain(`<script src="${src}"></script>`)
+    }
+    // 没有任何会加载外部资源的地址：SVG 里的 xmlns="http://www.w3.org/2000/svg" 只是命名空间标识，不是网络请求
+    expect(html).not.toMatch(/\b(?:src|href)\s*=\s*["']\s*(?:https?:)?\/\//i)
+    expect(html).not.toMatch(/url\(\s*["']?\s*(?:https?:)?\/\//i)
+    expect(html).not.toMatch(/jsdelivr/i)
+  })
+
+  it('沙箱的内容安全策略：脚本只能来自本源与内联，不允许任何网络连接，不允许 CDN', () => {
+    const csp = /Content-Security-Policy" content="([^"]*)"/.exec(html)?.[1] ?? ''
+    expect(csp).toContain("default-src 'none'")
+    expect(csp).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'")
+    expect(csp).toContain("connect-src 'none'")
+    expect(csp).not.toMatch(/jsdelivr|https?:/)
   })
 
   it('沙箱不发起网络请求，内置素材 SVG 不含脚本或事件属性', () => {

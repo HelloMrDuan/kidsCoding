@@ -38,7 +38,14 @@ export function readCurriculumSnapshot(): CurriculumSnapshot {
   const routes = walk(appDir).filter(f => /page\.tsx$/.test(f)).map(f => relative(appDir, f).split('/').slice(0, 2).join('/'))
   const e2eSpecs = walk(join(WEB, 'tests/e2e')).map(f => relative(WEB, f))
   const publicDir = join(WEB, 'public')
-  const publicAssets = walk(publicDir).map(f => relative(publicDir, f)).filter(f => !f.endsWith('-sandbox.html'))
+  // OPS-024: build artefacts regenerated from npm packages on every build
+  // (public/blockly-media/, public/scratch-vm/) are not shipped curriculum
+  // assets — their licences live in package.json / package-lock.json — so
+  // they must not be scanned as unlicensed assets. Without this exclusion
+  // the gate fails after any local `npm run build` (proven on pristine
+  // main: 16 blockly-media errors), even though CI runs vitest before build.
+  const GENERATED_DIRS = ['blockly-media/', 'scratch-vm/']
+  const publicAssets = walk(publicDir).map(f => relative(publicDir, f)).filter(f => !f.endsWith('-sandbox.html') && !GENERATED_DIRS.some(d => f.startsWith(d)))
   const trialIds = Object.keys(trialIntegrations)
   const allIds = [...catalog.tracks.flatMap(t => t.units.flatMap(u => u.lessons.map(l => l.id))), ...launchLessons.map(l => l.id)]
 
