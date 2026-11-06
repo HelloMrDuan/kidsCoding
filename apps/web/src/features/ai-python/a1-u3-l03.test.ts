@@ -7,7 +7,7 @@ import {
   fieldErrorsFor,
   validateRecordText,
 } from './a1-u3-l03'
-import { JsonAdapter, buildJsonJudgment } from './a1-u3-l03-adapter'
+import { JsonAdapter, buildJsonJudgment, passedCountOf } from './a1-u3-l03-adapter'
 import {
   L03_CONTRACT,
   L03_DRAFT_KEY,
@@ -213,6 +213,95 @@ describe('A1-U3-L03 workspace integration (contract fields + JsonAdapter)', () =
     expect(adapter.getJsonState().passedCount).toBe(0)
     expect(adapter.checkRecord().passed).toBe(false)
     expect(adapter.getJsonState().passedCount).toBeLessThan(5)
+  })
+
+  it('an empty object fails completeness and names all three required fields', () => {
+    const result = validateRecordText('{}')
+    expect(result.parseOk).toBe(true)
+    expect(result.passed).toBe(false)
+    expect(result.failedChecks).toEqual(['字段齐全'])
+    expect(result.fieldErrors.map((e) => e.field)).toEqual(['名称', '颜色', '重量'])
+  })
+
+  it('a null weight fails non-empty and type, and its fix never mentions quotes', () => {
+    const result = validateRecordText('{"名称": "苹果", "颜色": "红", "重量": null}')
+    expect(result.failedChecks).toEqual(['必填非空', '类型正确'])
+    const weightErrors = result.fieldErrors.filter((e) => e.field === '重量')
+    expect(weightErrors).toHaveLength(2)
+    expect(weightErrors[1].why).toContain('空值')
+    expect(weightErrors[1].fix).toContain('大于 0 的数字')
+    expect(weightErrors[1].fix).not.toContain('引号')
+  })
+
+  it('a boolean weight fails type only, and its fix never mentions quotes', () => {
+    const result = validateRecordText('{"名称": "苹果", "颜色": "红", "重量": true}')
+    expect(result.failedChecks).toEqual(['类型正确'])
+    expect(result.fieldErrors).toHaveLength(1)
+    expect(result.fieldErrors[0].fix).toContain('大于 0 的数字')
+    expect(result.fieldErrors[0].fix).not.toContain('引号')
+  })
+
+  it('a null diameter fails type only, and its fix never mentions quotes', () => {
+    const result = validateRecordText(
+      '{"名称": "苹果", "颜色": "红", "重量": 182, "直径": null}',
+    )
+    expect(result.failedChecks).toEqual(['类型正确'])
+    expect(result.fieldErrors.map((e) => e.field)).toEqual(['直径'])
+    expect(result.fieldErrors[0].fix).toContain('大于 0 的数字')
+    expect(result.fieldErrors[0].fix).not.toContain('引号')
+  })
+
+  it('a string diameter still fails type and its fix does mention quotes', () => {
+    const result = validateRecordText(
+      '{"名称": "苹果", "颜色": "红", "重量": 182, "直径": "7.6"}',
+    )
+    expect(result.failedChecks).toEqual(['类型正确'])
+    expect(result.fieldErrors[0].fix).toContain('引号')
+  })
+})
+
+describe('A1-U3-L03 parse-failure judgment (fail-closed wording)', () => {
+  it('passedCountOf is 0 on a parse failure, 5 on a pass, 4 on one failed check', () => {
+    expect(passedCountOf(validateRecordText('{bad'))).toBe(0)
+    expect(passedCountOf(validateRecordText(''))).toBe(0)
+    expect(
+      passedCountOf(
+        validateRecordText('{"名称": "苹果", "颜色": "红", "重量": 182, "直径": 7.6}'),
+      ),
+    ).toBe(5)
+    expect(
+      passedCountOf(
+        validateRecordText('{"名称": "苹果", "颜色": "红", "重量": "182", "直径": 7.6}'),
+      ),
+    ).toBe(4)
+  })
+
+  it('a parse failure never says "0 项未通过" and never claims 5 passed', () => {
+    const draft = { version: 1 as const, jsonText: '{bad', hintLevel: 0 as const }
+    const judgment = buildJsonJudgment(validateRecordText(draft.jsonText), draft)
+    expect(judgment.passed).toBe(false)
+    expect(judgment.layers[0].detail).toContain('JSON 格式错误')
+    expect(judgment.layers[0].detail).toContain('尚未校验五项')
+    expect(judgment.layers[1].detail).toContain('JSON 格式错误')
+    expect(judgment.layers[1].detail).not.toContain('0 项未通过')
+    expect(judgment.conclusion).toContain('未合格')
+  })
+
+  it('JsonAdapter: checkRecord on an empty or broken draft reports 0 passed', () => {
+    const adapter = new JsonAdapter()
+    expect(adapter.checkRecord().passed).toBe(false)
+    expect(adapter.getJsonState()).toEqual({
+      checked: true,
+      passedCount: 0,
+      totalChecks: 5,
+      verdict: '结论：未合格。',
+    })
+    // 非法草稿经 coerceDraft 回落为空草稿，校验同样是 0 通过（不是 5）。
+    adapter.loadScript('not an object')
+    expect(adapter.getScript()).toEqual({ version: 1, jsonText: '', hintLevel: 0 })
+    adapter.checkRecord()
+    expect(adapter.getJsonState().passedCount).toBe(0)
+    expect(adapter.getJsonState().verdict).toBe('结论：未合格。')
   })
 
   it('JsonAdapter: run fires finished immediately, stop is a no-op, validateDraft is strict shape', () => {
