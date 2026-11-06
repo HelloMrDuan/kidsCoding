@@ -374,7 +374,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
       - name: Run A1-U3-L02 dedicated unit tests
-        run: npx vitest run src/features/ai-python/a1-u3-l02.test.ts src/features/ai-python/a1-u3-l02-draft.test.ts
+        run: npx vitest run src/features/ai-python/a1-u3-l02.test.ts src/features/ai-python/a1-u3-l02-draft.test.ts src/features/ai-python/a1-u3-l02-slot.test.tsx
       - name: Install real Chrome for browser E2E
         run: npx playwright install chrome --with-deps
       - name: Run A1-U3-L02 summary lesson spec with real Chrome
@@ -600,6 +600,34 @@ jobs:
         if: always()
         with:
           name: duo-chrome-evidence-s6
+          path: apps/web/test-results/
+
+  scratch-vm-local:
+    # OPS-024: the G2 lab must load from the self-hosted VM with the old CDN
+    # host unreachable (regression for CI run 41983605834, shard s2).
+    timeout-minutes: 12
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
+      - name: Scratch VM self-hosted regression (G2-U2-L06, jsDelivr blocked in-spec)
+        run: npx playwright test tests/e2e/scratch-vm-local.spec.ts --project=desktop --workers=1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scratch-vm-local-evidence
           path: apps/web/test-results/
 
   scratch-touch-browser:
