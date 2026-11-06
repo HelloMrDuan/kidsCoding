@@ -16,9 +16,17 @@
  * 判定永不写进草稿，恢复后须重新检查才出结果）。
  * 恢复初始走外壳文件菜单：外壳以新 key 重挂插槽，initial 回到空草稿。
  */
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
-import type { EditorSlotProps } from '../lessons/workspace/workspace-slots'
+import type {
+  EditorSlotProps,
+  JudgmentResult,
+} from '../lessons/workspace/workspace-slots'
+import {
+  buildSummaryJudgment,
+  methodEvidenceForIndependent,
+  methodEvidenceForTransfer,
+} from './a1-u3-l02-adapter'
 import { L02_CONTRACT, TRANSFER_PASSAGE, TRANSFER_POINTS } from './a1-u3-l02-contract'
 import {
   BAD_SUMMARIES,
@@ -140,9 +148,22 @@ function PassagePanel({
   )
 }
 
-export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotProps) {
+/**
+ * 插槽 props：外壳的 EditorSlotProps 加可选判定上报通道（Issue #481
+ * 课程侧一半）。外壳尚未接 onJudgment 时该回调恒为 undefined，插槽
+ * 行为与原来完全一致；外壳接通后，每次检查的判定由此上报外壳反馈
+ * 区，改动后失效时上报 null。插槽不为此改布局、不加运行按钮。
+ */
+export type SummarySlotProps = EditorSlotProps & {
+  /** 上报最近一次检查的判定；null 表示已无有效判定（改动后失效）。 */
+  onJudgment?: (judgment: JudgmentResult | null) => void
+}
+
+export function SummaryEditorSlot({ initial, onChange, editable, onJudgment }: SummarySlotProps) {
   const [draft, setDraft] = useState<L02Draft>(() => coerceDraft(initial))
   const [tab, setTab] = useState<Tab>('predict')
+  // 最近一次上报的判定属于哪项活动；改动该活动的数据后判定失效。
+  const lastReportedRef = useRef<'independent' | 'transfer' | null>(null)
   const [summaryChecks, setSummaryChecks] = useState<L02Check[] | null>(null)
   const [transferChecks, setTransferChecks] = useState<L02Check[] | null>(null)
   const [factsChecked, setFactsChecked] = useState(false)
@@ -161,6 +182,14 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
     onChange(next)
   }
 
+  /** 改动某项活动的数据后，该活动的已上报判定失效（外壳反馈随之清空）。 */
+  function clearReported(activity: 'independent' | 'transfer') {
+    if (lastReportedRef.current === activity) {
+      lastReportedRef.current = null
+      onJudgment?.(null)
+    }
+  }
+
   function toggleSentence(id: string) {
     const selected = draft.selected.includes(id)
       ? draft.selected.filter((item) => item !== id)
@@ -168,6 +197,7 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
     persist({ ...draft, selected })
     setSummaryChecks(null)
     setPostResult(null)
+    clearReported('independent')
   }
 
   function toggleTransferSentence(id: string) {
@@ -177,6 +207,7 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
     persist({ ...draft, transferSelected: selected })
     setTransferChecks(null)
     setTransferPostResult(null)
+    clearReported('transfer')
   }
 
   function addCustom() {
@@ -195,6 +226,7 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
     setCustomNotice(null)
     setSummaryChecks(null)
     setPostResult(null)
+    clearReported('independent')
   }
 
   function removeCustom(index: number) {
@@ -202,6 +234,7 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
     setCustomNotice(null)
     setSummaryChecks(null)
     setPostResult(null)
+    clearReported('independent')
   }
 
   function setFact(id: string, value: string) {
@@ -230,6 +263,9 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
     }
     setSummaryChecks(checks)
     if (!draft.hasChecked) persist({ ...draft, hasChecked: true })
+    // 与插槽内 JudgeBlock 同一套判定：上报外壳反馈区，改动后失效。
+    lastReportedRef.current = 'independent'
+    onJudgment?.(buildSummaryJudgment(checks, methodEvidenceForIndependent(draft)))
   }
 
   function checkTransfer() {
@@ -245,6 +281,9 @@ export function SummaryEditorSlot({ initial, onChange, editable }: EditorSlotPro
     }
     setTransferChecks(checks)
     if (!draft.transferChecked) persist({ ...draft, transferChecked: true })
+    // 与插槽内 JudgeBlock 同一套判定：上报外壳反馈区，改动后失效。
+    lastReportedRef.current = 'transfer'
+    onJudgment?.(buildSummaryJudgment(checks, methodEvidenceForTransfer(draft)))
   }
 
   const passageForTab = tab === 'transfer' ? TRANSFER_PASSAGE : SUMMARY_PASSAGE
