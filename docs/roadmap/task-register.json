@@ -3502,7 +3502,7 @@
    "title": "KidsCoding 旧机 CF 监控解耦：GitHub SHA 查询失败不再阻断生命周期保活与安全 Resume",
    "priority": "P0",
    "category": "OPS",
-   "status": "in_progress",
+   "status": "in_review",
    "dependencies": [
     "OPS-013",
     "OPS-010"
@@ -3515,7 +3515,9 @@
     "本地测试 71/71；PR CI 全绿；Cloudflare 真实 Cron 轮次验证（APP_FAULT/drift 新字段已实测，限流下 LIFECYCLE_OK 待真实限流窗口）",
     "主监控 GH_STALE 与部署漂移问题本身不在本任务范围（漂移对齐另行处理，#150 仍不关闭）"
    ],
-   "evidence": {},
+   "evidence": {
+    "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/489"
+   },
    "notes": "根因（2026-11-06 实测）：已部署 Worker deepCheck() 在预期 SHA 取不到时直接 throw，每轮必达 BLOCKED_MONITOR，lastSuccessAt 冻在 2026-11-06T01:30:51Z；SHA 查询默认无鉴权（线上无 GITHUB_TOKEN），匿名限流 60/小时按出口 IP 共享；GitHub Actions run 73 失败是真实漂移（部署 0a913c6c ≠ 主线 e8472532），非监控 bug。本任务只修监控耦合，不处理部署漂移。已部署解耦版 Version bae9066d，14:50:53 真实 Cron 轮次 APP_FAULT/drift 新字段已验证。"
   }
  ]
