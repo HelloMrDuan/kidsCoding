@@ -1,5 +1,5 @@
 /**
- * Shared workspace slot interfaces (OPS-020, three-engine extension).
+ * Shared workspace slot interfaces (OPS-020, engine extension).
  *
  * This module holds TYPE-ONLY shared contracts plus tiny pure helpers. It
  * contains no course business logic, no thresholds, no lesson copy, and no

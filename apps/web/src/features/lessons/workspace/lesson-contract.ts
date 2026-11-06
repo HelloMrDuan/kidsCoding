@@ -1,5 +1,5 @@
 /**
- * Lesson Content Contract — TypeScript types for docs/product/p0-kitten-workspace/LESSON-CONTRACT.md v1.0.
+ * Lesson Content Contract — TypeScript types for docs/product/p0-kitten-workspace/LESSON-CONTRACT.md v1.1.
  *
  * The shell only renders contract content; it never invents lesson titles, tasks, hints or answers.
  * Demo contracts (demo-contracts.ts) are the only contracts this shell serves in this branch,
@@ -12,7 +12,14 @@ import type {
   StructuredHint,
 } from './workspace-slots'
 
-export type WorkspaceEngine = 'blockly' | 'scratch-vm' | 'summary'
+/**
+ * Engine values (OPS-026, Issue #482 chief ruling option ②): 'slot' is the
+ * generic slot-lesson engine — a course-owned EditorSlot with no forced
+ * Blockly/Scratch mount. 'json' is deliberately NOT an engine value: a JSON
+ * course must use 'slot', never masquerade as 'summary'. 'summary' stays
+ * the summary-editing engine only.
+ */
+export type WorkspaceEngine = 'blockly' | 'scratch-vm' | 'summary' | 'slot'
 
 export type ScopeLabel = '教学定向' | '开放创作'
 
@@ -49,12 +56,13 @@ export type LessonContract = {
   /** True only for demo fixtures. Demo contracts are never formal lesson data. */
   demo?: boolean
   /**
-   * Three-engine extension fields (all optional, purely additive).
+   * Engine extension fields (all optional, purely additive).
    * `structuredHints` renders level/title/text with the same cumulative
    * reveal; without it the shell renders the plain `hints` strings.
    * `methodSteps` / `scopeGap` / `progress` / `activities` render ONLY
    * inside the task drawer, never in the permanent editing area.
-   * `hasStage: false` renders no stage area at all (stage-less courses).
+   * `hasStage: false` renders no stage area at all (stage-less courses,
+   * e.g. summary and slot lessons).
    * `fileCapabilities` hides file operations the adapter does not support;
    * absent capabilities keep the demo default (all shown). Adopting the
    * structured hint form in the frozen spec text is a chief decision (C2);
@@ -105,8 +113,8 @@ export function validateLessonContract(contract: unknown): string[] {
   if (!Array.isArray(c.hints) || c.hints.length !== 3 || c.hints.some((h) => typeof h !== 'string' || h.length === 0)) {
     errors.push('hints 必须恰好是 3 条非空字符串')
   }
-  if (c.engine !== 'blockly' && c.engine !== 'scratch-vm' && c.engine !== 'summary') {
-    errors.push('engine 必须是 blockly、scratch-vm 或 summary')
+  if (c.engine !== 'blockly' && c.engine !== 'scratch-vm' && c.engine !== 'summary' && c.engine !== 'slot') {
+    errors.push('engine 必须是 blockly、scratch-vm、summary 或 slot')
   }
   if (!c.judging || typeof c.judging !== 'object') {
     errors.push('judging 缺失')

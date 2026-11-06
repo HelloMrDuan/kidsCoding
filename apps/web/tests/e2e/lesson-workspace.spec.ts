@@ -15,6 +15,7 @@ import { expect, test } from '@playwright/test'
 
 const DEMO_A = '/learn/workspace/demo-a'
 const DEMO_S = '/learn/workspace/demo-s'
+const DEMO_SLOT = '/learn/workspace/demo-slot'
 const DEMO_SCRATCH = '/learn/workspace/demo-scratch'
 
 async function dragFlyoutBlockToWorkspace(
@@ -886,4 +887,92 @@ test('OPS-022 slot container holds the A1 editing height at 1440, 768 and 375', 
     expect(box).not.toBeNull()
     expect(box!.height).toBeGreaterThanOrEqual(c.min)
   }
+})
+
+/* ---------------- OPS-026: generic slot engine (Issue #482, option ②) ---------------- */
+
+test('slot wide layout: task left, editor wide, honest empty feedback, no stage or run', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_SLOT)
+  await expect(page.getByTestId('ws-demo-slot-editor')).toBeVisible()
+  await expect(page.getByTestId('ws-task-panel')).toBeVisible()
+  const taskBox = await page.getByTestId('ws-task-panel').boundingBox()
+  const scriptBox = await page.getByTestId('ws-script-panel').boundingBox()
+  expect(taskBox).not.toBeNull()
+  expect(scriptBox).not.toBeNull()
+  expect(Math.abs(taskBox!.y - scriptBox!.y)).toBeLessThanOrEqual(20)
+  expect(taskBox!.x).toBeLessThan(scriptBox!.x)
+  const editorBox = await page.getByTestId('ws-demo-slot-editor').boundingBox()
+  expect(editorBox).not.toBeNull()
+  expect(editorBox!.width).toBeGreaterThan(400)
+  // No stage, no roles, no run button, honest empty state.
+  expect(await page.getByTestId('ws-stage-panel').count()).toBe(0)
+  expect(await page.getByTestId('ws-roles-panel').count()).toBe(0)
+  expect(await page.getByTestId('ws-run-script').count()).toBe(0)
+  expect(await page.getByTestId('ws-run-toggle').count()).toBe(0)
+  expect(await page.getByTestId('ws-sticky-run').count()).toBe(0)
+  await expect(page.getByTestId('ws-feedback')).toContainText('暂无检查结果')
+})
+
+test('slot demo: React editor slot mounts, checks in-slot, saves, restores; no stage or run button', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_SLOT)
+  await expect(page.getByTestId('ws-demo-slot-editor')).toBeVisible()
+  expect(await page.getByTestId('ws-stage-panel').count()).toBe(0)
+  expect(await page.getByTestId('ws-run-script').count()).toBe(0)
+  expect(await page.getByTestId('ws-roles-panel').count()).toBe(0)
+  await page.getByTestId('ws-demo-slot-item-0').check()
+  await page.getByTestId('ws-demo-slot-item-1').check()
+  await page.getByTestId('ws-demo-slot-item-2').check()
+  await page.getByTestId('ws-demo-slot-check').click()
+  await expect(page.getByTestId('ws-demo-slot-conclusion')).toHaveText('三项全部通过。')
+  // The check result lives in the slot only; the shell feedback stays neutral.
+  await expect(page.getByTestId('ws-feedback')).toContainText('暂无检查结果')
+  await page.getByTestId('ws-file-menu-button').click()
+  await page.getByTestId('ws-file-save').click()
+  await expect(page.getByTestId('ws-save-chip')).toHaveText('已保存到本机')
+  await page.reload()
+  await expect(page.getByTestId('ws-demo-slot-item-0')).toBeChecked({ timeout: 10000 })
+  await expect(page.getByTestId('ws-demo-slot-item-1')).toBeChecked()
+  await expect(page.getByTestId('ws-demo-slot-item-2')).toBeChecked()
+})
+
+test('slot tablet + mobile: editor stays wide, check + save/restore on phone', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 768, height: 1024 })
+  await page.goto(DEMO_SLOT)
+  await expect(page.getByTestId('ws-demo-slot-editor')).toBeVisible()
+  const tabletEditor = await page.getByTestId('ws-demo-slot-editor').boundingBox()
+  expect(tabletEditor).not.toBeNull()
+  expect(tabletEditor!.width).toBeGreaterThan(280)
+  await expect(page.getByTestId('ws-task-panel')).toBeVisible()
+  expect(await page.getByTestId('ws-stage-panel').count()).toBe(0)
+  expect(await page.getByTestId('ws-run-script').count()).toBe(0)
+
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto(DEMO_SLOT)
+  await expect(page.getByTestId('ws-demo-slot-editor')).toBeVisible()
+  const phoneEditor = await page.getByTestId('ws-demo-slot-editor').boundingBox()
+  expect(phoneEditor).not.toBeNull()
+  expect(phoneEditor!.width).toBeGreaterThan(300)
+  expect(await page.getByTestId('ws-stage-panel').count()).toBe(0)
+  expect(await page.getByTestId('ws-run-script').count()).toBe(0)
+  await page.getByTestId('ws-task-button').click()
+  await expect(page.getByTestId('ws-task-drawer')).toBeVisible()
+  await page.getByTestId('ws-task-button').click()
+  await page.getByTestId('ws-demo-slot-item-0').check()
+  await page.getByTestId('ws-demo-slot-item-1').check()
+  await page.getByTestId('ws-demo-slot-item-2').check()
+  await page.getByTestId('ws-demo-slot-check').click()
+  await expect(page.getByTestId('ws-demo-slot-conclusion')).toHaveText('三项全部通过。')
+  await page.getByTestId('ws-file-menu-button').click()
+  await page.getByTestId('ws-file-save').click()
+  await expect(page.getByTestId('ws-save-chip')).toHaveText('已保存到本机')
+  await page.reload()
+  await expect(page.getByTestId('ws-demo-slot-item-2')).toBeChecked({ timeout: 10000 })
 })
