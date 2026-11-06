@@ -3501,7 +3501,7 @@
       "title": "P0 共享反馈区：插槽判定上报通道（#481）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "OPS-020"
       ],
@@ -3514,10 +3514,15 @@
         "Summary/Blockly/Scratch 兼容无回归（Blockly/Scratch 走既有 getJudgmentResult 运行路径不动）"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/488",
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "本地：新单测 slot-judgment-report.test.tsx 5/5；工作区单测 13 文件 107/107；全量 vitest 183 文件 1317/1317；ESLint 改动文件 0 错；生产构建成功",
+          "本地：E2E lesson-workspace.spec.ts 三项目（1440/768/375）：97 通过 / 2 跳过 / 0 失败（含新加的反馈卡无“本演示”断言）",
+          "本地：scripts/check-task-ledger.py 校验通过（115 产品任务、432 课、changed == {OPS-025}）",
+          "CI：以 PR 头真实运行为准"
+        ],
         "reviewer": null
       },
       "notes": "首席亲自实施（duan 2026-11-06 指令）；#481 同页发现另记：外壳 handleEditorSlotChange 不同步适配器内部草稿（修 onJudgment 时不一并改，另立任务）；规范“版乱码”经核查主线 WORKSPACE-API.md 无 U+FFFD，不存在，不修。"
