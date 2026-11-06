@@ -382,6 +382,33 @@ test.describe('A1-U3-L02 tablet screen', () => {
     await expect(page.getByTestId('ai-u3-l02-transfer-checks')).toBeVisible()
     expect(await overflow(page)).toBe(false)
   })
+
+  test('768px: standard three sentences pass; verdict and check control are in view', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await expect(page.getByTestId('ws-topbar')).toContainText('实现文本摘要')
+    await page.getByTestId('ai-u3-l02-tab-independent').tap()
+    for (const id of ['P1-1', 'P3-1', 'P4-1']) {
+      await page.getByTestId(`ai-u3-l02-pick-${id}`).tap()
+    }
+    // The check control itself must be reachable by touch: tapping it is
+    // the proof, and its box must sit inside the viewport after scrolling.
+    const checkButton = page.getByTestId('ai-u3-l02-check-summary')
+    await checkButton.scrollIntoViewIfNeeded()
+    const buttonBox = await checkButton.boundingBox()
+    expect(buttonBox).not.toBeNull()
+    expect(buttonBox!.y).toBeGreaterThanOrEqual(0)
+    expect(buttonBox!.y + buttonBox!.height).toBeLessThanOrEqual(1024)
+    await checkButton.tap()
+    const verdict = page.getByTestId('ai-u3-l02-summary-verdict')
+    await expect(verdict).toContainText('合格：五项全部通过')
+    await verdict.scrollIntoViewIfNeeded()
+    const verdictBox = await verdict.boundingBox()
+    expect(verdictBox).not.toBeNull()
+    expect(verdictBox!.y).toBeGreaterThanOrEqual(0)
+    expect(verdictBox!.y + verdictBox!.height).toBeLessThanOrEqual(1024)
+    expect(await overflow(page)).toBe(false)
+  })
 })
 
 test.describe('A1-U3-L02 narrow screen', () => {
@@ -401,5 +428,39 @@ test.describe('A1-U3-L02 narrow screen', () => {
     await page.getByTestId('ai-u3-l02-transfer-check').tap()
     await expect(page.getByTestId('ai-u3-l02-transfer-checks')).toBeVisible()
     expect(await overflow(page)).toBe(false)
+  })
+
+  test('375px: standard three sentences pass; verdict and check control are in view', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await expect(page.getByTestId('ws-topbar')).toContainText('实现文本摘要')
+    await page.getByTestId('ai-u3-l02-tab-independent').tap()
+    for (const id of ['P1-1', 'P3-1', 'P4-1']) {
+      await page.getByTestId(`ai-u3-l02-pick-${id}`).tap()
+    }
+    const checkButton = page.getByTestId('ai-u3-l02-check-summary')
+    await checkButton.scrollIntoViewIfNeeded()
+    const buttonBox = await checkButton.boundingBox()
+    expect(buttonBox).not.toBeNull()
+    expect(buttonBox!.y).toBeGreaterThanOrEqual(0)
+    expect(buttonBox!.y + buttonBox!.height).toBeLessThanOrEqual(812)
+    await checkButton.tap()
+    const verdict = page.getByTestId('ai-u3-l02-summary-verdict')
+    await expect(verdict).toContainText('合格：五项全部通过')
+    await verdict.scrollIntoViewIfNeeded()
+    const verdictBox = await verdict.boundingBox()
+    expect(verdictBox).not.toBeNull()
+    expect(verdictBox!.y).toBeGreaterThanOrEqual(0)
+    expect(verdictBox!.y + verdictBox!.height).toBeLessThanOrEqual(812)
+    expect(await overflow(page)).toBe(false)
+  })
+
+  test('375px: method summary input caps at 200 characters in a real browser', async ({ page }) => {
+    test.setTimeout(150_000)
+    await page.goto(ROUTE)
+    await page.getByTestId('ai-u3-l02-tab-summary').tap()
+    const input = page.getByTestId('ai-u3-l02-method-summary')
+    await input.fill('x'.repeat(250))
+    await expect(input).toHaveValue('x'.repeat(200))
   })
 })
