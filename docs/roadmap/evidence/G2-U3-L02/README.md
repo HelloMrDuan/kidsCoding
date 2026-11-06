@@ -73,6 +73,7 @@ npx playwright test tests/e2e/g2-u3-l02-vm.spec.ts tests/e2e/g2-u3-l02-classroom
 桌面真实指针拖放：从分类面板按住拖出三块 → 用 `data-program` 断言结构是“绿旗 → 重复 → 里面一块移动” → 改参数 → 运行通过（篮子停在 x=150）→ 把移动积木拖进垃圾桶 → 脚本结构变为“重复里面为空” → 旧结果清除 → 重新运行变成未通过。
 
 截图（正式 LessonWorkspace 路由，本地真实 Chromium，1440 / 768 / 375；2026-11 接线后重新生成）：`screenshots/{desktop,tablet,phone}-{1-first-visit,2-solve-fail,3-solve-pass}.png`。
+另有 `screenshots/phone-4-solve-first-screen.png`：375×812 **视口截图（不是整页）**，第二关（可编辑关）孩子不滚动时看到的第一屏——舞台、关卡栏、一行任务栏、五个编辑控件和 Blockly 编辑区都在底部导航之上；编辑区画布可见高度约 180px（用例断言 ≥120px），空间不算宽裕。
 这些截图只证明布局和内容，不代替真实设备上的触摸手感。
 
 ## 五、测试发现并已修复的缺陷（保留记录）
