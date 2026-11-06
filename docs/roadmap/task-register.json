@@ -3539,7 +3539,7 @@
         "Summary/Blockly/Scratch 兼容无回归（Blockly/Scratch 走既有 getJudgmentResult 运行路径不动）"
       ],
       "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/488",
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/490",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
