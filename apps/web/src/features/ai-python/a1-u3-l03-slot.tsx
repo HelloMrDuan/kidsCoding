@@ -34,6 +34,38 @@ import {
   type RecordValidation,
 } from './a1-u3-l03'
 
+/**
+ * 字段表：与旧课堂同款内容。取值范围列（“苹果 / 香蕉 / 橙子”）自然宽度
+ * 超过 375px 视口，必须包一层横向滚动，否则整页横向溢出（旧课堂 lab.tsx
+ * 同样用 overflow-x-auto 包裹这张表）。
+ */
+function SchemaTable() {
+  return (
+    <div className="overflow-x-auto">
+      <table>
+        <thead>
+          <tr>
+            <th>字段</th>
+            <th>必填</th>
+            <th>类型</th>
+            <th>取值范围</th>
+          </tr>
+        </thead>
+        <tbody>
+          {FRUIT_SCHEMA_FIELDS.map((field) => (
+            <tr key={field.field}>
+              <td>{field.field}</td>
+              <td>{field.required ? '是' : '否'}</td>
+              <td>{field.type}</td>
+              <td>{field.values}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export function JsonEditorSlot({ initial, onChange, editable }: EditorSlotProps) {
   const [draft, setDraft] = useState<L03Draft>(() => coerceDraft(initial))
   const [result, setResult] = useState<RecordValidation | null>(null)
@@ -58,26 +90,7 @@ export function JsonEditorSlot({ initial, onChange, editable }: EditorSlotProps)
     return (
       <div className="kc-stack">
         <p>本课为只读预览：先看字段表，再看当前记录的校验结果。</p>
-        <table>
-          <thead>
-            <tr>
-              <th>字段</th>
-              <th>必填</th>
-              <th>类型</th>
-              <th>取值范围</th>
-            </tr>
-          </thead>
-          <tbody>
-            {FRUIT_SCHEMA_FIELDS.map((field) => (
-              <tr key={field.field}>
-                <td>{field.field}</td>
-                <td>{field.required ? '是' : '否'}</td>
-                <td>{field.type}</td>
-                <td>{field.values}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <SchemaTable />
         <pre>{draft.jsonText}</pre>
       </div>
     )
@@ -87,26 +100,7 @@ export function JsonEditorSlot({ initial, onChange, editable }: EditorSlotProps)
     <div className="kc-stack">
       <p>课程开发中：本课为本地规则 JSON 校验，不调用外部模型、不接网关。</p>
 
-      <table>
-        <thead>
-          <tr>
-            <th>字段</th>
-            <th>必填</th>
-            <th>类型</th>
-            <th>取值范围</th>
-          </tr>
-        </thead>
-        <tbody>
-          {FRUIT_SCHEMA_FIELDS.map((field) => (
-            <tr key={field.field}>
-              <td>{field.field}</td>
-              <td>{field.required ? '是' : '否'}</td>
-              <td>{field.type}</td>
-              <td>{field.values}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <SchemaTable />
 
       <label htmlFor="a1-u3-l03-json-input">把水果写成一条 JSON 记录</label>
       <textarea
