@@ -1,10 +1,9 @@
-// 共享 LessonWorkspace（main 651ae7f3，#469）两处缺陷的最小复现。
+// 共享 LessonWorkspace 的两处缺陷的最小复现（真实壳 + 真实的本课适配器与槽位，只把 VM 端口换成假的）。
 //
-// 做法：用真实的共享壳 + 真实的课程适配器与槽位（只把 VM 端口换成假的），断言“应有的行为”，
-// 用 it.fails 标记。今天缺陷存在，这些断言不成立，it.fails 因此通过；共享壳修复后断言成立，
-// it.fails 会变红，提醒去掉标记并完成最终接线（见 SHARED-SHELL-DEFECTS.md）。
-// 对照用例（不带 fails）证明测试装置本身没问题：同一个适配器在“没有 editorSlot 的 blockly 路径”下，壳确实会调用 run。
-// 这里不修改共享壳，不绕过缺陷。
+// D1（scratch-vm + editorSlot 时适配器不挂载、运行按钮空转）已由 OPS-022（#480）修复：下面两条 D1 用例是正常用例，直接通过。
+// D2（blockly 引擎 + 命令式适配器时壳泄漏演示积木内容）按首席裁定不在 OPS-022 范围，本课也不走那条路线：
+// 两条 D2 用例保留 it.fails，缺陷还在时通过；D2 将来被修复，它们会变红，提醒去掉标记。
+// 对照用例证明测试装置本身没问题。这里不修改共享壳，不绕过缺陷。
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { L02_CONTRACT } from './contract'
@@ -41,7 +40,7 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('D1：scratch-vm 引擎 + editorSlot —— 运行按钮不调用 adapter.run', () => {
+describe('D1（已由 OPS-022 修复）：scratch-vm 引擎 + editorSlot —— 壳挂载适配器、运行按钮调用 adapter.run', () => {
   it('对照：同一个适配器走 blockly 引擎且没有 editorSlot 时，壳会 mount 适配器，点运行会调用 run', () => {
     const { port, adapter } = readyAdapter()
     render(<LessonWorkspace contract={contractFor('blockly')} adapter={adapter} />)
@@ -70,7 +69,7 @@ describe('D1：scratch-vm 引擎 + editorSlot —— 运行按钮不调用 adapt
   })
 })
 
-describe('D2：blockly 引擎 + 课程自有脚本 —— 壳泄漏演示内容', () => {
+describe('D2（仍存在，保持预期失败）：blockly 引擎 + 课程自有脚本 —— 壳泄漏演示内容', () => {
   function renderBlocklyPath() {
     const { adapter } = readyAdapter()
     render(<LessonWorkspace contract={contractFor('blockly')} adapter={adapter} />)

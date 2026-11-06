@@ -5,7 +5,6 @@
 // 本文件依赖 OPS-022（#480）的共享壳：没有它，适配器从未挂载、引擎永远不就绪（D1），本文件在页面打开时就失败。
 import {readFileSync} from 'node:fs'
 import {expect, test, type Locator, type Page, type TestInfo} from '@playwright/test'
-import {routeLocalScratchVm} from './scratch-g2-helpers'
 
 const URL = '/learn/g2-u3-l02'
 const DRAFT_KEY = 'kidscoding-draft:G2-U3-L02'
@@ -24,7 +23,6 @@ async function injectCjkFont(page: Page) {
 
 async function open(page: Page) {
   await injectCjkFont(page)
-  await routeLocalScratchVm(page)
   await page.addInitScript(() => { if (!sessionStorage.getItem('l2-keep')) localStorage.removeItem('kidscoding-draft:G2-U3-L02') })
   await page.goto(URL)
   await expect(page.getByTestId('l2-engine-status')).toHaveText('Scratch VM 已就绪', {timeout: 60_000})

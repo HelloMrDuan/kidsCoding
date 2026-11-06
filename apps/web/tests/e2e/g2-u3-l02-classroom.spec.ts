@@ -1,13 +1,12 @@
 // G2-U3-L02《接住掉落水果》正式页面（共享 LessonWorkspace + 本课适配器与三个槽位）真实浏览器测试。
 // 桌面 1440 / 平板 768 / 手机 375，三个视口都在本文件里设置（不依赖 Playwright project 的个数）。
-// 页面里的 Scratch VM 是真实的 scratch-vm@5.0.300（CI 走 jsDelivr；本地用 SCRATCH_VM_LOCAL_CDN=1 + 本地副本）。
+// 页面里的 Scratch VM 是真实的 scratch-vm@5.0.300，由应用自己的源站提供（OPS-024：prebuild 把 npm 包复制到 public/scratch-vm/），不走 CDN。
 // 积木由真实 Blockly 工作区编辑（桌面用真实指针拖放），运行走真实 VM 沙箱，判定读 VM 的运行轨迹。
 //
 // 从过渡课堂页迁移到共享壳时：用例标题、操作步骤、断言的内容都保持不变，只把定位从 l2-* 换成壳的 ws-*（壳拥有的界面：
 // 顶栏、保存标签、文件菜单、运行按钮、反馈区）。壳的语义与旧页面不同、因而断言形式必须改变的地方，都在用例里用“壳语义：”注释说明。
 import {readFileSync} from 'node:fs'
 import {expect, test, type Locator, type Page, type TestInfo} from '@playwright/test'
-import {routeLocalScratchVm} from './scratch-g2-helpers'
 
 const URL = '/learn/g2-u3-l02'
 const DRAFT_KEY = 'kidscoding-draft:G2-U3-L02'
@@ -28,7 +27,6 @@ async function injectCjkFont(page: Page) {
 
 async function open(page: Page, opts: {fresh?: boolean} = {}) {
   await injectCjkFont(page)
-  await routeLocalScratchVm(page)
   if (opts.fresh !== false) await page.addInitScript(() => { if (!sessionStorage.getItem('l2-keep')) localStorage.removeItem('kidscoding-draft:G2-U3-L02') })
   await page.goto(URL)
   await expect(page.getByTestId('l2-engine-status')).toHaveText('Scratch VM 已就绪', {timeout: 60_000})
@@ -159,6 +157,19 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByTestId('l2-task-content')).toContainText('先猜一猜')
       await expect(page.getByTestId('l2-task-content')).toContainText('现在要做')
       await noHorizontalOverflow(page)
+    })
+
+    test('Scratch VM 从本站自托管：jsDelivr 不可达时照样能运行，且没有任何请求发往 CDN', async ({page}, info) => {
+      const cdn: string[] = []
+      await page.route('https://cdn.jsdelivr.net/**', route => { cdn.push(route.request().url()); return route.abort() })
+      await open(page)
+      await openTask(page, info)
+      await page.getByTestId('l2-pred-x').fill('40')
+      await page.getByTestId('l2-pred-caught-no').check()
+      await runButton(page, info, 'stage').click()
+      await expect(page.getByTestId('ws-feedback-conclusion')).toBeVisible({timeout: 30_000})
+      await expect(page.getByTestId('l2-stage')).toHaveAttribute('data-basket-x', '40') // 篮子真的被 VM 移动了
+      expect(cdn).toEqual([])
     })
 
     test('完整答案不在开始操作前出现；提示按 1→2→3 逐级揭示', async ({page}, info) => {
