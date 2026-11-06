@@ -11,7 +11,10 @@
  *   而插槽课没有运行事件；因此插槽的 JudgeBlock 是判定的正式显示处，
  *   本适配器的 getJudgmentResult 返回最近一次 check() 的结果（供单测
  *   与未来外壳显示复用），不作为外壳当前反馈的来源——不得谎称外壳
- *   反馈区已显示它。
+ *   反馈区已显示它。Issue #481 的课程侧上报由插槽直接做：插槽在每次
+ *   检查后用同一套 buildSummaryJudgment + 方法证据构造判定，经可选
+ *   onJudgment 回调上报外壳（外壳未接该通道时调用是空操作）；证据
+ *   构造器由此文件导出，供适配器与插槽共用，两处显示不得分叉。
  *
  * 本适配器提供的最小能力（首席集成指令）：
  * - 加载内容：loadScript（任意输入经 coerceDraft 规整，非法降级）；
@@ -98,7 +101,7 @@ export function buildSummaryJudgment(
   }
 }
 
-function methodEvidenceForIndependent(draft: L02Draft): string {
+export function methodEvidenceForIndependent(draft: L02Draft): string {
   const summary = buildDraftSummary(draft.selected, draft.custom)
   const sourced = summary.entries.filter((entry) => entry.sourceId !== null).length
   const points = summary.pointsCovered.length > 0 ? summary.pointsCovered.join('、') : '无'
@@ -109,7 +112,7 @@ function methodEvidenceForIndependent(draft: L02Draft): string {
   )
 }
 
-function methodEvidenceForTransfer(draft: L02Draft): string {
+export function methodEvidenceForTransfer(draft: L02Draft): string {
   const summary = buildTransferSummary(draft.transferSelected)
   const points = summary.pointsCovered.length > 0 ? summary.pointsCovered.join('、') : '无'
   return `迁移摘要共 ${summary.entries.length} 句，全部来自新课文原文；要点覆盖 ${points}。`
