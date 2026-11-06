@@ -572,7 +572,6 @@ for (const vp of VIEWPORTS) {
   // ---- 草稿与适配器（原“槽位验证页”的用例迁到正式页面）-----------------------------------------
   test.describe('G2-U3-L02 正式页面：适配器与共享草稿', () => {
     test.setTimeout(150_000)
-    test.skip(vp.name === 'tablet', '草稿与适配器用例只在桌面和手机视口验证')
 
     test('第一关：经壳运行，结论是“观察”，舞台来自真实 VM；草稿由共享 workspace-draft 写入，一课一键、不含运行结果', async ({page}, info) => {
       await open(page)
