@@ -29,6 +29,13 @@ export { L02_DRAFT_KEY }
 export const MAX_CUSTOM_COUNT = 5
 export const MAX_CUSTOM_LENGTH = 200
 
+/**
+ * 方法总结上限：一句话方法总结最多 200 字（与自加句单句上限一致）。
+ * 超限在输入时由 maxLength 拦住，在读取时截断到上限（不丢整句）；
+ * 3 号复核探针：100 万字符无上限收下是真实缺陷，本常量即修复。
+ */
+export const MAX_METHOD_SUMMARY_LENGTH = 200
+
 export type L02Prediction = {
   verdict: '合格' | '未合格'
   firstFailed: L02CheckName | ''
@@ -149,7 +156,10 @@ export function parseDraft(raw: string | null, fallback: L02Draft = emptyDraft()
     transferChecked: record['transferChecked'] === true,
     hasChecked: record['hasChecked'] === true,
     errorExplanations,
-    methodSummary: typeof record['methodSummary'] === 'string' ? record['methodSummary'] : '',
+    methodSummary:
+      typeof record['methodSummary'] === 'string'
+        ? record['methodSummary'].slice(0, MAX_METHOD_SUMMARY_LENGTH)
+        : '',
   }
 }
 
