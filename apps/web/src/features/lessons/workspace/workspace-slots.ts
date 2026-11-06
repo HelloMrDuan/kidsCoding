@@ -138,6 +138,17 @@ export interface EditorSlotProps {
   initial: unknown
   /** Called on every edit with the slot's current data. */
   onChange: (data: unknown) => void
+  /**
+   * Optional judgment report (OPS-025, #481): the slot reports the
+   * judgment its own check produced, and the shell displays it in the
+   * feedback card exactly as reported — the shell never recomputes a
+   * score and never invents a conclusion. Reporting `null` means the
+   * previously reported judgment no longer applies (same invalidation
+   * semantics as an edit through `onChange`). Slots that never report
+   * keep the old behavior: the feedback card shows only the neutral
+   * placeholder, never a fabricated result.
+   */
+  onJudgment?: (judgment: JudgmentResult | null) => void
   /** Optional selection reporting (block id, text range, etc.). */
   onSelectionChange?: (selection: unknown) => void
   editable: boolean
