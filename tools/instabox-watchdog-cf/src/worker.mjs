@@ -9,7 +9,16 @@
 //                         Kids deployed SHA (public API, no token)
 //   env.GITHUB_BRANCH     var: deployment branch (default main)
 //   env.GITHUB_TOKEN      optional GitHub read-only API token (Worker Secret),
-//                         NEVER printed or put in the KV state
+//                         NEVER printed or put in the KV state.
+//                         STRONGLY recommended: the unauthenticated
+//                         GitHub API limit (60/hr, shared per egress
+//                         IP) is what rate-limited this worker on
+//                         2026-11-06; an authenticated token raises it
+//                         to 5000/hr.
+//   env.EXPECTED_SHA_CACHE_TTL_MS  optional expected-SHA KV cache TTL
+//                         in ms (default 1800000 = 30 min). A fresh
+//                         cached head is used for the comparison;
+//                         a stale one never is.
 //   env.WATCHDOG_HOLD     var: "true" = monitor only, never resume
 //
 // HTTP surface:
@@ -138,6 +147,11 @@ async function runOnce(env, trigger) {
       machineId: env.MACHINE_ID || DEFAULT_MACHINE_ID,
       hold: env.WATCHDOG_HOLD === 'true',
       checkTianji: env.CHECK_TIANJI !== 'false',
+      // Expected-SHA KV cache TTL (ms). A fresh cached head is used
+      // for the comparison; a stale one never is (see core.mjs).
+      expectedShaCacheTtlMs: Number(env.EXPECTED_SHA_CACHE_TTL_MS) > 0
+        ? Number(env.EXPECTED_SHA_CACHE_TTL_MS)
+        : undefined,
     },
   });
   const line = {
@@ -148,7 +162,7 @@ async function runOnce(env, trigger) {
   };
   if (
     record.verdict &&
-    !['OK', 'STOPPED_MANUAL', 'HELD', 'IN_TRANSITION', 'LOCKED', 'COOLDOWN_WAIT'].includes(record.verdict)
+    !['OK', 'LIFECYCLE_OK', 'STOPPED_MANUAL', 'HELD', 'IN_TRANSITION', 'LOCKED', 'COOLDOWN_WAIT'].includes(record.verdict)
   ) {
     console.error(JSON.stringify({ alert: true, ...line }));
   } else {

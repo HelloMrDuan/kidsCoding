@@ -117,3 +117,21 @@ KidsCoding 专用平台机 `platforms-core-01` 的 InstaBox 也会返回 `409 ma
 本次改动限定 `tools/instabox-watchdog-cf`：GitHub 502/503/超时等瞬时故障最多三次实际 GET（500ms、1500ms 间隔）；HTTP 403/429 不盲重试，限流时记录 remaining 与 reset_epoch；HTTP 401/404、格式错误、无 40 位 SHA 都直接 fail-closed。**没有退化为缓存旧 SHA、弱化三方版本比对或把 GitHub 失败记 OK**。认证是可选 Worker Secret `GITHUB_TOKEN`，建议在确认日志确实 403/429 限流后由账户持有人配置最小只读凭据；源码和状态不输出令牌。如果依旧失败，查看 `/status` 的 lastAlert.detail 或 Workers Logs 的 `expected-sha-error` 获取具体 HTTP 状态，再决定是否配置 Token。
 
 部署：合并后用确切 main SHA 部署 `instabox-watchdog`，复用现网 KidsCoding KV `4945e95561e545508c703df75933013e`、`CHECK_TIANJI=false`、`GITHUB_BRANCH=main`、现有 Secrets、Observability true；不要动天机 `tj-watchdog`。PR+单测≠现网。真机 `running`、GitHub SHA 有效、Kids 部署 SHA 与容器版本一致才可 verdict=OK。
+
+
+## 2026-11-06 解耦：机器生命周期保活与 GitHub SHA 校验分离
+
+真实现象：2026-11-06 旧机 `platforms-core-01` 明明 running、Kids 健康 200，CF Worker 却在 `BLOCKED_MONITOR` 与 `APP_FAULT` 之间摇摆，`lastSuccessAt` 停在 09:30:51 CST 不动。根因在 `src/core.mjs` 的 `deepCheck()`：GitHub 期望 SHA 查不到（匿名请求撞上共享出口 IP 的 60/小时限流，`GitHub rate limit HTTP 403, remaining=0, reset_epoch=1793947885`）就直接抛错，整轮深查失败，机器生命周期 verdict 也跟着失效——Resume 本身并不依赖 GitHub，但恢复后的验证同样被这个抛错拖成 `BLOCKED_MONITOR`。
+
+本次改动限定 `tools/instabox-watchdog-cf`（本地副本 `instabox-deploy/watchdog-cf/`，已先同步到仓库主线版本，含 OPS-010/012/013）：
+
+- **生命周期 verdict 与部署 verdict 分离**：`assessDeep` 新增 `shaCheck` 字段（`ok` | `drift` | `unknown`）。深查的机器侧检查（Kids 健康端点、容器状态、运行镜像与机上部署记录的 SHA 对比）一如既往严格；期望 SHA 查不到时，不再抛错，只把部署比较记为 `unknown`。
+- **新 verdict `LIFECYCLE_OK`**：端点与容器都健康、但部署版本无法验证时， verdict 是 `LIFECYCLE_OK`（成功类，`lastSuccessAt` 推进，备用层据此判定主监控活着），**永远不是 `OK`**；`lastHealthyAt` 仍只在部署验证通过的 `OK` 时写。漂移（期望 SHA 已知且不一致）仍是 `APP_FAULT`，严格性不变；真实应用故障在期望 SHA 未知时同样是 `APP_FAULT`，不会被掩盖。
+- **期望 SHA 的 KV 缓存（TTL 默认 30 分钟，可配 `EXPECTED_SHA_CACHE_TTL_MS`）**：新鲜缓存直接用，GitHub 调用从每 10 分钟一次降到最多每 30 分钟一次；**过期缓存永不用于比较**——过期后若 live fetch 又失败，部署 verdict 是 `unknown` 而不是拿旧数据蒙一个 `OK`。`OK` 只可能来自 live fetch 或新鲜缓存，且 `/status` 如实记录 `expectedShaSource`（`live` | `cache` | `rate-limited` | `unavailable`）与 `expectedShaFetchedAt`。
+- **限流门**：失败信息里的 `reset_epoch` 被解析并记入 KV，重置时间到之前不再发任何 GitHub 请求（不空转、不重试）；到期后自动恢复 live fetch。
+- **认证仍是可选 Worker Secret `GITHUB_TOKEN`**（OPS-013 已有，本次未改）：匿名限流是共享出口 IP 的 60/小时，配 Token 后是 5000/小时，强烈建议由账户持有人配置最小只读凭据。源码、日志、状态、测试均不输出令牌。
+- **`/status` 向后兼容**：原有字段一个没动、没改名，只新增 `lastShaCheck`、`lastDeploymentVerdict`、`lastDeployedSha`、`lastExpectedSha`、`expectedShaSource`、`expectedShaFetchedAt`、`githubRateLimitUntil`、`lastShaError`；`APP_FAULT` 的 `lastAlert.detail` 现在带具体问题文本（以前是空串）。
+
+测试：`npm test` 71 项全过（基线 58 项 + 解耦新增 13 项，含：限流→LIFECYCLE_OK、漂移→APP_FAULT、挂起+限流→照常 Resume、新鲜缓存零 GitHub 调用、限流重置时间前零调用/到期后恢复、过期缓存永不判 OK、真实故障不被未知 SHA 掩盖、Token 只发 header 不进日志）。本地副本与仓库版的差异只是本次解耦改动。
+
+部署：仍须走正常流程——代码进仓库 PR 合并后，用原有 Cloudflare 账户把确切提交部署到 `instabox-watchdog`，复用现网 KV 与 Secrets，不要动 `tj-watchdog`、`instabox-watchdog-03`、`instabox-watchdog-04`。**PR+单测≠现网**：部署后须看真实 Cron 轮次：`lastSuccessAt` 推进、`lastShaCheck` 有值、限流期间 verdict 为 `LIFECYCLE_OK` 而不是 `BLOCKED_MONITOR`，才算修复生效。另：GitHub Actions 主监控 run 73 的失败是另一回事——真实版本漂移（部署 SHA `0a913c6c` 落后当时 main 头 `e8472532`），监控报得没错，修法是把机器部署追上当前 main，不是改监控代码。
