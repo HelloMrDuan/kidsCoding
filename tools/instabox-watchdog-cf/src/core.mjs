@@ -9,8 +9,19 @@
 //                 put(key, null) deletes. Keys: 'status', 'episode',
 //                 'lock'.
 //   deps.fetchExpectedSha — async () => 40-hex SHA of the KidsCoding
-//                 deployment branch head on GitHub; null/fetch errors
-//                 fail closed and never produce an OK verdict.
+//                 deployment branch head on GitHub. A failure here
+//                 NO LONGER fails the run (2026-11-06 decoupling):
+//                 the lifecycle verdict and the resume path proceed
+//                 on the machine-side checks, and the deployment
+//                 comparison is reported separately as
+//                 shaCheck ok|drift|unknown (see logic.mjs). The
+//                 expected SHA is KV-cached for
+//                 config.expectedShaCacheTtlMs (default 30 min) to
+//                 cut GitHub calls; a STALE cached SHA is never used
+//                 for a comparison — only a fresh cache, or a live
+//                 fetch, can produce an 'OK' verdict. A rate-limit
+//                 reset time from a failed fetch is honoured: no
+//                 GitHub call is attempted again before it.
 //   deps.now    — () => epoch ms; deps.sleep — async (ms) => void
 //   deps.log    — (event, detail) => void
 //   deps.config — { machineId, hold, ...tunables }
@@ -28,8 +39,12 @@
 //     therefore overlapping resumes) inside this layer; the other
 //     layers re-read state before acting, which is the cross-layer
 //     guard until they are retired or re-pointed.
-//   - FAIL-CLOSED: any monitoring error produces a BLOCKED_* verdict
-//     and never updates the healthy timestamps.
+//   - FAIL-CLOSED where it matters: a monitoring error on the
+//     InstaBox / exec path still produces a BLOCKED_* verdict and
+//     never updates the healthy timestamps. A GitHub SHA lookup
+//     failure is different: it degrades the DEPLOYMENT verdict to
+//     unknown (LIFECYCLE_OK, never OK) instead of killing the
+//     lifecycle verdict — but it never upgrades anything to OK.
 
 import {
   decideForState,
@@ -92,6 +107,12 @@ export const DEFAULTS = {
   episodeMaxCooldownRejections: 6,
   cooldownGraceMs: 30_000,
   cooldownRetryFloorMs: 60_000,
+  // Expected-SHA KV cache TTL. A live GitHub fetch happens at most
+  // once per TTL per worker; in between, a FRESH cached head is used
+  // for the comparison (drift still faults). Bound: an 'OK' verdict
+  // may reference a branch head up to TTL old — the source and the
+  // fetch time are recorded in the status so this is visible.
+  expectedShaCacheTtlMs: 30 * 60_000,
   runHistoryKeep: 20,
 };
 
@@ -141,6 +162,22 @@ export async function runWatchdog(deps) {
         if (record.state) status.lastMachineState = record.state;
         if (isRunSuccess(verdict)) status.lastSuccessAt = record.finishedAt;
         if (verdict === 'OK') status.lastHealthyAt = record.finishedAt;
+        // Deployment-version telemetry (additive: every pre-existing
+        // field above is untouched, so the Muse backup layer keeps
+        // working; these fields are only set when the run performed
+        // a deep check).
+        for (const [recKey, statusKey] of [
+          ['shaCheck', 'lastShaCheck'],
+          ['deploymentVerdict', 'lastDeploymentVerdict'],
+          ['deployedKidsSha', 'lastDeployedSha'],
+          ['expectedKidsSha', 'lastExpectedSha'],
+          ['expectedShaSource', 'expectedShaSource'],
+          ['expectedShaFetchedAt', 'expectedShaFetchedAt'],
+          ['githubRateLimitUntil', 'githubRateLimitUntil'],
+          ['expectedShaError', 'lastShaError'],
+        ]) {
+          if (record[recKey] !== undefined) status[statusKey] = record[recKey];
+        }
         if (FAILING_VERDICTS.has(verdict)) {
           status.lastAlert = {
             verdict,
@@ -201,20 +238,93 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
     return finish('BLOCKED_AUTH', { detail: 'INSTABOX_API_KEY secret is missing' });
   }
 
+  // Expected-SHA resolution with a KV cache and a rate-limit gate.
+  // Store key 'expectedShaCache': { sha, fetchedAt, rateLimitUntilMs }.
+  //   - A FRESH cached head (age < expectedShaCacheTtlMs) is used
+  //     without a GitHub call; drift against it still faults.
+  //   - A STALE cached head is NEVER used for a comparison: if the
+  //     live fetch then fails, the deployment verdict is 'unknown',
+  //     never a pass against old data.
+  //   - A rate-limit reset time parsed from a failed fetch is
+  //     honoured: no GitHub call is attempted before it.
   let expectedSha = null;
   let expectedShaResolved = false;
   let expectedShaError = '';
+  let expectedShaSource = 'unavailable';
+  let expectedShaFetchedAt = null;
+  let githubRateLimitUntilMs = null;
   async function expectedKidsSha() {
     if (!expectedShaResolved) {
       expectedShaResolved = true;
+      let cached = {};
       try {
-        expectedSha = await deps.fetchExpectedSha();
-      } catch (err) {
-        expectedShaError = String((err && err.message) || err);
-        log('expected-sha-error', expectedShaError);
-        expectedSha = null;
+        cached = (await store.get('expectedShaCache')) || {};
+      } catch {
+        cached = {};
       }
-      log('expected-sha', expectedSha || 'unavailable (recorded; machine-side checks still enforced)');
+      const ttl = cfg.expectedShaCacheTtlMs;
+      if (cached.rateLimitUntilMs && now() < cached.rateLimitUntilMs) {
+        githubRateLimitUntilMs = cached.rateLimitUntilMs;
+        expectedShaSource = 'rate-limited';
+        expectedShaError = `GitHub rate limit in effect until ${new Date(cached.rateLimitUntilMs).toISOString()}`;
+        log('expected-sha-rate-limited', expectedShaError);
+      } else if (
+        cached.sha &&
+        typeof cached.fetchedAt === 'number' &&
+        now() - cached.fetchedAt < ttl
+      ) {
+        expectedSha = cached.sha;
+        expectedShaSource = 'cache';
+        expectedShaFetchedAt = new Date(cached.fetchedAt).toISOString();
+        log('expected-sha', `from cache (${expectedShaFetchedAt}): ${expectedSha}`);
+      } else {
+        try {
+          const live = await deps.fetchExpectedSha();
+          if (typeof live === 'string' && /^[0-9a-f]{40}$/.test(live)) {
+            expectedSha = live;
+            expectedShaSource = 'live';
+            expectedShaFetchedAt = new Date(now()).toISOString();
+            try {
+              await store.put('expectedShaCache', {
+                sha: live,
+                fetchedAt: now(),
+                rateLimitUntilMs: null,
+              });
+            } catch (err) {
+              log('expected-sha-cache-write-failed', String((err && err.message) || err));
+            }
+            log('expected-sha', `live fetch: ${expectedSha}`);
+          } else {
+            expectedShaError = 'GitHub branch returned invalid 40-character SHA';
+            log('expected-sha-error', expectedShaError);
+          }
+        } catch (err) {
+          expectedShaError = String((err && err.message) || err);
+          log('expected-sha-error', expectedShaError);
+          const reset = /reset_epoch=(\d+)/.exec(expectedShaError);
+          if (reset) {
+            const untilMs = Number(reset[1]) * 1000;
+            if (Number.isFinite(untilMs) && untilMs > now()) {
+              githubRateLimitUntilMs = untilMs;
+              expectedShaSource = 'rate-limited';
+              try {
+                await store.put('expectedShaCache', {
+                  sha: cached.sha || null,
+                  fetchedAt: cached.fetchedAt || null,
+                  rateLimitUntilMs: untilMs,
+                });
+              } catch (writeErr) {
+                log('expected-sha-cache-write-failed', String((writeErr && writeErr.message) || writeErr));
+              }
+              log('expected-sha-rate-limited', `no GitHub calls until ${new Date(untilMs).toISOString()}`);
+            }
+          }
+          expectedSha = null;
+        }
+      }
+      if (!expectedSha) {
+        log('expected-sha', 'unavailable (recorded; machine-side checks still enforced)');
+      }
     }
     return expectedSha;
   }
@@ -224,21 +334,18 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
     if (!res || res.exitCode !== 0) {
       throw new Error(`deep check command exited ${res ? res.exitCode : 'no-response'}`);
     }
-    // Strict three-way SHA contract: a failed GitHub lookup must not
-    // silently bypass the expected-versus-deployed comparison.
+    // Decoupled (2026-11-06): a failed GitHub lookup no longer
+    // throws. The machine-side checks (health endpoints, containers,
+    // image-vs-recorded SHA) still run strictly; the expected-vs-
+    // deployed comparison is reported via shaCheck (ok|drift|unknown)
+    // and a missing expected head can only yield LIFECYCLE_OK, never OK.
     const expected = await expectedKidsSha();
-    if (!expected) {
-      throw new ApiError(
-        expectedShaError
-          ? `expected KidsCoding GitHub SHA unavailable: ${expectedShaError}`
-          : 'expected KidsCoding GitHub SHA unavailable',
-        {
-          code: 'expected_sha_unavailable',
-          retryable: true,
-        },
-      );
-    }
-    return assessDeep(parseDeepCheck(res.stdout || ''), expected, { checkTianji: cfg.checkTianji !== false });
+    const assessed = assessDeep(parseDeepCheck(res.stdout || ''), expected, {
+      checkTianji: cfg.checkTianji !== false,
+    });
+    assessed.shaError = expected ? '' : expectedShaError;
+    assessed.expectedShaSource = expectedShaSource;
+    return assessed;
   }
 
   async function pollState(want, timeoutMs) {
@@ -529,11 +636,24 @@ async function execute({ cfg, deps, now, sleep, log, finish }) {
         `tjTagsConsistent=${deep.tjTagsConsistent} problems=${JSON.stringify(deep.problems || [])}`,
     );
   }
+  const shaCheck = deep ? deep.shaCheck : 'unknown';
+  const detail =
+    lastError ||
+    (deep && !deep.healthy ? (deep.problems || []).join('; ') : '');
   return finish(verdictFor({ state, action, deep }), {
     state,
     deep,
+    shaCheck,
+    deploymentVerdict: shaCheck,
+    deployedKidsSha: deep ? deep.kidsSha || null : null,
     expectedKidsSha: expectedSha,
     expectedShaMissing: expectedShaResolved && !expectedSha,
-    detail: lastError,
+    expectedShaSource,
+    expectedShaFetchedAt,
+    githubRateLimitUntil: githubRateLimitUntilMs
+      ? new Date(githubRateLimitUntilMs).toISOString()
+      : null,
+    expectedShaError: expectedSha ? '' : expectedShaError,
+    detail,
   });
 }
