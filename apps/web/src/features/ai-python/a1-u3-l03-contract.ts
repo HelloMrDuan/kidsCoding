@@ -15,15 +15,13 @@
  * - scopeLabel 为教学定向：五项全过只表示本次记录合格，不等于完全
  *   掌握结构化输出；页面任何位置不写“已掌握”。
  *
- * 引擎待定（首席裁定，未擅自填值）：
- * - 共享 LessonContract 的 engine 只允许 blockly / scratch-vm / summary
- *  （规范 LESSON-CONTRACT.md 第一节与 lesson-contract.ts 的
- *   validateLessonContract 一致）；本课是 JSON 校验，没有对应引擎值，
- *   不能冒用 'summary'（那是摘要编辑）。因此本文件只提供除 engine 外
- *   的全部工作区契约字段（L03_WORKSPACE_CONTRACT_FIELDS），路由接入
- *   待引擎值裁定后补一行 engine（见 Issue，待首席定夺）。
+ * 引擎（首席裁定 2026-11-06）：通用引擎值为 'slot'，待 2 号共享 slot
+ *   契约落地后，路由以 `{ ...L03_WORKSPACE_CONTRACT_FIELDS, engine: 'slot' }`
+ *   补齐；不得填 'summary'，不得用 'json' 冒充。本文件不提供任何 engine
+ *   值（课程本地的 'json' 标签已删除）：只提供除 engine 外的全部工作区
+ *   契约字段（L03_WORKSPACE_CONTRACT_FIELDS）。
  * - 适配器与插槽不依赖 engine 值：校验、判定、草稿逻辑已完整实现并
- *   有单测覆盖；路由与 E2E 移植待引擎值落定后接线。
+ *   有单测覆盖；路由与 E2E 移植待 2 号 slot 契约落地后接线（Issue #482）。
  */
 
 import type { LessonContract } from '../lessons/workspace/lesson-contract'
@@ -43,7 +41,6 @@ export type L03Contract = {
   brief: string
   step: string
   hints: { level: 1 | 2 | 3; title: string; text: string }[]
-  engine: 'json'
   draftKey: string
   scopeLabel: '教学定向' | '开放创作'
   scopeGap: string
@@ -63,7 +60,6 @@ export const L03_CONTRACT: L03Contract = {
   brief: '目标：按字段表写一条能通过五项校验的水果记录 JSON。先读表，再改记录、点校验、修错误。',
   step: '先读字段表，再改记录、点校验、按字段级报错修到五项全过。',
   hints: HINTS,
-  engine: 'json',
   draftKey: L03_DRAFT_KEY,
   scopeLabel: '教学定向',
   scopeGap:
@@ -88,8 +84,8 @@ export const L03_CONTRACT: L03Contract = {
  *   恢复初始，全部真实可用，不隐藏。
  * - 课节进度是动态的（校验状态），外壳 progress 是静态值，
  *   故不填 progress；进度明细保留在插槽总结区。
- * engine 缺失是故意的：共享壳尚无 JSON 校验引擎值，待首席裁定后
- *   由路由以 `{ ...L03_WORKSPACE_CONTRACT_FIELDS, engine }` 补齐。
+ * engine 缺失是故意的：通用引擎值已裁定为 'slot'，待 2 号共享 slot 契约
+ *   落地后由路由以 `{ ...L03_WORKSPACE_CONTRACT_FIELDS, engine: 'slot' }` 补齐。
  */
 export const L03_WORKSPACE_CONTRACT_FIELDS: Omit<LessonContract, 'engine'> = {
   lessonId: L03_CONTRACT.lessonId,
