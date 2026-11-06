@@ -257,3 +257,45 @@ test('deep-check parser: mixed-length tianji tokens are consistent, drift is not
   assert.equal(d2.tjTagsConsistent, false);
   assert.equal(assessDeep(d2, SHA).healthy, false);
 });
+
+// -------- 2026-11-06 decoupling: shaCheck ok|drift|unknown --------
+
+test('shaCheck ok when deployed SHA equals the expected head', () => {
+  const a = assessDeep(parseDeepCheck(HEALTHY), SHA);
+  assert.equal(a.shaCheck, 'ok');
+  assert.equal(a.healthy, true);
+  assert.equal(verdictFor({ action: 'deep-check', deep: a }), 'OK');
+});
+
+test('shaCheck drift when deployed SHA disagrees with the expected head', () => {
+  const a = assessDeep(parseDeepCheck(HEALTHY), OTHER_SHA);
+  assert.equal(a.shaCheck, 'drift');
+  assert.equal(a.healthy, false);
+  assert.equal(verdictFor({ action: 'deep-check', deep: a }), 'APP_FAULT');
+});
+
+test('shaCheck unknown when the expected head is unavailable; verdict is LIFECYCLE_OK, never OK', () => {
+  const a = assessDeep(parseDeepCheck(HEALTHY), null);
+  assert.equal(a.shaCheck, 'unknown');
+  assert.equal(a.healthy, true);
+  assert.deepEqual(a.problems, []);
+  assert.equal(verdictFor({ action: 'deep-check', deep: a }), 'LIFECYCLE_OK');
+  assert.equal(isRunSuccess('LIFECYCLE_OK'), true);
+});
+
+test('shaCheck unknown when the deployed SHA is unreadable even with a known expected head', () => {
+  const out = HEALTHY.replace(`KIDS_SHA=${SHA}`, 'KIDS_SHA=MISSING');
+  const a = assessDeep(parseDeepCheck(out), SHA);
+  assert.equal(a.shaCheck, 'unknown');
+  assert.equal(a.healthy, false);
+  assert.ok(a.problems.some((p) => p.includes('unreadable')));
+  assert.equal(verdictFor({ action: 'deep-check', deep: a }), 'APP_FAULT');
+});
+
+test('a real app fault is still APP_FAULT when the expected head is unknown', () => {
+  const out = HEALTHY.replace('KIDS_HEALTH={"status":"ok"}', 'KIDS_HEALTH=CURL_FAIL');
+  const a = assessDeep(parseDeepCheck(out), null);
+  assert.equal(a.shaCheck, 'unknown');
+  assert.equal(a.healthy, false);
+  assert.equal(verdictFor({ action: 'deep-check', deep: a }), 'APP_FAULT');
+});

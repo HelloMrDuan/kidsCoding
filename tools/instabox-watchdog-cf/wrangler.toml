@@ -23,6 +23,11 @@ id = "REPLACE_WITH_KV_NAMESPACE_ID"
 MACHINE_ID = "m_agqv2gsjiybrpuen46a2rpxohe"
 GITHUB_REPO = "HelloMrDuan/kidsCoding"
 GITHUB_BRANCH = "main"
+# Expected-SHA KV cache TTL in ms (default 30 min). A fresh cached
+# branch head is used for the deployment comparison (drift still
+# faults); a stale cached head is never used — if the live fetch then
+# fails, the deployment verdict is 'unknown' (LIFECYCLE_OK, never OK).
+EXPECTED_SHA_CACHE_TTL_MS = "1800000"
 # Maintenance master switch: "true" = monitor and report only,
 # never resume. Change in the dashboard or here and redeploy.
 WATCHDOG_HOLD = "false"
