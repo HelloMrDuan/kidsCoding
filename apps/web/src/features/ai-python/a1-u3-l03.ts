@@ -120,7 +120,14 @@ export function fieldErrorsFor(record: FruitRecord, failed: ValidationCheckName[
         errors.push({
           field: key,
           why: `「${key}」应为${expected[key]}，当前是${typeName(v)} ${jsonPreview(v)}。`,
-          fix: key === '重量' || key === '直径' ? `把「${key}」的引号去掉，写成数字。` : `把「${key}」写成用引号包起来的文字，例如「苹果」。`,
+          // 只有字符串值才谈“去掉引号”；null / 布尔值等没有引号，
+          // 直接告诉学生写一个大于 0 的数字（数值字段）或引号文字（文本字段）。
+          fix:
+            key === '重量' || key === '直径'
+              ? typeof v === 'string'
+                ? `把「${key}」的引号去掉，写成数字。`
+                : `把「${key}」写成一个大于 0 的数字。`
+              : `把「${key}」写成用引号包起来的文字，例如「苹果」。`,
         })
       }
     }
