@@ -234,6 +234,11 @@ export function LessonWorkspace({
   const scratchMountRef = useRef<HTMLDivElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const mountedAdapterRef = useRef<{ adapter: EngineAdapter; engine: string } | null>(null)
+  /** OPS-023: the lesson whose data/adapter the shell currently holds.
+   * The mount cleanup saves under this lesson (never the incoming one),
+   * and the lesson-switch effect uses it to tell whether the mount
+   * effect already saved the old lesson on the same commit. */
+  const mountedLessonRef = useRef<string | null>(null)
   const contractRef = useRef(contract)
   contractRef.current = contract
   const initialScriptRef = useRef(initialScript)
@@ -459,6 +464,11 @@ export function LessonWorkspace({
     if (useSlotData) {
       loadEditorSlotData(contractRef.current, initialScriptRef.current)
     }
+    // OPS-023: from here on the shell holds this lesson's data/adapter.
+    // The cleanup below reads this ref, so it always saves under the
+    // outgoing lesson — never the incoming one (contractRef already
+    // points at the new lesson by the time a cleanup runs).
+    mountedLessonRef.current = contract.lessonId
     if (isSummary) {
       // Summary without a slot never edited anything: keep the old
       // no-cleanup behavior exactly (no null draft written on unmount).
@@ -477,8 +487,16 @@ export function LessonWorkspace({
             // Best effort; the run is abandoned either way.
           }
         }
+        // F2 + OPS-023: the run is stopped, so the displayed state must
+        // stop too. Otherwise the shell still shows "running" for a dead
+        // run, and a later stop click would fall back to the current
+        // target and stop a target that never ran.
+        setEngineState((prev) => (prev.running ? { ...prev, running: false } : prev))
         try {
-          saveDraftToLocal(contractRef.current.lessonId, editorDataRef.current ?? null)
+          saveDraftToLocal(
+            mountedLessonRef.current ?? contractRef.current.lessonId,
+            editorDataRef.current ?? null,
+          )
         } catch {
           // Unmount save is best effort; explicit 保存 is the reliable path.
         }
@@ -552,11 +570,17 @@ export function LessonWorkspace({
           // Best effort; the run is abandoned either way.
         }
       }
+      // F2 + OPS-023: the run is stopped, so the displayed state must
+      // stop too (same reason as the summary-slot cleanup above).
+      setEngineState((prev) => (prev.running ? { ...prev, running: false } : prev))
       try {
         // Slot courses save the slot's data, never the adapter script:
         // the slot owns the session; the adapter is only the run target.
+        // OPS-023: save under the lesson the outgoing adapter/data
+        // belonged to (mountedLessonRef), never contractRef (which
+        // already points at the incoming lesson when this cleanup runs).
         saveDraftToLocal(
-          contractRef.current.lessonId,
+          mountedLessonRef.current ?? contractRef.current.lessonId,
           useSlotData ? (editorDataRef.current ?? null) : (active?.getScript() ?? null),
         )
       } catch {
@@ -568,9 +592,14 @@ export function LessonWorkspace({
         if (scratchAdapterRef.current === active) scratchAdapterRef.current = null
       }
     }
-    // Mount once per engine kind; contract changes are handled below.
+    // Mount once per engine kind AND adapter instance: a new adapter
+    // prop (a different lesson's engine) must unmount the old one and
+    // mount the new one — reusing the previous lesson's adapter would
+    // run and judge the wrong lesson. The same instance is still reused
+    // (no re-run), so shared adapters and tab switches are unaffected.
+    // Contract changes are handled below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract.engine])
+  }, [contract.engine, adapter])
 
   // Lesson switch (client parent changes the contract prop): save current
   // draft under its own key first, then load the target lesson; all six
@@ -591,27 +620,36 @@ export function LessonWorkspace({
       autosaveTimerRef.current = null
     }
     const entry = mountedAdapterRef.current
-    if (editorSlot) {
-      try {
-        saveDraftToLocal(prevId, editorDataRef.current ?? null)
-      } catch {
-        // Best effort; explicit 保存 remains available.
-      }
-    } else if (entry) {
-      try {
-        saveDraftToLocal(prevId, entry.adapter.getScript())
-      } catch {
-        // Best effort; explicit 保存 remains available.
+    // OPS-023: the mount effect (declared above) already saved the old
+    // lesson when it swapped the adapter/engine — its cleanup runs first
+    // on the same commit. Save here only when the mounted data still
+    // belongs to the previous lesson (same engine, same adapter); saving
+    // the swapped-in adapter's script under the old key would overwrite
+    // the old lesson's draft with the new lesson's work.
+    if (mountedLessonRef.current === prevId) {
+      if (editorSlot) {
+        try {
+          saveDraftToLocal(prevId, editorDataRef.current ?? null)
+        } catch {
+          // Best effort; explicit 保存 remains available.
+        }
+      } else if (entry) {
+        try {
+          saveDraftToLocal(prevId, entry.adapter.getScript())
+        } catch {
+          // Best effort; explicit 保存 remains available.
+        }
       }
     }
     prevLessonRef.current = contract.lessonId
     // A lesson switch invalidates every in-flight run event (R3).
     runGenRef.current += 1
-    // F3: best-effort stop of the old run target on lesson switch. The
-    // generation bump above already drops any synchronous 'stopped' event
-    // the stop itself fires, so it can never display on the new lesson.
-    // The ref and the displayed running flag are cleared with it, so no
-    // stale target or state survives into the new lesson.
+    // F3 + OPS-023 (unified, single stop): best-effort stop of the old run
+    // target on lesson switch. The generation bump above already drops any
+    // synchronous 'stopped' event the stop itself fires, so it can never
+    // display on the new lesson. The target is the run's own target
+    // (runTargetRef), never whatever is mounted now; the ref is cleared
+    // with it, so no stale target survives into the new lesson.
     const oldTarget = runTargetRef.current
     runTargetRef.current = null
     if (oldTarget && engineStateRef.current.running) {
@@ -621,7 +659,13 @@ export function LessonWorkspace({
         // Best effort; the run is abandoned either way.
       }
     }
-    setEngineState((prev) => (prev.running ? { ...prev, running: false } : prev))
+    // OPS-023: the new lesson starts with a fresh run state. The old
+    // lesson's x/score/frames — and a stale scratch-ready flag — must
+    // never render as the new lesson's stage state (the scratch poller
+    // overwrites this with the current adapter's state on its next tick).
+    setEngineState({ x: 0, score: 0, running: false, frames: 0 })
+    setScratchReady(false)
+    setScratchError(null)
     setJudgment(null)
     setJudgmentStale(false)
     setRunError(null)
@@ -631,6 +675,8 @@ export function LessonWorkspace({
     setNotice(null)
     if (editorSlot) loadEditorSlotData(contract, initialScript)
     else if (entry) loadIntoAdapter(contract, initialScript)
+    // OPS-023: from here on the shell holds the new lesson's data.
+    mountedLessonRef.current = contract.lessonId
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract.lessonId])
 

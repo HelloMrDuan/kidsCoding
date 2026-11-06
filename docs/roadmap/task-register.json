@@ -3468,6 +3468,30 @@
       "notes": "登记重建：旧 #476 仅登记移动端 Gap A 且基底过期（mergeable dirty，不可合并），本登记以 #477 合并后主线为基重建并按 2026-11-05 首席裁定统一定义为 D1 + Gap A；分工：2 号负责共享外壳实现（按 3 号复现测试修复 D1），3 号提供复现测试与课程需求（已在 #470），首席验收；D2 不在本任务范围；实现另立 PR，不在本登记 PR 内写代码。实现 PR：#480（Draft，分支 muse-c/ops-022-slot-channel）；本地 Vitest 93/93、E2E 97/2/0、D1 复现去标记通过。"
     },
     {
+      "id": "OPS-023",
+      "title": "P0 共享 LessonWorkspace 跨课程切换与引擎生命周期可靠性",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-022"
+      ],
+      "scope": "只改共享外壳 apps/web/src/features/lessons/workspace/ 及配套单测/E2E，解决跨课程切换时引擎生命周期不可靠：同引擎下适配器课切 EditorSlot 课旧适配器错误复用；切课时旧运行未彻底停止；旧课判定、运行状态、草稿污染新课；页面卸载重进时适配器释放与重挂载；快速连续切课时异步运行结果串课；Blockly、Scratch VM、Summary 三模式生命周期一致性。以 Stacked PR 建在 #480（OPS-022）分支之上，#480 合并后再改基。不改正式课程文件、不改其他台账条目、不重设计 UI、不削减现有测试。",
+      "acceptance": [
+        "六项回归测试在缺口下失败、修复后通过（含同引擎适配器归属、运行中切课停止、判定/状态/草稿隔离、卸载重进、快速切课不串课、三模式一致性）",
+        "Summary 及现有 Blockly 课程兼容，无回归",
+        "任务门禁通过，PR 合并后主线 CI 通过"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/483",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "改基到主线 e8472532（首席 2026-11-06 裁定方案②，替代 Stacked 基底 #480 分支）；实现 PR #483（Draft）。3d（runAdapter.validateDraft）按首席裁定归下一项输入校验独立任务，不进本 PR。"
+    },
+    {
       "id": "OPS-024",
       "title": "Scratch VM CI 稳定性治理：固定版本运行时自托管，CI 不依赖外部 CDN",
       "priority": "P0",
