@@ -61,11 +61,21 @@ export function methodEvidenceForRecord(draft: L03Draft): string {
 }
 
 /**
+ * 通过项数：JSON 格式错误时五项尚未校验，通过数为 0（fail-closed，
+ * 不得把“0 项未通过”说成通过 5 项）。
+ */
+export function passedCountOf(result: RecordValidation): number {
+  if (!result.parseOk) return 0
+  return result.passed ? TOTAL_CHECKS : TOTAL_CHECKS - result.failedChecks.length
+}
+
+/**
  * 由一次校验结果构建三层判定。空检查列表不判过（fail-closed）；
- * JSON 格式错误时舞台层先报格式错，任务层为未合格。
+ * JSON 格式错误时舞台层先报格式错，任务层为未合格（不写“0 项未通过”，
+ * 格式错误不是“五项里挂了 0 项”，而是五项尚未校验）。
  */
 export function buildJsonJudgment(result: RecordValidation, draft: L03Draft): JudgmentResult {
-  const passedCount = result.passed ? TOTAL_CHECKS : TOTAL_CHECKS - result.failedChecks.length
+  const passedCount = passedCountOf(result)
   const stageDetail = !result.parseOk
     ? `检查结果：${result.parseError ?? 'JSON 格式错误'}（尚未校验五项）。`
     : result.failedChecks.length === 0
@@ -73,7 +83,9 @@ export function buildJsonJudgment(result: RecordValidation, draft: L03Draft): Ju
       : `检查结果：五项中通过 ${passedCount} 项，未通过：${result.failedChecks.join('、')}。`
   const taskDetail = result.passed
     ? '任务判定：合格：五项全部通过。'
-    : `任务判定：未合格：还有 ${result.failedChecks.length} 项未通过（${result.failedChecks.join('、')}）。`
+    : !result.parseOk
+      ? '任务判定：未合格：JSON 格式错误，尚未校验五项。'
+      : `任务判定：未合格：还有 ${result.failedChecks.length} 项未通过（${result.failedChecks.join('、')}）。`
   return {
     layers: [
       { id: 'stage', label: '检查结果', passed: result.passed, detail: stageDetail },
@@ -153,9 +165,7 @@ export class JsonAdapter implements EngineAdapter {
   /** 校验当前草稿 JSON 并记录三层判定（不写入草稿）。 */
   checkRecord(): JudgmentResult {
     const result = validateRecordText(this.draft.jsonText)
-    this.lastPassedCount = result.passed
-      ? TOTAL_CHECKS
-      : TOTAL_CHECKS - result.failedChecks.length
+    this.lastPassedCount = passedCountOf(result)
     this.lastJudgment = buildJsonJudgment(result, this.draft)
     return this.lastJudgment
   }
