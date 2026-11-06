@@ -30,7 +30,17 @@ describe('lesson-contract validation', () => {
 
   it('rejects an unknown engine', () => {
     const bad = { ...DEMO_A.contract, engine: 'turtle' }
-    expect(validateLessonContract(bad)).toContain('engine 必须是 blockly、scratch-vm 或 summary')
+    expect(validateLessonContract(bad)).toContain('engine 必须是 blockly、scratch-vm、summary 或 slot')
+  })
+
+  it("accepts the generic slot engine (OPS-026, Issue #482 option ②)", () => {
+    const slot = { ...DEMO_A.contract, engine: 'slot' as const }
+    expect(validateLessonContract(slot)).toEqual([])
+  })
+
+  it("rejects 'json' as an engine value: JSON courses must use 'slot', never a new engine", () => {
+    const bad = { ...DEMO_A.contract, engine: 'json' }
+    expect(validateLessonContract(bad)).toContain('engine 必须是 blockly、scratch-vm、summary 或 slot')
   })
 
   it('rejects a missing judging scope label', () => {

@@ -3543,6 +3543,35 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/489"
       },
       "notes": "根因（2026-11-06 实测）：已部署 Worker deepCheck() 在预期 SHA 取不到时直接 throw，每轮必达 BLOCKED_MONITOR，lastSuccessAt 冻在 2026-11-06T01:30:51Z；SHA 查询默认无鉴权（线上无 GITHUB_TOKEN），匿名限流 60/小时按出口 IP 共享；GitHub Actions run 73 失败是真实漂移（部署 0a913c6c ≠ 主线 e8472532），非监控 bug。本任务只修监控耦合，不处理部署漂移。已部署解耦版 Version bae9066d，14:50:53 真实 Cron 轮次 APP_FAULT/drift 新字段已验证。"
+    },
+    {
+      "id": "OPS-026",
+      "title": "P0 共享 LessonWorkspace 通用 slot 引擎（Issue #482，方案②：engine='slot'）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-022",
+        "OPS-023"
+      ],
+      "scope": "只改共享外壳 apps/web/src/features/lessons/workspace/、演示路由与 LESSON-CONTRACT.md 规范及配套测试：WorkspaceEngine 与 validateLessonContract 支持通用引擎值 'slot'（Issue #482 首席裁定方案②）；slot 课程允许课程自有 EditorSlot，不强制挂载 Blockly/Scratch；无真实运行目标不显示运行按钮、不虚构运行结果（无判定不上报、不伪造成功；反馈区无结果时只显示中性占位文案）；草稿、判定、保存、恢复与可选 onJudgment 保持兼容；Blockly、Scratch VM、Summary 现有行为不得回退；演示路由新增 demo-slot 演示课（自有 EditorSlot，插槽内自有检查按钮与检查结果，判定不走外壳反馈区），证明 slot 引擎端到端可用。'json' 不列为引擎值：JSON 课程用 'slot'，不得冒用 'summary'。不改任何正式课程文件、不碰 #464/#484 的文件、不改其他台账条目。本任务不实现 onJudgment（与 #488/OPS-025 兼容、不预占同名接口；A1-U3-L03 的 onJudgment 接线待 #488 合并后再集成）；A1-U3-L03 的 slot 接线由 4 号在本任务合并后做。OPS-023（#483，已合并入主线 4ceb9e87）的生命周期语义是本任务的验证基础，列为正式依赖。",
+      "acceptance": [
+        "契约接受 engine='slot'，拒绝 'json'（JSON 课程不得冒用 summary 或新设 json 引擎）",
+        "demo-slot 演示课挂载 EditorSlot：无舞台、无运行按钮、反馈区只显示中性占位文案，不虚构任何成功",
+        "插槽内检查按真实勾选状态计算，结果只显示在插槽内；改动后旧结果失效，不显示过期通过",
+        "草稿保存/恢复正常；非法草稿回落初始值且不报已恢复，存储草稿不动",
+        "带真实 runAdapter 的 slot 课仍有运行按钮且可真实运行；无 EditorSlot 的 slot 课渲染诚实 fallback、无死按钮",
+        "Blockly、Scratch VM、Summary 现有行为无回归：工作区单测与全量单测全过、三端 E2E 全过、生产构建通过",
+        "任务门禁通过，PR CI 全绿"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/491",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "Issue #482 首席裁定（2026-11-06）：方案②，新增通用 engine='slot'，不采用 'json'，不允许 JSON 课程伪装成 summary。依赖说明：正式依赖列 OPS-022 与 OPS-023（#483 已合并入主线 4ceb9e87）；#488/OPS-025（onJudgment 通道）关系为兼容待集成，A1-U3-L03 接线待 #488 合并后集成、由 4 号在本任务合并后做。实现分支 muse-c/ops-026-slot-engine，基底主线 4ceb9e87（改基自 4fa412d9）。"
     }
   ]
 }
