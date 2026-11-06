@@ -3549,7 +3549,7 @@
       "title": "P0 共享 LessonWorkspace 通用 slot 引擎（Issue #482，方案②：engine='slot'）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "OPS-022",
         "OPS-023"
@@ -3565,7 +3565,7 @@
         "任务门禁通过，PR CI 全绿"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/491",
         "mergeCommit": null,
         "mainCI": null,
         "tests": [],
