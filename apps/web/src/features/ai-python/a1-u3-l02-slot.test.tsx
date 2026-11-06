@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { JudgmentResult } from '../lessons/workspace/workspace-slots'
 import { SummaryAdapter } from './a1-u3-l02-adapter'
-import { emptyDraft } from './a1-u3-l02-draft'
+import { MAX_METHOD_SUMMARY_LENGTH, emptyDraft } from './a1-u3-l02-draft'
 import { SummaryEditorSlot } from './a1-u3-l02-slot'
 
 afterEach(cleanup)
@@ -12,6 +12,7 @@ function renderSlot(onJudgment?: (judgment: JudgmentResult | null) => void) {
   const onChange = vi.fn()
   render(
     <SummaryEditorSlot
+      lessonId="A1-U3-L02"
       initial={emptyDraft()}
       onChange={onChange}
       editable
@@ -142,5 +143,15 @@ describe('SummaryEditorSlot onJudgment reporting (Issue #481, course side)', () 
     expect(screen.getByTestId('ai-u3-l02-summary-verdict')).toHaveTextContent(
       '合格：五项全部通过',
     )
+  })
+})
+
+describe('SummaryEditorSlot method-summary input limit (3号 probe)', () => {
+  it('caps the one-sentence method summary at MAX_METHOD_SUMMARY_LENGTH', () => {
+    renderSlot()
+    fireEvent.click(screen.getByTestId('ai-u3-l02-tab-summary'))
+    const input = screen.getByTestId('ai-u3-l02-method-summary')
+    expect(input).toHaveAttribute('maxLength', String(MAX_METHOD_SUMMARY_LENGTH))
+    expect(MAX_METHOD_SUMMARY_LENGTH).toBe(200)
   })
 })
