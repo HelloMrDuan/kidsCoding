@@ -31,7 +31,7 @@ import {
 } from './blockly-adapter'
 import type { LessonContract } from './lesson-contract'
 import { validateLessonContract } from './lesson-contract'
-import type { EngineAdapter, EngineState, RunEvent } from './workspace-adapters'
+import type { EngineAdapter, EngineState, RunEvent, SlotRunAdapter } from './workspace-adapters'
 import { loadDraftFromLocal, saveDraftToLocal } from './workspace-draft'
 import {
   shouldAutosavePreservePrompt,
@@ -53,20 +53,32 @@ export type LessonWorkspaceProps = {
    */
   testFailSave?: boolean
   /**
-   * Three-engine slots (OPS-020). When `editorSlot` is present, the shell
-   * renders that React component as the editor and never mounts the
-   * imperative adapter for this lesson; adapters must never call
-   * createRoot themselves. When `stageSlot` is present, it renders the
-   * stage scene content inside the shell's stage box (the shell keeps the
-   * card chrome: header, state line, run bar, zoom). When `rolesSlot` is
-   * present, it renders the role column; the shell itself renders no
-   * characters and no roles. When `contract.hasStage === false`, no stage
-   * or roles area renders at all. All slots are optional; the demo route
-   * supplies stageSlot + rolesSlot for its demo lessons.
+   * Three-engine slots (OPS-020, OPS-022 D1). When `editorSlot` is present,
+   * the shell renders that React component as the editor; the slot owns
+   * the editing surface and its data, while the shell still mounts the
+   * imperative adapter for a real engine (scratch-vm/blockly) as the run
+   * target — only summary courses mount no adapter. Adapters must never
+   * call createRoot themselves. When `stageSlot` is present, it renders
+   * the stage scene content inside the shell's stage box (the shell keeps
+   * the card chrome: header, state line, run bar, zoom); a scratch-vm
+   * course with a stage slot gets a plain adapter host div outside the
+   * stage box (see ws-adapter-mount). When `rolesSlot` is present, it
+   * renders the role column; the shell itself renders no characters and
+   * no roles. When `contract.hasStage === false`, no stage or roles area
+   * renders at all. All slots are optional; the demo route supplies
+   * stageSlot + rolesSlot for its demo lessons.
    */
   editorSlot?: EditorSlotComponent
   stageSlot?: StageSlotComponent
   rolesSlot?: RolesSlotComponent
+  /**
+   * Independent run adapter (OPS-022, contract §2). A slot course whose
+   * run target is not its imperative adapter passes one here instead
+   * (e.g. a course-owned runner). Resolution: runAdapter ?? mounted
+   * adapter; with neither, the shell renders no run button at all
+   * (never a dead one).
+   */
+  runAdapter?: SlotRunAdapter
 }
 
 /** Autosave debounce (R4/C8 proposal value; #470's 350ms is reference only). */
@@ -158,6 +170,7 @@ export function LessonWorkspace({
   editorSlot,
   stageSlot,
   rolesSlot,
+  runAdapter,
 }: LessonWorkspaceProps) {
   const contractErrors = useMemo(() => validateLessonContract(contract), [contract])
   const hasStage = contract.hasStage !== false
@@ -210,6 +223,12 @@ export function LessonWorkspace({
   const [scriptList, setScriptList] = useState<DemoBlock[]>([])
   const [scratchReady, setScratchReady] = useState(false)
   const [scratchError, setScratchError] = useState<string | null>(null)
+  // OPS-022 D1: hasRunTarget reads mountedAdapterRef during render, but
+  // refs don't trigger renders. The mount effect bumps this tick after
+  // mounting, so a slot+adapter course re-renders and its run button
+  // appears even when every loadEditorSlotData setter bails out (e.g. an
+  // engine switch from summary to scratch-vm with unchanged slot data).
+  const [adapterMountTick, setAdapterMountTick] = useState(0)
 
   const blocklyMountRef = useRef<HTMLDivElement | null>(null)
   const scratchMountRef = useRef<HTMLDivElement | null>(null)
@@ -230,6 +249,23 @@ export function LessonWorkspace({
   const runGenRef = useRef(0)
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const editorDataRef = useRef<unknown>(undefined)
+  // OPS-022: run-target refs so the run callbacks stay identity-stable
+  // while always seeing the current prop/state. runAdapterRef follows the
+  // prop each render (same pattern as contractRef); engineStateRef lets
+  // the toggle read the live running flag instead of a stale closure.
+  const runAdapterRef = useRef(runAdapter)
+  runAdapterRef.current = runAdapter
+  const engineStateRef = useRef(engineState)
+  engineStateRef.current = engineState
+  /** The run target that produced the current run's events (R3 binding). */
+  const runTargetRef = useRef<{
+    run: (onEvent: (e: RunEvent) => void) => void
+    stop: () => void
+    getState: () => EngineState
+    getJudgmentResult?: () => JudgmentResult | null
+    getStageState?: () => Record<string, number | string | boolean>
+    getLastRunError?: () => string | null
+  } | null>(null)
   const saveMessageRef = useRef<string | null>(null)
   // Narrow-viewport defaults (effect, not initial state, so server and
   // client render identically): the material palette starts collapsed
@@ -321,8 +357,27 @@ export function LessonWorkspace({
       let loaded: unknown = null
       let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
-        loaded = draft.data
-        fromDraft = true
+        // OPS-022 chief review: validate the stored slot draft exactly like
+        // the adapter path does (loadIntoAdapter). Summary courses have no
+        // adapter concept, so they never validate against an adapter; an
+        // adapter without validateDraft accepts the draft (?? true). A
+        // throwing validator counts as invalid (fail-closed). An invalid
+        // draft falls back to the initial script below, is never reported
+        // as restored/saved, and is never overwritten or deleted here.
+        let valid = true
+        if (!isSummary) {
+          try {
+            valid = adapter.validateDraft?.(draft.data) ?? true
+          } catch {
+            valid = false
+          }
+        }
+        if (valid) {
+          loaded = draft.data
+          fromDraft = true
+        } else if (targetInitial !== undefined && targetInitial !== null) {
+          loaded = targetInitial
+        }
       } else if (targetInitial !== undefined && targetInitial !== null) {
         loaded = targetInitial
       }
@@ -339,7 +394,7 @@ export function LessonWorkspace({
         setSaveMessageAndRef(null)
       }
     },
-    [setSaveMessageAndRef],
+    [adapter, isSummary, setSaveMessageAndRef],
   )
 
   const loadIntoAdapter = useCallback(
@@ -394,13 +449,34 @@ export function LessonWorkspace({
   // tab switches and lesson switches never remount the engine.
   useEffect(() => {
     const engine = contract.engine
-    // Editor-slot courses never mount the imperative adapter: the React
-    // slot component owns the editing surface, and the shell owns its data.
-    if (editorSlot) {
+    // OPS-022 D1: editorSlot no longer blocks the adapter mount. A slot
+    // course with a real engine (scratch-vm/blockly) mounts its adapter
+    // exactly like an imperative course: the slot owns the editing
+    // surface and its data (loadEditorSlotData, never loadIntoAdapter),
+    // while the mounted adapter is the run target. Only summary courses
+    // still mount nothing (no run concept).
+    const useSlotData = Boolean(editorSlot)
+    if (useSlotData) {
       loadEditorSlotData(contractRef.current, initialScriptRef.current)
+    }
+    if (isSummary) {
+      // Summary without a slot never edited anything: keep the old
+      // no-cleanup behavior exactly (no null draft written on unmount).
+      if (!useSlotData) return
       return () => {
         if (autosaveTimerRef.current !== null) clearTimeout(autosaveTimerRef.current)
         runGenRef.current += 1
+        // F3: best-effort stop of the live run target before the slot data
+        // is saved; a summary course with a runAdapter may still hold one.
+        const liveTarget = runTargetRef.current
+        runTargetRef.current = null
+        if (liveTarget && engineStateRef.current.running) {
+          try {
+            liveTarget.stop()
+          } catch {
+            // Best effort; the run is abandoned either way.
+          }
+        }
         try {
           saveDraftToLocal(contractRef.current.lessonId, editorDataRef.current ?? null)
         } catch {
@@ -408,7 +484,6 @@ export function LessonWorkspace({
         }
       }
     }
-    if (isSummary) return
     const prev = mountedAdapterRef.current
     if (prev && prev.engine !== engine) {
       try {
@@ -419,40 +494,79 @@ export function LessonWorkspace({
       prev.adapter.unmount()
       mountedAdapterRef.current = null
     }
-    let entry = mountedAdapterRef.current
-    if (!entry) {
-      entry = { adapter, engine }
-      mountedAdapterRef.current = entry
-    }
-    const active = entry.adapter
     const mountEl = engine === 'scratch-vm' ? scratchMountRef.current : blocklyMountRef.current
-    if (mountEl) {
-      try {
-        active.mount(mountEl)
-      } catch (error) {
-        setRunError(error instanceof Error ? error.message : '引擎挂载失败')
-      }
-    }
-    const changeListener = () => handleAdapterChange()
-    const maybeListener = active as EngineAdapter & {
+    // OPS-022 D1 (fail-closed): a slot course with no adapter host (blockly
+    // + slot: the script panel renders the slot, not a Blockly mount) gets
+    // no mounted run target, so no run button renders for it. Adapter
+    // courses keep the existing register-always behavior untouched.
+    const canMount = !useSlotData || mountEl !== null
+    let active: EngineAdapter | null = null
+    let changeListener: (() => void) | null = null
+    let maybeListener: (EngineAdapter & {
       addChangeListener?: (cb: () => void) => void
       removeChangeListener?: (cb: () => void) => void
+    }) | null = null
+    if (canMount) {
+      let entry = mountedAdapterRef.current
+      if (!entry) {
+        entry = { adapter, engine }
+        mountedAdapterRef.current = entry
+      }
+      active = entry.adapter
+      if (mountEl) {
+        try {
+          active.mount(mountEl)
+        } catch (error) {
+          setRunError(error instanceof Error ? error.message : '引擎挂载失败')
+        }
+      }
+      changeListener = () => handleAdapterChange()
+      maybeListener = active as EngineAdapter & {
+        addChangeListener?: (cb: () => void) => void
+        removeChangeListener?: (cb: () => void) => void
+      }
+      maybeListener.addChangeListener?.(changeListener)
+      // Slot courses never load into the adapter: the slot's onChange data
+      // (editorDataRef) IS the course session, and loading adapter-side
+      // data over it would overwrite that session. Adapter courses keep
+      // the existing restore path untouched.
+      if (!useSlotData) {
+        loadIntoAdapter(contractRef.current, initialScriptRef.current)
+      }
+      if (engine === 'scratch-vm') scratchAdapterRef.current = active
+      setAdapterMountTick((t) => t + 1)
     }
-    maybeListener.addChangeListener?.(changeListener)
-    loadIntoAdapter(contractRef.current, initialScriptRef.current)
-    if (engine === 'scratch-vm') scratchAdapterRef.current = active
     return () => {
-      maybeListener.removeChangeListener?.(changeListener)
+      if (maybeListener && changeListener) maybeListener.removeChangeListener?.(changeListener)
       if (autosaveTimerRef.current !== null) clearTimeout(autosaveTimerRef.current)
       runGenRef.current += 1
+      // F3: best-effort stop of the live run target before the adapter is
+      // unmounted. The generation bump above drops any event the stop
+      // itself fires, and unmount() alone does not promise to end a run.
+      const liveTarget = runTargetRef.current
+      runTargetRef.current = null
+      if (liveTarget && engineStateRef.current.running) {
+        try {
+          liveTarget.stop()
+        } catch {
+          // Best effort; the run is abandoned either way.
+        }
+      }
       try {
-        saveDraftToLocal(contractRef.current.lessonId, active.getScript())
+        // Slot courses save the slot's data, never the adapter script:
+        // the slot owns the session; the adapter is only the run target.
+        saveDraftToLocal(
+          contractRef.current.lessonId,
+          useSlotData ? (editorDataRef.current ?? null) : (active?.getScript() ?? null),
+        )
       } catch {
         // Unmount save is best effort; explicit 保存 is the reliable path.
       }
-      active.unmount()
-      if (mountedAdapterRef.current?.adapter === active) mountedAdapterRef.current = null
-      if (scratchAdapterRef.current === active) scratchAdapterRef.current = null
+      if (active) {
+        active.unmount()
+        if (mountedAdapterRef.current?.adapter === active) mountedAdapterRef.current = null
+        if (scratchAdapterRef.current === active) scratchAdapterRef.current = null
+      }
     }
     // Mount once per engine kind; contract changes are handled below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -493,6 +607,21 @@ export function LessonWorkspace({
     prevLessonRef.current = contract.lessonId
     // A lesson switch invalidates every in-flight run event (R3).
     runGenRef.current += 1
+    // F3: best-effort stop of the old run target on lesson switch. The
+    // generation bump above already drops any synchronous 'stopped' event
+    // the stop itself fires, so it can never display on the new lesson.
+    // The ref and the displayed running flag are cleared with it, so no
+    // stale target or state survives into the new lesson.
+    const oldTarget = runTargetRef.current
+    runTargetRef.current = null
+    if (oldTarget && engineStateRef.current.running) {
+      try {
+        oldTarget.stop()
+      } catch {
+        // Best effort; the run is abandoned either way.
+      }
+    }
+    setEngineState((prev) => (prev.running ? { ...prev, running: false } : prev))
     setJudgment(null)
     setJudgmentStale(false)
     setRunError(null)
@@ -542,14 +671,55 @@ export function LessonWorkspace({
     return () => clearInterval(timer)
   }, [isScratch])
 
+  /**
+   * OPS-022 run resolution (contract §2): runAdapter ?? mounted adapter.
+   * Slot courses pass the slot's CURRENT data (editorDataRef, the same
+   * value save/judgment use) into runProgram; adapter courses keep their
+   * existing run() path untouched. Method references are wrapped so a
+   * class adapter's `this` never breaks when the shell calls back later.
+   */
+  const resolveRunTarget = useCallback(() => {
+    const slot = runAdapterRef.current
+    if (slot) {
+      return {
+        run: (onEvent: (e: RunEvent) => void) =>
+          slot.runProgram(editorDataRef.current ?? null, onEvent),
+        stop: () => slot.stop(),
+        getState: () => slot.getState(),
+        getJudgmentResult: slot.getJudgmentResult
+          ? () => slot.getJudgmentResult!()
+          : undefined,
+        getStageState: slot.getStageState ? () => slot.getStageState!() : undefined,
+        getLastRunError: slot.getLastRunError ? () => slot.getLastRunError!() : undefined,
+      }
+    }
+    const entry = mountedAdapterRef.current
+    if (!entry) return null
+    const a = entry.adapter
+    return {
+      run: (onEvent: (e: RunEvent) => void) => a.run(onEvent),
+      stop: () => a.stop(),
+      getState: () => a.getState(),
+      getJudgmentResult: a.getJudgmentResult ? () => a.getJudgmentResult!() : undefined,
+      getStageState: a.getStageState ? () => a.getStageState!() : undefined,
+      getLastRunError: (
+        a as EngineAdapter & { getLastRunError?: () => string | null }
+      ).getLastRunError
+        ? () => (a as EngineAdapter & { getLastRunError?: () => string | null }).getLastRunError!()
+        : undefined,
+    }
+  }, [])
+
   const handleRunEvent = useCallback(
     (event: RunEvent) => {
       setEngineState(event.state)
       if (event.kind === 'finished') {
-        // The shell displays ONLY an adapter-owned judgment. With no
-        // adapter judgment, a finished run shows run state alone — the
+        // The shell displays ONLY a target-owned judgment. With no
+        // target judgment, a finished run shows run state alone — the
         // shell never invents a pass/fail conclusion (no failJudgment).
-        const generic = mountedAdapterRef.current?.adapter.getJudgmentResult?.()
+        // The judgment is read from the run's own target (runTargetRef),
+        // never from whatever adapter happens to be mounted now.
+        const generic = runTargetRef.current?.getJudgmentResult?.()
         if (generic) {
           setJudgment(generic)
         }
@@ -557,11 +727,7 @@ export function LessonWorkspace({
         refreshScriptList()
       }
       if (event.kind === 'stopped') {
-        const asyncError = (
-          mountedAdapterRef.current?.adapter as EngineAdapter & {
-            getLastRunError?: () => string | null
-          }
-        ).getLastRunError?.()
+        const asyncError = runTargetRef.current?.getLastRunError?.()
         if (asyncError) {
           // Run errors surface as errors only, never as a fabricated
           // "未合格" judgment: the previous judgment (if any) stays cleared
@@ -573,25 +739,12 @@ export function LessonWorkspace({
     [refreshScriptList],
   )
 
-  const handleRunToggle = useCallback(() => {
-    const entry = mountedAdapterRef.current
-    if (!entry) return
-    if (engineState.running) {
-      // R3: stop invalidates the run generation first, so a late 'finished'
-      // from the stopped run can never display a stale pass afterwards.
-      // Clearing the displayed judgment here is defence-in-depth on top of
-      // the generation guard (the start branch already clears on run).
-      runGenRef.current += 1
-      try {
-        entry.adapter.stop()
-      } catch {
-        // Stop is best effort; the state below reflects the local view.
-      }
-      setJudgment(null)
-      setJudgmentStale(false)
-      setEngineState(entry.adapter.getState())
-      return
-    }
+  /** OPS-022 start branch: shared by the shell buttons and shell.run. */
+  const handleRunStart = useCallback(() => {
+    const target = resolveRunTarget()
+    if (!target) return
+    if (engineStateRef.current.running) return
+    runTargetRef.current = target
     setRunError(null)
     setJudgment(null)
     setJudgmentStale(false)
@@ -599,7 +752,7 @@ export function LessonWorkspace({
     // handleRunEvent; stale async results are dropped, never displayed.
     const gen = ++runGenRef.current
     try {
-      entry.adapter.run((event) => {
+      target.run((event) => {
         if (gen !== runGenRef.current) return
         handleRunEvent(event)
       })
@@ -609,11 +762,46 @@ export function LessonWorkspace({
       setRunError(message)
     }
     try {
-      setEngineState(entry.adapter.getState())
+      setEngineState(target.getState())
     } catch {
       // Keep the previous state.
     }
-  }, [engineState.running, handleRunEvent])
+  }, [handleRunEvent, resolveRunTarget])
+
+  /** OPS-022 stop branch: shared by the shell buttons and shell.stop. */
+  const handleRunStop = useCallback(() => {
+    if (!engineStateRef.current.running) return
+    // F2: stop the target that actually started the run (runTargetRef),
+    // never the current prop — the runAdapter may have changed mid-run,
+    // and stopping the new target would leave the old run live. Fall back
+    // to the current resolution only when no run was recorded (e.g. the
+    // Scratch poller reported a running state the shell never started).
+    const target = runTargetRef.current ?? resolveRunTarget()
+    if (!target) return
+    // R3: stop invalidates the run generation first, so a late 'finished'
+    // from the stopped run can never display a stale pass afterwards.
+    // Clearing the displayed judgment here is defence-in-depth on top of
+    // the generation guard (the start branch already clears on run).
+    runGenRef.current += 1
+    runTargetRef.current = null
+    try {
+      target.stop()
+    } catch {
+      // Stop is best effort; the state below reflects the local view.
+    }
+    setJudgment(null)
+    setJudgmentStale(false)
+    try {
+      setEngineState(target.getState())
+    } catch {
+      // Keep the previous state.
+    }
+  }, [resolveRunTarget])
+
+  const handleRunToggle = useCallback(() => {
+    if (engineStateRef.current.running) handleRunStop()
+    else handleRunStart()
+  }, [handleRunStart, handleRunStop])
 
   const handleSave = useCallback(() => {
     if (testFailSave) {
@@ -1086,6 +1274,34 @@ export function LessonWorkspace({
     </div>
   )
 
+  /**
+   * OPS-022: a run button renders only when a run target exists in steady
+   * state. Targets are runAdapter (a prop, hence reactive) or the adapter
+   * mounted by the mount effect — slot courses with a real engine mount
+   * their adapter too (D1), so a mounted adapter is a target for them as
+   * well; summary courses never mount and never run. The mounted-adapter
+   * clause reads a ref, so the mount effect's adapterMountTick bump is
+   * what re-renders this line after mounting. This keeps a slot course
+   * without a run target from ever showing a dead button (fail-closed,
+   * stricter than "any non-summary slot shows").
+   */
+  void adapterMountTick
+  const hasRunTarget =
+    Boolean(runAdapter) || mountedAdapterRef.current !== null || (!editorSlot && !isSummary)
+
+  /** OPS-022 shell control surface for the slot's own toolbar (contract §3). */
+  const shellControl = useMemo(
+    () => ({
+      run: handleRunToggle,
+      stop: handleRunStop,
+      save: handleSave,
+      running: engineState.running,
+      saveState,
+      judgment,
+    }),
+    [handleRunToggle, handleRunStop, handleSave, engineState.running, saveState, judgment],
+  )
+
   const scriptListPanel = isBlockly ? (
     <div className="ws-script-list-panel" data-testid="ws-script-list">
       <h3>脚本列表（可排序、删除、改参，均经适配器读写）</h3>
@@ -1222,7 +1438,7 @@ export function LessonWorkspace({
             lessonId={contract.lessonId}
             state={engineState}
             running={engineState.running}
-            stageState={adapter.getStageState?.()}
+            stageState={runAdapter?.getStageState?.() ?? adapter.getStageState?.()}
           />
         ) : isScratch ? (
           <div ref={scratchMountRef} data-testid="ws-scratch-mount" style={{ width: '100%', height: '100%' }} />
@@ -1230,15 +1446,29 @@ export function LessonWorkspace({
           <p>舞台尚未接入：本课程未提供舞台组件。</p>
         )}
       </div>
+      {/* OPS-022 D1: when a stage slot renders the scene, the scratch
+          adapter still needs a host element: the stage box holds the
+          slot, so the mount point lives here, outside the box, as a
+          plain empty div (mirroring the course's own l2-vm-mount, never
+          display:none). Mutually exclusive with ws-scratch-mount above,
+          which renders only when no stage slot exists — never a double
+          host for one adapter. */}
+      {StageSlotView && isScratch && adapter && (
+        <div ref={scratchMountRef} aria-hidden="true" data-testid="ws-adapter-mount" />
+      )}
       <div className="ws-runbar">
-        <button
-          type="button"
-          className={`kc-action-surface kc-btn-dark ${engineState.running ? 'ws-stop-btn' : 'ws-run-btn'}`}
-          onClick={handleRunToggle}
-          data-testid="ws-run-toggle"
-        >
-          {engineState.running ? '停止' : '运行作品'}
-        </button>
+        {/* OPS-022: no run target, no run button — never a dead one. The
+            zoom group stays: stage zoom is independent of running. */}
+        {hasRunTarget && (
+          <button
+            type="button"
+            className={`kc-action-surface kc-btn-dark ${engineState.running ? 'ws-stop-btn' : 'ws-run-btn'}`}
+            onClick={handleRunToggle}
+            data-testid="ws-run-toggle"
+          >
+            {engineState.running ? '停止' : '运行作品'}
+          </button>
+        )}
         <span className="ws-zoom-group">
           舞台缩放：
           <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('small')} data-testid="ws-zoom-small">
@@ -1323,8 +1553,10 @@ export function LessonWorkspace({
       <h2>脚本工作区</h2>
       {/* Mobile sticky action row: in-flow sticky (never a fixed overlay),
           so run/stop/save stay reachable without scrolling the editor.
-          Slot courses (e.g. summary) have no run concept and get no row. */}
-      {!EditorSlotView && (
+          OPS-022 (contract §3b): slot courses WITH a run target get the
+          row too, so run sits in the same zone as the slot; slot courses
+          without a target (e.g. summary) still get no row. */}
+      {(!EditorSlotView || hasRunTarget) && (
         <div className="ws-sticky-actions">
           <button
             type="button"
@@ -1348,6 +1580,11 @@ export function LessonWorkspace({
               initial={editorInitial}
               onChange={handleEditorSlotChange}
               editable
+              // OPS-022: shell is present only when a run target exists,
+              // so a slot can never render a run button from a targetless
+              // shell. Targetless slots (e.g. Summary) keep edit-only
+              // behavior; their save still flows via autosave + file menu.
+              shell={hasRunTarget ? shellControl : undefined}
             />
           </div>
         ) : (
@@ -1611,6 +1848,12 @@ export function LessonWorkspace({
            layout (task text left, editor right, feedback below the editor)
            instead of the old narrow textbox. */
         .ws-editor-slot textarea { width: 100%; min-height: 280px; box-sizing: border-box; }
+        /* OPS-022 (contract §3b, A1 space guarantee): the slot container
+           itself must hold editing height — the old rule sized only the
+           summary textarea, so a non-textarea slot (e.g. a course script
+           editor) collapsed. Same heights as the Blockly mount: phone
+           360px, tablet 480px, desktop 600px (media blocks below). */
+        .ws-editor-slot { min-height: 360px; }
         @media (max-width: 767px) {
           .ws-palette-chip { min-height: 44px; }
           .ws-script-list-panel input[type="number"], .ws-script-list-panel select { min-height: 44px; }
@@ -1653,6 +1896,7 @@ export function LessonWorkspace({
           .ws-task-wrap { display: none; }
           .ws-script-wrap { grid-column: 1 / -1; }
           .ws-blockly-mount { height: 480px; }
+          .ws-editor-slot { min-height: 480px; }
           /* Tablet zoom heights (round 3): compact stage, ~200px medium. */
           .ws-zoom-small .ws-stage-box { height: 160px; }
           .ws-zoom-medium .ws-stage-box { height: 200px; }
@@ -1763,6 +2007,7 @@ export function LessonWorkspace({
           .ws-grid.ws-has-rail .ws-script-wrap { grid-column: auto; grid-row: auto; }
           .ws-script-wrap { grid-column: auto; }
           .ws-blockly-mount { height: 600px; }
+          .ws-editor-slot { min-height: 600px; }
           /* Desktop zoom heights (unchanged values, now via classes). */
           .ws-zoom-small .ws-stage-box { height: 180px; }
           .ws-zoom-medium .ws-stage-box { height: 240px; }

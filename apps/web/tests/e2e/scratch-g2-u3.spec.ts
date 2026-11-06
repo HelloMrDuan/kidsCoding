@@ -1,14 +1,10 @@
 import {expect, test} from '@playwright/test'
 import {readFile} from 'node:fs/promises'
-import {openG2Lab, routeLocalScratchVm, selectTarget, spriteState, unzip} from './scratch-g2-helpers'
+import {openG2Lab, selectTarget, spriteState, unzip} from './scratch-g2-helpers'
 
 // G2-U3-L01 on the real Scratch VM (scratch-vm@5.0.300 in a sandboxed
 // iframe). No VM mocks: every task state below comes from VM key-press
 // hats and VM target coordinates after real key events.
-test.beforeEach(async ({page}) => {
-  await routeLocalScratchVm(page)
-})
-
 const U3L01 = 'G2-U3-L01'
 const U3L01_SAMPLE = 'public/scratch-samples/g2-u3-l01-boat-keys.sb3.b64'
 const keyLog = (page: import('@playwright/test').Page) => page.getByTestId('g2-key-log')

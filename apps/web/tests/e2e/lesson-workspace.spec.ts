@@ -832,3 +832,24 @@ test('round4 fix 3: file menu audit — blockly shows all five, scratch hides ne
   await page.getByTestId('ws-file-export').click()
   await expect(page.getByTestId('ws-notice')).toHaveText(/Scratch.*(就绪|挂载|加载)/)
 })
+
+test('OPS-022 slot container holds the A1 editing height at 1440, 768 and 375', async ({
+  page,
+}) => {
+  // Contract §3b: the slot container itself (not just a textarea inside
+  // it) keeps the Blockly mount heights, so a non-textarea course editor
+  // cannot collapse. The demo summary slot is the observable instance.
+  const cases = [
+    { width: 1440, height: 900, min: 600 },
+    { width: 768, height: 1024, min: 480 },
+    { width: 375, height: 812, min: 360 },
+  ]
+  for (const c of cases) {
+    await page.setViewportSize({ width: c.width, height: c.height })
+    await page.goto(DEMO_S)
+    await expect(page.getByTestId('ws-editor-slot')).toBeVisible()
+    const box = await page.getByTestId('ws-editor-slot').boundingBox()
+    expect(box).not.toBeNull()
+    expect(box!.height).toBeGreaterThanOrEqual(c.min)
+  }
+})

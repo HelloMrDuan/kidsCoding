@@ -1,20 +1,8 @@
 // Shared helpers for the G2 Scratch VM lab specs (scratch-g2-*.spec.ts).
-import {readFileSync} from 'node:fs'
+// The VM runtime (scratch-vm@5.0.300, scratch-storage@4.0.0) is self-hosted
+// from the app's own origin (OPS-024): no test needs a CDN workaround.
 import {deflateRawSync, inflateRawSync} from 'node:zlib'
-import {expect, type BrowserContext, type Page} from '@playwright/test'
-
-// Local-only CDN workaround, identical to the existing Scratch specs: when
-// SCRATCH_VM_LOCAL_CDN=1 the pinned scratch-vm@5.0.300 script is served from a
-// local copy (scratch-storage@4.0.0 likewise). CI never sets it and always loads the real jsDelivr script.
-export async function routeLocalScratchVm(target: Page | BrowserContext) {
-  if (process.env.SCRATCH_VM_LOCAL_CDN !== '1') return
-  const vmCode = readFileSync(process.env.SCRATCH_VM_LOCAL_FILE ?? '/tmp/scratch-local/scratch-vm.min.js')
-  const storageCode = readFileSync(process.env.SCRATCH_STORAGE_LOCAL_FILE ?? '/tmp/scratch-local/scratch-storage.min.js')
-  await target.route('https://cdn.jsdelivr.net/**', route => route.fulfill({
-    body: route.request().url().includes('/scratch-storage@') ? storageCode : vmCode,
-    contentType: 'application/javascript',
-  }))
-}
+import {expect, type Page} from '@playwright/test'
 
 const CRC_TABLE = (() => {
   const table: number[] = []
