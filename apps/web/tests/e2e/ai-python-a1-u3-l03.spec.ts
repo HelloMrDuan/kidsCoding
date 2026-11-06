@@ -92,6 +92,37 @@ test.describe('A1-U3-L03 lesson page', () => {
     await expect(page.getByTestId('ai-u3-l03-hint-text')).toContainText('五项全过')
   })
 
+  test('save failure shows 未能保存 and recovery restores saving', async ({ page }) => {
+    test.setTimeout(150_000)
+    // 在页面脚本之前包一层 setItem：窗口旗标为真时抛 QuotaExceededError。
+    await page.addInitScript(() => {
+      const original = Storage.prototype.setItem
+      const flags = window as unknown as { __l03FailSave?: boolean }
+      flags.__l03FailSave = false
+      Storage.prototype.setItem = function (key: string, value: string) {
+        if (flags.__l03FailSave) {
+          throw new DOMException('Quota exceeded', 'QuotaExceededError')
+        }
+        return original.call(this, key, value)
+      }
+    })
+    await page.goto(ROUTE)
+    const setFail = (value: boolean) =>
+      page.evaluate((flag) => {
+        ;(window as unknown as { __l03FailSave?: boolean }).__l03FailSave = flag
+      }, value)
+    await setFail(true)
+    await page.getByTestId('ai-u3-l03-example-good').click()
+    await expect(page.getByTestId('ai-u3-l03-draft-status')).toContainText('未能保存')
+    // 失败的一次没有留下半截草稿：关掉旗标再写，保存恢复；刷新后恢复的是
+    // 恢复后写的那条（type-error 例子，含字符串 "182"），不是失败的那条。
+    await setFail(false)
+    await page.getByTestId('ai-u3-l03-example-type-error').click()
+    await expect(page.getByTestId('ai-u3-l03-draft-status')).toContainText('已保存到本机草稿')
+    await page.reload()
+    await expect(page.getByTestId('ai-u3-l03-json-input')).toHaveValue(/"182"/)
+  })
+
   test('draft saves and restores across reload; restore-default clears', async ({ page }) => {
     test.setTimeout(150_000)
     await page.goto(ROUTE)
