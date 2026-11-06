@@ -339,6 +339,40 @@ test('lesson switch round-trip: A intact, B intact, no cross-lesson residue', as
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3, { timeout: 10000 })
 })
 
+test('OPS-023 lesson switch after a pass: B starts fresh, runs and passes on its own', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  // Make A pass first: hat + right 30 + repeat 3 x right 50 -> x=180 caught.
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await page.getByTestId('ws-run-toggle').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveText('结论：已完成，已掌握', {
+    timeout: 15000,
+  })
+  await expect(page.getByTestId('ws-demo-stage-state')).toContainText('分数=1')
+  // Switch to B through the demo nav (real client navigation).
+  await openDemoNav(page)
+  await page.getByRole('link', { name: '演示 B：送篮子到果园' }).click()
+  await expect(page.getByTestId('ws-topbar').locator('h1')).toHaveText('演示：送篮子到果园')
+  // B starts fresh: no conclusion from A, not running, demo stage at start.
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0)
+  await expect(page.getByTestId('ws-stage-state')).toContainText('未运行')
+  await expect(page.getByTestId('ws-demo-stage-state')).toContainText('分数=0')
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  // B runs and passes on its own program: hat + right 30 + repeat 3 x right
+  // 50 -> x=180, |240-180|=60 within B's threshold 60.
+  await page.getByTestId('ws-script-panel').getByTestId('ws-drawer-repeat').click()
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  await page.getByTestId('ws-run-toggle').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveText('结论：已完成，已掌握', {
+    timeout: 15000,
+  })
+  await expect(page.getByTestId('ws-demo-stage-state')).toContainText('分数=1')
+})
+
 test('demo nav details starts collapsed and opens to real links', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto(DEMO_A)
