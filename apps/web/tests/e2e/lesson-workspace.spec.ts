@@ -10,6 +10,7 @@
  * Run via a TEMP Playwright config inside apps/web (own port, no channel
  * line); the temp config is deleted after the run and playwright.config.ts
  * is never modified.
+ * OPS-028: JSON import legitimacy (blockly valid/invalid, summary valid).
  */
 import { expect, test } from '@playwright/test'
 
@@ -869,6 +870,59 @@ test('round4 fix 3: file menu audit — blockly shows all five, scratch hides ne
   await page.getByTestId('ws-file-menu-button').click()
   await page.getByTestId('ws-file-export').click()
   await expect(page.getByTestId('ws-notice')).toHaveText(/Scratch.*(就绪|挂载|加载)/)
+})
+
+test('OPS-028 JSON import: blockly accepts a valid script, rejects a non-list and unknown blocks', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_A)
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
+  // Positive: a valid 3-block script imports and replaces the script list.
+  await page.setInputFiles('[data-testid="ws-file-input"]', {
+    name: 'valid.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(
+      JSON.stringify([
+        { type: 'when_start' },
+        { type: 'ws_move_right', steps: 150 },
+        { type: 'ws_move_right', steps: 10 },
+      ]),
+    ),
+  })
+  await expect(page.getByTestId('ws-notice')).toHaveText('已导入脚本')
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  // Negative: a JSON object (not a list) is rejected, the program is unchanged.
+  await page.setInputFiles('[data-testid="ws-file-input"]', {
+    name: 'not-a-list.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify({ not: 'a list' })),
+  })
+  await expect(page.getByTestId('ws-notice')).toHaveText('导入文件不是积木列表，原脚本未变')
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+  // Negative: an unknown block type is rejected by the adapter validator.
+  await page.setInputFiles('[data-testid="ws-file-input"]', {
+    name: 'bad-block.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify([{ type: 'nope' }])),
+  })
+  await expect(page.getByTestId('ws-notice')).toHaveText('脚本无效：未知积木类型 nope')
+  await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(3)
+})
+
+test('OPS-028 JSON import: summary accepts a valid JSON payload into the editor', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_S)
+  await expect(page.getByTestId('ws-summary-textarea')).toBeVisible()
+  await page.setInputFiles('[data-testid="ws-file-input"]', {
+    name: 'summary.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify({ text: '导入的句子。另一句。' })),
+  })
+  await expect(page.getByTestId('ws-notice')).toHaveText('已导入作品数据')
+  await expect(page.getByTestId('ws-summary-textarea')).toHaveValue('导入的句子。另一句。')
 })
 
 test('OPS-022 slot container holds the A1 editing height at 1440, 768 and 375', async ({
