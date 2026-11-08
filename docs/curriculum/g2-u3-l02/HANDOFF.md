@@ -104,7 +104,7 @@ main 现在包含 OPS-020（`docs/roadmap/task-register.json` 尾部追加）。
 
 1. **#471 不能在 #470 之前单独合入 main**：main 上没有本课文件，#471 新增的 `vitest run src/features/lessons/g2-u3-l02` 与 `playwright test tests/e2e/g2-u3-l02-*.spec.ts` 都会 exit 1。不得用“文件不存在就跳过”规避。
 2. 顺序只能是：候选证据（#471 Stacked 运行）→ #470 合入 main → #471 改基到 main 并合入。
-3. #470 合入 main 的方式决定 #471 是否要改写历史：**merge commit** → 直接 retarget，门禁通过；**squash / rebase-merge** → `unknown task ID SYS-122`，需把 #471 的 3 个提交 cherry-pick 到新 main（实测无冲突、门禁通过），这需要**强制推送**（须首席授权）或**另开新分支 + 新 PR** 并关闭 #471。
+3. #470 合入 main 的方式**不需要**改写 #471 的历史（2026-11-06 用丢弃式本地模拟实测，merge commit 与 squash 两种都做了）：先把合入后的 main **普通 merge** 进 `kiro/ci-g2-u3-l02-coverage`（不强推），再把 PR 的 base 改成 main。两种方式下都没有冲突，相对 main 的 diff 只剩 workflow + 台账 2 个文件（+65），任务台账门禁通过（117 项）。**只有“不先 merge main、直接改 base”这一种做法**在 squash / rebase-merge 下会报 `unknown task ID SYS-122`（merge-base 退回旧 main），那种做法不要用。
 4. **#470 的 CI 不覆盖本课测试**（base 是 main，main 的 workflow 不含本课 Job）。本课测试证据只存在于 #471 的运行里。
 5. **刷新规程**（让 #471 的证据对应 #470 的最新候选 HEAD）：#470 每次出现可执行代码变化后，把课程分支**普通 merge** 进 `kiro/ci-g2-u3-l02-coverage`（不强推），等 #471 的 CI 跑完。实测：#471 相对课程分支的 diff 仍是 2 个文件 / +64，门禁通过。**当前**：#470 在 `21dbf83`，#471 的基线是 `429f2f6`，差异仅一个纯文档提交，已有证据仍有效；**#470 最终合并前必须刷新一次**。
 6. 如果 2 号 / 首席要求改变这个顺序，**重新提交门禁兼容方案**，不要擅自合并。已知的门禁约束：`scripts/check-task-ledger.py` 要求声明的 Task-ID 集合与实际改动的台账条目集合完全一致；合并 #471 进 #470 会使 #470 的改动集合多出 `SYS-122`。
@@ -130,6 +130,6 @@ main 现在包含 OPS-020（`docs/roadmap/task-register.json` 尾部追加）。
 | 阻塞 | 负责 |
 |---|---|
 | `StageSlot` 课程专属类型安全状态；`RunTrace` 位移增量与来源 | 2 号（#469） |
-| #470 合入 main 的方式（merge commit / squash / rebase）与是否授权强制推送 #471 | 首席 |
+| #470 合入 main 的方式（merge commit / squash / rebase）：对 #471 无影响，见第六节第 3 条，不需要强制推送 | 首席选择即可 |
 | 目录 JSON 与 `LESSON-CONTRACT.md` 示例里与新定位矛盾的文字 | 首席 / 课程架构负责人 |
 | 独立审核、儿童试学、真实设备验证 | 首席 / 教研 |

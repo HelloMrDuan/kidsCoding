@@ -106,8 +106,8 @@
 | #470 合入方式 | #471 直接改基到 main | 做法 |
 |---|---|---|
 | merge commit（保留祖先） | ✅ 门禁通过，diff 只剩 workflow + 台账 | 直接 retarget |
-| squash | ❌ `unknown task ID SYS-122`（merge-base 退回旧 main，三点 diff 34 个文件） | 把 #471 的 3 个提交 cherry-pick 到新 main（实测无冲突、门禁通过、diff 只剩 2 个文件）。这等于改写 #471 分支历史（需要强制推送），**或**另开新分支 + 新 PR（base=main），关闭 #471。**强制推送需首席明确授权。** |
-| rebase-merge | ❌ 同上 | 同上 |
+| squash | ❌ **仅当不先 merge main、直接改 base**：`unknown task ID SYS-122`（merge-base 退回旧 main，三点 diff 34 个文件） | **先把合入后的 main 普通 merge 进 CI 分支，再改 base**（2026-11-06 本地模拟实测：无冲突、门禁通过 117 项、diff 只剩 2 个文件 +65）。**不需要强制推送。**（早先写的“cherry-pick + 强制推送”只在不 merge main 的做法下才需要，已不推荐。） |
+| rebase-merge | 同 squash | 同 squash |
 
 4. **刷新规程**（让 #471 的 CI 证据对应 #470 的最新候选 HEAD）：每当 #470 前进（尤其是可执行代码变化），把课程分支**普通 merge** 进 CI 分支（不强推）。实测干净：#471 相对课程分支的 diff 仍是 2 个文件 / +64，门禁通过，workflow 内容不变。**当前状态**：#470 在 `21dbf83`（仅比 #471 的基线多一个纯文档提交），#471 在 `add3161`；差异不含可执行代码，已有的 CI 证据仍然有效，但**#470 最终合并前必须刷新一次**，使证据对应最终 HEAD。
 5. 注意：`pull_request` 的 `paths` 过滤看的是 **PR 整体 diff**，不是单个提交。#470 整体 diff 的 32 个文件中有 28 个命中 paths，所以 #470 的任何新提交（包括纯文档提交）都会触发整个工作流；但触发不等于覆盖——触发的是不含本课 Job 的 main 版 workflow。

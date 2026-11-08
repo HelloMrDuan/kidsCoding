@@ -3522,6 +3522,37 @@
       "notes": "根因：两份沙箱 HTML 在运行时从 jsDelivr 拉固定版本 VM（package.json 完全无 scratch 依赖，npm ci 装不到本地）；60 秒是测试等待超时，不是 VM 定时器。S2 单独失败、其余分片全过，符合外部下载抖动。OPS-023 已被 #483 占用，故取 OPS-024。"
     },
     {
+      "id": "OPS-025",
+      "title": "P0 共享反馈区：插槽判定上报通道（#481）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-020"
+      ],
+      "scope": "只改共享外壳 apps/web/src/features/lessons/workspace/ 与规范文本：workspace-slots.ts 给 EditorSlotProps 加可选 onJudgment 上报通道；lesson-workspace.tsx 接上报并原样展示进反馈卡、占位文案去“本演示”、无运行目标时失效提示改“重新检查”；WORKSPACE-API.md 第六节加 onJudgment 行；新增 slot-judgment-report.test.tsx 单测与 lesson-workspace.spec.ts 占位断言。不改任何课程文件（A1-U3-L02、#470 均不动，课程侧接入另行安排）；不在外壳内重算成绩；不改适配器草稿同步（#481 同页发现，另记不另修）。",
+      "acceptance": [
+        "插槽课检查通过后，外壳反馈卡显示与插槽一致的三层判定与结论",
+        "编辑后旧判定失效（失效提示按有无运行目标区分“重新运行/重新检查”）",
+        "上报 null 时判定失效；无上报时反馈卡只显示中性占位文案，不伪造结果",
+        "反馈卡不出现“本演示”字样；三端 1440/768/375 无溢出",
+        "Summary/Blockly/Scratch 兼容无回归（Blockly/Scratch 走既有 getJudgmentResult 运行路径不动）"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/490",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "本地：新单测 slot-judgment-report.test.tsx 5/5；工作区单测 13 文件 107/107；全量 vitest 183 文件 1317/1317；ESLint 改动文件 0 错；生产构建成功",
+          "本地：E2E lesson-workspace.spec.ts 三项目（1440/768/375）：97 通过 / 2 跳过 / 0 失败（含新加的反馈卡无“本演示”断言）",
+          "本地：scripts/check-task-ledger.py 校验通过（117 产品任务、432 课、changed == {OPS-025}）",
+          "CI：以 PR 头真实运行为准"
+        ],
+        "reviewer": null
+      },
+      "notes": "首席亲自实施（duan 2026-11-06 指令）；#481 同页发现另记：外壳 handleEditorSlotChange 不同步适配器内部草稿（修 onJudgment 时不一并改，另立任务）；规范“版乱码”经核查主线 WORKSPACE-API.md 无 U+FFFD，不存在，不修。"
+    },
+    {
       "id": "OPS-027",
       "title": "KidsCoding 旧机 CF 监控解耦：GitHub SHA 查询失败不再阻断生命周期保活与安全 Resume",
       "priority": "P0",
