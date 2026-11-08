@@ -22,6 +22,8 @@ import { use, useMemo } from 'react'
 import { BlocklyAdapter } from '@/features/lessons/workspace/blockly-adapter'
 import { getDemoContract } from '@/features/lessons/workspace/demo-contracts'
 import { createDemoStage, DemoRoles } from '@/features/lessons/workspace/demo-stage'
+import { SlotDemoAdapter } from '@/features/lessons/workspace/demo-slot-adapter'
+import { DemoSlotEditor } from '@/features/lessons/workspace/demo-slot-editor'
 import { DemoSummaryEditor } from '@/features/lessons/workspace/demo-summary-editor'
 import { LessonWorkspace } from '@/features/lessons/workspace/lesson-workspace'
 import { ScratchVMAdapter } from '@/features/lessons/workspace/scratch-adapter'
@@ -32,6 +34,7 @@ const DEMO_LINKS = [
   { lessonId: 'demo-b', label: '演示 B：送篮子到果园' },
   { lessonId: 'demo-scratch', label: '演示 C：Scratch 沙箱' },
   { lessonId: 'demo-s', label: '演示 S：写一段学习总结' },
+  { lessonId: 'demo-slot', label: '演示 Slot：插槽课自查清单' },
 ]
 
 export default function WorkspaceDemoPage({
@@ -62,6 +65,11 @@ export default function WorkspaceDemoPage({
     }
     if (engine === 'scratch-vm') {
       return new ScratchVMAdapter()
+    }
+    if (engine === 'slot') {
+      // Slot engine: the adapter owns draft data + validation only; the
+      // shell mounts no imperative adapter for it (OPS-026).
+      return new SlotDemoAdapter()
     }
     // Summary engine: no editor adapter exists yet (4 号接入中). The shell
     // renders the honest summary note and never mounts this.
@@ -127,7 +135,7 @@ export default function WorkspaceDemoPage({
           adapter={adapter}
           initialScript={demo.initialScript}
           testFailSave={testFailSave}
-          editorSlot={lessonId === 'demo-s' ? DemoSummaryEditor : undefined}
+          editorSlot={lessonId === 'demo-s' ? DemoSummaryEditor : lessonId === 'demo-slot' ? DemoSlotEditor : undefined}
           stageSlot={demoStageSlot}
           rolesSlot={isBlocklyDemo ? DemoRoles : undefined}
         />
