@@ -91,7 +91,7 @@ export function L03EditorSlot({
     onChangeRef.current(JSON.parse(json))
   }, [snap.state, session])
 
-  const { content, level, program, fingerprint, canRun, problems } = view
+  const { content, program, fingerprint, canRun, problems } = view
   const readOnly = content.readOnly || !editable
   const role = snap.role
 
