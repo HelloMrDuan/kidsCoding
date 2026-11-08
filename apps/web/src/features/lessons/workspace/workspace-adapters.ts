@@ -6,7 +6,7 @@
  * change listeners, Scratch project export), but the shell only relies on this
  * interface plus duck-typed optional extensions it probes for explicitly.
  *
- * Three-engine extensions (OPS-020, all optional, probed never required):
+ * Engine extensions (OPS-020, all optional, probed never required):
  * - `getSelectedBlockId` / `selectBlockById`: shell-owned selection tracking
  *   (see block-selection.ts). The shell never trusts Blockly's focus-fragile
  *   getSelected() directly.

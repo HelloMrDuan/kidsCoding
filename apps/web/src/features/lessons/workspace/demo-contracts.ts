@@ -176,6 +176,62 @@ export const DEMO_S: {
   initialScript: { text: '' },
 }
 
+/**
+ * 演示 Slot：通用插槽课演示（slot 演示，无舞台、无运行按钮）。
+ * 证明外壳能以 engine='slot' 挂载课程自有 EditorSlot：插槽拥有编辑面
+ * 与数据、插槽内自有检查按钮与检查结果；判定不走外壳反馈区，外壳
+ * 只显示中性占位文案。initialScript 在此仅作槽初始数据
+ * （{ version: 1, items: [false, false, false] }），不走 DemoBlock 列表。
+ */
+export const DEMO_SLOT: {
+  contract: LessonContract
+  initialScript: { version: 1; items: [boolean, boolean, boolean] } | null
+} = {
+  contract: {
+    lessonId: 'demo-slot',
+    title: '演示：插槽课自查清单',
+    goal5: [
+      '今天学什么：通用插槽课（slot 引擎）如何工作',
+      '要解决什么问题：没有积木引擎的课程怎样在工作区里编辑与检查',
+      '学完能做什么：判断一节插槽课有没有运行按钮、判定从哪里来',
+      '和上节课的联系：上节是摘要插槽课，本节是通用插槽课的演示',
+      '当前要完成哪一步：勾选三项并点检查，再保存',
+    ],
+    brief: '演示任务：勾选三项自查清单，点检查看插槽内结果，并保存到本机。',
+    step: '当前步骤：勾选并检查',
+    hints: [
+      '1 级：先看三项分别是什么，再决定勾哪几项',
+      '2 级：检查结果只显示在插槽内，不会出现在外壳反馈区',
+      '3 级：改动后检查结果会失效，重新点检查才更新',
+    ],
+    structuredHints: [
+      { level: 1, title: '先看', text: '三项分别是什么？先读一遍再勾。' },
+      { level: 2, title: '检查', text: '点检查，结果只在插槽内显示。' },
+      { level: 3, title: '改动', text: '改动后旧结果失效，重新点检查。' },
+    ],
+    methodSteps: ['勾选', '检查', '保存'],
+    scopeGap: '本演示只验证插槽挂载、检查与保存，不做课程判定。',
+    progress: { label: '演示进度', current: 1, total: 3 },
+    activities: [
+      { level: 1, title: '勾选', text: '按实际情况勾选三项' },
+      { level: 2, title: '检查', text: '点检查看插槽内结果' },
+      { level: 3, title: '保存', text: '保存后刷新，勾选状态应恢复' },
+    ],
+    engine: 'slot',
+    judging: {
+      stageRule: '舞台结果：插槽课无舞台，不做舞台判定',
+      taskRule: '任务判定：插槽内三项自查全部勾选并通过检查',
+      knowledgeRule: '知识证据：演示不做知识判定（判定属课程插槽）',
+      scopeLabel: '教学定向',
+    },
+    draftKey: draftKeyFor('demo-slot'),
+    hasStage: false,
+    fileCapabilities: { canNew: true, canSave: true, canExport: true, canImport: true, canReset: true },
+    demo: true,
+  },
+  initialScript: { version: 1, items: [false, false, false] },
+}
+
 export const DEMO_CONTRACTS: Record<string, DemoContractWithScript> = {
   'demo-a': DEMO_A,
   'demo-b': DEMO_B,
@@ -184,5 +240,6 @@ export const DEMO_CONTRACTS: Record<string, DemoContractWithScript> = {
 
 export function getDemoContract(lessonId: string): DemoContractWithScript | null {
   if (lessonId === 'demo-s') return DEMO_S as unknown as DemoContractWithScript
+  if (lessonId === 'demo-slot') return DEMO_SLOT as unknown as DemoContractWithScript
   return DEMO_CONTRACTS[lessonId] ?? null
 }
