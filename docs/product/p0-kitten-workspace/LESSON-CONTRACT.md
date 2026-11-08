@@ -13,10 +13,12 @@
 | `brief` | 任务简报（一两句目标 + 当前步骤） |
 | `step` | 当前步骤文案 |
 | `hints[3]` | 三级提示：1 级方向、2 级知识点 / 积木、3 级局部示范与调试线索；完整参考实现只在事后节点出现 |
-| `engine` | 引擎类型：`scratch-vm` / `blockly` / `summary`（摘要编辑，非积木） |
+| `engine` | 引擎类型：`scratch-vm` / `blockly` / `summary`（摘要编辑，非积木）/ `slot`（通用插槽课，见下） |
 | `judging` | 判定规则（见第三节）：舞台结果、任务判定、知识证据三层 |
 | `draftKey` | 草稿键，格式 `kidscoding-draft:{lessonId}`，按课节分键 |
 | `scopeLabel` | 任务类型诚实标注：`教学定向` 或 `开放创作`；行为化评测不支持时只能标教学定向并写明缺口 |
+
+`slot`（OPS-026，Issue #482 首席裁定方案②）：通用插槽课引擎。课程自带 EditorSlot，不强制挂载 Blockly/Scratch；无真实运行目标时不显示运行按钮，不虚构运行结果；判定由插槽自有检查产生，插槽可向外壳上报判定（上报通道待 #488 合并后接入，在此之前不上报），不上报时反馈区只显示中性占位文案。`json` 不是引擎值：JSON 课程用 `slot`，不得冒用 `summary`；`summary` 仍只表示摘要编辑。
 
 ## 二、渲染规则
 
@@ -59,7 +61,7 @@
 | `structuredHints` | 结构化三级提示：每项 `{level: 1\|2\|3, title, text}`；揭示为累计式（揭示第 N 级即显示 1..N 级），与 `hints[3]` 同义，不提前展示答案 |
 | `methodSteps` / `scopeGap` / `progress` / `activities` | 课程信息扩展，只渲染在任务抽屉内，永不进入永久编辑区；`progress` 为 `{label, current, total}`，`total > 0`；`activities` 每项含 level/title/text |
 | `fileCapabilities` | 文件能力 gating：`{canNew, canSave, canExport, canImport, canReset}` 均为布尔；适配器不支持的操作直接隐藏按钮，不得渲染点了只弹提示的空按钮 |
-| `hasStage` | `false` 时不渲染任何舞台区（无舞台课程，如摘要课）；缺失时按引擎默认 |
+| `hasStage` | `false` 时不渲染任何舞台区（无舞台课程，如摘要课、插槽课）；缺失时按引擎默认 |
 
 扩展字段校验失败时按第三节 fail-closed 处理：外壳拒绝渲染该契约，不猜测补全。
 
@@ -67,3 +69,8 @@
 
 - 本节与第五节为 v1.1 唯一新增契约内容；第一节至第四节原文、演示值（水果 x=200、阈值 80）与正式参数口径均未改动，正式参数仍以首席裁定为准。
 - 结构化提示在冻结规范文本中的采用，即为本修订本身；代码侧早已实现（`lesson-contract.ts` 原注“C2 待首席决定”随本修订落定，不再悬置）。
+
+## 七、OPS-026 增补（2026-11-06，Issue #482 首席裁定方案②）
+
+- 第一节 `engine` 新增 `slot`（通用插槽课）及 slot 语义段；第五节 `hasStage` 行补“插槽课”为例。本增补不改版本号（仍为 v1.1），不改第一节至第四节其他原文与演示值。
+- 实施：`lesson-contract.ts` 的 `WorkspaceEngine` 与 `validateLessonContract` 同步支持 `slot`；外壳对 `slot` 不挂载命令式适配器、无运行目标不显示运行按钮；`json` 不列为引擎值。

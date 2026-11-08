@@ -53,11 +53,11 @@ export type LessonWorkspaceProps = {
    */
   testFailSave?: boolean
   /**
-   * Three-engine slots (OPS-020, OPS-022 D1). When `editorSlot` is present,
+   * Engine slots (OPS-020, OPS-022 D1). When `editorSlot` is present,
    * the shell renders that React component as the editor; the slot owns
    * the editing surface and its data, while the shell still mounts the
    * imperative adapter for a real engine (scratch-vm/blockly) as the run
-   * target — only summary courses mount no adapter. Adapters must never
+   * target — only summary and slot courses mount no adapter. Adapters must never
    * call createRoot themselves. When `stageSlot` is present, it renders
    * the stage scene content inside the shell's stage box (the shell keeps
    * the card chrome: header, state line, run bar, zoom); a scratch-vm
@@ -287,6 +287,7 @@ export function LessonWorkspace({
   const isBlockly = contract.engine === 'blockly'
   const isScratch = contract.engine === 'scratch-vm'
   const isSummary = contract.engine === 'summary'
+  const isSlot = contract.engine === 'slot'
 
   const refreshScriptList = useCallback(() => {
     if (!isBlockly) return
@@ -458,8 +459,9 @@ export function LessonWorkspace({
     // course with a real engine (scratch-vm/blockly) mounts its adapter
     // exactly like an imperative course: the slot owns the editing
     // surface and its data (loadEditorSlotData, never loadIntoAdapter),
-    // while the mounted adapter is the run target. Only summary courses
-    // still mount nothing (no run concept).
+    // while the mounted adapter is the run target. Only summary and slot
+    // courses still mount nothing (no run concept of their own; a slot
+    // course with a real run target passes runAdapter instead).
     const useSlotData = Boolean(editorSlot)
     if (useSlotData) {
       loadEditorSlotData(contractRef.current, initialScriptRef.current)
@@ -469,15 +471,15 @@ export function LessonWorkspace({
     // outgoing lesson — never the incoming one (contractRef already
     // points at the new lesson by the time a cleanup runs).
     mountedLessonRef.current = contract.lessonId
-    if (isSummary) {
-      // Summary without a slot never edited anything: keep the old
+    if (isSummary || isSlot) {
+      // Summary/slot without a slot never edited anything: keep the old
       // no-cleanup behavior exactly (no null draft written on unmount).
       if (!useSlotData) return
       return () => {
         if (autosaveTimerRef.current !== null) clearTimeout(autosaveTimerRef.current)
         runGenRef.current += 1
         // F3: best-effort stop of the live run target before the slot data
-        // is saved; a summary course with a runAdapter may still hold one.
+        // is saved; a summary/slot course with a runAdapter may still hold one.
         const liveTarget = runTargetRef.current
         runTargetRef.current = null
         if (liveTarget && engineStateRef.current.running) {
@@ -1345,7 +1347,8 @@ export function LessonWorkspace({
    * state. Targets are runAdapter (a prop, hence reactive) or the adapter
    * mounted by the mount effect — slot courses with a real engine mount
    * their adapter too (D1), so a mounted adapter is a target for them as
-   * well; summary courses never mount and never run. The mounted-adapter
+   * well; summary and slot courses never mount an imperative adapter and
+   * never run without a runAdapter. The mounted-adapter
    * clause reads a ref, so the mount effect's adapterMountTick bump is
    * what re-renders this line after mounting. This keeps a slot course
    * without a run target from ever showing a dead button (fail-closed,
@@ -1353,7 +1356,7 @@ export function LessonWorkspace({
    */
   void adapterMountTick
   const hasRunTarget =
-    Boolean(runAdapter) || mountedAdapterRef.current !== null || (!editorSlot && !isSummary)
+    Boolean(runAdapter) || mountedAdapterRef.current !== null || (!editorSlot && !isSummary && !isSlot)
 
   /** OPS-022 shell control surface for the slot's own toolbar (contract §3). */
   const shellControl = useMemo(
@@ -1621,8 +1624,11 @@ export function LessonWorkspace({
           so run/stop/save stay reachable without scrolling the editor.
           OPS-022 (contract §3b): slot courses WITH a run target get the
           row too, so run sits in the same zone as the slot; slot courses
-          without a target (e.g. summary) still get no row. */}
-      {(!EditorSlotView || hasRunTarget) && (
+          without a target (e.g. summary, slot) still get no row. The row
+          is gated on hasRunTarget alone: a targetless course must never
+          render a dead run button here, even when it has no editor slot
+          (OPS-026). */}
+      {hasRunTarget && (
         <div className="ws-sticky-actions">
           <button
             type="button"
@@ -1785,7 +1791,12 @@ export function LessonWorkspace({
     )
   }
 
-  if (isSummary && !EditorSlotView) {
+  // OPS-026: a slot course without its EditorSlot is as degenerate as a
+  // summary course without one — render the same honest fallback page
+  // (goals + task, no editor, no run button, no "尚未运行" implication)
+  // instead of an empty script panel that promises a run that can never
+  // happen. The copy stays engine-specific; nothing here is invented.
+  if ((isSummary || isSlot) && !EditorSlotView) {
     return (
       <div className="ws-root" data-testid="ws-root">
         <style>{`
@@ -1807,8 +1818,12 @@ export function LessonWorkspace({
           </ol>
         </section>
         <section>
-          <h2>摘要编辑区</h2>
-          <p>摘要编辑尚未接入（4 号接入中）。</p>
+          <h2>{isSlot ? '插槽编辑区' : '摘要编辑区'}</h2>
+          {isSlot ? (
+            <p>插槽编辑尚未接入：本课程未提供编辑器组件。</p>
+          ) : (
+            <p>摘要编辑尚未接入（4 号接入中）。</p>
+          )}
           <p>本演示不提供虚假编辑器。</p>
         </section>
         <section>{taskContent}</section>
