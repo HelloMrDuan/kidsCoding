@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>G2-U3-L02 接住掉落水果 沙箱</title>
+<script src="/scratch-vm/scratch-vm.js"></script>
+<!-- scratch-storage 是 scratch-vm 加载工程必需的素材仓库，和 scratch-g2-sandbox.html 使用同一个固定版本。 -->
+<script src="/scratch-vm/scratch-storage.min.js"></script>
+</head>
+<body>
+<script>
+(() => {
+  // G2-U3-L02 课堂沙箱。
+  // 只运行本课的固定舞台（果园背景 + 篮子 + 水果）；篮子脚本只允许三种积木：
+  // 当绿旗被点击、将 x 坐标增加、重复执行。其余一律拒绝，保持上一次状态。
+  // 每次运行都重新载入工程（舞台复位），由真实 Scratch VM 逐帧执行；
+  // 本页只做三件事：校验、观察、裁判（水果落到篮子高度那一帧读取两个角色的 x）。
+  //
+  // 与 scratch-g2-sandbox.html 一样没有渲染器。真实 Scratch 里循环每转一圈会因为角色移动而让出一帧，
+  // 没有渲染器时 VM 不会让出，整个脚本会在一帧内跑完，所以这里在 control_repeat 每次迭代后请求重绘，
+  // 让循环每帧只前进一圈，和带渲染器的 Scratch 节奏一致。
+  const LIMITS = {
+    basketStartX: 0, basketY: -130, fruitStartY: 150,
+    maxRepeatTimes: 20, minRepeatTimes: 1, maxMoveDx: 100, minMoveDx: -100,
+    maxBlocks: 12, maxNesting: 2, maxScripts: 3, frameCap: 150,
+  };
+  const ASSETS = {
+    backdrop: '5a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d',
+    basket: '6b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e',
+    fruit: '7c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f',
+  };
+  const NAMES = {basket: '篮子', fruit: '水果'};
+  // 原创 SVG（本项目绘制，无第三方素材）。
+  const SVG = {
+    backdrop: '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360"><rect width="480" height="360" fill="#dff3ff"/><rect y="250" width="480" height="110" fill="#9bd36b"/><rect y="290" width="480" height="70" fill="#7fbf55"/><circle cx="420" cy="50" r="28" fill="#ffd95a"/><g fill="#6b4a2b"><rect x="60" y="130" width="14" height="120"/><rect x="380" y="150" width="12" height="100"/></g><g fill="#58a845"><circle cx="67" cy="115" r="46"/><circle cx="386" cy="135" r="38"/></g></svg>',
+    basket: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40" viewBox="0 0 80 40"><path d="M4 8h72l-8 28a4 4 0 0 1-4 3H16a4 4 0 0 1-4-3z" fill="#c98a3d" stroke="#8a5a1f" stroke-width="3" stroke-linejoin="round"/><path d="M14 16h52M18 26h44M28 8l2 30M40 8v31M52 8l-2 30" stroke="#8a5a1f" stroke-width="2" fill="none"/></svg>',
+    fruit: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><path d="M20 12c-8-6-16 0-15 10 1 9 7 15 11 15 2 0 3-1 4-1s2 1 4 1c4 0 10-6 11-15 1-10-7-16-15-10z" fill="#e8483c" stroke="#a82a22" stroke-width="2"/><path d="M20 12c0-4 1-7 4-9" stroke="#6b4a2b" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M24 6c4-3 8-1 8 1-3 2-7 2-8-1z" fill="#58a845"/></svg>',
+  };
+  const ALLOWED_BASKET = new Set(['event_whenflagclicked', 'motion_changexby', 'control_repeat']);
+  const ALLOWED_FRUIT = ['event_whenflagclicked', 'motion_gotoxy', 'control_repeat', 'motion_changeyby'];
+  const BAD_TEXT = /[\u0000-\u001f<>]/;
+
+  let vm = null;
+  let timer = null;
+  let current = null; // {id, levelId, fingerprint, frame, trace, ...}
+
+  function send(kind, info = {}) {
+    window.parent.postMessage({kind, ...info}, '*');
+  }
+  function uri(svg) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
+  function isIntInRange(raw, min, max) {
+    const text = String(raw);
+    if (!/^-?\d{1,4}$/.test(text)) return false;
+    const n = Number(text);
+    return Number.isInteger(n) && n >= min && n <= max;
+  }
+  const num = (input, code) => Array.isArray(input) && input.length === 2 && input[0] === 1 &&
+    Array.isArray(input[1]) && input[1].length === 2 && input[1][0] === code ? input[1][1] : null;
+
+  // 校验篮子脚本：只允许三种 opcode，结构必须是“若干条以绿旗开头或散落的积木链”，数值在范围内。
+  function validateBasket(blocks) {
+    const ids = Object.keys(blocks);
+    if (ids.length > LIMITS.maxBlocks + LIMITS.maxScripts) throw new Error('积木太多');
+    const seen = new Set();
+    let hats = 0;
+    let looseBlocks = 0;
+    for (const id of ids) {
+      const b = blocks[id];
+      if (!b || typeof b !== 'object' || !ALLOWED_BASKET.has(b.opcode)) throw new Error('本课不允许的积木：' + String(b && b.opcode).slice(0, 40));
+      if (b.shadow) throw new Error('不允许影子积木');
+      const inputNames = Object.keys(b.inputs || {}).sort().join(',');
+      if (Object.keys(b.fields || {}).length) throw new Error('积木选项不符合本课');
+      if (b.opcode === 'event_whenflagclicked') {
+        hats++;
+        if (!b.topLevel || b.parent !== null || inputNames !== '') throw new Error('绿旗积木结构不对');
+      } else if (b.opcode === 'motion_changexby') {
+        if (inputNames !== 'DX' || num(b.inputs.DX, 4) === null || !isIntInRange(num(b.inputs.DX, 4), LIMITS.minMoveDx, LIMITS.maxMoveDx)) throw new Error('x 增加量超出范围');
+      } else {
+        const ok = inputNames === 'TIMES' || inputNames === 'SUBSTACK,TIMES';
+        if (!ok || num(b.inputs.TIMES, 6) === null || !isIntInRange(num(b.inputs.TIMES, 6), LIMITS.minRepeatTimes, LIMITS.maxRepeatTimes)) throw new Error('重复次数超出范围');
+        const sub = b.inputs.SUBSTACK;
+        if (sub !== undefined && !(Array.isArray(sub) && sub[0] === 2 && typeof sub[1] === 'string' && blocks[sub[1]] && blocks[sub[1]].parent === id)) throw new Error('重复里的积木连接不对');
+      }
+      if (b.next !== null && (typeof b.next !== 'string' || !blocks[b.next] || blocks[b.next].parent !== id)) throw new Error('积木连接不对');
+      if (b.parent !== null && (typeof b.parent !== 'string' || !blocks[b.parent])) throw new Error('积木父级不存在');
+      if (b.opcode !== 'event_whenflagclicked' && b.topLevel) looseBlocks++;
+    }
+    if (hats > LIMITS.maxScripts) throw new Error('脚本太多');
+    if (looseBlocks) throw new Error('本课不接收没有绿旗的散积木');
+    // 从每个帽子出发走一遍：每块积木只能被访问一次，且重复嵌套不超过上限。
+    function walk(startId, depth) {
+      let id = startId;
+      while (id) {
+        if (seen.has(id)) throw new Error('积木连接成环或重复');
+        seen.add(id);
+        const b = blocks[id];
+        if (b.opcode === 'control_repeat') {
+          if (depth + 1 > LIMITS.maxNesting) throw new Error('重复嵌套太深');
+          if (b.inputs.SUBSTACK) walk(b.inputs.SUBSTACK[1], depth + 1);
+        }
+        id = b.next;
+      }
+    }
+    for (const id of ids) if (blocks[id].opcode === 'event_whenflagclicked') { seen.add(id); walk(blocks[id].next, 0); }
+    if (seen.size !== ids.length) throw new Error('有积木没有接上');
+    if (ids.length - hats > LIMITS.maxBlocks) throw new Error('积木太多');
+  }
+
+  // 水果脚本必须是课程预置形状：绿旗 → 移到 → 重复 → y 增加。
+  function validateFruit(blocks, level) {
+    const ids = Object.keys(blocks);
+    if (ids.length !== ALLOWED_FRUIT.length) throw new Error('水果脚本不是课程预置脚本');
+    const ops = ids.map(id => blocks[id].opcode).sort().join(',');
+    if (ops !== [...ALLOWED_FRUIT].sort().join(',')) throw new Error('水果脚本不是课程预置脚本');
+    const byOp = op => ids.map(id => blocks[id]).find(b => b.opcode === op);
+    const go = byOp('motion_gotoxy');
+    if (!isIntInRange(num(go.inputs.X, 4), -240, 240) || Number(num(go.inputs.Y, 4)) !== LIMITS.fruitStartY) throw new Error('水果起点不对');
+    const rep = byOp('control_repeat');
+    if (!isIntInRange(num(rep.inputs.TIMES, 6), 1, 100)) throw new Error('水果下落次数不对');
+    const fall = byOp('motion_changeyby');
+    const dy = Number(num(fall.inputs.DY, 4));
+    if (!(dy <= -1 && dy >= -60) || !Number.isInteger(dy)) throw new Error('水果下落速度不对');
+    if (!(level && Number(num(go.inputs.X, 4)) === level.fruitX && -dy === level.fallSpeed)) throw new Error('水果脚本与所选关卡不一致');
+    for (const id of ids) if (Object.keys(blocks[id].fields || {}).length) throw new Error('水果脚本选项不对');
+  }
+
+  function validateProject(project, level) {
+    if (!project || typeof project !== 'object' || !Array.isArray(project.targets) || project.targets.length !== 3) throw new Error('工程需要 3 个对象');
+    const [stage, basket, fruit] = project.targets;
+    if (!stage.isStage || stage.name !== 'Stage' || Object.keys(stage.blocks || {}).length !== 0) throw new Error('舞台不对');
+    if (basket.isStage || basket.name !== NAMES.basket || fruit.isStage || fruit.name !== NAMES.fruit) throw new Error('角色名单不对');
+    const art = [[stage, ASSETS.backdrop], [basket, ASSETS.basket], [fruit, ASSETS.fruit]];
+    for (const [t, id] of art) {
+      if (!Array.isArray(t.costumes) || t.costumes.length !== 1 || t.costumes[0].assetId !== id || t.costumes[0].dataFormat !== 'svg') throw new Error('造型不对');
+      if (Object.keys(t.variables || {}).length || Object.keys(t.lists || {}).length || Object.keys(t.broadcasts || {}).length) throw new Error('本课不允许变量、列表或广播');
+      if ((t.sounds || []).length) throw new Error('本课不允许声音');
+    }
+    for (const t of [basket, fruit]) {
+      if (typeof t.x !== 'number' || typeof t.y !== 'number' || t.x < -240 || t.x > 240 || t.y < -180 || t.y > 180) throw new Error('角色起点超出舞台');
+    }
+    if (basket.x !== LIMITS.basketStartX || basket.y !== LIMITS.basketY) throw new Error('篮子起点不对');
+    if (!level || typeof level.fruitX !== 'number' || typeof level.fallSpeed !== 'number') throw new Error('缺少关卡参数');
+    validateBasket(basket.blocks || {});
+    validateFruit(fruit.blocks || {}, level);
+  }
+
+  function newMachine() {
+    const Storage = typeof window.ScratchStorage === 'function' ? window.ScratchStorage : window.ScratchStorage.ScratchStorage;
+    const machine = new window.VirtualMachine();
+    const storage = new Storage();
+    machine.attachStorage(storage);
+    for (const [key, svg] of Object.entries(SVG)) {
+      storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, new TextEncoder().encode(svg), ASSETS[key]);
+    }
+    return machine;
+  }
+  function spriteOf(machine, name) {
+    return machine.runtime.targets.find(t => !t.isStage && t.isOriginal && t.sprite && t.sprite.name === name) || null;
+  }
+  // 积木是否位于“重复执行”的循环体里面。
+  // Scratch 里排在某块后面的积木，其 parent 也指向前一块（包括前一块是重复执行的情况），
+  // 所以必须区分：parent.next === 当前块 → 只是排在后面（同一层，继续向上找）；
+  // 否则当前块挂在 parent 的输入（SUBSTACK）里，此时 parent 若是循环才算“在循环里”。
+  function ancestorIsLoop(target, blockId) {
+    let cur = target.blocks.getBlock(blockId);
+    for (let guard = 0; cur && cur.parent && guard < 100; guard++) {
+      const parent = target.blocks.getBlock(cur.parent);
+      if (!parent) return false;
+      if (parent.next !== cur.id && (parent.opcode === 'control_repeat' || parent.opcode === 'control_forever')) return true;
+      cur = parent;
+    }
+    return false;
+  }
+
+  // 观察再调用：包装 Scratch 自己的积木函数，记录后立即调用原函数，不改变积木行为。
+  function attachObservers(machine, run) {
+    const primitives = machine.runtime._primitives;
+    const move = primitives.motion_changexby;
+    primitives.motion_changexby = function (args, util) {
+      try {
+        if (machine === vm && run.live && !util.target.isStage && util.target.sprite.name === NAMES.basket) {
+          const dx = Number(args.DX);
+          run.trace.basketMoves.push({frame: run.frame, dx: Number.isFinite(dx) ? dx : 0, inLoop: ancestorIsLoop(util.target, util.thread.peekStack())});
+        }
+      } catch (_error) {}
+      return move.call(this, args, util);
+    };
+    const repeat = primitives.control_repeat;
+    primitives.control_repeat = function (args, util) {
+      const result = repeat.call(this, args, util);
+      try { util.runtime.requestRedraw(); } catch (_error) {}
+      return result;
+    };
+  }
+
+  function stopTimer() { if (timer !== null) { clearTimeout(timer); timer = null; } }
+  function disposeMachine() {
+    stopTimer();
+    if (vm) {
+      try { vm.stopAll(); } catch (_error) {}
+      try { vm.quit(); } catch (_error) {}
+    }
+    vm = null;
+  }
+  function finish(run, endedBy, error) {
+    if (run !== current || !run.live) return;
+    run.live = false;
+    stopTimer();
+    run.trace.endedBy = endedBy;
+    run.trace.framesRun = run.frame;
+    if (error) run.trace.error = String(error).slice(0, 200);
+    try { vm && vm.stopAll(); } catch (_error) {}
+    send('RUN_DONE', {id: run.id, trace: run.trace});
+  }
+
+  function stepOnce(run) {
+    if (run !== current || !run.live) return;
+    try {
+      run.frame += 1;
+      vm.runtime.currentStepTime = 1000 / 30;
+      vm.runtime._step();
+      const basket = spriteOf(vm, NAMES.basket);
+      const fruit = spriteOf(vm, NAMES.fruit);
+      if (!basket || !fruit) throw new Error('角色丢失');
+      send('FRAME', {id: run.id, frame: run.frame, basket: {x: basket.x, y: basket.y}, fruit: {x: fruit.x, y: fruit.y}});
+      if (!run.trace.landing && fruit.y <= LIMITS.basketY) {
+        run.trace.landing = {frame: run.frame, basketX: basket.x, fruitX: fruit.x, fruitY: fruit.y};
+        finish(run, 'landed');
+        return;
+      }
+      if (run.frame >= LIMITS.frameCap) { finish(run, 'frameCap'); return; }
+      timer = setTimeout(() => stepOnce(run), run.frameMs);
+    } catch (error) {
+      finish(run, 'error', error);
+    }
+  }
+
+  async function startRun(data) {
+    disposeMachine();
+    if (current) current.live = false;
+    const id = data.id;
+    if (!Number.isInteger(id) || id < 1) { send('ERROR', {id: 0, error: '运行编号不对'}); return; }
+    try {
+      validateProject(data.project, data.level);
+    } catch (error) {
+      send('REJECTED', {id, error: String(error.message || error).slice(0, 120)});
+      return;
+    }
+    if (typeof window.VirtualMachine !== 'function' || !window.ScratchStorage) {
+      send('ERROR', {id, error: 'Scratch VM 脚本没有加载（可能是网络问题）'});
+      return;
+    }
+    const frameMs = Number.isFinite(data.frameMs) ? Math.max(0, Math.min(100, data.frameMs)) : 33;
+    const run = {
+      id, frameMs, frame: 0, live: false, cancelled: false, loading: true,
+      trace: {levelId: String(data.levelId || ''), runId: id, fingerprint: String(data.fingerprint || '').slice(0, 4000),
+        endedBy: 'error', framesRun: 0, start: {basketX: LIMITS.basketStartX, fruitX: data.level.fruitX}, landing: null, basketMoves: []},
+    };
+    current = run;
+    try {
+      const machine = newMachine();
+      vm = machine;
+      await machine.loadProject(JSON.stringify(data.project));
+      if (current !== run || run.cancelled) return; // 加载期间又有新的运行或停止
+      attachObservers(machine, run);
+      machine.greenFlag();
+      run.loading = false;
+      run.live = true;
+      send('STARTED', {id});
+      timer = setTimeout(() => stepOnce(run), run.frameMs);
+    } catch (error) {
+      if (current === run) { run.loading = false; run.live = false; disposeMachine(); send('ERROR', {id, error: String(error).slice(0, 200)}); }
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent || !event.data || typeof event.data !== 'object') return;
+    const data = event.data;
+    if (data.kind === 'PING') {
+      send('FRAME_READY', {
+        available: typeof window.VirtualMachine === 'function' && !!window.ScratchStorage,
+        limits: LIMITS, assets: {backdrop: uri(SVG.backdrop), basket: uri(SVG.basket), fruit: uri(SVG.fruit)},
+      });
+      return;
+    }
+    if (data.kind === 'RUN') { startRun(data); return; }
+    if (data.kind === 'STOP') {
+      if (!current || data.id !== current.id || current.cancelled) return;
+      if (current.live) { current.cancelled = true; finish(current, 'stopped'); return; }
+      // 还在加载或已结束：取消后不再启动；加载中被停止时也要回一个“已停止”的结果。
+      if (current.loading) {
+        current.loading = false;
+        current.cancelled = true;
+        disposeMachine();
+        current.trace.endedBy = 'stopped';
+        send('RUN_DONE', {id: current.id, trace: current.trace});
+      }
+      return;
+    }
+  });
+})();
+</script>
+</body>
+</html>
