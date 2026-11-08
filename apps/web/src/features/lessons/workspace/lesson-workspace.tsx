@@ -915,6 +915,26 @@ export function LessonWorkspace({
     [scheduleAutosave],
   )
 
+  /**
+   * OPS-025 (#481) slot judgment report: the slot's own check reports its
+   * judgment and the shell displays it verbatim in the feedback card.
+   * The shell never recomputes a score here — this is display only.
+   * Reporting null invalidates exactly like an edit: only when a judgment
+   * is currently shown does the stale notice appear; reporting null with
+   * nothing shown is a no-op (no stale notice, no invented result).
+   */
+  const handleSlotJudgment = useCallback((reported: JudgmentResult | null) => {
+    if (reported) {
+      setJudgment(reported)
+      setJudgmentStale(false)
+      return
+    }
+    if (judgmentRef.current) {
+      setJudgment(null)
+      setJudgmentStale(true)
+    }
+  }, [])
+
   const insertBlock = useCallback(
     (block: DemoBlock) => {
       const current = isDemoScript(mountedAdapterRef.current?.adapter.getScript())
@@ -1625,6 +1645,10 @@ export function LessonWorkspace({
               lessonId={contract.lessonId}
               initial={editorInitial}
               onChange={handleEditorSlotChange}
+              // OPS-025 (#481): slot-reported judgment channel. The slot
+              // reports the judgment its own check produced; the shell
+              // displays it verbatim and never recomputes a score.
+              onJudgment={handleSlotJudgment}
               editable
               // OPS-022: shell is present only when a run target exists,
               // so a slot can never render a run button from a targetless
@@ -2260,7 +2284,13 @@ export function LessonWorkspace({
         <h2>反馈</h2>
         {runError && <p data-testid="ws-run-error">{runError}</p>}
         {notice && <p data-testid="ws-notice">{notice}</p>}
-        {judgmentStale && <p data-testid="ws-judgment-stale">旧判定已失效，修改后请重新运行</p>}
+        {judgmentStale && (
+          <p data-testid="ws-judgment-stale">
+            {hasRunTarget
+              ? '旧判定已失效，修改后请重新运行'
+              : '旧判定已失效，修改后请重新检查'}
+          </p>
+        )}
         {judgment ? (
           <>
             {judgment.layers.map((layer) => (
@@ -2273,7 +2303,11 @@ export function LessonWorkspace({
         ) : (
           !judgmentStale &&
           (EditorSlotView ? (
-            <p>暂无检查结果：检查与判定由课程适配器提供，本演示不作判定。</p>
+            // OPS-025 (#481): neutral placeholder. A slot lesson's
+            // judgment lives with its own check; before the first check
+            // there is simply no result yet — never "本演示不作判定",
+            // which contradicts the slot's own pass once reported.
+            <p>暂无检查结果：检查与判定由课程适配器提供，检查后结果会显示在这里。</p>
           ) : (
             <p>尚未运行：运行后这里显示运行状态与课程反馈。</p>
           ))
