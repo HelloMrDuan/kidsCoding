@@ -185,7 +185,7 @@ export class L03Session {
 
   /** 导出文件内容的校验与载入（调用方先检查文件大小）。 */
   importWork(parsed: { lessonId?: unknown; script?: unknown }): void {
-    if (parsed.lessonId !== L03_LESSON_ID) throw new Error('这不是“接住掉落水果”的作品')
+    if (parsed.lessonId !== L03_LESSON_ID) throw new Error('这不是“随机出现的礼物”的作品')
     this.loadDraft(parsed.script)
   }
 

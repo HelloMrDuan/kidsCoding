@@ -146,6 +146,16 @@ export function judgeRun(trace: RunTrace, level: LevelParams): RunJudgment {
   return { status: 'judged', stage, task, knowledge, understanding: UNDERSTANDING_NOTE, passed, conclusion, level }
 }
 
+/** 预测对照用：这一次运行里有几次出现在要求范围之外、有没有出现在整个舞台之外。只描述这一次的放置，不下结论。 */
+export function predictionOutcome(trace: RunTrace, level: LevelParams): { total: number; outside: number; beyondStage: boolean } {
+  const xs = trace.placements.map(p => p.x)
+  return {
+    total: xs.length,
+    outside: xs.filter(x => !inAllowed(x, level)).length,
+    beyondStage: xs.some(x => x < L03_PARAMS.stageMinX || x > L03_PARAMS.stageMaxX),
+  }
+}
+
 /**
  * 结果失效：判定只在“程序指纹、关卡、运行序号”三者都与当前一致时才有效。
  * 编辑脚本、切换关卡、再次运行都会让旧结果作废。
