@@ -1713,7 +1713,7 @@
       "unitId": "G2-U3",
       "focusConcept": "坐标读取与位置对准",
       "plannedLearningOutcome": "能读取水果的 x 坐标，算出篮子要移动的方向和距离，用「重复执行」把篮子对准落点接住水果，并展示可运行的结果与运行证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1727,12 +1727,12 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/470",
-        "mergeCommit": null,
-        "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/g2-u3-l02-vm.spec.ts（真实 scratch-vm 行为矩阵）+ apps/web/tests/e2e/g2-u3-l02-classroom.spec.ts（三端课堂）",
+        "mergeCommit": "5d4b50225a7c0a20d05652d7c55cb26923c099c4",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/42454271410",
+        "realE2E": "apps/web/tests/e2e/g2-u3-l02-vm.spec.ts（真实 scratch-vm 行为矩阵 22）+ g2-u3-l02-classroom.spec.ts（正式 LessonWorkspace 路由，三视口 63）+ g2-u3-l02-shell-gap-a.spec.ts（真实壳内手机五项编辑与 ShellControl，14）。GitHub Actions 真实 Chrome：PR #471 的 g2-u3-l02-browser-trial 92 passed / 7 skipped / 0 failed（run 42454352225，头 52e0887a，base=main）。",
         "lessonReview": null
       },
-      "notes": "P0 样板 A（Draft PR #470，等待首席审核）。教学定向；首席 2026-11-03 裁定 focusConcept 为「坐标读取与位置对准」，教学参数为试点运行参数（rulingStatus=pilot-approved，不代表儿童教学效果已验证）。目录 full-catalog-v1.json / track-g2-detailed-lessons-v1.json / priority-asset-requirements-v1.json 中本课仍写「侦测」「鼠标跟随」「触碰」，属首席受控文件，见 PR #470 的矛盾清单。本地真实 scratch-vm + Chromium 三视口测试见 docs/roadmap/evidence/G2-U3-L02/README.md；PR/main CI 未出结果，无独立教研、无儿童试学、无真实设备。全量目录仍为 outline_not_playable，非已发布。"
+      "notes": "Kiro：真实 Scratch VM 原创课堂「接住掉落水果」，已接入共享 LessonWorkspace（LessonL02Adapter + 编辑/舞台/角色三个槽位），教学定向。已合并（#470，合并提交 5d4b5022）；main CI 该提交：curriculum content checks 42454271410、task accountability 42454271378、deploy-pipeline 42454271424 均 success。【重要】main 的 curriculum 工作流目前**没有**本课专属 Job（g2-u3-l02-browser-trial 在 PR #471 里，尚未合入 main），所以 main CI success 不能证明本课测试在 main 上被执行；本课测试的真实 Chrome 证据来自 PR #471（SYS-122）与 PR #470 的分支运行。教学参数为首席批准的试点运行参数（rulingStatus=pilot-approved），不代表儿童教学效果已验证。目录 JSON 中本课仍写「侦测」「鼠标跟随」「触碰」，属首席受控文件，未改。课程代码入 main 与教学验收分开登记：独立人工教研复核未做（lessonReview=null）、儿童试学未做、真实手机/平板触摸与 Safari/Firefox/Chrome 稳定版未验证；catalogStatus 仍为 outline_not_playable，非已发布。保持 merged_waiting_ci，不得标 completed。"
     },
     {
       "id": "G2-U3-L03",
