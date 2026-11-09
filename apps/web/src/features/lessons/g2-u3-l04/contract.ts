@@ -87,7 +87,7 @@ export type LevelContent = {
 }
 
 export function levelSituation(level: LevelParams): string {
-  const speed = level.ballSpeed === L04_LEVELS.solve.ballSpeed ? '球落得不快' : '球落得更快'
+  const speed = level.ballSpeed === L04_LEVELS.solve.ballSpeed ? '球落得不快' : '球落得更慢'
   return `本关要求：碰到篮子的红球加 ${level.points} 分，落在地上的蓝球不加分（${speed}）。`
 }
 
@@ -155,21 +155,21 @@ export const L04_CONTENT: Record<LevelId, LevelContent> = {
       '不用“如果”，把“加 1 分”的程序放在重复里，总分也可能是 2。这样对吗？为什么？',
     ],
   },
-  transferFast: {
-    id: 'transferFast',
+  transferSlow: {
+    id: 'transferSlow',
     layer: 3,
     layerName: '迁移应用',
-    title: '第三关 B：球落得更快',
-    task: `${levelSituation(L04_LEVELS.transferFast)}球落得更快了，上一关的程序还能用吗？改一改，让红球只得一次分、蓝球不得分。`,
-    step: '想一想球更快会带来什么问题，再改程序并运行',
+    title: '第三关 B：球落得更慢',
+    task: `${levelSituation(L04_LEVELS.transferSlow)}球落得更慢了，上一关的程序还能用吗？改一改，让红球只得一次分、蓝球不得分。`,
+    step: '想一想球更慢会带来什么问题，再改程序并运行',
     readOnly: false,
     hints: [
-      '球落得更快，会更早还是更晚到篮子上？你的“重复执行”要检查多少次才够？',
+      '球落得更慢，会更早还是更晚到篮子上？你的“重复执行”要检查多少次才够？',
       '“重复执行”次数太少的话，检查结束的时候球可能还没落到篮子上。',
       '先运行一次，看红球得了几分。如果是 0 分，想想是哪里的次数出了问题。',
     ],
     reflection: [
-      '球变快以后，你改了哪里？为什么？',
+      '球变慢以后，你改了哪里？为什么？',
       '检查的次数多一点好，还是越少越好？为什么？',
     ],
   },

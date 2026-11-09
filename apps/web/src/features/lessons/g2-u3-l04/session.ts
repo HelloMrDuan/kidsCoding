@@ -62,7 +62,7 @@ export const IMPORT_MAX_BYTES = 64 * 1024
 export const PREDICTION_REQUIRED_REASON = '先在“任务”里写下你的预测，再运行'
 export const ENGINE_NOT_READY_REASON = 'Scratch VM 还没准备好，请稍等几秒再试'
 
-const NO_HINTS: Record<LevelId, number> = { explore: 0, solve: 0, transferPoints: 0, transferFast: 0 }
+const NO_HINTS: Record<LevelId, number> = { explore: 0, solve: 0, transferPoints: 0, transferSlow: 0 }
 
 export function deriveView(s: SessionSnapshot): SessionView {
   const levelId = s.state.levelId

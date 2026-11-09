@@ -151,7 +151,7 @@ const R = (r: Row) => r
 
 // 每一行都是真实 VM + 真实渲染器跑出来的结果；期望值来自实测，不是估算。帧号按沙箱约定（第一次 _step() 是第 1 帧）。
 const ROWS: Row[] = [
-  R({name: '标准做法：重复 40 次 { 如果〈碰到篮子〉{ 得分+1；隐藏 } }', level: 'solve', program: standard(40), score: 1, red: 1, blue: 0, layers: [true, true, true, true], redHideFrame: 25}),
+  R({name: '标准做法：重复 40 次 { 如果〈碰到篮子〉{ 得分+1；隐藏 } }', level: 'solve', program: standard(40), score: 1, red: 1, blue: 0, layers: [true, true, true, true], redHideFrame: 21}),
   R({name: '隐藏在得分之前也通过（顺序不影响）', level: 'solve', program: flag(repeat(40, iftouch(hide as never, score(1) as never))), score: 1, red: 1, blue: 0, layers: [true, true, true, true]}),
   R({name: '没有“如果”：重复 40 次 { 得分+1 } → 两个球都被加了分', level: 'solve', program: flag(repeat(40, score(1))), score: 80, red: 40, blue: 40, layers: [false, false, false, false],
     says: {task: '蓝球也被加了', knowledge: '没有用到判断'}}),
@@ -159,10 +159,10 @@ const ROWS: Row[] = [
     says: {task: '蓝球也被加了 1 次', knowledge: '没有用到判断'}}),
   R({name: '有“如果”，没有隐藏：红球被连加 8 次（同一球重复计分）', level: 'solve', program: flag(repeat(40, iftouch(score(1) as never))), score: 8, red: 8, blue: 0, layers: [false, false, true, false],
     says: {stage: '最终得分是 8 分', task: '红球被加了 8 次分', knowledge: '满足判断要求'}}),
-  R({name: '检查次数恰好够：重复 25 次（球第 25 帧到）', level: 'solve', program: standard(25), score: 1, red: 1, blue: 0, layers: [true, true, true, true]}),
-  R({name: '检查次数少 1：重复 24 次 → 球到的时候检查已经结束，得 0 分', level: 'solve', program: standard(24), score: 0, red: 0, blue: 0, layers: [false, false, false, false],
+  R({name: '检查次数恰好够：重复 21 次（球第 21 帧到）', level: 'solve', program: standard(21), score: 1, red: 1, blue: 0, layers: [true, true, true, true]}),
+  R({name: '检查次数少 1：重复 20 次 → 球到的时候检查已经结束，得 0 分', level: 'solve', program: standard(20), score: 0, red: 0, blue: 0, layers: [false, false, false, false],
     says: {task: '一次分都没有加', knowledge: '检查的次数可能不够'}}),
-  R({name: '检查次数少 2：重复 23 次', level: 'solve', program: standard(23), score: 0, red: 0, blue: 0, layers: [false, false, false, false]}),
+  R({name: '检查次数少 2：重复 19 次', level: 'solve', program: standard(19), score: 0, red: 0, blue: 0, layers: [false, false, false, false]}),
   R({name: '隐藏写在“如果”外面：两个球第 1 帧就被隐藏，什么都碰不到', level: 'solve', program: flag(repeat(40, iftouch(score(1) as never), hide)), score: 0, red: 0, blue: 0, layers: [false, false, false, false],
     says: {knowledge: '检查的次数可能不够'}}),
   R({name: '只检查一次（“如果”不在“重复”里）：球还没到，得 0 分', level: 'solve', program: flag(iftouch(score(1) as never, hide as never)), score: 0, red: 0, blue: 0, layers: [false, false, false, false]}),
@@ -184,11 +184,12 @@ const ROWS: Row[] = [
     says: {task: '红球这一次加了 1 分，本关要求每个球加 2 分'}}),
   R({name: '迁移 A：没有“如果”、各加 1 分 → 总分碰巧是 2（舞台通过），但任务和知识证据指出蓝球也被算了', level: 'transferPoints', program: flag(repeat(1, score(1))), score: 2, red: 1, blue: 1, layers: [true, false, false, false],
     says: {stage: '正好是本关要求的 2 分', task: '蓝球也被加了 1 次', knowledge: '没有用到判断'}}),
-  // ---- 迁移 B：球更快 ----
-  R({name: '迁移 B：重复 13 次恰好够（球第 13 帧到）', level: 'transferFast', program: standard(13), score: 1, red: 1, blue: 0, layers: [true, true, true, true], redHideFrame: 13}),
-  R({name: '迁移 B：重复 12 次错过了球', level: 'transferFast', program: standard(12), score: 0, red: 0, blue: 0, layers: [false, false, false, false], says: {knowledge: '检查的次数可能不够'}}),
-  R({name: '迁移 B：照抄上一关的重复 10 次也错过', level: 'transferFast', program: standard(10), score: 0, red: 0, blue: 0, layers: [false, false, false, false]}),
-  R({name: '迁移 B：重复 40 次也通过', level: 'transferFast', program: standard(40), score: 1, red: 1, blue: 0, layers: [true, true, true, true]}),
+  // ---- 迁移 B：球更慢（速度 5，球第 41 帧才到）----
+  R({name: '迁移 B：重复 41 次恰好够（球第 41 帧到）', level: 'transferSlow', program: standard(41), score: 1, red: 1, blue: 0, layers: [true, true, true, true], redHideFrame: 41}),
+  R({name: '迁移 B：重复 40 次差 1 次，错过了球', level: 'transferSlow', program: standard(40), score: 0, red: 0, blue: 0, layers: [false, false, false, false], says: {knowledge: '检查的次数可能不够'}}),
+  R({name: '迁移 B：照抄上一关常见的重复 30 次也错过', level: 'transferSlow', program: standard(30), score: 0, red: 0, blue: 0, layers: [false, false, false, false]}),
+  R({name: '迁移 B：照抄上一关刚好够的重复 21 次也错过', level: 'transferSlow', program: standard(21), score: 0, red: 0, blue: 0, layers: [false, false, false, false]}),
+  R({name: '迁移 B：重复 100 次也通过（积木允许的最大次数足够）', level: 'transferSlow', program: standard(100), score: 1, red: 1, blue: 0, layers: [true, true, true, true]}),
   // ---- 探索关（只读演示程序，没有隐藏）----
   R({name: '探索关演示：球速 10、不隐藏 → 8 分、蓝球不加分', level: 'explore', program: flag(repeat(40, iftouch(score(1) as never))), score: 8, red: 8, blue: 0, layers: [false, false, true, false]}),
 ]
@@ -221,9 +222,9 @@ test.describe('G2-U3-L04 真实 Scratch VM + 渲染器：真实碰撞与行为�
   test('touching 来自真实渲染器：红球只在落到篮子上的那几帧为 true，蓝球一次都不是', async ({page}) => {
     const r = await run(page, flag(repeat(40, iftouch(score(1) as never))), 'explore')
     const redTrue = r.trace.checks.filter(c => c.ball === '红球' && c.result).map(c => c.frame)
-    expect(redTrue).toEqual([25, 26, 27, 28, 29, 30, 31, 32]) // 连续 8 帧，正是红球与篮子重叠的帧
+    expect(redTrue).toEqual([21, 22, 23, 24, 25, 26, 27, 28]) // 连续 8 帧，正是红球穿过篮子（与篮子重叠）的帧
     expect(r.trace.checks.filter(c => c.ball === '蓝球' && c.result)).toHaveLength(0)
-    // 红球 true 的帧，位置确实与篮子相交：球心 y 在 (-130-20-20, -130+20+20) 的范围里
+    // 红球 true 的帧，位置确实与篮子相交：球心 y 在 (basketY-40, basketY+40) 的范围里（球半径 20 + 篮子半高 20）
     for (const f of redTrue) {
       const m = r.frames.find(x => x.frame === f)!
       expect(m.hitBall.y, `第 ${f} 帧红球位置`).toBeLessThanOrEqual(L04_PARAMS.basketY + 40)
@@ -244,6 +245,10 @@ test.describe('G2-U3-L04 真实 Scratch VM + 渲染器：真实碰撞与行为�
     expect(r.frames[0].hitBall.x).toBe(L04_PARAMS.hitBallX)
     const last = r.frames[r.frames.length - 1]
     expect(last.groundBall.y).toBeLessThanOrEqual(L04_PARAMS.groundY + 40) // 蓝球落到了地上
+    expect(last.groundBall.y).toBeGreaterThanOrEqual(L04_PARAMS.groundY + 20) // 整个球都在舞台里（球心离舞台底至少一个半径）
+    expect(last.hitBall.y).toBeGreaterThanOrEqual(L04_PARAMS.groundY + 20)
+    // 球最终停在篮子下面，不再压着篮子（否则落地后每次检查都为真，“连加”的分数就取决于循环剩余的次数）
+    expect(last.hitBall.y + 20).toBeLessThan(L04_PARAMS.basketY - 20)
   })
 
   test('得分变量由真实积木改：舞台上最后的得分等于 trace.finalScore，每一帧回报的得分单调不减', async ({page}) => {
@@ -257,10 +262,12 @@ test.describe('G2-U3-L04 真实 Scratch VM + 渲染器：真实碰撞与行为�
     const r = await run(page, flag(repeat(40, score(1))), 'solve')
     const byFrame = new Map<number, number>()
     for (const e of r.trace.scores.filter(x => x.ball === '红球')) byFrame.set(e.frame, (byFrame.get(e.frame) ?? 0) + 1)
-    // 下落期间（第 1～33 帧）每帧恰好一次
-    for (let f = 1; f <= 33; f++) expect(byFrame.get(f), `第 ${f} 帧`).toBe(1)
-    // 最后一帧一次性多了 7 次（40 - 33）
-    expect(byFrame.get(34)).toBe(7)
+    const fall = Math.floor(L04_PARAMS.fallDistance / L04_LEVELS.solve.ballSpeed) // 下落脚本的帧数
+    // 下落期间每帧恰好一次
+    for (let f = 1; f <= fall; f++) expect(byFrame.get(f), `第 ${f} 帧`).toBe(1)
+    // 下落脚本结束的那一帧里，孩子的循环一次性多跑了剩下的迭代（40 - 下落期间已跑的）
+    expect(r.trace.framesRun).toBe(fall + 1)
+    expect(byFrame.get(fall + 1)).toBe(40 - fall)
   })
 
   test('“等 SVG 造型就绪”这道守卫真的执行了：点绿旗之前各角色的包围盒就是造型的真实尺寸（没等的话是比真实尺寸大 1 的占位值），耗时有上界', async ({page}) => {
@@ -385,7 +392,7 @@ test.describe('G2-U3-L04 正式沙箱：安全边界（独立于 spike 的断言
 test.describe('G2-U3-L04 参考做法：每一个“别的做法”都真的在真实 VM 里通过三层判定', () => {
   test.setTimeout(180_000)
   test.beforeEach(async ({page}) => { await ready(page) })
-  for (const levelId of ['solve', 'transferPoints', 'transferFast'] as const) {
+  for (const levelId of ['solve', 'transferPoints', 'transferSlow'] as const) {
     test(`${levelId}：所有别的做法合法，且真实运行全部通过`, async ({page}) => {
       const alts = alternatives(L04_LEVELS[levelId])
       expect(alts.length, '这一关应该有别的做法').toBeGreaterThanOrEqual(2)

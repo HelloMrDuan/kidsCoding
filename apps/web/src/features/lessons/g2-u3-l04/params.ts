@@ -17,16 +17,24 @@ export const L04_PARAMS = {
   stageMinX: -240,
   stageMaxX: 240,
   groundY: -180,
-  /** 篮子固定不动。 */
+  /**
+   * 篮子固定不动。位置的几何约束（实测得出，见 TEACHING-PLAN）：球要“穿过”篮子再落到地上，并且最终整个球都在舞台里、不再压着篮子。
+   * 球直径 40，舞台底 -180，所以球最终球心 ≥ -160（两个速度下最终球心都是 -160，球占 -180～-140）；
+   * 要让球最终不与篮子重叠，篮子底边必须高于球顶边 -140。取篮子中心 -90（篮子 -110～-70，底边 -110）。
+   * 如果把篮子放到 -130（底边 -150），球停在篮子里，落地后每一次检查都是真的，“连加”的分数就取决于循环剩余的迭代次数（实测重复 40 次得 16），不是一个稳定的数。
+   */
   basketX: 0,
-  basketY: -130,
+  basketY: -90,
   /** 两个球从这个高度同时开始落下。 */
   ballStartY: 150,
   /** 红球（会落在篮子上）和蓝球（落在篮子旁边的地上）的起点 x。 */
   hitBallX: 0,
   groundBallX: -150,
-  /** 课程预置的下落脚本要走的总距离：从 y=150 落到 y=-180（舞台底）。帧数 = ceil(fallDistance / 球速)。 */
-  fallDistance: 330,
+  /**
+   * 课程预置的下落脚本最多走的距离，帧数 = floor(fallDistance / 球速)：球从 y=150 落下，停在地面条之内（地面条在 y -150～-180），
+   * 整个球都看得见（球心最终在 -160 或 -150，球半径 20，不会有一半落到舞台外面）。
+   */
+  fallDistance: 310,
 
   // 程序限制（沙箱与编辑器共用同一组数）
   minRepeatTimes: 1,
@@ -46,7 +54,7 @@ export const L04_PARAMS = {
   skinWaitMs: 2000,
 } as const
 
-export type LevelId = 'explore' | 'solve' | 'transferPoints' | 'transferFast'
+export type LevelId = 'explore' | 'solve' | 'transferPoints' | 'transferSlow'
 
 export type LevelParams = {
   id: LevelId
@@ -61,12 +69,12 @@ export const L04_LEVELS: Record<LevelId, LevelParams> = {
   explore: { id: 'explore', layer: 1, ballSpeed: 10, points: 1 },
   solve: { id: 'solve', layer: 2, ballSpeed: 10, points: 1 },
   transferPoints: { id: 'transferPoints', layer: 3, ballSpeed: 10, points: 2 },
-  transferFast: { id: 'transferFast', layer: 3, ballSpeed: 20, points: 1 },
+  transferSlow: { id: 'transferSlow', layer: 3, ballSpeed: 5, points: 1 },
 }
 
-export const L04_LEVEL_ORDER: LevelId[] = ['explore', 'solve', 'transferPoints', 'transferFast']
+export const L04_LEVEL_ORDER: LevelId[] = ['explore', 'solve', 'transferPoints', 'transferSlow']
 
-/** 课程预置的下落脚本要重复的次数（每次下落 ballSpeed）。 */
+/** 课程预置的下落脚本要重复的次数（每次下落 ballSpeed）。向下取整：宁可停得高一点，也不让球掉出舞台。 */
 export function fallFrames(level: LevelParams): number {
-  return Math.ceil(L04_PARAMS.fallDistance / level.ballSpeed)
+  return Math.floor(L04_PARAMS.fallDistance / level.ballSpeed)
 }

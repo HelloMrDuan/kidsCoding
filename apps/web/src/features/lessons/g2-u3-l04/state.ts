@@ -30,7 +30,7 @@ export const DEMO_PROGRAM: Program = {
 export function initialState(): LessonState {
   return {
     levelId: 'explore',
-    programs: { solve: EMPTY_PROGRAM, transferPoints: EMPTY_PROGRAM, transferFast: EMPTY_PROGRAM },
+    programs: { solve: EMPTY_PROGRAM, transferPoints: EMPTY_PROGRAM, transferSlow: EMPTY_PROGRAM },
     predictions: {},
     passedAt: {},
   }
@@ -104,7 +104,7 @@ export function fromDraft(raw: unknown): LessonState | null {
   const programs = d.programs as Partial<LessonState['programs']> | undefined
   if (!programs || typeof programs !== 'object') return null
   const clean = initialState()
-  for (const key of ['solve', 'transferPoints', 'transferFast'] as const) {
+  for (const key of ['solve', 'transferPoints', 'transferSlow'] as const) {
     const p = programs[key]
     if (p === undefined) continue
     if (validateProgram(p).length > 0) return null

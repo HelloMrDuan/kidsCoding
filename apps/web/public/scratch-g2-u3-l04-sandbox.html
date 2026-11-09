@@ -30,7 +30,7 @@
   //      所以点绿旗之前必须等所有角色的 getBounds() 宽高等于造型真实尺寸（有超时，超时就报错）。
   const LIMITS = {
     stageMinX: -240, stageMaxX: 240, groundY: -180,
-    basketX: 0, basketY: -130, ballStartY: 150, hitBallX: 0, groundBallX: -150, fallDistance: 330,
+    basketX: 0, basketY: -90, ballStartY: 150, hitBallX: 0, groundBallX: -150, fallDistance: 310,
     minRepeatTimes: 1, maxRepeatTimes: 100, minScoreStep: 1, maxScoreStep: 9,
     maxBlocks: 8, maxNesting: 2, maxScripts: 3, frameCap: 150, skinWaitMs: 2000,
   };
@@ -91,7 +91,7 @@
         // 课程预置的下落脚本：必须逐项等于预期，孩子不能通过工程伪造它。
         if (id === prefix + 'h' && (b.opcode !== 'event_whenflagclicked' || !b.topLevel || b.parent !== null || b.next !== prefix + 'r')) throw new Error('下落脚本被改动');
         if (id === prefix + 'r') {
-          const frames = Math.ceil(LIMITS.fallDistance / expectedSpeed);
+          const frames = Math.floor(LIMITS.fallDistance / expectedSpeed);
           if (b.opcode !== 'control_repeat' || lit(b.inputs.TIMES, 6) !== String(frames) || !(b.inputs.SUBSTACK && b.inputs.SUBSTACK[1] === prefix + 'm') || b.next !== null) throw new Error('下落脚本被改动');
         }
         if (id === prefix + 'm' && (b.opcode !== 'motion_changeyby' || lit(b.inputs.DY, 4) !== String(-expectedSpeed) || b.next !== null)) throw new Error('下落脚本被改动');

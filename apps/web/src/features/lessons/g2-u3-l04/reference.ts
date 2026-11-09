@@ -14,10 +14,11 @@ const iftouch = (...body: Array<{ t: 'score'; by: number } | { t: 'hide' }>): Bl
 const repeat = (times: number, ...body: Block[]): Block => ({ t: 'repeat', times, body: body as never })
 
 /**
- * 球第一次碰到篮子的帧数（来自真实 VM 的实测，见 TEACHING-PLAN）：速度 10 → 第 25 帧，速度 20 → 第 13 帧。
- * 这里不重新推导，只列出课程里出现过的速度；遇到没实测过的速度就返回 null，调用方不给“别的做法”（宁可少给，不给没验证过的）。
+ * 球第一次碰到篮子的帧数（真实 VM 的实测，见 TEACHING-PLAN）：速度 10 → 第 21 帧，速度 5 → 第 41 帧。
+ * 这里不重新推导，只列出课程里出现过的速度；遇到没实测过的速度就返回空，调用方不给“别的做法”（宁可少给，不给没验证过的）。
+ * 数据一变（篮子位置、起点高度、球速）这张表就会过期：g2-u3-l04-vm.spec.ts 的“参考做法”用例会在真实 VM 里逐个跑一遍，过期了会立刻失败。
  */
-const FIRST_TOUCH_FRAME: Record<number, number> = { 10: 25, 20: 13 }
+const FIRST_TOUCH_FRAME: Record<number, number> = { 10: 21, 5: 41 }
 
 /** 枚举几个确实能通过本关的写法；`points` 来自本关要求。 */
 export function alternatives(level: LevelParams): Alternative[] {
