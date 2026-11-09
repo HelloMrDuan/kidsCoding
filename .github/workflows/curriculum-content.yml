@@ -14,6 +14,11 @@ on:
       - 'apps/web/tests/e2e/ux-003.spec.ts'
       - 'apps/web/src/features/lessons/**'
       - 'apps/web/tests/e2e/g2-u3-l04-renderer-spike.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l04-vm.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l04-classroom.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l04-shell-gap-a.spec.ts'
+      - 'apps/web/src/app/learn/g2-u3-l04/**'
+      - 'apps/web/scripts/copy-scratch-vm.mjs'
       - 'apps/web/public/**'
       - 'apps/web/tests/e2e/ux-101.spec.ts'
       - 'apps/web/tests/e2e/ux-103.spec.ts'
@@ -157,6 +162,8 @@ jobs:
         run: npx vitest run src/features/ui/lesson-card.test.tsx src/features/ui/progress-track.test.tsx src/features/ui/story-dialog.test.tsx
       - name: UX-101 component unit tests
         run: npx vitest run src/features/lessons/adventure-map.test.tsx src/features/lessons/map-view.test.tsx
+      - name: G2-U3-L04 unit tests (program validation, judging, session, lesson adapter, reference alternatives)
+        run: npx vitest run src/features/lessons/g2-u3-l04
       - name: G2-U3-L02 unit tests (contract, judging, params boundaries, draft, sandbox/TS parity)
         run: npx vitest run src/features/lessons/g2-u3-l02
 
@@ -683,11 +690,14 @@ jobs:
           name: scratch-vm-local-evidence
           path: apps/web/test-results/
 
-  # G2-U3-L04 方案 A 的 spike（scratch-render + 真实 VM 的 touching）：独立 Job，只验证机制是否在 CI 的真实 Chrome 上可行。
-  # 它不是 L04 课程的测试；spike 结论为「不可行」或首席决定不接时，应整体删除本 Job。
-  # 超时预算（SYS-108）：Job 15 分钟（硬限制，不是目标）；本地实测 spike 全部用例约 9 秒，所以主要开销是 Chrome 安装。
-  # 每一步自带上限：安装每次 100 秒、最多 2 次（都失败才报错，不掩盖）；测试 3 分钟；核对 1 分钟。
-  g2-u3-l04-renderer-spike:
+  # G2-U3-L04《判断碰撞得分》：真实 Scratch VM + 真实 scratch-render（方案①，首席已批准）+ 真实 Chrome。
+  # 一个 Job 跑四个文件：VM 矩阵（判定/安全/拒绝）、三视口课堂、共享壳 Gap A、渲染器 spike（保留的机制证据，#499）。
+  # 页面测试由 playwright 的 webServer 先 `npm run build`（prebuild 里 copy-scratch-vm.mjs 复制 vm / storage / render 三个固定版本文件），
+  # 所以「构建之后 /scratch-vm/scratch-render.js 仍在」由课堂用例真实验证。
+  # 超时预算（SYS-108）：Job 15 分钟（硬限制，不是目标），预算包含所有开销：
+  #   checkout + npm ci 约 1 分钟 + Chrome 安装最多 4 分钟 + 测试步骤（含构建）最多 8 分钟 + 核对 1 分钟 + 上传，各步自带上限。
+  # 若测试步骤超过 8 分钟，应把 Job 拆成两个（VM 矩阵 / 页面），不要放宽预算。
+  g2-u3-l04-browser-trial:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -701,8 +711,6 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Copy the pinned Scratch VM (scratch-render is served by the test from node_modules, not copied)
-        run: node scripts/copy-scratch-vm.mjs
       - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
         timeout-minutes: 4
         run: |
@@ -716,15 +724,16 @@ jobs:
           done
           echo "::error::Chrome install failed after 2 attempts"
           exit 1
-      - name: Run the G2-U3-L04 renderer spike with real Chrome (WebGL, three viewports)
-        timeout-minutes: 3
+      - name: Run G2-U3-L04 real VM + real renderer matrix, three-viewport classroom, shared-shell Gap A and renderer spike with real Chrome
+        timeout-minutes: 8
         env:
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g2-u3-l04/junit.xml
-        run: npx playwright test tests/e2e/g2-u3-l04-renderer-spike.spec.ts --project=desktop --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l04
+        run: npx playwright test tests/e2e/g2-u3-l04-vm.spec.ts tests/e2e/g2-u3-l04-classroom.spec.ts tests/e2e/g2-u3-l04-shell-gap-a.spec.ts tests/e2e/g2-u3-l04-renderer-spike.spec.ts --project=desktop --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l04
       - name: Verify the executed counts (no silent skipping or shrinking)
         timeout-minutes: 1
         run: |
           python3 - <<'PY'
+          import os
           import xml.etree.ElementTree as ET
           root = ET.parse('test-results/g2-u3-l04/junit.xml').getroot()
           suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
@@ -733,15 +742,22 @@ jobs:
           errors = sum(int(s.get('errors', 0)) for s in suites)
           skipped = sum(int(s.get('skipped', 0)) for s in suites)
           passed = tests - failures - errors - skipped
-          print(f'G2-U3-L04 spike: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          print(f'G2-U3-L04 browser: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # 按设计的跳过：课堂 7 个（证据截图 3、手机首屏用例在桌面/平板 2、真实指针拖放在平板/手机 2）；
+          # VM 矩阵里“与 L03 沙箱的 CSP 对比”那 1 个，只在仓库里存在 L03 沙箱文件时才执行，否则跳过。
+          # 数量变化必须有意识地改这里，防止 spec 被悄悄跳过或缩水。
+          has_l03 = os.path.exists('public/scratch-g2-u3-l03-sandbox.html')
+          want_skipped = 7 + (0 if has_l03 else 1)
+          want_total = 211
           assert failures == 0 and errors == 0, 'failures present'
-          assert skipped == 0, f'unexpected skipped count: {skipped}'
-          assert passed == 18, f'unexpected passed count: {passed}'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped} (L03 sandbox present: {has_l03})'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: g2-u3-l04-renderer-spike-evidence
+          name: g2-u3-l04-chrome-evidence
           path: apps/web/test-results/
 
   scratch-touch-browser:
