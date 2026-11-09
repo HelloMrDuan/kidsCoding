@@ -87,7 +87,7 @@ export type LevelContent = {
 }
 
 export function levelSituation(level: LevelParams): string {
-  const speed = level.ballSpeed === L04_LEVELS.solve.ballSpeed ? '球落得不快' : '球落得更慢'
+  const speed = level.ballSpeed === L04_LEVELS.solve.ballSpeed ? '球速正常' : '球落得更慢'
   return `本关要求：碰到篮子的红球加 ${level.points} 分，落在地上的蓝球不加分（${speed}）。`
 }
 

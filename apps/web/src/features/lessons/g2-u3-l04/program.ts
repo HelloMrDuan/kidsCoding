@@ -79,8 +79,10 @@ export function validateProgram(program: unknown): string[] {
       errors.push(`scripts[${i}] 的开头积木不对`)
       return
     }
+    const before = errors.length
     checkBlocks(s.body, errors, `scripts[${i}].body`, 'top')
-    if (Array.isArray(s.body)) {
+    // 结构有问题（如 null、未知类型）时不再数积木：countBlocks 假定每一块都是合法对象
+    if (errors.length === before && Array.isArray(s.body)) {
       total += countBlocks(s.body as Block[])
       if (nestingOf(s.body as Block[]) > L04_PARAMS.maxNesting) errors.push(`嵌套不能超过 ${L04_PARAMS.maxNesting} 层`)
     }
