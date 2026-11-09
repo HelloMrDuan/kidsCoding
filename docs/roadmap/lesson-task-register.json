@@ -1757,10 +1757,10 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/494",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": "apps/web/tests/e2e/g2-u3-l03-vm.spec.ts（真实 scratch-vm 行为矩阵）+ g2-u3-l03-classroom.spec.ts（三端课堂）+ g2-u3-l03-shell-gap-a.spec.ts；本地 164 通过 / 7 跳过 / 0 失败，见 docs/roadmap/evidence/G2-U3-L03/README.md",
+        "realE2E": "apps/web/tests/e2e/g2-u3-l03-vm.spec.ts（真实 scratch-vm 行为矩阵）+ g2-u3-l03-classroom.spec.ts（三端课堂）+ g2-u3-l03-shell-gap-a.spec.ts；CI Job g2-u3-l03-browser-trial 在真实 Chrome 上实际运行，核对 171 个实例中 164 通过 / 7 按设计跳过 / 0 失败；详见 docs/roadmap/evidence/G2-U3-L03/README.md",
         "lessonReview": null
       },
-      "notes": "Draft PR #494，等待独立审核。教学定向；教学参数为提议值（rulingStatus=proposed），待首席裁定，不代表已批准或儿童教学效果已验证。台账 focusConcept 写「判断」，目录与详案写的是「随机数与取值范围」（条件判断、碰撞、计分属于 L04）；目录 JSON 是首席受控文件，本 PR 未改。本课浏览器测试目前只有本地运行证据（Chromium，非 Chrome 稳定版）：课程浏览器 CI Job 只列了 L02 的 spec，需另立 CI 任务接入 L03 三个 spec。无独立教研、无儿童试学、无真实设备；目录仍为 outline_not_playable，非已发布。"
+      "notes": "PR #494，等待 4 号非作者独立审核。教学定向；首席已裁定教学参数为试点运行参数（rulingStatus=pilot-approved，不代表儿童教学效果已验证），focusConcept 确定为「随机数与取值范围」，本行与目录里 L03 自己的条目已按裁定做最小一致性修正（其他课程未动）。浏览器测试已由独立并行 CI Job g2-u3-l03-browser-trial 接入真实 Chrome。无独立教研、无儿童试学、无真实设备；目录仍为 outline_not_playable，非已发布，不得标 completed。"
     },
     {
       "id": "G2-U3-L04",
