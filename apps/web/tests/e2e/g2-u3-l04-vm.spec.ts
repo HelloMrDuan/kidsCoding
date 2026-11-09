@@ -8,7 +8,7 @@ import {createServer, type Server} from 'node:http'
 import {existsSync, readFileSync} from 'node:fs'
 import {join} from 'node:path'
 import {expect, test, type Page} from '@playwright/test'
-import {compileProject} from '../../src/features/lessons/g2-u3-l04/compile'
+import {compileProject, L04_ASSETS} from '../../src/features/lessons/g2-u3-l04/compile'
 import {judgeRun, type RunJudgment, type RunTrace} from '../../src/features/lessons/g2-u3-l04/judge'
 import {L04_LEVELS, L04_PARAMS, type LevelId} from '../../src/features/lessons/g2-u3-l04/params'
 import {programFingerprint, type Block, type Program} from '../../src/features/lessons/g2-u3-l04/program'
@@ -17,6 +17,7 @@ const WEB_ROOT = join(__dirname, '..', '..')
 const PUBLIC_DIR = join(WEB_ROOT, 'public')
 let server: Server
 let origin = ''
+const requested: string[] = []
 
 test.beforeAll(async () => {
   for (const f of ['scratch-vm.js', 'scratch-storage.min.js', 'scratch-render.js']) {
@@ -24,6 +25,7 @@ test.beforeAll(async () => {
   }
   server = createServer((req, res) => {
     const url = (req.url ?? '/').split('?')[0]
+    requested.push(url)
     if (url === '/host.html') {
       res.setHeader('content-type', 'text/html; charset=utf-8')
       res.end(HOST_HTML)
@@ -261,8 +263,9 @@ test.describe('G2-U3-L04 真实 Scratch VM + 渲染器：真实碰撞与行为�
   })
 
   test('“等 SVG 造型就绪”这道守卫真的执行了：点绿旗之前各角色的包围盒就是造型的真实尺寸（没等的话是比真实尺寸大 1 的占位值），耗时有上界', async ({page}) => {
-    // 说明：本课的球要落 24 帧才碰到篮子，造型早就就绪，所以删掉守卫不会改变本课任何判定结果（见 SPIKE-RENDERER.md：
-    // 守卫在“一开始就重叠”的场景里才决定成败）。这条测试用“点绿旗之前读到的尺寸”证明守卫确实执行，作为将来改场景时的保险。
+    // 如实说明这条测试能证明什么、不能证明什么：本课的球要落 24 帧才碰到篮子，而造型几毫秒内就会就绪，所以**删掉这道守卫
+    // 不会改变本课任何判定结果，也杀不掉“删掉守卫”的变异**——这是本课场景下的等价变异。守卫的必要性证据在 spike（#499）：
+    // 那里球和篮子一开始就重叠，“不等造型”的变异被发现。这里只断言：点绿旗之前读到的尺寸是造型的真实尺寸，且等待有上界。
     const r = await run(page, standard(40), 'solve')
     expect(r.sizes).toEqual({'篮子': [80, 40], '红球': [40, 40], '蓝球': [40, 40]})
     expect(r.skinMs).not.toBeNull()
@@ -283,6 +286,98 @@ test.describe('G2-U3-L04 真实 Scratch VM + 渲染器：真实碰撞与行为�
     expect(r.trace.finalScore).toBe(0)
     expect(r.trace.visible).toEqual({红球: true, 蓝球: true})
     expect(r.frames[0].hitBall.visible).toBe(true)
+  })
+})
+
+test.describe('G2-U3-L04 正式沙箱：安全边界（独立于 spike 的断言）', () => {
+  test.setTimeout(120_000)
+  const html = readFileSync(join(PUBLIC_DIR, 'scratch-g2-u3-l04-sandbox.html'), 'utf8')
+  const l02 = readFileSync(join(PUBLIC_DIR, 'scratch-g2-u3-l02-sandbox.html'), 'utf8')
+  const l03Path = join(PUBLIC_DIR, 'scratch-g2-u3-l03-sandbox.html')
+  const csp = (h: string) => /Content-Security-Policy" content="([^"]*)"/.exec(h)?.[1] ?? ''
+
+  test('CSP 与 L02 沙箱逐字相同，只多一条 img-src data:；不开放网络、blob、外部来源、通配', () => {
+    const policy = csp(html)
+    expect(policy).toContain("default-src 'none'")
+    expect(policy).toContain("connect-src 'none'")
+    expect(policy).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'")
+    expect(policy).toContain('img-src data:')
+    expect(policy).not.toMatch(/https?:|blob:|\*|ws:|wss:/)
+    expect(policy.replace(' img-src data:;', '')).toBe(csp(l02))
+  })
+
+  test('L03 沙箱（如果存在）的 CSP 也与本沙箱只差 img-src data:（渲染器没有改变其他课程的沙箱）', () => {
+    test.skip(!existsSync(l03Path), 'L03 沙箱不在这个分支里（#494 未合并）')
+    expect(csp(html).replace(' img-src data:;', '')).toBe(csp(readFileSync(l03Path, 'utf8')))
+  })
+
+  test('沙箱页只加载三个本源脚本（VM、storage、render），没有任何外部地址', () => {
+    const srcs = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1])
+    expect(srcs).toEqual(['/scratch-vm/scratch-vm.js', '/scratch-vm/scratch-storage.min.js', '/scratch-vm/scratch-render.js'])
+    expect(html).not.toMatch(/\b(?:src|href)\s*=\s*["']\s*(?:https?:)?\/\//i)
+    expect(html).not.toMatch(/url\(\s*["']?\s*(?:https?:)?\/\//i)
+    expect(html).not.toMatch(/jsdelivr/i)
+  })
+
+  test('沙箱不发起网络请求，内置 SVG 不含脚本或事件属性', () => {
+    const script = html.slice(html.indexOf('<script>\n(() =>'))
+    expect(script).not.toMatch(/\bfetch\s*\(/)
+    expect(script).not.toMatch(/XMLHttpRequest|WebSocket|sendBeacon/)
+    const svgBlock = /const SVG = \{([\s\S]*?)\n  \};/.exec(script)?.[1] ?? ''
+    expect(svgBlock.length).toBeGreaterThan(100)
+    expect(svgBlock).not.toMatch(/<script/i)
+    expect(svgBlock).not.toMatch(/\son[a-z]+=/i)
+    expect(svgBlock).not.toMatch(/xlink:href|<image|<foreignObject/i)
+  })
+
+  test('LIMITS 与 params.ts 一致（防止两边数字漂移）', () => {
+    const limits = /const LIMITS = \{([^}]*)\}/.exec(html)?.[1] ?? ''
+    const read = (key: string) => Number(new RegExp(`${key}:\\s*(-?\\d+)`).exec(limits)?.[1])
+    for (const key of ['stageMinX', 'stageMaxX', 'groundY', 'basketX', 'basketY', 'ballStartY', 'hitBallX', 'groundBallX', 'fallDistance', 'minRepeatTimes', 'maxRepeatTimes', 'minScoreStep', 'maxScoreStep', 'maxBlocks', 'maxNesting', 'maxScripts', 'frameCap', 'skinWaitMs'] as const) {
+      expect(read(key), key).toBe(L04_PARAMS[key])
+    }
+  })
+
+  test('素材 ID 与 compile.ts 一致', () => {
+    for (const [key, id] of Object.entries(L04_ASSETS)) expect(html, key).toContain(`${key}: '${id}'`)
+  })
+
+  test('沙箱只允许本课需要的积木', () => {
+    const set = /const ALLOWED_BALL = new Set\(\[([\s\S]*?)\]\)/.exec(html)?.[1] ?? ''
+    const ops = [...set.matchAll(/'([a-z_]+)'/g)].map(m => m[1]).sort()
+    expect(ops).toEqual(['control_if', 'control_repeat', 'data_changevariableby', 'event_whenflagclicked', 'looks_hide', 'motion_changeyby', 'sensing_touchingobject', 'sensing_touchingobjectmenu'])
+  })
+
+  test('宿主 iframe 只有 allow-scripts；沙箱里读 localStorage 抛 SecurityError（opaque origin）', async ({page}) => {
+    await ready(page)
+    expect(await page.evaluate(() => document.getElementById('f')!.getAttribute('sandbox'))).toBe('allow-scripts')
+    const frame = page.frames().find(f => f.url().endsWith('/scratch-g2-u3-l04-sandbox.html'))!
+    const access = await frame.evaluate(() => { try { void localStorage.length; return 'readable' } catch (e) { return (e as Error).name } })
+    expect(access).toBe('SecurityError')
+  })
+
+  test('沙箱内主动发起 fetch / XHR / 图片 / WebSocket 到外部地址，全部被拒绝', async ({page}) => {
+    await ready(page)
+    const frame = page.frames().find(f => f.url().endsWith('/scratch-g2-u3-l04-sandbox.html'))!
+    const results = await frame.evaluate(async () => {
+      const attempts: Record<string, () => Promise<string>> = {
+        fetch: () => fetch('https://example.com/x').then(() => 'allowed', () => 'blocked'),
+        xhr: () => new Promise(res => { try { const x = new XMLHttpRequest(); x.open('GET', 'https://example.com/x'); x.onerror = () => res('blocked'); x.onload = () => res('allowed'); x.send() } catch { res('blocked') } }),
+        img: () => new Promise(res => { const i = new Image(); i.onload = () => res('allowed'); i.onerror = () => res('blocked'); i.src = 'https://example.com/x.png' }),
+        ws: () => new Promise(res => { try { const w = new WebSocket('wss://example.com/x'); w.onerror = () => res('blocked'); w.onopen = () => res('allowed') } catch { res('blocked') } }),
+      }
+      const out: Record<string, string> = {}
+      await Promise.all(Object.entries(attempts).map(async ([k, f]) => { out[k] = await f() }))
+      return out
+    })
+    expect(results).toEqual({fetch: 'blocked', xhr: 'blocked', img: 'blocked', ws: 'blocked'})
+  })
+
+  test('运行（含渲染器）期间没有产生任何对 VM / 渲染器 / 沙箱页以外的请求', async ({page}) => {
+    requested.length = 0
+    await ready(page)
+    await run(page, standard(40), 'solve')
+    expect([...new Set(requested)].sort()).toEqual(['/host.html', '/scratch-g2-u3-l04-sandbox.html', '/scratch-vm/scratch-render.js', '/scratch-vm/scratch-storage.min.js', '/scratch-vm/scratch-vm.js'].sort())
   })
 })
 
@@ -422,6 +517,7 @@ test.describe('G2-U3-L04 真实 Scratch VM + 渲染器：停止、拒绝与资�
       await post(page, {kind: 'RUN', id, levelId: 'solve', ballSpeed: speed, fingerprint: 'x', frameMs: 0, project: base()})
       const m = await page.evaluate(i => (window as unknown as {waitFor: (t: (m: {kind: string; id: number}) => boolean) => Promise<{kind: string; error?: string}>}).waitFor(m => (m.kind === 'REJECTED' || m.kind === 'RUN_DONE' || m.kind === 'ERROR') && m.id === i), id) as {kind: string; error?: string}
       expect(m.kind, `速度 ${speed}`).toBe('REJECTED')
+      expect(m.error, `速度 ${speed}：因为“球速不对”被拒绝，而不是被后面的下落脚本检查顺带挡住`).toBe('球速不对')
     }
   })
 
