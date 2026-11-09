@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<!--
+  CSP：与 L02 / L03 沙箱逐字相同，只多一条 img-src data:（scratch-render 把 SVG 造型转成位图时用 data: 图片）。
+  default-src 'none'、connect-src 'none'（不允许任何网络连接）、脚本只来自本源与内联、不开放 blob: 和任何外部来源。
+  本页由宿主用 sandbox="allow-scripts" 的 iframe 加载（不给 same-origin）。方案与验证见 docs/curriculum/g2-u3-l04/SPIKE-RENDERER.md。
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<title>G2-U3-L04 判断碰撞得分 沙箱</title>
+<script src="/scratch-vm/scratch-vm.js"></script>
+<!-- scratch-storage 是 scratch-vm 加载工程必需的素材仓库，和 L02 / L03 沙箱使用同一个固定版本。 -->
+<script src="/scratch-vm/scratch-storage.min.js"></script>
+<!-- scratch-render@2.2.84：真实渲染器，只有本页加载。真实的 sensing_touchingobject 需要它（没有渲染器时永远返回 false）。 -->
+<script src="/scratch-vm/scratch-render.js"></script>
+</head>
+<body>
+<script>
+(() => {
+  // G2-U3-L04 课堂沙箱。
+  // 只运行本课的固定舞台（背景 + 篮子 + 红球 + 蓝球）；球的脚本只允许这些积木：
+  //   当绿旗被点击、重复执行、如果〈碰到 篮子？〉、将 得分 增加、隐藏（以及课程预置的“将 y 增加 -N”下落脚本）。
+  // 其余一律拒绝，保持上一次状态。每次运行都重新载入工程（舞台复位），由真实 Scratch VM 逐帧执行，并挂上真实渲染器。
+  // 本页只做三件事：校验、观察、回报。
+  //
+  // 渲染器带来的两个硬性前提（spike 实测，缺一会让 touching 静默判错；任何一个不满足都明确报错，不静默继续）：
+  //   1. 必须设置 vm.runtime.currentStepTime 再 _step()，否则线程调度器一个线程都不前进；
+  //   2. SVG 造型在渲染器里是异步转位图的，转完之前角色包围盒是占位值（比真实尺寸大 1 像素），此时 touching 判不到。
+  //      所以点绿旗之前必须等所有角色的 getBounds() 宽高等于造型真实尺寸（有超时，超时就报错）。
+  const LIMITS = {
+    stageMinX: -240, stageMaxX: 240, groundY: -180,
+    basketX: 0, basketY: -130, ballStartY: 150, hitBallX: 0, groundBallX: -150, fallDistance: 330,
+    minRepeatTimes: 1, maxRepeatTimes: 100, minScoreStep: 1, maxScoreStep: 9,
+    maxBlocks: 8, maxNesting: 2, maxScripts: 3, frameCap: 150, skinWaitMs: 2000,
+  };
+  const ASSETS = {
+    backdrop: 'd4e5f6a7b8c9d0e1f2a3b4c5d6e7f801',
+    basket: 'e5f6a7b8c9d0e1f2a3b4c5d6e7f80912',
+    hitBall: 'f6a7b8c9d0e1f2a3b4c5d6e7f8091a23',
+    groundBall: 'a7b8c9d0e1f2a3b4c5d6e7f8091a2b34',
+  };
+  const NAMES = {basket: '篮子', hitBall: '红球', groundBall: '蓝球'};
+  const SCORE_NAME = '得分';
+  const SCORE_ID = 'kcl4_score';
+  // 造型的真实尺寸（用于判断“SVG 位图已就绪”，与位置无关）。
+  const SIZES = {[NAMES.basket]: [80, 40], [NAMES.hitBall]: [40, 40], [NAMES.groundBall]: [40, 40]};
+  // 原创 SVG（本项目绘制，无第三方素材）。
+  const SVG = {
+    backdrop: '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360"><rect width="480" height="360" fill="#eaf4ff"/><rect y="330" width="480" height="30" fill="#c9d9a8"/></svg>',
+    basket: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40" viewBox="0 0 80 40"><path d="M2 6h76l-8 30a4 4 0 0 1-4 3H14a4 4 0 0 1-4-3z" fill="#b87a3d" stroke="#7a4a1c" stroke-width="3"/><path d="M14 14h52M18 24h44" stroke="#7a4a1c" stroke-width="2"/></svg>',
+    hitBall: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#e0564f" stroke="#9c2f2a" stroke-width="3"/><circle cx="14" cy="13" r="4" fill="#fff" opacity=".6"/></svg>',
+    groundBall: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#3f7fd6" stroke="#244f8f" stroke-width="3"/><circle cx="14" cy="13" r="4" fill="#fff" opacity=".6"/></svg>',
+  };
+  const ALLOWED_BALL = new Set([
+    'event_whenflagclicked', 'control_repeat', 'control_if', 'sensing_touchingobject', 'sensing_touchingobjectmenu',
+    'data_changevariableby', 'looks_hide', 'motion_changeyby',
+  ]);
+  const STEP_MS = 1000 / 30;
+
+  const send = (kind, info = {}) => window.parent.postMessage({kind, ...info}, '*');
+  const uri = (svg) => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  const isIntInRange = (n, min, max) => Number.isInteger(n) && n >= min && n <= max;
+  const isNumStr = (s) => typeof s === 'string' && /^-?\d+$/.test(s);
+
+  let vm = null, renderer = null, canvasEl = null, timer = null, current = null;
+
+  // ---------------- 校验：只放行本课的工程 ----------------
+
+  // 输入形如 [1, [code, value]]：一个直接写在积木上的字面量。
+  const lit = (input, code) => Array.isArray(input) && input.length === 2 && input[0] === 1 &&
+    Array.isArray(input[1]) && input[1].length === 2 && input[1][0] === code ? input[1][1] : null;
+
+  // 校验一个球的积木。prefix 区分课程预置的下落脚本（motion_changeyby）与孩子的脚本：
+  // 课程预置的下落脚本的积木 id 以 `${prefix}h` / `${prefix}r` / `${prefix}m` 命名，只能是这三块。
+  function validateBall(blocks, prefix, expectedSpeed) {
+    const ids = Object.keys(blocks);
+    if (ids.length > LIMITS.maxBlocks * 3 + LIMITS.maxScripts * 2 + 3) throw new Error('积木太多');
+    const fallIds = new Set([prefix + 'h', prefix + 'r', prefix + 'm']);
+    let hats = 0, looseBlocks = 0;
+    const counts = {score: 0, hide: 0, iff: 0, repeat: 0};
+    for (const id of ids) {
+      const b = blocks[id];
+      if (!b || typeof b !== 'object' || !ALLOWED_BALL.has(b.opcode)) throw new Error('本课不允许的积木：' + String(b && b.opcode).slice(0, 40));
+      if (b.opcode !== 'sensing_touchingobjectmenu' && b.shadow) throw new Error('不允许影子积木');
+      const inputNames = Object.keys(b.inputs || {}).sort().join(',');
+      const fieldNames = Object.keys(b.fields || {}).sort().join(',');
+      if (fallIds.has(id)) {
+        // 课程预置的下落脚本：必须逐项等于预期，孩子不能通过工程伪造它。
+        if (id === prefix + 'h' && (b.opcode !== 'event_whenflagclicked' || !b.topLevel || b.parent !== null || b.next !== prefix + 'r')) throw new Error('下落脚本被改动');
+        if (id === prefix + 'r') {
+          const frames = Math.ceil(LIMITS.fallDistance / expectedSpeed);
+          if (b.opcode !== 'control_repeat' || lit(b.inputs.TIMES, 6) !== String(frames) || !(b.inputs.SUBSTACK && b.inputs.SUBSTACK[1] === prefix + 'm') || b.next !== null) throw new Error('下落脚本被改动');
+        }
+        if (id === prefix + 'm' && (b.opcode !== 'motion_changeyby' || lit(b.inputs.DY, 4) !== String(-expectedSpeed) || b.next !== null)) throw new Error('下落脚本被改动');
+        continue;
+      }
+      if (b.opcode === 'motion_changeyby') throw new Error('本课不允许的积木：motion_changeyby');
+      if (b.opcode === 'event_whenflagclicked') {
+        hats++;
+        if (!b.topLevel || b.parent !== null || inputNames !== '' || fieldNames !== '') throw new Error('绿旗积木结构不对');
+      } else if (b.opcode === 'control_repeat') {
+        counts.repeat++;
+        const t = lit(b.inputs.TIMES, 6);
+        const ok = (inputNames === 'TIMES' || inputNames === 'SUBSTACK,TIMES') && fieldNames === '' && isNumStr(t) &&
+          isIntInRange(Number(t), LIMITS.minRepeatTimes, LIMITS.maxRepeatTimes);
+        if (!ok) throw new Error('重复次数超出范围');
+        const sub = b.inputs.SUBSTACK;
+        if (sub !== undefined && !(Array.isArray(sub) && sub[0] === 2 && typeof sub[1] === 'string' && blocks[sub[1]] && blocks[sub[1]].parent === id)) throw new Error('重复里的积木连接不对');
+      } else if (b.opcode === 'control_if') {
+        counts.iff++;
+        const cond = b.inputs.CONDITION;
+        const condOk = Array.isArray(cond) && cond.length === 2 && cond[0] === 2 && typeof cond[1] === 'string' &&
+          blocks[cond[1]] && blocks[cond[1]].opcode === 'sensing_touchingobject' && blocks[cond[1]].parent === id;
+        if (!(inputNames === 'CONDITION' || inputNames === 'CONDITION,SUBSTACK') || fieldNames !== '' || !condOk) throw new Error('“如果”的条件必须是“碰到 篮子？”');
+        const sub = b.inputs.SUBSTACK;
+        if (sub !== undefined && !(Array.isArray(sub) && sub[0] === 2 && typeof sub[1] === 'string' && blocks[sub[1]] && blocks[sub[1]].parent === id)) throw new Error('“如果”里的积木连接不对');
+      } else if (b.opcode === 'sensing_touchingobject') {
+        const m = b.inputs.TOUCHINGOBJECTMENU;
+        const menuOk = inputNames === 'TOUCHINGOBJECTMENU' && Array.isArray(m) && m.length === 2 && m[0] === 1 && typeof m[1] === 'string' &&
+          blocks[m[1]] && blocks[m[1]].opcode === 'sensing_touchingobjectmenu' && blocks[m[1]].parent === id;
+        if (!menuOk || fieldNames !== '' || b.next !== null || b.topLevel) throw new Error('“碰到”积木结构不对');
+      } else if (b.opcode === 'sensing_touchingobjectmenu') {
+        const f = b.fields.TOUCHINGOBJECTMENU;
+        if (inputNames !== '' || fieldNames !== 'TOUCHINGOBJECTMENU' || !Array.isArray(f) || f[0] !== NAMES.basket || !b.shadow) throw new Error('只能检测“碰到 篮子”');
+      } else if (b.opcode === 'data_changevariableby') {
+        counts.score++;
+        const v = lit(b.inputs.VALUE, 4);
+        const f = b.fields.VARIABLE;
+        const ok = inputNames === 'VALUE' && fieldNames === 'VARIABLE' && isNumStr(v) && isIntInRange(Number(v), LIMITS.minScoreStep, LIMITS.maxScoreStep) &&
+          Array.isArray(f) && f[0] === SCORE_NAME && f[1] === SCORE_ID;
+        if (!ok) throw new Error('得分增量超出范围，或不是“得分”变量');
+      } else if (b.opcode === 'looks_hide') {
+        counts.hide++;
+        if (inputNames !== '' || fieldNames !== '') throw new Error('“隐藏”结构不对');
+      }
+      if (b.opcode !== 'sensing_touchingobject' && b.opcode !== 'sensing_touchingobjectmenu') {
+        if (b.next !== null && (typeof b.next !== 'string' || !blocks[b.next] || blocks[b.next].parent !== id)) throw new Error('积木连接不对');
+        if (b.parent !== null && (typeof b.parent !== 'string' || !blocks[b.parent])) throw new Error('积木父级不存在');
+        if (b.opcode !== 'event_whenflagclicked' && b.topLevel) looseBlocks++;
+      }
+    }
+    if (hats > LIMITS.maxScripts) throw new Error('脚本太多');
+    if (looseBlocks) throw new Error('本课不接收没有绿旗的散积木');
+    // 从每个孩子的帽子出发走一遍：每块积木只能被访问一次；统计块数与嵌套。
+    const seen = new Set();
+    let counted = 0;
+    function walk(startId, depth) {
+      let id = startId;
+      while (id) {
+        if (seen.has(id)) throw new Error('积木连接成环或重复');
+        seen.add(id);
+        counted++;
+        const b = blocks[id];
+        if (b.opcode === 'control_repeat') {
+          if (depth + 1 > LIMITS.maxNesting) throw new Error('嵌套太深');
+          if (depth > 0) throw new Error('“重复执行”只能放在最外层');
+          if (b.inputs.SUBSTACK) walk(b.inputs.SUBSTACK[1], depth + 1);
+        } else if (b.opcode === 'control_if') {
+          if (depth + 1 > LIMITS.maxNesting) throw new Error('嵌套太深');
+          if (b.inputs.SUBSTACK) {
+            // 如果里面只能放叶子积木（得分、隐藏）
+            let cur = b.inputs.SUBSTACK[1];
+            while (cur) { const cb = blocks[cur]; if (cb.opcode === 'control_if' || cb.opcode === 'control_repeat') throw new Error('“如果”里面只能放“得分”和“隐藏”'); cur = cb.next; }
+            walk(b.inputs.SUBSTACK[1], depth + 1);
+          }
+        }
+        id = b.next;
+      }
+    }
+    for (const id of ids) {
+      if (!fallIds.has(id) && blocks[id].opcode === 'event_whenflagclicked') { seen.add(id); walk(blocks[id].next, 0); }
+    }
+    // 孩子的脚本里：走到的积木 + 条件积木 + 菜单 = 全部非预置积木，否则有积木没有接上。
+    const own = ids.filter(id => !fallIds.has(id)).length;
+    const attached = seen.size + counts.iff * 2;
+    if (attached !== own) throw new Error('有积木没有接上');
+    if (counted > LIMITS.maxBlocks) throw new Error('积木太多');
+    return counts;
+  }
+
+  // 把一个球的孩子脚本压成与积木 id 无关的规范文本：从每个绿旗出发，按顺序列出 opcode、字面量参数、字段和子结构。
+  // 课程预置的下落脚本不参与比较（它们的 id 以 prefix + h/r/m 命名，且已被 validateBall 逐项核对）。
+  function canonicalScript(blocks, prefix) {
+    const fall = new Set([prefix + 'h', prefix + 'r', prefix + 'm']);
+    const render = (id) => {
+      const out = [];
+      for (let cur = id; cur; cur = blocks[cur].next) {
+        const b = blocks[cur];
+        const parts = [b.opcode];
+        for (const k of Object.keys(b.inputs || {}).sort()) {
+          const v = b.inputs[k];
+          if (k === 'SUBSTACK') parts.push('SUBSTACK(' + render(v[1]) + ')');
+          else if (k === 'CONDITION') parts.push('CONDITION(' + render(v[1]) + ')');
+          else if (k === 'TOUCHINGOBJECTMENU') parts.push('MENU(' + render(v[1]) + ')');
+          else parts.push(k + '=' + JSON.stringify(v));
+        }
+        for (const k of Object.keys(b.fields || {}).sort()) parts.push(k + ':' + JSON.stringify(b.fields[k]));
+        out.push(parts.join('|'));
+        if (b.opcode === 'sensing_touchingobject' || b.opcode === 'sensing_touchingobjectmenu') break; // 条件与菜单是单个积木，不沿 next 走
+      }
+      return out.join(';');
+    };
+    return Object.keys(blocks)
+      .filter(id => !fall.has(id) && blocks[id].opcode === 'event_whenflagclicked')
+      .map(id => render(blocks[id].next))
+      .sort()
+      .join('##');
+  }
+
+  function validateProject(project, speed) {
+    if (!project || typeof project !== 'object' || !Array.isArray(project.targets) || project.targets.length !== 4) throw new Error('工程需要 4 个对象');
+    const [stage, basket, hitBall, groundBall] = project.targets;
+    if (!stage.isStage || stage.name !== 'Stage' || Object.keys(stage.blocks || {}).length !== 0) throw new Error('舞台不对');
+    const sv = stage.variables || {};
+    if (Object.keys(sv).length !== 1 || !Array.isArray(sv[SCORE_ID]) || sv[SCORE_ID][0] !== SCORE_NAME || sv[SCORE_ID][1] !== 0) throw new Error('舞台变量不对');
+    if (basket.isStage || basket.name !== NAMES.basket || Object.keys(basket.blocks || {}).length !== 0) throw new Error('篮子不对');
+    if (hitBall.isStage || hitBall.name !== NAMES.hitBall) throw new Error('红球不对');
+    if (groundBall.isStage || groundBall.name !== NAMES.groundBall) throw new Error('蓝球不对');
+    const art = [[stage, ASSETS.backdrop], [basket, ASSETS.basket], [hitBall, ASSETS.hitBall], [groundBall, ASSETS.groundBall]];
+    for (const [t, id] of art) {
+      if (!Array.isArray(t.costumes) || t.costumes.length !== 1 || t.costumes[0].assetId !== id || t.costumes[0].dataFormat !== 'svg') throw new Error('造型不对');
+      if (!t.isStage && Object.keys(t.variables || {}).length) throw new Error('本课不允许角色变量');
+      if (Object.keys(t.lists || {}).length || Object.keys(t.broadcasts || {}).length) throw new Error('本课不允许列表或广播');
+      if ((t.sounds || []).length) throw new Error('本课不允许声音');
+    }
+    const place = [[basket, LIMITS.basketX, LIMITS.basketY], [hitBall, LIMITS.hitBallX, LIMITS.ballStartY], [groundBall, LIMITS.groundBallX, LIMITS.ballStartY]];
+    for (const [t, x, y] of place) if (t.x !== x || t.y !== y || t.visible !== true) throw new Error('角色起点不对');
+    if (!Number.isFinite(speed) || speed < 1 || speed > 40) throw new Error('球速不对');
+    const a = validateBall(hitBall.blocks || {}, 'hb', speed);
+    const b = validateBall(groundBall.blocks || {}, 'gb', speed);
+    // 两个球必须是同一段孩子的脚本：积木种类、数量、连接结构、参数逐项相同（积木 id 的前缀不同，比较前归一化）。
+    if (JSON.stringify(a) !== JSON.stringify(b) || canonicalScript(hitBall.blocks, 'hb') !== canonicalScript(groundBall.blocks, 'gb')) throw new Error('两个球的脚本必须一样');
+    return a;
+  }
+
+  // ---------------- 机器：VM + 渲染器 ----------------
+
+  function newMachine() {
+    const Storage = typeof window.ScratchStorage === 'function' ? window.ScratchStorage : window.ScratchStorage.ScratchStorage;
+    const machine = new window.VirtualMachine();
+    const storage = new Storage();
+    machine.attachStorage(storage);
+    for (const [key, svg] of Object.entries(SVG)) {
+      storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, new TextEncoder().encode(svg), ASSETS[key]);
+    }
+    canvasEl = document.createElement('canvas');
+    canvasEl.width = 480; canvasEl.height = 360;
+    document.body.appendChild(canvasEl);
+    renderer = new window.ScratchRender(canvasEl);
+    renderer.setLayerGroupOrdering(['group1']);
+    machine.attachRenderer(renderer);
+    return machine;
+  }
+  function spriteOf(machine, name) {
+    return machine.runtime.targets.find(t => !t.isStage && t.isOriginal && t.sprite && t.sprite.name === name) || null;
+  }
+
+  // 等所有角色的 SVG 造型就绪：包围盒的宽、高等于造型真实尺寸（占位值比真实尺寸大 1，且偏在左上象限）。
+  // 判据与位置无关。超时就抛错：沙箱绝不在造型没就绪时开始运行（那样 touching 会静默判错）。
+  async function waitForSkins(machine, run) {
+    const sprites = () => machine.runtime.targets.filter(t => !t.isStage);
+    const ready = () => sprites().every(t => {
+      const b = t.getBounds(); const want = SIZES[t.sprite.name];
+      return b && want && Math.round(b.right - b.left) === want[0] && Math.round(b.top - b.bottom) === want[1];
+    });
+    const t0 = performance.now();
+    while (!ready()) {
+      if (current !== run || run.cancelled) return null;
+      if (performance.now() - t0 > LIMITS.skinWaitMs) throw new Error('造型在 ' + LIMITS.skinWaitMs + 'ms 内没有就绪，无法判定碰撞');
+      await new Promise(r => setTimeout(r, 10));
+    }
+    return Math.round(performance.now() - t0);
+  }
+
+  // 观察再调用：包装 Scratch 自己的积木函数，记录后立即调用原函数，不改变积木行为。
+  function ballNameOf(util) {
+    const n = util.target && util.target.sprite && util.target.sprite.name;
+    return n === NAMES.hitBall || n === NAMES.groundBall ? n : null;
+  }
+  function attachObservers(machine, run) {
+    const p = machine.runtime._primitives;
+    const touching = p.sensing_touchingobject;
+    p.sensing_touchingobject = function (args, util) {
+      const out = touching.call(this, args, util);
+      try {
+        const ball = ballNameOf(util);
+        if (machine === vm && run.live && ball) run.trace.checks.push({frame: run.frame, ball, result: out === true});
+      } catch (_e) {}
+      return out;
+    };
+    const change = p.data_changevariableby;
+    p.data_changevariableby = function (args, util) {
+      const out = change.call(this, args, util);
+      try {
+        const ball = ballNameOf(util);
+        if (machine === vm && run.live && ball) run.trace.scores.push({frame: run.frame, ball, by: Number(args.VALUE)});
+      } catch (_e) {}
+      return out;
+    };
+    const hide = p.looks_hide;
+    p.looks_hide = function (args, util) {
+      const out = hide.call(this, args, util);
+      try {
+        const ball = ballNameOf(util);
+        if (machine === vm && run.live && ball) run.trace.hides.push({frame: run.frame, ball});
+      } catch (_e) {}
+      return out;
+    };
+  }
+
+  function scoreOf(machine) {
+    const v = machine.runtime.getTargetForStage().lookupVariableByNameAndType(SCORE_NAME);
+    return v ? Number(v.value) : 0;
+  }
+  function snapshot(machine) {
+    const pick = (name) => { const t = spriteOf(machine, name); return t ? {x: t.x, y: t.y, visible: !!t.visible} : null; };
+    return {basket: pick(NAMES.basket), hitBall: pick(NAMES.hitBall), groundBall: pick(NAMES.groundBall), score: scoreOf(machine)};
+  }
+
+  function stopTimer() { if (timer !== null) { clearTimeout(timer); timer = null; } }
+  // 释放：停脚本、退出 VM、主动让 WebGL 上下文丢失、移除 canvas、清掉引用。每次运行和停止后都执行。
+  function disposeMachine() {
+    stopTimer();
+    if (vm) {
+      try { vm.stopAll(); } catch (_e) {}
+      try { vm.quit(); } catch (_e) {}
+    }
+    if (renderer) {
+      try {
+        const gl = renderer.gl;
+        const ext = gl && gl.getExtension && gl.getExtension('WEBGL_lose_context');
+        if (ext) ext.loseContext();
+      } catch (_e) {}
+    }
+    if (canvasEl && canvasEl.parentNode) canvasEl.parentNode.removeChild(canvasEl);
+    vm = null; renderer = null; canvasEl = null;
+  }
+  function finish(run, endedBy, error) {
+    if (run !== current || !run.live) return;
+    run.live = false;
+    stopTimer();
+    run.trace.endedBy = endedBy;
+    run.trace.framesRun = run.frame;
+    if (error) run.trace.error = String(error).slice(0, 200);
+    try {
+      const s = vm ? snapshot(vm) : null;
+      if (s) { run.trace.finalScore = s.score; run.trace.visible = {红球: !!(s.hitBall && s.hitBall.visible), 蓝球: !!(s.groundBall && s.groundBall.visible)}; }
+    } catch (_e) {}
+    disposeMachine();
+    send('RUN_DONE', {id: run.id, trace: run.trace});
+  }
+
+  function stepOnce(run) {
+    if (run !== current || !run.live) return;
+    try {
+      run.frame += 1;
+      vm.runtime.currentStepTime = STEP_MS;
+      vm.runtime._step();
+      const s = snapshot(vm);
+      if (!s.hitBall || !s.groundBall || !s.basket) throw new Error('角色丢失');
+      send('FRAME', {id: run.id, frame: run.frame, ...s});
+      // 所有脚本都跑完（没有活着的线程）就结束；这一帧里刚产生的检查与得分已经记录。
+      if (vm.runtime.threads.length === 0) { finish(run, 'finished'); return; }
+      if (run.frame >= LIMITS.frameCap) { finish(run, 'frameCap'); return; }
+      timer = setTimeout(() => stepOnce(run), run.frameMs);
+    } catch (error) {
+      finish(run, 'error', error);
+    }
+  }
+
+  async function startRun(data) {
+    disposeMachine();
+    if (current) current.live = false;
+    const id = data.id;
+    if (!Number.isInteger(id) || id < 1) { send('ERROR', {id: 0, error: '运行编号不对'}); return; }
+    try {
+      validateProject(data.project, data.ballSpeed);
+    } catch (error) {
+      send('REJECTED', {id, error: String(error.message || error).slice(0, 120)});
+      return;
+    }
+    if (typeof window.VirtualMachine !== 'function' || !window.ScratchStorage) {
+      send('ERROR', {id, error: 'Scratch VM 脚本没有加载（可能是网络问题）'});
+      return;
+    }
+    if (typeof window.ScratchRender !== 'function') {
+      send('ERROR', {id, error: '渲染器脚本没有加载（可能是网络问题），无法判定碰撞'});
+      return;
+    }
+    const frameMs = Number.isFinite(data.frameMs) ? Math.max(0, Math.min(100, data.frameMs)) : 33;
+    const run = {
+      id, frameMs, frame: 0, live: false, cancelled: false, loading: true,
+      trace: {levelId: String(data.levelId || ''), runId: id, fingerprint: String(data.fingerprint || '').slice(0, 4000),
+        endedBy: 'error', framesRun: 0, checks: [], scores: [], hides: [], finalScore: 0, visible: {红球: true, 蓝球: true}},
+    };
+    current = run;
+    try {
+      const machine = newMachine();
+      vm = machine;
+      await machine.loadProject(JSON.stringify(data.project));
+      if (current !== run || run.cancelled) return; // 加载期间又有新的运行或停止
+      const skinMs = await waitForSkins(machine, run);
+      if (skinMs === null) return; // 等待期间被停止或被取代
+      attachObservers(machine, run);
+      machine.greenFlag();
+      run.loading = false;
+      run.live = true;
+      send('STARTED', {id, skinMs});
+      timer = setTimeout(() => stepOnce(run), run.frameMs);
+    } catch (error) {
+      if (current === run) { run.loading = false; run.live = false; disposeMachine(); send('ERROR', {id, error: String(error && error.message || error).slice(0, 200)}); }
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent || !event.data || typeof event.data !== 'object') return;
+    const data = event.data;
+    if (data.kind === 'PING') {
+      send('FRAME_READY', {
+        available: typeof window.VirtualMachine === 'function' && !!window.ScratchStorage && typeof window.ScratchRender === 'function',
+        limits: LIMITS,
+        assets: {backdrop: uri(SVG.backdrop), basket: uri(SVG.basket), hitBall: uri(SVG.hitBall), groundBall: uri(SVG.groundBall)},
+      });
+      return;
+    }
+    if (data.kind === 'RUN') { startRun(data); return; }
+    if (data.kind === 'STOP') {
+      if (!current || data.id !== current.id || current.cancelled) return;
+      if (current.live) { current.cancelled = true; finish(current, 'stopped'); return; }
+      // 还在加载或等造型：取消后不再启动；这时被停止也要回一个“已停止”的结果。
+      if (current.loading) {
+        current.loading = false;
+        current.cancelled = true;
+        disposeMachine();
+        current.trace.endedBy = 'stopped';
+        send('RUN_DONE', {id: current.id, trace: current.trace});
+      }
+      return;
+    }
+    if (data.kind === 'DISPOSE') {
+      const had = {vm: vm !== null, renderer: renderer !== null};
+      disposeMachine();
+      send('DISPOSED', {id: data.id, had, vmNull: vm === null, rendererNull: renderer === null, canvasCount: document.querySelectorAll('canvas').length});
+    }
+  });
+})();
+</script>
+</body>
+</html>
