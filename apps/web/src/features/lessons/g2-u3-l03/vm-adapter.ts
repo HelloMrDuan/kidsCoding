@@ -1,9 +1,9 @@
 // ScratchL03Adapter：把本课沙箱（真实 Scratch VM，iframe + postMessage）包成
 // WORKSPACE-API.md §2 的引擎适配器形状：mount/unmount/loadScript/getScript/run/stop/getState。
-// 共享 EngineAdapter 类型在 PR #469（Draft，未合并）里，这里用结构相同的本地类型，
-// 合并后可直接替换为共享类型，不需要改字段。
+// 共享 EngineAdapter 类型已随 #469 合并进 main，上层的 lesson-adapter.ts 直接使用共享类型；
+// 本文件的 VmPort 只服务于会话，所以保留字段一一对应的本地 EngineState / RunEvent。
 //
-// 与 #469 的 ScratchVMAdapter 的区别（接入缺口见 PR 说明）：它连接的是受限“陨石模型”沙箱，
+// 与共享的 ScratchVMAdapter 的区别：它连接的是受限“陨石模型”沙箱，
 // 只读首个角色的 x，分数恒为 0，也没有脚本编辑器；本适配器连接本课沙箱，
 // 脚本由学生搭出来并编译为 Scratch 工程，由真实 VM 逐帧执行，并带回可判定的运行轨迹。
 

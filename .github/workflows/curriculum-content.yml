@@ -741,11 +741,15 @@ jobs:
 
   # G2-U3-L03：独立、可并行的真实 Chrome 浏览器 Job（不与 L02 共用 Job，互不影响耗时和失败）。
   # 实际运行三个 spec：真实 Scratch VM 边界矩阵、三视口课堂、共享壳内的 Gap A。不使用 continue-on-error，不跳过。
-  # Chrome 安装曾在 runner 上出现 8～12 分钟卡住（见 PR #471 的数据）。处理方式：每次尝试限时 4 分钟、最多 3 次，
-  # 3 次都失败才让 Job 失败（如实报错，不掩盖）；Job 总时限 25 分钟，足够 3 次安装加上约 8 分钟的测试。
+  # 超时预算（SYS-108：预算含全部开销，15 分钟是硬限制、不是目标）。CI 实测（#494 两次运行）：Job 共 448～461 秒（约 7.5 分钟），
+  # 其中测试 381～411 秒，Chrome 安装成功时 27～39 秒。Chrome 安装曾在 runner 上卡住 8～12 分钟（见 PR #471 的数据），
+  # 所以安装每次最多 100 秒（成功用时的约 3 倍）、最多 2 次，两次都失败才让 Job 失败（如实报错，不掩盖）。
+  # 最坏情况（全部可复核）：checkout、setup-node、npm ci 约 1 分钟 + 安装 2×100 秒加 5 秒间隔 = 约 3.5 分钟
+  # + 测试步骤上限 8 分钟（实测最慢 6.9 分钟，余量约 17%）+ 核对与上传约 0.5 分钟 = 约 13 分钟；
+  # 每一步都有自己的超时，因此最坏情况也是该步骤失败，而不是被 15 分钟硬限制取消。正常情况约 7.7 分钟。
   g2-u3-l03-browser-trial:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: apps/web
@@ -758,22 +762,25 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
       - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
+        timeout-minutes: 4
         run: |
-          for attempt in 1 2 3; do
-            if timeout 240 npx playwright install chrome --with-deps; then
+          for attempt in 1 2; do
+            if timeout 100 npx playwright install chrome --with-deps; then
               echo "Chrome installed on attempt $attempt"
               exit 0
             fi
-            echo "::warning::Chrome install attempt $attempt failed or timed out after 240s"
+            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
             sleep 5
           done
-          echo "::error::Chrome install failed after 3 attempts"
+          echo "::error::Chrome install failed after 2 attempts"
           exit 1
       - name: Run G2-U3-L03 real Scratch VM matrix, three-viewport classroom and shared-shell Gap A specs with real Chrome
+        timeout-minutes: 8
         env:
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g2-u3-l03/junit.xml
         run: npx playwright test tests/e2e/g2-u3-l03-vm.spec.ts tests/e2e/g2-u3-l03-classroom.spec.ts tests/e2e/g2-u3-l03-shell-gap-a.spec.ts --project=desktop --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l03
       - name: Verify the executed counts (no silent skipping or shrinking)
+        timeout-minutes: 1
         run: |
           python3 - <<'PY'
           import xml.etree.ElementTree as ET
