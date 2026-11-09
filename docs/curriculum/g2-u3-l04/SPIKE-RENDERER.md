@@ -14,7 +14,7 @@
 
 ## 二、验证项与结果（真实 Chromium，本地）
 
-`apps/web/tests/e2e/g2-u3-l04-renderer-spike.spec.ts`：共 17 个实例，17 通过 / 0 失败 / 0 跳过（JUnit 核对）：10 个相交 / 分离用例 + 4 个安全与释放用例 + 1 个「三端一致」用例在 3 个视口各跑一次。
+`apps/web/tests/e2e/g2-u3-l04-renderer-spike.spec.ts`：共 18 个实例，18 通过 / 0 失败 / 0 跳过（JUnit 核对）：1 个版本守卫 + 10 个相交 / 分离用例 + 4 个安全与释放用例 + 1 个「三端一致」用例在 3 个视口各跑一次。
 
 | 首席要求的验证项 | 做法 | 结果 |
 |---|---|---|
@@ -53,7 +53,7 @@
 | 新增资源 | `scratch-render.js` 约 3.0MB，gzip 后约 0.96MB（VM 本身 7.4MB / gzip 3.1MB）。**只有 L04 沙箱页会加载它**，其他课程不受影响。 |
 | 依赖 | `scratch-render@2.2.84` 已在 `package-lock.json` 中固定，是 `scratch-vm` 的传递依赖（`^2.0.0`），**不是** `package.json` 的直接依赖。spike 的复制脚本会核对安装版本和锁文件版本都等于 2.2.84，不符就失败。接正式课程时建议在 `package.json` 里显式固定为直接依赖。 |
 | 许可证 | AGPL-3.0-only，与已使用的 scratch-vm、scratch-storage 一致。 |
-| 复制方式 | 本 spike 用独立脚本 `scripts/copy-scratch-render-spike.mjs`，**没有**改共享的 `copy-scratch-vm.mjs`（它被每个课程的 predev / prebuild 使用）。产物在 `public/scratch-vm/`，被 `.gitignore` 忽略（构建产物）。 |
+| 提供方式 | spike 的测试宿主**直接从 `node_modules/scratch-render/dist/web/` 提供** `scratch-render.js`，不经过 `public/`，也**没有改**共享的 `copy-scratch-vm.mjs`。测试里有版本守卫：安装版本与锁文件版本都必须等于 2.2.84，否则失败。 |
 | CSP | 比 L02 只多 `img-src data:`。正式沙箱建议保持同样的最小集合，不开放 `blob:` / 外部来源。 |
 | 内存 | 每次运行新建渲染器与 WebGL 上下文，运行结束必须 `dispose`（含 `WEBGL_lose_context`）。已验证连续 12 次运行不累积，但**没有测量过内存峰值**。 |
 
@@ -71,7 +71,6 @@
 ```
 cd apps/web
 node scripts/copy-scratch-vm.mjs              # 既有脚本：复制 scratch-vm / scratch-storage
-node scripts/copy-scratch-render-spike.mjs    # spike 专用：复制固定版本的 scratch-render
 npx playwright test tests/e2e/g2-u3-l04-renderer-spike.spec.ts --project=desktop
 node ../../docs/curriculum/g2-u3-l04/probe-touch-without-renderer.cjs   # 无渲染器对照探针（Node）
 ```
@@ -80,4 +79,16 @@ node ../../docs/curriculum/g2-u3-l04/probe-touch-without-renderer.cjs   # 无渲
 
 1. 让 spike 在 **CI 的真实 Chrome** 上跑一次（独立 Job，不影响现有 Job）。这是接正式课程前最关键的缺口。
 2. CI 通过后，才进入 L04 教学方案与正式沙箱：沙箱内保留本文第一节的两个硬性前提，并各有守护测试。
-3. 在 `package.json` 里把 `scratch-render` 固定为直接依赖，并让正式课程自己的复制脚本负责产物（继续不碰共享的 `copy-scratch-vm.mjs`，除非首席裁定推广）。
+3. 在 `package.json` 里把 `scratch-render` 固定为直接依赖。**接正式课程时不能把 `scratch-render.js` 放进 `public/scratch-vm/` 后指望它留着**：见第九节。
+
+## 九、CI 上踩到的坑：共享 prebuild 会清空 `public/scratch-vm/`（接正式课程时必须处理）
+
+第一版 spike 的 CI Job 在真实 Chrome 上失败，18 个用例全部是同一个错误 `ENOENT: public/scratch-vm/scratch-render.js`。**这不是渲染器或 WebGL 的结论**，是我的配置问题：
+
+- 我在 CI 里先跑 `copy-scratch-vm.mjs`、再把 `scratch-render.js` 复制进 `public/scratch-vm/`。
+- 但 `playwright.config.ts` 的 webServer 命令是 `npm run build && npm run start`，`npm run build` 会触发 `prebuild`，而 `prebuild` 里的 `copy-scratch-vm.mjs` 结尾是 `rmSync(target, {recursive: true})`——**把整个 `public/scratch-vm/` 清空后只复制它自己的两个文件**，我复制进去的 `scratch-render.js` 被删了。
+- 本地没发现，是因为我本地的 Playwright 配置直接 `next start`，不跑 build。**本地通过掩盖了一个 CI 才会出现的问题**，这也是首席坚持要在真实 Chrome 的 CI 上验证的原因。
+
+处理：spike 的测试宿主改为直接从 `node_modules` 提供 `scratch-render.js`，彻底与 `prebuild` 无关，且删除了 `public/scratch-vm/scratch-render.js` 之后本地仍然通过（证明修复是真的）。
+
+**对正式课程的含义**：正式 L04 页面要从应用自己的源站加载渲染器，必须让产物在 `prebuild` 之后仍然存在。可选做法：① 正式时由首席裁定把 scratch-render 并入共享的 `copy-scratch-vm.mjs`（即「推广」，当前未获批）；② 给 L04 自己的复制脚本，并保证它在 `copy-scratch-vm.mjs` 之后运行（改 `prebuild` 的串联，也属于共享文件改动）；③ 不放在 `public/`，改由 Next 的路由处理器从 `node_modules` 提供。这三种都会触及共享文件，所以留给首席裁定，我没有擅自选。

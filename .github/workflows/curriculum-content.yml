@@ -14,7 +14,6 @@ on:
       - 'apps/web/tests/e2e/ux-003.spec.ts'
       - 'apps/web/src/features/lessons/**'
       - 'apps/web/tests/e2e/g2-u3-l04-renderer-spike.spec.ts'
-      - 'apps/web/scripts/copy-scratch-render-spike.mjs'
       - 'apps/web/public/**'
       - 'apps/web/tests/e2e/ux-101.spec.ts'
       - 'apps/web/tests/e2e/ux-103.spec.ts'
@@ -702,10 +701,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Copy the pinned Scratch VM and the spike-only scratch-render
-        run: |
-          node scripts/copy-scratch-vm.mjs
-          node scripts/copy-scratch-render-spike.mjs
+      - name: Copy the pinned Scratch VM (scratch-render is served by the test from node_modules, not copied)
+        run: node scripts/copy-scratch-vm.mjs
       - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
         timeout-minutes: 4
         run: |
@@ -739,7 +736,7 @@ jobs:
           print(f'G2-U3-L04 spike: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
           assert failures == 0 and errors == 0, 'failures present'
           assert skipped == 0, f'unexpected skipped count: {skipped}'
-          assert passed == 17, f'unexpected passed count: {passed}'
+          assert passed == 18, f'unexpected passed count: {passed}'
           PY
       - uses: actions/upload-artifact@v4
         if: always()

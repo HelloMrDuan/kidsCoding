@@ -12,6 +12,9 @@ import {join} from 'node:path'
 import {expect, test, type Page} from '@playwright/test'
 
 const PUBLIC_DIR = join(__dirname, '..', '..', 'public')
+const WEB_ROOT = join(__dirname, '..', '..')
+const RENDER_FILE = join(WEB_ROOT, 'node_modules', 'scratch-render', 'dist', 'web', 'scratch-render.js')
+const EXPECTED_RENDER_VERSION = '2.2.84'
 let server: Server
 let origin = ''
 const requested: string[] = []
@@ -30,10 +33,17 @@ test.beforeAll(async () => {
       res.end(readFileSync(join(PUBLIC_DIR, 'scratch-render-spike-sandbox.html')))
       return
     }
-    const vm = /^\/scratch-vm\/(scratch-vm\.js|scratch-storage\.min\.js|scratch-render\.js)$/.exec(url)
+    const vm = /^\/scratch-vm\/(scratch-vm\.js|scratch-storage\.min\.js)$/.exec(url)
     if (vm) {
       res.setHeader('content-type', 'text/javascript; charset=utf-8')
       res.end(readFileSync(join(PUBLIC_DIR, 'scratch-vm', vm[1])))
+      return
+    }
+    // scratch-render 直接从 node_modules 里的固定版本提供，不经过 public/：
+    // 共享的 prebuild（copy-scratch-vm.mjs）每次构建都会清空 public/scratch-vm/，而首席要求不把渲染器并入共享脚本。
+    if (url === '/scratch-vm/scratch-render.js') {
+      res.setHeader('content-type', 'text/javascript; charset=utf-8')
+      res.end(readFileSync(RENDER_FILE))
       return
     }
     res.statusCode = 404
@@ -102,6 +112,12 @@ const waitKind = <T,>(page: Page, kind: string, id: number) =>
 
 test.describe('方案 A spike：scratch-render + 真实 VM 的 touching（相交 / 分离）', () => {
   test.setTimeout(120_000)
+
+  test('前提：scratch-render 的安装版本与锁文件版本都是固定的 2.2.84（不符就失败，不静默用别的版本）', async () => {
+    const installed = JSON.parse(readFileSync(join(WEB_ROOT, 'node_modules', 'scratch-render', 'package.json'), 'utf8')).version
+    const lock = JSON.parse(readFileSync(join(WEB_ROOT, 'package-lock.json'), 'utf8')).packages['node_modules/scratch-render'].version
+    expect([installed, lock]).toEqual([EXPECTED_RENDER_VERSION, EXPECTED_RENDER_VERSION])
+  })
 
   test('前提：沙箱页加载了 VM 与 scratch-render 两个全局', async ({page}) => {
     const hello = await ready(page)
