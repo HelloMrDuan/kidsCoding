@@ -3,7 +3,7 @@
 //
 // 课程文案不含任何标准答案：三级提示逐级给方向、知识点、局部做法，从不给完整积木排列。
 // 参考做法只在“通过本关之后”的环节出现（见 reference.ts）。
-// 教学定位与数值是【提议】（rulingStatus = 'proposed'），见 docs/curriculum/g2-u3-l03/TEACHING-PLAN.md。
+// 教学定位与数值是首席批准的试点运行参数（rulingStatus = 'pilot-approved'，不代表儿童教学效果已验证），见 docs/curriculum/g2-u3-l03/TEACHING-PLAN.md。
 
 import { L03_LESSON_ID, L03_LEVELS, L03_PARAMS, type LevelId, type LevelParams } from './params'
 

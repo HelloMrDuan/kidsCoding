@@ -1,6 +1,6 @@
 // G2-U3-L03《随机出现的礼物》教学参数。
 //
-// 状态：**提议，待首席裁定**（rulingStatus = 'proposed'）。这些数值是提议值，裁定之前不得描述为“已批准”或“已验证”。
+// 状态：**pilot-approved**（首席对 #494 裁定：批准为试点运行参数）。这不是儿童教学效果验收，不得描述为“已验证”或“已掌握”，课程也不得标 completed。
 // 所有会影响教学判定的数值只能写在这个文件里；界面、判定、测试都从这里读取，不得在别处复制数字。
 // 方案与理由：docs/curriculum/g2-u3-l03/TEACHING-PLAN.md。
 
@@ -10,7 +10,7 @@ export const L03_LESSON_ID = 'G2-U3-L03'
 export type RulingStatus = 'proposed' | 'pilot-approved' | 'approved'
 
 export const L03_PARAMS = {
-  rulingStatus: 'proposed' as RulingStatus,
+  rulingStatus: 'pilot-approved' as RulingStatus,
 
   // 舞台（Scratch：x -240..240）
   stageMinX: -240,

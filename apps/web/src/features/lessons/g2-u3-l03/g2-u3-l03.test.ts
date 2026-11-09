@@ -36,8 +36,10 @@ function memoryStorage(): StorageLike & { data: Record<string, string> } {
 }
 
 describe('参数与契约', () => {
-  it('教学参数现在是“提议”，不是已批准也不是已验证', () => {
-    expect(L03_PARAMS.rulingStatus).toBe('proposed')
+  it('教学参数是首席批准的“试点运行参数”，不是已验证的正式参数', () => {
+    expect(L03_PARAMS.rulingStatus).toBe('pilot-approved')
+    expect(L03_PARAMS.rulingStatus).not.toBe('approved')
+    expect(L03_PARAMS.rulingStatus).not.toBe('proposed')
   })
 
   it('契约字段完整：恰 5 条目标、3 级提示、draftKey 绑定本课、教学定向', () => {

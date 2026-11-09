@@ -1739,8 +1739,8 @@
       "title": "随机出现的礼物",
       "trackId": "G2",
       "unitId": "G2-U3",
-      "focusConcept": "判断",
-      "plannedLearningOutcome": "能使用判断解释并完成「随机出现的礼物」中的关键操作，并展示可运行的结果或设计证据。",
+      "focusConcept": "随机数与取值范围",
+      "plannedLearningOutcome": "能使用「在……之间取随机数」，自己决定它的下界和上界，让礼物每次都出现在要求的范围内，并展示可运行的结果与运行证据。",
       "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
@@ -1748,7 +1748,7 @@
         "G2-U3-L02"
       ],
       "acceptance": [
-        "以真实执行器完成本课的指定知识点「判断」，不得用静态播放代替",
+        "以真实执行器完成本课的指定知识点「随机数与取值范围」，不得用静态播放代替",
         "至少两种目标不同的亲手练习，以及一条实际错误或边界测试",
         "有分层纠错、可修改的原创作品与关闭重开验证",
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
