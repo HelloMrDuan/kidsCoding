@@ -67,14 +67,14 @@ describe('scaffold-lesson generator (OPS-030)', () => {
     expect(existsSync(join(tmp, 'src/features/ai-python', `${lessonIdToSlug(LESSON_ID)}-contract.ts`))).toBe(true)
   })
 
-  it('generated contract ROUTE matches the lesson-level route directory', () => {
+  it('generated contract emits no route constant (no production route yet)', () => {
     gen()
     const contract = readFileSync(
       join(tmp, 'src/features/ai-python', `${lessonIdToSlug(LESSON_ID)}-contract.ts`),
       'utf8',
     )
-    expect(contract).toContain("'/learn/ai-python-lab-u3-l04/A1-U3-L04'")
-    expect(contract).not.toContain("'/learn/a1-u3-l04/A1-U3-L04'")
+    expect(contract).not.toContain('_ROUTE')
+    expect(contract).not.toContain('/learn/')
   })
 
   it('refuses to overwrite an existing target', () => {
