@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>G2-U3-L03 随机出现的礼物 沙箱</title>
+<script src="/scratch-vm/scratch-vm.js"></script>
+<!-- scratch-storage 是 scratch-vm 加载工程必需的素材仓库，和 scratch-g2-sandbox.html 使用同一个固定版本。 -->
+<script src="/scratch-vm/scratch-storage.min.js"></script>
+</head>
+<body>
+<script>
+(() => {
+  // G2-U3-L03 课堂沙箱。
+  // 只运行本课的固定舞台（果园背景 + 一个礼物）；礼物脚本只允许四种积木：
+  // 当绿旗被点击、重复执行、将 x 设为、以及嵌在“将 x 设为”里的“在……之间取随机数”。其余一律拒绝，保持上一次状态。
+  // 每次运行都重新载入工程（舞台复位），由真实 Scratch VM 逐帧执行；本页只做三件事：校验、观察、报告。
+  //
+  // 观察的是真实 VM 的积木调用：包装 runtime._primitives 里的 operator_random 与 motion_setx，记录后立即调用原函数，
+  // 不改变积木行为。例外只有一处：演示关（data.seeded）在“真实 operator_random 被调用的那一瞬间”把 Math.random 换成带种子的
+  // 发生器，调用结束立即恢复——随机块本身仍然是真实 VM 的块，只是这一次抽到的数每个人都一样。自己搭的三关从不换。
+  //
+  // 与 scratch-g2-sandbox.html 一样没有渲染器。真实 Scratch 里循环每转一圈会让出一帧，没有渲染器时 VM 不会让出，
+  // 整个脚本会在一帧内跑完，所以这里在 control_repeat 每次迭代后请求重绘，让循环每帧只前进一圈。
+  const LIMITS = {
+    stageMinX: -240, stageMaxX: 240, giftY: 0,
+    minBound: -500, maxBound: 500,
+    minRepeatTimes: 1, maxRepeatTimes: 20,
+    maxBlocks: 8, maxNesting: 1, maxScripts: 3, frameCap: 150,
+    demoSeed: 7,
+  };
+  const ASSETS = {
+    backdrop: '8d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70',
+    gift: '9e4f5a6b7c8d9e0f1a2b3c4d5e6f7081',
+  };
+  const NAMES = {gift: '礼物'};
+  // 原创 SVG（本项目绘制，无第三方素材）。
+  const SVG = {
+    backdrop: '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360"><rect width="480" height="360" fill="#fff4e0"/><rect y="250" width="480" height="110" fill="#f2d9a8"/><circle cx="420" cy="50" r="26" fill="#ffd95a"/></svg>',
+    gift: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><rect x="5" y="14" width="30" height="22" rx="3" fill="#e0564f" stroke="#9c2f2a" stroke-width="2"/><rect x="18" y="14" width="4" height="22" fill="#ffd95a"/><rect x="5" y="22" width="30" height="4" fill="#ffd95a"/><path d="M20 14c-6-8-12-2-8 1M20 14c6-8 12-2 8 1" fill="none" stroke="#9c2f2a" stroke-width="2"/></svg>',
+  };
+  const ALLOWED_GIFT = new Set(['event_whenflagclicked', 'control_repeat', 'motion_setx', 'operator_random']);
+
+  let vm = null;
+  let timer = null;
+  let current = null; // {id, levelId, fingerprint, frame, trace, ...}
+
+  function send(kind, info = {}) {
+    window.parent.postMessage({kind, ...info}, '*');
+  }
+  function uri(svg) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
+  function isIntInRange(raw, min, max) {
+    const text = String(raw);
+    if (!/^-?\d{1,4}$/.test(text)) return false;
+    const n = Number(text);
+    return Number.isInteger(n) && n >= min && n <= max;
+  }
+  // 输入形如 [1, [code, value]]：一个直接写在积木上的字面量。
+  const lit = (input, code) => Array.isArray(input) && input.length === 2 && input[0] === 1 &&
+    Array.isArray(input[1]) && input[1].length === 2 && input[1][0] === code ? input[1][1] : null;
+
+  // 校验礼物脚本：只允许四种 opcode；motion_setx 的 X 输入必须是“嵌着一个 operator_random 的遮挡输入”；
+  // operator_random 的上下界必须是范围内的整数字面量，且它的 parent 必须是唯一指向它的 motion_setx。
+  function validateGift(blocks) {
+    const ids = Object.keys(blocks);
+    if (ids.length > LIMITS.maxBlocks * 2 + LIMITS.maxScripts) throw new Error('积木太多');
+    const seen = new Set();
+    let hats = 0;
+    let looseBlocks = 0;
+    let setx = 0;
+    let randoms = 0;
+    const referenced = new Set();
+    for (const id of ids) {
+      const b = blocks[id];
+      if (!b || typeof b !== 'object' || !ALLOWED_GIFT.has(b.opcode)) throw new Error('本课不允许的积木：' + String(b && b.opcode).slice(0, 40));
+      if (b.shadow) throw new Error('不允许影子积木');
+      const inputNames = Object.keys(b.inputs || {}).sort().join(',');
+      if (Object.keys(b.fields || {}).length) throw new Error('积木选项不符合本课');
+      if (b.opcode === 'event_whenflagclicked') {
+        hats++;
+        if (!b.topLevel || b.parent !== null || inputNames !== '') throw new Error('绿旗积木结构不对');
+      } else if (b.opcode === 'motion_setx') {
+        setx++;
+        const x = b.inputs.X;
+        const okShape = inputNames === 'X' && Array.isArray(x) && x.length === 3 && x[0] === 3 && typeof x[1] === 'string' &&
+          Array.isArray(x[2]) && x[2].length === 2 && x[2][0] === 4;
+        if (!okShape) throw new Error('“将 x 设为”里必须放“取随机数”');
+        const r = blocks[x[1]];
+        if (!r || r.opcode !== 'operator_random' || r.parent !== id) throw new Error('“将 x 设为”里必须放“取随机数”');
+        if (referenced.has(x[1])) throw new Error('同一个“取随机数”不能被用两次');
+        referenced.add(x[1]);
+      } else if (b.opcode === 'operator_random') {
+        randoms++;
+        if (inputNames !== 'FROM,TO' || b.next !== null || b.topLevel) throw new Error('“取随机数”结构不对');
+        const from = lit(b.inputs.FROM, 4);
+        const to = lit(b.inputs.TO, 4);
+        if (from === null || to === null || !isIntInRange(from, LIMITS.minBound, LIMITS.maxBound) || !isIntInRange(to, LIMITS.minBound, LIMITS.maxBound)) throw new Error('取随机数的上下界超出范围');
+      } else {
+        const ok = inputNames === 'TIMES' || inputNames === 'SUBSTACK,TIMES';
+        if (!ok || lit(b.inputs.TIMES, 6) === null || !isIntInRange(lit(b.inputs.TIMES, 6), LIMITS.minRepeatTimes, LIMITS.maxRepeatTimes)) throw new Error('重复次数超出范围');
+        const sub = b.inputs.SUBSTACK;
+        if (sub !== undefined && !(Array.isArray(sub) && sub[0] === 2 && typeof sub[1] === 'string' && blocks[sub[1]] && blocks[sub[1]].parent === id)) throw new Error('重复里的积木连接不对');
+      }
+      if (b.opcode !== 'operator_random') {
+        if (b.next !== null && (typeof b.next !== 'string' || !blocks[b.next] || blocks[b.next].parent !== id)) throw new Error('积木连接不对');
+        if (b.parent !== null && (typeof b.parent !== 'string' || !blocks[b.parent])) throw new Error('积木父级不存在');
+        if (b.opcode !== 'event_whenflagclicked' && b.topLevel) looseBlocks++;
+      }
+    }
+    if (randoms !== setx) throw new Error('每个“将 x 设为”必须恰好带一个“取随机数”');
+    if (hats > LIMITS.maxScripts) throw new Error('脚本太多');
+    if (looseBlocks) throw new Error('本课不接收没有绿旗的散积木');
+    // 从每个帽子出发走一遍：每块积木只能被访问一次，且重复嵌套不超过上限。
+    let counted = 0;
+    function walk(startId, depth) {
+      let id = startId;
+      while (id) {
+        if (seen.has(id)) throw new Error('积木连接成环或重复');
+        seen.add(id);
+        counted++;
+        const b = blocks[id];
+        if (b.opcode === 'control_repeat') {
+          if (depth + 1 > LIMITS.maxNesting) throw new Error('重复嵌套太深');
+          if (b.inputs.SUBSTACK) walk(b.inputs.SUBSTACK[1], depth + 1);
+        }
+        id = b.next;
+      }
+    }
+    for (const id of ids) if (blocks[id].opcode === 'event_whenflagclicked') { seen.add(id); walk(blocks[id].next, 0); }
+    // 走到的积木 + 嵌在里面的取随机数 = 全部积木，否则有积木没有接上。
+    if (seen.size + randoms !== ids.length) throw new Error('有积木没有接上');
+    if (counted > LIMITS.maxBlocks) throw new Error('积木太多');
+  }
+
+  function validateProject(project) {
+    if (!project || typeof project !== 'object' || !Array.isArray(project.targets) || project.targets.length !== 2) throw new Error('工程需要 2 个对象');
+    const [stage, gift] = project.targets;
+    if (!stage.isStage || stage.name !== 'Stage' || Object.keys(stage.blocks || {}).length !== 0) throw new Error('舞台不对');
+    if (gift.isStage || gift.name !== NAMES.gift) throw new Error('角色名单不对');
+    const art = [[stage, ASSETS.backdrop], [gift, ASSETS.gift]];
+    for (const [t, id] of art) {
+      if (!Array.isArray(t.costumes) || t.costumes.length !== 1 || t.costumes[0].assetId !== id || t.costumes[0].dataFormat !== 'svg') throw new Error('造型不对');
+      if (Object.keys(t.variables || {}).length || Object.keys(t.lists || {}).length || Object.keys(t.broadcasts || {}).length) throw new Error('本课不允许变量、列表或广播');
+      if ((t.sounds || []).length) throw new Error('本课不允许声音');
+    }
+    if (typeof gift.x !== 'number' || typeof gift.y !== 'number' || gift.x !== 0 || gift.y !== LIMITS.giftY) throw new Error('礼物起点不对');
+    validateGift(gift.blocks || {});
+  }
+
+  function newMachine() {
+    const Storage = typeof window.ScratchStorage === 'function' ? window.ScratchStorage : window.ScratchStorage.ScratchStorage;
+    const machine = new window.VirtualMachine();
+    const storage = new Storage();
+    machine.attachStorage(storage);
+    for (const [key, svg] of Object.entries(SVG)) {
+      storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, new TextEncoder().encode(svg), ASSETS[key]);
+    }
+    return machine;
+  }
+  function spriteOf(machine, name) {
+    return machine.runtime.targets.find(t => !t.isStage && t.isOriginal && t.sprite && t.sprite.name === name) || null;
+  }
+  // 积木是否位于“重复执行”的循环体里面。
+  // Scratch 里排在某块后面的积木，其 parent 也指向前一块（包括前一块是重复执行的情况），
+  // 所以必须区分：parent.next === 当前块 → 只是排在后面（同一层，继续向上找）；
+  // 否则当前块挂在 parent 的输入（SUBSTACK）里，此时 parent 若是循环才算“在循环里”。
+  function ancestorIsLoop(target, blockId) {
+    let cur = target.blocks.getBlock(blockId);
+    for (let guard = 0; cur && cur.parent && guard < 100; guard++) {
+      const parent = target.blocks.getBlock(cur.parent);
+      if (!parent) return false;
+      if (parent.next !== cur.id && (parent.opcode === 'control_repeat' || parent.opcode === 'control_forever')) return true;
+      cur = parent;
+    }
+    return false;
+  }
+
+  // 演示关用的带种子发生器（mulberry32）。TypeScript 孪生在 src/features/lessons/g2-u3-l03/seeded-random.ts，
+  // 单测与 E2E 会拿它和真实 VM 取出的值逐个对比，两份实现不一致会立刻被发现。
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // 观察再调用：包装 Scratch 自己的积木函数，记录后立即调用原函数，不改变积木行为。
+  function attachObservers(machine, run) {
+    const primitives = machine.runtime._primitives;
+    const random = primitives.operator_random;
+    // “取随机数”积木嵌在“将 x 设为”里，它的积木 id 也要记下来，用来判断它是不是在循环里。
+    primitives.operator_random = function (args, util) {
+      let value;
+      const realRandom = Math.random;
+      // 演示关：只在真实 operator_random 执行的这一瞬间换上带种子的发生器，立刻恢复。
+      if (run.seededRandom) Math.random = run.seededRandom;
+      try {
+        value = random.call(this, args, util);
+      } finally {
+        Math.random = realRandom;
+      }
+      try {
+        if (machine === vm && run.live && !util.target.isStage && util.target.sprite.name === NAMES.gift) {
+          const from = Number(args.FROM);
+          const to = Number(args.TO);
+          // 真实 VM 的 execute() 把线程栈顶当作“正在执行的语句积木”，嵌在里面的报告块（取随机数）在它执行的过程中被求值，
+          // 所以栈顶就是外层的“将 x 设为”（motion_setx），不是取随机数本身。
+          const owner = util.thread.peekStack();
+          run.trace.draws.push({
+            frame: run.frame,
+            from: Number.isFinite(from) ? from : 0,
+            to: Number.isFinite(to) ? to : 0,
+            value: Number(value),
+            inLoop: ancestorIsLoop(util.target, owner),
+          });
+        }
+      } catch (_error) {}
+      return value;
+    };
+    const setx = primitives.motion_setx;
+    primitives.motion_setx = function (args, util) {
+      const result = setx.call(this, args, util);
+      try {
+        if (machine === vm && run.live && !util.target.isStage && util.target.sprite.name === NAMES.gift) {
+          run.trace.placements.push({frame: run.frame, x: Number(util.target.x)});
+        }
+      } catch (_error) {}
+      return result;
+    };
+    const repeat = primitives.control_repeat;
+    primitives.control_repeat = function (args, util) {
+      const result = repeat.call(this, args, util);
+      try { util.runtime.requestRedraw(); } catch (_error) {}
+      return result;
+    };
+  }
+
+  function stopTimer() { if (timer !== null) { clearTimeout(timer); timer = null; } }
+  function disposeMachine() {
+    stopTimer();
+    if (vm) {
+      try { vm.stopAll(); } catch (_error) {}
+      try { vm.quit(); } catch (_error) {}
+    }
+    vm = null;
+  }
+  function finish(run, endedBy, error) {
+    if (run !== current || !run.live) return;
+    run.live = false;
+    stopTimer();
+    run.trace.endedBy = endedBy;
+    run.trace.framesRun = run.frame;
+    if (error) run.trace.error = String(error).slice(0, 200);
+    try { vm && vm.stopAll(); } catch (_error) {}
+    send('RUN_DONE', {id: run.id, trace: run.trace});
+  }
+
+  function stepOnce(run) {
+    if (run !== current || !run.live) return;
+    try {
+      run.frame += 1;
+      vm.runtime.currentStepTime = 1000 / 30;
+      vm.runtime._step();
+      const gift = spriteOf(vm, NAMES.gift);
+      if (!gift) throw new Error('角色丢失');
+      // 把到目前为止真实 motion_setx 放过的 x 都带上（最多 60 个），界面直接画出来，不靠推断。
+      send('FRAME', {id: run.id, frame: run.frame, gift: {x: gift.x, y: gift.y}, trail: run.trace.placements.slice(0, 60).map(p => p.x)});
+      // 所有脚本都跑完（没有活着的线程）就结束；这一帧里刚产生的位置已经记录。
+      if (vm.runtime.threads.length === 0) { finish(run, 'finished'); return; }
+      if (run.frame >= LIMITS.frameCap) { finish(run, 'frameCap'); return; }
+      timer = setTimeout(() => stepOnce(run), run.frameMs);
+    } catch (error) {
+      finish(run, 'error', error);
+    }
+  }
+
+  async function startRun(data) {
+    disposeMachine();
+    if (current) current.live = false;
+    const id = data.id;
+    if (!Number.isInteger(id) || id < 1) { send('ERROR', {id: 0, error: '运行编号不对'}); return; }
+    try {
+      validateProject(data.project);
+    } catch (error) {
+      send('REJECTED', {id, error: String(error.message || error).slice(0, 120)});
+      return;
+    }
+    if (typeof window.VirtualMachine !== 'function' || !window.ScratchStorage) {
+      send('ERROR', {id, error: 'Scratch VM 脚本没有加载（可能是网络问题）'});
+      return;
+    }
+    const frameMs = Number.isFinite(data.frameMs) ? Math.max(0, Math.min(100, data.frameMs)) : 33;
+    const run = {
+      id, frameMs, frame: 0, live: false, cancelled: false, loading: true,
+      seededRandom: data.seeded === true ? mulberry32(LIMITS.demoSeed) : null,
+      trace: {levelId: String(data.levelId || ''), runId: id, fingerprint: String(data.fingerprint || '').slice(0, 4000),
+        endedBy: 'error', framesRun: 0, seeded: data.seeded === true, draws: [], placements: []},
+    };
+    current = run;
+    try {
+      const machine = newMachine();
+      vm = machine;
+      await machine.loadProject(JSON.stringify(data.project));
+      if (current !== run || run.cancelled) return; // 加载期间又有新的运行或停止
+      attachObservers(machine, run);
+      machine.greenFlag();
+      run.loading = false;
+      run.live = true;
+      send('STARTED', {id});
+      timer = setTimeout(() => stepOnce(run), run.frameMs);
+    } catch (error) {
+      if (current === run) { run.loading = false; run.live = false; disposeMachine(); send('ERROR', {id, error: String(error).slice(0, 200)}); }
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent || !event.data || typeof event.data !== 'object') return;
+    const data = event.data;
+    if (data.kind === 'PING') {
+      send('FRAME_READY', {
+        available: typeof window.VirtualMachine === 'function' && !!window.ScratchStorage,
+        limits: LIMITS, assets: {backdrop: uri(SVG.backdrop), gift: uri(SVG.gift)},
+      });
+      return;
+    }
+    if (data.kind === 'RUN') { startRun(data); return; }
+    if (data.kind === 'STOP') {
+      if (!current || data.id !== current.id || current.cancelled) return;
+      if (current.live) { current.cancelled = true; finish(current, 'stopped'); return; }
+      // 还在加载或已结束：取消后不再启动；加载中被停止时也要回一个“已停止”的结果。
+      if (current.loading) {
+        current.loading = false;
+        current.cancelled = true;
+        disposeMachine();
+        current.trace.endedBy = 'stopped';
+        send('RUN_DONE', {id: current.id, trace: current.trace});
+      }
+      return;
+    }
+  });
+})();
+</script>
+</body>
+</html>

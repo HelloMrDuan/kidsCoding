@@ -1739,28 +1739,28 @@
       "title": "随机出现的礼物",
       "trackId": "G2",
       "unitId": "G2-U3",
-      "focusConcept": "判断",
-      "plannedLearningOutcome": "能使用判断解释并完成「随机出现的礼物」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "focusConcept": "随机数与取值范围",
+      "plannedLearningOutcome": "能使用「在……之间取随机数」，自己决定它的下界和上界，让礼物每次都出现在要求的范围内，并展示可运行的结果与运行证据。",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
         "G2-U3-L02"
       ],
       "acceptance": [
-        "以真实执行器完成本课的指定知识点「判断」，不得用静态播放代替",
+        "以真实执行器完成本课的指定知识点「随机数与取值范围」，不得用静态播放代替",
         "至少两种目标不同的亲手练习，以及一条实际错误或边界测试",
         "有分层纠错、可修改的原创作品与关闭重开验证",
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/494",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/g2-u3-l03-vm.spec.ts（真实 scratch-vm 行为矩阵）+ g2-u3-l03-classroom.spec.ts（三端课堂）+ g2-u3-l03-shell-gap-a.spec.ts；CI Job g2-u3-l03-browser-trial 在真实 Chrome 上实际运行，核对 171 个实例中 164 通过 / 7 按设计跳过 / 0 失败；详见 docs/roadmap/evidence/G2-U3-L03/README.md",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "PR #494，等待 4 号非作者独立审核。教学定向；首席已裁定教学参数为试点运行参数（rulingStatus=pilot-approved，不代表儿童教学效果已验证），focusConcept 确定为「随机数与取值范围」，本行与目录里 L03 自己的条目已按裁定做最小一致性修正（其他课程未动）。浏览器测试已由独立并行 CI Job g2-u3-l03-browser-trial 接入真实 Chrome。无独立教研、无儿童试学、无真实设备；目录仍为 outline_not_playable，非已发布，不得标 completed。"
     },
     {
       "id": "G2-U3-L04",
