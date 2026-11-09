@@ -172,6 +172,9 @@ const ROWS: Row[] = [
     says: {knowledge: '共 2 次加分没有被条件挡住'}}),
   R({name: '两条脚本：一条负责检查，另一条无条件加分（判定看行为，不看“有没有如果”）', level: 'solve', program: {scripts: [{hat: 'flag', body: [repeat(40, iftouch(hide as never))]}, {hat: 'flag', body: [score(1)]}]}, score: 2, red: 1, blue: 1, layers: [false, false, false, false],
     says: {knowledge: '共 2 次加分没有被条件挡住'}}),
+  R({name: '散积木（没接绿旗）和标准脚本并存：散积木不运行，得分仍是 1', level: 'solve', program: {scripts: [{hat: null, body: [score(1)]}, {hat: 'flag', body: [repeat(40, iftouch(score(1) as never, hide as never))]}]}, score: 1, red: 1, blue: 0, layers: [true, true, true, true]}),
+  R({name: '标准脚本外面再多一个无条件“得分+1”：红球 2 次、蓝球 1 次', level: 'solve', program: flag(repeat(40, iftouch(score(1) as never, hide as never)), score(1)), score: 3, red: 2, blue: 1, layers: [false, false, false, false],
+    says: {task: '红球被加了 2 次分', knowledge: '没有被条件挡住'}}),
   // ---- 迁移 A：每个球 2 分 ----
   R({name: '迁移 A：标准做法加 2 分', level: 'transferPoints', program: standard(40, 2), score: 2, red: 1, blue: 0, layers: [true, true, true, true]}),
   R({name: '迁移 A：照抄上一关的加 1 分 → 舞台、任务不通过，知识证据通过', level: 'transferPoints', program: standard(40, 1), score: 1, red: 1, blue: 0, layers: [false, false, true, false],
