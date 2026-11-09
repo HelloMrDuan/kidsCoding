@@ -63,8 +63,18 @@ describe('scaffold-lesson generator (OPS-030)', () => {
   it('generated files land under the derived A1 directories', () => {
     const result = gen()
     expect(result.featureDir).toBe('src/features/ai-python')
-    expect(result.routeDir).toBe('src/app/learn/ai-python-lab-a1-u3')
+    expect(result.routeDir).toBe('src/app/learn/ai-python-lab-u3-l04')
     expect(existsSync(join(tmp, 'src/features/ai-python', `${lessonIdToSlug(LESSON_ID)}-contract.ts`))).toBe(true)
+  })
+
+  it('generated contract ROUTE matches the lesson-level route directory', () => {
+    gen()
+    const contract = readFileSync(
+      join(tmp, 'src/features/ai-python', `${lessonIdToSlug(LESSON_ID)}-contract.ts`),
+      'utf8',
+    )
+    expect(contract).toContain("'/learn/ai-python-lab-u3-l04/A1-U3-L04'")
+    expect(contract).not.toContain("'/learn/a1-u3-l04/A1-U3-L04'")
   })
 
   it('refuses to overwrite an existing target', () => {
@@ -85,7 +95,7 @@ describe('scaffold-lesson generator (OPS-030)', () => {
   it('derives G2 paths for a G2 lesson', () => {
     const paths = derivePaths('G2-U3-L03')
     expect(paths.featureDir).toBe('src/features/lessons/g2-u3')
-    expect(paths.routeDir).toBe('src/app/learn/g2-u3')
+    expect(paths.routeDir).toBe('src/app/learn/g2-u3-l03')
     expect(paths.e2ePrefix).toBe('g2-u3')
   })
 

@@ -19,7 +19,7 @@ import { HINTS, LESSON_STEPS } from './a1-u3-l04'
 
 export const L04_LESSON_ID = 'A1-U3-L04'
 export const L04_LESSON_TITLE = '检索可信资料'
-export const L04_ROUTE = '/learn/a1-u3-l04/A1-U3-L04'
+export const L04_ROUTE = '/learn/ai-python-lab-u3-l04/A1-U3-L04'
 
 /** 契约草稿键：规范格式 kidscoding-draft:{lessonId}，按课节分键。 */
 export const L04_DRAFT_KEY = 'kidscoding-draft:A1-U3-L04'

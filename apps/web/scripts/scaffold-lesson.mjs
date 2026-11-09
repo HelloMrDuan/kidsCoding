@@ -86,27 +86,34 @@ export function lessonIdToUnit(lessonId) {
 /**
  * 由 lessonId 推导课程文件所在目录与路由目录。
  * A1 系课程放 ai-python；G2 系放 lessons/g2-<unit>；其余放 lessons/<track>。
- * 路由目录：A1 用 ai-python-lab-<unitLower>；G2 用 g2-<unitLower>。
+ * 路由目录为课节级（跟 L02/L03 正式课模式）：A1 用
+ * ai-python-lab-<unit>-<lesson>（例：ai-python-lab-u3-l04）；G2 用
+ * <track>-<unit>-<lesson>（例：g2-u3-l03）。单元级目录已废弃（2026-11-09
+ * 首席裁定：单元级路由目录与正式课的课节级目录不一致，导致契约里的
+ * ROUTE 常量写错）。
  */
 export function derivePaths(lessonId, opts = {}) {
   const prefix = lessonIdToPrefix(lessonId)
   const unit = lessonIdToUnit(lessonId)
   const unitLower = unit.toLowerCase()
   const slug = lessonIdToSlug(lessonId)
+  const lessonPart = lessonId.split('-')[2].toLowerCase()
   let featureDir
   let routeDir
   let e2ePrefix
   if (prefix === 'A1') {
     featureDir = 'src/features/ai-python'
-    routeDir = `src/app/learn/ai-python-lab-${unitLower}`
+    // 单元 A1-U3 -> u3，课节 L04 -> l04，拼成 ai-python-lab-u3-l04。
+    const unitPart = unitLower.split('-')[1]
+    routeDir = `src/app/learn/ai-python-lab-${unitPart}-${lessonPart}`
     e2ePrefix = 'ai-python'
   } else if (prefix === 'G2') {
     featureDir = `src/features/lessons/${unitLower}`
-    routeDir = `src/app/learn/${unitLower}`
+    routeDir = `src/app/learn/${unitLower}-${lessonPart}`
     e2ePrefix = unitLower
   } else {
     featureDir = `src/features/lessons/${unitLower}`
-    routeDir = `src/app/learn/${unitLower}`
+    routeDir = `src/app/learn/${unitLower}-${lessonPart}`
     e2ePrefix = unitLower
   }
   if (opts.featureDir) featureDir = opts.featureDir
@@ -191,8 +198,12 @@ export const HINTS = [
 // ---------------------------------------------------------------------------
 // 模板：契约骨架
 // ---------------------------------------------------------------------------
-export function contractTemplate({ lessonId, title, slug, engine }) {
+export function contractTemplate({ lessonId, title, slug, engine, routeDir }) {
   const S = shortName(slug)
+  // 路由常量必须与正式建课时创建的课节级路由目录一致（例：
+  // ai-python-lab-u3-l04），不得用 slug 拼单元级目录（旧 bug：
+  // '/learn/a1-u3-l04/A1-U3-L04'，实际路由目录是 ai-python-lab-u3-l04）。
+  const routePath = routeDir ? routeDir.replace('src/app/learn/', '') : slug
   return `/**
  * ${lessonId} 课程内容契约（Lesson Content Contract，脚手架 OPS-030 生成）。
  *
@@ -214,7 +225,7 @@ import { HINTS, LESSON_STEPS } from './${slug}'
 
 export const ${S}_LESSON_ID = '${lessonId}'
 export const ${S}_LESSON_TITLE = '${title}'
-export const ${S}_ROUTE = '/learn/${slug}/${lessonId}'
+export const ${S}_ROUTE = '/learn/${routePath}/${lessonId}'
 
 /** 契约草稿键：规范格式 kidscoding-draft:{lessonId}，按课节分键。 */
 export const ${S}_DRAFT_KEY = 'kidscoding-draft:${lessonId}'
@@ -729,9 +740,9 @@ describe('${lessonId} slot onJudgment (scaffold)', () => {
 // ---------------------------------------------------------------------------
 // 生成器
 // ---------------------------------------------------------------------------
-export function buildFileList({ lessonId, title, engine, featureDir }) {
+export function buildFileList({ lessonId, title, engine, featureDir, routeDir }) {
   const slug = lessonIdToSlug(lessonId)
-  const params = { lessonId, title, slug, engine, featureDir }
+  const params = { lessonId, title, slug, engine, featureDir, routeDir }
   return [
     {
       path: join(featureDir, `${slug}.ts`),
@@ -837,6 +848,7 @@ export function generate({ lessonId, title, engine = 'slot', outDir = null, ...o
     title,
     engine,
     featureDir: paths.featureDir,
+    routeDir: paths.routeDir,
   })
   const root = outDir ? resolve(outDir) : WEB_ROOT
   const written = []
