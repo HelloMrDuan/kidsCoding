@@ -6,7 +6,7 @@
 // 教学定位与数值是【提议】（rulingStatus = 'proposed'），见 docs/curriculum/g2-u3-l04/TEACHING-PLAN.md。
 // 数字（球速、帧数、得分）来自 params.ts 与真实 VM 的实测，不在文案里另写一份。
 
-import { L04_LESSON_ID, L04_LEVELS, L04_PARAMS, type LevelId, type LevelParams } from './params'
+import { L04_LESSON_ID, L04_LEVELS, type LevelId, type LevelParams } from './params'
 
 export type L04Contract = {
   lessonId: string

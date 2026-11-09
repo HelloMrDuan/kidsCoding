@@ -21,6 +21,8 @@ export type L04StageState = {
 
 export type StageDict = Record<string, number | string | boolean>
 
+// 起点对每一关都一样（球速不同只影响下落快慢）；保留关卡参数是为了和调用方、L02 的同名函数签名一致。
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function startPositions(_levelId: LevelId): StagePositions {
   return {
     basket: { x: L04_PARAMS.basketX, y: L04_PARAMS.basketY },
