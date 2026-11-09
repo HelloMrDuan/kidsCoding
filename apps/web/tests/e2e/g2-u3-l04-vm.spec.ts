@@ -11,7 +11,8 @@ import {expect, test, type Page} from '@playwright/test'
 import {compileProject, L04_ASSETS} from '../../src/features/lessons/g2-u3-l04/compile'
 import {judgeRun, type RunJudgment, type RunTrace} from '../../src/features/lessons/g2-u3-l04/judge'
 import {L04_LEVELS, L04_PARAMS, type LevelId} from '../../src/features/lessons/g2-u3-l04/params'
-import {programFingerprint, type Block, type Program} from '../../src/features/lessons/g2-u3-l04/program'
+import {programFingerprint, validateProgram, type Block, type Program} from '../../src/features/lessons/g2-u3-l04/program'
+import {alternatives} from '../../src/features/lessons/g2-u3-l04/reference'
 
 const WEB_ROOT = join(__dirname, '..', '..')
 const PUBLIC_DIR = join(WEB_ROOT, 'public')
@@ -378,6 +379,26 @@ test.describe('G2-U3-L04 正式沙箱：安全边界（独立于 spike 的断言
     await ready(page)
     await run(page, standard(40), 'solve')
     expect([...new Set(requested)].sort()).toEqual(['/host.html', '/scratch-g2-u3-l04-sandbox.html', '/scratch-vm/scratch-render.js', '/scratch-vm/scratch-storage.min.js', '/scratch-vm/scratch-vm.js'].sort())
+  })
+})
+
+test.describe('G2-U3-L04 参考做法：每一个“别的做法”都真的在真实 VM 里通过三层判定', () => {
+  test.setTimeout(180_000)
+  test.beforeEach(async ({page}) => { await ready(page) })
+  for (const levelId of ['solve', 'transferPoints', 'transferFast'] as const) {
+    test(`${levelId}：所有别的做法合法，且真实运行全部通过`, async ({page}) => {
+      const alts = alternatives(L04_LEVELS[levelId])
+      expect(alts.length, '这一关应该有别的做法').toBeGreaterThanOrEqual(2)
+      for (const alt of alts) {
+        expect(validateProgram(alt.program), alt.title).toEqual([])
+        const r = await run(page, alt.program, levelId)
+        const j = judged(r)
+        expect([j.stage.passed, j.task.passed, j.knowledge.passed, j.passed], `${levelId} · ${alt.title}`).toEqual([true, true, true, true])
+      }
+    })
+  }
+  test('没实测过的球速不给“别的做法”（宁可少给，不给没验证过的）', () => {
+    expect(alternatives({id: 'solve', layer: 2, ballSpeed: 15, points: 1})).toEqual([])
   })
 })
 
