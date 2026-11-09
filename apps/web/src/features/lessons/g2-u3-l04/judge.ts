@@ -7,7 +7,7 @@
 //   · 任务结果 = 逐球核算：红球恰好加分一次且加的是本关分数，蓝球（落在地上）一次都没加。
 //     这一层能区分“总分碰巧对”与“每个球都对”（例如迁移 A 要 2 分：不带“如果”的程序两个球各加 1 分，总分也是 2）；
 //   · 知识证据（判断）= 每一次得分之前，**同一个球**最近一次“碰到篮子？”检查必须返回 true，并且条件确实在把关
-//     （这个球至少检查过一次，且既有 true 也有 false，或者一直是 false 且从未得分）。看的是条件有没有真的挡住不该得分的情况，不是总分。
+//     看的是条件有没有真的挡住不该得分的情况，不是总分。
 //     两个球的线程交错执行，所以必须按球分别配对，不能用全局顺序。
 
 import type { LevelParams } from './params'
@@ -51,8 +51,6 @@ export type RunJudgment =
   | { status: 'judged'; stage: Layer; task: Layer; knowledge: Layer; understanding: string; passed: boolean; conclusion: string; level: LevelParams }
   | { status: 'not-judged'; reason: string }
 
-const BALLS: BallName[] = ['红球', '蓝球']
-
 /**
  * 没有被条件挡住的得分：加分发生的那一帧，该球必须有一次“碰到 篮子？”检查，并且那次检查返回 true。
  * 检查与加分在同一个线程里紧挨着执行（检查是加分的条件），所以它们落在同一帧；如果加分的那一帧里这个球的检查
@@ -93,7 +91,6 @@ export function judgeRun(trace: RunTrace, level: LevelParams): RunJudgment {
   }
 
   // ---- 知识证据：每次得分前，同一个球最近一次检查必须为 true；条件确实在把关 ----
-  const checksByBall = (ball: BallName) => trace.checks.filter(c => c.ball === ball)
   const totalChecks = trace.checks.length
   const unguarded = unguardedScores(trace)
   let knowledge: Layer
@@ -120,11 +117,10 @@ export function judgeRun(trace: RunTrace, level: LevelParams): RunJudgment {
         : '知识证据：本次程序没有满足判断要求——“碰到 篮子？”检查了，却一次也没有碰到：检查的时候球还没落到篮子上（检查的次数可能不够）',
     }
   } else {
-    // 所有得分都在检查为 true 的同一帧发生；条件还要确实“挡住”过没碰到的情况：两个球的检查里至少有一个 false。
-    const sawFalse = BALLS.some(b => checksByBall(b).some(c => !c.result))
-    knowledge = sawFalse
-      ? { passed: true, line: '知识证据：本次程序满足判断要求——每一次加分之前，“碰到 篮子？”都是真的；没碰到的时候没有加分。这条结论只看条件有没有把关，不只看总分' }
-      : { passed: false, line: '知识证据：本次程序没有满足判断要求——“碰到 篮子？”从来没有出现过“没碰到”，看不出条件在把关' }
+    // 所有得分都发生在“碰到 篮子？”为真的同一帧，条件确实在把关。
+    // 注意：不再要求“检查里出现过 false”——蓝球落在地上，只要有检查，蓝球的每次检查都是 false，所以这一条在任何真实运行里恒成立，
+    // 写出来只会让读代码的人误以为有一道防线。真正的防线是上面的“每次得分前同一个球同一帧检查为真”和“蓝球不能被加分”（任务结果）。
+    knowledge = { passed: true, line: '知识证据：本次程序满足判断要求——每一次加分之前，“碰到 篮子？”都是真的；没碰到的时候没有加分。这条结论只看条件有没有把关，不只看总分' }
   }
 
   const passed = stage.passed && task.passed && knowledge.passed

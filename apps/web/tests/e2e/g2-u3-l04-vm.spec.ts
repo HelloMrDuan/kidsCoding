@@ -165,6 +165,13 @@ const ROWS: Row[] = [
   R({name: '只检查一次（“如果”不在“重复”里）：球还没到，得 0 分', level: 'solve', program: flag(iftouch(score(1) as never, hide as never)), score: 0, red: 0, blue: 0, layers: [false, false, false, false]}),
   R({name: '空程序', level: 'solve', program: {scripts: []}, score: 0, red: 0, blue: 0, layers: [false, false, false, false], says: {knowledge: '没有用到判断'}}),
   R({name: '只有绿旗', level: 'solve', program: flag(), score: 0, red: 0, blue: 0, layers: [false, false, false, false]}),
+  // ---- 有真实的检查，但得分不受它约束（这是知识证据“按球、同一帧配对”要抓住的情形）----
+  R({name: '有检查但得分在条件外：重复 40 次 { 如果{隐藏}；得分+1 } → 80 次加分里 79 次没被条件挡住', level: 'solve', program: flag(repeat(40, iftouch(hide as never), score(1))), score: 80, red: 40, blue: 40, layers: [false, false, false, false],
+    says: {knowledge: '共 79 次加分没有被条件挡住'}}),
+  R({name: '有检查但得分在条件外，只做一次', level: 'solve', program: flag(iftouch(hide as never), score(1)), score: 2, red: 1, blue: 1, layers: [false, false, false, false],
+    says: {knowledge: '共 2 次加分没有被条件挡住'}}),
+  R({name: '两条脚本：一条负责检查，另一条无条件加分（判定看行为，不看“有没有如果”）', level: 'solve', program: {scripts: [{hat: 'flag', body: [repeat(40, iftouch(hide as never))]}, {hat: 'flag', body: [score(1)]}]}, score: 2, red: 1, blue: 1, layers: [false, false, false, false],
+    says: {knowledge: '共 2 次加分没有被条件挡住'}}),
   // ---- 迁移 A：每个球 2 分 ----
   R({name: '迁移 A：标准做法加 2 分', level: 'transferPoints', program: standard(40, 2), score: 2, red: 1, blue: 0, layers: [true, true, true, true]}),
   R({name: '迁移 A：照抄上一关的加 1 分 → 舞台、任务不通过，知识证据通过', level: 'transferPoints', program: standard(40, 1), score: 1, red: 1, blue: 0, layers: [false, false, true, false],
