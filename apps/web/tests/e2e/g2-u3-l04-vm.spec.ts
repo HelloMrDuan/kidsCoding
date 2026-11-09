@@ -79,7 +79,7 @@ const HOST_HTML = `<!doctype html><meta charset="utf-8"><body>
 
 let nextRunId = 1000
 type FrameMsg = {frame: number; basket: {x: number; y: number}; hitBall: {x: number; y: number; visible: boolean}; groundBall: {x: number; y: number; visible: boolean}; score: number}
-export type RunResult = {trace: RunTrace; judgment: RunJudgment; frames: FrameMsg[]; skinMs: number | null}
+export type RunResult = {trace: RunTrace; judgment: RunJudgment; frames: FrameMsg[]; skinMs: number | null; sizes: Record<string, [number, number]> | null}
 
 async function ready(page: Page) {
   await page.goto(`${origin}/host.html`)
@@ -103,8 +103,8 @@ async function run(page: Page, program: Program, levelId: LevelId, opts: {frameM
     return done.trace
   }, {message, id}) as RunTrace
   const frames = await page.evaluate((id) => (window as unknown as {inboxOf: (k: string, i: number) => unknown[]}).inboxOf('FRAME', id), id) as FrameMsg[]
-  const started = await page.evaluate((id) => (window as unknown as {inboxOf: (k: string, i: number) => Array<{skinMs: number}>}).inboxOf('STARTED', id), id)
-  return {trace, judgment: judgeRun(trace, level), frames, skinMs: started[0]?.skinMs ?? null}
+  const started = await page.evaluate((id) => (window as unknown as {inboxOf: (k: string, i: number) => Array<{skinMs: number; sizes: Record<string, [number, number]>}>}).inboxOf('STARTED', id), id)
+  return {trace, judgment: judgeRun(trace, level), frames, skinMs: started[0]?.skinMs ?? null, sizes: started[0]?.sizes ?? null}
 }
 
 const score = (by: number): Block => ({t: 'score', by})
@@ -260,10 +260,12 @@ test.describe('G2-U3-L04 真实 Scratch VM + 渲染器：真实碰撞与行为�
     expect(byFrame.get(34)).toBe(7)
   })
 
-  test('造型就绪等待是真实发生的，并且有上界（沙箱里 STARTED 回报耗时）', async ({page}) => {
+  test('“等 SVG 造型就绪”这道守卫真的执行了：点绿旗之前各角色的包围盒就是造型的真实尺寸（没等的话是比真实尺寸大 1 的占位值），耗时有上界', async ({page}) => {
+    // 说明：本课的球要落 24 帧才碰到篮子，造型早就就绪，所以删掉守卫不会改变本课任何判定结果（见 SPIKE-RENDERER.md：
+    // 守卫在“一开始就重叠”的场景里才决定成败）。这条测试用“点绿旗之前读到的尺寸”证明守卫确实执行，作为将来改场景时的保险。
     const r = await run(page, standard(40), 'solve')
+    expect(r.sizes).toEqual({'篮子': [80, 40], '红球': [40, 40], '蓝球': [40, 40]})
     expect(r.skinMs).not.toBeNull()
-    expect(r.skinMs!).toBeGreaterThanOrEqual(0)
     expect(r.skinMs!).toBeLessThan(L04_PARAMS.skinWaitMs)
   })
 

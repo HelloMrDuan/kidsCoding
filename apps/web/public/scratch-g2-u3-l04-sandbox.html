@@ -402,11 +402,19 @@
       if (current !== run || run.cancelled) return; // 加载期间又有新的运行或停止
       const skinMs = await waitForSkins(machine, run);
       if (skinMs === null) return; // 等待期间被停止或被取代
+      // 点绿旗之前读一次各角色的包围盒尺寸并回报：造型就绪时必须等于真实尺寸（篮子 80×40、球 40×40）；
+      // 没等的话读到的是占位值（比真实尺寸大 1），测试据此证明“等造型就绪”这道守卫真的执行了。
+      const sizes = {};
+      for (const t of machine.runtime.targets) {
+        if (t.isStage) continue;
+        const b = t.getBounds();
+        sizes[t.sprite.name] = [Math.round(b.right - b.left), Math.round(b.top - b.bottom)];
+      }
       attachObservers(machine, run);
       machine.greenFlag();
       run.loading = false;
       run.live = true;
-      send('STARTED', {id, skinMs});
+      send('STARTED', {id, skinMs, sizes});
       timer = setTimeout(() => stepOnce(run), run.frameMs);
     } catch (error) {
       if (current === run) { run.loading = false; run.live = false; disposeMachine(); send('ERROR', {id, error: String(error && error.message || error).slice(0, 200)}); }
