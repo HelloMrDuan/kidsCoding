@@ -9224,7 +9224,7 @@
       "unitId": "A1-U4",
       "focusConcept": "需求",
       "plannedLearningOutcome": "能使用需求解释并完成「提出校园真实问题」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -9237,13 +9237,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/501",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "开发中（分支 muse-c/a1-u4-l01）：校园问题分析课堂，探索分类（有效 3、模糊 3，含成绩禁题）、问题卡（三句陈述 + 四问可行性检查）、迁移（2 场景 + 成绩题）；工作区接入已做契约/适配器/插槽/草稿，正式路由用通用 slot 引擎 engine='slot'（OPS-026 #491）接 LessonWorkspace，onJudgment 反馈通道已接通，未冒用 summary。全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
     },
     {
       "id": "A1-U4-L02",
