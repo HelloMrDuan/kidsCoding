@@ -248,14 +248,12 @@ for (const vp of VIEWPORTS) {
         await expect(page.getByTestId('l3-stage')).toHaveAttribute('data-gift-x', '138')
         // 舞台之外的 3 个位置（-293、-263、287）也要让孩子看得见：贴在舞台边缘的箭头，必须真的落在舞台画面里，而不是被裁掉
         expect(await dots(page).evaluateAll(els => els.filter(e => e.getAttribute('data-offstage') === 'true').map(e => e.getAttribute('data-x')))).toEqual(['-293', '-263', '287'])
-        const stageBox = (await page.getByTestId('l3-stage').boundingBox())!
-        for (const d of await dots(page).all()) {
-          const b = (await d.boundingBox())!
-          expect(b.x, '圆点 / 箭头在舞台画面内（左）').toBeGreaterThanOrEqual(stageBox.x - 0.5)
-          expect(b.x + b.width, '圆点 / 箭头在舞台画面内（右）').toBeLessThanOrEqual(stageBox.x + stageBox.width + 0.5)
-          expect(b.y).toBeGreaterThanOrEqual(stageBox.y)
-          expect(b.y + b.height).toBeLessThanOrEqual(stageBox.y + stageBox.height)
-        }
+        // 一次 evaluate 里量完舞台和所有标记（运行结束时页面会出反馈、发生滚动，分次量会拿到不同时刻的坐标）
+        await expect.poll(() => page.evaluate(() => {
+          const st = document.querySelector('[data-testid="l3-stage"]')!.getBoundingClientRect()
+          const marks = Array.from(document.querySelectorAll('[data-testid="l3-stage-dot"]')).map(e => e.getBoundingClientRect())
+          return {count: marks.length, allInStage: marks.every(r => r.left >= st.left - 0.5 && r.right <= st.right + 0.5 && r.top >= st.top - 0.5 && r.bottom <= st.bottom + 0.5)}
+        }), {message: '10 个标记（含舞台之外的 3 个箭头）都画在舞台画面内'}).toEqual({count: 10, allInStage: true})
         await expect(page.getByTestId('ws-feedback-stage')).toContainText('3 次超出')
         await expect(page.getByTestId('l3-pred-compare')).toContainText('你预测有 0 次跑出要求的范围')
         await expect(page.getByTestId('l3-pred-compare')).toContainText('10 次里有 3 次跑出了要求的范围')
