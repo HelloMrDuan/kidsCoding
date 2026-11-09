@@ -697,8 +697,11 @@ jobs:
   # 超时预算（SYS-108）：Job 15 分钟（硬限制，不是目标），预算包含所有开销：
   #   checkout + npm ci 约 1 分钟 + Chrome 安装最多 4 分钟 + 测试步骤（含构建）最多 8 分钟 + 核对 1 分钟 + 上传，各步自带上限。
   # 若测试步骤超过 8 分钟，应把 Job 拆成两个（VM 矩阵 / 页面），不要放宽预算。
+  # runs-on 固定为 ubuntu-24.04：2026-11-09 09:15～09:46 之间 `ubuntu-latest` 从 24.04 变成了 26.04，
+  # Playwright 不支持 26.04（`playwright install chrome --with-deps` 报 "does not support ffmpeg on ubuntu26.04-x64"），
+  # 同一次运行里所有安装 Chrome 的 Job 都因此失败。只固定本课自己的 Job；其他 Job 属于别的任务，由首席另行裁定。
   g2-u3-l04-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
