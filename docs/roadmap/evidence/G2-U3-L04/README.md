@@ -24,8 +24,8 @@ npx playwright test tests/e2e/g2-u3-l04-vm.spec.ts tests/e2e/g2-u3-l04-classroom
 ```
 
 - Vitest（`src/features/lessons/g2-u3-l04`）：**129 通过**（核心 65 + 会话 35 + 适配器 29）。整个 `src/features/lessons` 一起跑：63 个文件 737 通过 + 2 个预期失败（共享壳既有缺陷的 `it.fails`，本 PR 未改动）。
-- Playwright 四个文件合计 **211 个实例：203 通过 / 8 跳过 / 0 失败**（本地一次完整运行 324 秒，用 JUnit 核对数量）：
-  - `g2-u3-l04-vm.spec.ts`：92 个实例，91 通过 / 1 跳过（跳过的是“与 L03 沙箱 CSP 对比”，L03 沙箱不在这个分支里，#494 未合并；L03 合并后这一条会执行）。
+- Playwright 四个文件合计 211 个实例（#494 的 L03 合并进主线之前，本地一次完整运行 324 秒：203 通过 / 8 跳过 / 0 失败；合并之后 VM + Gap A + spike 三个文件本地重跑 124 / 124 通过、0 跳过）：
+  - `g2-u3-l04-vm.spec.ts`：92 个实例。“与 L03 沙箱 CSP 对比”那一条在 L03 沙箱不在分支里时按设计跳过；#494 合并并同步主线之后它真的执行并通过，所以现在 0 跳过。
   - `g2-u3-l04-classroom.spec.ts`：87 个实例（三视口），80 通过 / 7 跳过。7 个跳过是设计决定：证据截图 3（需要 `L04_SHOT_DIR`，只生成图片）、手机首屏用例在桌面 / 平板 2、真实指针拖放在平板 / 手机 2。
   - `g2-u3-l04-shell-gap-a.spec.ts`：14 个实例（7 场景 × 桌面 / 手机），全部通过。
   - `g2-u3-l04-renderer-spike.spec.ts`：18 个，全部通过（#499 保留的机制证据，从 `node_modules` 提供渲染器，与正式课程用的是同一个固定版本）。
@@ -63,12 +63,19 @@ npx playwright test tests/e2e/g2-u3-l04-vm.spec.ts tests/e2e/g2-u3-l04-classroom
 
 ## 六、没有做到 / 还不能宣称的
 
-- **CI 覆盖**：`curriculum-content.yml` 的独立并行 Job `g2-u3-l04-browser-trial` 在真实 Chrome 上运行上述四个 spec，Job 末尾用 JUnit 核对数量（总数 211、失败 0、跳过 7 + 1、通过 = 总数 − 跳过），所以不会靠 skip 或缩水变绿；没有 `continue-on-error`。**超时预算按 SYS-108**：Job `timeout-minutes: 15`（硬限制，不是目标），各步自带上限（Chrome 安装 4、测试 8、核对 1），Chrome 安装每次限时 100 秒、最多 2 次。原 spike 专用 Job 并入本 Job。**本地数字不能代替 CI，CI 结果见 PR 页面的最新运行。**
+- **CI 覆盖**：`curriculum-content.yml` 新增两个并行 Job，都在真实 Chrome 上运行，Job 末尾用 JUnit 核对数量，所以不会靠 skip 或缩水变绿；没有 `continue-on-error`。
+  - `g2-u3-l04-vm-trial`：VM 矩阵 + Gap A + spike，124 个实例（有 L03 沙箱文件时要求 0 跳过，否则恰好 1 个）。
+  - `g2-u3-l04-browser-trial`：三视口课堂，按视口分成 desktop / tablet / phone 三个并行分片（`--grep "\[viewport\]"`，不是 playwright 的 `--shard`），每片 29 个实例，核对 总数 29、跳过 2 / 3 / 2（按设计的跳过）。
+  - **为什么拆**：第一版把四个文件放在一个 Job 里，CI 实测构建约 67 秒 + 测试超过 7 分钟，211 个里 193 个通过（0 失败）时被 8 分钟的步骤上限截断；第二版把课堂单独放一个 Job，87 个实例仍然超出 7 分钟的步骤上限。所以按视口再分片，**没有放宽任何预算**。
+  - **超时预算按 SYS-108**：每个 Job `timeout-minutes: 15`（硬限制，不是目标），各步自带上限（Chrome 安装 4、测试 7、核对 1），Chrome 安装每次限时 100 秒、最多 2 次。原 spike 专用 Job 并入 `g2-u3-l04-vm-trial`。
+  - **runner**：两个 Job 固定 `ubuntu-24.04`。2026-11-09 09:15～09:46 之间 `ubuntu-latest` 变成了 ubuntu-26.04，Playwright 不支持（`does not support ffmpeg on ubuntu26.04-x64`），当时同一次运行里所有安装 Chrome 的 Job（含 L02、L03）和 deploy-pipeline 的 e2e-blockly 都在安装步失败。本 PR 只固定自己的 Job，其他 Job 不属于本任务，没有改。
+  - **本地数字不能代替 CI，CI 结果见 PR 页面的最新运行。**
 - **控制台 CSP 噪音**：本课没有放宽 CSP；测试只允许 `font-src` 这一类噪音（渲染器内部的字体尝试），任何其他 CSP 违规都会让用例失败。
 - **参数仍是 proposed**：球速、分数、重复次数范围等未经首席裁定；教学提示 transferPoints 的第 2 条略微解释了为什么需要“如果”，待教研判断。
 - **“脚本复制到两个球上”与“只提供隐藏、不提供‘已收集’标志变量”是为了让五种积木就够用的简化**，待首席确认。
 - 没有独立教研、没有儿童试学、没有真实设备、没有内存 / 多角色性能的专门测试；目录仍是 `outline_not_playable`，本课未发布。
-- 共享 `workspace/`、L02 与 L03 的沙箱和行为未修改；workflow 只改了 L04 自己的 Job、单测步骤和触发路径（把 spike Job 并入）。
+- 共享 `workspace/`、L02 与 L03 的沙箱和行为未修改；workflow 只**新增**了 L04 自己的两个 Job、单测步骤和触发路径（相对主线 0 行删除）；`.github` 之外对共享文件的改动只有 `package.json` / `package-lock.json` 各 1 行（`scratch-render@2.2.84`）和 `scripts/copy-scratch-vm.mjs`（复制第三个固定版本文件并校验版本）。
+- 此前误提交过 `apps/web/tsconfig.tsbuildinfo`（主线里没有这个文件），已从仓库移出；`public/scratch-vm/` 是被 gitignore 的构建产物，仓库里 0 个文件，清空后跑复制脚本会重新生成三个文件，`scratch-render.js` 的哈希与 `node_modules` 一致。
 
 ## 七、截图
 
