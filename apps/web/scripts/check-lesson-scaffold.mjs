@@ -7,17 +7,19 @@
  *   node apps/web/scripts/check-lesson-scaffold.mjs --lessonId A1-U3-L04
  *
  * 校验项（静态，不编译 TS；深层校验由生成的骨架测试经 vitest 完成）：
- *  1. 课程 10 个文件齐全（数据/契约/适配器/草稿/插槽/路由/3 测试/E2E）。
+ *  1. 课程 8 个文件齐全（数据/契约/适配器/草稿/插槽/3 测试）。
  *  2. 课程 ID 格式合法（X0-U0-L00），且各文件内的 lessonId 一致。
  *  3. 契约引擎值为 slot 或 summary（不得为 json，不得冒充）。
  *  4. 草稿键为 kidscoding-draft:{lessonId}（按课分键，不串课）。
  *  5. 插槽含 onJudgment 上报通道（编辑报 null、校验报判定）。
  *  6. 适配器实现 EngineAdapter 关键方法（mount / validateDraft /
  *     getJudgmentResult / run / stop / getState）。
- *  7. 路由把契约、适配器、插槽交给统一 LessonWorkspace（不自造外壳）。
- *  8. E2E 骨架含三端视口（1440 / 768 / 375）与反馈卡断言。
- *  9. 无“已掌握”“本演示”等虚假文案。
- * 10. 无 TODO 残留统计（只报告数量，不判定失败——TODO 是课程作者的待填项）。
+ *  7. 无“已掌握”“本演示”等虚假文案。
+ *  8. 无 TODO 残留统计（只报告数量，不判定失败——TODO 是课程作者的待填项）。
+ *
+ * 不校验生产路由与 E2E（2026-11-09 首席裁定，OPS-030 整改）：
+ * 演示骨架不生成路由 page.tsx 与 E2E spec；路由与 E2E 由课程作者在
+ * 正式建课时按 L02/L03 模式另建，另有课程 E2E 与 CI 覆盖。
  *
  * 退出码：0 = 全部通过；1 = 有失败项。
  */
@@ -58,13 +60,8 @@ function lessonIdToSlug(lessonId) {
 
 function findCourseFiles(webRoot, lessonId) {
   const slug = lessonIdToSlug(lessonId)
-  const unit = lessonId.split('-').slice(0, 2).join('-').toLowerCase()
   const found = []
-  const searchRoots = [
-    join(webRoot, 'src', 'features'),
-    join(webRoot, 'src', 'app', 'learn'),
-    join(webRoot, 'tests', 'e2e'),
-  ]
+  const searchRoots = [join(webRoot, 'src', 'features')]
   const wanted = new Set([
     `${slug}.ts`,
     `${slug}-contract.ts`,
@@ -88,15 +85,6 @@ function findCourseFiles(webRoot, lessonId) {
         if (entry.name === 'node_modules') continue
         walk(full)
       } else if (wanted.has(entry.name)) {
-        found.push(full)
-      } else if (
-        entry.name.endsWith('.spec.ts') &&
-        entry.name.includes(slug)
-      ) {
-        // E2E 骨架带前缀，如 ai-python-a1-u3-l04.spec.ts
-        found.push(full)
-      } else if (entry.name === 'page.tsx' && (full.includes(slug) || full.includes(unit))) {
-        // 路由 page.tsx 在含单元名的目录下，如 ai-python-lab-a1-u3
         found.push(full)
       }
     }
@@ -134,16 +122,10 @@ export function checkCourse({ lessonId, webRoot = WEB_ROOT }) {
     `${slug}-slot.test.tsx`,
   ]
   const missing = required.filter((name) => !byName.has(name))
-  // E2E 骨架带前缀（如 ai-python-a1-u3-l04.spec.ts），按“含 slug 的 .spec.ts”认。
-  const hasSpec = files.some((f) => f.endsWith('.spec.ts') && f.includes(slug))
-  if (!hasSpec) missing.push(`${slug}.spec.ts（或带前缀的同名 spec）`)
-  // 路由 page.tsx 在含单元名的目录下。
-  const hasPage = files.some((f) => f.endsWith('page.tsx'))
-  if (!hasPage) missing.push('page.tsx（路由）')
   if (missing.length > 0) {
     fail('文件齐全', `缺失：${missing.join('、')}`)
   } else {
-    pass('文件齐全', '10 个文件齐全（8 课程文件 + 路由 + E2E）')
+    pass('文件齐全', '8 个文件齐全（数据/契约/适配器/草稿/插槽/3 测试）')
   }
 
   const read = (name) => {
@@ -159,13 +141,10 @@ export function checkCourse({ lessonId, webRoot = WEB_ROOT }) {
   const adapter = read(`${slug}-adapter.ts`)
   const draft = read(`${slug}-draft.ts`)
   const slot = read(`${slug}-slot.tsx`)
-  const route = read('page.tsx')
-  const e2eFile = files.find((f) => f.endsWith('.spec.ts') && f.includes(slug))
-  const e2e = e2eFile ? readFileSync(e2eFile, 'utf8') : ''
-  // 虚假文案只查课程源码（契约/适配器/草稿/插槽/路由），不查测试与 E2E
-  //（E2E 含 not.toContainText('本演示') 这类反向断言，属合法）。
-  const sourceText = [contract, adapter, draft, slot, route].join('\n')
-  const allText = [sourceText, e2e].join('\n')
+  // 虚假文案只查课程源码（契约/适配器/草稿/插槽），不查测试
+  //（测试含 not.toContainText('本演示') 这类反向断言，属合法）。
+  const sourceText = [contract, adapter, draft, slot].join('\n')
+  const allText = sourceText
 
   // 3. 引擎值
   const engineMatch = contract.match(/engine:\s*'(slot|summary|blockly|scratch-vm|json)'/)
@@ -207,23 +186,7 @@ export function checkCourse({ lessonId, webRoot = WEB_ROOT }) {
     pass('适配器接口', 'mount / validateDraft / getJudgmentResult / run / stop / getState 齐全')
   }
 
-  // 7. 路由交给统一 LessonWorkspace
-  if (!/LessonWorkspace/.test(route) || !/contract=/.test(route) || !/editorSlot=/.test(route)) {
-    fail('路由接线', '路由须把契约、适配器、插槽交给统一 LessonWorkspace')
-  } else {
-    pass('路由接线', '契约 + 适配器 + 插槽交统一 LessonWorkspace')
-  }
-
-  // 8. E2E 三端 + 反馈卡
-  const viewports = ['1440', '768', '375'].filter((v) => e2e.includes(v))
-  const hasFeedback = /ws-feedback/.test(e2e)
-  if (viewports.length < 3 || !hasFeedback) {
-    fail('E2E 覆盖', `视口:${viewports.join('/')}（须 1440/768/375）反馈卡:${hasFeedback}`)
-  } else {
-    pass('E2E 覆盖', '三端视口 + 反馈卡断言')
-  }
-
-  // 9. 无虚假文案（只查课程源码，不查测试与 E2E 的反向断言）
+  // 7. 无虚假文案（只查课程源码，不查测试的反向断言）
   const badPhrases = ['已掌握', '本演示']
   const foundBad = badPhrases.filter((p) => sourceText.includes(p))
   if (foundBad.length > 0) {
@@ -232,7 +195,7 @@ export function checkCourse({ lessonId, webRoot = WEB_ROOT }) {
     pass('无虚假文案', '无“已掌握”“本演示”')
   }
 
-  // 10. TODO 统计（只报告，不判定）
+  // 8. TODO 统计（只报告，不判定）
   const todos = (allText.match(/TODO/g) || []).length
 
   const passed = results.every((r) => r.ok)

@@ -1,8 +1,8 @@
 /**
  * 课程脚手架测试（OPS-030）。
  *
- * 覆盖：生成器（10 文件齐全、拒绝覆盖、参数校验）与静态校验器
- * （通过项与失败项）。生成目标为临时目录，不写仓库真实课程目录。
+ * 覆盖：生成器（8 文件齐全、拒绝覆盖、参数校验、不生成生产路由与 E2E）
+ * 与静态校验器（通过项与失败项）。生成目标为临时目录，不写仓库真实课程目录。
  */
 
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -31,9 +31,9 @@ function gen() {
 }
 
 describe('scaffold-lesson generator (OPS-030)', () => {
-  it('generates 10 files with the right paths', () => {
+  it('generates 8 files with the right paths', () => {
     const result = gen()
-    expect(result.files).toHaveLength(10)
+    expect(result.files).toHaveLength(8)
     const slug = lessonIdToSlug(LESSON_ID)
     for (const name of [
       `${slug}.ts`,
@@ -44,8 +44,6 @@ describe('scaffold-lesson generator (OPS-030)', () => {
       `${slug}.test.ts`,
       `${slug}-draft.test.ts`,
       `${slug}-slot.test.tsx`,
-      `${slug}.spec.ts`,
-      'page.tsx',
     ]) {
       expect(
         result.files.some((f) => f.endsWith(name)),
@@ -54,14 +52,19 @@ describe('scaffold-lesson generator (OPS-030)', () => {
     }
   })
 
+  it('does not emit a production route or an E2E spec (demo must not enter prod routes)', () => {
+    const result = gen()
+    expect(result.files.some((f) => f.endsWith('page.tsx'))).toBe(false)
+    expect(result.files.some((f) => f.endsWith('.spec.ts'))).toBe(false)
+    expect(result.files.some((f) => f.includes('src/app'))).toBe(false)
+    expect(result.files.some((f) => f.includes('tests/e2e'))).toBe(false)
+  })
+
   it('generated files land under the derived A1 directories', () => {
     const result = gen()
     expect(result.featureDir).toBe('src/features/ai-python')
     expect(result.routeDir).toBe('src/app/learn/ai-python-lab-a1-u3')
     expect(existsSync(join(tmp, 'src/features/ai-python', `${lessonIdToSlug(LESSON_ID)}-contract.ts`))).toBe(true)
-    expect(
-      existsSync(join(tmp, 'src/app/learn/ai-python-lab-a1-u3', '[lessonId]', 'page.tsx')),
-    ).toBe(true)
   })
 
   it('refuses to overwrite an existing target', () => {

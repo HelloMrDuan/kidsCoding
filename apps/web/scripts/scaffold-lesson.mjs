@@ -12,11 +12,15 @@
  *   apps/web/src/features/<trackDir>/<slug>-adapter.ts        适配器骨架
  *   apps/web/src/features/<trackDir>/<slug>-draft.ts          草稿骨架
  *   apps/web/src/features/<trackDir>/<slug>-slot.tsx          插槽骨架
- *   apps/web/src/app/learn/<routeDir>/[lessonId]/page.tsx     路由
  *   apps/web/src/features/<trackDir>/<slug>.test.ts            数据/契约测试骨架
  *   apps/web/src/features/<trackDir>/<slug>-draft.test.ts     草稿测试骨架
  *   apps/web/src/features/<trackDir>/<slug>-slot.test.tsx     插槽/onJudgment 测试骨架
- *   apps/web/tests/e2e/<e2ePrefix>-<slug>.spec.ts             E2E 骨架（三端 + 反馈卡 + 草稿恢复）
+ *
+ * 不生成生产路由与 E2E（2026-11-09 首席裁定，OPS-030 整改）：
+ * 演示骨架带 TODO 占位文案，绝不能进入生产路由；路由 page.tsx 与
+ * E2E spec 由课程作者在正式建课时按 L02/L03 模式另建（路由目录、
+ * E2E 前缀、CI Job 均在打印的接入手册里说明）。生成器只出 8 个文件，
+ * 不写 src/app 下的任何文件，不写 tests/e2e 下的任何文件。
  *
  * 另打印 CI 接入片段与台账登记模板（不自动改 workflow 与台账，
  * 改 workflow 须独立任务、独立 PR）。
@@ -580,41 +584,6 @@ export function ${P}EditorSlot({
 }
 
 // ---------------------------------------------------------------------------
-// 模板：路由骨架
-// ---------------------------------------------------------------------------
-export function routeTemplate({ lessonId, slug }) {
-  const S = shortName(slug)
-  const P = pascalSlug(slug)
-  return `/**
- * ${lessonId} 路由（脚手架 OPS-030 生成）。
- *
- * 薄接线：只把本课契约、适配器、插槽交给统一 LessonWorkspace，
- * 不写课程逻辑、不复制外壳。
- */
-
-'use client'
-
-import { useMemo } from 'react'
-
-import { ${P}Adapter } from '@/features/ai-python/${slug}-adapter'
-import { ${S}_WORKSPACE_CONTRACT } from '@/features/ai-python/${slug}-contract'
-import { ${P}EditorSlot } from '@/features/ai-python/${slug}-slot'
-import { LessonWorkspace } from '@/features/lessons/workspace/lesson-workspace'
-
-export default function ${P}Page() {
-  const adapter = useMemo(() => new ${P}Adapter(), [])
-  return (
-    <LessonWorkspace
-      contract={${S}_WORKSPACE_CONTRACT}
-      adapter={adapter}
-      editorSlot={${P}EditorSlot}
-    />
-  )
-}
-`
-}
-
-// ---------------------------------------------------------------------------
 // 模板：测试骨架
 // ---------------------------------------------------------------------------
 export function dataTestTemplate({ lessonId, slug }) {
@@ -758,76 +727,11 @@ describe('${lessonId} slot onJudgment (scaffold)', () => {
 }
 
 // ---------------------------------------------------------------------------
-// 模板：E2E 骨架
-// ---------------------------------------------------------------------------
-export function e2eTemplate({ lessonId, slug, routeDir }) {
-  const route = `/${routeDir.replace('src/app/learn/', '')}/${lessonId}`
-  return `/**
- * ${lessonId} E2E 骨架（脚手架 OPS-030 生成）。
- *
- * 三端（1440×900 / 768×1024 / 375×812）+ 真实反馈卡 + 草稿恢复。
- * 课程独有的断言由课程作者按本课判定填写；骨架断言只覆盖外壳行为。
- */
-
-import { expect, test } from '@playwright/test'
-
-const LESSON_URL = '${route}'
-
-test.describe('${lessonId} classroom (scaffold)', () => {
-  test('desktop renders the workspace and the feedback card', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 1440, height: 900 })
-    await page.goto(LESSON_URL)
-    await expect(page.getByTestId('ws-root')).toBeVisible()
-    await expect(page.getByTestId('ws-feedback')).toBeVisible()
-    await expect(page.getByTestId('ws-feedback')).not.toContainText('本演示')
-  })
-
-  test('tablet renders without overflow', async ({ page }) => {
-    await page.setViewportSize({ width: 768, height: 1024 })
-    await page.goto(LESSON_URL)
-    await expect(page.getByTestId('ws-root')).toBeVisible()
-    await expect(page.getByTestId('ws-feedback')).toBeVisible()
-  })
-
-  test('mobile renders without overflow', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 })
-    await page.goto(LESSON_URL)
-    await expect(page.getByTestId('ws-root')).toBeVisible()
-    await expect(page.getByTestId('ws-feedback')).toBeVisible()
-  })
-
-  test('check reports a judgment to the shell feedback card', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 1440, height: 900 })
-    await page.goto(LESSON_URL)
-    await page.getByTestId('ws-${slug}-check').click()
-    // 骨架断言：反馈卡出现判定结论（课程作者按本课判定收紧文案）。
-    await expect(page.getByTestId('ws-feedback-conclusion')).toBeVisible()
-  })
-
-  test('editing after a check invalidates the shown judgment', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 1440, height: 900 })
-    await page.goto(LESSON_URL)
-    await page.getByTestId('ws-${slug}-check').click()
-    await expect(page.getByTestId('ws-feedback-conclusion')).toBeVisible()
-    await page.getByTestId('ws-${slug}-input').fill('edited')
-    await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0)
-  })
-})
-`
-}
-
-// ---------------------------------------------------------------------------
 // 生成器
 // ---------------------------------------------------------------------------
-export function buildFileList({ lessonId, title, engine, featureDir, routeDir, e2ePrefix }) {
+export function buildFileList({ lessonId, title, engine, featureDir }) {
   const slug = lessonIdToSlug(lessonId)
-  const params = { lessonId, title, slug, engine, featureDir, routeDir, e2ePrefix }
+  const params = { lessonId, title, slug, engine, featureDir }
   return [
     {
       path: join(featureDir, `${slug}.ts`),
@@ -850,10 +754,6 @@ export function buildFileList({ lessonId, title, engine, featureDir, routeDir, e
       content: slotTemplate(params),
     },
     {
-      path: join(routeDir, '[lessonId]', 'page.tsx'),
-      content: routeTemplate(params),
-    },
-    {
       path: join(featureDir, `${slug}.test.ts`),
       content: dataTestTemplate(params),
     },
@@ -865,15 +765,20 @@ export function buildFileList({ lessonId, title, engine, featureDir, routeDir, e
       path: join(featureDir, `${slug}-slot.test.tsx`),
       content: slotTestTemplate(params),
     },
-    {
-      path: join('tests', 'e2e', `${e2ePrefix}-${slug}.spec.ts`),
-      content: e2eTemplate(params),
-    },
   ]
 }
 
 export function ciSnippet({ lessonId, slug, e2ePrefix }) {
-  return `--- CI 接入建议（手动加入 .github/workflows/curriculum-content.yml，改 workflow 须独立任务） ---
+  return `--- 正式建课接入手册（路由 + E2E + CI，课程作者按 L02/L03 模式另建） ---
+演示骨架不含生产路由与 E2E：路由 page.tsx 与 E2E spec 须在正式建课时
+另建，不得把 TODO 骨架直接挂到生产路由上。
+路由：新建 apps/web/src/app/learn/<路由目录>/[lessonId]/page.tsx，
+薄接线（只把本课契约、适配器、插槽交给统一 LessonWorkspace），
+路由目录按 L02/L03 模式取（例：ai-python-lab-u3-l02）；路由 URL 为
+/learn/<路由目录>/${lessonId}。
+E2E：新建 apps/web/tests/e2e/${e2ePrefix}-${slug}.spec.ts，三端 +
+反馈卡 + 草稿恢复，断言按本课判定填写；URL 用 /learn/<路由目录>/${lessonId}。
+CI 接入（手动加入 .github/workflows/curriculum-content.yml，改 workflow 须独立任务）：
 1. on.pull_request.paths 增加：
       - 'apps/web/tests/e2e/${e2ePrefix}-${slug}.spec.ts'
       - 'apps/web/src/app/learn/**/${slug}/**'   # 按实际路由目录调整
@@ -932,8 +837,6 @@ export function generate({ lessonId, title, engine = 'slot', outDir = null, ...o
     title,
     engine,
     featureDir: paths.featureDir,
-    routeDir: paths.routeDir,
-    e2ePrefix: paths.e2ePrefix,
   })
   const root = outDir ? resolve(outDir) : WEB_ROOT
   const written = []
