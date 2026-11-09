@@ -370,10 +370,17 @@ export function LessonWorkspace({
         // throwing validator counts as invalid (fail-closed). An invalid
         // draft falls back to the initial script below, is never reported
         // as restored/saved, and is never overwritten or deleted here.
+        // OPS-028 (3d): validation authority follows the real data owner.
+        // A runAdapter that owns independent program data decides first;
+        // the mounted adapter is consulted only when the run adapter
+        // provides no validator (G2/A1 style: the mounted adapter owns
+        // the slot data). The mounted adapter is therefore never asked
+        // about data the run adapter already accepted or rejected.
         let valid = true
         if (!isSummary) {
           try {
-            valid = adapter.validateDraft?.(draft.data) ?? true
+            const validator = runAdapter?.validateDraft ?? adapter.validateDraft
+            valid = validator?.(draft.data) ?? true
           } catch {
             valid = false
           }
@@ -400,7 +407,7 @@ export function LessonWorkspace({
         setSaveMessageAndRef(null)
       }
     },
-    [adapter, isSummary, setSaveMessageAndRef],
+    [adapter, isSummary, runAdapter, setSaveMessageAndRef],
   )
 
   const loadIntoAdapter = useCallback(
@@ -1134,6 +1141,36 @@ export function LessonWorkspace({
         if (editorSlot) {
           const text = await file.text()
           const parsed: unknown = JSON.parse(text)
+          // OPS-028: validate the imported payload with the same
+          // data-owner validator as draft restore (runAdapter first,
+          // mounted adapter as fallback; Summary never validates; no
+          // validator = accept; a throwing validator = invalid). An
+          // invalid payload is rejected BEFORE any state change, so the
+          // program, judgment and stored draft stay untouched, no
+          // autosave is scheduled, and the notice reports the real
+          // reason instead of a fake success.
+          // Exception (G2 contract, #493 CI): a payload that claims
+          // ANOTHER lesson (a string lessonId different from this
+          // lesson) is not judged by this lesson's validator — the
+          // shell cannot judge another lesson's data. It is handed to
+          // the slot, which rejects it with its own lesson-specific
+          // error and echoes the current work back so the autosave
+          // never stores it (see L02EditorSlot import handling).
+          const foreignLesson =
+            typeof parsed === 'object' &&
+            parsed !== null &&
+            typeof (parsed as { lessonId?: unknown }).lessonId === 'string' &&
+            (parsed as { lessonId: string }).lessonId !== contract.lessonId
+          if (!isSummary && !foreignLesson) {
+            const validator = runAdapter?.validateDraft ?? adapter.validateDraft
+            let valid = true
+            try {
+              valid = validator?.(parsed) ?? true
+            } catch {
+              valid = false
+            }
+            if (!valid) throw new Error('导入文件数据无效，原作品未变')
+          }
           editorDataRef.current = parsed
           setEditorInitial(parsed)
           setSlotResetKey((k) => k + 1)
@@ -1177,7 +1214,7 @@ export function LessonWorkspace({
         setNotice(error instanceof Error ? error.message : '导入失败，原作品未变')
       }
     },
-    [editorSlot, isBlockly, isScratch, refreshScriptList, scheduleAutosave],
+    [adapter, editorSlot, isBlockly, isScratch, isSummary, refreshScriptList, runAdapter, scheduleAutosave],
   )
 
   const stageWidth = stageZoom === 'small' ? 220 : stageZoom === 'large' ? 380 : 280

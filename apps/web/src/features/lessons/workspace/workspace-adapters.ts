@@ -91,6 +91,16 @@ export type SlotRunAdapter = {
   stop: () => void
   /** Same shape as EngineState. Must not throw (the shell keeps the last state on error). */
   getState: () => EngineState
+  /**
+   * OPS-028 (3d): optional draft validation, owned by the run adapter.
+   * A SlotRunAdapter that owns independent program data may validate the
+   * slot's stored/imported data; the shell consults it BEFORE the mounted
+   * adapter (validation authority follows the real data owner), so a
+   * mounted adapter that does not own the slot data can never veto a
+   * draft the owner accepts. Absent = no validation (accept), same as
+   * EngineAdapter.validateDraft. A throwing validator counts as invalid.
+   */
+  validateDraft?: (data: unknown) => boolean
   /** Adapter-owned judgment; absent = run state alone, never an invented conclusion. */
   getJudgmentResult?: () => JudgmentResult | null
   /** Course multi-object stage state, passed through untouched to the stageSlot. */

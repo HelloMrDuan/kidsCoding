@@ -3472,7 +3472,7 @@
       "title": "P0 共享 LessonWorkspace 跨课程切换与引擎生命周期可靠性",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-022"
       ],
@@ -3484,9 +3484,13 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/483",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
+        "mergeCommit": "a018f5f72b426ff86ee2c1bf068290bfcf637d1e",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/42549647973",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/42549648009",
+        "tests": [
+          "PR #483 门禁：38 项检查 35 成功 + 3 跳过、0 失败（头 a7bc806f；合并 SHA 4ceb9e876ac80af3bfed7a3ada7c8313525b144d）",
+          "main CI 课程 42549647973（28 Job 全 success，含 scratch-touch-browser）、追踪 42549648009、deploy-pipeline 42549647972 均 success（主线头 a018f5f7，#496 合并后）"
+        ],
         "reviewer": null
       },
       "notes": "改基到主线 e8472532（首席 2026-11-06 裁定方案②，替代 Stacked 基底 #480 分支）；实现 PR #483（Draft）。3d（runAdapter.validateDraft）按首席裁定归下一项输入校验独立任务，不进本 PR。"
@@ -3636,6 +3640,34 @@
         "reviewer": null
       },
       "notes": "首席 2026-11-04 批准方案 A（独立 CI PR，Stacked）。起因：#470 的三个工作流全绿但未执行任何 G2-U3-L02 测试（审计见 docs/curriculum/g2-u3-l02/CI-COVERAGE-PLAN.md）。本条目仅为本 CI PR 的门禁登记；文件顶层 updatedAt 按现有惯例不随本条改动。"
+    },
+    {
+      "id": "OPS-028",
+      "title": "P0 共享 LessonWorkspace JSON 导入合法性校验 + SlotRunAdapter.validateDraft 数据所有权修复（3d）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-022",
+        "OPS-023"
+      ],
+      "scope": "只改共享外壳 apps/web/src/features/lessons/workspace/（lesson-workspace.tsx、workspace-adapters.ts）及配套单测/E2E 与 WORKSPACE-API.md：SlotRunAdapter 增加可选 validateDraft；loadEditorSlotData 按 runAdapter.validateDraft ?? adapter.validateDraft 咨询校验器（校验权跟随真实数据所有者：拥有独立程序数据的 SlotRunAdapter 优先，挂载适配器仅在其未提供时作为回落，不得越权否决）；JSON 导入路径（editorSlot 分支）在接受前以同一校验器校验载荷，非法拒绝接受、不静默存为合法草稿、不报已导入/已保存；例外：载荷 lessonId 与本课不同时直接交槽位处理（壳不评判别课数据，槽位按课节身份报错，G2 错课节导入用例，#493 CI）。保持 Summary 槽位兼容（无适配器概念仍不校验）、无校验器时接受（?? true）、抛异常按无效（fail-closed）、不覆盖不删除原有无效草稿。Blockly 导入分支已有 loadScript 事前校验，不动；Scratch .sb3 二进制导入走沙箱 verdict，不动。不改正式课程文件、不碰 #490/#491 的文件与 PR、不重设计 UI、不削减现有测试。与 #490（OPS-025 onJudgment 通道）、#491（OPS-026 slot 引擎）的交互关系为兼容待合流，不写成已依赖。",
+      "acceptance": [
+        "校验器只挂在 runAdapter 上时非法草稿被拒绝、回落初始脚本、不报已恢复、已存草稿不动（3d 复现先失败、修复后通过）",
+        "runAdapter 接受而挂载适配器拒绝时草稿被接受（挂载适配器不得越权否决）；runAdapter 拒绝而挂载适配器接受时草稿被拒绝（数据所有者说了算）",
+        "JSON 导入非法载荷被拒绝接受、不静默存为合法草稿、不显示已导入/已保存，错误提示诚实；合法载荷正常导入",
+        "Summary 槽位兼容：恢复与导入均不校验；无校验器时接受；抛异常按无效",
+        "Blockly、Scratch VM、Summary 现有行为无回归：工作区单测与全量单测全过、三端 E2E 全过、生产构建通过",
+        "任务门禁通过，PR CI 全绿"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/493",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "3d 缺口（compat-check/REPORT.md §3）：校验器只挂在 runAdapter 上时从不被咨询，非法 Summary 形草稿会被接受；JSON 导入路径（editorSlot 分支）接受前未经合法性校验。首席裁定（2026-11-06）：校验权跟随真实数据所有者。实现分支 muse-c/ops-028-json-import-validation，基底主线 50d88b00（变基后）。"
     }
   ]
 }
