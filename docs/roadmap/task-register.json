@@ -3668,6 +3668,30 @@
         "reviewer": null
       },
       "notes": "3d 缺口（compat-check/REPORT.md §3）：校验器只挂在 runAdapter 上时从不被咨询，非法 Summary 形草稿会被接受；JSON 导入路径（editorSlot 分支）接受前未经合法性校验。首席裁定（2026-11-06）：校验权跟随真实数据所有者。实现分支 muse-c/ops-028-json-import-validation，基底主线 50d88b00（变基后）。"
+    },
+    {
+      "id": "OPS-030",
+      "title": "课程模板化与自动化交付脚手架（最小可用版）：生成 slot/summary 课程骨架与静态校验",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-026",
+        "OPS-025"
+      ],
+      "scope": "只新增：apps/web/scripts/scaffold-lesson.mjs（生成器：8 文件骨架（数据/契约/适配器/草稿/插槽/3 测试）+ CI/台账片段打印，不生成生产路由与 E2E）、apps/web/scripts/check-lesson-scaffold.mjs（静态校验器 8 项）、apps/web/scripts/lesson-scaffold.test.ts（15 项）；A1-U3-L04 演示骨架 8 文件（TODO 标记，非正式课程，不可经 URL 访问）。不改共享工作区、不改 workflow、不建管理平台；blockly/scratch-vm 不在 v1 范围。",
+      "acceptance": [
+        "生成器一键生成 8 文件骨架（数据/契约/适配器/草稿/插槽/3 测试），拒绝覆盖已存在目标",
+        "校验器 8 项（7 项判定全过 + TODO 统计只报告）",
+        "A1-U3-L04 演示骨架：校验 8/8 通过、骨架测试 11/11 通过、生产构建成功",
+        "全量 vitest 无回归（198 文件 1567 通过 + 2 有意 expected fail）；ESLint 0 错 0 警告",
+        "重复步骤减少量有实测对照（A1-U3-L03 手工 vs A1-U3-L04 脚手架，约 9 类重复步骤）",
+        "独立审核通过（非作者复核）"
+],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/495"
+      },
+      "notes": "duan 2026-11-08 19:57 下达：亲自开发课程批量交付能力，首版只做最小功能，禁止重构共享工作区、禁止建大型管理平台；本轮必须交付实际代码。OPS-028（输入校验）与 OPS-029（Chrome 缓存）已预留，不抢号。A1-U3-L04 为 todo 课程（无 PR），演示骨架由 4 号接手时填 TODO；台账本课一行不随本 PR 动。2026-11-09 首席整改：演示骨架不得进入生产路由（生成器只出 8 文件，路由与 E2E 由正式建课时另建）；2026-11-09 2 号复核：删无依据的路由常量（契约不生成 ROUTE，正式建课时由课程作者按实际路径建立）。"
     }
   ]
 }

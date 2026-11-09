@@ -63,6 +63,10 @@ on:
       - 'apps/web/tests/e2e/g2-u3-l02-classroom.spec.ts'
       - 'apps/web/tests/e2e/g2-u3-l02-shell-gap-a.spec.ts'
       - 'apps/web/src/app/learn/g2-u3-l02/**'
+      - 'apps/web/tests/e2e/g2-u3-l03-vm.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l03-classroom.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l03-shell-gap-a.spec.ts'
+      - 'apps/web/src/app/learn/g2-u3-l03/**'
       - 'apps/web/tests/e2e/scratch-g2-helpers.ts'
       - 'apps/web/src/features/lessons/playable-stage/**'
       - 'apps/web/src/app/learn/lesson/**'
@@ -166,6 +170,8 @@ jobs:
         run: npx vitest run src/features/lessons/g2-u3-l04
       - name: G2-U3-L02 unit tests (contract, judging, params boundaries, draft, sandbox/TS parity)
         run: npx vitest run src/features/lessons/g2-u3-l02
+      - name: G2-U3-L03 unit tests (contract, judging, bounds boundaries, seeded sequence, draft, sandbox/TS parity)
+        run: npx vitest run src/features/lessons/g2-u3-l03
 
   scratch-rls-postgres:
     runs-on: ubuntu-latest
@@ -915,4 +921,69 @@ jobs:
         if: always()
         with:
           name: g2-u3-l02-chrome-evidence
+          path: apps/web/test-results/
+
+  # G2-U3-L03：独立、可并行的真实 Chrome 浏览器 Job（不与 L02 共用 Job，互不影响耗时和失败）。
+  # 实际运行三个 spec：真实 Scratch VM 边界矩阵、三视口课堂、共享壳内的 Gap A。不使用 continue-on-error，不跳过。
+  # 超时预算（SYS-108：预算含全部开销，15 分钟是硬限制、不是目标）。CI 实测（#494 两次运行）：Job 共 448～461 秒（约 7.5 分钟），
+  # 其中测试 381～411 秒，Chrome 安装成功时 27～39 秒。Chrome 安装曾在 runner 上卡住 8～12 分钟（见 PR #471 的数据），
+  # 所以安装每次最多 100 秒（成功用时的约 3 倍）、最多 2 次，两次都失败才让 Job 失败（如实报错，不掩盖）。
+  # 最坏情况（全部可复核）：checkout、setup-node、npm ci 约 1 分钟 + 安装 2×100 秒加 5 秒间隔 = 约 3.5 分钟
+  # + 测试步骤上限 8 分钟（实测最慢 6.9 分钟，余量约 17%）+ 核对与上传约 0.5 分钟 = 约 13 分钟；
+  # 每一步都有自己的超时，因此最坏情况也是该步骤失败，而不是被 15 分钟硬限制取消。正常情况约 7.7 分钟。
+  g2-u3-l03-browser-trial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
+        timeout-minutes: 4
+        run: |
+          for attempt in 1 2; do
+            if timeout 100 npx playwright install chrome --with-deps; then
+              echo "Chrome installed on attempt $attempt"
+              exit 0
+            fi
+            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
+            sleep 5
+          done
+          echo "::error::Chrome install failed after 2 attempts"
+          exit 1
+      - name: Run G2-U3-L03 real Scratch VM matrix, three-viewport classroom and shared-shell Gap A specs with real Chrome
+        timeout-minutes: 8
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g2-u3-l03/junit.xml
+        run: npx playwright test tests/e2e/g2-u3-l03-vm.spec.ts tests/e2e/g2-u3-l03-classroom.spec.ts tests/e2e/g2-u3-l03-shell-gap-a.spec.ts --project=desktop --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l03
+      - name: Verify the executed counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('test-results/g2-u3-l03/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          print(f'G2-U3-L03 browser: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # 7 个跳过都是按设计的（证据截图 3、手机首屏用例在桌面/平板 2、真实指针拖放在平板/手机 2）。
+          # 数量变化必须有意识地改这里，防止 spec 被悄悄跳过或缩水。
+          assert failures == 0 and errors == 0, 'failures present'
+          assert skipped == 7, f'unexpected skipped count: {skipped}'
+          assert passed == 164, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g2-u3-l03-chrome-evidence
           path: apps/web/test-results/

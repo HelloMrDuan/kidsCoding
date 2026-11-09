@@ -1,0 +1,199 @@
+/* G2-U3-L03 课堂布局。只用 globals.css 里已冻结的 --kc-* token，不新增 token、不改全局样式。
+   三档真实宽度：桌面 ≥1100（舞台列 + 角色列 + 脚本区同屏）、平板 641~1099（舞台行置顶 + 脚本区）、
+   手机 ≤640（舞台 / 积木 / 脚本 / 任务 四个工作区切换，只切换可见性）。 */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 100vh;
+  padding: 10px 12px 24px;
+  background: var(--kc-canvas);
+  color: var(--kc-text);
+  font-family: var(--kc-font-body);
+  font-size: var(--kc-font-size-body);
+  box-sizing: border-box;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+.root * { box-sizing: border-box; }
+
+.topbar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 12px; border-radius: var(--kc-radius-panel);
+  background: var(--kc-nav); color: #fff;
+}
+.topbar h1 { margin: 0; font-size: 18px; line-height: 1.2; font-weight: 700; }
+.topbar .lessonId { font-size: 12px; color: var(--kc-nav-text); }
+.spacer { flex: 1 1 8px; }
+.levels { display: flex; gap: 4px; flex-wrap: wrap; }
+.levelBtn {
+  min-height: 36px; padding: 4px 10px; border-radius: var(--kc-radius-button); cursor: pointer;
+  border: 1px solid var(--kc-nav-secondary); background: var(--kc-nav-secondary); color: var(--kc-nav-text); font-size: 13px;
+}
+.levelBtn[aria-current='step'] { background: var(--kc-action); border-color: var(--kc-action); color: #fff; }
+.levelBtn[data-done='true']::after { content: ' 已过'; color: #9be7c7; font-size: 12px; }
+.chip { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: var(--kc-nav-secondary); color: var(--kc-nav-text); }
+.chip[data-state='failed'] { background: var(--kc-danger); color: #fff; }
+.chip[data-state='saved'] { color: #9be7c7; }
+
+.btn {
+  min-height: 40px; padding: 6px 14px; border-radius: var(--kc-radius-button); cursor: pointer; font-size: 14px;
+  border: 1px solid var(--kc-line); background: var(--kc-surface); color: var(--kc-text);
+}
+.btn:focus-visible { outline: 3px solid var(--kc-focus); outline-offset: 1px; }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btnPrimary { background: var(--kc-action); border-color: var(--kc-action); color: #fff; font-weight: 700; }
+.btnPrimary:hover:not([disabled]) { background: var(--kc-action-hover); }
+.btnStop { background: var(--kc-danger); border-color: var(--kc-danger); color: #fff; font-weight: 700; }
+.btnGhost { background: transparent; color: #fff; border-color: var(--kc-nav-text); }
+
+.menuWrap { position: relative; }
+.menu {
+  position: absolute; right: 0; top: 44px; z-index: 30; display: flex; flex-direction: column; gap: 4px;
+  min-width: 168px; padding: 8px; border-radius: var(--kc-radius-panel);
+  background: var(--kc-surface); border: 1px solid var(--kc-line); box-shadow: var(--kc-shadow-panel);
+}
+
+.goalbar {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;
+  padding: 8px 10px; border-radius: var(--kc-radius-panel); background: var(--kc-surface); border: 1px solid var(--kc-line);
+}
+.goalItem { margin: 0; padding: 6px 8px; border-radius: var(--kc-radius-pane); background: var(--kc-canvas); font-size: 13px; line-height: 1.45; }
+.goalNow { grid-column: 1 / -1; font-weight: 700; background: #e8f0ff; }
+
+/* 工作区网格 */
+.grid {
+  display: grid; gap: 10px; align-items: start;
+  grid-template-columns: minmax(280px, 30%) 112px minmax(0, 1fr);
+  grid-template-areas: 'stage roles script' 'feedback feedback feedback';
+}
+.stagePanel { grid-area: stage; }
+.rolesPanel { grid-area: roles; }
+.scriptPanel { grid-area: script; }
+.feedbackPanel { grid-area: feedback; }
+.blocksPanel, .taskPanel { display: none; }
+
+.panel {
+  padding: 10px; border-radius: var(--kc-radius-panel); background: var(--kc-surface);
+  border: 1px solid var(--kc-line); box-shadow: var(--kc-shadow-panel); min-width: 0;
+}
+.panel h2 { margin: 0 0 8px; font-size: 15px; }
+/* 壳给舞台框的高度是固定的（随断点和缩放档位变），宽度也是确定的：舞台取“框的宽度”和“框高度 × 4/3”里较小的那个，整幅都看得见，比例始终 4:3 */
+.stageBox { height: 100%; container-type: size; display: flex; justify-content: center; align-items: center; }
+.stageHead { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.stageHead .runBtn { min-width: 112px; }
+.stageNote { margin: 8px 0 0; font-size: 12px; color: var(--kc-text-muted); }
+
+.roles { display: flex; flex-direction: column; gap: 6px; }
+.roleBtn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 64px; padding: 6px; cursor: pointer;
+  border-radius: var(--kc-radius-pane); border: 2px solid var(--kc-line); background: var(--kc-surface); font-size: 13px;
+}
+.roleBtn[aria-pressed='true'] { border-color: var(--kc-action); background: #e8f0ff; font-weight: 700; }
+.roleBtn img { width: 40px; height: 28px; object-fit: contain; }
+.roleDivider { height: 1px; background: var(--kc-line); margin: 2px 0; }
+
+.scriptHost { height: 360px; border: 1px solid var(--kc-line); border-radius: var(--kc-radius-pane); overflow: hidden; background: #fff; position: relative; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.toolbar label { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
+.toolbar input[type='number'] { width: 72px; min-height: 40px; padding: 4px 6px; border: 1px solid var(--kc-line); border-radius: 6px; font-size: 15px; }
+.palette { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; padding: 8px; border-radius: var(--kc-radius-pane); background: var(--kc-canvas); }
+.palBtn { min-height: 44px; padding: 6px 12px; border-radius: 8px; border: 0; color: #fff; font-size: 14px; cursor: pointer; }
+.palEvent { background: #c9a300; color: #231a00; }
+.palMove { background: #4a6cd4; }
+.palRepeat { background: #d98a1d; }
+.miniStage { display: none; margin-bottom: 8px; }
+.runInScript { display: none; }
+
+.readonlyList { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.readonlyList li { padding: 8px 10px; border-radius: 8px; color: #fff; font-size: 14px; }
+.readonlyList li.indent { margin-left: 22px; }
+
+.feedback { display: flex; flex-direction: column; gap: 6px; }
+.layerRow { padding: 8px 10px; border-radius: var(--kc-radius-pane); border-left: 5px solid var(--kc-line); background: var(--kc-canvas); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.layerRow[data-passed='true'] { border-left-color: var(--kc-success); }
+.layerRow[data-passed='false'] { border-left-color: var(--kc-danger); }
+.conclusion { padding: 10px 12px; border-radius: var(--kc-radius-pane); background: #fff7e8; font-weight: 700; overflow-wrap: anywhere; }
+.conclusion[data-passed='true'] { background: #e6f7f0; }
+.muted { color: var(--kc-text-muted); }
+.error { padding: 8px 10px; border-radius: var(--kc-radius-pane); background: #fdecec; color: #8b1d1d; overflow-wrap: anywhere; }
+
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 40; width: min(420px, 100vw); overflow-y: auto;
+  padding: 14px; background: var(--kc-surface); border-left: 1px solid var(--kc-line); box-shadow: var(--kc-shadow-panel);
+}
+.drawer h2 { margin: 0 0 8px; font-size: 16px; }
+.drawer h3 { margin: 12px 0 6px; font-size: 14px; }
+.drawer ol, .drawer ul { margin: 0; padding-left: 20px; line-height: 1.6; }
+.hint { padding: 8px 10px; margin: 6px 0; border-radius: 8px; background: #eef4ff; line-height: 1.55; }
+.pre { white-space: pre-wrap; margin: 6px 0; padding: 8px 10px; border-radius: 8px; background: var(--kc-canvas); font-family: var(--kc-font-code); font-size: 13px; }
+.field { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.field input[type='text'], .field input[type='number'] { min-height: 40px; padding: 4px 8px; border: 1px solid var(--kc-line); border-radius: 6px; font-size: 15px; }
+.choices { display: flex; gap: 8px; flex-wrap: wrap; }
+.choices label { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 10px; border: 1px solid var(--kc-line); border-radius: 8px; }
+
+.tabs { display: none; }
+
+/* 平板 */
+@media (max-width: 1099px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) 132px;
+    grid-template-areas: 'stage roles' 'script script' 'feedback feedback';
+  }
+  .goalbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scriptHost { height: 400px; }
+}
+
+/* 手机：四个工作区切换，只切换可见性，不重建 Blockly，不丢脚本 */
+@media (max-width: 640px) {
+  /* 全局底部导航（--kc-mobile-nav-height）固定在视口底部，页面底部要留出同样高的空间，内容才不会被盖住 */
+  .root { padding: 6px 6px calc(var(--kc-mobile-nav-height, 62px) + 20px); gap: 6px; }
+  .topbar { padding: 6px 8px; }
+  .topbar h1 { font-size: 16px; }
+  .levelBtn { padding: 4px 8px; min-height: 40px; }
+  .goalbar { grid-template-columns: 1fr; gap: 4px; padding: 6px; }
+  .goalItem.hideOnPhone { display: none; }
+  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .tab { min-height: 44px; border-radius: var(--kc-radius-button); border: 1px solid var(--kc-line); background: var(--kc-surface); font-size: 14px; cursor: pointer; }
+  .tab[aria-selected='true'] { background: var(--kc-action); border-color: var(--kc-action); color: #fff; font-weight: 700; }
+  .grid { display: block; }
+  .stagePanel, .rolesPanel, .scriptPanel, .blocksPanel, .taskPanel { display: none; margin-bottom: 8px; }
+  .active { display: block !important; }
+  .scriptHost { height: 300px; }
+  /* “将 x 设为 在 A 到 B 之间取随机数”很宽，右端的字会被右下角的放大 / 缩小按钮盖住，手机上点不到；手机用双指缩放，不放按钮 */
+  .scriptHost :global(.blocklyZoom) { display: none; }
+  .miniStage { display: block; max-width: 220px; }
+  .runInScript { display: inline-flex; }
+  .drawer { width: 100vw; }
+  .menu { right: auto; left: 0; }
+}
+
+/* 编辑槽位内嵌的任务栏（CollapsibleTaskPanel）：桌面 / 平板不折叠，手机默认折叠成一行 */
+.taskFold { margin-bottom: 8px; }
+.taskBar { display: none; }
+.taskBarText { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.taskBarText[data-needs-prediction='true'] { color: var(--kc-brand, #1d4ed8); }
+@media (max-width: 640px) {
+  .taskBar { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 2px 0; }
+  .taskFold .taskFoldBody { display: none; }
+  .taskFold[data-open='true'] .taskFoldBody { display: block; }
+}
+
+/* 槽位工具栏里的壳控制（运行 / 停止 / 保存）：≥768px 显示；手机上壳自己的粘性运行行一直在视口顶部，
+   这里再放一份只会把积木编辑区挤出首屏，所以手机隐藏。 */
+.shellCtl { display: contents; }
+@media (max-width: 767px) {
+  .shellCtl { display: none; }
+}
+
+/* 手机：工具栏五个控件排成一行（添加 / 上移 / 下移 / 删除 / 数字），触控目标高度仍是 40px */
+@media (max-width: 640px) {
+  .toolbar { flex-wrap: nowrap; gap: 4px; }
+  .toolbar .btn { padding-left: 8px; padding-right: 8px; white-space: nowrap; }
+  .toolbar .numLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .toolbar input[type='number'] { width: 60px; }
+}
+
+/* 视觉隐藏但保留在页面里（读屏可读） */
+.srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
