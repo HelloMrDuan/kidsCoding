@@ -1,4 +1,6 @@
-const VM = require('./node_modules/scratch-vm');
+// 用法：在 apps/web 目录下运行  node ../../docs/curriculum/g2-u3-l04/probe-touch-without-renderer.cjs
+const req = id => require(require.resolve(id, {paths: [process.cwd()]}));
+const VM = req('scratch-vm');
 const costume = (name, id) => ({assetId: id, name, md5ext: id + '.svg', dataFormat: 'svg', rotationCenterX: 20, rotationCenterY: 20});
 const base = () => ({variables: {}, lists: {}, broadcasts: {}, comments: {}, currentCostume: 0, sounds: [], volume: 100, tempo: 60});
 const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="red"/></svg>';
@@ -18,7 +20,7 @@ const project = {
 };
 (async () => {
   const vm = new VM();
-  const SS = require('./node_modules/scratch-storage'); const Storage = typeof SS === 'function' ? SS : (SS.default || SS.ScratchStorage);
+  const SS = req('scratch-storage'); const Storage = typeof SS === 'function' ? SS : (SS.default || SS.ScratchStorage);
   const storage = new Storage(); vm.attachStorage(storage);
   for (const id of ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'cccccccccccccccccccccccccccccccc'])
     storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, Buffer.from(svg), id);
