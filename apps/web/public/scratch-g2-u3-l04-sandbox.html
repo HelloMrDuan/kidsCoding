@@ -64,6 +64,8 @@
   const isNumStr = (s) => typeof s === 'string' && /^-?\d+$/.test(s);
 
   let vm = null, renderer = null, canvasEl = null, timer = null, current = null;
+  // 最近一次释放时，WebGL 上下文是否确实已经丢失（释放后 renderer / canvas 都清空了，外部看不到，所以在这里留一个可观察的记录）。
+  let lastRelease = {had: false, contextLost: null};
 
   // ---------------- 校验：只放行本课的工程 ----------------
 
@@ -326,13 +328,17 @@
       try { vm.stopAll(); } catch (_e) {}
       try { vm.quit(); } catch (_e) {}
     }
+    let contextLost = null;
     if (renderer) {
       try {
         const gl = renderer.gl;
         const ext = gl && gl.getExtension && gl.getExtension('WEBGL_lose_context');
         if (ext) ext.loseContext();
+        contextLost = !!(gl && gl.isContextLost && gl.isContextLost());
       } catch (_e) {}
     }
+    // 只记录“真的释放了东西”的那一次；对已经释放干净的沙箱再调用一次（空释放）不能覆盖掉上一次真实释放的记录。
+    if (renderer !== null || vm !== null) lastRelease = {had: renderer !== null, contextLost};
     if (canvasEl && canvasEl.parentNode) canvasEl.parentNode.removeChild(canvasEl);
     vm = null; renderer = null; canvasEl = null;
   }
@@ -449,7 +455,7 @@
     if (data.kind === 'DISPOSE') {
       const had = {vm: vm !== null, renderer: renderer !== null};
       disposeMachine();
-      send('DISPOSED', {id: data.id, had, vmNull: vm === null, rendererNull: renderer === null, canvasCount: document.querySelectorAll('canvas').length});
+      send('DISPOSED', {id: data.id, had, lastRelease, vmNull: vm === null, rendererNull: renderer === null, canvasCount: document.querySelectorAll('canvas').length});
     }
   });
 })();

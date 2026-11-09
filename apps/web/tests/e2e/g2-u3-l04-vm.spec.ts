@@ -427,6 +427,8 @@ test.describe('G2-U3-L04 真实 Scratch VM + 渲染器：停止、拒绝与资�
     // 运行正常结束时沙箱已经自己释放了：此时没有任何东西需要释放
     expect(d.had).toEqual({vm: false, renderer: false})
     expect([d.vmNull, d.rendererNull, d.canvasCount]).toEqual([true, true, 0])
+    // 最近一次真正的释放（最后一次运行结束时）：确实有渲染器，并且 WebGL 上下文确实已经丢失
+    expect((d as unknown as {lastRelease: {had: boolean; contextLost: boolean}}).lastRelease).toEqual({had: true, contextLost: true})
   })
 
   // ---- 沙箱只接受本课的工程：任何越界的工程在进入 VM 之前就被拒绝，并且说明原因 ----
