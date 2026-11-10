@@ -94,6 +94,8 @@ on:
       - 'apps/web/src/app/learn/ai-python-lab-u3-l03/**'
       - 'apps/web/tests/e2e/ai-python-a1-u3-l06.spec.ts'
       - 'apps/web/src/app/learn/ai-python-lab-u3-l06/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u4-l02.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u4-l02/**'
       - 'apps/web/src/features/ai-python/**'
       - 'apps/web/supabase/migrations/**'
       - 'apps/web/scripts/child-privacy-rls.sql'
@@ -437,6 +439,30 @@ jobs:
         run: npx playwright install chrome --with-deps
       - name: Run A1-U3-L06 Q&A lesson spec with real Chrome
         run: npx playwright test tests/e2e/ai-python-a1-u3-l06.spec.ts --project=desktop
+
+  a1-u4-l02-qa:
+    # OPS-029 Plan A (duan 2026-11-10): Chrome-installing jobs pin to
+    # ubuntu-24.04; ubuntu-latest is migrating to Ubuntu 26.04 and breaks
+    # the Chrome install. Do not change any other job's runs-on here.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U4-L02 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u4-l02.test.ts src/features/ai-python/a1-u4-l02-draft.test.ts src/features/ai-python/a1-u4-l02-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U4-L02 permission-checklist lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u4-l02.spec.ts --project=desktop
 
   python-batch3:
     runs-on: ubuntu-24.04
