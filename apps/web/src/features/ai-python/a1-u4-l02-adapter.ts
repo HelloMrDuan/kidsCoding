@@ -72,8 +72,14 @@ export function buildL02Judgment(result: L02CheckResult, draft: L02Draft): Judgm
         ? '检查结果：六项数据分类全部正确（聚合可用 3、缺许可即停 3）。'
         : `检查结果：探索分类通过 ${result.explore.passedCount} 项，未通过：${failedExploreIds.join('、')}。`
   const missingTask: string[] = []
+  // 任务判定要求三者全过：探索未过也要列进原因，否则仅探索失败时
+  // 会出现“任务判定：未合格：。”这种空原因文案（#508：与 L01 同款结构）。
+  if (!result.explore.passed) {
+    missingTask.push(`探索分类未通过：${failedExploreIds.join('、')}`)
+  }
   if (!result.checklist.passed) missingTask.push('许可清单未完成')
   if (!result.transfer.passed) missingTask.push('迁移未完成')
+  if (missingTask.length === 0) missingTask.push('有检查项未通过')
   const taskDetail = result.passed
     ? '任务判定：合格：许可清单与迁移均已完成。'
     : `任务判定：未合格：${missingTask.join('；')}。`

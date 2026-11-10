@@ -325,7 +325,8 @@ describe('A1-U4-L02 workspace integration (contract fields + L02Adapter)', () =>
     expect(judgment.conclusion).toBe('结论：未合格。')
     expect(judgment.layers[0].detail).toContain('探索分类通过 5 项')
     expect(judgment.layers[0].detail).toContain('P1')
-    expect(judgment.layers[1].detail).toContain('未合格')
+    expect(judgment.layers[1].detail).toBe('任务判定：未合格：探索分类未通过：P1。')
+    expect(judgment.layers[1].detail).not.toContain('未合格：。')
   })
 
   it('an empty lesson builds a fail judgment listing zero classified items', () => {
