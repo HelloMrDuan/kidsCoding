@@ -114,6 +114,50 @@ describe('真实 VM 轨迹：常见错误', () => {
   })
 })
 
+describe('真实 VM 轨迹：广播的时机与次数（每条都对应任务层或知识层的一个子检查）', () => {
+  it('广播了两次：任务不通过，写明次数；倒计时本身是对的，所以舞台和知识证据通过', async () => {
+    const { trace, j } = await judged(flag(set(10), until(wait(), dec()), over, over))
+    expect(trace.broadcasts).toHaveLength(2)
+    expect(j.stage.passed).toBe(true)
+    expect(j.task.passed).toBe(false)
+    expect(j.task.line).toContain('广播了 2 次')
+    expect(j.knowledge.passed).toBe(true)
+  })
+
+  it('广播之后又把 timeLeft 设回 5：得分从 19 涨到 25，任务不通过；舞台也不通过（最后不是 0）', async () => {
+    const { trace, j } = await judged(flag(set(10), until(wait(), dec()), over, set(5)))
+    const at = trace.frames.find(f => f.frame === trace.broadcasts[0])!
+    expect(at.score).toBe(19)
+    expect(trace.frames[trace.frames.length - 1].score).toBeGreaterThan(19)
+    expect(j.task.passed).toBe(false)
+    expect(j.task.line).toContain('得分还在变')
+    expect(j.stage.passed).toBe(false)
+  })
+
+  it('一开始就广播（倒计时还没开始）：倒计时期间一分都没有得到；知识证据也不通过——广播之前没有任何真的判断', async () => {
+    const { trace, j } = await judged(flag(set(10), over, until(wait(), dec())))
+    expect(trace.broadcasts[0]).toBe(1)
+    expect(j.task.passed).toBe(false)
+    expect(j.task.line).toContain('倒计时期间一分都没有得到')
+    expect(j.knowledge.passed).toBe(false)
+    expect(j.knowledge.line).toContain('还不是真的')
+  })
+
+  it('归零之后又等了 2 秒才广播：得分本来就停了，任务层看不出来；只有知识证据发现判断和广播不相连', async () => {
+    const { j } = await judged(flag(set(10), until(wait(), dec()), wait(), wait(), over))
+    expect(j.stage.passed).toBe(true)
+    expect(j.task.passed).toBe(true)
+    expect(j.knowledge.passed).toBe(false)
+    expect(j.knowledge.line).toContain('不相连')
+  })
+
+  it('起点太小（1 秒）：倒计时没有从本关要求的秒数开始', async () => {
+    const { j } = await judged(flag(set(1), until(wait(), dec()), over))
+    expect(j.task.passed).toBe(false)
+    expect(j.task.line).toContain('10 秒')
+  })
+})
+
 describe('迁移关：6 秒', () => {
   it('照抄上一关的 10 秒：倒计时从 10 开始，不是本关要求的 6，不通过', async () => {
     const { j } = await judged(standard(10), 'transferShort')
