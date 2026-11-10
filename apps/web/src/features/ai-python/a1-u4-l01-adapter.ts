@@ -68,8 +68,12 @@ export function buildL01Judgment(result: L01CheckResult, draft: L01Draft): Judgm
         ? '检查结果：六条问题描述分类全部正确（有效 3、模糊 3）。'
         : `检查结果：探索分类通过 ${result.explore.passedCount} 项，未通过：${failedExploreIds.join('、')}。`
   const missingTask: string[] = []
+  // 任务判定要求三者全过：探索未过也要列进原因，否则仅探索失败时
+  // 会出现“任务判定：未合格：。”这种空原因文案（#507 F1）。
+  if (!result.explore.passed) missingTask.push('探索分类未通过')
   if (!result.problemCard.passed) missingTask.push('问题卡未完成')
   if (!result.transfer.passed) missingTask.push('迁移未完成')
+  if (missingTask.length === 0) missingTask.push('有检查项未通过')
   const taskDetail = result.passed
     ? '任务判定：合格：问题卡与迁移均已完成。'
     : `任务判定：未合格：${missingTask.join('；')}。`

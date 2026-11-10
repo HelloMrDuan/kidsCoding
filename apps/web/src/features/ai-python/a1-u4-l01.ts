@@ -225,6 +225,67 @@ export function isStatementValid(text: unknown): text is string {
   )
 }
 
+/**
+ * 自由文本三句话的隐私校验：个人记录类题目一律拒绝（#507 F2）。
+ * 本课规则（见课头诚实边界与 V2 禁题）：成绩禁题、个人记录类一律拒绝，
+ * 课堂数据只能是聚合计数。自由文本只验长度会让“用真实成绩做题”绕过
+ * 固定选项的禁题，所以三句话也要验隐私。
+ * 实现是明确的关键词模式匹配，不宣称能识别所有敏感信息；命中时只返回
+ * 原因（第几句 + 哪类个人记录），不回传、不记录学生写的原文。
+ */
+export type PrivacyIssue = {
+  field: 'target' | 'data' | 'success'
+  reason: string
+}
+
+const PRIVACY_PATTERNS: { pattern: RegExp; reason: string }[] = [
+  {
+    pattern: /成绩|分数/,
+    reason: '成绩、分数是个人记录，不能当课堂数据',
+  },
+  {
+    pattern: /学号|身份证|电话|手机号|住址|消费记录|考勤记录/,
+    reason: '学号、电话、住址这些是个人记录，不能当课堂数据',
+  },
+  {
+    pattern: /(学生|同学|全班|真实).*(成绩|分数|排名|名次|记录)|真实.*(学生|同学)/,
+    reason: '真实学生记录不能当课堂数据',
+  },
+  {
+    // 具体分数是个人记录；“5 分钟”这种时长不算（后跟钟、秒时排除）。
+    pattern: /\d{1,3}\s*分(?![钟秒])/,
+    reason: '具体的分数是个人记录，不能当课堂数据',
+  },
+  {
+    pattern: /姓名/,
+    reason: '姓名是个人记录，不能当课堂数据',
+  },
+]
+
+/** 三句话逐句验隐私：返回每句命中的第一个原因；无命中返回空数组。 */
+export function findPrivacyIssues(statement: ProblemStatement): PrivacyIssue[] {
+  const fields: ('target' | 'data' | 'success')[] = ['target', 'data', 'success']
+  const issues: PrivacyIssue[] = []
+  for (const field of fields) {
+    const text = statement[field]
+    if (typeof text !== 'string') continue
+    for (const { pattern, reason } of PRIVACY_PATTERNS) {
+      if (pattern.test(text)) {
+        issues.push({ field, reason })
+        break
+      }
+    }
+  }
+  return issues
+}
+
+/** 三句话的句号：第 1 句是要判断什么，第 2 句是数据，第 3 句是成功标准。 */
+const STATEMENT_FIELD_INDEX: Record<PrivacyIssue['field'], number> = {
+  target: 1,
+  data: 2,
+  success: 3,
+}
+
 /** 一条探索描述的核对结果。 */
 export type ExploreCheck = {
   id: string
@@ -275,6 +336,8 @@ export function checkExplore(draft: L01Draft): ExploreCheckResult {
 export type ProblemCardCheck = {
   chosenExample: ProblemExampleId | null
   statementComplete: boolean
+  /** 三句话的隐私问题（为空表示无问题）；只记原因，不记学生原文。 */
+  privacyIssues: PrivacyIssue[]
   feasibilityAnsweredCount: number
   feasibilityTotal: number
   passed: boolean
@@ -282,15 +345,18 @@ export type ProblemCardCheck = {
 }
 
 /**
- * 核对问题卡：选了例 + 三句话均非空（1–200 字）+ 四问均已答，才算通过。
+ * 核对问题卡：选了例 + 三句话均非空（1–200 字）+ 三句话无隐私问题
+ * + 四问均已答，才算通过。
  * 四问答“通过”或“不可行”都算已答——写出不可行点不丢人，硬上才丢人。
- * 未选例、缺句、缺问，一律未通过（fail-closed）。
+ * 未选例、缺句、有隐私问题、缺问，一律未通过（fail-closed）。
  */
 export function checkProblemCard(draft: L01Draft): ProblemCardCheck {
-  const statementComplete =
+  const privacyIssues = findPrivacyIssues(draft.statement)
+  const lengthComplete =
     isStatementValid(draft.statement.target) &&
     isStatementValid(draft.statement.data) &&
     isStatementValid(draft.statement.success)
+  const statementComplete = lengthComplete && privacyIssues.length === 0
   const feasibilityAnsweredCount = FEASIBILITY_IDS.filter(
     (id) => draft.feasibility[id] !== undefined,
   ).length
@@ -300,13 +366,19 @@ export function checkProblemCard(draft: L01Draft): ProblemCardCheck {
     feasibilityAnsweredCount === FEASIBILITY_IDS.length
   const missing: string[] = []
   if (draft.chosenExample === null) missing.push('未选讨论例')
-  if (!statementComplete) missing.push('问题陈述三句未齐')
+  if (!lengthComplete) missing.push('问题陈述三句未齐')
+  for (const issue of privacyIssues) {
+    missing.push(
+      `问题陈述第${STATEMENT_FIELD_INDEX[issue.field]}句有个人记录：${issue.reason}，请换成聚合计数`,
+    )
+  }
   if (feasibilityAnsweredCount < FEASIBILITY_IDS.length) {
     missing.push(`可行性检查只答了 ${feasibilityAnsweredCount}/${FEASIBILITY_IDS.length} 问`)
   }
   return {
     chosenExample: draft.chosenExample,
     statementComplete,
+    privacyIssues,
     feasibilityAnsweredCount,
     feasibilityTotal: FEASIBILITY_IDS.length,
     passed,
@@ -320,30 +392,41 @@ export function checkProblemCard(draft: L01Draft): ProblemCardCheck {
 export type TransferCheck = {
   scenario: TransferScenarioId | null
   statementComplete: boolean
+  /** 三句话的隐私问题（为空表示无问题）；只记原因，不记学生原文。 */
+  privacyIssues: PrivacyIssue[]
   gradesCorrect: boolean
   passed: boolean
   detail: string
 }
 
 /**
- * 核对迁移：选了场景 + 迁移三句话均非空（1–200 字）+ 成绩题答对 A，
- * 才算通过。未选场景、缺句、成绩题答错，一律未通过（fail-closed）。
+ * 核对迁移：选了场景 + 迁移三句话均非空（1–200 字）+ 三句话无隐私问题
+ * + 成绩题答对 A，才算通过。未选场景、缺句、有隐私问题、成绩题答错，
+ * 一律未通过（fail-closed）。
  */
 export function checkTransfer(draft: L01Draft): TransferCheck {
-  const statementComplete =
+  const privacyIssues = findPrivacyIssues(draft.transferStatement)
+  const lengthComplete =
     isStatementValid(draft.transferStatement.target) &&
     isStatementValid(draft.transferStatement.data) &&
     isStatementValid(draft.transferStatement.success)
+  const statementComplete = lengthComplete && privacyIssues.length === 0
   const gradesCorrect = draft.gradesAnswer === GRADES_QUESTION.answer
   const passed =
     draft.transferScenario !== null && statementComplete && gradesCorrect
   const missing: string[] = []
   if (draft.transferScenario === null) missing.push('未选迁移场景')
-  if (!statementComplete) missing.push('迁移三句未齐')
+  if (!lengthComplete) missing.push('迁移三句未齐')
+  for (const issue of privacyIssues) {
+    missing.push(
+      `迁移第${STATEMENT_FIELD_INDEX[issue.field]}句有个人记录：${issue.reason}，请换成聚合计数`,
+    )
+  }
   if (!gradesCorrect) missing.push('成绩题未答对')
   return {
     scenario: draft.transferScenario,
     statementComplete,
+    privacyIssues,
     gradesCorrect,
     passed,
     detail: passed

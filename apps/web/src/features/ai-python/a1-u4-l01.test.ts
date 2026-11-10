@@ -14,6 +14,7 @@ import {
   checkL01,
   checkProblemCard,
   checkTransfer,
+  findPrivacyIssues,
   type L01Draft,
 } from './a1-u4-l01'
 import { L01Adapter, buildL01Judgment, passedCountOf } from './a1-u4-l01-adapter'
@@ -199,6 +200,54 @@ describe('A1-U4-L01 lesson data (three discussion examples, all aggregate counts
     expect(result.feasibilityAnsweredCount).toBe(4)
   })
 
+  it('free text with real grades or student records is rejected, with a child-readable reason and without echoing the original text', () => {
+    // 普通校园问题描述通过（聚合计数，不碰个人记录）。
+    expect(findPrivacyIssues(allCorrectDraft().statement)).toEqual([])
+    expect(checkProblemCard(allCorrectDraft()).passed).toBe(true)
+
+    // 明确包含真实个人成绩的文本被拒绝。
+    const grades = allCorrectDraft()
+    grades.statement.target = '用全班真实成绩预测谁会考砸'
+    const gradesChecked = checkProblemCard(grades)
+    expect(gradesChecked.passed).toBe(false)
+    expect(gradesChecked.statementComplete).toBe(false)
+    expect(gradesChecked.detail).toContain('个人记录')
+    expect(gradesChecked.detail).toContain('请换成聚合计数')
+    expect(gradesChecked.detail).not.toContain('用全班真实成绩预测谁会考砸')
+
+    // 含具体分数的文本被拒绝。
+    const score = allCorrectDraft()
+    score.statement.data = '小明数学考了 98 分'
+    expect(checkProblemCard(score).passed).toBe(false)
+    expect(checkProblemCard(score).detail).not.toContain('小明数学考了 98 分')
+
+    // 三个自由文本字段都受校验：逐个字段放隐私文本，逐个被拒绝。
+    const sensitive = [
+      '用全班真实成绩做预测',
+      '数据是每位同学的学号',
+      '把小明的姓名列出来',
+    ] as const
+    const fields = ['target', 'data', 'success'] as const
+    for (let i = 0; i < fields.length; i++) {
+      const draft = allCorrectDraft()
+      draft.statement[fields[i]] = sensitive[i]
+      const checked = checkProblemCard(draft)
+      expect(checked.passed).toBe(false)
+      expect(checked.privacyIssues.map((issue) => issue.field)).toContain(fields[i])
+      expect(checked.detail).not.toContain(sensitive[i])
+    }
+
+    // 迁移的三句话同样受校验，且被拒绝的原文不进方法证据。
+    const transfer = allCorrectDraft()
+    transfer.transferStatement.data = '每位学生的成绩单'
+    const transferChecked = checkTransfer(transfer)
+    expect(transferChecked.passed).toBe(false)
+    expect(transferChecked.detail).toContain('个人记录')
+    expect(transferChecked.detail).not.toContain('每位学生的成绩单')
+    const judgment = buildL01Judgment(checkL01(transfer), transfer)
+    expect(judgment.methodEvidence ?? '').not.toContain('每位学生的成绩单')
+  })
+
   it('checkTransfer passes on a scenario, three sentences and the correct grades answer', () => {
     const result = checkTransfer(allCorrectDraft())
     expect(result.passed).toBe(true)
@@ -307,6 +356,15 @@ describe('A1-U4-L01 workspace integration (contract fields + L01Adapter)', () =>
     expect(judgment.layers[0].detail).toContain('探索分类通过 5 项')
     expect(judgment.layers[0].detail).toContain('V2')
     expect(judgment.layers[1].detail).toContain('未合格')
+  })
+
+  it('only the explore step fails, the task judgment names the explore failure instead of an empty reason', () => {
+    const draft = allCorrectDraft()
+    draft.explore.V2 = '有效'
+    const judgment = buildL01Judgment(checkL01(draft), draft)
+    expect(judgment.passed).toBe(false)
+    expect(judgment.layers[1].detail).toBe('任务判定：未合格：探索分类未通过。')
+    expect(judgment.layers[1].detail).not.toContain('未合格：。')
   })
 
   it('an empty lesson builds a fail judgment listing zero classified items', () => {
