@@ -26,7 +26,7 @@ on:
 jobs:
   lesson-workspace-e2e:
     name: lesson-workspace E2E (desktop + tablet + mobile)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
