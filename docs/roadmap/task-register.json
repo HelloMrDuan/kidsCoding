@@ -3716,6 +3716,31 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/495"
       },
       "notes": "duan 2026-11-08 19:57 下达：亲自开发课程批量交付能力，首版只做最小功能，禁止重构共享工作区、禁止建大型管理平台；本轮必须交付实际代码。OPS-028（输入校验）与 OPS-029（Chrome 缓存）已预留，不抢号。A1-U3-L04 为 todo 课程（无 PR），演示骨架由 4 号接手时填 TODO；台账本课一行不随本 PR 动。2026-11-09 首席整改：演示骨架不得进入生产路由（生成器只出 8 文件，路由与 E2E 由正式建课时另建）；2026-11-09 2 号复核：删无依据的路由常量（契约不生成 ROUTE，正式建课时由课程作者按实际路径建立）。"
+    },
+    {
+      "id": "SPEC-003",
+      "title": "四账号 432 节路线归属统一与旧身份规范纠偏",
+      "priority": "P0",
+      "category": "SPEC",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "仅治理文档：新增 docs/roadmap/AGENT-OWNERSHIP.md，更新 AGENTS.md、docs/roadmap/README.md、docs/product/p0-kitten-workspace/OWNERSHIP.md，并登记本产品任务；统一主 Muse/2/3/4 号归属与审核边界，移除现行规范中的已停用身份称谓。历史审计档案原样保留，不修改课程业务、432 节台账、CI 或 V2 视觉。",
+      "acceptance": [
+        "主 Muse=72、2号=144、3号=120、4号=96；18 路线唯一覆盖 432 节",
+        "当前执行账号只用主 Muse、2号、3号、4号；三处现行入口均指向唯一总归属规范",
+        "区分课程长期归属、当前开发权限、历史审定/PR、共享组件及非作者审核",
+        "文档独立 PR CI、非作者审核和主线合并证据齐备；不得改变 432 节课程状态"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/512",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [
+          "文档静态校验：18 个唯一路线 × 24 课 = 432；四组数量 72/144/120/96；现行角色/引用路径一致；未改课程台账与代码。"
+        ],
+        "reviewer": null
+      },
+      "notes": "项目负责人 2026-11-11 统一角色名称与归属，停用的旧称仅留于历史档案的可追溯证据中。合并/CI/审核完成后另行回填。"
     }
   ]
 }
