@@ -98,8 +98,16 @@ on:
       - 'apps/web/src/app/learn/ai-python-lab-u3-l02/**'
       - 'apps/web/tests/e2e/ai-python-a1-u3-l02.spec.ts'
       - 'apps/web/src/app/learn/ai-python-lab-u3-l03/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u3-l04.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u3-l04/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u3-l05.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u3-l05/**'
       - 'apps/web/tests/e2e/ai-python-a1-u3-l06.spec.ts'
       - 'apps/web/src/app/learn/ai-python-lab-u3-l06/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u4-l01.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u4-l01/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u4-l02.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u4-l02/**'
       - 'apps/web/src/features/ai-python/**'
       - 'apps/web/supabase/migrations/**'
       - 'apps/web/scripts/child-privacy-rls.sql'
@@ -244,7 +252,7 @@ jobs:
           path: examples/scratch/g3/meteor_clones.sb3
 
   python-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -263,7 +271,7 @@ jobs:
         run: npx playwright test tests/e2e/python-lab.spec.ts tests/e2e/python-multi.spec.ts --project=desktop
 
   a0-classify-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -282,7 +290,7 @@ jobs:
         run: npx playwright test tests/e2e/classify-a0-u1.spec.ts --project=desktop
 
   g2-u3-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -301,7 +309,7 @@ jobs:
         run: npx playwright test tests/e2e/scratch-g2-u3.spec.ts --project=desktop
 
   g2-u1-viewport-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -325,7 +333,7 @@ jobs:
           path: apps/web/test-results/
 
   ai-python-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -344,7 +352,7 @@ jobs:
         run: npx playwright test tests/e2e/ai-python-a1-u1.spec.ts --project=desktop
 
   a1-u3-local-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -363,7 +371,7 @@ jobs:
         run: npx playwright test tests/e2e/ai-python-a1-u3.spec.ts --project=desktop
 
   a1-u1-l06-second-batch:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -384,7 +392,7 @@ jobs:
         run: npx playwright test tests/e2e/ai-python-a1-u1-l06.spec.ts --project=desktop
 
   a1-u3-l02-summary:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -405,7 +413,7 @@ jobs:
         run: npx playwright test tests/e2e/ai-python-a1-u3-l02.spec.ts --project=desktop
 
   a1-u3-l03-validation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -425,8 +433,29 @@ jobs:
       - name: Run A1-U3-L03 validation lesson spec with real Chrome
         run: npx playwright test tests/e2e/ai-python-a1-u3-l03.spec.ts --project=desktop
 
+  a1-u3-l04-retrieval:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U3-L04 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u3-l04.test.ts src/features/ai-python/a1-u3-l04-draft.test.ts src/features/ai-python/a1-u3-l04-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U3-L04 retrieval lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u3-l04.spec.ts --project=desktop
+
   a1-u3-l06-qa:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -446,8 +475,74 @@ jobs:
       - name: Run A1-U3-L06 Q&A lesson spec with real Chrome
         run: npx playwright test tests/e2e/ai-python-a1-u3-l06.spec.ts --project=desktop
 
+  a1-u3-l05-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U3-L05 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u3-l05.test.ts src/features/ai-python/a1-u3-l05-draft.test.ts src/features/ai-python/a1-u3-l05-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U3-L05 citation lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u3-l05.spec.ts --project=desktop
+
+  a1-u4-l01-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U4-L01 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u4-l01.test.ts src/features/ai-python/a1-u4-l01-draft.test.ts src/features/ai-python/a1-u4-l01-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U4-L01 problem-posing lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u4-l01.spec.ts --project=desktop
+
+  a1-u4-l02-qa:
+    # OPS-029 Plan A (duan 2026-11-10): Chrome-installing jobs pin to
+    # ubuntu-24.04; ubuntu-latest is migrating to Ubuntu 26.04 and breaks
+    # the Chrome install. Do not change any other job's runs-on here.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U4-L02 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u4-l02.test.ts src/features/ai-python/a1-u4-l02-draft.test.ts src/features/ai-python/a1-u4-l02-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U4-L02 permission-checklist lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u4-l02.spec.ts --project=desktop
+
   python-batch3:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -466,7 +561,7 @@ jobs:
         run: npx playwright test tests/e2e/python-lab-layout-ux411.spec.ts tests/e2e/python-error-recovery-ux412.spec.ts tests/e2e/python-cross-device-ux413.spec.ts --project=desktop
 
   portfolio-ux302:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -485,7 +580,7 @@ jobs:
         run: npx playwright test tests/e2e/portfolio-resume-export-ux302.spec.ts tests/e2e/portfolio-cloud-isolation-ux303.spec.ts tests/e2e/draft-cross-device-cloud102.spec.ts tests/e2e/scratch-cloud-restore-cloud102.spec.ts tests/e2e/scratch-cloud-conflict-cloud103.spec.ts tests/e2e/scratch-cloud-delete-restore-cloud104.spec.ts --project=desktop
 
   parent-growth-ux503:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -851,7 +946,7 @@ jobs:
 
   scratch-touch-browser:
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: apps/web
@@ -875,7 +970,7 @@ jobs:
 
   scratch-v2-visual-browser:
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: apps/web
@@ -898,7 +993,7 @@ jobs:
           path: apps/web/test-results/
 
   g2-u3-l02-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -932,7 +1027,7 @@ jobs:
   # + 测试步骤上限 8 分钟（实测最慢 6.9 分钟，余量约 17%）+ 核对与上传约 0.5 分钟 = 约 13 分钟；
   # 每一步都有自己的超时，因此最坏情况也是该步骤失败，而不是被 15 分钟硬限制取消。正常情况约 7.7 分钟。
   g2-u3-l03-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
