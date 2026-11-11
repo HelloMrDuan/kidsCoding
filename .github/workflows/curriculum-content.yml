@@ -13,6 +13,12 @@ on:
       - 'apps/web/tests/e2e/ux-002.spec.ts'
       - 'apps/web/tests/e2e/ux-003.spec.ts'
       - 'apps/web/src/features/lessons/**'
+      - 'apps/web/tests/e2e/g2-u3-l04-renderer-spike.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l04-vm.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l04-classroom.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l04-shell-gap-a.spec.ts'
+      - 'apps/web/src/app/learn/g2-u3-l04/**'
+      - 'apps/web/scripts/copy-scratch-vm.mjs'
       - 'apps/web/public/**'
       - 'apps/web/tests/e2e/ux-101.spec.ts'
       - 'apps/web/tests/e2e/ux-103.spec.ts'
@@ -92,8 +98,16 @@ on:
       - 'apps/web/src/app/learn/ai-python-lab-u3-l02/**'
       - 'apps/web/tests/e2e/ai-python-a1-u3-l02.spec.ts'
       - 'apps/web/src/app/learn/ai-python-lab-u3-l03/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u3-l04.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u3-l04/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u3-l05.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u3-l05/**'
       - 'apps/web/tests/e2e/ai-python-a1-u3-l06.spec.ts'
       - 'apps/web/src/app/learn/ai-python-lab-u3-l06/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u4-l01.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u4-l01/**'
+      - 'apps/web/tests/e2e/ai-python-a1-u4-l02.spec.ts'
+      - 'apps/web/src/app/learn/ai-python-lab-u4-l02/**'
       - 'apps/web/src/features/ai-python/**'
       - 'apps/web/supabase/migrations/**'
       - 'apps/web/scripts/child-privacy-rls.sql'
@@ -160,6 +174,8 @@ jobs:
         run: npx vitest run src/features/ui/lesson-card.test.tsx src/features/ui/progress-track.test.tsx src/features/ui/story-dialog.test.tsx
       - name: UX-101 component unit tests
         run: npx vitest run src/features/lessons/adventure-map.test.tsx src/features/lessons/map-view.test.tsx
+      - name: G2-U3-L04 unit tests (program validation, judging, session, lesson adapter, reference alternatives)
+        run: npx vitest run src/features/lessons/g2-u3-l04
       - name: G2-U3-L02 unit tests (contract, judging, params boundaries, draft, sandbox/TS parity)
         run: npx vitest run src/features/lessons/g2-u3-l02
       - name: G2-U3-L03 unit tests (contract, judging, bounds boundaries, seeded sequence, draft, sandbox/TS parity)
@@ -236,7 +252,7 @@ jobs:
           path: examples/scratch/g3/meteor_clones.sb3
 
   python-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -255,7 +271,7 @@ jobs:
         run: npx playwright test tests/e2e/python-lab.spec.ts tests/e2e/python-multi.spec.ts --project=desktop
 
   a0-classify-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -274,7 +290,7 @@ jobs:
         run: npx playwright test tests/e2e/classify-a0-u1.spec.ts --project=desktop
 
   g2-u3-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -293,7 +309,7 @@ jobs:
         run: npx playwright test tests/e2e/scratch-g2-u3.spec.ts --project=desktop
 
   g2-u1-viewport-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -317,7 +333,7 @@ jobs:
           path: apps/web/test-results/
 
   ai-python-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -336,7 +352,7 @@ jobs:
         run: npx playwright test tests/e2e/ai-python-a1-u1.spec.ts --project=desktop
 
   a1-u3-local-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -355,7 +371,7 @@ jobs:
         run: npx playwright test tests/e2e/ai-python-a1-u3.spec.ts --project=desktop
 
   a1-u1-l06-second-batch:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -376,7 +392,7 @@ jobs:
         run: npx playwright test tests/e2e/ai-python-a1-u1-l06.spec.ts --project=desktop
 
   a1-u3-l02-summary:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -397,7 +413,7 @@ jobs:
         run: npx playwright test tests/e2e/ai-python-a1-u3-l02.spec.ts --project=desktop
 
   a1-u3-l03-validation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -417,8 +433,29 @@ jobs:
       - name: Run A1-U3-L03 validation lesson spec with real Chrome
         run: npx playwright test tests/e2e/ai-python-a1-u3-l03.spec.ts --project=desktop
 
+  a1-u3-l04-retrieval:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U3-L04 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u3-l04.test.ts src/features/ai-python/a1-u3-l04-draft.test.ts src/features/ai-python/a1-u3-l04-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U3-L04 retrieval lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u3-l04.spec.ts --project=desktop
+
   a1-u3-l06-qa:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -438,8 +475,74 @@ jobs:
       - name: Run A1-U3-L06 Q&A lesson spec with real Chrome
         run: npx playwright test tests/e2e/ai-python-a1-u3-l06.spec.ts --project=desktop
 
+  a1-u3-l05-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U3-L05 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u3-l05.test.ts src/features/ai-python/a1-u3-l05-draft.test.ts src/features/ai-python/a1-u3-l05-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U3-L05 citation lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u3-l05.spec.ts --project=desktop
+
+  a1-u4-l01-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U4-L01 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u4-l01.test.ts src/features/ai-python/a1-u4-l01-draft.test.ts src/features/ai-python/a1-u4-l01-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U4-L01 problem-posing lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u4-l01.spec.ts --project=desktop
+
+  a1-u4-l02-qa:
+    # OPS-029 Plan A (duan 2026-11-10): Chrome-installing jobs pin to
+    # ubuntu-24.04; ubuntu-latest is migrating to Ubuntu 26.04 and breaks
+    # the Chrome install. Do not change any other job's runs-on here.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run A1-U4-L02 dedicated unit tests
+        run: npx vitest run src/features/ai-python/a1-u4-l02.test.ts src/features/ai-python/a1-u4-l02-draft.test.ts src/features/ai-python/a1-u4-l02-slot.test.tsx
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run A1-U4-L02 permission-checklist lesson spec with real Chrome
+        run: npx playwright test tests/e2e/ai-python-a1-u4-l02.spec.ts --project=desktop
+
   python-batch3:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -458,7 +561,7 @@ jobs:
         run: npx playwright test tests/e2e/python-lab-layout-ux411.spec.ts tests/e2e/python-error-recovery-ux412.spec.ts tests/e2e/python-cross-device-ux413.spec.ts --project=desktop
 
   portfolio-ux302:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -477,7 +580,7 @@ jobs:
         run: npx playwright test tests/e2e/portfolio-resume-export-ux302.spec.ts tests/e2e/portfolio-cloud-isolation-ux303.spec.ts tests/e2e/draft-cross-device-cloud102.spec.ts tests/e2e/scratch-cloud-restore-cloud102.spec.ts tests/e2e/scratch-cloud-conflict-cloud103.spec.ts tests/e2e/scratch-cloud-delete-restore-cloud104.spec.ts --project=desktop
 
   parent-growth-ux503:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -688,9 +791,161 @@ jobs:
           name: scratch-vm-local-evidence
           path: apps/web/test-results/
 
+  # G2-U3-L04《判断碰撞得分》：真实 Scratch VM + 真实 scratch-render（方案①，首席已批准）+ 真实 Chrome。拆成两个并行 Job（SYS-108：不放宽预算，拆开）：
+  #   g2-u3-l04-browser-trial  三视口课堂（87 个实例），按视口再分成 desktop / tablet / phone 三个并行分片（每片 29 个）
+  #   g2-u3-l04-vm-trial       VM 矩阵 + 共享壳 Gap A + 渲染器 spike（124 个实例，spike 是 #499 保留的机制证据）
+  # 页面测试由 playwright 的 webServer 先 `npm run build`（prebuild 里 copy-scratch-vm.mjs 复制 vm / storage / render 三个固定版本文件），
+  # 所以「构建之后 /scratch-vm/scratch-render.js 仍在」由课堂用例真实验证。
+  # 为什么拆：第一版把四个文件放在一个 Job 里，CI 实测构建约 67 秒 + 测试超过 7 分钟，211 个实例里 193 个通过（0 失败）时被 8 分钟的步骤上限截断，
+  # 预估完整需要约 9 分钟，没有余量，所以拆开而不是放宽。
+  # runs-on 固定为 ubuntu-24.04（与 OPS-029 / #505 对其他浏览器 Job 的处理一致）：`ubuntu-latest` 已迁移到 ubuntu-26.04，
+  # Playwright 不支持（`playwright install chrome --with-deps` 报 "does not support ffmpeg on ubuntu26.04-x64"）。
+  # 超时预算（SYS-108）：每个 Job 15 分钟（硬限制，不是目标），预算包含所有开销：checkout + npm ci 约 20 秒 + Chrome 安装最多 4 分钟 + 测试步骤（含构建）最多 7 分钟 + 核对 1 分钟。
+  g2-u3-l04-browser-trial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 课堂 spec 的三个视口分组各 29 个实例，按标题里的 [viewport] 过滤（确定的分片，不是 playwright 的 --shard）。
+          # 按设计的跳过：证据截图（只在设置 L04_SHOT_DIR 时生成图片）每组 1 个；手机首屏用例在桌面/平板各 1 个；真实指针拖放在平板/手机各 1 个。
+          - viewport: desktop
+            total: 29
+            skipped: 2
+          - viewport: tablet
+            total: 29
+            skipped: 3
+          - viewport: phone
+            total: 29
+            skipped: 2
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
+        timeout-minutes: 4
+        run: |
+          for attempt in 1 2; do
+            if timeout 100 npx playwright install chrome --with-deps; then
+              echo "Chrome installed on attempt $attempt"
+              exit 0
+            fi
+            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
+            sleep 5
+          done
+          echo "::error::Chrome install failed after 2 attempts"
+          exit 1
+      - name: Run G2-U3-L04 classroom spec (${{ matrix.viewport }} group) with real Chrome
+        timeout-minutes: 7
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g2-u3-l04-${{ matrix.viewport }}/junit.xml
+          VIEWPORT: ${{ matrix.viewport }}
+        run: npx playwright test tests/e2e/g2-u3-l04-classroom.spec.ts --project=desktop --grep "\\[${VIEWPORT}\\]" --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l04-${VIEWPORT}
+      - name: Verify the executed counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        env:
+          WANT_TOTAL: ${{ matrix.total }}
+          WANT_SKIPPED: ${{ matrix.skipped }}
+          VIEWPORT: ${{ matrix.viewport }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          vp = os.environ['VIEWPORT']
+          root = ET.parse(f'test-results/g2-u3-l04-{vp}/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          want_total = int(os.environ['WANT_TOTAL'])
+          want_skipped = int(os.environ['WANT_SKIPPED'])
+          print(f'g2-u3-l04-browser-trial [{vp}]: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # 数量变化必须有意识地改这里（matrix 里的 total / skipped），防止 spec 被悄悄跳过或缩水。
+          assert failures == 0 and errors == 0, 'failures present'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped}'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g2-u3-l04-browser-trial-${{ matrix.viewport }}-chrome-evidence
+          path: apps/web/test-results/
+
+  g2-u3-l04-vm-trial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
+        timeout-minutes: 4
+        run: |
+          for attempt in 1 2; do
+            if timeout 100 npx playwright install chrome --with-deps; then
+              echo "Chrome installed on attempt $attempt"
+              exit 0
+            fi
+            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
+            sleep 5
+          done
+          echo "::error::Chrome install failed after 2 attempts"
+          exit 1
+      - name: Run G2-U3-L04 real VM + real renderer matrix, shared-shell Gap A and renderer spike with real Chrome
+        timeout-minutes: 7
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g2-u3-l04-vm/junit.xml
+        run: npx playwright test tests/e2e/g2-u3-l04-vm.spec.ts tests/e2e/g2-u3-l04-shell-gap-a.spec.ts tests/e2e/g2-u3-l04-renderer-spike.spec.ts --project=desktop --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l04-vm
+      - name: Verify the executed counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          root = ET.parse('test-results/g2-u3-l04-vm/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          print(f'g2-u3-l04-vm-trial: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # VM 矩阵里“与 L03 沙箱 CSP 对比”那 1 个，只在仓库里存在 L03 沙箱文件时才执行，否则按设计跳过；其余全部必须执行。
+          has_l03 = os.path.exists('public/scratch-g2-u3-l03-sandbox.html')
+          want_skipped = 0 if has_l03 else 1
+          want_total = 124
+          assert failures == 0 and errors == 0, 'failures present'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped} (L03 sandbox present: {has_l03})'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g2-u3-l04-vm-trial-chrome-evidence
+          path: apps/web/test-results/
+
   scratch-touch-browser:
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: apps/web
@@ -714,7 +969,7 @@ jobs:
 
   scratch-v2-visual-browser:
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: apps/web
@@ -737,7 +992,7 @@ jobs:
           path: apps/web/test-results/
 
   g2-u3-l02-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
       run:
@@ -771,7 +1026,7 @@ jobs:
   # + 测试步骤上限 8 分钟（实测最慢 6.9 分钟，余量约 17%）+ 核对与上传约 0.5 分钟 = 约 13 分钟；
   # 每一步都有自己的超时，因此最坏情况也是该步骤失败，而不是被 15 分钟硬限制取消。正常情况约 7.7 分钟。
   g2-u3-l03-browser-trial:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:

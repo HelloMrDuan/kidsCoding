@@ -3484,7 +3484,7 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/483",
-        "mergeCommit": "a018f5f72b426ff86ee2c1bf068290bfcf637d1e",
+        "mergeCommit": "4ceb9e876ac80af3bfed7a3ada7c8313525b144d",
         "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/42549647973",
         "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/42549648009",
         "tests": [
@@ -3668,6 +3668,30 @@
         "reviewer": null
       },
       "notes": "3d 缺口（compat-check/REPORT.md §3）：校验器只挂在 runAdapter 上时从不被咨询，非法 Summary 形草稿会被接受；JSON 导入路径（editorSlot 分支）接受前未经合法性校验。首席裁定（2026-11-06）：校验权跟随真实数据所有者。实现分支 muse-c/ops-028-json-import-validation，基底主线 50d88b00（变基后）。"
+    },
+    {
+      "id": "OPS-029",
+      "title": "Runner 环境修复（Ubuntu 26.04 兼容）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [],
+      "scope": "只改 3 个 workflow 文件中 19 个 Job 的 runs-on: ubuntu-latest → ubuntu-24.04：.github/workflows/curriculum-content.yml 17 个（python-browser-trial、a0-classify-browser-trial、g2-u3-browser-trial、g2-u1-viewport-trial、ai-python-browser-trial、a1-u3-local-trial、a1-u1-l06-second-batch、a1-u3-l02-summary、a1-u3-l03-validation、a1-u3-l06-qa、python-batch3、portfolio-ux302、parent-growth-ux503、scratch-touch-browser、scratch-v2-visual-browser、g2-u3-l02-browser-trial、g2-u3-l03-browser-trial）、deploy.yml 1 个（e2e-blockly）、lesson-workspace-e2e.yml 1 个（lesson-workspace-e2e）。只改 runs-on 标签，不动步骤、命令、超时、触发条件、测试范围与断言；不加 continue-on-error；不跳过失败测试；不建缓存系统；不升级 @playwright/test（保持 1.58.2）；不改课程代码。",
+      "acceptance": [
+        "19 个 Job 的真实 Chrome/Playwright 安装步骤（npx playwright install chrome|chromium --with-deps）全部通过",
+        "主线 curriculum-content 与 deploy 工作流全量跑绿（其余 Job 不因此变红）",
+        "#501 的 a1-u3-l04-retrieval Job 在新主线变基重跑后通过",
+        "任务门禁通过，PR CI 全绿",
+        "独立审核通过（非作者复核）"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/505",
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": [],
+        "reviewer": null
+      },
+      "notes": "首席裁定（2026-11-10）：方案 A。根因：@playwright/test 1.58.2 在 Ubuntu 26.04 上无 ffmpeg 依赖表，ubuntu-latest 切到 26.04 后 npx playwright install chrome --with-deps 报错；主线 f3b44f5a 的 curriculum-content 运行 17 个 Job 全死在安装步骤。实现分支 muse-c/ops-029-runner-ubuntu-2404，基底主线 f3b44f5a。OPS-030 notes 曾写 OPS-029 预留给 Chrome 缓存，已被本次首席裁定取代；缓存与 Playwright 版本升级属后续优化，不在本任务内。"
     },
     {
       "id": "OPS-030",

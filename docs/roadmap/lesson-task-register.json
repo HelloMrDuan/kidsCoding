@@ -1769,7 +1769,7 @@
       "unitId": "G2-U3",
       "focusConcept": "判断",
       "plannedLearningOutcome": "能使用判断解释并完成「判断碰撞得分」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -1782,13 +1782,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/499",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/g2-u3-l04-vm.spec.ts（真实 scratch-vm + 真实 scratch-render 行为矩阵）+ g2-u3-l04-classroom.spec.ts（三端课堂）+ g2-u3-l04-shell-gap-a.spec.ts + g2-u3-l04-renderer-spike.spec.ts；CI Job g2-u3-l04-vm-trial 与 g2-u3-l04-browser-trial（desktop / tablet / phone 三个并行分片）在真实 Chrome 上实际运行并用 JUnit 核对数量；详见 docs/roadmap/evidence/G2-U3-L04/README.md",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "PR #499（Draft），等待非作者独立审核。教学定向；教学参数仍是 proposed，尚无首席裁定。首席批准方案①：scratch-render@2.2.84 作为直接依赖并锁版本，copy-scratch-vm.mjs 在 prebuild 里复制，只有 L04 沙箱使用，L02 / L03 行为未改。无独立教研、无儿童试学、无真实设备；目录仍为 outline_not_playable，非已发布，不得标 completed。"
     },
     {
       "id": "G2-U3-L05",
@@ -9140,7 +9140,7 @@
       "unitId": "A1-U3",
       "focusConcept": "提示词",
       "plannedLearningOutcome": "能使用提示词解释并完成「检索可信资料」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -9153,13 +9153,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/501",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "开发中（分支 muse-c/a1-u3-l04）：检索可信资料课堂，复用 U3 本地试点语料与四问判定（零改动试点）；工作区接入已做契约/适配器/插槽/草稿，正式路由用通用 slot 引擎 engine='slot'（OPS-026 #491）接 LessonWorkspace，onJudgment 反馈通道已接通，未冒用 summary。本地 Vitest 59/59、真实浏览器 E2E 17/17（含反馈卡断言，三端），三端均无溢出；V2 视觉复核、独立人工教研、儿童试学在发布门禁内。"
     },
     {
       "id": "A1-U3-L05",
@@ -9168,7 +9168,7 @@
       "unitId": "A1-U3",
       "focusConcept": "安全",
       "plannedLearningOutcome": "能使用安全解释并完成「引用与幻觉核对」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -9181,13 +9181,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/511",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。2026-11-09 2 号开发中：分支 muse-c/a1-u3-l05，基底主线 f3b44f5a；本地单测 39 项通过，工作区单测 159/159，全量 211 文件 1843 通过 + 2 预期失败，生产构建成功；三端 E2E 13 项全过（desktop/mobile 双项目共 26 次执行，0 失败；桌面 10、平板 768×1024 1、手机 375×812 2）。"
     },
     {
       "id": "A1-U3-L06",
@@ -9224,7 +9224,7 @@
       "unitId": "A1-U4",
       "focusConcept": "需求",
       "plannedLearningOutcome": "能使用需求解释并完成「提出校园真实问题」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -9237,7 +9237,7 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/507",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
@@ -9252,7 +9252,7 @@
       "unitId": "A1-U4",
       "focusConcept": "需求",
       "plannedLearningOutcome": "能使用需求解释并完成「建立数据使用许可」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -9265,7 +9265,7 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/510",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
