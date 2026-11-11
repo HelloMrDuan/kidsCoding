@@ -3631,12 +3631,12 @@
         "mergeCommit": null,
         "mainCI": null,
         "tests": [
-          "PR #471 head 647b8707 curriculum content checks（run 41757100374）success：24 个 Job，仅新增 g2-u3-l02-browser-trial，其余 23 个与 #470 运行结论逐个一致",
-          "curriculum-web 新步骤 G2-U3-L02 unit tests 真实执行：g2-u3-l02.test.ts 66 passed (66)",
-          "g2-u3-l02-browser-trial（真实 Chrome、真实 jsDelivr 的 scratch-vm）：69 个用例，64 passed / 5 skipped（按设计）/ 0 failed；vm.spec 21 条 + classroom.spec 48 条；实测 328 秒（5.5 分钟）≤ 12 分钟",
-          "失败演练（一次性 PR #472，已关闭并删分支）：故意让 R2 断言失败 → Job 变红，upload-artifact 仍执行，artifact 含 trace.zip/error-context.md/junit.xml，日志含 Expected/Received 与出错行",
-          "workflow 相对 main +30/-0 纯新增；与并行 PR #468/#464/#462/#265/#260 三方合并 0 冲突块、无重名 Job"
-        ],
+      "PR #471 head 647b8707 curriculum content checks（run 41757100374）success：24 个 Job，仅新增 g2-u3-l02-browser-trial，其余 23 个与 #470 运行结论逐个一致",
+      "curriculum-web 新步骤 G2-U3-L02 unit tests 真实执行：g2-u3-l02.test.ts 66 passed (66)",
+      "g2-u3-l02-browser-trial（真实 Chrome、真实 jsDelivr 的 scratch-vm）：69 个用例，64 passed / 5 skipped（按设计）/ 0 failed；vm.spec 21 条 + classroom.spec 48 条；实测 328 秒（5.5 分钟）≤ 12 分钟",
+      "失败演练（一次性 PR #472，已关闭并删分支）：故意让 R2 断言失败 → Job 变红，upload-artifact 仍执行，artifact 含 trace.zip/error-context.md/junit.xml，日志含 Expected/Received 与出错行",
+      "workflow 相对 main +30/-0 纯新增；与并行 PR #468/#464/#462/#265/#260 三方合并 0 冲突块、无重名 Job"
+    ],
         "reviewer": null
       },
       "notes": "首席 2026-11-04 批准方案 A（独立 CI PR，Stacked）。起因：#470 的三个工作流全绿但未执行任何 G2-U3-L02 测试（审计见 docs/curriculum/g2-u3-l02/CI-COVERAGE-PLAN.md）。本条目仅为本 CI PR 的门禁登记；文件顶层 updatedAt 按现有惯例不随本条改动。"
@@ -3711,7 +3711,7 @@
         "全量 vitest 无回归（198 文件 1567 通过 + 2 有意 expected fail）；ESLint 0 错 0 警告",
         "重复步骤减少量有实测对照（A1-U3-L03 手工 vs A1-U3-L04 脚手架，约 9 类重复步骤）",
         "独立审核通过（非作者复核）"
-      ],
+],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/495"
       },
@@ -3722,7 +3722,7 @@
       "title": "四账号 432 节路线归属统一与旧身份规范纠偏",
       "priority": "P0",
       "category": "SPEC",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [],
       "scope": "仅治理文档：新增 docs/roadmap/AGENT-OWNERSHIP.md，更新 AGENTS.md、docs/roadmap/README.md、docs/product/p0-kitten-workspace/OWNERSHIP.md，并登记本产品任务；统一主 Muse/2/3/4 号归属与审核边界，移除现行规范中的已停用身份称谓。历史审计档案原样保留，不修改课程业务、432 节台账、CI 或 V2 视觉。",
       "acceptance": [
@@ -3732,10 +3732,12 @@
         "文档独立 PR CI、非作者审核和主线合并证据齐备；不得改变 432 节课程状态"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/512",
         "mergeCommit": null,
         "mainCI": null,
-        "tests": [],
+        "tests": [
+          "文档静态校验：18 个唯一路线 × 24 课 = 432；四组数量 72/144/120/96；现行角色/引用路径一致；未改课程台账与代码。"
+        ],
         "reviewer": null
       },
       "notes": "项目负责人 2026-11-11 统一角色名称与归属，停用的旧称仅留于历史档案的可追溯证据中。合并/CI/审核完成后另行回填。"
