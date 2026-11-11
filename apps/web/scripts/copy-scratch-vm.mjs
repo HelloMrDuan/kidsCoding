@@ -20,11 +20,15 @@
  *   externally-hosted extensions (loadExtensionURL), which no lesson uses;
  *   built-in extensions (pen, music, ...) load synchronously. The worker URL
  *   resolves document-relative either way, so behaviour is unchanged.
- * - Both packages are AGPL-3.0-only; the licence is declared in
+ * - scratch-render@2.2.84 (G2-U3-L04 only) is copied in the SAME clean-and-copy pass, so the
+ *   prebuild's rmSync can never delete it. Only the L04 sandbox page loads it; the L02 / L03
+ *   sandboxes and every other page do not reference it. It is a direct, exactly pinned
+ *   dependency, and this script fails if the installed version differs from the pin.
+ * - All three packages are AGPL-3.0-only; the licence is declared in
  *   package.json / package-lock.json, and the copies are build artefacts
  *   (public/scratch-vm/ is gitignored, like public/blockly-media/).
  */
-import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -40,7 +44,27 @@ const files = [
     source: path.join(webRoot, 'node_modules', 'scratch-storage', 'dist', 'web', 'scratch-storage.min.js'),
     name: 'scratch-storage.min.js',
   },
+  {
+    source: path.join(webRoot, 'node_modules', 'scratch-render', 'dist', 'web', 'scratch-render.js'),
+    name: 'scratch-render.js',
+  },
 ]
+
+// scratch-render must be exactly the pinned version: installed copy, package.json and lockfile all agree.
+const SCRATCH_RENDER_PINNED = '2.2.84'
+{
+  const installed = existsSync(path.join(webRoot, 'node_modules', 'scratch-render', 'package.json'))
+    ? JSON.parse(readFileSync(path.join(webRoot, 'node_modules', 'scratch-render', 'package.json'), 'utf8')).version
+    : null
+  const declared = JSON.parse(readFileSync(path.join(webRoot, 'package.json'), 'utf8')).dependencies?.['scratch-render']
+  const locked = JSON.parse(readFileSync(path.join(webRoot, 'package-lock.json'), 'utf8')).packages?.['node_modules/scratch-render']?.version
+  if (installed !== SCRATCH_RENDER_PINNED || declared !== SCRATCH_RENDER_PINNED || locked !== SCRATCH_RENDER_PINNED) {
+    console.error(
+      `[copy-scratch-vm] scratch-render must be exactly ${SCRATCH_RENDER_PINNED}: installed=${installed}, package.json=${declared}, lockfile=${locked}`,
+    )
+    process.exit(1)
+  }
+}
 
 for (const { source } of files) {
   if (!existsSync(source)) {

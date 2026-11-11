@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<!--
+  G2-U3-L04 方案 A 可行性验证（SPIKE，不是正式课程沙箱，不接受外部积木，不被任何课程页面引用）。
+  目的：在受限 iframe 里用「本地、固定版本」的 scratch-render，通过真实 VM 的 attachRenderer，
+  让真实的 sensing_touchingobject 工作。验证项与结论见 docs/curriculum/g2-u3-l04/SPIKE-RENDERER.md。
+
+  安全基线与 L02 / L03 沙箱相同：default-src 'none'，connect-src 'none'（不允许任何网络连接），
+  脚本只来自本源与内联。唯一的差别是 img-src data:（scratch-render 把 SVG 造型转成位图时用 data: 图片）。
+  本页由宿主用 sandbox="allow-scripts" 的 iframe 加载（不给 same-origin）。
+
+  spike 发现的两个硬性要求（正式沙箱必须保留，并有测试守护）：
+    1. 必须设置 vm.runtime.currentStepTime 再 _step()，否则线程调度器一个线程都不前进（L02 / L03 沙箱也是这样做的）。
+    2. SVG 造型在渲染器里是异步转位图的，转完之前角色的包围盒是占位值（左上象限），touching 判不到。
+       所以点绿旗之前必须等所有角色的 getBounds() 宽高等于造型的真实尺寸（waitForSkins，有超时；判据与位置无关）。
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<title>scratch-render spike 沙箱</title>
+<script src="/scratch-vm/scratch-vm.js"></script>
+<script src="/scratch-vm/scratch-storage.min.js"></script>
+<script src="/scratch-vm/scratch-render.js"></script>
+</head>
+<body>
+<script>
+(() => {
+  const ASSETS = {
+    backdrop: 'a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1',
+    basket: 'b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2',
+    ball: 'c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3',
+  };
+  // 原创 SVG（本项目绘制）。篮子 80×40，球 40×40，造型中心在图形中心。
+  const SVG = {
+    backdrop: '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360"><rect width="480" height="360" fill="#fff4e0"/></svg>',
+    basket: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"><rect width="80" height="40" rx="6" fill="#8b5a2b"/></svg>',
+    ball: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="20" fill="#e0564f"/></svg>',
+  };
+  const STEP_MS = 1000 / 30;
+  const SKIN_WAIT_MS = 2000;
+  const send = (kind, info = {}) => window.parent.postMessage({kind, ...info}, '*');
+
+  let vm = null, renderer = null, storage = null, canvasEl = null;
+
+  function costume(name, key, cx, cy) {
+    return {assetId: ASSETS[key], name, md5ext: ASSETS[key] + '.svg', dataFormat: 'svg', rotationCenterX: cx, rotationCenterY: cy};
+  }
+  const base = () => ({variables: {}, lists: {}, broadcasts: {}, comments: {}, currentCostume: 0, sounds: [], volume: 100, tempo: 60});
+
+  // 固定内置工程。球脚本（真实积木）：
+  //   当绿旗被点击 → 如果〈碰到 篮子？〉那么 { 将 得分 增加 1 ；(collect 模式) 隐藏 }
+  // collect 模式用于验证「同一目标不重复计分」：得分后立即隐藏，隐藏的角色不再碰到任何东西。
+  // repeat 是球脚本循环检测的次数（模拟「同一个球被循环多次检测」的失败情形）。
+  function project(p) {
+    const inner = {
+      s: {opcode: 'data_changevariableby', next: p.collect ? 'hd' : null, parent: 'i', inputs: {VALUE: [1, [4, '1']]}, fields: {VARIABLE: ['得分', 'v1']}, shadow: false, topLevel: false},
+    };
+    if (p.collect) inner.hd = {opcode: 'looks_hide', next: null, parent: 's', inputs: {}, fields: {}, shadow: false, topLevel: false};
+    const ball = {
+      h: {opcode: 'event_whenflagclicked', next: 'r', parent: null, inputs: {}, fields: {}, shadow: false, topLevel: true, x: 0, y: 0},
+      r: {opcode: 'control_repeat', next: null, parent: 'h', inputs: {TIMES: [1, [6, String(p.repeat || 1)]], SUBSTACK: [2, 'i']}, fields: {}, shadow: false, topLevel: false},
+      i: {opcode: 'control_if', next: null, parent: 'r', inputs: {CONDITION: [2, 't'], SUBSTACK: [2, 's']}, fields: {}, shadow: false, topLevel: false},
+      t: {opcode: 'sensing_touchingobject', next: null, parent: 'i', inputs: {TOUCHINGOBJECTMENU: [1, 'm']}, fields: {}, shadow: false, topLevel: false},
+      m: {opcode: 'sensing_touchingobjectmenu', next: null, parent: 't', inputs: {}, fields: {TOUCHINGOBJECTMENU: ['篮子', null]}, shadow: true, topLevel: false},
+      ...inner,
+    };
+    return {
+      targets: [
+        {isStage: true, name: 'Stage', ...base(), variables: {v1: ['得分', 0]}, blocks: {}, layerOrder: 0, costumes: [costume('背景', 'backdrop', 240, 180)]},
+        {isStage: false, name: '篮子', ...base(), blocks: {}, layerOrder: 1, visible: true, x: p.basketX, y: p.basketY, size: 100, direction: 90, draggable: false, rotationStyle: 'all around', costumes: [costume('篮子', 'basket', 40, 20)]},
+        {isStage: false, name: '球', ...base(), blocks: ball, layerOrder: 2, visible: true, x: p.ballX, y: p.ballY, size: 100, direction: 90, draggable: false, rotationStyle: 'all around', costumes: [costume('球', 'ball', 20, 20)]},
+      ],
+      monitors: [], extensions: [], meta: {semver: '3.0.0', vm: '0.2.0', agent: 'KidsCoding L04 renderer spike'},
+    };
+  }
+
+  // 释放：停脚本、退出 VM、主动让 WebGL 上下文丢失、把引用清掉、移除 canvas。
+  function dispose() {
+    let lost = null;
+    if (vm) { try { vm.stopAll(); } catch (_e) {} try { vm.quit(); } catch (_e) {} }
+    if (renderer) {
+      try {
+        const gl = renderer.gl;
+        const ext = gl && gl.getExtension && gl.getExtension('WEBGL_lose_context');
+        if (ext) { ext.loseContext(); lost = gl.isContextLost(); }
+      } catch (_e) {}
+    }
+    if (canvasEl && canvasEl.parentNode) canvasEl.parentNode.removeChild(canvasEl);
+    const had = {vm: vm !== null, renderer: renderer !== null};
+    vm = null; renderer = null; storage = null; canvasEl = null;
+    return {had, lost};
+  }
+
+  function newRenderer() {
+    canvasEl = document.createElement('canvas');
+    canvasEl.width = 480; canvasEl.height = 360;
+    document.body.appendChild(canvasEl);
+    const r = new window.ScratchRender(canvasEl);
+    r.setLayerGroupOrdering(['group1']);
+    return r;
+  }
+
+  // 等所有角色的 SVG 造型在渲染器里就绪：getBounds 变成以自身为中心的真实值。有超时，超时就报错而不是静默继续。
+  async function waitForSkins() {
+    const sprites = () => vm.runtime.targets.filter(t => !t.isStage);
+    // 就绪判据与位置无关：包围盒的宽、高等于造型的真实尺寸（占位值是 81×41、41×41，比真实尺寸大 1）。
+    const SIZE = {'篮子': [80, 40], '球': [40, 40]};
+    const ready = () => sprites().every(t => {
+      const b = t.getBounds(); const want = SIZE[t.sprite.name];
+      return b && want && Math.round(b.right - b.left) === want[0] && Math.round(b.top - b.bottom) === want[1];
+    });
+    const t0 = performance.now();
+    while (!ready()) {
+      if (performance.now() - t0 > SKIN_WAIT_MS) throw new Error('造型在 ' + SKIN_WAIT_MS + 'ms 内没有就绪');
+      await new Promise(r => setTimeout(r, 10));
+    }
+    return Math.round(performance.now() - t0);
+  }
+
+  async function run(data) {
+    const id = data.id;
+    dispose();
+    try {
+      const Storage = typeof window.ScratchStorage === 'function' ? window.ScratchStorage : window.ScratchStorage.ScratchStorage;
+      vm = new window.VirtualMachine();
+      storage = new Storage();
+      vm.attachStorage(storage);
+      for (const [key, svg] of Object.entries(SVG)) {
+        storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, new TextEncoder().encode(svg), ASSETS[key]);
+      }
+      if (data.renderer !== false) {
+        renderer = newRenderer();
+        vm.attachRenderer(renderer);
+      }
+      await vm.loadProject(JSON.stringify(project({...data.layout, collect: !!data.collect, repeat: data.repeat})));
+      const skinMs = renderer ? await waitForSkins() : 0;
+      const ball = vm.runtime.targets.find(t => !t.isStage && t.sprite && t.sprite.name === '球');
+      const touchingBefore = ball.isTouchingSprite('篮子');
+      // 记录真实积木 sensing_touchingobject 被调用的次数与返回值（只记录，不改变行为）。
+      const calls = [];
+      const orig = vm.runtime._primitives.sensing_touchingobject;
+      vm.runtime._primitives.sensing_touchingobject = function (args, util) {
+        const out = orig.call(this, args, util);
+        calls.push(out);
+        return out;
+      };
+      vm.greenFlag();
+      let steps = 0;
+      for (; steps < 60; steps++) {
+        vm.runtime.currentStepTime = STEP_MS;
+        vm.runtime._step();
+        if (vm.runtime.threads.length === 0) { steps++; break; }
+      }
+      const score = vm.runtime.getTargetForStage().lookupVariableByNameAndType('得分').value;
+      send('SPIKE_DONE', {
+        id, hasRenderer: !!vm.runtime.renderer, skinMs, touchingBefore, score, calls, steps,
+        ballVisible: ball.visible, finished: vm.runtime.threads.length === 0,
+        glIsWebGL2: !!(renderer && renderer.gl && typeof WebGL2RenderingContext !== 'undefined' && renderer.gl instanceof WebGL2RenderingContext),
+      });
+    } catch (error) {
+      send('SPIKE_ERROR', {id, error: String(error && error.message || error).slice(0, 300)});
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent || !event.data || typeof event.data !== 'object') return;
+    const d = event.data;
+    if (d.kind === 'PING') {
+      send('SPIKE_READY', {hasVM: typeof window.VirtualMachine === 'function', hasRender: typeof window.ScratchRender === 'function'});
+    } else if (d.kind === 'SPIKE_RUN') {
+      run(d);
+    } else if (d.kind === 'SPIKE_DISPOSE') {
+      const r = dispose();
+      send('SPIKE_DISPOSED', {id: d.id, ...r, vmNull: vm === null, rendererNull: renderer === null, canvasCount: document.querySelectorAll('canvas').length});
+    } else if (d.kind === 'SPIKE_PROBE_NETWORK') {
+      // 在沙箱内主动尝试各种外部请求，由宿主汇总结果（CSP 应当全部拒绝）。
+      const results = {};
+      const attempts = {
+        fetch: () => fetch('https://example.com/x').then(() => 'allowed', () => 'blocked'),
+        xhr: () => new Promise(res => { try { const x = new XMLHttpRequest(); x.open('GET', 'https://example.com/x'); x.onerror = () => res('blocked'); x.onload = () => res('allowed'); x.send(); } catch (_e) { res('blocked'); } }),
+        img: () => new Promise(res => { const i = new Image(); i.onload = () => res('allowed'); i.onerror = () => res('blocked'); i.src = 'https://example.com/x.png'; }),
+        ws: () => new Promise(res => { try { const w = new WebSocket('wss://example.com/x'); w.onerror = () => res('blocked'); w.onopen = () => res('allowed'); } catch (_e) { res('blocked'); } }),
+      };
+      Promise.all(Object.entries(attempts).map(([k, f]) => f().then(v => { results[k] = v; }))).then(() => send('SPIKE_NETWORK', {id: d.id, results}));
+    }
+  });
+})();
+</script>
+</body>
+</html>
