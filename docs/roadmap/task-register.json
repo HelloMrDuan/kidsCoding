@@ -3722,7 +3722,7 @@
       "title": "四账号 432 节路线归属统一与旧身份规范纠偏",
       "priority": "P0",
       "category": "SPEC",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "仅治理文档：新增 docs/roadmap/AGENT-OWNERSHIP.md，更新 AGENTS.md、docs/roadmap/README.md、docs/product/p0-kitten-workspace/OWNERSHIP.md，并登记本产品任务；统一主 Muse/2/3/4 号归属与审核边界，移除现行规范中的已停用身份称谓。历史审计档案原样保留，不修改课程业务、432 节台账、CI 或 V2 视觉。",
       "acceptance": [
@@ -3733,14 +3733,17 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/512",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "37318a6601f9b4f650147745edcd91b6726298d7",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/43010880193",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/43010880181",
         "tests": [
-          "文档静态校验：18 个唯一路线 × 24 课 = 432；四组数量 72/144/120/96；现行角色/引用路径一致；未改课程台账与代码。"
+          "文档静态校验：18 个唯一路线 × 24 课 = 432；四组数量 72/144/120/96；现行角色/引用路径一致；未改课程台账与代码。",
+          "PR #512 门禁：40 项检查全部 success、0 失败（头 c5eecb25；合并 SHA 37318a6601f9b4f650147745edcd91b6726298d7）",
+          "main CI 课程运行 43010880193（37 Job 全 success）、追踪运行 43010880181 均 success（主线头 37318a66，#512 合并后）"
         ],
-        "reviewer": null
+        "reviewer": "4号 kid四号小宝：Review 5857864511（COMMENTED/PASS，2026-11-11 19:14 CST，头 c5eecb25），结论通过，交首席验收合并"
       },
-      "notes": "项目负责人 2026-11-11 统一角色名称与归属，停用的旧称仅留于历史档案的可追溯证据中。合并/CI/审核完成后另行回填。"
+      "notes": "项目负责人 2026-11-11 统一角色名称与归属，停用的旧称仅留于历史档案的可追溯证据中。关账 PR 另行回填 mergeCommit、mainCI 与审核证据；432 节课程状态未变。"
     }
   ]
 }
