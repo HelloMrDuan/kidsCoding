@@ -798,9 +798,8 @@ jobs:
   # 所以「构建之后 /scratch-vm/scratch-render.js 仍在」由课堂用例真实验证。
   # 为什么拆：第一版把四个文件放在一个 Job 里，CI 实测构建约 67 秒 + 测试超过 7 分钟，211 个实例里 193 个通过（0 失败）时被 8 分钟的步骤上限截断，
   # 预估完整需要约 9 分钟，没有余量，所以拆开而不是放宽。
-  # runs-on 固定为 ubuntu-24.04：2026-11-09 09:15～09:46 之间 `ubuntu-latest` 从 24.04 变成了 26.04，Playwright 不支持 26.04
-  # （`playwright install chrome --with-deps` 报 "does not support ffmpeg on ubuntu26.04-x64"），同一次运行里所有安装 Chrome 的 Job 都因此失败。
-  # 只固定本课自己的 Job；其他 Job 属于别的任务，由首席另行裁定。
+  # runs-on 固定为 ubuntu-24.04（与 OPS-029 / #505 对其他浏览器 Job 的处理一致）：`ubuntu-latest` 已迁移到 ubuntu-26.04，
+  # Playwright 不支持（`playwright install chrome --with-deps` 报 "does not support ffmpeg on ubuntu26.04-x64"）。
   # 超时预算（SYS-108）：每个 Job 15 分钟（硬限制，不是目标），预算包含所有开销：checkout + npm ci 约 20 秒 + Chrome 安装最多 4 分钟 + 测试步骤（含构建）最多 7 分钟 + 核对 1 分钟。
   g2-u3-l04-browser-trial:
     runs-on: ubuntu-24.04

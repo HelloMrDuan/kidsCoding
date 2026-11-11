@@ -68,7 +68,7 @@ npx playwright test tests/e2e/g2-u3-l04-vm.spec.ts tests/e2e/g2-u3-l04-classroom
   - `g2-u3-l04-browser-trial`：三视口课堂，按视口分成 desktop / tablet / phone 三个并行分片（`--grep "\[viewport\]"`，不是 playwright 的 `--shard`），每片 29 个实例，核对 总数 29、跳过 2 / 3 / 2（按设计的跳过）。
   - **为什么拆**：第一版把四个文件放在一个 Job 里，CI 实测构建约 67 秒 + 测试超过 7 分钟，211 个里 193 个通过（0 失败）时被 8 分钟的步骤上限截断；第二版把课堂单独放一个 Job，87 个实例仍然超出 7 分钟的步骤上限。所以按视口再分片，**没有放宽任何预算**。
   - **超时预算按 SYS-108**：每个 Job `timeout-minutes: 15`（硬限制，不是目标），各步自带上限（Chrome 安装 4、测试 7、核对 1），Chrome 安装每次限时 100 秒、最多 2 次。原 spike 专用 Job 并入 `g2-u3-l04-vm-trial`。
-  - **runner**：两个 Job 固定 `ubuntu-24.04`。2026-11-09 09:15～09:46 之间 `ubuntu-latest` 变成了 ubuntu-26.04，Playwright 不支持（`does not support ffmpeg on ubuntu26.04-x64`），当时同一次运行里所有安装 Chrome 的 Job（含 L02、L03）和 deploy-pipeline 的 e2e-blockly 都在安装步失败。本 PR 只固定自己的 Job，其他 Job 不属于本任务，没有改。
+  - **runner**：两个 Job 固定 `ubuntu-24.04`。`ubuntu-latest` 迁移到 ubuntu-26.04 后 Playwright 不支持（`does not support ffmpeg on ubuntu26.04-x64`），当时所有安装 Chrome 的 Job 都在安装步失败；这个问题由 OPS-029（#505，已合并）统一把受影响的 Job 固定到 `ubuntu-24.04`，本 PR 的两个 Job 在 #505 之前就已自行固定，与之一致。
   - **本地数字不能代替 CI，CI 结果见 PR 页面的最新运行。**
 - **控制台 CSP 噪音**：本课没有放宽 CSP；测试只允许 `font-src` 这一类噪音（渲染器内部的字体尝试），任何其他 CSP 违规都会让用例失败。
 - **参数仍是 proposed**：球速、分数、重复次数范围等未经首席裁定；教学提示 transferPoints 的第 2 条略微解释了为什么需要“如果”，待教研判断。
