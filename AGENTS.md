@@ -7,6 +7,8 @@
 
 V2 是唯一已批准的全站视觉基线。未经项目负责人明确批准，禁止重新设计或改变布局、颜色、字体层级、组件视觉、分区顺序及响应式交互。旧 roadmap / CSS / V1 不能覆盖 V2；业务冲突先提交具体差异和最小方案，等待裁定，不能先改后报。
 
+所有账号必须遵循 [四账号课程归属统一规范](docs/roadmap/AGENT-OWNERSHIP.md)：长期课程归属、当前任务授权、历史证据、交叉审核不得混淆。
+
 只推进 [任务台账](docs/roadmap/task-register.json) 中一个 Task-ID，遵守
 [单任务制度](docs/roadmap/11-TASK-EXECUTION-POLICY.md)。真实执行与数据不能由原型演示代替。
 UI 任务必须有真实 Chrome 三断点对比、功能正反与恢复测试、PR/main CI 和日志证据。未满足验收条件不得标记 completed；当前已记录的 V2 AA 缺口不得自行改色或伪报通过。
@@ -15,7 +17,7 @@ UI 任务必须有真实 Chrome 三断点对比、功能正反与恢复测试、
 
 # 全体 AI Agent 统一工程协作规范（2026-10-30，duan 指令；与已合并 SYS-108 同为主线）
 
-适用：Muse1、Muse2、Muse3、Muse4、Codex、Hark 及后续新增的全部 Agent。
+适用：主 Muse、2 号 Muse、3 号 Muse、4 号 Muse，以及被明确授权的 Codex/自动化代理。
 主架构账号（kid小宝）负责架构裁定、任务分配、跨 Agent 冲突协调与规范最终审核；
 各执行 Agent 只做明确分配给自己的任务；独立审核不得由提交者本人担任。
 
