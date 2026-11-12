@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>G2-U3-L05 倒计时游戏结束 沙箱</title>
+<script src="/scratch-vm/scratch-vm.js"></script>
+<!-- scratch-storage 是 scratch-vm 加载工程必需的素材仓库，和其他 G2 沙箱使用同一个固定版本。 -->
+<script src="/scratch-vm/scratch-storage.min.js"></script>
+</head>
+<body>
+<script>
+(() => {
+  // G2-U3-L05 课堂沙箱：在真实 Scratch VM 里跑学生的倒计时脚本，本页只做四件事：校验、运行、观察、报告。
+  // 没有渲染器：本课的判定只看舞台变量 timeLeft / score、广播和“timeLeft < 1”的真实求值，都不需要画面。
+  //
+  // 虚拟时钟（本课的核心机制，Node 探针 probe-countdown-virtual-clock.cjs 先验证过）：
+  // scratch-vm@5.0.300 的计时器取全局时钟（此构建 USE_PERFORMANCE 为 false，runtime.currentMSecs 与线程计时都走 Date.now；
+  // 探针输出 uses self.performance: false）。本页把 Date.now 换成虚拟时钟，并尝试把 performance.now 也换成同一个
+  // 虚拟时钟（换不上也不影响 VM：它读的是 Date.now）。虚拟时钟只在每一帧开始时前进 STEP_MS，帧内不动。
+  //
+  // 必须踩的坑（探针与变异检验都复现过）：调度器在一帧里会反复轮询正在“等待”的线程，直到有重绘请求或用掉 75%
+  // 的帧时间才退出；虚拟时钟在一帧内不走，所以不请求重绘就会死循环。解决办法和 Node 运行器一致：
+  // 包装 sequencer.stepThread，每跑一遍线程就 requestRedraw()，一帧恰好一遍。
+  //
+  // 观察的是真实 VM 的积木调用：包装 runtime._primitives.operator_lt（只记录学生的“timeLeft < 1”，
+  // 课程自带的水果脚本里只有 operator_gt）与 runtime.startHats（广播“游戏结束”的接收帽子被触发的次数），
+  // 记录后立即调用原函数，不改变积木行为。
+  const LIMITS = {
+    frameCap: 700, settleFrames: 90, maxBlocks: 8, maxScripts: 3,
+    minStart: 1, maxStart: 20, minWait: 1, maxWait: 2, minDecrease: 1, maxDecrease: 5,
+    minRepeatTimes: 1, maxRepeatTimes: 20, scoreEverySeconds: 0.5, broadcastSlackFrames: 2,
+  };
+  const STEP_MS = 1000 / 30;
+  const ASSET_IDS = {
+    backdrop: 'c3d4e5f6a7b8293a4b5c6d7e8f901a23',
+    student: 'a1b2c3d4e5f60718293a4b5c6d7e8f01',
+    fruit: 'b2c3d4e5f6a718293a4b5c6d7e8f9012',
+  };
+  const STUDENT = '学生';
+  const FRUIT = '水果';
+  const TIME_ID = 'kcl5_time';
+  const SCORE_ID = 'kcl5_score';
+  const BC_ID = 'kcl5_bc';
+  const BC_NAME = '游戏结束';
+  // 本课原创 SVG 造型（学生 / 水果 / 背景各一份，不再共用空白图）。本课没有渲染器：
+  // 造型只用于角色栏缩略图与工程完整性，舞台判定只看 timeLeft / score，不靠画面。
+  const SVG = {
+    student: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120"><path d="M24 40a26 23 0 0 1 52 0z" fill="#2463eb"/><rect x="18" y="38" width="64" height="7" rx="3.5" fill="#1748b5"/><circle cx="26" cy="54" r="5" fill="#ffd9b3"/><circle cx="74" cy="54" r="5" fill="#ffd9b3"/><circle cx="50" cy="54" r="24" fill="#ffd9b3"/><circle cx="41" cy="52" r="3.2" fill="#1f2d3d"/><circle cx="59" cy="52" r="3.2" fill="#1f2d3d"/><ellipse cx="36" cy="62" rx="4.5" ry="2.8" fill="#ff9d9d" opacity="0.65"/><ellipse cx="64" cy="62" rx="4.5" ry="2.8" fill="#ff9d9d" opacity="0.65"/><path d="M41 63q9 8 18 0" stroke="#1f2d3d" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M27 120v-20a23 15 0 0 1 46 0v20z" fill="#ffc53d"/><path d="M42 88h16l-8 9z" fill="#fff"/></svg>',
+    fruit: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M50 28q3-11 11-15" stroke="#8a5a2b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M52 22q17-13 27-4-4 15-21 13z" fill="#2f9e44"/><path d="M50 36c-6-8-24-9-32 3C8 51 16 75 28 87c6 6 14 2 22 2s16 4 22-2c12-12 20-36 10-48-8-12-26-11-32-3z" fill="#e5484d"/><ellipse cx="34" cy="56" rx="6.5" ry="11" fill="#ffffff" opacity="0.35" transform="rotate(-14 34 56)"/></svg>',
+    backdrop: '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360"><rect width="480" height="360" fill="#bfe0f7"/><circle cx="402" cy="58" r="40" fill="#ffe066" opacity="0.45"/><circle cx="402" cy="58" r="27" fill="#ffd43b"/><g fill="#ffffff"><ellipse cx="96" cy="62" rx="42" ry="17"/><ellipse cx="128" cy="52" rx="30" ry="14"/><ellipse cx="316" cy="96" rx="36" ry="14"/><ellipse cx="342" cy="88" rx="24" ry="11"/></g><path d="M0 262q120-52 240-18t240-6v122H0z" fill="#7cc47f"/><path d="M0 300q140-34 300-12t180-4v76H0z" fill="#4c9a52"/><rect x="52" y="196" width="13" height="42" rx="5" fill="#8a5a2b"/><circle cx="58" cy="178" r="30" fill="#3d9970"/><circle cx="36" cy="192" r="19" fill="#4caf6d"/><circle cx="80" cy="192" r="19" fill="#4caf6d"/><g><circle cx="150" cy="322" r="6" fill="#ff8fab"/><circle cx="168" cy="330" r="5" fill="#ffd43b"/><circle cx="330" cy="318" r="6" fill="#ffd43b"/><circle cx="352" cy="328" r="5" fill="#ff8fab"/></g></svg>',
+  };
+  const uri = (svg) => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+
+  // ---- 虚拟时钟 -------------------------------------------------------------
+  const VIRTUAL_START = 1000000;
+  let virtualNow = VIRTUAL_START;
+  Date.now = () => virtualNow;
+  try {
+    const perfBase = performance.now();
+    Object.defineProperty(performance, 'now', {
+      value: () => perfBase + (virtualNow - VIRTUAL_START),
+      configurable: true,
+    });
+  } catch (_error) { /* performance.now 换不上没关系：本课 VM 读的是 Date.now（见文件头注释） */ }
+
+  let vm = null;
+  let timer = null;
+  let current = null; // {id, levelId, fingerprint, frameMs, frame, live, loading, cancelled, trace}
+
+  function send(kind, info = {}) {
+    window.parent.postMessage({kind, ...info}, '*');
+  }
+  const toNumber = (v) => {
+    const n = typeof v === 'number' ? v : Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+  // 输入形如 [1, [code, value]]：一个直接写在积木上的字面量（code 4 = 数字）。
+  const lit = (input, code) => Array.isArray(input) && input.length === 2 && input[0] === 1 &&
+    Array.isArray(input[1]) && input[1].length === 2 && input[1][0] === code ? input[1][1] : null;
+  function intInRange(raw, min, max) {
+    const text = String(raw);
+    if (!/^-?\d{1,4}$/.test(text)) return false;
+    const n = Number(text);
+    return Number.isInteger(n) && n >= min && n <= max;
+  }
+  const isVarField = (fields, name, id) => {
+    const f = fields && fields.VARIABLE;
+    return Array.isArray(f) && f.length === 2 && f[0] === name && f[1] === id;
+  };
+
+  // ---- 工程校验（与 compile.ts 的输出一一对应；不是 compile 产出的工程一律拒绝） ------------
+  const STUDENT_OPS = new Set([
+    'event_whenflagclicked', 'data_setvariableto', 'control_wait', 'data_changevariableby', 'event_broadcast',
+    'control_repeat', 'control_repeat_until', 'operator_lt', 'data_variable',
+  ]);
+
+  function checkLeafOrTop(b, inLoop) {
+    // 校验一块在链上的积木（不含帽子、含循环本身）；循环体里只允许 wait / decrease。
+    switch (b.opcode) {
+      case 'data_setvariableto':
+        if (inLoop) throw new Error('循环里只能放“等待”和“减少”');
+        if (!isVarField(b.fields, 'timeLeft', TIME_ID)) throw new Error('“将 timeLeft 设为”的变量不对');
+        if (Object.keys(b.inputs || {}).join(',') !== 'VALUE' || !intInRange(lit(b.inputs.VALUE, 4), LIMITS.minStart, LIMITS.maxStart)) {
+          throw new Error('起始秒数超出范围');
+        }
+        break;
+      case 'control_wait':
+        if (Object.keys(b.inputs || {}).join(',') !== 'DURATION' || !intInRange(lit(b.inputs.DURATION, 4), LIMITS.minWait, LIMITS.maxWait)) {
+          throw new Error('等待秒数超出范围');
+        }
+        break;
+      case 'data_changevariableby':
+        if (!isVarField(b.fields, 'timeLeft', TIME_ID)) throw new Error('“将 timeLeft 增加”的变量不对');
+        if (Object.keys(b.inputs || {}).join(',') !== 'VALUE') throw new Error('积木结构不对');
+        {
+          const v = lit(b.inputs.VALUE, 4);
+          const n = v === null ? NaN : Number(v);
+          if (!Number.isInteger(n) || n < -LIMITS.maxDecrease || n > -LIMITS.minDecrease) throw new Error('减少量超出范围');
+        }
+        break;
+      case 'event_broadcast':
+        if (inLoop) throw new Error('循环里只能放“等待”和“减少”');
+        {
+          const inp = b.inputs && b.inputs.BROADCAST_INPUT;
+          const ok = Object.keys(b.inputs || {}).join(',') === 'BROADCAST_INPUT' && Array.isArray(inp) && inp.length === 2 && inp[0] === 1 &&
+            Array.isArray(inp[1]) && inp[1][0] === 11 && inp[1][1] === BC_NAME && inp[1][2] === BC_ID;
+          if (!ok) throw new Error('只能广播“游戏结束”');
+        }
+        break;
+      case 'control_repeat':
+      case 'control_repeat_until':
+        if (inLoop) throw new Error('循环里不能再放循环');
+        break;
+      default:
+        throw new Error('本课不允许的积木：' + String(b.opcode).slice(0, 40));
+    }
+  }
+
+  function validateCondition(condId, untilId, blocks, seen) {
+    const cond = blocks[condId];
+    if (!cond || cond.opcode !== 'operator_lt' || cond.parent !== untilId) throw new Error('“重复直到”的条件不对');
+    if (seen.has(condId)) throw new Error('积木连接成环或重复');
+    seen.add(condId);
+    const keys = Object.keys(cond.inputs || {}).sort().join(',');
+    if (keys !== 'OPERAND1,OPERAND2') throw new Error('“小于”积木结构不对');
+    const op1 = cond.inputs.OPERAND1;
+    if (!Array.isArray(op1) || op1.length !== 3 || op1[0] !== 3 || typeof op1[1] !== 'string') throw new Error('“小于”左边必须是 timeLeft');
+    const varBlock = blocks[op1[1]];
+    if (!varBlock || varBlock.opcode !== 'data_variable' || varBlock.parent !== condId || !isVarField(varBlock.fields, 'timeLeft', TIME_ID)) {
+      throw new Error('“小于”左边必须是 timeLeft');
+    }
+    if (seen.has(op1[1])) throw new Error('积木连接成环或重复');
+    seen.add(op1[1]);
+    if (lit(cond.inputs.OPERAND2, 4) === null || String(lit(cond.inputs.OPERAND2, 4)) !== '1') throw new Error('“小于”右边必须是 1');
+  }
+
+  function validateStudent(blocks) {
+    const ids = Object.keys(blocks || {});
+    for (const id of ids) {
+      const b = blocks[id];
+      if (!b || typeof b !== 'object' || !STUDENT_OPS.has(b.opcode)) throw new Error('本课不允许的积木：' + String(b && b.opcode).slice(0, 40));
+      if (b.shadow) throw new Error('不允许影子积木');
+    }
+    const seen = new Set();
+    let counted = 0;
+    let hats = 0;
+    function walkChain(firstId, inLoop) {
+      let id = firstId;
+      while (id) {
+        if (typeof id !== 'string' || !blocks[id]) throw new Error('积木连接不对');
+        if (seen.has(id)) throw new Error('积木连接成环或重复');
+        seen.add(id);
+        counted++;
+        const b = blocks[id];
+        checkLeafOrTop(b, inLoop);
+        if (b.opcode === 'control_repeat') {
+          const times = lit(b.inputs.TIMES, 4);
+          const keys = Object.keys(b.inputs || {}).sort().join(',');
+          if ((keys !== 'TIMES' && keys !== 'SUBSTACK,TIMES') || !intInRange(times, LIMITS.minRepeatTimes, LIMITS.maxRepeatTimes)) {
+            throw new Error('重复次数超出范围');
+          }
+          const sub = b.inputs.SUBSTACK;
+          if (sub !== undefined) {
+            if (!Array.isArray(sub) || sub[0] !== 2 || typeof sub[1] !== 'string' || !blocks[sub[1]] || blocks[sub[1]].parent !== id) throw new Error('重复里的积木连接不对');
+            walkChain(sub[1], true);
+          }
+        } else if (b.opcode === 'control_repeat_until') {
+          const keys = Object.keys(b.inputs || {}).sort().join(',');
+          if (keys !== 'CONDITION' && keys !== 'CONDITION,SUBSTACK') throw new Error('“重复直到”结构不对');
+          const condInput = b.inputs.CONDITION;
+          if (!Array.isArray(condInput) || condInput[0] !== 2 || typeof condInput[1] !== 'string') throw new Error('“重复直到”的条件不对');
+          validateCondition(condInput[1], id, blocks, seen);
+          const sub = b.inputs.SUBSTACK;
+          if (sub !== undefined) {
+            if (!Array.isArray(sub) || sub[0] !== 2 || typeof sub[1] !== 'string' || !blocks[sub[1]] || blocks[sub[1]].parent !== id) throw new Error('“重复直到”里的积木连接不对');
+            walkChain(sub[1], true);
+          }
+        }
+        id = b.next;
+      }
+    }
+    for (const id of ids) {
+      const b = blocks[id];
+      if (b.opcode === 'event_whenflagclicked') {
+        hats++;
+        if (!b.topLevel || b.parent !== null || Object.keys(b.inputs || {}).length || Object.keys(b.fields || {}).length) throw new Error('绿旗积木结构不对');
+        seen.add(id);
+        if (b.next) walkChain(b.next, false);
+      }
+    }
+    if (hats > LIMITS.maxScripts) throw new Error('脚本太多');
+    if (seen.size !== ids.length) throw new Error('有积木没有接上');
+    if (counted > LIMITS.maxBlocks) throw new Error('积木太多');
+  }
+
+  // 课程自带的水果脚本是 compile.ts 里写死的那一段，逐块核对形状，改过任何一块都拒绝。
+  function validateFruit(blocks) {
+    const SHAPE = {
+      fh: 'event_whenflagclicked', ff: 'control_forever', fw: 'control_wait', fi: 'control_if',
+      fc: 'operator_gt', fv: 'data_variable', fa: 'data_changevariableby',
+    };
+    const ids = Object.keys(blocks || {}).sort();
+    if (ids.join(',') !== Object.keys(SHAPE).sort().join(',')) throw new Error('水果脚本不对');
+    for (const [id, opcode] of Object.entries(SHAPE)) {
+      if (!blocks[id] || blocks[id].opcode !== opcode || blocks[id].shadow) throw new Error('水果脚本不对');
+    }
+    const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const fh = blocks.fh, ff = blocks.ff, fw = blocks.fw, fi = blocks.fi, fc = blocks.fc, fv = blocks.fv, fa = blocks.fa;
+    if (!fh.topLevel || fh.parent !== null || fh.next !== 'ff') throw new Error('水果脚本不对');
+    if (ff.parent !== 'fh' || ff.next !== null || !eq(ff.inputs, {SUBSTACK: [2, 'fw']})) throw new Error('水果脚本不对');
+    if (fw.parent !== 'ff' || fw.next !== 'fi' || !eq(fw.inputs, {DURATION: [1, [4, String(LIMITS.scoreEverySeconds)]]})) throw new Error('水果脚本不对');
+    if (fi.parent !== 'fw' || fi.next !== null || !eq(fi.inputs, {CONDITION: [2, 'fc'], SUBSTACK: [2, 'fa']})) throw new Error('水果脚本不对');
+    if (fc.parent !== 'fi' || fc.next !== null || !eq(fc.inputs, {OPERAND1: [3, 'fv', [10, '']], OPERAND2: [1, [4, '0']]})) throw new Error('水果脚本不对');
+    if (fv.parent !== 'fc' || fv.next !== null || !isVarField(fv.fields, 'timeLeft', TIME_ID)) throw new Error('水果脚本不对');
+    if (fa.parent !== 'fi' || fa.next !== null || !eq(fa.inputs, {VALUE: [1, [4, '1']]}) || !isVarField(fa.fields, 'score', SCORE_ID)) throw new Error('水果脚本不对');
+  }
+
+  function validateTargetBasics(t, name, assetId) {
+    if (!t || t.isStage !== (name === 'Stage') || t.name !== name) throw new Error('角色名单不对');
+    if (!Array.isArray(t.costumes) || t.costumes.length !== 1 || t.costumes[0].assetId !== assetId || t.costumes[0].dataFormat !== 'svg') throw new Error('造型不对');
+    if ((t.sounds || []).length || Object.keys(t.lists || {}).length) throw new Error('本课不允许列表或声音');
+  }
+
+  function validateProject(project) {
+    if (!project || typeof project !== 'object' || !Array.isArray(project.targets) || project.targets.length !== 3) throw new Error('工程需要 3 个对象');
+    const [stage, student, fruit] = project.targets;
+    validateTargetBasics(stage, 'Stage', ASSET_IDS.backdrop);
+    if (Object.keys(stage.blocks || {}).length !== 0) throw new Error('舞台不能有脚本');
+    const varIds = Object.keys(stage.variables || {}).sort();
+    if (varIds.join(',') !== [SCORE_ID, TIME_ID].sort().join(',')) throw new Error('舞台变量不对');
+    if (stage.variables[TIME_ID][0] !== 'timeLeft' || stage.variables[SCORE_ID][0] !== 'score') throw new Error('舞台变量不对');
+    if (Object.keys(stage.broadcasts || {}).join(',') !== BC_ID || stage.broadcasts[BC_ID] !== BC_NAME) throw new Error('舞台广播不对');
+    validateTargetBasics(student, STUDENT, ASSET_IDS.student);
+    validateTargetBasics(fruit, FRUIT, ASSET_IDS.fruit);
+    for (const t of [student, fruit]) {
+      if (Object.keys(t.variables || {}).length || Object.keys(t.broadcasts || {}).length) throw new Error('角色不能自带变量或广播');
+    }
+    validateStudent(student.blocks || {});
+    validateFruit(fruit.blocks || {});
+  }
+
+  // ---- 运行 -------------------------------------------------------------------
+  function newMachine() {
+    const Storage = typeof window.ScratchStorage === 'function' ? window.ScratchStorage : window.ScratchStorage.ScratchStorage;
+    const machine = new window.VirtualMachine();
+    const storage = new Storage();
+    machine.attachStorage(storage);
+    for (const key of Object.keys(ASSET_IDS)) {
+      storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, new TextEncoder().encode(SVG[key]), ASSET_IDS[key]);
+    }
+    return machine;
+  }
+  function stageVars(machine) {
+    const stage = machine.runtime.getTargetForStage();
+    const find = (name) => Object.values(stage.variables).find(v => v.name === name);
+    return {timeVar: find('timeLeft'), scoreVar: find('score')};
+  }
+  // 记录广播、记录学生“timeLeft < 1”的真实求值、防死循环的重绘请求——都和 Node 运行器同做法。
+  function attachObservers(machine, run) {
+    const runtime = machine.runtime;
+    const origStartHats = runtime.startHats.bind(runtime);
+    runtime.startHats = (opcode, ...rest) => {
+      if (opcode === 'event_whenbroadcastreceived' && run.live) run.trace.broadcasts.push(run.frame);
+      return origStartHats(opcode, ...rest);
+    };
+    const primitives = runtime._primitives;
+    const origLt = primitives.operator_lt;
+    primitives.operator_lt = (args, util) => {
+      const result = origLt.call(null, args, util);
+      try {
+        if (run.live && util && util.target && !util.target.isStage && util.target.sprite && util.target.sprite.name === STUDENT) {
+          const {timeVar} = stageVars(machine);
+          run.trace.checks.push({frame: run.frame, value: toNumber(timeVar && timeVar.value), result: result === true});
+        }
+      } catch (_error) {}
+      return result;
+    };
+    const seq = runtime.sequencer;
+    const origStepThread = seq.stepThread.bind(seq);
+    seq.stepThread = (thread) => { origStepThread(thread); runtime.requestRedraw(); };
+  }
+
+  function stopTimer() { if (timer !== null) { clearTimeout(timer); timer = null; } }
+  function disposeMachine() {
+    stopTimer();
+    if (vm) {
+      try { vm.stopAll(); } catch (_error) {}
+      try { vm.quit(); } catch (_error) {}
+    }
+    vm = null;
+  }
+  function finish(run, endedBy, error) {
+    if (run !== current || !run.live) return;
+    run.live = false;
+    stopTimer();
+    run.trace.endedBy = endedBy;
+    if (error) run.trace.error = String(error).slice(0, 200);
+    try { vm && vm.stopAll(); } catch (_error) {}
+    send('RUN_DONE', {id: run.id, trace: run.trace});
+  }
+
+  function stepOnce(run) {
+    if (run !== current || !run.live) return;
+    try {
+      run.frame += 1;
+      virtualNow += STEP_MS;
+      vm.runtime.updateCurrentMSecs();
+      vm.runtime.currentStepTime = STEP_MS;
+      vm.runtime._step();
+      const {timeVar, scoreVar} = stageVars(vm);
+      if (!timeVar || !scoreVar) throw new Error('工程里缺少 timeLeft 或 score');
+      const timeLeft = toNumber(timeVar.value);
+      const score = toNumber(scoreVar.value);
+      run.trace.frames.push({frame: run.frame, timeLeft, score});
+      send('FRAME', {id: run.id, frame: run.frame, timeLeft, score, over: run.trace.broadcasts.length > 0});
+      // “学生脚本结束”自己判断：水果脚本永远不结束，只看学生角色上还有没有活动线程。
+      const studentActive = vm.runtime.threads.some(t => t.target && t.target.sprite && t.target.sprite.name === STUDENT && t.status !== 4);
+      if (!studentActive && run.settledSince < 0) run.settledSince = run.frame;
+      if (run.settledSince >= 0 && run.frame - run.settledSince >= LIMITS.settleFrames) { finish(run, 'finished'); return; }
+      if (run.frame >= LIMITS.frameCap) { finish(run, 'frameCap'); return; }
+      timer = setTimeout(() => stepOnce(run), run.frameMs);
+    } catch (error) {
+      finish(run, 'error', error);
+    }
+  }
+
+  async function startRun(data) {
+    disposeMachine();
+    if (current) current.live = false;
+    const id = data.id;
+    if (!Number.isInteger(id) || id < 1) { send('ERROR', {id: 0, error: '运行编号不对'}); return; }
+    try {
+      validateProject(data.project);
+    } catch (error) {
+      send('REJECTED', {id, error: String(error.message || error).slice(0, 120)});
+      return;
+    }
+    if (typeof window.VirtualMachine !== 'function' || !window.ScratchStorage) {
+      send('ERROR', {id, error: 'Scratch VM 脚本没有加载（可能是网络问题）'});
+      return;
+    }
+    const frameMs = Number.isFinite(data.frameMs) ? Math.max(0, Math.min(100, data.frameMs)) : 16;
+    const run = {
+      id, frameMs, frame: 0, live: false, loading: true, cancelled: false, settledSince: -1,
+      trace: {
+        levelId: String(data.levelId || ''), runId: id, fingerprint: String(data.fingerprint || '').slice(0, 4000),
+        endedBy: 'error', frames: [], broadcasts: [], checks: [],
+      },
+    };
+    current = run;
+    try {
+      virtualNow = VIRTUAL_START; // 每次运行从同一个虚拟时刻开始：同一程序的轨迹逐帧可复现
+      const machine = newMachine();
+      vm = machine;
+      await machine.loadProject(JSON.stringify(data.project));
+      if (current !== run || run.cancelled) return; // 加载期间又有新的运行或停止
+      const {timeVar, scoreVar} = stageVars(machine);
+      if (!timeVar || !scoreVar) throw new Error('工程里缺少 timeLeft 或 score');
+      attachObservers(machine, run);
+      machine.runtime.currentStepTime = STEP_MS;
+      machine.greenFlag();
+      run.loading = false;
+      run.live = true;
+      send('STARTED', {id});
+      timer = setTimeout(() => stepOnce(run), run.frameMs);
+    } catch (error) {
+      if (current === run) { run.loading = false; run.live = false; disposeMachine(); send('ERROR', {id, error: String(error).slice(0, 200)}); }
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent || !event.data || typeof event.data !== 'object') return;
+    const data = event.data;
+    if (data.kind === 'PING') {
+      send('FRAME_READY', {
+        available: typeof window.VirtualMachine === 'function' && !!window.ScratchStorage,
+        limits: LIMITS,
+        assets: {backdrop: uri(SVG.backdrop), student: uri(SVG.student), fruit: uri(SVG.fruit)},
+      });
+      return;
+    }
+    if (data.kind === 'RUN') { startRun(data); return; }
+    if (data.kind === 'STOP') {
+      if (!current || data.id !== current.id || current.cancelled) return;
+      if (current.live) { current.cancelled = true; finish(current, 'stopped'); return; }
+      // 还在加载：取消后不再启动，并回一个“已停止”的结果，轨迹为空。
+      if (current.loading) {
+        current.loading = false;
+        current.cancelled = true;
+        disposeMachine();
+        current.trace.endedBy = 'stopped';
+        send('RUN_DONE', {id: current.id, trace: current.trace});
+      }
+      return;
+    }
+  });
+})();
+</script>
+</body>
+</html>

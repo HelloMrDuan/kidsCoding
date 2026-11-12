@@ -1270,15 +1270,15 @@
               "concepts": [
                 "侦测",
                 "判断",
-                "随机"
+                "计时"
               ],
-              "focusConcept": "随机",
+              "focusConcept": "计时与游戏结束",
               "prerequisiteLessonIds": [
                 "G2-U3-L04"
               ],
-              "learningOutcome": "能使用随机解释并完成「倒计时游戏结束」中的关键操作，并展示可运行的结果或设计证据。",
+              "learningOutcome": "能使用计时与游戏结束解释并完成「倒计时游戏结束」中的关键操作，并展示可运行的结果或设计证据。",
               "projectArtifact": "倒计时游戏结束的可演示作品、运行记录或设计稿",
-              "evidence": "学生能说明所用随机规则，演示正常输入，并解释至少一个失败或边界情形。",
+              "evidence": "学生能说明所用计时规则，演示正常输入，并解释至少一个失败或边界情形。",
               "status": "outline_not_playable"
             },
             {

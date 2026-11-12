@@ -1795,28 +1795,28 @@
       "title": "倒计时游戏结束",
       "trackId": "G2",
       "unitId": "G2-U3",
-      "focusConcept": "随机",
-      "plannedLearningOutcome": "能使用随机解释并完成「倒计时游戏结束」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "focusConcept": "计时与游戏结束",
+      "plannedLearningOutcome": "能使用计时与游戏结束解释并完成「倒计时游戏结束」中的关键操作，并展示可运行的结果或设计证据。",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
         "G2-U3-L04"
       ],
       "acceptance": [
-        "以真实执行器完成本课的指定知识点「随机」，不得用静态播放代替",
+        "以真实执行器完成本课的指定知识点「计时与游戏结束」，不得用静态播放代替",
         "至少两种目标不同的亲手练习，以及一条实际错误或边界测试",
         "有分层纠错、可修改的原创作品与关闭重开验证",
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/515",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/g2-u3-l05-vm.spec.ts（真实 scratch-vm + 虚拟时钟行为矩阵） + g2-u3-l05-classroom.spec.ts（三端课堂）；CI Job g2-u3-l05-vm-trial 与 g2-u3-l05-browser-trial（desktop / tablet / phone 三个并行分片）在真实 Chrome 上实际运行并用 JUnit 核对数量；详见 docs/roadmap/evidence/G2-U3-L05/README.md",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "本轮提交（kiro/p0-g2-u3-l05，PR #515）已把目录（full-catalog-v1.json 与 track-g2-detailed-lessons-v1.json）中仅 L05 条目与本课目录概念做最小一致性修正（concepts「随机」→「计时」、focusConcept 与学习成果/证据表述改为「计时与游戏结束」），界面文案全程无「随机」表述；台账本条目的 focusConcept/plannedLearningOutcome/acceptance 同步对齐。首席（主 Muse）已同意核心方向由「随机」调整为「计时与游戏结束」（经用户 zhij 于 2026-11-11 转达），本轮课程工程据此核对；但除核心方向外的其他教学参数（timeLeft 起点、wait/重复次数/每次减少量上限、得分节奏、settleFrames/frameCap、关卡配置）仍为开发侧 proposed，未获独立教研裁定，不得表述为参数已批准或已验证。浏览器沙箱仅加载 scratch-vm 与 scratch-storage（无渲染器），倒计时由虚拟时钟逐帧驱动、可复现。AI 自审不能代替独立教研；无独立教研、无儿童试学与监护人授权记录、无真实设备验证；目录 catalogStatus 保持 outline_not_playable，本课不是已发布课程，不得标记 completed。当前等待非作者独立审核（按 SPEC-003 由 4 号工程复核）与主 Muse 合并，合并与合并后 main CI 归主 Muse（3 号无自合权限）。"
     },
     {
       "id": "G2-U3-L06",

@@ -18,6 +18,9 @@ on:
       - 'apps/web/tests/e2e/g2-u3-l04-classroom.spec.ts'
       - 'apps/web/tests/e2e/g2-u3-l04-shell-gap-a.spec.ts'
       - 'apps/web/src/app/learn/g2-u3-l04/**'
+      - 'apps/web/tests/e2e/g2-u3-l05-vm.spec.ts'
+      - 'apps/web/tests/e2e/g2-u3-l05-classroom.spec.ts'
+      - 'apps/web/src/app/learn/g2-u3-l05/**'
       - 'apps/web/scripts/copy-scratch-vm.mjs'
       - 'apps/web/public/**'
       - 'apps/web/tests/e2e/ux-101.spec.ts'
@@ -180,6 +183,10 @@ jobs:
         run: npx vitest run src/features/lessons/g2-u3-l02
       - name: G2-U3-L03 unit tests (contract, judging, bounds boundaries, seeded sequence, draft, sandbox/TS parity)
         run: npx vitest run src/features/lessons/g2-u3-l03
+      # L05 的真实 VM 单测一次运行约 1–4 秒（scratch-vm 加载 + 约 400 帧虚拟时钟），默认 5 秒超时在共享 CPU 的 runner 上会偶发不够：
+      # 只放宽超时到 30 秒，测试本身与断言不变（本地共享 CPU 环境实测 7 次里 2 次因 5000ms 超时失败，放宽后全过）。
+      - name: G2-U3-L05 unit tests (program validation, judging on real VM traces, session, lesson adapter, reference alternatives, draft, sandbox/TS parity)
+        run: npx vitest run src/features/lessons/g2-u3-l05 --testTimeout=30000
 
   scratch-rls-postgres:
     runs-on: ubuntu-latest
@@ -941,6 +948,150 @@ jobs:
         if: always()
         with:
           name: g2-u3-l04-vm-trial-chrome-evidence
+          path: apps/web/test-results/
+
+  # G2-U3-L05《倒计时游戏结束》：真实 Scratch VM + 虚拟时钟（本课沙箱没有渲染器，判定不需要碰撞）+ 真实 Chrome。拆成两个并行 Job（SYS-108）：
+  #   g2-u3-l05-browser-trial  三视口课堂（45 个实例），按视口分成 desktop / tablet / phone 三个并行分片（每片 15 个）
+  #   g2-u3-l05-vm-trial       VM 行为矩阵（17 个实例：判定矩阵、虚拟时钟确定性、停止 / 帧上限、篡改工程拒绝）
+  # 虚拟时钟：沙箱逐帧推进 1000/30 毫秒，课堂上每帧约 16 毫秒真实时间，所以一节 10 秒倒计时约 6–7 秒跑完；
+  # VM 矩阵用 frameMs=0 全速运行。runs-on 固定 ubuntu-24.04、每 Job 15 分钟上限，与 L04 两个 Job 的处理一致（理由见上方 L04 注释）。
+  g2-u3-l05-browser-trial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 课堂 spec 的三个视口分组各 15 个实例，按标题里的 [viewport] 过滤（确定的分片，不是 playwright 的 --shard）。
+          # 按设计的跳过：手机首屏用例只在 phone 组执行（desktop / tablet 各跳 1 个）；真实指针拖放只在 desktop 组执行（tablet / phone 各跳 1 个）。
+          - viewport: desktop
+            total: 15
+            skipped: 1
+          - viewport: tablet
+            total: 15
+            skipped: 2
+          - viewport: phone
+            total: 15
+            skipped: 1
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
+        timeout-minutes: 4
+        run: |
+          for attempt in 1 2; do
+            if timeout 100 npx playwright install chrome --with-deps; then
+              echo "Chrome installed on attempt $attempt"
+              exit 0
+            fi
+            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
+            sleep 5
+          done
+          echo "::error::Chrome install failed after 2 attempts"
+          exit 1
+      - name: Run G2-U3-L05 classroom spec (${{ matrix.viewport }} group) with real Chrome
+        timeout-minutes: 7
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g2-u3-l05-${{ matrix.viewport }}/junit.xml
+          VIEWPORT: ${{ matrix.viewport }}
+        run: npx playwright test tests/e2e/g2-u3-l05-classroom.spec.ts --project=desktop --grep "\\[${VIEWPORT}\\]" --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l05-${VIEWPORT}
+      - name: Verify the executed counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        env:
+          WANT_TOTAL: ${{ matrix.total }}
+          WANT_SKIPPED: ${{ matrix.skipped }}
+          VIEWPORT: ${{ matrix.viewport }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          vp = os.environ['VIEWPORT']
+          root = ET.parse(f'test-results/g2-u3-l05-{vp}/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          want_total = int(os.environ['WANT_TOTAL'])
+          want_skipped = int(os.environ['WANT_SKIPPED'])
+          print(f'g2-u3-l05-browser-trial [{vp}]: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # 数量变化必须有意识地改这里（matrix 里的 total / skipped），防止 spec 被悄悄跳过或缩水。
+          assert failures == 0 and errors == 0, 'failures present'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped}'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g2-u3-l05-browser-trial-${{ matrix.viewport }}-chrome-evidence
+          path: apps/web/test-results/
+
+  g2-u3-l05-vm-trial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
+        timeout-minutes: 4
+        run: |
+          for attempt in 1 2; do
+            if timeout 100 npx playwright install chrome --with-deps; then
+              echo "Chrome installed on attempt $attempt"
+              exit 0
+            fi
+            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
+            sleep 5
+          done
+          echo "::error::Chrome install failed after 2 attempts"
+          exit 1
+      - name: Run G2-U3-L05 real VM matrix (virtual clock) with real Chrome
+        timeout-minutes: 7
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g2-u3-l05-vm/junit.xml
+        run: npx playwright test tests/e2e/g2-u3-l05-vm.spec.ts --project=desktop --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/g2-u3-l05-vm
+      - name: Verify the executed counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('test-results/g2-u3-l05-vm/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          print(f'g2-u3-l05-vm-trial: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          want_total = 17
+          want_skipped = 0
+          assert failures == 0 and errors == 0, 'failures present'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped}'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g2-u3-l05-vm-trial-chrome-evidence
           path: apps/web/test-results/
 
   scratch-touch-browser:
