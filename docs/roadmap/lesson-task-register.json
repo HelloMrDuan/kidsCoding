@@ -4703,7 +4703,7 @@
       "plannedLearningOutcome": "能使用CSV解释并完成「读写日记文本」中的关键操作，并展示可运行的结果或设计证据。",
       "status": "in_review",
       "catalogStatus": "outline_not_playable",
-      "detailAssetPresent": false,
+      "detailAssetPresent": true,
       "prerequisiteLessonIds": [],
       "acceptance": [
         "以真实执行器完成本课的指定知识点「CSV」，不得用静态播放代替",
