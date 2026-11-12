@@ -3784,7 +3784,7 @@
       "title": "E7 共享壳移动端布局整改：750px 安全边界（LessonWorkspace）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [],
       "scope": "只改共享 LessonWorkspace（apps/web/src/features/lessons/workspace/lesson-workspace.tsx 及相关壳样式）：移动端（375×812）底部固定导航覆盖约 62px（y=750–812），须调整壳布局使三块程序栈在首屏可完整查看与编辑、不被底部导航遮挡。课层压缩最多可省 ~18px（隐藏 <md 路由 eyebrow），其余须由壳层解决。不得削弱 E7 断言、不得只检查第一块积木、不得隐藏教学功能、不得改三层判定语义、不得改 V2 冻结 token。不得改其他课程文件。",
       "acceptance": [
@@ -3793,7 +3793,7 @@
         "已有课程（L02/L03/L04 等）E2E 无回归",
         "不改 V2 冻结 token，不改三层判定语义"
       ],
-      "evidence": {},
+      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/518"},
       "notes": "首席 2026-11-12 裁定（Kitten 总控，#272 E7）：E7 已实测为真实缺口（#272 bedab301 的 E7 用例内 KNOWN GAP 注释，2026-11-12 测量并上报首席）。移动端三块程序栈约 189px，从画布顶 ~608 起至 ~810，超出 750 安全线约 60px；帽块单独在安全线之上，完整程序须滚动约 60px。课层压缩最多省 ~18px，关闭缺口须共享壳布局改动。实施者：2 号（按文件边界实施）。文件责任：共享 LessonWorkspace（lesson-workspace.tsx 及壳样式）。与 OPS-032（E2E 接线）分开，不得混 PR。查重：台账无现有 E7/壳布局/750 任务，故新立本号。2026-11-12 OPS-033 实施（本地提交，未推送，未建 PR）：lesson-workspace.tsx 仅 <=767px 媒体块内纵向间距压缩（顶栏/目标条/面板/粘性运行行 padding 与 margin 各省 2–4px，实测 −30px；未删内容/控件/提示，未改按钮尺寸与舞台高度，未改 V2 token 与三层判定语义）；本课层另在 #272 压缩约 49px（路由 eyebrow 隐藏 + 标题一行 + 通过标记改 ✓）；联合实测 E7 通过（三块程序栈底边 731.1，750 线之上余量 18.9px；通过态 732.9，余量 17.1px）；回归：共享工作区 E2E 118/2/0、A1-U3-L05 + A1-U4-L01/L02 + G2-U3-L02 E2E 103/7/0。evidence.pr 待推送建 PR 后填，届时状态翻 in_review。"
     },
     {
