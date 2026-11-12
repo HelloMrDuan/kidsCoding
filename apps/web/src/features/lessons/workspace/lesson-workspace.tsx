@@ -2122,6 +2122,25 @@ export function LessonWorkspace({
           .ws-panel > section { padding: 2px 6px; }
           .ws-runbar { margin-top: 0; }
           .ws-sticky-actions { padding: 0; }
+          /* OPS-033 fix for #518 CI failure (G2-U3-L03 reselect, phone leg,
+             2026-11-12): the fixed bottom nav (.kc-mobile-bottom, 62px,
+             y=750–812) covers whatever scrollIntoViewIfNeeded bottom-aligns.
+             After the spacing compression above, the G2 blank-tap point
+             (85% of l3-blockly, 298px tall) landed at y=767.5 — under the
+             nav, on the 家长 link — so the tap navigated to /auth/bind and
+             Blockly never saw a workspace click (no deselect; CI failed at
+             l3-delete toBeDisabled). Main (115980d8) measured blank y=586.5
+             (canvas hit, pass); shell measured blank y=767.5 twice.
+             scroll-padding-bottom makes every scroll-into-view stop the
+             content 62px above the viewport bottom, i.e. the canvas bottom
+             lands at y=750 and the 85% point at y≈705, on real canvas
+             (probe-verified: scrollY 95→157, blank 767.5→705.5, tap
+             deselects, no navigation). Layout is untouched — this only
+             changes scroll positioning, never sizes or positions — so the
+             E7 stack bottom (733 ≤ 750) is unaffected. Value follows
+             --kc-mobile-nav-height (62px); at 601–767px there is no fixed
+             nav, the clearance there only affects scroll positioning. */
+          html { scroll-padding-bottom: var(--kc-mobile-nav-height, 62px); }
           /* Gate 1 phone budget (<= 767px): the stage-head toggle is
              the tallest head item; its padding cut keeps every control
              (run/stop stay full size). Palette trims are vertical only. */
