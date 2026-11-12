@@ -3744,6 +3744,75 @@
         "reviewer": "4号 kid四号小宝：Review 5857864511（COMMENTED/PASS，2026-11-11 19:14 CST，头 c5eecb25），结论通过，交首席验收合并"
       },
       "notes": "项目负责人 2026-11-11 统一角色名称与归属，停用的旧称仅留于历史档案的可追溯证据中。关账 PR 另行回填 mergeCommit、mainCI 与审核证据；432 节课程状态未变。"
+    },
+    {
+      "id": "OPS-031",
+      "title": "P3-U1-L01 E2E 接入 GitHub CI（三端分片，SYS-108）",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "只增：.github/workflows/curriculum-content.yml 增加 P3-U1-L01 专属 E2E Job（三端分片：桌面 1440×900、平板 768×1024、手机 375×812，显式文件分片，非 --shard；runs-on 固定 ubuntu-24.04、每 Job 15 分钟上限、真实 Chrome、JUnit 核对数量、无 continue-on-error）；E2E spec（python-multi.spec.ts 或新建 P3-U1-L01 专属 spec）接入；台账 P3-U1-L01 evidence.realE2E 回填。不改其他课程 Job、不改共享壳、不改 Python 引擎/评测逻辑。",
+      "acceptance": [
+        "P3-U1-L01 E2E 在 CI 中三端实际运行，数量核对无静默跳过或缩水",
+        "CI Job 全绿（或按设计跳过有据可查），无 continue-on-error",
+        "台账 P3-U1-L01 evidence.realE2E 已填结构化证据",
+        "不影响已有课程 CI（触发路径只含 P3-U1-L01 相关文件）"
+      ],
+      "evidence": {},
+      "notes": "首席 2026-11-12 裁定（Kitten 总控）：#243 的 E2E 须按独立 Task-ID 接入 CI。主线 CI 现只有通用 python-multi 的桌面 Job，非 P3-U1-L01 三端专属；#243 台账 realE2E 为 null。实施者：4 号。文件责任：curriculum-content.yml（只增 P3-U1-L01 Job）、E2E spec、台账 P3-U1-L01 行。不得混进 #243 课程功能 PR 的视觉整改（UX-604 另立）。"
+    },
+    {
+      "id": "OPS-032",
+      "title": "G1-U1-L01 E2E 接入 GitHub CI（三端分片，SYS-108）",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "只增：.github/workflows/curriculum-content.yml 增加 G1-U1-L01 专属 E2E Job（三端分片：桌面 1440×900、平板 768×1024、手机 375×812，显式文件分片，非 --shard；runs-on 固定 ubuntu-24.04、每 Job 15 分钟上限、真实 Chrome、JUnit 核对数量、无 continue-on-error）；E2E spec g1-u1-l01-workspace.spec.ts（E1–E10，含 E7 画布门禁）接入；台账 G1-U1-L01 evidence.realE2E 回填。不改其他课程 Job、不改共享壳（壳布局改动属 OPS-033）、不改三层判定语义。",
+      "acceptance": [
+        "G1-U1-L01 E2E 在 CI 中三端实际运行，数量核对无静默跳过或缩水",
+        "CI Job 全绿（或按设计跳过有据可查），无 continue-on-error",
+        "台账 G1-U1-L01 evidence.realE2E 已填结构化证据",
+        "不影响已有课程 CI（触发路径只含 G1-U1-L01 相关文件）"
+      ],
+      "evidence": {},
+      "notes": "首席 2026-11-12 裁定（Kitten 总控）：#272 的 E2E 须按独立 Task-ID 接入 CI。#272 头 bedab301 已迁入 LessonWorkspace，E2E spec g1-u1-l01-workspace.spec.ts 已建（E1–E10），但 curriculum-content.yml 中 0 处提及 g1-u1，未进 CI。实施者：2 号。文件责任：curriculum-content.yml（只增 G1-U1-L01 Job）、E2E spec、台账 G1-U1-L01 行。E7 壳布局改动属 OPS-033，不混入本任务。"
+    },
+    {
+      "id": "OPS-033",
+      "title": "E7 共享壳移动端布局整改：750px 安全边界（LessonWorkspace）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "只改共享 LessonWorkspace（apps/web/src/features/lessons/workspace/lesson-workspace.tsx 及相关壳样式）：移动端（375×812）底部固定导航覆盖约 62px（y=750–812），须调整壳布局使三块程序栈在首屏可完整查看与编辑、不被底部导航遮挡。课层压缩最多可省 ~18px（隐藏 <md 路由 eyebrow），其余须由壳层解决。不得削弱 E7 断言、不得只检查第一块积木、不得隐藏教学功能、不得改三层判定语义、不得改 V2 冻结 token。不得改其他课程文件。",
+      "acceptance": [
+        "E7 画布门禁在移动端通过：三块程序栈完整在 750px 安全线之上（或经首席裁定以单块为界并记录在案）",
+        "G1-U1-L01 E2E（E1–E10）在 CI 中全绿，E7 断言未削弱",
+        "已有课程（L02/L03/L04 等）E2E 无回归",
+        "不改 V2 冻结 token，不改三层判定语义"
+      ],
+      "evidence": {},
+      "notes": "首席 2026-11-12 裁定（Kitten 总控，#272 E7）：E7 已实测为真实缺口（#272 bedab301 的 E7 用例内 KNOWN GAP 注释，2026-11-12 测量并上报首席）。移动端三块程序栈约 189px，从画布顶 ~608 起至 ~810，超出 750 安全线约 60px；帽块单独在安全线之上，完整程序须滚动约 60px。课层压缩最多省 ~18px，关闭缺口须共享壳布局改动。实施者：2 号（按文件边界实施）。文件责任：共享 LessonWorkspace（lesson-workspace.tsx 及壳样式）。与 OPS-032（E2E 接线）分开，不得混 PR。查重：台账无现有 E7/壳布局/750 任务，故新立本号。"
+    },
+    {
+      "id": "UX-604",
+      "title": "Python 通用页面 V2 视觉整改（共用 PythonMultiLab，9 课回归）",
+      "priority": "P1",
+      "category": "UX",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "只调整共用 Python 页面（apps/web/src/features/python-lab/python-multi-lab.tsx、apps/web/src/app/learn/python-lab/[lessonId]/page.tsx 及相关样式与必要 UI 测试）的视觉结构与样式，使其符合 V2 冻结规范与 Kitten 信息架构；复用已有组件（LessonWorkspace/V2 组件），不另造第二套通用课堂外壳。影响范围：共用 PythonMultiLab 的 9 课——主线 8 课（P0-U1-L02、P0-U1-L03、P0-U1-L04、P0-U1-L05、P0-U1-L06、P3-U1-L02、P3-U1-L03、P3-U2-L02）加 #243 的 P3-U1-L01。保持 Python 引擎、沙箱、课程参数、评测逻辑、草稿与进度语义不变。颜色映射遵守 V2 冻结 token，不能自行创造新设计。独立 UI PR，做九课回归及三端视觉截图，不能混进 #243 的课程功能 PR。",
+      "acceptance": [
+        "9 课回归全过（功能与 E2E 无回归）",
+        "三端真实浏览器截图（1440×900、768×1024、375×812）已提交并与首页/学习地图做视觉一致性对照",
+        "视觉符合 V2 冻结 token，无自创配色；无第二套通用课堂外壳",
+        "Python 引擎、沙箱、课程参数、评测逻辑、草稿与进度语义未变（以测试为证）",
+        "独立 UI PR，不混进 #243 课程功能 PR"
+      ],
+      "evidence": {},
+      "notes": "首席 2026-11-12 裁定（Kitten 总控，#243 视觉整改）：查重后新立本号（台账无现有 Python 视觉任务）。duan 2026-11-12 指令：立即处理视觉整改协调，不等其他审核结束；UI PR 合并并完成主线验证后，#243 再同步 main、完成视觉验收和非作者审核。实施者：4 号（#243 作者）或首席指定。文件责任：python-multi-lab.tsx、python-lab 路由页及相关样式/UI 测试。不得改引擎/沙箱/评测/草稿/进度。9 课范围已实核（主线 pythonPracticeLessons 8 项 + P3-U1-L01）。"
     }
   ]
 }
