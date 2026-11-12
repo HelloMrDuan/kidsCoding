@@ -3811,7 +3811,7 @@
         "Python 引擎、沙箱、课程参数、评测逻辑、草稿与进度语义未变（以测试为证）",
         "独立 UI PR，不混进 #243 课程功能 PR"
       ],
-      "evidence": {},
+      "evidence": {"branch": "muse-c/ux-604-python-v2"},
       "notes": "首席 2026-11-12 裁定（Kitten 总控，#243 视觉整改）：查重后新立本号（台账无现有 Python 视觉任务）。duan 2026-11-12 指令：立即处理视觉整改协调，不等其他审核结束；UI PR 合并并完成主线验证后，#243 再同步 main、完成视觉验收和非作者审核。实施者：4 号（#243 作者）或首席指定。文件责任：python-multi-lab.tsx、python-lab 路由页及相关样式/UI 测试。不得改引擎/沙箱/评测/草稿/进度。9 课范围已实核（主线 pythonPracticeLessons 8 项 + P3-U1-L01）。"
     }
   ]
