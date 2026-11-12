@@ -81,7 +81,7 @@ npm run build
 - **F2 舞台配色回归 V2 token**：`stage-view.tsx` 暖米/橙色硬编码全部清除，只用 `--kc-action`（圆环）、`--kc-danger`（负数）、`--kc-success`（结束）、`--kc-text` / `--kc-text-muted`、`--kc-nav`（得分牌）、`--kc-surface` / `--kc-canvas` / `--kc-line`，仅保留 L04 先例的 `#fff`；`classroom.module.css` 删除不存在的 `--kc-brand`，改 `var(--kc-action)`。单测新增 2 项守卫（stage-view 无其他十六进制色且使用上述 token；CSS 无 `--kc-brand`）。未改 globals.css、未定义新 token。
 - **F3 三端截图入库 + 手机首屏几何断言**：截图见 `screenshots/`（下方清单），均为整改后以本地真实 Chrome 157.0.8103.78 打开生产构建截取；课堂 spec 手机专属用例新增几何断言：粘性运行按钮与舞台运行按钮须完整落在 375×812 视口内、且中心点 `elementFromPoint` 命中自身（不被站点底部导航等固定层遮挡），不再只靠 `toBeVisible()`；实例计数不变（每视口仍 15，CI 的 JUnit 核对数不变）。
 
-整改后本地复跑（2026-11-12）：单测 **79/79**；VM E2E **17/17**；课堂 E2E 三端 0 失败（desktop 14 过 1 跳、tablet 13 过 2 跳、phone 14 过 1 跳，跳过按设计，含新增几何断言的手机用例）；变异检验复跑见提交说明（要求工作树干净，截图与本文先行提交后执行）；生产构建通过；本课 tsc 0 错误、ESLint 0 错。其他课程文件零改动（diff 仅 L05 目录、L05 两个 spec 与本证据目录）。
+整改后本地复跑（2026-11-12）：单测 **79/79**；VM E2E **17/17**；课堂 E2E 三端 0 失败（desktop 14 过 1 跳、tablet 13 过 2 跳、phone 14 过 1 跳，跳过按设计，含新增几何断言的手机用例）；变异检验在干净工作树上复跑 **20/20 全部被发现**（19 KILLED + 第 19 项超时 KILLED，与基线一致，工作树干净）；生产构建通过；本课 tsc 0 错误、ESLint 0 错。其他课程文件零改动（diff 仅 L05 目录、L05 两个 spec 与本证据目录）。
 
 ### 截图清单（`screenshots/`，视口为 Playwright 视口，手机 isMobile + hasTouch）
 
