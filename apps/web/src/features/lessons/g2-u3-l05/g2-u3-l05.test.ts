@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { L05_ASSET_ID } from './compile'
+import { compileProject, L05_ASSETS } from './compile'
 import { L05_ACTIVITY_NOTE, L05_CONTENT, L05_CONTRACT, levelSituation, validateL05Contract } from './contract'
 import { judgeRun, type RunTrace } from './judge'
 import { L05_LEVEL_ORDER, L05_LEVELS, L05_PARAMS } from './params'
@@ -183,6 +183,44 @@ describe('参考做法（通过之后才出现）：真实 VM 逐个验证', () 
   })
 })
 
+describe('角色造型素材（F1 整改）', () => {
+  it('三个角色各用自己的造型 ID，互不相同，也不是旧的共用空白图', () => {
+    const project = compileProject(STANDARD) as { targets: { name: string; costumes: { assetId: string }[] }[] }
+    const byName = new Map(project.targets.map(t => [t.name, t.costumes[0].assetId]))
+    expect(byName.get('Stage')).toBe(L05_ASSETS.backdrop)
+    expect(byName.get('学生')).toBe(L05_ASSETS.student)
+    expect(byName.get('水果')).toBe(L05_ASSETS.fruit)
+    expect(new Set(byName.values()).size).toBe(3)
+    expect([...byName.values()]).not.toContain('b1c2d3e4f5a60718293a4b5c6d7e8f90')
+  })
+
+  it('沙箱为三个造型各内置一份真实 SVG（不是 4×4 空白图），并随握手回传素材', () => {
+    const html = readFileSync(join(process.cwd(), 'public', 'scratch-g2-u3-l05-sandbox.html'), 'utf8')
+    expect(html).not.toContain('width="4" height="4"')
+    expect(html).toContain('assets: {backdrop: uri(SVG.backdrop), student: uri(SVG.student), fruit: uri(SVG.fruit)}')
+    // 学生有帽子和笑脸、水果是红苹果、背景有天空草地：用关键形状粗检三份图各就其位。
+    expect(html).toContain('#e5484d')
+    expect(html).toContain('#ffd43b')
+  })
+})
+
+describe('舞台配色只用 V2 token（F2 整改）', () => {
+  it('stage-view 无暖色硬编码（只允许 L04 先例的 #fff），且用了 --kc-action 圆环', () => {
+    const src = readFileSync(join(process.cwd(), 'src/features/lessons/g2-u3-l05/ui/stage-view.tsx'), 'utf8')
+    const hexes = src.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []
+    expect(hexes).toEqual(['#fff'])
+    expect(src).toContain('var(--kc-action)')
+    expect(src).toContain('var(--kc-danger)')
+    expect(src).toContain('var(--kc-success)')
+  })
+
+  it('classroom CSS 不再引用不存在的 --kc-brand', () => {
+    const css = readFileSync(join(process.cwd(), 'src/features/lessons/g2-u3-l05/ui/classroom.module.css'), 'utf8')
+    expect(css).not.toContain('--kc-brand')
+    expect(css).toContain('var(--kc-action)')
+  })
+})
+
 describe('沙箱常量与 TypeScript 一致（防止两边数字漂移）', () => {
   const html = readFileSync(join(process.cwd(), 'public', 'scratch-g2-u3-l05-sandbox.html'), 'utf8')
 
@@ -197,7 +235,7 @@ describe('沙箱常量与 TypeScript 一致（防止两边数字漂移）', () =
 
   it('虚拟时钟步长与素材 ID 一致', () => {
     expect(html).toContain('1000 / 30')
-    expect(html).toContain(`'${L05_ASSET_ID}'`)
+    for (const assetId of Object.values(L05_ASSETS)) expect(html).toContain(`'${assetId}'`)
     expect(html).toContain("'kcl5_time'")
     expect(html).toContain("'kcl5_bc'")
   })

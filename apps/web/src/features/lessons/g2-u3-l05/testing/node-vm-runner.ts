@@ -8,7 +8,7 @@
 // 所以必须靠重绘请求退出（否则死循环，探针里复现过）：每跑一遍线程就请求一次重绘，一帧恰好一遍。
 
 import { createRequire } from 'node:module'
-import { compileProject, L05_ASSET_ID, SCORE_VAR, TIME_VAR } from '../compile'
+import { compileProject, L05_ASSETS, SCORE_VAR, TIME_VAR } from '../compile'
 import type { Check, Frame, RunTrace } from '../judge'
 import { L05_PARAMS } from '../params'
 import type { Program } from '../program'
@@ -62,7 +62,11 @@ export async function runProgramInRealVm(program: Program, opts: RunOptions = {}
     const vm = new VM()
     const storage = new Storage()
     vm.attachStorage(storage)
-    storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, Buffer.from(SVG), L05_ASSET_ID)
+    // Node 侧没有渲染器，造型字节不影响执行；三个素材 ID 都要缓存，工程才能完整加载。
+    // 造型原图以浏览器沙箱内置的原创 SVG 为准，本处只按 ID 占位缓存。
+    for (const assetId of Object.values(L05_ASSETS)) {
+      storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, Buffer.from(SVG), assetId)
+    }
     await vm.loadProject(JSON.stringify(compileProject(program)))
 
     const stage = vm.runtime.getTargetForStage()

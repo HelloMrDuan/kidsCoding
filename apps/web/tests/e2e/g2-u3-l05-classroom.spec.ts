@@ -418,6 +418,30 @@ for (const vp of VIEWPORTS) {
       test('手机：工具栏的添加 / 上移 / 下移 / 删除 / 数字框都在首屏、可点、可改；任务折叠成一行但任务、提示、预测一个不少', async ({page}, info) => {
         test.skip(!isPhone(info), '仅手机视口')
         await open(page)
+        // 首屏几何断言（F3 整改）：不只看 toBeVisible——关键操作必须完整落在 375×812 视口内，
+        // 且中心点命中自己（没有被站点底部导航等固定层遮挡）。粘性运行按钮是脚本区内运行入口。
+        const geo = await page.evaluate(() => {
+          const probe = (tid: string) => {
+            const el = document.querySelector(`[data-testid="${tid}"]`)
+            if (!el) return { tid, missing: true as const }
+            const r = el.getBoundingClientRect()
+            const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+            return {
+              tid, missing: false as const,
+              within: r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth,
+              covered: !(hit === el || el.contains(hit)),
+              bottom: Math.round(r.bottom), viewportH: window.innerHeight,
+            }
+          }
+          return [probe('ws-sticky-run'), probe('ws-run-toggle')]
+        })
+        for (const g of geo) {
+          expect(g.missing, `${g.tid} 应存在`).toBe(false)
+          if (!g.missing) {
+            expect(g.within, `${g.tid} 应完整落在视口内（bottom=${g.bottom}/${g.viewportH}）`).toBe(true)
+            expect(g.covered, `${g.tid} 中心点不应被其他固定层遮挡`).toBe(false)
+          }
+        }
         await goLevel(page, 'solve')
         for (const id of ['l5-add-block', 'l5-move-up', 'l5-move-down', 'l5-delete', 'l5-number']) {
           await expect(page.getByTestId(id)).toBeVisible()

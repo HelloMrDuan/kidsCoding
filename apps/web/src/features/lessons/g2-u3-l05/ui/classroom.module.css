@@ -175,7 +175,7 @@
 .taskFold { margin-bottom: 8px; }
 .taskBar { display: none; }
 .taskBarText { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
-.taskBarText[data-needs-prediction='true'] { color: var(--kc-brand, #1d4ed8); }
+.taskBarText[data-needs-prediction='true'] { color: var(--kc-action); }
 @media (max-width: 640px) {
   .taskBar { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 2px 0; }
   .taskFold .taskFoldBody { display: none; }

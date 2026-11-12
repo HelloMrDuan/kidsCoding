@@ -6,7 +6,12 @@ import { L05_PARAMS } from './params'
 import type { Block, Program } from './program'
 import { runnableScripts } from './program'
 
-export const L05_ASSET_ID = 'b1c2d3e4f5a60718293a4b5c6d7e8f90'
+/** 沙箱内置的原创 SVG 造型使用的资源 ID（沙箱只接受这三个，各对应一个真实造型）。 */
+export const L05_ASSETS = {
+  backdrop: 'c3d4e5f6a7b8293a4b5c6d7e8f901a23',
+  student: 'a1b2c3d4e5f60718293a4b5c6d7e8f01',
+  fruit: 'b2c3d4e5f6a718293a4b5c6d7e8f9012',
+} as const
 export const STUDENT_NAME = '学生'
 export const FRUIT_NAME = '水果'
 export const TIME_VAR = { id: 'kcl5_time', name: 'timeLeft' } as const
@@ -106,18 +111,19 @@ export function fruitBlocks(): Record<string, Sb3Block> {
   return b
 }
 
-const costume = (name: string) => ({ assetId: L05_ASSET_ID, name, md5ext: `${L05_ASSET_ID}.svg`, dataFormat: 'svg', rotationCenterX: 0, rotationCenterY: 0 })
+const costume = (name: string, assetId: string, cx: number, cy: number) => ({ assetId, name, md5ext: `${assetId}.svg`, dataFormat: 'svg', rotationCenterX: cx, rotationCenterY: cy })
 const baseTarget = () => ({ variables: {}, lists: {}, broadcasts: {}, comments: {}, currentCostume: 0, sounds: [], volume: 100, tempo: 60 })
 const sprite = (name: string, blocks: Record<string, Sb3Block>, layerOrder: number) => ({
   isStage: false, name, ...baseTarget(), blocks, layerOrder, visible: false, x: 0, y: 0, size: 100,
-  direction: 90, draggable: false, rotationStyle: 'all around', costumes: [costume(name)],
+  direction: 90, draggable: false, rotationStyle: 'all around',
+  costumes: [costume(name, name === STUDENT_NAME ? L05_ASSETS.student : L05_ASSETS.fruit, 50, name === STUDENT_NAME ? 60 : 50)],
 })
 
 export function compileProject(program: Program): Record<string, unknown> {
   return {
     targets: [
       {
-        isStage: true, name: 'Stage', ...baseTarget(), blocks: {}, layerOrder: 0, costumes: [costume('背景')],
+        isStage: true, name: 'Stage', ...baseTarget(), blocks: {}, layerOrder: 0, costumes: [costume('背景', L05_ASSETS.backdrop, 240, 180)],
         variables: { [TIME_VAR.id]: [TIME_VAR.name, 0], [SCORE_VAR.id]: [SCORE_VAR.name, 0] },
         broadcasts: { [BROADCAST_ID]: L05_PARAMS.broadcastName },
       },

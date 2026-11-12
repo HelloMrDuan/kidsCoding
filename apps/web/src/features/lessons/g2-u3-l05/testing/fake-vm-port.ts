@@ -79,7 +79,7 @@ export class FakeVmPort implements VmPort {
       this.pending = null
     }
   }
-  getStatus(): VmStatus { return { ready: this.ready, error: this.error } }
+  getStatus(): VmStatus { return { ready: this.ready, error: this.error, assets: null } }
   subscribe(h: { ready?: () => void; frame?: (f: FrameInfo) => void }): void { this.handlers = h }
   currentRunId(): number { return this.runSeq }
 

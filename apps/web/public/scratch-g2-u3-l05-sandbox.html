@@ -32,14 +32,25 @@
     minRepeatTimes: 1, maxRepeatTimes: 20, scoreEverySeconds: 0.5, broadcastSlackFrames: 2,
   };
   const STEP_MS = 1000 / 30;
-  const ASSET_ID = 'b1c2d3e4f5a60718293a4b5c6d7e8f90';
+  const ASSET_IDS = {
+    backdrop: 'c3d4e5f6a7b8293a4b5c6d7e8f901a23',
+    student: 'a1b2c3d4e5f60718293a4b5c6d7e8f01',
+    fruit: 'b2c3d4e5f6a718293a4b5c6d7e8f9012',
+  };
   const STUDENT = '学生';
   const FRUIT = '水果';
   const TIME_ID = 'kcl5_time';
   const SCORE_ID = 'kcl5_score';
   const BC_ID = 'kcl5_bc';
   const BC_NAME = '游戏结束';
-  const SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="4" height="4"/></svg>';
+  // 本课原创 SVG 造型（学生 / 水果 / 背景各一份，不再共用空白图）。本课没有渲染器：
+  // 造型只用于角色栏缩略图与工程完整性，舞台判定只看 timeLeft / score，不靠画面。
+  const SVG = {
+    student: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120"><path d="M24 40a26 23 0 0 1 52 0z" fill="#2463eb"/><rect x="18" y="38" width="64" height="7" rx="3.5" fill="#1748b5"/><circle cx="26" cy="54" r="5" fill="#ffd9b3"/><circle cx="74" cy="54" r="5" fill="#ffd9b3"/><circle cx="50" cy="54" r="24" fill="#ffd9b3"/><circle cx="41" cy="52" r="3.2" fill="#1f2d3d"/><circle cx="59" cy="52" r="3.2" fill="#1f2d3d"/><ellipse cx="36" cy="62" rx="4.5" ry="2.8" fill="#ff9d9d" opacity="0.65"/><ellipse cx="64" cy="62" rx="4.5" ry="2.8" fill="#ff9d9d" opacity="0.65"/><path d="M41 63q9 8 18 0" stroke="#1f2d3d" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M27 120v-20a23 15 0 0 1 46 0v20z" fill="#ffc53d"/><path d="M42 88h16l-8 9z" fill="#fff"/></svg>',
+    fruit: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M50 28q3-11 11-15" stroke="#8a5a2b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M52 22q17-13 27-4-4 15-21 13z" fill="#2f9e44"/><path d="M50 36c-6-8-24-9-32 3C8 51 16 75 28 87c6 6 14 2 22 2s16 4 22-2c12-12 20-36 10-48-8-12-26-11-32-3z" fill="#e5484d"/><ellipse cx="34" cy="56" rx="6.5" ry="11" fill="#ffffff" opacity="0.35" transform="rotate(-14 34 56)"/></svg>',
+    backdrop: '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360"><rect width="480" height="360" fill="#bfe0f7"/><circle cx="402" cy="58" r="40" fill="#ffe066" opacity="0.45"/><circle cx="402" cy="58" r="27" fill="#ffd43b"/><g fill="#ffffff"><ellipse cx="96" cy="62" rx="42" ry="17"/><ellipse cx="128" cy="52" rx="30" ry="14"/><ellipse cx="316" cy="96" rx="36" ry="14"/><ellipse cx="342" cy="88" rx="24" ry="11"/></g><path d="M0 262q120-52 240-18t240-6v122H0z" fill="#7cc47f"/><path d="M0 300q140-34 300-12t180-4v76H0z" fill="#4c9a52"/><rect x="52" y="196" width="13" height="42" rx="5" fill="#8a5a2b"/><circle cx="58" cy="178" r="30" fill="#3d9970"/><circle cx="36" cy="192" r="19" fill="#4caf6d"/><circle cx="80" cy="192" r="19" fill="#4caf6d"/><g><circle cx="150" cy="322" r="6" fill="#ff8fab"/><circle cx="168" cy="330" r="5" fill="#ffd43b"/><circle cx="330" cy="318" r="6" fill="#ffd43b"/><circle cx="352" cy="328" r="5" fill="#ff8fab"/></g></svg>',
+  };
+  const uri = (svg) => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 
   // ---- 虚拟时钟 -------------------------------------------------------------
   const VIRTUAL_START = 1000000;
@@ -225,23 +236,23 @@
     if (fa.parent !== 'fi' || fa.next !== null || !eq(fa.inputs, {VALUE: [1, [4, '1']]}) || !isVarField(fa.fields, 'score', SCORE_ID)) throw new Error('水果脚本不对');
   }
 
-  function validateTargetBasics(t, name) {
+  function validateTargetBasics(t, name, assetId) {
     if (!t || t.isStage !== (name === 'Stage') || t.name !== name) throw new Error('角色名单不对');
-    if (!Array.isArray(t.costumes) || t.costumes.length !== 1 || t.costumes[0].assetId !== ASSET_ID || t.costumes[0].dataFormat !== 'svg') throw new Error('造型不对');
+    if (!Array.isArray(t.costumes) || t.costumes.length !== 1 || t.costumes[0].assetId !== assetId || t.costumes[0].dataFormat !== 'svg') throw new Error('造型不对');
     if ((t.sounds || []).length || Object.keys(t.lists || {}).length) throw new Error('本课不允许列表或声音');
   }
 
   function validateProject(project) {
     if (!project || typeof project !== 'object' || !Array.isArray(project.targets) || project.targets.length !== 3) throw new Error('工程需要 3 个对象');
     const [stage, student, fruit] = project.targets;
-    validateTargetBasics(stage, 'Stage');
+    validateTargetBasics(stage, 'Stage', ASSET_IDS.backdrop);
     if (Object.keys(stage.blocks || {}).length !== 0) throw new Error('舞台不能有脚本');
     const varIds = Object.keys(stage.variables || {}).sort();
     if (varIds.join(',') !== [SCORE_ID, TIME_ID].sort().join(',')) throw new Error('舞台变量不对');
     if (stage.variables[TIME_ID][0] !== 'timeLeft' || stage.variables[SCORE_ID][0] !== 'score') throw new Error('舞台变量不对');
     if (Object.keys(stage.broadcasts || {}).join(',') !== BC_ID || stage.broadcasts[BC_ID] !== BC_NAME) throw new Error('舞台广播不对');
-    validateTargetBasics(student, STUDENT);
-    validateTargetBasics(fruit, FRUIT);
+    validateTargetBasics(student, STUDENT, ASSET_IDS.student);
+    validateTargetBasics(fruit, FRUIT, ASSET_IDS.fruit);
     for (const t of [student, fruit]) {
       if (Object.keys(t.variables || {}).length || Object.keys(t.broadcasts || {}).length) throw new Error('角色不能自带变量或广播');
     }
@@ -255,7 +266,9 @@
     const machine = new window.VirtualMachine();
     const storage = new Storage();
     machine.attachStorage(storage);
-    storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, new TextEncoder().encode(SVG), ASSET_ID);
+    for (const key of Object.keys(ASSET_IDS)) {
+      storage.cache(storage.AssetType.ImageVector, storage.DataFormat.SVG, new TextEncoder().encode(SVG[key]), ASSET_IDS[key]);
+    }
     return machine;
   }
   function stageVars(machine) {
@@ -383,6 +396,7 @@
       send('FRAME_READY', {
         available: typeof window.VirtualMachine === 'function' && !!window.ScratchStorage,
         limits: LIMITS,
+        assets: {backdrop: uri(SVG.backdrop), student: uri(SVG.student), fruit: uri(SVG.fruit)},
       });
       return;
     }

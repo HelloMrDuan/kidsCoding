@@ -27,7 +27,9 @@ export type FrameInfo = {
 export const SANDBOX_URL = '/scratch-g2-u3-l05-sandbox.html'
 export const READY_TIMEOUT_MS = 15000
 
-export type VmStatus = { ready: boolean; error: string | null }
+export type SandboxAssets = { backdrop: string; student: string; fruit: string }
+
+export type VmStatus = { ready: boolean; error: string | null; assets: SandboxAssets | null }
 
 /**
  * 课程会话（session.ts）依赖的虚拟机端口。生产实现是下面的 ScratchL05Adapter（iframe 里的真实 Scratch VM）；
@@ -50,6 +52,7 @@ export class ScratchL05Adapter implements VmPort {
   private listener: ((e: MessageEvent) => void) | null = null
   private ready = false
   private loadError: string | null = null
+  private assets: SandboxAssets | null = null
   private program: Program = { scripts: [] }
   private levelId: LevelId = 'solve'
   private runSeq = 0
@@ -61,7 +64,7 @@ export class ScratchL05Adapter implements VmPort {
 
   /** 沙箱握手情况：ready=true 才能运行；loadError 非空时界面必须如实显示。 */
   getStatus(): VmStatus {
-    return { ready: this.ready, error: this.loadError }
+    return { ready: this.ready, error: this.loadError, assets: this.assets }
   }
 
   subscribe(handlers: { ready?: () => void; frame?: (f: FrameInfo) => void }): void {
@@ -124,6 +127,7 @@ export class ScratchL05Adapter implements VmPort {
       if (data.available === true) {
         this.ready = true
         this.loadError = null
+        this.assets = (data.assets as SandboxAssets | undefined) ?? null
         if (this.readyTimer) clearTimeout(this.readyTimer)
         this.stopPing()
       } else {
