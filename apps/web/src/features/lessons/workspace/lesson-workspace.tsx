@@ -2106,9 +2106,22 @@ export function LessonWorkspace({
           .ws-search-row { margin-bottom: 2px; }
           .ws-search-row input { min-height: 36px; }
           .ws-palette { padding: 4px 8px; margin-bottom: 2px; }
-          .ws-panel { margin-bottom: 4px; }
-          .ws-panel > section { padding: 4px 6px; }
-          .ws-runbar { margin-top: 2px; }
+          /* OPS-033 (E7 750px 安全边界，2026-11-12)：手机 375×812 下三块
+             程序栈（约 189px）底边须在 y=750 底部导航线之上。实测缺口
+             约 60px：课层压缩约 49px（路由 eyebrow 隐藏 + 标题一行）后，
+             壳层再以纯纵向间距压缩补足——顶栏/目标条/面板/粘性运行行
+             的 padding 与 margin 各省 2–4px。未删任何内容、控件或提示，
+             未改按钮尺寸（运行/停止保持 41.7px）、未改舞台高度
+             （medium 档仍为 140px）、未改 V2 token、未改三层判定语义。
+             顶栏保存后换行（+30.6px）是另一处布局跳动：它是标题长度
+             决定的换行，单行化须按课裁标题/缩字号，对所有课不通用，
+             本轮不碰，只压间距。 */
+          .ws-topbar { margin-bottom: 4px; padding: 2px 8px; }
+          .ws-goalstrip { padding: 2px 8px; margin-bottom: 4px; }
+          .ws-panel { margin-bottom: 2px; }
+          .ws-panel > section { padding: 2px 6px; }
+          .ws-runbar { margin-top: 0; }
+          .ws-sticky-actions { padding: 0; }
           /* Gate 1 phone budget (<= 767px): the stage-head toggle is
              the tallest head item; its padding cut keeps every control
              (run/stop stay full size). Palette trims are vertical only. */
