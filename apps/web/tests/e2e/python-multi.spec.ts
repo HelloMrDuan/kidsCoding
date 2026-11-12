@@ -98,8 +98,7 @@ test('TQ-005 real NameError shows three ordered hint layers instead of a generic
   await expect(page.getByTestId('python-multi-passed')).toHaveCount(0)
 })
 
-test('sixth Python capstone executes a real three-input card, rejects bad data, and restores source', async ({page}) => {
-  test.setTimeout(180_000)
+test('sixth Python capstone executes a real three-input card, rejects bad data, and restores source', async ({page}) => {  test.setTimeout(180_000)
   await page.goto('/learn/catalog/P0-U1-L06')
   await page.getByTestId('python-multi-trial-entry').click()
   await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
@@ -250,3 +249,57 @@ test('P3-U2-L02 line_chart draws a text line chart and rejects bad data', async 
   await expect(page.getByTestId('python-case-4')).toContainText('ERROR:ValueError')
   await expect(page.getByTestId('python-local-save')).toContainText('已在本机保存')
 })
+test('P3-U1-L01 diary CSV round-trip runs five real cases and restores the draft after reload', async ({page})=>{
+  test.setTimeout(180_000)
+  await page.goto('/learn/python-lab/P3-U1-L01')
+  await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-multi-count')).toHaveText('0/5',{timeout:70_000})
+  const solution='import csv\nimport io\n\ndef diary_entry(csv_text, date):\n    reader = csv.DictReader(io.StringIO(csv_text))\n    if not reader.fieldnames:\n        raise ValueError("没有找到这一天的日记")\n    for row in reader:\n        if row.get("日期") == date:\n            buf = io.StringIO()\n            writer = csv.DictWriter(buf, fieldnames=reader.fieldnames, lineterminator="\\n")\n            writer.writeheader()\n            writer.writerow(row)\n            return buf.getvalue()\n    raise ValueError("没有找到这一天的日记")'
+  await page.getByTestId('python-multi-source').fill(solution)
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-multi-passed')).toBeVisible({timeout:70_000})
+  await expect(page.getByTestId('python-multi-count')).toHaveText('5/5')
+  await expect(page.getByTestId('python-case-1')).toContainText('复习了昨天的笔记, 还画了图')
+  await expect(page.getByTestId('python-case-4')).toContainText('ERROR:ValueError')
+  await expect(page.getByTestId('python-local-save')).toContainText('已在本机保存')
+  await page.reload()
+  await expect(page.getByTestId('python-multi-source')).toHaveValue(solution)
+  await expect(page.getByTestId('python-multi-passed')).toBeVisible()
+  await page.getByTestId('python-portfolio-link').click()
+  await expect(page.getByTestId('practice-item-P3-U1-L01')).toBeVisible()
+  await expect(page.getByText('不是正式课程成绩', { exact: true })).toBeVisible()
+  await page.getByRole('link',{name:'继续编辑作品 →'}).click()
+  await expect(page.getByTestId('python-multi-source')).toHaveValue(solution)
+})
+
+test('P3-U1-L01 second practice runs a new diary date and reports a missing date as a real error', async ({page})=>{
+  test.setTimeout(180_000)
+  await page.goto('/learn/python-lab/P3-U1-L01')
+  await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+  const solution='import csv\nimport io\n\ndef diary_entry(csv_text, date):\n    reader = csv.DictReader(io.StringIO(csv_text))\n    if not reader.fieldnames:\n        raise ValueError("没有找到这一天的日记")\n    for row in reader:\n        if row.get("日期") == date:\n            buf = io.StringIO()\n            writer = csv.DictWriter(buf, fieldnames=reader.fieldnames, lineterminator="\\n")\n            writer.writeheader()\n            writer.writerow(row)\n            return buf.getvalue()\n    raise ValueError("没有找到这一天的日记")'
+  await page.getByTestId('python-multi-source').fill(solution)
+  await page.getByTestId('python-custom-arg-0').fill('日期,心情,日记\n2026-10-04,兴奋,今天跑了步\n')
+  await page.getByTestId('python-custom-arg-1').fill('2026-10-04')
+  await page.getByTestId('python-custom-run').click()
+  await expect(page.getByTestId('python-custom-result')).toContainText('2026-10-04,兴奋,今天跑了步', {timeout:70_000})
+  await expect(page.getByTestId('python-custom-done')).toBeVisible()
+  await page.getByTestId('python-custom-arg-1').fill('2026-10-09')
+  await page.getByTestId('python-custom-run').click()
+  await expect(page.getByTestId('python-custom-result')).toContainText('ERROR:ValueError', {timeout:70_000})
+  await page.reload()
+  await expect(page.getByTestId('python-custom-done')).toBeVisible()
+})
+
+for (const vp of [{name:'desktop',width:1440,height:900},{name:'tablet',width:768,height:1024},{name:'phone',width:375,height:812}]) {
+  test(`P3-U1-L01 ${vp.name} viewport fits without horizontal overflow`, async ({page})=>{
+    test.setTimeout(120_000)
+    await page.setViewportSize({width:vp.width,height:vp.height})
+    await page.goto('/learn/python-lab/P3-U1-L01')
+    await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+    await expect(page.getByTestId('python-multi-run')).toBeVisible()
+    await expect(page.getByTestId('python-custom-arg-0')).toBeVisible()
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    expect(overflow).toBe(0)
+  })
+}

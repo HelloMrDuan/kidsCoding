@@ -1,0 +1,137 @@
+{
+  "ageBand": "P3 Python 数据与自动化",
+  "blockers": [
+    "AI 评分且评分者是实现者本人，需负责人或独立人工复核后才能作为正式结论",
+    "没有儿童试学"
+  ],
+  "childTrial": "none",
+  "independent": false,
+  "lessonId": "P3-U1-L01",
+  "maturityLevel": 3,
+  "newConcepts": [
+    "csv.DictReader 读 CSV",
+    "csv.DictWriter 写 CSV",
+    "含逗号字段的自动加引号"
+  ],
+  "prerequisites": [],
+  "references": [],
+  "reviewedAt": "2026-11-12",
+  "reviewedCommit": "fc8697a1629fa0bfe931051d5d4f99838b51c524",
+  "reviewer": "kid四号小宝（AI 参考评分，亦为本课实现者）",
+  "reviewerKind": "ai",
+  "runEvidence": {
+    "e2eSpecs": [
+      "apps/web/tests/e2e/python-multi.spec.ts › P3-U1-L01 diary CSV round-trip runs five real cases and restores the draft after reload",
+      "apps/web/tests/e2e/python-multi.spec.ts › P3-U1-L01 second practice runs a new diary date and reports a missing date as a real error",
+      "apps/web/tests/e2e/python-multi.spec.ts › P3-U1-L01 desktop/tablet/phone viewport fits without horizontal overflow"
+    ],
+    "equivalentSolutions": [
+      "for 循环逐行查找与 next((row for row in reader if row.get(\"日期\") == date), None) 两种写法返回值相同即可通过（评分只比返回值）",
+      "先定义中间变量与直接返回表达式均可通过"
+    ],
+    "failureCase": "缺失日期 2026-10-03 → ERROR:ValueError 并出三层提示；空 CSV 与仅表头 CSV 同为 ERROR:ValueError",
+    "hintLayers": [
+      "第一层：说出发生了什么（现象）",
+      "第二层：讲清可能原因（概念）",
+      "第三层：给出具体做法（动手修复）"
+    ],
+    "normalRun": "L01 diary_entry 五组用例真实运行 5/5；练习 B 自选参数 1 组真实运行（python-multi.spec.ts）",
+    "practiceA": "练习 A：固定用例五组不同参数真实运行",
+    "practiceB": "练习 B：自选一组固定用例以外的参数真实调用同一函数并观察结果（抄固定用例不计完成）",
+    "saveReopen": "草稿存 kids-python-local-practice-v1:P3-U1-L01；L01 的刷新恢复与作品夹往返经 E2E 验证",
+    "screenshots": []
+  },
+  "schemaVersion": 1,
+  "scores": {
+    "assessment": {
+      "defects": [
+        "无儿童试学"
+      ],
+      "evidence": [
+        "5 组用例含 3 组错误边界；实际 vs 目标逐组对照；保存重开与作品夹往返经 E2E 验证"
+      ],
+      "score": 8
+    },
+    "creation": {
+      "defects": [],
+      "evidence": [
+        "练习 B 自选日期组合；草稿进本机作品夹，可继续编辑"
+      ],
+      "score": 11
+    },
+    "feedback": {
+      "defects": [
+        "三层提示为按错误类型通用文本，未针对每课单列专属诊断"
+      ],
+      "evidence": [
+        "固定用例逐组实际 vs 目标对照；运行错误与单组抛错均进三层提示（现象→原因→修复）"
+      ],
+      "score": 14
+    },
+    "knowledge": {
+      "defects": [
+        "新概念密度仍以单课 1～2 个为限（DictReader/DictWriter 一次引入）"
+      ],
+      "evidence": [
+        "prompt 明确 DictReader 读、DictWriter 写回、含逗号自动加引号三步；5 组用例覆盖正例 2 组与反例 3 组",
+        "本地参考实现 5/5，初始代码不通过"
+      ],
+      "score": 17
+    },
+    "practice": {
+      "defects": [],
+      "evidence": [
+        "练习 A：diary_entry 五组不同参数真实运行 5/5",
+        "练习 B：自选参数真实调用"
+      ],
+      "score": 21
+    },
+    "story": {
+      "defects": [
+        "故事主要在课程文字中，实验室页本身情境较薄"
+      ],
+      "evidence": [
+        "日记情境贯穿：prompt 与 5 组用例均为查找某一天的日记"
+      ],
+      "score": 12
+    }
+  },
+  "vetoes": {
+    "broken-or-false-success": {
+      "note": "保存重开经 E2E 验证；成绩边界在页面明示非正式考核",
+      "status": "pass"
+    },
+    "fake-execution": {
+      "note": "真实 Pyodide 在沙箱内执行学生代码；评分只比返回值",
+      "status": "pass"
+    },
+    "fake-project": {
+      "note": "未宣称课程已发布；目录仍为 outline_not_playable",
+      "status": "pass"
+    },
+    "id-status-mismatch": {
+      "note": "课程 ID 与 python-lab 路由一致，状态未冒称为已发布",
+      "status": "pass"
+    },
+    "minor-privacy-risk": {
+      "note": "草稿默认存本机浏览器；云端草稿接口只收 lessonId 与代码，不收 userId、不信任本地 passed 标志；数据全部是虚构示例",
+      "status": "pass"
+    },
+    "no-failure-test": {
+      "note": "正常执行 5/5；缺失日期、空 CSV、仅表头 CSV 三组真实错误边界",
+      "status": "pass"
+    },
+    "no-hands-on": {
+      "note": "学生亲手写 diary_entry 函数并跑练习 B",
+      "status": "pass"
+    },
+    "rigid-answer": {
+      "note": "评分只比返回值，多种写法可通过；练习 B 允许任意自选参数",
+      "status": "pass"
+    },
+    "unlicensed-assets": {
+      "note": "无第三方素材；数据全部是虚构示例",
+      "status": "pass"
+    }
+  }
+}
