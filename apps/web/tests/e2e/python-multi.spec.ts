@@ -136,3 +136,117 @@ test('sixth Python capstone executes a real three-input card, rejects bad data, 
   await page.getByTestId('practice-item-P0-U1-L06').getByRole('link',{name:'继续编辑作品 →'}).click()
   await expect(page.getByTestId('python-multi-source')).toHaveValue(solution)
 })
+
+// UX-604: the three P3 lessons on the shared page had no browser E2E coverage
+// (the 7 tests above only visit P0 lessons). Minimal load / edit / run regression
+// for each, same pattern as the P0 tests. Solutions verified locally against
+// every case in python-multi-grade.ts with exact string equality (the harness
+// compares outputs[index] === expected, no trimming).
+test('P3-U1-L02 ledger_row writes a quoted CSV row and rejects bad amounts', async ({page})=>{
+  test.setTimeout(150_000)
+  await page.goto('/learn/python-lab/P3-U1-L02')
+  await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-multi-count')).toHaveText('0/4',{timeout:70_000})
+  const solution = [
+    'import csv',
+    'import io',
+    '',
+    'def ledger_row(item, amount, category):',
+    '    item = item.strip()',
+    '    category = category.strip()',
+    '    if not item or not category:',
+    '        raise ValueError("项目或类别为空")',
+    '    try:',
+    '        value = float(amount)',
+    '    except (TypeError, ValueError):',
+    '        raise ValueError("金额不是数字")',
+    '    buf = io.StringIO()',
+    '    writer = csv.writer(buf, lineterminator="\\n")',
+    '    writer.writerow([item, f"{value:.2f}", category])',
+    '    return buf.getvalue().strip()',
+  ].join('\n')
+  await page.getByTestId('python-multi-source').fill(solution)
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-multi-passed')).toBeVisible({timeout:70_000})
+  await expect(page.getByTestId('python-multi-count')).toHaveText('4/4')
+  await expect(page.getByTestId('python-case-1')).toContainText('"书,笔记本",30.00,学习')
+  await expect(page.getByTestId('python-local-save')).toContainText('已在本机保存')
+})
+
+test('P3-U1-L03 contact_card finds a contact and rejects bad JSON', async ({page})=>{
+  test.setTimeout(150_000)
+  await page.goto('/learn/python-lab/P3-U1-L03')
+  await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-multi-count')).toHaveText('0/4',{timeout:70_000})
+  const solution = [
+    'import json',
+    '',
+    'def contact_card(json_text, name):',
+    '    name = name.strip()',
+    '    if not name:',
+    '        raise ValueError("姓名为空")',
+    '    try:',
+    '        contacts = json.loads(json_text)',
+    '    except Exception:',
+    '        raise ValueError("JSON 解析失败")',
+    '    if not isinstance(contacts, list):',
+    '        raise ValueError("通讯录不是列表")',
+    '    for person in contacts:',
+    '        if person.get("姓名") == name:',
+    '            return f"姓名：{name}；电话：{person.get(\'电话\', \'\')}"',
+    '    raise ValueError("找不到姓名")',
+  ].join('\n')
+  await page.getByTestId('python-multi-source').fill(solution)
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-multi-passed')).toBeVisible({timeout:70_000})
+  await expect(page.getByTestId('python-multi-count')).toHaveText('4/4')
+  await expect(page.getByTestId('python-case-0')).toContainText('姓名：小雨；电话：分机101')
+  await expect(page.getByTestId('python-local-save')).toContainText('已在本机保存')
+})
+
+test('P3-U2-L02 line_chart draws a text line chart and rejects bad data', async ({page})=>{
+  test.setTimeout(150_000)
+  await page.goto('/learn/python-lab/P3-U2-L02')
+  await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-multi-count')).toHaveText('0/5',{timeout:70_000})
+  const solution = [
+    'import csv',
+    'import io',
+    '',
+    'def line_chart(csv_text, height):',
+    '    h = int(height)',
+    '    if h < 2:',
+    '        raise ValueError("高度须大于 1")',
+    '    reader = csv.DictReader(io.StringIO(csv_text))',
+    '    rows = list(reader)',
+    '    if len(rows) < 2:',
+    '        raise ValueError("记录少于 2 条")',
+    '    temps = []',
+    '    for row in rows:',
+    '        raw = (row.get("温度") or "").strip()',
+    '        if raw == "":',
+    '            raise ValueError("温度为空")',
+    '        try:',
+    '            temps.append(float(raw))',
+    '        except ValueError:',
+    '            raise ValueError("温度不是数字")',
+    '    lo, hi = min(temps), max(temps)',
+    '    if lo == hi:',
+    '        raise ValueError("所有温度相同")',
+    '    grid = [[" "] * len(temps) for _ in range(h)]',
+    '    for j, t in enumerate(temps):',
+    '        r = round((t - lo) / (hi - lo) * (h - 1))',
+    '        grid[(h - 1) - r][j] = "*"',
+    '    return "\\n".join("".join(row).rstrip() for row in grid)',
+  ].join('\n')
+  await page.getByTestId('python-multi-source').fill(solution)
+  await page.getByTestId('python-multi-run').click()
+  await expect(page.getByTestId('python-multi-passed')).toBeVisible({timeout:70_000})
+  await expect(page.getByTestId('python-multi-count')).toHaveText('5/5')
+  await expect(page.getByTestId('python-case-0')).toContainText('*')
+  await expect(page.getByTestId('python-case-4')).toContainText('ERROR:ValueError')
+  await expect(page.getByTestId('python-local-save')).toContainText('已在本机保存')
+})
