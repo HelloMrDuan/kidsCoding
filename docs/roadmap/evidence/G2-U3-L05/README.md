@@ -11,7 +11,7 @@
 | 渲染器 | **没有**。本课舞台只显示 timeLeft 与 score 两个变量，判定不依赖碰撞，所以 L05 沙箱只加载 VM 与 storage；VM 规范用例断言 `scratch-render` 从未被请求。L02–L04 的沙箱未改动。 |
 | 虚拟时钟 | 打包版 scratch-vm 的 Timer 走 `Date.now`（探针实测 `USE_PERFORMANCE=false`）。沙箱把 `Date.now` 接到虚拟时钟、逐帧推进 1000/30 ms 再 `_step()`；`performance.now` 同步替换为尽力而为。每次运行虚拟起点重置，同一程序两跑轨迹逐帧一致（浏览器与 Node 双环境都断言）。课堂每帧约 16 ms 真实时间，10 秒倒计时约 6–7 秒跑完。 |
 | 沙箱 CSP | 与 L03/L04 同款：`default-src 'none'`、`connect-src 'none'`，只放行本站 script 与 data: 图片。 |
-| 浏览器 | 本地为真实 **Google Chrome 157.0.8103.50**（`channel: 'chrome'`，与 CI 相同通道），headless。本地这台机器的 Chrome 是手动下载官方 .deb 装的（Playwright 的 `--with-deps` 安装在本机 apt 镜像上失败，依赖由系统已满足）；CI 按工作流自己的有界安装步骤装 Chrome。 |
+| 浏览器 | 本地为真实 **Google Chrome 157**（首轮 157.0.8103.50；整改轮 157.0.8103.78，官方 .deb 解压到工作区后以 `executablePath` 指定，`channel: 'chrome'` 等价通道），headless。CI 按工作流自己的有界安装步骤装 Chrome。 |
 | 中文字体 | 本地 Chrome 自带 CJK 字体，未注入测试字体。 |
 | 真实设备 | **没有**。1440 / 768 / 375 是 Playwright 视口（手机 `isMobile + hasTouch`）。真实指针拖放只在桌面视口；手机、平板走点按添加。 |
 | 儿童试学 / 独立教研 | **没有做**，不宣称。 |
@@ -26,7 +26,7 @@ python3 docs/curriculum/g2-u3-l05/mutate-l05.py
 npm run build
 ```
 
-- Vitest（`src/features/lessons/g2-u3-l05`）：**75 通过 / 0 失败**（交接核心层 29 + 本轮新增 46：契约/草稿/舞台字典、会话、课内适配器、参考做法真实 VM 验证、沙箱与 TS 常量一致性）。
+- Vitest（`src/features/lessons/g2-u3-l05`）：首轮 **75 通过 / 0 失败**（交接核心层 29 + 新增 46）；4 号复核整改后 **79 通过 / 0 失败**（再增 F1 素材 2 项、F2 配色守卫 2 项，见第七节）。
   - 超时说明：真实 VM 单测一次运行约 1–4 秒（scratch-vm 加载 + 约 400 帧），默认 5 秒超时在本机共享 CPU 环境实测 7 次中 2 次超时失败（交接的 `judge.vm.test.ts` 标准做法与新增的参考做法各中一次）。CI 的 checks 步骤因此显式 `--testTimeout=30000`，本课自己的参考做法用例也逐个写了 30 秒超时；**断言一条未改**。
 - Playwright（本地真实 Chrome，含生产构建）：
   - `g2-u3-l05-vm.spec.ts`：**17 通过 / 0 跳过 / 0 失败**。
@@ -58,7 +58,7 @@ npm run build
 
 ## 五、与交接核心层的关系
 
-- `params.ts / program.ts / compile.ts / judge.ts / judge.vm.test.ts / program.test.ts / testing/node-vm-runner.ts` 与 `docs/curriculum/g2-u3-l05/` 交接文档**一字未改**（本 PR 的 diff 可核）。浏览器沙箱是同一判定的第二个运行环境：常量与 opcode 清单由新增单测与 TS 侧逐项对齐（漂移即失败）。
+- `params.ts / program.ts / judge.ts / judge.vm.test.ts / program.test.ts` 与 `docs/curriculum/g2-u3-l05/` 交接文档**一字未改**（本 PR 的 diff 可核）。首轮 `compile.ts` 亦未改；整改轮（第七节）`compile.ts` 与 `testing/node-vm-runner.ts` 各有且仅有素材 ID/缓存的 F1 改动，判定与编译逻辑未动。浏览器沙箱是同一判定的第二个运行环境：常量与 opcode 清单由新增单测与 TS 侧逐项对齐（漂移即失败）。
 - 本课判定**没有**共享判定器：L02–L04 的共享轨迹形状装不下「检查记录」这一层，理由写在 `lesson-adapter.ts` 的注释里；舞台/任务/知识三层文字直接来自 `judge.ts`。
 
 ## 六、没有做到 / 还不能宣称的
@@ -72,3 +72,29 @@ npm run build
 - 没有独立教研、没有儿童试学、没有真实设备、没有低端设备性能实测；课堂单次运行约 400 帧 × 16 ms，低端机可能更慢。目录仍是 `outline_not_playable`，本课未发布，台账只到 `in_review`。
 - 共享 `workspace/` 壳、L02 / L03 / L04 的沙箱与行为未修改；`apps/web/playwright.local.config.ts` 是本地验证用的一次性文件，**未提交**；`public/scratch-vm/` 是 gitignore 的构建产物。
 - 推送方式：本机无 git 直推通道，分支经 GitHub Git Data API 逐提交镜像（tree 与本地逐字一致，已读回核对），提交 SHA 与本地不同源于 API 侧时间戳规范化，内容以 tree 为准。
+
+## 七、4 号非作者复核 FAIL 整改（F1–F3，2026-11-12）
+
+4 号对 HEAD `526836af` 的复核结论为 FAIL（引擎/判定/CI/契约通过），三项视觉/证据缺口已整改：
+
+- **F1 角色栏缩略图**：学生 / 水果 / 舞台各一份本课原创 SVG 造型（沙箱内置，三个独立素材 ID），沙箱按角色分别校验并缓存、握手（FRAME_READY）回传 data: URI，vm-adapter/会话以 `engine.assets` 暴露，角色栏渲染真实缩略图（做法与 L04 一致，舞台卡同样有图）。不再共用 4×4 空白 SVG。单测新增 2 项守卫（编译产物三角色素材 ID 各就其位且互不相同；沙箱三份 SVG 非空白且握手回传）。诚实边界不变：本课没有渲染器，缩略图只用于角色栏识别，舞台仍只呈现 VM 的 timeLeft / score。
+- **F2 舞台配色回归 V2 token**：`stage-view.tsx` 暖米/橙色硬编码全部清除，只用 `--kc-action`（圆环）、`--kc-danger`（负数）、`--kc-success`（结束）、`--kc-text` / `--kc-text-muted`、`--kc-nav`（得分牌）、`--kc-surface` / `--kc-canvas` / `--kc-line`，仅保留 L04 先例的 `#fff`；`classroom.module.css` 删除不存在的 `--kc-brand`，改 `var(--kc-action)`。单测新增 2 项守卫（stage-view 无其他十六进制色且使用上述 token；CSS 无 `--kc-brand`）。未改 globals.css、未定义新 token。
+- **F3 三端截图入库 + 手机首屏几何断言**：截图见 `screenshots/`（下方清单），均为整改后以本地真实 Chrome 157.0.8103.78 打开生产构建截取；课堂 spec 手机专属用例新增几何断言：粘性运行按钮与舞台运行按钮须完整落在 375×812 视口内、且中心点 `elementFromPoint` 命中自身（不被站点底部导航等固定层遮挡），不再只靠 `toBeVisible()`；实例计数不变（每视口仍 15，CI 的 JUnit 核对数不变）。
+
+整改后本地复跑（2026-11-12）：单测 **79/79**；VM E2E **17/17**；课堂 E2E 三端 0 失败（desktop 14 过 1 跳、tablet 13 过 2 跳、phone 14 过 1 跳，跳过按设计，含新增几何断言的手机用例）；变异检验复跑见提交说明（要求工作树干净，截图与本文先行提交后执行）；生产构建通过；本课 tsc 0 错误、ESLint 0 错。其他课程文件零改动（diff 仅 L05 目录、L05 两个 spec 与本证据目录）。
+
+### 截图清单（`screenshots/`，视口为 Playwright 视口，手机 isMobile + hasTouch）
+
+| 文件 | 视口 | 内容 |
+|---|---|---|
+| `desktop-1440-first-screen.png` | 1440×900 | 桌面首屏：共享工作区、三角角色缩略图、token 化舞台 |
+| `desktop-1440-running-result.png` | 1440×900 | 桌面运行后：演示程序 −5 / 得分 19 与三层反馈、观察结论 |
+| `tablet-768-workspace.png` | 768×1024 | 平板工作区首屏 |
+| `tablet-768-script-edit.png` | 768×1024 | 平板切到「自己搭」并点按加入两块积木后 |
+| `phone-375-first-screen.png` | 375×812 | 手机单屏首屏（v1.1：舞台+运行行+任务栏+脚本同屏，底部导航未遮挡关键操作） |
+| `phone-375-edit.png` | 375×812 | 手机点按素材加积木后 |
+| `phone-375-restored.png` | 375×812 | 手机保存后重载，草稿恢复 |
+| `phone-375-running-result.png` | 375×812 | 手机脚本区内运行后（−5 / 19） |
+| `phone-375-stopped.png` | 375×812 | 手机运行中停止后（不判定） |
+| `v2-compare-home-desktop.png` | 1440×900 | 对照：站点首页（同一 V2 深蓝外壳） |
+| `v2-compare-map-desktop.png` | 1440×900 | 对照：学习地图 `/learn/map`（同一 V2 外壳） |
