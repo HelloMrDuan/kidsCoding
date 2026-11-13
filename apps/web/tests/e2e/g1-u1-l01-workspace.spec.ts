@@ -379,98 +379,111 @@ test('E6 desktop: run, stop, re-run — stop cancels playback, script survives, 
   await runAndExpect(page, true)
 })
 
-test('E7 canvas Gate 1: viewport ∩ canvas visible height (tablet ≥300, mobile ≥220)', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'desktop viewport runs once, on desktop')
-  test.setTimeout(240_000)
-  for (const [width, height, minVisible] of [
-    [768, 1024, 300],
-    [375, 812, 220],
-  ] as const) {
-    await page.setViewportSize({ width, height })
-    await page.goto(ROUTE)
-    await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible({ timeout: 20_000 })
-    // Gate 1 is a load-time layout budget (same formulation as
-    // lesson-workspace.spec.ts 'gate1 layout budget default'): measured at
-    // scroll 0, before any click scrolls the page. A fresh load starts with
-    // an empty canvas by design (the draft starts empty), so there is no
-    // first block to check at load; the "one complete block group visible
-    // and operable" part is verified below, after building, back at
-    // scroll 0.
-    const svgBox = await page.getByTestId('ws-editor-slot').locator('svg.blocklySvg').boundingBox()
-    expect(svgBox).not.toBeNull()
-    const visibleAtLoad = Math.max(0, Math.min(height, svgBox!.y + svgBox!.height) - Math.max(0, svgBox!.y))
-    expect(visibleAtLoad).toBeGreaterThanOrEqual(minVisible)
-    // Mobile only: the fixed bottom nav covers roughly the bottom 62px
-    // (shell spec 'mobile 375 first screen'), so the canvas top must
-    // clear y=750 to be genuinely visible, not merely rendered behind
-    // the nav. Tablet has no bottom nav.
-    if (width === 375) expect(svgBox!.y).toBeLessThan(750)
-    // E7 FIXED (2026-11-12, OPS-033 + lesson layer, measured — do not
-    // weaken this bound): the 3-block stack was ~189px from a canvas top
-    // of ~608, ending ~810, 60px past the 750 nav line. Closed by
-    // (a) lesson layer: route eyebrow hidden <md, back link icon-only
-    // <md so the h1 fits one line (title row 85.2 -> 36.6px), passed
-    // marker '（已通过）' -> ' ✓' so the step header never wraps to
-    // 2 lines after passing; (b) shell layer (OPS-033): phone-only
-    // vertical spacing compression in lesson-workspace.tsx (topbar /
-    // goalstrip / panel / sticky padding + margins, -30px total, no
-    // content or control removed, stage stays 140px, buttons full
-    // size). Re-measured 2026-11-12: canvas top 529.7, stack
-    // 541.7–731.1, 18.9px clear of the 750 line; canvas visible
-    // 282.3px at step 3 (>= 220). The bare shell demo passes because
-    // its starter program is only ~110px tall from a canvas top of 566.
-    // Run and task entries reachable without scrolling.
-    for (const testid of ['ws-run-toggle', 'ws-task-button']) {
-      const box = await page.getByTestId(testid).boundingBox()
-      expect(box).not.toBeNull()
-      expect(box!.y + box!.height).toBeLessThanOrEqual(height)
-    }
-    await noOverflow(page)
-    // Build the program, then re-verify the scroll-independent part of
-    // the gate: the canvas keeps >= minVisible visible height even after
-    // the page has scrolled to the palette. Back at scroll 0, the first
-    // block group must sit fully inside the viewport and inside the
-    // canvas (not cut off by the canvas edge or the fold).
-    await next(page)
-    await next(page)
-    await expect(page.getByTestId('g1-u1-l01-step-title')).toContainText('第 3 关')
-    await add(page, 'say_line')
-    await add(page, 'move_right')
-    await expect.poll(() => draftProgramLength(page, 'build-opening')).toBe(3)
-    await page.evaluate(() => window.scrollTo(0, 0))
-    const svgBoxAfter = await page.getByTestId('ws-editor-slot').locator('svg.blocklySvg').boundingBox()
-    expect(svgBoxAfter).not.toBeNull()
-    const firstBlock = page.locator('.blocklyBlockCanvas .blocklyDraggable').first()
-    await expect(firstBlock).toBeVisible({ timeout: 10_000 })
-    const firstBox = await firstBlock.boundingBox()
-    expect(firstBox).not.toBeNull()
-    expect(firstBox!.y).toBeGreaterThanOrEqual(0)
-    expect(firstBox!.y).toBeGreaterThanOrEqual(svgBoxAfter!.y)
-    // Mobile: the block must sit fully above the bottom nav (y=750),
-    // not merely inside the 812px viewport behind it (shell spec).
-    expect(firstBox!.y + firstBox!.height).toBeLessThanOrEqual(width === 375 ? 750 : height)
-    // E7 strengthened (2026-11-13, OPS-032 fix): assert EVERY block of
-    // the 3-block stack, not just the first — the stack bottom is the
-    // last block's bottom, and the original failure was the stack bottom
-    // (~810) past the 750 nav line while the first block was fine.
-    // Tablet leg: every block bottom must be within the viewport (1024).
-    const blocks = page.locator('.blocklyBlockCanvas .blocklyDraggable')
-    await expect(blocks).toHaveCount(3)
-    const blockBottoms: number[] = []
-    for (let i = 0; i < 3; i++) {
-      const box = await blocks.nth(i).boundingBox()
-      expect(box).not.toBeNull()
-      blockBottoms.push(box!.y + box!.height)
-      expect(box!.y).toBeGreaterThanOrEqual(0)
-      expect(box!.y).toBeGreaterThanOrEqual(svgBoxAfter!.y)
-      expect(box!.y + box!.height).toBeLessThanOrEqual(width === 375 ? 750 : height)
-    }
-    const visibleAfterBuild = await canvasVisibleHeight(page, height)
-    expect(visibleAfterBuild).toBeGreaterThanOrEqual(minVisible)
-    console.log(`E7 ${width}x${height}: visibleAtLoad=${visibleAtLoad} visibleAfterBuild=${visibleAfterBuild} firstBlockY=${Math.round(firstBox!.y)} firstBlockBottom=${Math.round(firstBox!.y + firstBox!.height)} blockBottoms=[${blockBottoms.map((b) => Math.round(b)).join(', ')}]`)
-    await noOverflow(page)
-    await page.evaluate(() => window.localStorage.clear())
+// E7 canvas Gate 1 — split into two viewport-specific tests (2026-11-13,
+// SYS-108 §2.2): the old single test looped over 768 and 375 inside one
+// test on the desktop project, so no --grep/--project partition could put
+// the 768 leg in the tablet shard and the 375 leg in the mobile shard
+// without duplicating the test or omitting a leg. The two tests share one
+// helper; every assertion is preserved (visible heights, run/task
+// reachability, noOverflow, first block + all three blocks above the
+// line, E7 three-block bottoms).
+async function gate1Canvas(page: Page, width: number, height: number, minVisible: number) {
+  await page.setViewportSize({ width, height })
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible({ timeout: 20_000 })
+  // Gate 1 is a load-time layout budget (same formulation as
+  // lesson-workspace.spec.ts 'gate1 layout budget default'): measured at
+  // scroll 0, before any click scrolls the page. A fresh load starts with
+  // an empty canvas by design (the draft starts empty), so there is no
+  // first block to check at load; the "one complete block group visible
+  // and operable" part is verified below, after building, back at
+  // scroll 0.
+  const svgBox = await page.getByTestId('ws-editor-slot').locator('svg.blocklySvg').boundingBox()
+  expect(svgBox).not.toBeNull()
+  const visibleAtLoad = Math.max(0, Math.min(height, svgBox!.y + svgBox!.height) - Math.max(0, svgBox!.y))
+  expect(visibleAtLoad).toBeGreaterThanOrEqual(minVisible)
+  // Mobile only: the fixed bottom nav covers roughly the bottom 62px
+  // (shell spec 'mobile 375 first screen'), so the canvas top must
+  // clear y=750 to be genuinely visible, not merely rendered behind
+  // the nav. Tablet has no bottom nav.
+  if (width === 375) expect(svgBox!.y).toBeLessThan(750)
+  // E7 FIXED (2026-11-12, OPS-033 + lesson layer, measured — do not
+  // weaken this bound): the 3-block stack was ~189px from a canvas top
+  // of ~608, ending ~810, 60px past the 750 nav line. Closed by
+  // (a) lesson layer: route eyebrow hidden <md, back link icon-only
+  // <md so the h1 fits one line (title row 85.2 -> 36.6px), passed
+  // marker '（已通过）' -> ' ✓' so the step header never wraps to
+  // 2 lines after passing; (b) shell layer (OPS-033): phone-only
+  // vertical spacing compression in lesson-workspace.tsx (topbar /
+  // goalstrip / panel / sticky padding + margins, -30px total, no
+  // content or control removed, stage stays 140px, buttons full
+  // size). Re-measured 2026-11-12: canvas top 529.7, stack
+  // 541.7–731.1, 18.9px clear of the 750 line; canvas visible
+  // 282.3px at step 3 (>= 220). The bare shell demo passes because
+  // its starter program is only ~110px tall from a canvas top of 566.
+  // Run and task entries reachable without scrolling.
+  for (const testid of ['ws-run-toggle', 'ws-task-button']) {
+    const box = await page.getByTestId(testid).boundingBox()
+    expect(box).not.toBeNull()
+    expect(box!.y + box!.height).toBeLessThanOrEqual(height)
   }
+  await noOverflow(page)
+  // Build the program, then re-verify the scroll-independent part of
+  // the gate: the canvas keeps >= minVisible visible height even after
+  // the page has scrolled to the palette. Back at scroll 0, the first
+  // block group must sit fully inside the viewport and inside the
+  // canvas (not cut off by the canvas edge or the fold).
+  await next(page)
+  await next(page)
+  await expect(page.getByTestId('g1-u1-l01-step-title')).toContainText('第 3 关')
+  await add(page, 'say_line')
+  await add(page, 'move_right')
+  await expect.poll(() => draftProgramLength(page, 'build-opening')).toBe(3)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  const svgBoxAfter = await page.getByTestId('ws-editor-slot').locator('svg.blocklySvg').boundingBox()
+  expect(svgBoxAfter).not.toBeNull()
+  const firstBlock = page.locator('.blocklyBlockCanvas .blocklyDraggable').first()
+  await expect(firstBlock).toBeVisible({ timeout: 10_000 })
+  const firstBox = await firstBlock.boundingBox()
+  expect(firstBox).not.toBeNull()
+  expect(firstBox!.y).toBeGreaterThanOrEqual(0)
+  expect(firstBox!.y).toBeGreaterThanOrEqual(svgBoxAfter!.y)
+  // Mobile: the block must sit fully above the bottom nav (y=750),
+  // not merely inside the 812px viewport behind it (shell spec).
+  expect(firstBox!.y + firstBox!.height).toBeLessThanOrEqual(width === 375 ? 750 : height)
+  // E7 strengthened (2026-11-13, OPS-032 fix): assert EVERY block of
+  // the 3-block stack, not just the first — the stack bottom is the
+  // last block's bottom, and the original failure was the stack bottom
+  // (~810) past the 750 nav line while the first block was fine.
+  // Tablet leg: every block bottom must be within the viewport (1024).
+  const blocks = page.locator('.blocklyBlockCanvas .blocklyDraggable')
+  await expect(blocks).toHaveCount(3)
+  const blockBottoms: number[] = []
+  for (let i = 0; i < 3; i++) {
+    const box = await blocks.nth(i).boundingBox()
+    expect(box).not.toBeNull()
+    blockBottoms.push(box!.y + box!.height)
+    expect(box!.y).toBeGreaterThanOrEqual(0)
+    expect(box!.y).toBeGreaterThanOrEqual(svgBoxAfter!.y)
+    expect(box!.y + box!.height).toBeLessThanOrEqual(width === 375 ? 750 : height)
+  }
+  const visibleAfterBuild = await canvasVisibleHeight(page, height)
+  expect(visibleAfterBuild).toBeGreaterThanOrEqual(minVisible)
+  console.log(`E7 ${width}x${height}: visibleAtLoad=${visibleAtLoad} visibleAfterBuild=${visibleAfterBuild} firstBlockY=${Math.round(firstBox!.y)} firstBlockBottom=${Math.round(firstBox!.y + firstBox!.height)} blockBottoms=[${blockBottoms.map((b) => Math.round(b)).join(', ')}]`)
+  await noOverflow(page)
+  await page.evaluate(() => window.localStorage.clear())
+}
+
+test('E7 tablet 768x1024: canvas Gate 1 visible height ≥300', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'tablet viewport runs inside the desktop project')
+  test.setTimeout(240_000)
+  await gate1Canvas(page, 768, 1024, 300)
+})
+
+test('E7 mobile 375x812: canvas Gate 1 visible height ≥220, three blocks above 750', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'mobile viewport runs on the mobile project')
+  test.setTimeout(240_000)
+  await gate1Canvas(page, 375, 812, 220)
 })
 
 test('E8 desktop: two say lines, one each — per-block dropdowns, global rewrite is repairable per block', async ({ page }, testInfo) => {
