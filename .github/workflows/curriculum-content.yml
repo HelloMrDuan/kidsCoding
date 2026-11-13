@@ -46,6 +46,7 @@ on:
       - 'examples/scratch/g3/**'
       - 'examples/scratch/g2/**'
       - 'apps/web/src/features/python-lab/**'
+      - 'apps/web/tests/e2e/python-multi.spec.ts'
       - 'apps/web/src/features/progress/local-practice*'
       - 'apps/web/src/features/progress/cloud-python-drafts*'
       - 'apps/web/src/app/api/practice/drafts/**'
@@ -276,6 +277,90 @@ jobs:
         run: npx playwright install chrome --with-deps
       - name: Run first lesson with actual Pyodide Python in a sandboxed browser
         run: npx playwright test tests/e2e/python-lab.spec.ts tests/e2e/python-multi.spec.ts --project=desktop
+
+  # P3-U1-L01《读写日记文本》：真实 Pyodide 执行 + CSV 边界 + 保存恢复（本课沙箱走 Python 多题实验室）+ 真实 Chrome。
+  # OPS-031：三视口课堂（9 个实例），按视口分成 desktop / tablet / phone 三个并行分片（每片 3 个：主运行 5/5 + 练习 B + 视口适配）。
+  # 用例标题带 [viewport] 标记，按标题过滤（确定的分片，不是 playwright 的 --shard）。runs-on 固定 ubuntu-24.04、每 Job 15 分钟上限。
+  # 本 Job 只在含 L01 用例的分支上真实运行（叠层在 #243 之上）；主线尚无 L01 用例时不得以空跑充数。
+  p3-u1-l01-browser-trial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # python-multi.spec.ts 里的 L01 用例按 [viewport] 分片：每端 3 个（主运行 + 练习 B + 视口适配），跳过 0 个。
+          - viewport: desktop
+            total: 3
+            skipped: 0
+          - viewport: tablet
+            total: 3
+            skipped: 0
+          - viewport: phone
+            total: 3
+            skipped: 0
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
+        timeout-minutes: 4
+        run: |
+          for attempt in 1 2; do
+            if timeout 100 npx playwright install chrome --with-deps; then
+              echo "Chrome installed on attempt $attempt"
+              exit 0
+            fi
+            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
+            sleep 5
+          done
+          echo "::error::Chrome install failed after 2 attempts"
+          exit 1
+      - name: Run P3-U1-L01 spec (${{ matrix.viewport }} group) with real Chrome
+        timeout-minutes: 7
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/p3-u1-l01-${{ matrix.viewport }}/junit.xml
+          VIEWPORT: ${{ matrix.viewport }}
+        run: npx playwright test tests/e2e/python-multi.spec.ts --project=desktop --grep "P3-U1-L01.*\\[${VIEWPORT}\\]" --workers=2 --reporter=list,junit --trace=retain-on-failure --output=test-results/p3-u1-l01-${VIEWPORT}
+      - name: Verify the executed counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        env:
+          WANT_TOTAL: ${{ matrix.total }}
+          WANT_SKIPPED: ${{ matrix.skipped }}
+          VIEWPORT: ${{ matrix.viewport }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          vp = os.environ['VIEWPORT']
+          root = ET.parse(f'test-results/p3-u1-l01-{vp}/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          want_total = int(os.environ['WANT_TOTAL'])
+          want_skipped = int(os.environ['WANT_SKIPPED'])
+          print(f'p3-u1-l01-browser-trial [{vp}]: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # 数量变化必须有意识地改这里（matrix 里的 total / skipped），防止 spec 被悄悄跳过或缩水。
+          assert failures == 0 and errors == 0, 'failures present'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped}'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-u1-l01-browser-trial-${{ matrix.viewport }}
+          path: apps/web/test-results/
 
   a0-classify-browser-trial:
     runs-on: ubuntu-24.04

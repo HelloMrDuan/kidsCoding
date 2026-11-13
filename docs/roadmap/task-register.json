@@ -3759,7 +3759,10 @@
         "台账 P3-U1-L01 evidence.realE2E 已填结构化证据",
         "不影响已有课程 CI（触发路径只含 P3-U1-L01 相关文件）"
       ],
-      "evidence": {},
+      "evidence": {
+        "branch": "muse-c/ops-031-p3-u1-l01-e2e",
+        "pr": 519
+      },
       "notes": "首席 2026-11-12 裁定（Kitten 总控）：#243 的 E2E 须按独立 Task-ID 接入 CI。主线 CI 现只有通用 python-multi 的桌面 Job，非 P3-U1-L01 三端专属；#243 台账 realE2E 为 null。实施者：4 号。文件责任：curriculum-content.yml（只增 P3-U1-L01 Job）、E2E spec、台账 P3-U1-L01 行。不得混进 #243 课程功能 PR 的视觉整改（UX-604 另立）。"
     },
     {
