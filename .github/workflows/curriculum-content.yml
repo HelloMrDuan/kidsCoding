@@ -75,7 +75,9 @@ on:
       - 'apps/web/src/features/lessons/playable-stage/**'
       - 'apps/web/src/app/learn/lesson/**'
       - 'apps/web/src/app/learn/remedial/**'
+      - 'apps/web/src/app/learn/story-lab/**'
       - 'apps/web/tests/e2e/guest-story.spec.ts'
+      - 'apps/web/tests/e2e/g1-u1-l01-workspace.spec.ts'
       - 'apps/web/tests/e2e/blockly-first-run.spec.ts'
       - 'apps/web/tests/e2e/blockly-forest-sequence.spec.ts'
       - 'apps/web/tests/e2e/blockly-meadow-journey.spec.ts'
@@ -633,6 +635,191 @@ jobs:
       - name: Run A1-U4-L02 permission-checklist lesson spec with real Chrome
         run: npx playwright test tests/e2e/ai-python-a1-u4-l02.spec.ts --project=desktop
 
+  g1-u1-l01-check-desktop:
+    # OPS-032 (2026-11-12, reshaped 2026-11-13 for SYS-108 §2): G1-U1-L01 E2E
+    # into CI, three parallel shards (desktop / tablet / mobile). One Job
+    # per shard — shards must NOT be serial legs inside one Job (§2.4).
+    # Chrome-installing jobs pin to ubuntu-24.04; ubuntu-latest is migrating
+    # to Ubuntu 26.04 and breaks the Chrome install (OPS-029 Plan A).
+    # Do not change any other job's runs-on here.
+    # Sharding (§2.2, --grep on stable titles, proven by --list):
+    # - desktop shard: --project=desktop --grep "E1 |E3 |E5 |E6 |E8 |E9 |E10 "
+    #   = 7 tests (E1/E3/E5/E6/E8/E9/E10 at 1440x900), 0 skipped;
+    # - tablet shard: --project=desktop --grep "E4 |E7 tablet"
+    #   = 2 tests (E4 + E7-tablet at 768x1024), 0 skipped;
+    # - mobile shard: --project=mobile --grep "E2 |E7 mobile"
+    #   = 2 tests (E2 + E7-mobile at 375x812, real touch), 0 skipped.
+    # 7+2+2 = 11 = file total after the E7 split (E7 was one test looping
+    # over 768 and 375; it is now E7-tablet + E7-mobile sharing one
+    # helper, all assertions preserved). No overlap, no omission.
+    # NOTE: --grep matches the title path including the file name, so
+    # anchored patterns (^E1 ...) do NOT match — use unanchored
+    # substrings with a trailing space (E1 + space never matches E10).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Run G1-U1-L01 dedicated unit tests
+        run: npx vitest run src/features/lessons/story/g1-u1-l01-contract.test.ts src/features/lessons/story/g1-u1-l01-draft.test.ts src/features/lessons/story/g1-u1-l01-judging.test.ts src/features/lessons/story/g1-u1-l01-blockly-ops.test.ts src/features/lessons/story/g1-u1-l01-run-adapter.test.ts src/features/lessons/story/g1-u1-l01-slot.test.tsx src/content/curriculum/g1-u1-story-lessons.test.ts
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run G1-U1-L01 desktop shard with real Chrome (1440x900)
+        timeout-minutes: 7
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g1-u1-l01-desktop/junit.xml
+        run: npx playwright test tests/e2e/g1-u1-l01-workspace.spec.ts --project=desktop --grep "E1 |E3 |E5 |E6 |E8 |E9 |E10 " --reporter=list,junit --output=test-results/g1-u1-l01-desktop
+      - name: Verify desktop shard counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        env:
+          WANT_TOTAL: '7'
+          WANT_SKIPPED: '0'
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          root = ET.parse('test-results/g1-u1-l01-desktop/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          want_total = int(os.environ['WANT_TOTAL'])
+          want_skipped = int(os.environ['WANT_SKIPPED'])
+          print(f'g1-u1-l01-check-desktop [desktop]: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # Count changes must be a conscious edit here (WANT_TOTAL /
+          # WANT_SKIPPED), so the spec cannot be silently skipped or shrunk.
+          assert failures == 0 and errors == 0, 'failures present'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped}'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g1-u1-l01-desktop-evidence
+          path: apps/web/test-results/
+
+  g1-u1-l01-check-tablet:
+    # OPS-032 tablet shard (SYS-108 §2): E4 + E7-tablet at 768x1024.
+    # Unit tests run once, in the desktop shard; this shard runs only
+    # its own E2E shard so a shard failure attributes to its own tests.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run G1-U1-L01 tablet shard with real Chrome (768x1024)
+        timeout-minutes: 7
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g1-u1-l01-tablet/junit.xml
+        run: npx playwright test tests/e2e/g1-u1-l01-workspace.spec.ts --project=desktop --grep "E4 |E7 tablet" --reporter=list,junit --output=test-results/g1-u1-l01-tablet
+      - name: Verify tablet shard counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        env:
+          WANT_TOTAL: '2'
+          WANT_SKIPPED: '0'
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          root = ET.parse('test-results/g1-u1-l01-tablet/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          want_total = int(os.environ['WANT_TOTAL'])
+          want_skipped = int(os.environ['WANT_SKIPPED'])
+          print(f'g1-u1-l01-check-tablet [tablet]: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # Count changes must be a conscious edit here (WANT_TOTAL /
+          # WANT_SKIPPED), so the spec cannot be silently skipped or shrunk.
+          assert failures == 0 and errors == 0, 'failures present'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped}'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g1-u1-l01-tablet-evidence
+          path: apps/web/test-results/
+
+  g1-u1-l01-check-mobile:
+    # OPS-032 mobile shard (SYS-108 §2): E2 + E7-mobile at 375x812, real touch.
+    # Unit tests run once, in the desktop shard; this shard runs only
+    # its own E2E shard so a shard failure attributes to its own tests.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Install real Chrome for browser E2E
+        run: npx playwright install chrome --with-deps
+      - name: Run G1-U1-L01 mobile shard with real Chrome (375x812 touch)
+        timeout-minutes: 7
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g1-u1-l01-mobile/junit.xml
+        run: npx playwright test tests/e2e/g1-u1-l01-workspace.spec.ts --project=mobile --grep "E2 |E7 mobile" --reporter=list,junit --output=test-results/g1-u1-l01-mobile
+      - name: Verify mobile shard counts (no silent skipping or shrinking)
+        timeout-minutes: 1
+        env:
+          WANT_TOTAL: '2'
+          WANT_SKIPPED: '0'
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          root = ET.parse('test-results/g1-u1-l01-mobile/junit.xml').getroot()
+          suites = [root] if root.tag == 'testsuite' else list(root.iter('testsuite'))
+          tests = sum(int(s.get('tests', 0)) for s in suites)
+          failures = sum(int(s.get('failures', 0)) for s in suites)
+          errors = sum(int(s.get('errors', 0)) for s in suites)
+          skipped = sum(int(s.get('skipped', 0)) for s in suites)
+          passed = tests - failures - errors - skipped
+          want_total = int(os.environ['WANT_TOTAL'])
+          want_skipped = int(os.environ['WANT_SKIPPED'])
+          print(f'g1-u1-l01-check-mobile [mobile]: total={tests} passed={passed} skipped={skipped} failed={failures} errors={errors}')
+          # Count changes must be a conscious edit here (WANT_TOTAL /
+          # WANT_SKIPPED), so the spec cannot be silently skipped or shrunk.
+          assert failures == 0 and errors == 0, 'failures present'
+          assert tests == want_total, f'unexpected total count: {tests}'
+          assert skipped == want_skipped, f'unexpected skipped count: {skipped}'
+          assert passed == want_total - want_skipped, f'unexpected passed count: {passed}'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g1-u1-l01-mobile-evidence
+          path: apps/web/test-results/
   python-batch3:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
