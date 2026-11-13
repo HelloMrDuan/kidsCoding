@@ -4701,9 +4701,9 @@
       "unitId": "P3-U1",
       "focusConcept": "CSV",
       "plannedLearningOutcome": "能使用CSV解释并完成「读写日记文本」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
-      "detailAssetPresent": false,
+      "detailAssetPresent": true,
       "prerequisiteLessonIds": [],
       "acceptance": [
         "以真实执行器完成本课的指定知识点「CSV」，不得用静态播放代替",
@@ -4712,13 +4712,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/243",
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/python-multi.spec.ts（P3-U1-L01 主运行 5/5 + 练习 B + 三视口适配，按 [viewport] 分片）；CI Job p3-u1-l01-browser-trial（desktop / tablet / phone 三个并行分片，每端 3 个用例）在真实 Chrome 上实际运行并用 JUnit 核对数量（PR #519，run 43209282564，三端各 total=3 passed=3 skipped=0 failed=0）；通用 python-browser-trial 在 #243 新头 c5b1cad1 上 19 passed（含 5 个 L01 用例）",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Muse-C：/learn/python-lab/P3-U1-L01 CSV 读加写 Draft PR #243，头 c5b1cad1（2026-11-12 变基到主线 8005a829，含已合并 #517 V2 与 #515；原头 0b867f6f 已备份）。以下为修改前 HEAD（c5b1cad1）的验证结果：diary_entry 本地 Python 精确核对 5/5、本地 vitest 16/16（含 cloud-python-drafts）、本课 tsc 0、ESLint 0 错、生产构建通过；本机真实浏览器三端加载/编辑/布局实测无横向溢出（1440x900、768x1024、375x812），主运行 5/5，练习 B 正常 CSV 与缺失日期错误例均真实返回，刷新后草稿含 DictWriter 且保存文案正常，截图 resync-*（桌面/平板/手机 3 张）在本地证据目录；新头 CI 52 项 49 success + 3 skipped，0 失败（python-browser-trial 19 passed，含 5 个 L01 用例）。教学合同 AI 自评 83/100（非独立参考）；主 Muse 已给工程及 V2 视觉初步 PASS（最终复核待定）；独立人工教研与儿童试学尚未完成。保持 in_review，未合并，未发布，全量目录仍为 outline_not_playable。本次仅修正 notes 文字，不改代码；新头 CI 须重新验证。"
     },
     {
       "id": "P3-U1-L02",
