@@ -4756,7 +4756,7 @@
       "unitId": "P3-U1",
       "focusConcept": "JSON",
       "plannedLearningOutcome": "能使用JSON解释并完成「JSON通讯录」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "in_review",
+      "status": "merged_waiting_ci",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": false,
       "prerequisiteLessonIds": [
@@ -4770,12 +4770,13 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/274",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "52e8e3336750e98b7a746776d09c3d2cecf61c8f",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41283261482",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/41283261466",
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "Muse-C：/learn/python-lab/P3-U1-L03 JSON 通讯录 Draft PR #274，头 d7ce522，本地 Python 参考实现 4/4、本地 vitest 7/7；本机真实浏览器 E2E 尚未执行，V2 视觉对齐未宣称通过、独立人工教研复核未完成，保持 in_review，未合并，未发布，catalogStatus 仍为 outline_not_playable。"
+      "notes": "Muse-C：/learn/python-lab/P3-U1-L03 JSON 通讯录 Draft PR #274，头 d7ce522，本地 Python 参考实现 4/4、本地 vitest 7/7；本机真实浏览器 E2E 尚未执行，V2 视觉对齐未宣称通过、独立人工教研复核未完成，保持 in_review，未合并，未发布，catalogStatus 仍为 outline_not_playable。已合并事实：合并 52e8e333、头 b712c757；主线 curriculum（41283261482）与 task（41283261466）均成功。"
     },
     {
       "id": "P3-U1-L04",
