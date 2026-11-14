@@ -337,7 +337,10 @@ test('E5 desktop: switching lessonId does not pollute the saved draft', async ({
   const saved = await page.evaluate((key) => window.localStorage.getItem(key), KEY)
   expect(saved).not.toBeNull()
 
-  const resp = await page.goto('/learn/story-lab/G1-U1-L02')
+  // G1-U1-L02 is a real lesson since PR #530, so the 404 probe must use a
+  // lessonId that truly does not exist; the intent (switching lessonId
+  // must not pollute the saved draft) is unchanged.
+  const resp = await page.goto('/learn/story-lab/G1-U1-L99')
   expect(resp?.status()).toBe(404)
   await expect.poll(() => page.evaluate((key) => window.localStorage.getItem(key), KEY)).toBe(saved)
   expect(await page.evaluate(() => window.localStorage.getItem('kidscoding-draft:G1-U1-L02'))).toBeNull()
