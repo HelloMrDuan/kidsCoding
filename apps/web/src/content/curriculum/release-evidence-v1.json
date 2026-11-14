@@ -642,6 +642,32 @@
         "status": "unchecked"
       }
     },
+    "G3-U1-L01": {
+      "contentReviewed": {
+        "status": "unchecked"
+      },
+      "engineProductionReady": {
+        "status": "unchecked",
+        "note": "画笔试玩未完成三端验收"
+      },
+      "assessmentE2EPassed": {
+        "status": "unchecked",
+        "note": "新 E2E 待新头 CI 运行"
+      },
+      "licensedAssetsReady": {
+        "status": "unchecked",
+        "note": "课节所需素材未生产"
+      },
+      "progressVerified": {
+        "status": "unchecked"
+      },
+      "minorPrivacyApproved": {
+        "status": "unchecked"
+      },
+      "humanApproved": {
+        "status": "unchecked"
+      }
+    },
     "G3-U1-L02": {
       "contentReviewed": {
         "status": "unchecked"

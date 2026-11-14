@@ -46,7 +46,15 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
             <Link data-testid="scratch-trial-entry" href={trial} className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">体验 Scratch VM →</Link>
           </section>
         ) : null}
-        {trial && maturity.engine === 'scratch-vm' && !lesson.id.startsWith('G2-') ? (
+        {trial && maturity.engine === 'scratch-vm' && lesson.id === 'G3-U1-L01' ? (
+          <section className="rounded-[2rem] border-2 border-indigo-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-bold text-indigo-700">Scratch VM 真实执行 · 画笔实验</p>
+            <h2 className="mt-2 text-xl font-black">运行原创画星形 Scratch 项目</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">加载真正的 .sb3 文件，在真实 Scratch VM 里运行本课主项目，看画笔自制积木画出 6 颗尺寸递增的星；可下载 .sb3 到兼容 Scratch 编辑器继续做练习与找错。课堂内暂不提供画笔积木编辑。此实验仍不保存正式成绩。</p>
+            <Link data-testid="scratch-trial-entry" href={trial} className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">体验 Scratch VM →</Link>
+          </section>
+        ) : null}
+        {trial && maturity.engine === 'scratch-vm' && !lesson.id.startsWith('G2-') && lesson.id !== 'G3-U1-L01' ? (
           <section className="rounded-[2rem] border-2 border-indigo-200 bg-white p-6 shadow-sm">
             <p className="text-xs font-bold text-indigo-700">Scratch VM 真实执行 · 受限积木编辑</p>
             <h2 className="mt-2 text-xl font-black">运行原创流星分身 Scratch 项目</h2>
