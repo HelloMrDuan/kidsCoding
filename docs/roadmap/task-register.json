@@ -3770,7 +3770,7 @@
       "title": "G1-U1-L01 E2E 接入 GitHub CI（三端分片，SYS-108）",
       "priority": "P1",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "只增：.github/workflows/curriculum-content.yml 增加 G1-U1-L01 专属 E2E Job（三端分片：桌面 1440×900、平板 768×1024、手机 375×812，显式文件分片，非 --shard；runs-on 固定 ubuntu-24.04、每 Job 15 分钟上限、真实 Chrome、JUnit 核对数量、无 continue-on-error）；E2E spec g1-u1-l01-workspace.spec.ts（E1–E10，含 E7 画布门禁）接入；台账 G1-U1-L01 evidence.realE2E 回填。不改其他课程 Job、不改共享壳（壳布局改动属 OPS-033）、不改三层判定语义。",
       "acceptance": [
@@ -3779,7 +3779,19 @@
         "台账 G1-U1-L01 evidence.realE2E 已填结构化证据",
         "不影响已有课程 CI（触发路径只含 G1-U1-L01 相关文件）"
       ],
-      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/522"},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/522",
+        "mergeCommit": "de3268811e3631a16778c0b6487c331089767b9c",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/43412551754",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/43412551720",
+        "tests": [
+          "PR #522 门禁：60 项检查 57 成功 + 3 跳过、0 失败（头 e260a41b；合并 SHA de3268811e3631a16778c0b6487c331089767b9c）",
+          "G1 三端专属 Job（run 43406566891）：desktop 7 passed / 0 skipped / 0 failed、tablet 2/0/0、mobile 2/0/0，合计 11/0/0，真实 Chrome，JUnit 数量核对通过，三片 artifact 已上传",
+          "main CI（主线头 de326881）：课程 43412551754（47 Job 全 success）、追踪 43412551720、deploy-pipeline 43412551810 均 success",
+          "台账校验：scripts/check-task-ledger.py TASK_VALIDATE_PR=1 校验通过（changed == {OPS-032}）"
+        ],
+        "reviewer": "4号：轻量复核 PASS（Review 5889376863，头 e260a41b）；正式复审 5889119658 七项技术验证全 PASS，唯一阻塞（课节台账 realE2E 为 null）已由 #272 回填解除"
+      },
       "notes": "首席 2026-11-12 裁定（Kitten 总控）：#272 的 E2E 须按独立 Task-ID 接入 CI。#272 头 bedab301 已迁入 LessonWorkspace，E2E spec g1-u1-l01-workspace.spec.ts 已建（E1–E10），但 curriculum-content.yml 中 0 处提及 g1-u1，未进 CI。实施者：2 号。文件责任：curriculum-content.yml（只增 G1-U1-L01 Job）、E2E spec、台账 G1-U1-L01 行。E7 壳布局改动属 OPS-033，不混入本任务。2026-11-12 OPS-032 实施（本地提交，未推送，未建 PR）：curriculum-content.yml 新增 g1-u1-l01-check（runs-on ubuntu-24.04、timeout 15 分钟、真实 Chrome、desktop/mobile 双项目 + JUnit 数量核对、无 continue-on-error）与两行本课触发 paths；2026-11-13 改为叠层 PR：基底为 #272 新头 5e6436b4（已含课节文件与 spec，含 EVIDENCE 可移植修复、E7 三块断言与 E7 平板/手机拆分），CI 不再缺文件；E7 已闭合（OPS-033 #518 已合并；E7 联合验证 10/10/0，手机栈底 733≤750）。evidence.pr 待推送建 PR 后填，届时状态翻 in_review。2026-11-13 #522 已建，状态已翻 in_review，evidence.pr 已填；三端分片整改（SYS-108 §2）：单 Job 串行 desktop+mobile 改为 desktop/tablet/mobile 三并行 Job（g1-u1-l01-check-desktop/tablet/mobile），每片独立 JUnit 核对与 artifact 上传；E7 拆为平板/手机两测（#272 课节分支），三片 --list 7+2+2=11，无遗漏、无重复。"
     },
     {
