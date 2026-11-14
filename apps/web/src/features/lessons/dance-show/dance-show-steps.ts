@@ -147,7 +147,7 @@ export const DANCE_SHOW_STEPS: DanceShowStep[] = [
       'Spotlight 是聚光灯舞台，Bedroom 3 是卧室，换背景就像换演出场地。',
       '换背景不用改脚本，点一下就行；想让背景自动换，再加“换成背景”积木。',
     ],
-    checkHint: '检查：当前背景已经不是 backdrop1 了，或者项目里多了一块“换成背景”积木。',
+    checkHint: '检查：当前背景已经不是 Bedroom 3 了，或者项目里多了一块“换成背景”积木。',
   },
   {
     id: 'step-7-challenge',

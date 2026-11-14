@@ -254,7 +254,7 @@ export function evaluateProject(project: ScratchProject): StepCheckResult[] {
       pass: abbyScripts >= 3 && (repeatCount > 0 || foreverCount >= 3),
       detail:
         abbyScripts >= 3
-          ? `Abby 现在有 ${abbyScripts} 条脚本（原来 2 条），你编的新脚本在里面；循环积木：重复执行 ${repeatCount} 块、重复执行 ${foreverCount} 块。`
+          ? `Abby 现在有 ${abbyScripts} 条脚本（原来 2 条），你编的新脚本在里面；循环积木：重复执行 ${repeatCount} 块、永远执行 ${foreverCount} 块。`
           : `Abby 只有 ${abbyScripts} 条脚本（原来 2 条），还没编出自己的新脚本。`,
     },
     {
