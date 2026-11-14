@@ -3861,6 +3861,26 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/532"
       },
       "notes": "负责人 2026-11-14 最终裁定：独立兼容性 Spike → 优先集成官方 Scratch GUI；禁自研整套角色/造型/声音/背景编辑器；首版用 GUI 原生界面；样板 10 项全保留，声音首版必需；本轮不改 G0 旧壳。样例 .sb3 已核实（337361 字节，SHA-256 c4948fb79133c4217130b509ef06b307f8dda31823a79681ed8844920380f679；Stage 3 背景+pop，Abby 4 造型+Dance Space，两条绿旗脚本）。验证报告：~/workspace/kidscoding-next-phase/ops-037-spike-report.md。收口（PR #533）：实验页已改为仅限本地开发（生产环境返回 404，不渲染 iframe、不连接 localhost）；Spike 记录已入仓（docs/engineering/ops-037-spike-record.md）。"
+    },
+    {
+      "id": "OPS-038",
+      "title": "Scratch GUI 正式产品接入：standalone 独立部署 + 学习模式《我的舞蹈秀》",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "正式产品接入（第三阶段：学习模式层）。分支 feature/ops-038-dance-show（基底 main 45e61f30）。以已验证的官方 Scratch GUI standalone 为唯一真实项目编辑环境（iframe 嵌入，默认 http://localhost:8601/，NEXT_PUBLIC_SCRATCH_GUI_URL 可覆盖），KidsCoding 只增加学习引导层：桌面样板页 /learn/dance-show（9 步：认识作品、加载 .sb3、观察造型、加循环、调等待节奏、加音乐、换背景、独立挑战、保存展示）；指引为浮层抽屉（可收起，不挤占编辑宽度；实测 GUI 在 ≤1000px 时隐藏 File 菜单，故浮层必需）；评价引擎读导出的 .sb3 的 project.json 结构（角色/造型/背景/声音/脚本）+ 运行结果核对；受控消息接口（严格来源白名单 + 结构校验，禁 postMessage('*')，正式桥接发送端待建）。禁止：改 G2 课程适配器、动受限教学沙箱白名单、改实验页、改 G0 旧壳、提交 .sb3/音频/截图到公开仓库、批量迁移 432 节、改 React 19。",
+      "acceptance": [
+        "桌面样板页 /learn/dance-show 真实加载官方 Scratch GUI（真实 Chromium 1440×900 验证，非占位）",
+        "学习层 9 步完整（目标/操作/三级提示/检查），指引可收起且收起后 GUI 全宽、File 菜单可用",
+        "评价核对真实 project.json 结构与运行结果（导入、绿旗跳舞、改等待变速、音乐可操作、换背景、保存重开保留修改、导出有效），逐项 PASS/FAIL 有浏览器证据",
+        "作品状态经受控接口传递（导出文件通道本地解析 + postMessage 接收端白名单校验），无不受约束的 postMessage('*')",
+        "不改 G2 课程适配器，不动受限教学沙箱白名单，不改实验页与 G0 旧壳，不提交 .sb3/音频/截图到公开仓库"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/534"
+      },
+      "notes": "负责人 2026-11-15 裁定：进入 Scratch 产品化（standalone + 独立部署 + 自研学习模式），不再重复技术选型。第三阶段《我的舞蹈秀》桌面样板：真实浏览器验证 15/15 PASS（导入、绿旗跳舞、音乐 WebAudio 触发、改等待变速、拖拽 repeat、换背景、评价原始 3/9 与改过 9/9、导出有效、重开保留修改、指引收起/展开）；单元测试 11/11，ESLint 干净。真人听音验收待负责人在真实设备完成（无头浏览器只证明 WebAudio 触发，不证明人耳听到）。未解决：生产构建 OOM（6GB Terser）、移动端 375×812 布局不可用、AGPL 合规待法律复核、正式桥接发送端待建。验证脚本与截图仅本地（~/workspace/ops-038-dance-show/），未提交仓库。"
     }
   ]
 }
