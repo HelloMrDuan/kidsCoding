@@ -693,8 +693,8 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/272",
-        "mergeCommit": null,
-        "mainCI": null,
+        "mergeCommit": "b2d7157fa8ac39643e97a79083ebede61a2e8791",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/43409378544",
         "realE2E": "apps/web/tests/e2e/g1-u1-l01-workspace.spec.ts（E1–E10，E7 平板/手机拆分）；OPS-032 PR #522 的 curriculum-content 运行 https://github.com/HelloMrDuan/kidsCoding/actions/runs/43400362608 上 g1-u1-l01-check-desktop/tablet/mobile 三个并行分片在真实 Chrome 上实际运行并用 JUnit 核对数量：desktop 7 passed / 0 skipped / 0 failed，tablet 2 passed / 0 skipped / 0 failed，mobile 2 passed / 0 skipped / 0 failed，合计 11 passed / 0 skipped / 0 failed；三片 artifact 已上传（g1-u1-l01-desktop-evidence、g1-u1-l01-tablet-evidence、g1-u1-l01-mobile-evidence）；E7 手机端三块积木底边 [733, 733, 733] ≤750（CI Job 日志实测），平板 [876, 876, 876] ≤1024",
         "lessonReview": null
       },
