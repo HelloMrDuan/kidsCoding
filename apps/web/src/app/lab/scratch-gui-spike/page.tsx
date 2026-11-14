@@ -1,6 +1,13 @@
 /**
  * OPS-037 Spike 实验页：独立加载原版 Scratch GUI（官方 scratch-gui）。
  *
+ * 仅限本地开发环境（dev-only）：
+ * - 生产环境（NODE_ENV=production）下访问本路由返回 404，不渲染 iframe、
+ *   不连接 localhost。门禁用 next/navigation 的 notFound() 实现。
+ * - 开发环境（NODE_ENV=development）下保持原样可用。
+ * - 本页不是正式产品页面，只做技术验证；生产构建中不得暴露可直接访问的
+ *   实验页或自动连接访客 localhost。
+ *
  * 这不是正式产品页面，只做技术验证：
  * - 实验页通过 iframe 加载 scratch-editor 单体仓库的 standalone 开发版 GUI
  *   （默认 http://localhost:8601/，可用 NEXT_PUBLIC_SCRATCH_GUI_URL 覆盖）。
@@ -15,14 +22,19 @@
  * 然后访问本页。
  *
  * 验证报告：~/workspace/kidscoding-next-phase/ops-037-spike-report.md
+ * Spike 记录：docs/engineering/ops-037-spike-record.md
  */
 
-'use client'
+import { notFound } from 'next/navigation'
 
 const GUI_URL =
   process.env.NEXT_PUBLIC_SCRATCH_GUI_URL ?? 'http://localhost:8601/'
 
 export default function ScratchGuiSpikePage() {
+  // 仅限本地开发：生产环境下返回 404，不渲染 iframe、不连接 localhost。
+  if (process.env.NODE_ENV === 'production') {
+    notFound()
+  }
   return (
     <main style={{ padding: 16, fontFamily: 'system-ui, sans-serif' }}>
       <h1 style={{ fontSize: 20, margin: '0 0 8px' }}>

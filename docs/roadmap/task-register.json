@@ -3860,7 +3860,7 @@
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/532"
       },
-      "notes": "负责人 2026-11-14 最终裁定：独立兼容性 Spike → 优先集成官方 Scratch GUI；禁自研整套角色/造型/声音/背景编辑器；首版用 GUI 原生界面；样板 10 项全保留，声音首版必需；本轮不改 G0 旧壳。样例 .sb3 已核实（337361 字节，SHA-256 c4948fb79133c4217130b509ef06b307f8dda31823a79681ed8844920380f679；Stage 3 背景+pop，Abby 4 造型+Dance Space，两条绿旗脚本）。验证报告：~/workspace/kidscoding-next-phase/ops-037-spike-report.md。"
+      "notes": "负责人 2026-11-14 最终裁定：独立兼容性 Spike → 优先集成官方 Scratch GUI；禁自研整套角色/造型/声音/背景编辑器；首版用 GUI 原生界面；样板 10 项全保留，声音首版必需；本轮不改 G0 旧壳。样例 .sb3 已核实（337361 字节，SHA-256 c4948fb79133c4217130b509ef06b307f8dda31823a79681ed8844920380f679；Stage 3 背景+pop，Abby 4 造型+Dance Space，两条绿旗脚本）。验证报告：~/workspace/kidscoding-next-phase/ops-037-spike-report.md。收口（PR #533）：实验页已改为仅限本地开发（生产环境返回 404，不渲染 iframe、不连接 localhost）；Spike 记录已入仓（docs/engineering/ops-037-spike-record.md）。"
     }
   ]
 }
