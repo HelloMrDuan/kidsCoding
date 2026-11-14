@@ -3674,7 +3674,7 @@
       "title": "Runner 环境修复（Ubuntu 26.04 兼容）",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [],
       "scope": "只改 3 个 workflow 文件中 19 个 Job 的 runs-on: ubuntu-latest → ubuntu-24.04：.github/workflows/curriculum-content.yml 17 个（python-browser-trial、a0-classify-browser-trial、g2-u3-browser-trial、g2-u1-viewport-trial、ai-python-browser-trial、a1-u3-local-trial、a1-u1-l06-second-batch、a1-u3-l02-summary、a1-u3-l03-validation、a1-u3-l06-qa、python-batch3、portfolio-ux302、parent-growth-ux503、scratch-touch-browser、scratch-v2-visual-browser、g2-u3-l02-browser-trial、g2-u3-l03-browser-trial）、deploy.yml 1 个（e2e-blockly）、lesson-workspace-e2e.yml 1 个（lesson-workspace-e2e）。只改 runs-on 标签，不动步骤、命令、超时、触发条件、测试范围与断言；不加 continue-on-error；不跳过失败测试；不建缓存系统；不升级 @playwright/test（保持 1.58.2）；不改课程代码。",
       "acceptance": [
@@ -3686,10 +3686,15 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/505",
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": [],
-        "reviewer": null
+        "mergeCommit": "95df5415b9d599b84886c7a791cdb6aae2c97792",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/42765294373",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/42765294536",
+        "tests": [
+          "PR #505 门禁：43 项检查 40 成功 + 3 跳过、0 失败（头 40d1fb55；合并 SHA 95df5415b9d599b84886c7a791cdb6aae2c97792）",
+          "主线 CI（主线头 95df5415）：课程 42765294373（29 Job 全 success）、追踪 42765294536、deploy-pipeline 42765294403、LessonWorkspace E2E 42765294407 均 success",
+          "台账校验：scripts/check-task-ledger.py TASK_VALIDATE_PR=1 校验通过（changed == {OPS-029}）"
+        ],
+        "reviewer": "首席（kid小宝）非作者复核 PASS（关账复核 #505 diff：19 处 runs-on ubuntu-latest→ubuntu-24.04，0 处非 runs-on 改动，与 scope 一致；#505 本身 0 条 Review 记录）"
       },
       "notes": "首席裁定（2026-11-10）：方案 A。根因：@playwright/test 1.58.2 在 Ubuntu 26.04 上无 ffmpeg 依赖表，ubuntu-latest 切到 26.04 后 npx playwright install chrome --with-deps 报错；主线 f3b44f5a 的 curriculum-content 运行 17 个 Job 全死在安装步骤。实现分支 muse-c/ops-029-runner-ubuntu-2404，基底主线 f3b44f5a。OPS-030 notes 曾写 OPS-029 预留给 Chrome 缓存，已被本次首席裁定取代；缓存与 Playwright 版本升级属后续优化，不在本任务内。"
     },
