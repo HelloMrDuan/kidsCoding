@@ -3842,6 +3842,25 @@
       ],
       "evidence": {"branch": "muse-c/ux-604-python-v2", "pr": 517},
       "notes": "首席 2026-11-12 裁定（Kitten 总控，#243 视觉整改）：查重后新立本号（台账无现有 Python 视觉任务）。duan 2026-11-12 指令：立即处理视觉整改协调，不等其他审核结束；UI PR 合并并完成主线验证后，#243 再同步 main、完成视觉验收和非作者审核。实施者：4 号（#243 作者）或首席指定。文件责任：python-multi-lab.tsx、python-lab 路由页及相关样式/UI 测试。不得改引擎/沙箱/评测/草稿/进度。9 课范围已实核（主线 pythonPracticeLessons 8 项 + P3-U1-L01）。"
+    },
+    {
+      "id": "OPS-037",
+      "title": "Scratch GUI 兼容性 Spike 与舞蹈样板“我的舞蹈秀”（第一、二阶段）",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "独立 Spike 分支 spike/ops-037-scratch-gui（基底 main 348bf069）。第一阶段：验证官方 scratch-gui（scratch-editor 单体仓库）与本仓库 Next.js/React/构建工具及 Scratch VM 的兼容性，在独立实验页面（apps/web/src/app/lab/scratch-gui-spike/page.tsx）加载原版 GUI，评估 AGPL-3.0-only 合规影响。第二阶段：用负责人提供的《Scratch作品.sb3》（仅本地测试）验证舞蹈样板 10 项。禁止：改 G2 课程适配器、动受限教学沙箱白名单、把 .sb3 或其中音频素材提交到公开仓库、大范围重写 LessonWorkspace、批量迁移课程、改 G0 旧壳。",
+      "acceptance": [
+        "独立实验页面真实加载原版 Scratch GUI（本地开发服务器 + 真实 Chromium 验证，非占位）",
+        "舞蹈样板 10 项逐项 PASS/FAIL 均有真实浏览器证据（截图与操作记录），不成功项写具体错误与最小修复路径",
+        "AGPL-3.0-only 合规评估有明确结论（能否正式采用、采用条件、须做的合规动作）",
+        "不改 G2 课程适配器，不动受限教学沙箱白名单，不提交 .sb3 或音频素材到公开仓库"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/532"
+      },
+      "notes": "负责人 2026-11-14 最终裁定：独立兼容性 Spike → 优先集成官方 Scratch GUI；禁自研整套角色/造型/声音/背景编辑器；首版用 GUI 原生界面；样板 10 项全保留，声音首版必需；本轮不改 G0 旧壳。样例 .sb3 已核实（337361 字节，SHA-256 c4948fb79133c4217130b509ef06b307f8dda31823a79681ed8844920380f679；Stage 3 背景+pop，Abby 4 造型+Dance Space，两条绿旗脚本）。验证报告：~/workspace/kidscoding-next-phase/ops-037-spike-report.md。"
     }
   ]
 }
