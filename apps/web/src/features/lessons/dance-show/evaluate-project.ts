@@ -47,6 +47,96 @@ export interface StepCheckResult {
   detail: string
 }
 
+/**
+ * 保存→关闭→重新打开的真实恢复证据（步骤 8 只认这个，不认“文件里有没有改”）。
+ * 由页面在确实发生“保存后重新加载”时提供：库里有上次保存的作品
+ * （savedAt），本会话通过桥接把它载入 GUI 并验证非空（loadedAt，
+ * restored 为真）。projectHash 把证据绑定到恢复当时的作品内容上：
+ * 恢复之后又改过的作品不能“搭便车”——步骤 8 还要求当前作品的哈希
+ * 与证据一致（见 evaluateProject）。
+ */
+export interface RestoreEvidence {
+  savedAt: number
+  loadedAt: number
+  restored: boolean
+  projectHash: string
+}
+
+/**
+ * 作品内容的规范哈希（cyrb53，确定性身份标识，非密码学哈希）：
+ * 先把 project.json 按 key 排序规范化再哈希，VM 往返重排 key 顺序
+ * 不影响结果；内容一变哈希就变。步骤 8 用它核对“重新打开的作品
+ * 是不是当初保存的那一份修改”。
+ */
+export function projectHash(project: ScratchProject): string {
+  const canonicalize = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(canonicalize)
+    if (value && typeof value === 'object') {
+      const obj = value as Record<string, unknown>
+      const out: Record<string, unknown> = {}
+      for (const k of Object.keys(obj).sort()) out[k] = canonicalize(obj[k])
+      return out
+    }
+    return value
+  }
+  const text = JSON.stringify(canonicalize(project))
+  let h1 = 0xdeadbeef
+  let h2 = 0x41c6ce57
+  for (let i = 0; i < text.length; i++) {
+    const ch = text.charCodeAt(i)
+    h1 = Math.imul(h1 ^ ch, 2654435761)
+    h2 = Math.imul(h2 ^ ch, 1597334677)
+  }
+  h1 =
+    Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+    Math.imul(h2 ^ (h2 >>> 13), 3266489909)
+  h2 =
+    Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+    Math.imul(h1 ^ (h1 >>> 13), 3266489909)
+  return (
+    (h2 >>> 0).toString(16).padStart(8, '0') +
+    (h1 >>> 0).toString(16).padStart(8, '0')
+  )
+}
+
+/**
+ * 桥接（或未来对端）能提供的真实运行观测值。原型 bridge.js 不发本字段，
+ * 没有时评价如实标注“未观测到实际运行过程”，不伪造。
+ */
+export interface RunObservations {
+  /** GUI 里绿旗被点过。 */
+  greenFlagClicked?: boolean
+  /** 造型确实切换过。 */
+  costumeSwitched?: boolean
+  /** 声音确实播放过（只证明触发，不证明人耳听到）。 */
+  soundPlayed?: boolean
+}
+
+export interface EvaluationOptions {
+  restoreEvidence?: RestoreEvidence
+  runObservations?: RunObservations
+  /** 当前被评价作品的 projectHash（与恢复证据的 projectHash 比对用）。 */
+  projectHash?: string
+}
+
+/**
+ * 评价口径说明（页面展示用）：自动评价核对的是项目结构与已观测的
+ * 运行证据；没有运行观测值时明确标注局限，不宣称已验证每位孩子
+ * 的实际运行结果。
+ */
+export function evaluationScopeNote(
+  observations?: RunObservations,
+): string {
+  const observed: string[] = []
+  if (observations?.greenFlagClicked) observed.push('绿旗被点击')
+  if (observations?.costumeSwitched) observed.push('造型确实切换过')
+  if (observations?.soundPlayed) observed.push('声音播放被触发')
+  if (observed.length > 0) {
+    return `本次评价基于项目结构与已观测的运行证据（${observed.join('、')}）。`
+  }
+  return '本次评价基于项目结构，未观测到实际运行过程（舞台是不是真的在变、音乐是不是真的响，要孩子自己看、自己听）。'
+}
+
 /** 从 .sb3 文件（ZIP）中读出 project.json 并解析。 */
 export async function parseSb3(data: ArrayBuffer): Promise<ScratchProject> {
   const zip = await JSZip.loadAsync(data)
@@ -85,13 +175,66 @@ function countOpcode(target: ScratchTarget, opcode: string): number {
   return allBlocks(target).filter((b) => b.opcode === opcode).length
 }
 
+/**
+ * 能开始一条脚本的帽子积木（绿旗、按键、广播、克隆、自定义积木定义等）。
+ * 只有从帽子开始的脚本点绿旗才会跑；没有帽子的浮动积木不算脚本。
+ */
+function isHatOpcode(opcode: string): boolean {
+  return (
+    opcode.startsWith('event_') ||
+    opcode === 'control_start_as_clone' ||
+    opcode === 'procedures_definition'
+  )
+}
+
+/**
+ * 真实连在脚本里的积木 id 集合。
+ * 判据：沿 parent 链向上能走到一块顶层帽子积木。浮动积木
+ * （parent 为空且自身不是帽子）或挂在浮动积木下的积木都不算；
+ * 只数 control_repeat 数量会把没连上的积木也算进去（P2 修复 1）。
+ */
+export function connectedBlockIds(target: ScratchTarget): Set<string> {
+  const blocks = target.blocks ?? {}
+  const connected = new Set<string>()
+  for (const [id, block] of Object.entries(blocks)) {
+    let cur: ScratchBlock | undefined = block
+    let guard = 0
+    let ok = false
+    while (cur && guard < 10000) {
+      guard += 1
+      if (cur.topLevel) {
+        ok = isHatOpcode(cur.opcode)
+        break
+      }
+      const parent: string | null | undefined = cur.parent
+      if (typeof parent !== 'string' || !parent || !blocks[parent]) break
+      cur = blocks[parent]
+    }
+    if (ok) connected.add(id)
+  }
+  return connected
+}
+
+/** 只数真实连在脚本里的某类积木（未连接的不算）。 */
+export function countConnectedOpcode(
+  target: ScratchTarget,
+  opcode: string,
+): number {
+  const connected = connectedBlockIds(target)
+  return Object.entries(target.blocks ?? {}).filter(
+    ([id, b]) => connected.has(id) && b.opcode === opcode,
+  ).length
+}
+
 function countOpcodeInProject(project: ScratchProject, opcode: string): number {
   return project.targets.reduce((n, t) => n + countOpcode(t, opcode), 0)
 }
 
-/** 该目标的顶层脚本数（绿旗帽子等顶层积木的数量）。 */
+/** 该目标的脚本数：只数顶层帽子积木（浮动积木堆不算一条脚本）。 */
 function topLevelScriptCount(target: ScratchTarget): number {
-  return allBlocks(target).filter((b) => b.topLevel).length
+  return allBlocks(target).filter(
+    (b) => b.topLevel && isHatOpcode(b.opcode),
+  ).length
 }
 
 /**
@@ -127,12 +270,14 @@ function readNumericInput(
   return null
 }
 
-/** control_wait 积木的全部等待秒数（DURATION 存在 inputs 里）。 */
+/** control_wait 积木的全部等待秒数（只数真实连在脚本里的；浮动的不算）。 */
 export function getWaitDurations(project: ScratchProject): number[] {
   const out: number[] = []
   for (const target of project.targets) {
-    for (const block of allBlocks(target)) {
+    const connected = connectedBlockIds(target)
+    for (const [id, block] of Object.entries(target.blocks ?? {})) {
       if (block.opcode !== 'control_wait') continue
+      if (!connected.has(id)) continue
       const v = readNumericInput(block, 'DURATION')
       if (v !== null) out.push(v)
     }
@@ -160,8 +305,15 @@ export function getCurrentBackdropName(project: ScratchProject): string | null {
 /**
  * 按步骤评价一个真实项目。每个检查都读 project.json 的结构，
  * 并在 detail 里写明实际读到的值（不是只报通过/不通过）。
+ *
+ * 评价口径（P2 修复 4）：自动评价核对的是项目结构与已观测的运行证据，
+ * 不能宣称已验证每位孩子的实际运行结果；无运行观测值时步骤 0 的
+ * detail 末尾明确标注局限。允许多种合理的创作结果，不要求照抄标准答案。
  */
-export function evaluateProject(project: ScratchProject): StepCheckResult[] {
+export function evaluateProject(
+  project: ScratchProject,
+  options: EvaluationOptions = {},
+): StepCheckResult[] {
   const stage = getStage(project)
   const abby = getSprite(project, 'Abby')
   const abbyCostumes = abby?.costumes.map((c) => c.name) ?? []
@@ -170,55 +322,82 @@ export function evaluateProject(project: ScratchProject): StepCheckResult[] {
   const abbyScripts = abby ? topLevelScriptCount(abby) : 0
   const waits = getWaitDurations(project)
   const currentBackdrop = getCurrentBackdropName(project)
+  const observations = options.runObservations
+  const scopeNote = evaluationScopeNote(observations)
 
+  // 只数真实连在脚本里的积木：浮动（未连接）的积木不算通过（P2 修复 1）。
   const hasNextCostume =
-    !!abby && countOpcode(abby, 'looks_nextcostume') > 0
-  const repeatCount = abby ? countOpcode(abby, 'control_repeat') : 0
-  const foreverCount = abby ? countOpcode(abby, 'control_forever') : 0
+    !!abby && countConnectedOpcode(abby, 'looks_nextcostume') > 0
+  const repeatCount = abby ? countConnectedOpcode(abby, 'control_repeat') : 0
+  const foreverCount = abby ? countConnectedOpcode(abby, 'control_forever') : 0
   const hasSetVolume =
-    !!abby && countOpcode(abby, 'sound_setvolumeto') > 0
+    !!abby && countConnectedOpcode(abby, 'sound_setvolumeto') > 0
   const hasPlaySound =
     !!abby &&
-    (countOpcode(abby, 'sound_playuntildone') > 0 ||
-      countOpcode(abby, 'sound_play') > 0)
+    (countConnectedOpcode(abby, 'sound_playuntildone') > 0 ||
+      countConnectedOpcode(abby, 'sound_play') > 0)
   const hasSwitchBackdrop =
-    !!stage && countOpcode(stage, 'looks_switchbackdrop') > 0
+    !!stage && countConnectedOpcode(stage, 'looks_switchbackdrop') > 0
 
+  // 造型/背景用“至少”（P2 修复 3）：孩子主动增加素材不扣分。
   const baseOk =
     !!abby &&
-    abbyCostumes.length === 4 &&
-    stageBackdrops.length === 3 &&
+    abbyCostumes.length >= 4 &&
+    stageBackdrops.length >= 3 &&
     abbyScripts >= 2
+
+  // 步骤 8 只认真实的保存→关闭→重新打开流程（P2 修复 2）：
+  // 恢复证据为真、当前作品的哈希与证据一致（恢复后又改过的不算），
+  // 且修改仍在。没有恢复证据时不通过，并写明原因。
+  const restoreEvidence = options.restoreEvidence
+  const hasRestored = restoreEvidence?.restored === true
+  const hashMatches =
+    hasRestored &&
+    options.projectHash !== undefined &&
+    restoreEvidence.projectHash === options.projectHash
+  const modificationsKept =
+    waits.some((v) => v !== 0.3) || repeatCount > 0 || abbyScripts >= 3
+  const step8Pass = baseOk && hashMatches && modificationsKept
+  const step8Detail = !hasRestored
+    ? '还没有“保存后重新打开”的记录：这一步只认真实走完保存→关闭→重新打开的流程（不是只看文件里有没有改）。先保存作品，再关掉重新打开一次，然后重新检查。'
+    : !hashMatches
+      ? '这次检查的作品和上次重新打开的作品不一样（保存后又改过了）：这一步要的是改完保存、关掉、重新打开后修改还在。请先点“检查我的作品”保存当前作品，再关掉重新打开一次，然后重新检查。'
+      : step8Pass
+      ? `重新打开的作品是有效的，改的东西都在：等待 [${waits.join(', ')}] 秒，重复执行 ${repeatCount} 块，脚本 ${abbyScripts} 条（上次保存于 ${new Date(restoreEvidence.savedAt).toLocaleString('zh-CN')}，重新打开于 ${new Date(restoreEvidence.loadedAt).toLocaleString('zh-CN')}）。`
+      : '重新打开的作品里没有保留你的修改，请确认上次保存成功后再打开。'
 
   return [
     {
       id: 'step-0-preview',
       pass: baseOk,
       detail: baseOk
-        ? `Abby 在，造型 ${abbyCostumes.length}/4（${abbyCostumes.join('、')}），背景 ${stageBackdrops.length}/3，脚本 ${abbyScripts} 条。`
-        : `项目不完整：Abby=${!!abby}，造型 ${abbyCostumes.length}/4，背景 ${stageBackdrops.length}/3，脚本 ${abbyScripts} 条。`,
+        ? `Abby 在，造型 ${abbyCostumes.length} 个（至少 4 个：${abbyCostumes.join('、')}），背景 ${stageBackdrops.length} 个（至少 3 个），脚本 ${abbyScripts} 条。${scopeNote}`
+        : `项目不完整：Abby=${!!abby}，造型 ${abbyCostumes.length} 个（至少 4 个），背景 ${stageBackdrops.length} 个（至少 3 个），脚本 ${abbyScripts} 条。${scopeNote}`,
     },
     {
       id: 'step-1-load',
       pass: baseOk,
       detail: baseOk
-        ? `作品已打开：Abby、4 个造型、3 个背景、${abbyScripts} 条脚本都在。`
-        : `作品未完整加载：Abby=${!!abby}，造型 ${abbyCostumes.length}/4，背景 ${stageBackdrops.length}/3，脚本 ${abbyScripts} 条。`,
+        ? `作品已打开：Abby、至少 4 个造型、至少 3 个背景、${abbyScripts} 条脚本都在。`
+        : `作品未完整加载：Abby=${!!abby}，造型 ${abbyCostumes.length} 个（至少 4 个），背景 ${stageBackdrops.length} 个（至少 3 个），脚本 ${abbyScripts} 条。`,
     },
     {
       id: 'step-2-observe',
       pass: hasNextCostume,
       detail: hasNextCostume
-        ? '找到“下一个造型”积木：Abby 靠它换姿势跳舞。'
-        : '没找到“下一个造型”积木：Abby 还不会换姿势。',
+        ? '找到连在脚本里的“下一个造型”积木：Abby 靠它换姿势跳舞。' +
+          (observations?.costumeSwitched
+            ? '已观测到造型确实切换过。'
+            : '')
+        : '没找到连在脚本里的“下一个造型”积木：Abby 还不会换姿势（只放在旁边、没连上的不算）。',
     },
     {
       id: 'step-3-loop',
       pass: repeatCount > 0,
       detail:
         repeatCount > 0
-          ? `找到“重复执行”积木 ${repeatCount} 块，转圈循环已加上。`
-          : `还没找到“重复执行”积木（当前 forever ${foreverCount} 块是原来的跳舞和音乐循环）。`,
+          ? `找到真实连在脚本里的“重复执行”积木 ${repeatCount} 块，转圈循环已加上。`
+          : `还没找到真实连在脚本里的“重复执行”积木（当前 forever ${foreverCount} 块是原来的跳舞和音乐循环；只放在旁边、没连上的不算）。`,
     },
     {
       id: 'step-4-rhythm',
@@ -259,18 +438,8 @@ export function evaluateProject(project: ScratchProject): StepCheckResult[] {
     },
     {
       id: 'step-8-save',
-      pass:
-        baseOk &&
-        (waits.some((v) => v !== 0.3) ||
-          repeatCount > 0 ||
-          abbyScripts >= 3),
-      detail:
-        baseOk &&
-        (waits.some((v) => v !== 0.3) ||
-          repeatCount > 0 ||
-          abbyScripts >= 3)
-          ? `重新打开的作品是有效的，改的东西都在：等待 [${waits.join(', ')}] 秒，重复执行 ${repeatCount} 块，脚本 ${abbyScripts} 条。`
-          : '重新打开的作品里没有保留你的修改，请确认上次保存成功后再打开。',
+      pass: step8Pass,
+      detail: step8Detail,
     },
   ]
 }
@@ -280,4 +449,6 @@ export const __testHelpers = {
   countOpcode,
   countOpcodeInProject,
   topLevelScriptCount,
+  countConnectedOpcode,
+  connectedBlockIds,
 }

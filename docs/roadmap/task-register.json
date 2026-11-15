@@ -3869,7 +3869,7 @@
       "category": "OPS",
       "status": "in_progress",
       "dependencies": [],
-      "scope": "正式产品接入（第三阶段：学习模式层）。分支 feature/ops-038-dance-show（基底 main 45e61f30）。以已验证的官方 Scratch GUI standalone 为唯一真实项目编辑环境（iframe 嵌入，默认 http://localhost:8601/，NEXT_PUBLIC_SCRATCH_GUI_URL 可覆盖），KidsCoding 只增加学习引导层：桌面样板页 /learn/dance-show（9 步：认识作品、加载 .sb3、观察造型、加循环、调等待节奏、加音乐、换背景、独立挑战、保存展示）；指引为浮层抽屉（可收起，不挤占编辑宽度；实测 GUI 在 ≤1000px 时隐藏 File 菜单，故浮层必需）；评价引擎读导出的 .sb3 的 project.json 结构（角色/造型/背景/声音/脚本）+ 运行结果核对；受控消息接口（严格来源白名单 + 结构校验，禁 postMessage('*')，正式桥接发送端待建）。禁止：改 G2 课程适配器、动受限教学沙箱白名单、改实验页、改 G0 旧壳、提交 .sb3/音频/截图到公开仓库、批量迁移 432 节、改 React 19。",
+      "scope": "正式产品接入（第三阶段：学习模式层）。分支 feature/ops-038-dance-show（基底 main 45e61f30）；Round 2 分支 feature/ops-038-round2-bridge-eval-r2（基底 main 0ea26fd3）。以已验证的官方 Scratch GUI standalone 为唯一真实项目编辑环境（iframe 嵌入桥接宿主页面 bridge-host.html；地址只读 NEXT_PUBLIC_SCRATCH_GUI_URL，未配置时不渲染 iframe、不连 localhost，fail-closed），KidsCoding 只增加学习引导层：桌面样板页 /learn/dance-show（9 步：认识作品、加载 .sb3、观察造型、加循环、调等待节奏、加音乐、换背景、独立挑战、保存展示）；指引为浮层抽屉（可收起，不挤占编辑宽度；实测 GUI 在 ≤1000px 时隐藏 File 菜单，故浮层必需）；评价引擎读 GUI 当前作品的 project.json 结构（角色/造型/背景/声音/脚本）+ 运行结果核对（桥接直读主通道，导出文件为备用）；受控消息接口（严格来源白名单 + 结构校验，禁 postMessage('*')，正式桥接发送端已建：gui-bridge.ts 的 ScratchBridgeClient，按 P1 原型协议 get-project/load-project/ready/project/loaded/error，单条载荷上限 5MB）；作品取回后存浏览器 IndexedDB，加载时经桥接恢复；步骤 8 只认真实的保存→关闭→重新打开流程（恢复证据）。禁止：改 G2 课程适配器、动受限教学沙箱白名单、改实验页、改 G0 旧壳、提交 .sb3/音频/截图到公开仓库、批量迁移 432 节、改 React 19。",
       "acceptance": [
         "桌面样板页 /learn/dance-show 真实加载官方 Scratch GUI（真实 Chromium 1440×900 验证，非占位）",
         "学习层 9 步完整（目标/操作/三级提示/检查），指引可收起且收起后 GUI 全宽、File 菜单可用",
@@ -3880,7 +3880,7 @@
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/534"
       },
-      "notes": "负责人 2026-11-15 裁定：进入 Scratch 产品化（standalone + 独立部署 + 自研学习模式），不再重复技术选型。第三阶段《我的舞蹈秀》桌面样板：真实浏览器验证 15/15 PASS（导入、绿旗跳舞、音乐 WebAudio 触发、改等待变速、拖拽 repeat、换背景、评价原始 3/9 与改过 9/9、导出有效、重开保留修改、指引收起/展开）；单元测试 11/11，ESLint 干净。真人听音验收待负责人在真实设备完成（无头浏览器只证明 WebAudio 触发，不证明人耳听到）。未解决：生产构建 OOM（6GB Terser）、移动端 375×812 布局不可用、AGPL 合规待法律复核、正式桥接发送端待建。验证脚本与截图仅本地（~/workspace/ops-038-dance-show/），未提交仓库。2026-11-15 紧急部署：NEXT_PUBLIC_SCRATCH_GUI_URL 已设为真实地址 https://8601-agqyaa5wasdjfhjlhvvdhxppem.instabox.tech/standalone.html（仓库 Actions 变量 + deploy.yml/Dockerfile.web 构建期注入；config-check 硬校验须为 https，缺失则 CI 失败），预发布重建部署后 /learn/dance-show 不再回退 localhost:8601。另：生产构建已在 back-instabox 成功（峰值约 5.3GB），此前 notes 中“生产构建 OOM”描述已过时。"
+      "notes": "负责人 2026-11-15 裁定：进入 Scratch 产品化（standalone + 独立部署 + 自研学习模式），不再重复技术选型。第三阶段《我的舞蹈秀》桌面样板：真实浏览器验证 15/15 PASS（导入、绿旗跳舞、音乐 WebAudio 触发、改等待变速、拖拽 repeat、换背景、评价原始 3/9 与改过 9/9、导出有效、重开保留修改、指引收起/展开）；单元测试 11/11，ESLint 干净。真人听音验收待负责人在真实设备完成（无头浏览器只证明 WebAudio 触发，不证明人耳听到）。生产构建 OOM 已解决（back-instabox 成功，webpack 峰值约 5.3GB，7.5GB 可用内存足够；dist-standalone 不产 standalone.html，可服务版用 NODE_ENV=production webpack）。未解决：移动端 375×812 布局不可用、AGPL 合规待法律复核、真人听音待负责人。Round 2：桥接发送端、IndexedDB 持久化、初始作品接线、判定修复（连接计数/恢复证据/至少判据/评价口径）已实现，见 PR #537（源自 PR #535 的变基重建，Supersedes #535）。验证脚本与截图仅本地（~/workspace/ops-038-dance-show/），未提交仓库。2026-11-15 紧急部署：NEXT_PUBLIC_SCRATCH_GUI_URL 已设为真实地址 https://8601-agqyaa5wasdjfhjlhvvdhxppem.instabox.tech/standalone.html（仓库 Actions 变量 + deploy.yml/Dockerfile.web 构建期注入；config-check 硬校验须为 https，缺失则 CI 失败），预发布重建部署后 /learn/dance-show 不再回退 localhost:8601。"
     }
   ]
 }
