@@ -3887,7 +3887,7 @@
       "title": "统一全屏课堂 StudioShell：/studio/* 不继承 AppShell，100dvh + 浮层指引抽屉",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [],
       "scope": "新建共享全屏课堂外壳。分支 muse-c/ops-039-studio-shell（基底 main 0ea26fd3）。/studio/* 不继承 /learn/layout.tsx 的 AppShell：新增 src/app/studio/layout.tsx（仅返回 children）；StudioShell（features/lessons/studio/studio-shell.tsx）100dvh、禁重复全站导航/外层溢出/多层滚动，顶栏保留返回、课程名、进度、保存状态、帮助，课程指引为默认收起的浮层抽屉（开关不重新挂载编辑器）；新增 StudioLesson 契约（studio-lesson.ts，兼容 blockly/scratch-vm/summary/slot/python，python 仅契约层兼容，挂载随真实 Python 课接入）；LessonWorkspace 新增 chrome='full'|'studio'（studio 模式隐藏自身顶栏/目标条/任务抽屉，运行与保存不删不重复）与 onSaveStateChange/onShellControl 上报回调，ShellControl 扩展 file/stage 控制面（OPS-022 通道复用，不建全局命令通道）；新增 /studio 首页（诚实空态，无假编辑器）与 /studio/demo/[lessonId] 演示路由（仅 demo 契约，否则 notFound）。不改 AppShell、Scratch GUI 源码、现有课程判定；不接真实课程（OPS-041 另做）。",
       "acceptance": [
@@ -3899,7 +3899,7 @@
         "双层 UI 消除方式明确：LessonWorkspace studio 模式隐藏自身顶栏/目标条/任务抽屉，运行与保存只保留一份",
         "五尺寸真实 Chrome 验证：1920×1080、1440×900、1366×768、768×1024、375×812；单测与共享工作区回归 0 失败"
       ],
-      "evidence": {},
+      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/539"},
       "notes": "2026-11-15 负责人转发主 Muse 指令：先做 OPS-039，完成并合并后再做 OPS-041，各独立分支、独立 PR，不自合。V2 冻结张力已记入 PR 描述：/studio/* 无左侧导航与 AppShell 顶栏/底部导航（路由级不继承）、100dvh 固定壳 + 主区内部滚动（非 V2 文档流）、浮层指引抽屉；顶栏高度 76px/58px 与颜色/圆角/按钮样式沿用 V2 token，不建第二品牌。台账状态说明：本 PR 建 PR 前为 in_progress（门禁脚本要求 in_review 必须有真实 PR URL，空 pr + in_review 会直接失败）；建 PR 时回填 evidence.pr 并改为 in_review。"
     }
   ]
