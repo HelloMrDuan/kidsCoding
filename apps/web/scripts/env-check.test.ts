@@ -13,6 +13,7 @@ describe('createEnvCheckReport', () => {
         STRIPE_SECRET_KEY: 'sk_test_123',
         STRIPE_WEBHOOK_SECRET: 'whsec_123',
         NEXT_PUBLIC_APP_URL: 'https://kidscoding.example.com',
+        NEXT_PUBLIC_SCRATCH_GUI_URL: 'https://gui.example.com/standalone.html',
         PAYMENT_PROVIDER_DEFAULT: 'stripe',
         AI_PROVIDER_MODE: 'openai_compatible',
         AI_PROVIDER_PRIMARY_NAME: 'OpenAI',
