@@ -38,6 +38,8 @@ import {
   type EditorSlotComponent,
   type JudgmentResult,
   type RolesSlotComponent,
+  type SaveState,
+  type ShellControl,
   type StageSlotComponent,
 } from './workspace-slots'
 
@@ -79,6 +81,30 @@ export type LessonWorkspaceProps = {
    * (never a dead one).
    */
   runAdapter?: SlotRunAdapter
+  /**
+   * OPS-039 studio chrome. `'full'` (default) keeps the current behavior:
+   * the shell renders its own topbar (title / save chip / file menu /
+   * task button / stage toggle), goal strip and task drawer. `'studio'`
+   * hides all of that chrome — StudioShell owns the topbar, the save
+   * chip, the file menu and the guidance drawer — and the shell renders
+   * only the stage / roles / rail / script panels, the feedback card
+   * and the honest no-editor fallback. Run buttons stay inside the
+   * workspace in both modes; StudioShell adds no second run button.
+   */
+  chrome?: 'full' | 'studio'
+  /**
+   * OPS-039: report the save state upward so StudioShell can render the
+   * save chip in its own topbar. Called from an effect on every change;
+   * the message is the shell's save message (null when none).
+   */
+  onSaveStateChange?: (state: SaveState, message: string | null) => void
+  /**
+   * OPS-039: report the shell control surface upward so StudioShell can
+   * drive the shell's own run / save / file / stage actions through the
+   * same ShellControl the EditorSlot receives — no second state machine,
+   * no global command bus. Called from an effect on every change.
+   */
+  onShellControl?: (control: ShellControl) => void
 }
 
 /** Autosave debounce (R4/C8 proposal value; #470's 350ms is reference only). */
@@ -130,7 +156,7 @@ function RailIcon({ label, color }: { label: string; color: string }) {
   )
 }
 
-type SaveState = 'unsaved' | 'saved' | 'failed'
+/** OPS-039: SaveState lives in workspace-slots.ts next to ShellControl. */
 
 const REPEAT_OPTIONS = [2, 3, 4, 5, 6, 8]
 
@@ -171,9 +197,15 @@ export function LessonWorkspace({
   stageSlot,
   rolesSlot,
   runAdapter,
+  chrome = 'full',
+  onSaveStateChange,
+  onShellControl,
 }: LessonWorkspaceProps) {
   const contractErrors = useMemo(() => validateLessonContract(contract), [contract])
   const hasStage = contract.hasStage !== false
+  // OPS-039: in studio chrome StudioShell owns the topbar / goal strip /
+  // task drawer; this shell renders only the editing surface.
+  const isStudio = chrome === 'studio'
   // JSX needs capitalised aliases to render the slot component types.
   const StageSlotView = stageSlot ?? null
   const EditorSlotView = editorSlot ?? null
@@ -1396,7 +1428,7 @@ export function LessonWorkspace({
     Boolean(runAdapter) || mountedAdapterRef.current !== null || (!editorSlot && !isSummary && !isSlot)
 
   /** OPS-022 shell control surface for the slot's own toolbar (contract §3). */
-  const shellControl = useMemo(
+  const shellControl: ShellControl = useMemo(
     () => ({
       run: handleRunToggle,
       stop: handleRunStop,
@@ -1404,9 +1436,50 @@ export function LessonWorkspace({
       running: engineState.running,
       saveState,
       judgment,
+      // OPS-039: the same surface, extended so StudioShell can drive the
+      // file menu and the stage toggle that used to live in this shell's
+      // topbar. `file.save` is intentionally NOT repeated here: save is
+      // the top-level entry above. Capabilities are the shell's already
+      // resolved fileCaps, so the caller hides unsupported actions.
+      file: {
+        newLesson: handleNew,
+        export: handleExport,
+        import: () => fileInputRef.current?.click(),
+        reset: handleResetInitial,
+        capabilities: fileCaps,
+      },
+      stage: {
+        visible: stageVisible,
+        toggle: () => setStageVisible((v) => !v),
+        canToggle: hasStage,
+      },
     }),
-    [handleRunToggle, handleRunStop, handleSave, engineState.running, saveState, judgment],
+    [
+      handleRunToggle,
+      handleRunStop,
+      handleSave,
+      handleNew,
+      handleExport,
+      handleResetInitial,
+      engineState.running,
+      saveState,
+      judgment,
+      fileCaps,
+      stageVisible,
+      hasStage,
+    ],
   )
+
+  // OPS-039: report shell state upward for StudioShell's topbar. Effects,
+  // never render-time calls, so a parent's setState never runs during
+  // render. Placed here — before the no-editor early return below — so the
+  // honest fallback path reports too.
+  useEffect(() => {
+    onSaveStateChange?.(saveState, saveMessage)
+  }, [onSaveStateChange, saveState, saveMessage])
+  useEffect(() => {
+    onShellControl?.(shellControl)
+  }, [onShellControl, shellControl])
 
   const scriptListPanel = isBlockly ? (
     <div className="ws-script-list-panel" data-testid="ws-script-list">
@@ -1833,6 +1906,25 @@ export function LessonWorkspace({
   // (goals + task, no editor, no run button, no "尚未运行" implication)
   // instead of an empty script panel that promises a run that can never
   // happen. The copy stays engine-specific; nothing here is invented.
+  // OPS-039: in studio chrome the title / goals / task live in StudioShell;
+  // this fallback renders only the honest no-editor notice, never a second
+  // title or a second copy of the teaching content.
+  if ((isSummary || isSlot) && !EditorSlotView && isStudio) {
+    return (
+      <div className="ws-root ws-studio" data-testid="ws-root">
+        <section>
+          <h2>{isSlot ? '插槽编辑区' : '摘要编辑区'}</h2>
+          {isSlot ? (
+            <p>插槽编辑尚未接入：本课程未提供编辑器组件。</p>
+          ) : (
+            <p>摘要编辑尚未接入（4 号接入中）。</p>
+          )}
+          <p>本演示不提供虚假编辑器。</p>
+        </section>
+      </div>
+    )
+  }
+
   if ((isSummary || isSlot) && !EditorSlotView) {
     return (
       <div className="ws-root" data-testid="ws-root">
@@ -1870,7 +1962,7 @@ export function LessonWorkspace({
 
   return (
     <div
-      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}${hasStage && !stageVisible ? ' ws-stage-hidden' : ''}`}
+      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}${hasStage && !stageVisible ? ' ws-stage-hidden' : ''}${isStudio ? ' ws-studio' : ''}`}
       data-testid="ws-root"
       style={{ '--ws-stage-w': `${stageWidth}px` } as CSSProperties}
     >
@@ -2188,6 +2280,11 @@ export function LessonWorkspace({
         }
       `}</style>
 
+      {/* OPS-039: studio chrome hides this whole topbar — StudioShell owns
+          the title / save chip / file menu / task entry / stage toggle.
+          The hidden file input is hoisted below the header so the import
+          action keeps working when the topbar is gone. */}
+      {chrome !== 'studio' && (
       <header className="ws-topbar" data-testid="ws-topbar">
         <h1 style={{ margin: 0, fontSize: 18 }}>{contract.title}</h1>
         {contract.demo && <span data-testid="ws-demo-badge">演示</span>}
@@ -2266,20 +2363,28 @@ export function LessonWorkspace({
             )}
           </div>
         )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={editorSlot || isBlockly ? '.json,application/json' : '.sb3'}
-          style={{ display: 'none' }}
-          data-testid="ws-file-input"
-          onChange={(event) => {
-            const file = event.target.files?.[0]
-            event.target.value = ''
-            if (file) void handleImportFile(file)
-          }}
-        />
       </header>
+      )}
+      {/* OPS-039: the import input is invisible chrome — it stays mounted
+          outside the gated header so ShellControl.file.import keeps working
+          when the workspace topbar is hidden. */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={editorSlot || isBlockly ? '.json,application/json' : '.sb3'}
+        style={{ display: 'none' }}
+        data-testid="ws-file-input"
+        onChange={(event) => {
+          const file = event.target.files?.[0]
+          event.target.value = ''
+          if (file) void handleImportFile(file)
+        }}
+      />
 
+      {/* OPS-039: studio chrome hides the goal strip too — its current goal
+          lives in StudioShell's topbar (desktop) and its full goal5 in the
+          guidance drawer; the save state here would duplicate the topbar chip. */}
+      {chrome !== 'studio' && (
       <section className="ws-goalstrip">
         <p className="ws-goalstrip-current" data-testid="ws-goal-current">
           <strong>当前目标：</strong>
@@ -2305,8 +2410,9 @@ export function LessonWorkspace({
           ))}
         </ol>
       </section>
+      )}
 
-      {drawerOpen && (
+      {drawerOpen && chrome !== 'studio' && (
         <section data-testid="ws-task-drawer">
           <h2>任务抽屉</h2>
           {taskContent}
@@ -2356,12 +2462,17 @@ export function LessonWorkspace({
           <div className="ws-panel ws-rail-wrap">{iconRail}</div>
         )}
         <div className="ws-panel ws-script-wrap">{scriptPanel}</div>
+        {/* OPS-039: in studio chrome the teaching content lives in
+            StudioShell's guidance drawer; this second copy (visible for
+            summary-wide courses) stays hidden. */}
+        {chrome !== 'studio' && (
         <div className="ws-panel ws-task-wrap">
           <section data-testid="ws-task-panel">
             <h2>任务</h2>
             {taskContent}
           </section>
         </div>
+        )}
       </div>
 
       <section className="ws-feedback-card" data-testid="ws-feedback">

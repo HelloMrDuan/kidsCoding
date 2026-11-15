@@ -3881,6 +3881,26 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/534"
       },
       "notes": "负责人 2026-11-15 裁定：进入 Scratch 产品化（standalone + 独立部署 + 自研学习模式），不再重复技术选型。第三阶段《我的舞蹈秀》桌面样板：真实浏览器验证 15/15 PASS（导入、绿旗跳舞、音乐 WebAudio 触发、改等待变速、拖拽 repeat、换背景、评价原始 3/9 与改过 9/9、导出有效、重开保留修改、指引收起/展开）；单元测试 11/11，ESLint 干净。真人听音验收待负责人在真实设备完成（无头浏览器只证明 WebAudio 触发，不证明人耳听到）。生产构建 OOM 已解决（back-instabox 成功，webpack 峰值约 5.3GB，7.5GB 可用内存足够；dist-standalone 不产 standalone.html，可服务版用 NODE_ENV=production webpack）。未解决：移动端 375×812 布局不可用、AGPL 合规待法律复核、真人听音待负责人。Round 2：桥接发送端、IndexedDB 持久化、初始作品接线、判定修复（连接计数/恢复证据/至少判据/评价口径）已实现，见 PR #537（源自 PR #535 的变基重建，Supersedes #535）。验证脚本与截图仅本地（~/workspace/ops-038-dance-show/），未提交仓库。2026-11-15 紧急部署：NEXT_PUBLIC_SCRATCH_GUI_URL 已设为真实地址 https://8601-agqyaa5wasdjfhjlhvvdhxppem.instabox.tech/standalone.html（仓库 Actions 变量 + deploy.yml/Dockerfile.web 构建期注入；config-check 硬校验须为 https，缺失则 CI 失败），预发布重建部署后 /learn/dance-show 不再回退 localhost:8601。2026-11-15 桥接宿主切换：NEXT_PUBLIC_SCRATCH_GUI_URL 已改为桥接宿主地址 https://8602-agqyaa5wasdjfhjlhvvdhxppem.instabox.tech/bridge-host.html（仓库 Actions 变量；桥接宿主部署在 back-instabox 8602 端口，publication pv-mebeg373evm7fdmhacgufffmi4；PARENT_ORIGIN 为 KidsCoding 预发布 origin；8601/standalone.html 保留作回滚）。2026-11-15 部署触发修复（PR #540）：deploy.yml 的 on.push.paths-ignore 含 docs/** 与 **/*.md，#538 仅改 task-register.json 故合并后未触发 deploy（机上只有 WAITING_IMAGE）；本 PR 在 on: 增加 workflow_dispatch:，手动触发作为长期备用，非 docs 改动的合并本身即触发 deploy。2026-11-15 初始作品接线收尾：重建 starter .sb3（337278 字节，SHA-256 f653ea5fc9e233df019933a2e57d5c85ccf4d1e57b738400ff440b10bab00613，非 duan 孩子私有作品）已托管到桥接宿主同源 https://8602-agqyaa5wasdjfhjlhvvdhxppem.instabox.tech/dance-show-starter.sb3（back-instabox /data/home/ops-038-bridge/gui-dist/，8602 端口公开，无需新 publication）；仓库变量 NEXT_PUBLIC_DANCE_SHOW_STARTER_URL 已设为该地址，deploy.yml/Dockerfile.web/env-check/.env.example/env-check.test.ts 已按 #536 模式补齐构建期变量（config-check 硬校验 https，缺失则 CI 失败）。恢复竞态已修复：dance-show-page.tsx 恢复完成前不设 projectReady（恢复期间检查/加载按钮保持禁用，显示“正在恢复上次保存的作品…”），杜绝恢复完成前点“检查”把默认作品写进 IndexedDB 静默覆盖已保存作品；约 20 秒恢复时间大头为 GUI 17MB 资源加载（网络），未为优化牺牲正确性（轮询间隔与超时未动，恢复验证未跳过）。"
+    },
+    {
+      "id": "OPS-039",
+      "title": "统一全屏课堂 StudioShell：/studio/* 不继承 AppShell，100dvh + 浮层指引抽屉",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_progress",
+      "dependencies": [],
+      "scope": "新建共享全屏课堂外壳。分支 muse-c/ops-039-studio-shell（基底 main 0ea26fd3）。/studio/* 不继承 /learn/layout.tsx 的 AppShell：新增 src/app/studio/layout.tsx（仅返回 children）；StudioShell（features/lessons/studio/studio-shell.tsx）100dvh、禁重复全站导航/外层溢出/多层滚动，顶栏保留返回、课程名、进度、保存状态、帮助，课程指引为默认收起的浮层抽屉（开关不重新挂载编辑器）；新增 StudioLesson 契约（studio-lesson.ts，兼容 blockly/scratch-vm/summary/slot/python，python 仅契约层兼容，挂载随真实 Python 课接入）；LessonWorkspace 新增 chrome='full'|'studio'（studio 模式隐藏自身顶栏/目标条/任务抽屉，运行与保存不删不重复）与 onSaveStateChange/onShellControl 上报回调，ShellControl 扩展 file/stage 控制面（OPS-022 通道复用，不建全局命令通道）；新增 /studio 首页（诚实空态，无假编辑器）与 /studio/demo/[lessonId] 演示路由（仅 demo 契约，否则 notFound）。不改 AppShell、Scratch GUI 源码、现有课程判定；不接真实课程（OPS-041 另做）。",
+      "acceptance": [
+        "/studio/* 不继承 AppShell：无 222px 侧栏、无全站顶栏、无移动端底部导航",
+        "StudioShell 100dvh，文档不滚动、无外层横向滚动，主区为唯一纵向滚动区",
+        "顶栏含返回、课程名、进度、保存状态、帮助；指引抽屉默认收起、浮层、不挤压编辑器",
+        "抽屉开关不重新挂载编辑器（Blockly 节点与 Scratch iframe 标记在开关前后保持同一实例）",
+        "StudioLesson 契约兼容 Scratch、Blockly、Python；契约无效时 fail-closed，不展示假编辑器",
+        "双层 UI 消除方式明确：LessonWorkspace studio 模式隐藏自身顶栏/目标条/任务抽屉，运行与保存只保留一份",
+        "五尺寸真实 Chrome 验证：1920×1080、1440×900、1366×768、768×1024、375×812；单测与共享工作区回归 0 失败"
+      ],
+      "evidence": {},
+      "notes": "2026-11-15 负责人转发主 Muse 指令：先做 OPS-039，完成并合并后再做 OPS-041，各独立分支、独立 PR，不自合。V2 冻结张力已记入 PR 描述：/studio/* 无左侧导航与 AppShell 顶栏/底部导航（路由级不继承）、100dvh 固定壳 + 主区内部滚动（非 V2 文档流）、浮层指引抽屉；顶栏高度 76px/58px 与颜色/圆角/按钮样式沿用 V2 token，不建第二品牌。台账状态说明：本 PR 建 PR 前为 in_progress（门禁脚本要求 in_review 必须有真实 PR URL，空 pr + in_review 会直接失败）；建 PR 时回填 evidence.pr 并改为 in_review。"
     }
   ]
 }

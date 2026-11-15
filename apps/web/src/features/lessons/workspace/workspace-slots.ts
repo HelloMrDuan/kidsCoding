@@ -108,6 +108,9 @@ export interface FileCapabilities {
   canReset?: boolean
 }
 
+/** Save state shown in the topbar chip (OPS-039: also rendered by StudioShell). */
+export type SaveState = 'unsaved' | 'saved' | 'failed'
+
 /**
  * Shell control surface (OPS-022, contract §3): the channel through which
  * a slot's own toolbar drives the shell's run/stop/save and observes
@@ -126,9 +129,32 @@ export interface ShellControl {
   /** Shell's current running state, updated on every shell re-render. */
   running: boolean
   /** Shell's current save state. */
-  saveState: 'unsaved' | 'saved' | 'failed'
+  saveState: SaveState
   /** Adapter-returned current judgment, or null; the shell never invents one. */
   judgment: JudgmentResult | null
+  /**
+   * OPS-039: file operations, the same entries as the shell's own file
+   * menu. Absent = the shell has no file menu to drive (old behavior).
+   * `save` stays top-level (not duplicated here); `capabilities` are the
+   * shell's already-resolved fileCaps, so the caller hides unsupported
+   * actions instead of rendering dead buttons.
+   */
+  file?: {
+    newLesson: () => void
+    export: () => void
+    import: () => void
+    reset: () => void
+    capabilities: FileCapabilities
+  }
+  /**
+   * OPS-039: stage visibility, the same control as the shell's own stage
+   * toggle. Absent = no stage to toggle (hasStage === false).
+   */
+  stage?: {
+    visible: boolean
+    toggle: () => void
+    canToggle: boolean
+  }
 }
 
 /** Props the shell passes to a React editor slot component. */
