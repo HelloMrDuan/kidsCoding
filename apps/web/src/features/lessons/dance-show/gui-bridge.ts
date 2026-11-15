@@ -416,6 +416,8 @@ export class ScratchBridgeClient {
     if (event.source !== this.iframe.contentWindow) return
     // 2. 信封结构校验；畸形消息静默丢弃（与对端同一标准）。
     if (!isValidBridgeEnvelope(event.data)) return
+    // 3. 载荷大小边界：超过 5MB 单条上限的回复直接丢弃（纵深防御，与发送端同一上限）。
+    if (isBridgeMessageOversized(event.data)) return
     const msg = event.data as BridgeEnvelope
     if (msg.type === 'ready') {
       this.readyReceived = true
@@ -515,6 +517,13 @@ export class ScratchBridgeClient {
     }
     if (typeof payload.projectJson !== 'string') {
       throw new Error('桥接回复缺少 projectJson')
+    }
+    // 纵深防御：byteLength 是对端声明值，可能被伪装得很小；projectJson
+    // 字符串本身也须在 5MB 上限内，超限拒绝（解析前校验，避免解析超大串）。
+    if (payload.projectJson.length > BRIDGE_MAX_PAYLOAD_BYTES) {
+      throw new Error(
+        `桥接回复的 projectJson 超过 5MB 上限（${payload.projectJson.length} 字符），已拒绝`,
+      )
     }
     let project: ScratchProject
     try {

@@ -66,15 +66,20 @@ const GUI_URL = process.env.NEXT_PUBLIC_SCRATCH_GUI_URL ?? ''
 /** 初始作品 .sb3 的下载地址（部署时把 P3 starter 文件放到静态服务上）。 */
 const STARTER_URL = process.env.NEXT_PUBLIC_DANCE_SHOW_STARTER_URL ?? ''
 
-const GUI_CONFIGURED = GUI_URL !== ''
 const GUI_ORIGIN = (() => {
-  if (!GUI_CONFIGURED) return ''
+  if (GUI_URL === '') return ''
   try {
     return new URL(GUI_URL).origin
   } catch {
     return ''
   }
 })()
+/**
+ * 地址是否可用：非空且能解析出合法 origin。
+ * 相对路径等非法地址视为未配置——不渲染 iframe、不建桥接、检查按钮禁用，
+ * 与未配置时一致（P0 fail-closed）。
+ */
+const GUI_CONFIGURED = GUI_URL !== '' && GUI_ORIGIN !== ''
 
 const NAVY = '#152238'
 const NAVY_2 = '#1c2c46'

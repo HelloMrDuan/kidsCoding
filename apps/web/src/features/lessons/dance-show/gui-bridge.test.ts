@@ -406,7 +406,7 @@ describe('ScratchBridgeClient（桥接发送端）', () => {
     }
   })
 
-  it('error 回复转为拒绝；超大作品回复拒绝', async () => {
+  it('error 回复转为拒绝；超大作品回复在接收路径丢弃，不影响在途请求', async () => {
     const { posted, client, reply, cleanup } = setupClient()
     try {
       const p1 = client.getProject()
@@ -420,8 +420,19 @@ describe('ScratchBridgeClient（桥接发送端）', () => {
       })
       await expect(p1).rejects.toThrow(/busy/)
 
+      // 超过 5MB 的回复在 onMessage 接收路径即被丢弃（纵深防御），
+      // 不兑现也不拒绝在途请求；随后正确的回复仍可兑现。
       const p2 = client.getProject()
       const id2 = (posted[1].msg as Record<string, unknown>).requestId as string
+      let p2Settled = false
+      void p2.then(
+        () => {
+          p2Settled = true
+        },
+        () => {
+          p2Settled = true
+        },
+      )
       reply({
         protocol: 'kidscoding-scratch-bridge',
         version: 1,
@@ -434,7 +445,50 @@ describe('ScratchBridgeClient（桥接发送端）', () => {
           data: new ArrayBuffer(1),
         },
       })
-      await expect(p2).rejects.toThrow(/5MB/)
+      // MessageEvent 分发是同步的：丢弃后请求仍在途，未兑现。
+      await new Promise((r) => setTimeout(r, 0))
+      expect(p2Settled).toBe(false)
+      const sb3 = new ArrayBuffer(3)
+      reply({
+        protocol: 'kidscoding-scratch-bridge',
+        version: 1,
+        type: 'project',
+        requestId: id2,
+        payload: {
+          format: 'sb3',
+          byteLength: 3,
+          projectJson: JSON.stringify({ targets: [] }),
+          data: sb3,
+        },
+      })
+      const res = await p2
+      expect(res.byteLength).toBe(3)
+    } finally {
+      cleanup()
+    }
+  })
+
+  it('get-project 回复 projectJson 超过 5MB 时拒绝（byteLength 伪装很小也不行）', async () => {
+    const { posted, client, reply, cleanup } = setupClient()
+    try {
+      const p = client.getProject()
+      const requestId = (posted[0].msg as Record<string, unknown>)
+        .requestId as string
+      // byteLength 声明很小（能通过接收路径的载荷检查），
+      // 但 projectJson 字符串实际超大：getProject 须在解析前拒绝。
+      reply({
+        protocol: 'kidscoding-scratch-bridge',
+        version: 1,
+        type: 'project',
+        requestId,
+        payload: {
+          format: 'sb3',
+          byteLength: 3,
+          projectJson: 'x'.repeat(BRIDGE_MAX_PAYLOAD_BYTES + 1),
+          data: new ArrayBuffer(3),
+        },
+      })
+      await expect(p).rejects.toThrow(/5MB/)
     } finally {
       cleanup()
     }
