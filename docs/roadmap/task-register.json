@@ -3907,7 +3907,7 @@
       "title": "Python 课堂 StudioShell 适配评估（最终结论）：基于已合并 StudioShell 的真实接口",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "OPS-039"
       ],
@@ -3920,7 +3920,9 @@
         "草稿键不变（kids-python-local-practice-v1:）、已有保存数据保留、回滚无数据风险；passed 代码变化时立即清零，未来加指纹时旧草稿缺有效指纹不得恢复旧通过成绩但保留源码；practiceB 为探索标记，不作发布成绩",
         "输出最小改动文件清单、兼容性结论与后续实施建议；评估 PR 由主号复核"
       ],
-      "evidence": {},
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/543"
+      },
       "notes": "2026-11-15 用户指令：OPS-039 合并后立即开始 OPS-043 最终结论（基底 main 40d0ae84），前期 Python 核查成果全部保留、不重复从头检查。Python 文件在 0ea26fd3..40d0ae84 间零改动，前期评估与深化结论仍有效。台账状态说明：本 PR 建 PR 前为 in_progress（门禁脚本要求 in_review 必须有真实 PR URL，空 pr + in_review 会直接失败）；建 PR 时回填 evidence.pr 并改为 in_review。实施改造须主号分配正式 Task-ID（另行 PR），本任务只做评估。"
     }
   ]
