@@ -50,11 +50,40 @@ async function assertShellInvariants(page: Page) {
   }))
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.innerWidth)
   expect(overflow.docScrollHeight).toBeLessThanOrEqual(overflow.innerHeight)
+  // Rebuild (chief ruling 2026-11-15): the main area NEVER scrolls and
+  // the editor fills it exactly — the main area is not a second scroll
+  // region; inner regions (Blockly canvas, script wrap) scroll on their
+  // own. The workspace root must end exactly at the main area's bottom.
+  const fill = await page.evaluate(() => {
+    const main = document.querySelector('[data-testid="studio-main"]') as HTMLElement
+    const root = document.querySelector('[data-testid="ws-root"]') as HTMLElement | null
+    const mainBox = main.getBoundingClientRect()
+    const rootBox = root?.getBoundingClientRect()
+    return {
+      mainScrollHeight: main.scrollHeight,
+      mainClientHeight: main.clientHeight,
+      mainBottom: mainBox.bottom,
+      mainHeight: mainBox.height,
+      rootBottom: rootBox?.bottom ?? null,
+      rootHeight: rootBox?.height ?? null,
+    }
+  })
+  expect(fill.mainScrollHeight).toBeLessThanOrEqual(fill.mainClientHeight)
+  if (fill.rootBottom !== null) {
+    expect(Math.abs(fill.rootBottom - fill.mainBottom)).toBeLessThanOrEqual(2)
+    expect(Math.abs((fill.rootHeight ?? 0) - fill.mainHeight)).toBeLessThanOrEqual(2)
+  }
   // The drawer is closed by default.
   await expect(page.getByTestId('studio-guide-drawer')).toHaveCount(0)
 }
 
 async function assertTopbarFits(page: Page, width: number) {
+  // Slim topbar (chief ruling 2026-11-15): ONE 52px row on every
+  // viewport, total height inside 48–56px — no two-row fallback.
+  const topbarBox = await page.getByTestId('studio-topbar').boundingBox()
+  expect(topbarBox, 'topbar has a bounding box').not.toBeNull()
+  expect(topbarBox!.height, 'slim topbar height in 48–56px').toBeGreaterThanOrEqual(48)
+  expect(topbarBox!.height, 'slim topbar height in 48–56px').toBeLessThanOrEqual(56)
   // Every topbar control must be inside the viewport: overflow:hidden on
   // the shell would otherwise clip off-screen buttons while scrollWidth
   // still reads clean, and a collapsed title would still count as
@@ -98,6 +127,12 @@ for (const size of SIZES) {
     // No run button in the topbar — run lives only inside the editor area.
     // (The step text mentions 运行, so scope to buttons, not raw text.)
     await expect(page.getByTestId('studio-topbar').getByRole('button', { name: /运行/ })).toHaveCount(0)
+    // Flex-fill: the Blockly mount is a real, usable canvas that ends
+    // inside the viewport — never truncated by a scrolling main area.
+    const mountBox = await page.getByTestId('ws-blockly-mount').boundingBox()
+    expect(mountBox, 'Blockly mount has a bounding box').not.toBeNull()
+    expect(mountBox!.height, 'Blockly mount keeps a usable height').toBeGreaterThan(300)
+    expect(mountBox!.y + mountBox!.height, 'Blockly mount ends inside the viewport').toBeLessThanOrEqual(size.height)
     await page.screenshot({ path: `test-results/studio-shell-${size.name}.png` })
   })
 }
@@ -169,6 +204,27 @@ test('drawer toggle does not rebuild the Scratch iframe', async ({ page }) => {
   })
   expect(probe.sameNode).toBe(true)
   expect(probe.markIntact).toBe(true)
+})
+
+test('scratch editor fills the main area on desktop (no main-area scroll)', async ({ page }) => {
+  // Chief ruling 2026-11-15: the desktop Scratch editor must not be
+  // truncated by StudioShell main-area scrolling. The stage box IS the
+  // editor for a Scratch course, so it flex-fills the main area (the old
+  // zoom box was 240px on desktop); the main area never scrolls.
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(DEMO_SCRATCH)
+  const frame = page.locator('[data-testid="ws-scratch-mount"] iframe')
+  await expect(frame).toBeAttached({ timeout: 30000 })
+  await assertShellInvariants(page)
+  const mountBox = await page.getByTestId('ws-scratch-mount').boundingBox()
+  expect(mountBox, 'Scratch mount has a bounding box').not.toBeNull()
+  expect(mountBox!.height, 'Scratch editor fills past the old 240px zoom box').toBeGreaterThan(400)
+  expect(mountBox!.width, 'Scratch editor takes the full width, not the 280px stage column').toBeGreaterThan(600)
+  expect(mountBox!.y + mountBox!.height, 'Scratch mount ends inside the viewport').toBeLessThanOrEqual(900)
+  const frameBox = await frame.boundingBox()
+  expect(frameBox, 'Scratch iframe has a bounding box').not.toBeNull()
+  expect(frameBox!.y + frameBox!.height, 'Scratch iframe ends inside the viewport').toBeLessThanOrEqual(900)
+  await page.screenshot({ path: 'test-results/studio-shell-scratch.png' })
 })
 
 test('drawer on mobile 375: opens over the editor, closes, editor intact', async ({ page }) => {

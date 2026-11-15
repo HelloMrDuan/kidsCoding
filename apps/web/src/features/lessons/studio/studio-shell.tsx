@@ -4,18 +4,18 @@
  * StudioShell — the shared fullscreen classroom shell (OPS-039).
  *
  * Layout: `height: 100dvh`, flex column, `overflow: hidden`. The topbar
- * is the ONLY topbar: on desktop it is a single 76px row (the frozen V2
- * value); below 1024px it becomes two rows (title row + actions row,
- * height auto, min 58px) so the back link, title, progress, save chip,
- * file menu, stage toggle, help and guide all stay visible and reachable
- * on narrow screens instead of being clipped off-screen. The current-goal
- * subtitle shows only at >=1280px (it is always in the drawer). The main
- * area is the single vertical scroll region (`overflow-y: auto`, no
- * horizontal overflow); the document itself never scrolls.
+ * is the ONLY topbar: a single 52px slim row (chief ruling 2026-11-15,
+ * 48–56px range) on EVERY viewport — no two-row fallback, so the back
+ * link, title, progress, save chip, file menu, stage toggle, help and
+ * guide all fit one row; the progress text ellipsises and the demo badge
+ * hides below 480px rather than pushing a control off-screen. The main
+ * area NEVER scrolls (`overflow: hidden`): the embedded editor fills it
+ * exactly (flex height) and its own inner regions scroll — the main area
+ * is never a second scroll region. The document itself never scrolls.
  *
  * The guidance drawer is a floating overlay (absolute inside the shell
- * root, below the topbar), default closed. Its content comes only from
- * the StudioLesson contract. The editor subtree (`children`) is the
+ * root, below the 52px topbar), default closed. Its content comes only
+ * from the StudioLesson contract. The editor subtree (`children`) is the
  * drawer's sibling and is always mounted — toggling the drawer only
  * changes overlay visibility and can never remount the editor.
  *
@@ -95,33 +95,50 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
       <style>{`
         .studio-shell { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; position: relative; background: #f3f6fb; color: #18243a; font-family: "PingFang SC","Microsoft YaHei",sans-serif; box-sizing: border-box; }
         .studio-shell * { box-sizing: border-box; }
-        .studio-topbar { height: 76px; flex: 0 0 auto; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: #ffffff; border-bottom: 1px solid #e7edf5; }
-        .studio-topbar-main { display: flex; align-items: center; gap: 12px; flex: 1 1 auto; min-width: 0; }
-        .studio-topbar-actions { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
-        .studio-topbar h1 { margin: 0; font-size: 18px; flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Slim topbar: ONE 52px row on every viewport (chief ruling
+           2026-11-15, 48–56px). The title flexes (min 44px so it stays
+           readable); the progress/save-message shrink with ellipsis
+           instead of pushing a button off-screen; every other control
+           never shrinks. No overflow:hidden here: the file menu drops
+           below the bar and must not be clipped by it. */
+        .studio-topbar { height: 52px; flex: 0 0 auto; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: #ffffff; border-bottom: 1px solid #e7edf5; }
+        .studio-topbar-main { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; }
+        .studio-topbar-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+        .studio-topbar-main > *, .studio-topbar-actions > * { flex-shrink: 0; }
+        .studio-topbar h1 { margin: 0; font-size: 16px; flex: 1 1 auto; min-width: 44px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .studio-topbar a { color: #2463eb; text-decoration: none; white-space: nowrap; flex: 0 0 auto; }
-        .studio-btn { background: #2463eb; color: #ffffff; border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; white-space: nowrap; flex: 0 0 auto; }
-        .studio-btn-outline { background: #ffffff; color: #18243a; border: 1px solid #e7edf5; border-radius: 8px; padding: 10px 16px; cursor: pointer; white-space: nowrap; flex: 0 0 auto; }
-        .studio-topbar .studio-meta { color: #6f7d92; font-size: 13px; white-space: nowrap; flex: 0 0 auto; }
-        .studio-goal-current { color: #6f7d92; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; min-width: 0; }
+        .studio-btn { background: #2463eb; color: #ffffff; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap; flex: 0 0 auto; }
+        .studio-btn-outline { background: #ffffff; color: #18243a; border: 1px solid #e7edf5; border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap; flex: 0 0 auto; }
+        .studio-topbar .studio-meta { color: #6f7d92; font-size: 12px; white-space: nowrap; flex: 0 0 auto; }
+        .studio-topbar .studio-progress { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+        .studio-topbar .studio-save-message { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+        .studio-topbar .studio-goal-current { color: #6f7d92; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; min-width: 0; }
         .studio-demo-badge { background: #2463eb; color: #ffffff; border-radius: 8px; padding: 2px 8px; font-size: 12px; white-space: nowrap; flex: 0 0 auto; }
         .studio-file-wrap { position: relative; display: flex; flex: 0 0 auto; }
         .studio-file-menu { position: absolute; top: calc(100% + 8px); right: 0; z-index: 40; background: #ffffff; border: 1px solid #e7edf5; border-radius: 14px; box-shadow: 0 10px 32px rgba(30,57,96,.12); padding: 8px; display: flex; flex-direction: column; gap: 4px; }
-        .studio-main { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
-        .studio-guide-drawer { position: absolute; left: 0; top: 76px; bottom: 0; width: min(360px, 92vw); background: #ffffff; border-right: 1px solid #e7edf5; z-index: 30; overflow-y: auto; box-shadow: 0 10px 32px rgba(30,57,96,.12); padding: 16px; }
+        /* Main area: NEVER a scroll region. The embedded editor fills it
+           exactly (flex height, min-height 0); inner regions scroll. */
+        .studio-main { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+        .studio-main > * { flex: 1 1 auto; min-height: 0; }
+        .studio-guide-drawer { position: absolute; left: 0; top: 52px; bottom: 0; width: min(360px, 92vw); background: #ffffff; border-right: 1px solid #e7edf5; z-index: 30; overflow-y: auto; box-shadow: 0 10px 32px rgba(30,57,96,.12); padding: 16px; }
         .studio-guide-drawer h2 { font-size: 15px; margin: 0 0 8px; }
         .studio-guide-drawer h3 { font-size: 14px; margin: 16px 0 6px; }
         @media (max-width: 1279px) {
           .studio-goal-current { display: none; }
         }
-        @media (max-width: 1023px) {
-          .studio-topbar { height: auto; min-height: 58px; flex-direction: column; align-items: stretch; gap: 6px; padding: 8px 12px; }
-          .studio-topbar-main { flex: 0 0 auto; }
-          .studio-topbar-actions { flex-wrap: wrap; gap: 8px; }
-          .studio-topbar h1 { font-size: 16px; }
-          .studio-topbar-actions .studio-meta { min-width: 0; overflow: hidden; text-overflow: ellipsis; flex: 1 1 100px; }
-          .studio-btn, .studio-btn-outline { padding: 8px 12px; }
-          .studio-guide-drawer { position: fixed; top: 0; bottom: 0; }
+        @media (max-width: 767px) {
+          .studio-topbar { gap: 6px; padding: 0 8px; }
+          .studio-topbar h1 { font-size: 15px; }
+          .studio-btn, .studio-btn-outline { padding: 7px 8px; font-size: 12px; }
+          .studio-topbar .studio-progress { max-width: 72px; }
+        }
+        @media (max-width: 479px) {
+          .studio-topbar { gap: 4px; padding: 0 6px; }
+          .studio-btn, .studio-btn-outline { padding: 6px 6px; }
+          .studio-topbar .studio-progress { max-width: 40px; }
+          /* The lesson title already carries 演示：, so the badge is
+             redundant here — hiding it keeps all 8 controls in view. */
+          .studio-demo-badge { display: none; }
         }
       `}</style>
 
@@ -138,7 +155,7 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
             </span>
           )}
           {saveMessage && (
-            <span className="studio-meta" data-testid="studio-save-message">
+            <span className="studio-meta studio-save-message" data-testid="studio-save-message">
               {saveMessage}
             </span>
           )}
@@ -147,7 +164,7 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
           <span className="studio-goal-current" data-testid="studio-goal-current">
             {lesson.goal5[0]}
           </span>
-          <span className="studio-meta" data-testid="studio-progress">
+          <span className="studio-meta studio-progress" data-testid="studio-progress">
             {progressText}
           </span>
           {file !== undefined && (

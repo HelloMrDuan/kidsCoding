@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { DEMO_A, DEMO_SLOT } from './demo-contracts'
+import { DEMO_A, DEMO_SCRATCH, DEMO_SLOT } from './demo-contracts'
 import { LessonWorkspace } from './lesson-workspace'
 import type { ShellControl } from './workspace-slots'
 import type { EngineAdapter, EngineState, RunEvent } from './workspace-adapters'
@@ -135,6 +135,27 @@ describe('LessonWorkspace chrome="studio" (OPS-039)', () => {
     expect(screen.getByText('本演示不提供虚假编辑器。')).toBeTruthy()
     expect(screen.queryByTestId('ws-topbar')).toBeNull()
     expect(onShellControl).toHaveBeenCalledTimes(1)
+  })
+
+  it('marks a Scratch course root ws-scratch so its stage box flex-fills; Blockly does not get it', () => {
+    // Rebuild (chief ruling 2026-11-15): the Scratch stage box IS the
+    // editor, so it flex-fills the shell main area; a Blockly course
+    // keeps its zoom-sized stage preview and the flex goes to the mount.
+    const fake = new FakeAdapter()
+    render(
+      <LessonWorkspace contract={DEMO_SCRATCH.contract} adapter={fake} initialScript={DEMO_SCRATCH.initialScript} chrome="studio" />,
+    )
+    expect(screen.getByTestId('ws-root').classList.contains('ws-studio')).toBe(true)
+    expect(screen.getByTestId('ws-root').classList.contains('ws-scratch')).toBe(true)
+  })
+
+  it('does not mark a Blockly course root ws-scratch', () => {
+    const fake = new FakeAdapter()
+    render(
+      <LessonWorkspace contract={DEMO_A.contract} adapter={fake} initialScript={DEMO_A.initialScript} chrome="studio" />,
+    )
+    expect(screen.getByTestId('ws-root').classList.contains('ws-studio')).toBe(true)
+    expect(screen.getByTestId('ws-root').classList.contains('ws-scratch')).toBe(false)
   })
 })
 
