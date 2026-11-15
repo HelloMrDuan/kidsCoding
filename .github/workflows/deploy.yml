@@ -37,6 +37,7 @@ name: deploy-pipeline
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
+  workflow_dispatch:
 
 permissions:
   contents: read
