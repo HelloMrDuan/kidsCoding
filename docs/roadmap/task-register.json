@@ -3930,7 +3930,7 @@
       "title": "《我的舞蹈秀》全屏整改：正式入口 /studio/scratch/dance-show，StudioShell 唯一外壳",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "OPS-039"
       ],
@@ -3942,7 +3942,7 @@
         "1920/1440/1366 桌面与平板、手机视口真实浏览器测试；移动端不支持的功能（GUI 内导入/导出）明确标记",
         "独立 PR、非作者复核与 CI；不自行合并；线上部署待部署机器恢复后另行验证"
       ],
-      "evidence": {},
+      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/544"},
       "notes": "2026-11-15 负责人正式开工指令：OPS-039 已合并（merge 40d0ae84）、#537 桥接已合并、前置全满足，从最新 main 建独立分支真实编码，不再写技术方案。执行：3 号 Muse（kid三号小宝）。OPS-040 验收通过后再做 OPS-042 正式迁移。"
     }
   ]
