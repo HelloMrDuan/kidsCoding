@@ -51,6 +51,7 @@ env:
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
   NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
   NEXT_PUBLIC_SCRATCH_GUI_URL: ${{ vars.NEXT_PUBLIC_SCRATCH_GUI_URL }}
+  NEXT_PUBLIC_DANCE_SHOW_STARTER_URL: ${{ vars.NEXT_PUBLIC_DANCE_SHOW_STARTER_URL }}
 
 jobs:
   config-check:
@@ -80,7 +81,7 @@ jobs:
       - name: Verify build configuration is real and complete
         run: |
           fail=0
-          for name in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_APP_URL NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY NEXT_PUBLIC_SCRATCH_GUI_URL; do
+          for name in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_APP_URL NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY NEXT_PUBLIC_SCRATCH_GUI_URL NEXT_PUBLIC_DANCE_SHOW_STARTER_URL; do
             value="${!name:-}"
             if [ -z "$value" ]; then echo "::error::$name is missing or empty"; fail=1; fi
           done
@@ -95,6 +96,10 @@ jobs:
           case "${NEXT_PUBLIC_SCRATCH_GUI_URL:-}" in
             https://*) ;;
             *) echo "::error::NEXT_PUBLIC_SCRATCH_GUI_URL must be an https URL"; fail=1 ;;
+          esac
+          case "${NEXT_PUBLIC_DANCE_SHOW_STARTER_URL:-}" in
+            https://*) ;;
+            *) echo "::error::NEXT_PUBLIC_DANCE_SHOW_STARTER_URL must be an https URL"; fail=1 ;;
           esac
           key="${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-}"
           if [ "${#key}" -lt 100 ]; then echo "::error::NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY looks truncated"; fail=1; fi
@@ -208,6 +213,7 @@ jobs:
             NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
             NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
             NEXT_PUBLIC_SCRATCH_GUI_URL=${{ vars.NEXT_PUBLIC_SCRATCH_GUI_URL }}
+            NEXT_PUBLIC_DANCE_SHOW_STARTER_URL=${{ vars.NEXT_PUBLIC_DANCE_SHOW_STARTER_URL }}
 
       # Honest status: this is where the workflow's responsibility
       # ends. Deployment (for the designated active branch only) is

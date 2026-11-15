@@ -108,6 +108,13 @@ export default function DanceShowPage() {
     GUI_CONFIGURED ? 'connecting' : 'unconfigured',
   )
   const [projectReady, setProjectReady] = useState(false)
+  /**
+   * 是否正在恢复上次保存的作品。
+   * 恢复完成前 projectReady 保持 false，检查/加载按钮保持禁用：
+   * 否则恢复完成前点“检查”会把 GUI 默认作品写进 IndexedDB，
+   * 静默覆盖用户已保存的作品；在 GUI 里编辑也会被 loadProject 覆盖。
+   */
+  const [restoring, setRestoring] = useState(false)
   const [restoreEvidence, setRestoreEvidence] = useState<RestoreEvidence | null>(
     null,
   )
@@ -155,35 +162,50 @@ export default function DanceShowPage() {
         await client.waitUntilProjectNonEmpty()
         if (cancelled) return
         setBridgeStatus('ready')
-        setProjectReady(true)
-        // 恢复上次保存的作品（IndexedDB 里有才恢复；没有则用 GUI 默认作品）。
+        // 先恢复上次保存的作品，再启用检查/加载按钮。
+        // projectReady 之前若已启用，恢复完成前点“检查”会把 GUI
+        // 默认作品写进 IndexedDB，静默覆盖用户已保存的作品；
+        // 恢复期间在 GUI 里编辑也会被 loadProject 覆盖。
+        // 恢复完成（或确认无已保存作品）后才设 ready；按钮已 gate
+        // 在 projectReady 上，随 ready 延后自动保持禁用。
+        setRestoring(true)
         const saved = await loadSavedProject().catch(() => null)
-        if (!saved || cancelled) return
-        await client.loadProject({ format: 'sb3', data: saved.sb3 })
-        const check = await client.getProject()
         if (cancelled) return
-        if (check.project.targets.length === 0) return
-        const evidence: RestoreEvidence = {
-          savedAt: saved.savedAt,
-          loadedAt: Date.now(),
-          restored: true,
-          // 证据绑定恢复当时的作品内容：恢复后又改过的作品不能搭便车。
-          projectHash: projectHash(check.project),
+        if (saved) {
+          await client.loadProject({ format: 'sb3', data: saved.sb3 })
+          const check = await client.getProject()
+          if (cancelled) return
+          if (check.project.targets.length > 0) {
+            const evidence: RestoreEvidence = {
+              savedAt: saved.savedAt,
+              loadedAt: Date.now(),
+              restored: true,
+              // 证据绑定恢复当时的作品内容：恢复后又改过的作品不能搭便车。
+              projectHash: projectHash(check.project),
+            }
+            setRestoreEvidence(evidence)
+            setObservations(check.observations)
+            setProject(check.project)
+            setResults(
+              evaluateProject(check.project, {
+                restoreEvidence: evidence,
+                runObservations: check.observations,
+                projectHash: evidence.projectHash,
+              }),
+            )
+            setFileName('上次保存的作品（已恢复）')
+            setSavedAt(saved.savedAt)
+          }
+          // 恢复后仍是空作品：不认恢复证据（现有逻辑保留），
+          // 但恢复流程已走完，继续设 ready（GUI 里是默认作品，
+          // 用户可正常操作；不因恢复验证失败而卡住页面）。
         }
-        setRestoreEvidence(evidence)
-        setObservations(check.observations)
-        setProject(check.project)
-        setResults(
-          evaluateProject(check.project, {
-            restoreEvidence: evidence,
-            runObservations: check.observations,
-            projectHash: evidence.projectHash,
-          }),
-        )
-        setFileName('上次保存的作品（已恢复）')
-        setSavedAt(saved.savedAt)
+        if (cancelled) return
+        setRestoring(false)
+        setProjectReady(true)
       } catch (e) {
         if (cancelled) return
+        setRestoring(false)
         setBridgeStatus('failed')
         setError(
           `创作环境连接失败：${e instanceof Error ? e.message : String(e)}。可以改用“从文件检查”：在编辑器里“文件 → 保存到你的电脑”，再选那个 .sb3 文件。`,
@@ -396,9 +418,11 @@ export default function DanceShowPage() {
           title={
             !GUI_CONFIGURED
               ? '创作环境地址未配置'
-              : !projectReady
-                ? '创作环境正在准备，请稍等'
-                : '直接读编辑器里正在改的作品，不用导出文件'
+              : restoring
+                ? '正在恢复上次保存的作品，请稍候'
+                : !projectReady
+                  ? '创作环境正在准备，请稍等'
+                  : '直接读编辑器里正在改的作品，不用导出文件'
           }
           data-testid="dance-show-check-button"
           style={{
@@ -525,7 +549,11 @@ export default function DanceShowPage() {
                 onClick={() => void handleLoadStarter()}
                 disabled={checking || !projectReady}
                 title={
-                  !projectReady ? '创作环境正在准备，请稍等' : '把初始作品载入编辑器'
+                  restoring
+                    ? '正在恢复上次保存的作品，请稍候'
+                    : !projectReady
+                      ? '创作环境正在准备，请稍等'
+                      : '把初始作品载入编辑器'
                 }
                 data-testid="dance-show-load-starter"
                 style={{
@@ -693,6 +721,11 @@ export default function DanceShowPage() {
             >
               <div style={{ fontWeight: 700, marginBottom: 6 }}>检查结果</div>
               {checking && <div style={{ fontSize: 14 }}>正在读你的作品…</div>}
+              {restoring && (
+                <div style={{ fontSize: 14 }}>
+                  正在恢复上次保存的作品…恢复完成前请不要点“检查我的作品”，也不要在编辑器里改动，以免覆盖。
+                </div>
+              )}
               {error && (
                 <div style={{ fontSize: 14, color: RED, lineHeight: 1.6 }}>{error}</div>
               )}
