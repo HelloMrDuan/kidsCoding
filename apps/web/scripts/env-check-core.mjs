@@ -294,6 +294,13 @@ export function createEnvCheckReport({ env, mode }) {
           hint: 'Dance-show iframe falls back to localhost:8601 without a real GUI URL',
           validator: isValidUrl,
         }),
+        buildFieldResult({
+          field: 'NEXT_PUBLIC_DANCE_SHOW_STARTER_URL',
+          value: env.NEXT_PUBLIC_DANCE_SHOW_STARTER_URL,
+          mode,
+          hint: 'Dance-show "加载初始作品" shows "not configured" without a starter .sb3 URL',
+          validator: isValidUrl,
+        }),
       ],
     },
   ].map((group) => ({

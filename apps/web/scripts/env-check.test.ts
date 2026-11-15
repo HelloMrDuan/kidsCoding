@@ -14,6 +14,8 @@ describe('createEnvCheckReport', () => {
         STRIPE_WEBHOOK_SECRET: 'whsec_123',
         NEXT_PUBLIC_APP_URL: 'https://kidscoding.example.com',
         NEXT_PUBLIC_SCRATCH_GUI_URL: 'https://gui.example.com/standalone.html',
+        NEXT_PUBLIC_DANCE_SHOW_STARTER_URL:
+          'https://gui.example.com/dance-show-starter.sb3',
         PAYMENT_PROVIDER_DEFAULT: 'stripe',
         AI_PROVIDER_MODE: 'openai_compatible',
         AI_PROVIDER_PRIMARY_NAME: 'OpenAI',
@@ -131,5 +133,54 @@ describe('createEnvCheckReport', () => {
         (item) => item.field === 'CN_PAYMENT_PROVIDER_WEBHOOK_SECRET',
       )?.status,
     ).toBe('FAIL')
+  })
+
+  it('fails the scratch-gui group in production when the dance-show starter URL is missing', () => {
+    const report = createEnvCheckReport({
+      mode: 'production',
+      env: {
+        NEXT_PUBLIC_SUPABASE_URL: 'https://demo.supabase.co',
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb-publishable',
+        SUPABASE_SERVICE_ROLE_KEY: 'sb-service',
+        NEXT_PUBLIC_APP_URL: 'https://kidscoding.example.com',
+        NEXT_PUBLIC_SCRATCH_GUI_URL: 'https://gui.example.com/standalone.html',
+      },
+    })
+
+    const guiGroup = report.groups.find((group) => group.id === 'scratch-gui')
+    expect(guiGroup?.status).toBe('FAIL')
+    expect(
+      guiGroup?.items.find(
+        (item) => item.field === 'NEXT_PUBLIC_DANCE_SHOW_STARTER_URL',
+      )?.status,
+    ).toBe('FAIL')
+    expect(
+      guiGroup?.items.find(
+        (item) => item.field === 'NEXT_PUBLIC_SCRATCH_GUI_URL',
+      )?.status,
+    ).toBe('OK')
+  })
+
+  it('passes the scratch-gui group when the dance-show starter URL is a valid https URL', () => {
+    const report = createEnvCheckReport({
+      mode: 'production',
+      env: {
+        NEXT_PUBLIC_SUPABASE_URL: 'https://demo.supabase.co',
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb-publishable',
+        SUPABASE_SERVICE_ROLE_KEY: 'sb-service',
+        NEXT_PUBLIC_APP_URL: 'https://kidscoding.example.com',
+        NEXT_PUBLIC_SCRATCH_GUI_URL: 'https://gui.example.com/standalone.html',
+        NEXT_PUBLIC_DANCE_SHOW_STARTER_URL:
+          'https://gui.example.com/dance-show-starter.sb3',
+      },
+    })
+
+    const guiGroup = report.groups.find((group) => group.id === 'scratch-gui')
+    expect(guiGroup?.status).toBe('OK')
+    expect(
+      guiGroup?.items.find(
+        (item) => item.field === 'NEXT_PUBLIC_DANCE_SHOW_STARTER_URL',
+      )?.status,
+    ).toBe('OK')
   })
 })
