@@ -283,6 +283,19 @@ export function createEnvCheckReport({ env, mode }) {
         }),
       ],
     },
+    {
+      id: 'scratch-gui',
+      label: 'SCRATCH GUI',
+      items: [
+        buildFieldResult({
+          field: 'NEXT_PUBLIC_SCRATCH_GUI_URL',
+          value: env.NEXT_PUBLIC_SCRATCH_GUI_URL,
+          mode,
+          hint: 'Dance-show iframe falls back to localhost:8601 without a real GUI URL',
+          validator: isValidUrl,
+        }),
+      ],
+    },
   ].map((group) => ({
     ...group,
     status: group.status ?? summarizeGroup(group.items),
