@@ -38,6 +38,8 @@ import {
   type EditorSlotComponent,
   type JudgmentResult,
   type RolesSlotComponent,
+  type SaveState,
+  type ShellControl,
   type StageSlotComponent,
 } from './workspace-slots'
 
@@ -79,6 +81,30 @@ export type LessonWorkspaceProps = {
    * (never a dead one).
    */
   runAdapter?: SlotRunAdapter
+  /**
+   * OPS-039 studio chrome. `'full'` (default) keeps the current behavior:
+   * the shell renders its own topbar (title / save chip / file menu /
+   * task button / stage toggle), goal strip and task drawer. `'studio'`
+   * hides all of that chrome — StudioShell owns the topbar, the save
+   * chip, the file menu and the guidance drawer — and the shell renders
+   * only the stage / roles / rail / script panels, the feedback card
+   * and the honest no-editor fallback. Run buttons stay inside the
+   * workspace in both modes; StudioShell adds no second run button.
+   */
+  chrome?: 'full' | 'studio'
+  /**
+   * OPS-039: report the save state upward so StudioShell can render the
+   * save chip in its own topbar. Called from an effect on every change;
+   * the message is the shell's save message (null when none).
+   */
+  onSaveStateChange?: (state: SaveState, message: string | null) => void
+  /**
+   * OPS-039: report the shell control surface upward so StudioShell can
+   * drive the shell's own run / save / file / stage actions through the
+   * same ShellControl the EditorSlot receives — no second state machine,
+   * no global command bus. Called from an effect on every change.
+   */
+  onShellControl?: (control: ShellControl) => void
 }
 
 /** Autosave debounce (R4/C8 proposal value; #470's 350ms is reference only). */
@@ -130,7 +156,7 @@ function RailIcon({ label, color }: { label: string; color: string }) {
   )
 }
 
-type SaveState = 'unsaved' | 'saved' | 'failed'
+/** OPS-039: SaveState lives in workspace-slots.ts next to ShellControl. */
 
 const REPEAT_OPTIONS = [2, 3, 4, 5, 6, 8]
 
@@ -171,9 +197,15 @@ export function LessonWorkspace({
   stageSlot,
   rolesSlot,
   runAdapter,
+  chrome = 'full',
+  onSaveStateChange,
+  onShellControl,
 }: LessonWorkspaceProps) {
   const contractErrors = useMemo(() => validateLessonContract(contract), [contract])
   const hasStage = contract.hasStage !== false
+  // OPS-039: in studio chrome StudioShell owns the topbar / goal strip /
+  // task drawer; this shell renders only the editing surface.
+  const isStudio = chrome === 'studio'
   // JSX needs capitalised aliases to render the slot component types.
   const StageSlotView = stageSlot ?? null
   const EditorSlotView = editorSlot ?? null
@@ -277,12 +309,16 @@ export function LessonWorkspace({
   // below 1280px — on tablet and phone it opens on demand, so the script
   // area reaches the first screen; the roles strip collapses below 768px
   // only (tablet shows it unconditionally). Desktop keeps both open.
+  // OPS-039 rebuild: studio chrome collapses the palette on every
+  // viewport — the fullscreen shell has a fixed height, so the open
+  // drawer (128px) would starve the Blockly canvas; the rail stays the
+  // primary category surface and the toggle reopens the drawer.
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (window.innerWidth < 1280) setPaletteOpen(false)
+      if (window.innerWidth < 1280 || isStudio) setPaletteOpen(false)
       if (window.innerWidth < 768) setRolesOpen(false)
     }
-  }, [])
+  }, [isStudio])
 
   const isBlockly = contract.engine === 'blockly'
   const isScratch = contract.engine === 'scratch-vm'
@@ -1396,7 +1432,7 @@ export function LessonWorkspace({
     Boolean(runAdapter) || mountedAdapterRef.current !== null || (!editorSlot && !isSummary && !isSlot)
 
   /** OPS-022 shell control surface for the slot's own toolbar (contract §3). */
-  const shellControl = useMemo(
+  const shellControl: ShellControl = useMemo(
     () => ({
       run: handleRunToggle,
       stop: handleRunStop,
@@ -1404,9 +1440,50 @@ export function LessonWorkspace({
       running: engineState.running,
       saveState,
       judgment,
+      // OPS-039: the same surface, extended so StudioShell can drive the
+      // file menu and the stage toggle that used to live in this shell's
+      // topbar. `file.save` is intentionally NOT repeated here: save is
+      // the top-level entry above. Capabilities are the shell's already
+      // resolved fileCaps, so the caller hides unsupported actions.
+      file: {
+        newLesson: handleNew,
+        export: handleExport,
+        import: () => fileInputRef.current?.click(),
+        reset: handleResetInitial,
+        capabilities: fileCaps,
+      },
+      stage: {
+        visible: stageVisible,
+        toggle: () => setStageVisible((v) => !v),
+        canToggle: hasStage,
+      },
     }),
-    [handleRunToggle, handleRunStop, handleSave, engineState.running, saveState, judgment],
+    [
+      handleRunToggle,
+      handleRunStop,
+      handleSave,
+      handleNew,
+      handleExport,
+      handleResetInitial,
+      engineState.running,
+      saveState,
+      judgment,
+      fileCaps,
+      stageVisible,
+      hasStage,
+    ],
   )
+
+  // OPS-039: report shell state upward for StudioShell's topbar. Effects,
+  // never render-time calls, so a parent's setState never runs during
+  // render. Placed here — before the no-editor early return below — so the
+  // honest fallback path reports too.
+  useEffect(() => {
+    onSaveStateChange?.(saveState, saveMessage)
+  }, [onSaveStateChange, saveState, saveMessage])
+  useEffect(() => {
+    onShellControl?.(shellControl)
+  }, [onShellControl, shellControl])
 
   const scriptListPanel = isBlockly ? (
     <div className="ws-script-list-panel" data-testid="ws-script-list">
@@ -1774,7 +1851,7 @@ export function LessonWorkspace({
               </button>
             </div>
           )}
-          <p>分类由左侧图标列选择（点图标打开素材面板，素材面板即 Blockly 弹出面板），拖放、改参、垃圾桶删除均真实可用；下方脚本列表与画布同一程序。</p>
+          <p className="ws-script-note">分类由左侧图标列选择（点图标打开素材面板，素材面板即 Blockly 弹出面板），拖放、改参、垃圾桶删除均真实可用；下方脚本列表与画布同一程序。</p>
           {scriptListPanel}
           <div className="ws-runbar">
             <button
@@ -1833,6 +1910,25 @@ export function LessonWorkspace({
   // (goals + task, no editor, no run button, no "尚未运行" implication)
   // instead of an empty script panel that promises a run that can never
   // happen. The copy stays engine-specific; nothing here is invented.
+  // OPS-039: in studio chrome the title / goals / task live in StudioShell;
+  // this fallback renders only the honest no-editor notice, never a second
+  // title or a second copy of the teaching content.
+  if ((isSummary || isSlot) && !EditorSlotView && isStudio) {
+    return (
+      <div className="ws-root ws-studio" data-testid="ws-root">
+        <section>
+          <h2>{isSlot ? '插槽编辑区' : '摘要编辑区'}</h2>
+          {isSlot ? (
+            <p>插槽编辑尚未接入：本课程未提供编辑器组件。</p>
+          ) : (
+            <p>摘要编辑尚未接入（4 号接入中）。</p>
+          )}
+          <p>本演示不提供虚假编辑器。</p>
+        </section>
+      </div>
+    )
+  }
+
   if ((isSummary || isSlot) && !EditorSlotView) {
     return (
       <div className="ws-root" data-testid="ws-root">
@@ -1870,7 +1966,7 @@ export function LessonWorkspace({
 
   return (
     <div
-      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}${hasStage && !stageVisible ? ' ws-stage-hidden' : ''}`}
+      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}${hasStage && !stageVisible ? ' ws-stage-hidden' : ''}${isStudio ? ' ws-studio' : ''}${isStudio && isScratch ? ' ws-scratch' : ''}`}
       data-testid="ws-root"
       style={{ '--ws-stage-w': `${stageWidth}px` } as CSSProperties}
     >
@@ -2186,8 +2282,118 @@ export function LessonWorkspace({
           .ws-stage-hidden .ws-grid.ws-has-rail { grid-template-columns: 56px minmax(0, 1fr); }
           .ws-stage-hidden .ws-grid.ws-has-roles.ws-has-rail { grid-template-columns: 120px 56px minmax(0, 1fr); }
         }
+        /* OPS-039 rebuild (chief ruling 2026-11-15): flex-height studio
+           model. The shell main area never scrolls, so the studio root
+           fills it exactly (height 100%, flex column) and inner regions
+           scroll on their own. chrome='full' is untouched: every rule
+           below is scoped .ws-studio, appended last so it wins ties.
+           - The editor column flexes: the Blockly mount / slot editor
+             (or, for a Scratch course, the stage box, which IS the
+             editor) takes the free height instead of a fixed px height.
+           - A Blockly course's stage preview keeps its zoom height
+             (stage wrap align-self:start) and its zoom control stays
+             functional; a Scratch course's stage box flexes, so its
+             zoom group (meaningless once the box fills) hides in studio.
+           - Summary-wide courses have no task column in studio (the
+             task copy is hidden), so the editor takes the full width.
+           - Phones: the grid is a flex column; Blockly's script wrap
+             flexes and scrolls internally (mount keeps its 360px floor),
+             Scratch's stage wrap flexes and the script wrap is content
+             height. */
+        .ws-studio { height: 100%; display: flex; flex-direction: column; min-height: 0; }
+        .ws-studio .ws-grid { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+        .ws-studio .ws-feedback-card { flex: 0 0 auto; }
+        .ws-studio .ws-stage-wrap, .ws-studio .ws-script-wrap { display: flex; flex-direction: column; min-height: 0; }
+        .ws-studio .ws-roles-wrap.ws-roles-open { display: flex; flex-direction: column; min-height: 0; }
+        .ws-studio .ws-stage, .ws-studio .ws-script { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+        /* The mount is the primary editor and takes all of the script
+           column's free space; the script list is a fixed 64px scrolling
+           window. (A 5:1 grow split did not distribute as written —
+           measured 294:80 at 1366, 6px short of the 300px bar — so the
+           list's height is pinned and the mount takes the rest.) */
+        .ws-studio .ws-blockly-mount { flex: 1 1 0; height: auto; min-height: 0; }
+        .ws-studio .ws-script-list-panel { flex: 0 0 64px; min-height: 0; overflow-y: auto; }
+        /* Studio hides UI guidance that the shell already provides: the
+           script panel's explanatory paragraph (the drawer guide covers
+           it) and its heading (the panel is self-evident in the shell;
+           the heading is already hidden below 1024px). */
+        .ws-studio .ws-script-note { display: none; }
+        .ws-studio [data-testid="ws-script-panel"] > h2 { display: none; }
+        .ws-studio .ws-editor-slot { flex: 1 1 auto; height: auto; min-height: 0; }
+        .ws-studio.ws-summary-wide .ws-grid { grid-template-columns: minmax(0, 1fr); }
+        .ws-studio.ws-scratch .ws-stage-box { flex: 1 1 auto; min-height: 0; height: auto; }
+        .ws-studio.ws-scratch .ws-zoom-group { display: none; }
+        @media (min-width: 1280px) {
+          .ws-studio .ws-grid { grid-template-rows: minmax(0, 1fr); }
+          .ws-studio:not(.ws-scratch) .ws-stage-wrap { align-self: start; }
+          .ws-studio:not(.ws-scratch) .ws-roles-wrap { align-self: start; }
+          /* Scratch on desktop: the stage IS the editor, so it takes the
+             full width (a 280px stage column would squeeze the GUI) and
+             fills; the short script panel sits below it. */
+          .ws-studio.ws-scratch .ws-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+          .ws-studio.ws-scratch .ws-stage-wrap { grid-column: 1 / -1; grid-row: 1; }
+          .ws-studio.ws-scratch .ws-script-wrap { grid-column: 1 / -1; grid-row: 2; }
+        }
+        @media (min-width: 768px) {
+          /* Studio spacing compaction: the script column's fixed chrome
+             (search, palette, zoom, runbar) must leave room for a usable
+             canvas, so their gaps shrink in the shell only. Phones keep
+             their own tighter values (below). */
+          .ws-studio .ws-search-row { margin-bottom: 6px; }
+          .ws-studio .ws-palette { margin-bottom: 6px; }
+          .ws-studio .ws-script-list-panel { margin-top: 6px; }
+          .ws-studio .ws-runbar { margin-top: 6px; }
+          .ws-studio .ws-editor-zoom { margin: 6px 0; }
+        }
+        @media (min-width: 768px) and (max-width: 1279px) {
+          /* Tablet studio: roles strip on top, stage | rail | script
+             side by side below — the stacked tablet grid starves the
+             Blockly mount (measured 130px). The script column fills
+             row 2. Scratch keeps the stacked layout: its stage is the
+             editor and takes the full width. */
+          .ws-studio .ws-grid { grid-template-columns: var(--ws-stage-w, 280px) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+          .ws-studio .ws-grid.ws-has-rail { grid-template-columns: var(--ws-stage-w, 280px) 56px minmax(0, 1fr); }
+          .ws-studio .ws-roles-wrap { grid-row: 1; grid-column: 1 / -1; }
+          .ws-studio .ws-stage-wrap { grid-row: 2; grid-column: 1; }
+          .ws-studio .ws-grid.ws-has-rail .ws-stage-wrap { grid-column: 1; }
+          .ws-studio .ws-rail-wrap { grid-row: 2; grid-column: 2; }
+          .ws-studio .ws-script-wrap { grid-row: 2; grid-column: 2; }
+          .ws-studio .ws-grid.ws-has-rail .ws-script-wrap { grid-column: 3; }
+          .ws-studio:not(.ws-scratch) .ws-stage-wrap { align-self: start; }
+          .ws-studio:not(.ws-scratch) .ws-roles-wrap { align-self: start; }
+          .ws-studio.ws-scratch .ws-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto auto; }
+          .ws-studio.ws-scratch .ws-stage-wrap { grid-row: 1; grid-column: 1 / -1; }
+          .ws-studio.ws-scratch .ws-roles-wrap { grid-row: 2; grid-column: 1 / -1; }
+          .ws-studio.ws-scratch .ws-rail-wrap, .ws-studio.ws-scratch .ws-script-wrap { grid-row: 3; }
+          /* Stage hidden: drop the stage column so the script takes the width. */
+          .ws-studio.ws-stage-hidden .ws-grid { grid-template-columns: minmax(0, 1fr); }
+          .ws-studio.ws-stage-hidden .ws-grid.ws-has-rail { grid-template-columns: 56px minmax(0, 1fr); }
+          .ws-studio.ws-stage-hidden .ws-script-wrap { grid-column: 1; }
+          .ws-studio.ws-stage-hidden .ws-grid.ws-has-rail .ws-script-wrap { grid-column: 2; }
+          .ws-studio.ws-stage-hidden .ws-grid.ws-has-rail .ws-rail-wrap { grid-column: 1; }
+        }
+        @media (max-width: 767px) {
+          .ws-studio .ws-grid { display: flex; flex-direction: column; }
+          .ws-studio .ws-stage-wrap { flex: 0 0 auto; }
+          .ws-studio .ws-roles-wrap.ws-roles-open { flex: 0 0 auto; }
+          .ws-studio .ws-script-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+          .ws-studio .ws-blockly-mount { min-height: 360px; }
+          .ws-studio .ws-editor-slot { min-height: 360px; }
+          /* Phones: panels size to content and the script wrap scrolls;
+             only a Scratch stage section flexes (it IS the editor). */
+          .ws-studio .ws-script { flex: 0 0 auto; }
+          .ws-studio:not(.ws-scratch) .ws-stage { flex: 0 0 auto; }
+          .ws-studio .ws-script-list-panel { flex: 0 0 auto; overflow-y: visible; }
+          .ws-studio.ws-scratch .ws-stage-wrap { flex: 1 1 auto; min-height: 0; }
+          .ws-studio.ws-scratch .ws-script-wrap { flex: 0 0 auto; overflow-y: visible; }
+        }
       `}</style>
 
+      {/* OPS-039: studio chrome hides this whole topbar — StudioShell owns
+          the title / save chip / file menu / task entry / stage toggle.
+          The hidden file input is hoisted below the header so the import
+          action keeps working when the topbar is gone. */}
+      {chrome !== 'studio' && (
       <header className="ws-topbar" data-testid="ws-topbar">
         <h1 style={{ margin: 0, fontSize: 18 }}>{contract.title}</h1>
         {contract.demo && <span data-testid="ws-demo-badge">演示</span>}
@@ -2266,20 +2472,28 @@ export function LessonWorkspace({
             )}
           </div>
         )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={editorSlot || isBlockly ? '.json,application/json' : '.sb3'}
-          style={{ display: 'none' }}
-          data-testid="ws-file-input"
-          onChange={(event) => {
-            const file = event.target.files?.[0]
-            event.target.value = ''
-            if (file) void handleImportFile(file)
-          }}
-        />
       </header>
+      )}
+      {/* OPS-039: the import input is invisible chrome — it stays mounted
+          outside the gated header so ShellControl.file.import keeps working
+          when the workspace topbar is hidden. */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={editorSlot || isBlockly ? '.json,application/json' : '.sb3'}
+        style={{ display: 'none' }}
+        data-testid="ws-file-input"
+        onChange={(event) => {
+          const file = event.target.files?.[0]
+          event.target.value = ''
+          if (file) void handleImportFile(file)
+        }}
+      />
 
+      {/* OPS-039: studio chrome hides the goal strip too — its current goal
+          lives in StudioShell's topbar (desktop) and its full goal5 in the
+          guidance drawer; the save state here would duplicate the topbar chip. */}
+      {chrome !== 'studio' && (
       <section className="ws-goalstrip">
         <p className="ws-goalstrip-current" data-testid="ws-goal-current">
           <strong>当前目标：</strong>
@@ -2305,8 +2519,9 @@ export function LessonWorkspace({
           ))}
         </ol>
       </section>
+      )}
 
-      {drawerOpen && (
+      {drawerOpen && chrome !== 'studio' && (
         <section data-testid="ws-task-drawer">
           <h2>任务抽屉</h2>
           {taskContent}
@@ -2356,12 +2571,17 @@ export function LessonWorkspace({
           <div className="ws-panel ws-rail-wrap">{iconRail}</div>
         )}
         <div className="ws-panel ws-script-wrap">{scriptPanel}</div>
+        {/* OPS-039: in studio chrome the teaching content lives in
+            StudioShell's guidance drawer; this second copy (visible for
+            summary-wide courses) stays hidden. */}
+        {chrome !== 'studio' && (
         <div className="ws-panel ws-task-wrap">
           <section data-testid="ws-task-panel">
             <h2>任务</h2>
             {taskContent}
           </section>
         </div>
+        )}
       </div>
 
       <section className="ws-feedback-card" data-testid="ws-feedback">
