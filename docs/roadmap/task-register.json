@@ -3901,6 +3901,29 @@
       ],
       "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/539"},
       "notes": "2026-11-15 负责人转发主 Muse 指令：先做 OPS-039，完成并合并后再做 OPS-041，各独立分支、独立 PR，不自合。V2 冻结张力已记入 PR 描述：/studio/* 无左侧导航与 AppShell 顶栏/底部导航（路由级不继承）、100dvh 固定壳 + 主区内部滚动（非 V2 文档流）、浮层指引抽屉；顶栏 52px 精简（首席 2026-11-15 裁定，不再固定 76px），颜色/圆角/按钮样式沿用 V2 token，不建第二品牌。台账状态说明：本 PR 建 PR 前为 in_progress（门禁脚本要求 in_review 必须有真实 PR URL，空 pr + in_review 会直接失败）；建 PR 时回填 evidence.pr 并改为 in_review。2026-11-15 首席裁定：#539 以最新 main 为基重建（#540/#542 台账尾部追加冲突），内容不变，只换台账基底；#540/#542 的 OPS-038 内容原样保留；最终基底 819b3ff0。"
+    },
+    {
+      "id": "OPS-043",
+      "title": "Python 课堂 StudioShell 适配评估（最终结论）：基于已合并 StudioShell 的真实接口",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-039"
+      ],
+      "scope": "只读评估，不改 Python 引擎、不改 StudioShell、不改 LessonWorkspace、不改沙箱、不改 grader。基底 main 40d0ae84（#539 已合并）。实读已合并的 StudioShell/StudioLesson/LessonWorkspace chrome='studio' 真实接口，确认 Python 进入 StudioShell 的组件边界：Python 不走 LessonWorkspace（toLessonContract 对 python 显式 throw），而是作为 StudioShell 的直接 children（纯 React 组件 + 隐藏执行 iframe）挂载。保留 Pyodide Worker、iframe 沙箱隔离、运行超时、输入输出、异常反馈与现有判题机制；明确重复顶栏移除与 100dvh 主区高度处理；确认编辑器实例稳定挂载；草稿键不变、可回滚；passed 代码变化时立即清零，未来实施时加 grader/用例集版本指纹；practiceB 保留为探索标记。输出最小改动文件清单、兼容性结论与后续实施建议。评估文档：docs/roadmap/evidence/OPS-043-python-studioshell-adaptation.md。",
+      "acceptance": [
+        "明确 Python 进入 StudioShell 的真实组件边界（直接 children，不走 LessonWorkspace；toLessonContract 对 python 显式 throw 为正确防线）",
+        "保留 Pyodide Worker、iframe 沙箱隔离、运行超时、输入输出、异常反馈与现有判题机制（零改动）",
+        "明确重复顶栏移除（返回课程介绍进 backHref、查看本机作品夹保留在编辑区、警告文案进 scopeGap 与反馈区）与 100dvh 主区高度处理（去 <main>/max-w-6xl，编辑器 flex 填满、内部滚动）",
+        "确认编辑器实例稳定挂载：抽屉开关不重建 iframe（同节点探针），Python 组件每课只挂载一次",
+        "草稿键不变（kids-python-local-practice-v1:）、已有保存数据保留、回滚无数据风险；passed 代码变化时立即清零，未来加指纹时旧草稿缺有效指纹不得恢复旧通过成绩但保留源码；practiceB 为探索标记，不作发布成绩",
+        "输出最小改动文件清单、兼容性结论与后续实施建议；评估 PR 由主号复核"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/543"
+      },
+      "notes": "2026-11-15 用户指令：OPS-039 合并后立即开始 OPS-043 最终结论（基底 main 40d0ae84），前期 Python 核查成果全部保留、不重复从头检查。Python 文件在 0ea26fd3..40d0ae84 间零改动，前期评估与深化结论仍有效。台账状态说明：本 PR 建 PR 前为 in_progress（门禁脚本要求 in_review 必须有真实 PR URL，空 pr + in_review 会直接失败）；建 PR 时回填 evidence.pr 并改为 in_review。实施改造须主号分配正式 Task-ID（另行 PR），本任务只做评估。"
     }
   ]
 }
