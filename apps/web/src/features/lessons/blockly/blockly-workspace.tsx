@@ -6,6 +6,7 @@ import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 
 import { BLOCKLY_MEDIA_PATH } from './blockly-media'
 import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
+import { buildSnapshot, LINE_FIELD, REPEAT_BODY_INPUT, REPEAT_TIMES_FIELD } from './blockly-snapshot'
 import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
 import { DEFAULT_REPEAT_TIMES, REPEAT_BLOCK, REPEAT_TIMES_OPTIONS, type ProgramBlock } from './program-tree'
 import { restoreBlockSequence } from './restore-block-sequence'
@@ -14,9 +15,6 @@ import type { SayLinePreset } from './say-line-presets'
 /** SYS-107: snapshots are program trees; a repeat block carries `times` and `body`. */
 type BlockSnapshot = ProgramBlock
 
-const LINE_FIELD = 'LINE'
-const REPEAT_TIMES_FIELD = 'TIMES'
-const REPEAT_BODY_INPUT = 'DO'
 const BASE_SCALE = 0.9
 /** Lowest scale the fit may shrink to: still readable for kids on a 375px phone. */
 const MIN_FIT_SCALE = 0.6
@@ -144,24 +142,6 @@ function applyMotionLabel(block: Blockly.Block, verb: MotionVerb) {
   if (field && field.getValue() !== label) field.setValue(label)
 }
 
-function collectSequence(block: Blockly.Block | null, result: BlockSnapshot[]) {
-  let current = block
-
-  while (current) {
-    const line = current.getField(LINE_FIELD)?.getValue()
-    const item: BlockSnapshot = typeof line === 'string' && line ? { type: current.type, line } : { type: current.type }
-    if (current.type === REPEAT_BLOCK) {
-      // SYS-107: the count and the blocks inside the repeat's mouth.
-      item.times = Number(current.getFieldValue(REPEAT_TIMES_FIELD)) || DEFAULT_REPEAT_TIMES
-      const body: BlockSnapshot[] = []
-      collectSequence(current.getInputTargetBlock(REPEAT_BODY_INPUT), body)
-      item.body = body
-    }
-    result.push(item)
-    current = current.getNextBlock()
-  }
-}
-
 /** SYS-107: build a restored block (and, for a repeat, everything inside it). */
 function createRestoredBlock(
   workspace: Blockly.WorkspaceSvg,
@@ -198,19 +178,6 @@ function ensureLineField(block: Blockly.Block, choices: readonly SayLinePreset[]
   // Own row under “说一句话”, so the block stays narrow enough for the phone workspace.
   block.appendDummyInput('LINE_ROW').appendField(dropdown, LINE_FIELD)
   block.setInputsInline(false)
-}
-
-/** SYS-107: exported for the headless serialisation test. */
-export function buildSnapshot(workspace: Blockly.Workspace) {
-  const snapshot: BlockSnapshot[] = []
-
-  workspace.getTopBlocks(true).forEach((block, index) => {
-    const start = snapshot.length
-    collectSequence(block, snapshot)
-    if (index > 0) snapshot[start].disconnected = true
-  })
-
-  return snapshot
 }
 
 /** SYS-107: the last block of the main stack (the first top block), or null. */

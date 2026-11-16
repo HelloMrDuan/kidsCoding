@@ -18,7 +18,7 @@
  */
 import * as Blockly from 'blockly'
 
-import { buildSnapshot } from '../blockly/blockly-workspace'
+import { buildSnapshot } from '../blockly/blockly-snapshot'
 import type { ProgramBlock } from '../blockly/program-tree'
 
 /**

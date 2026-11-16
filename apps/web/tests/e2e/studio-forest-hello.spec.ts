@@ -217,13 +217,27 @@ async function dragToolboxBlock(page: Page, categoryLabel: string) {
   const lastBox = await lastBlock.boundingBox().catch(() => null)
   const canvasBox = await canvas.boundingBox()
   expect(canvasBox).not.toBeNull()
-  // Drop so the dragged block's TOP connection lands exactly on the
-  // existing stack's bottom connection: the mouse holds the block by its
-  // centre, so the top edge sits half a block-height above the mouse.
-  // (E6 首轮：落点只比栈底低 12px，连接点埋进 when_start 块内 12px，
-  // 拖得太快未触发吸附，积木以 disconnected 散块落地。)
-  const dropX = lastBox ? lastBox.x + lastBox.width / 2 : canvasBox!.x + canvasBox!.width / 2
-  const dropY = lastBox ? lastBox.y + lastBox.height + box!.height / 2 : canvasBox!.y + 80
+  // Drop so the dragged block's TOP connection lands on the existing
+  // stack's bottom connection. Zelos statement connections sit at x=12
+  // from the block's LEFT edge (not the block centre), and the stack's
+  // bottom connection sits 8 workspace units above the stack's bottom
+  // edge — so the dragged block must be LEFT-ALIGNED with the stack (same
+  // left edge), not centred under it. The mouse holds the dragged block by
+  // its centre, so dropX = stackLeft + draggedWidth/2 and dropY =
+  // stackBottom - 8*scale + draggedHeight/2.
+  // (E6 root cause, OPS-041 probes v4/v5: the old centre-aligned drop put
+  // the real connection points 36.2 workspace units apart, outside
+  // Blockly's snapRadius 28, so no candidate was found and the block was
+  // bumped away unconnected. A connection-aligned drop connects first try;
+  // the E6 assertion is unchanged and the drag is still a real mouse drag.)
+  const canvasTransform = await page
+    .locator('svg.blocklySvg .blocklyBlockCanvas')
+    .evaluate((el) => el.getAttribute('transform') ?? '')
+  const scale = Number.parseFloat(/scale\(([\d.]+)\)/.exec(canvasTransform)?.[1] ?? '1') || 1
+  const dropX = lastBox ? lastBox.x + box!.width / 2 : canvasBox!.x + canvasBox!.width / 2
+  const dropY = lastBox
+    ? lastBox.y + lastBox.height - 8 * scale + box!.height / 2
+    : canvasBox!.y + 80
   await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
   await page.mouse.down()
   await page.mouse.move(dropX, dropY, { steps: 20 })
