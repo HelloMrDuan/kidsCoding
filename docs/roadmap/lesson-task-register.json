@@ -707,7 +707,7 @@
       "unitId": "G1-U1",
       "focusConcept": "对白",
       "plannedLearningOutcome": "能使用对白解释并完成「与兔子轮流说话」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_review",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -720,13 +720,13 @@
         "课程与页面分开验收，提交PR/CI/人工教研及发布证据"
       ],
       "evidence": {
-        "pr": null,
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/273",
         "mergeCommit": null,
         "mainCI": null,
         "realE2E": null,
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。 2026-10-30 课程开发账号A第一阶段：轮流对白执行器与6个本地测试通过（正确顺序、顺序颠倒失败、同时说话失败等），证据 docs/roadmap/evidence/G1-U1-L02/；不是网页课堂可玩课程，未独立教研，未儿童试学，不得标 completed。前置 G1-U1-L01 尚在 PR #272 未合并，本登记不写未合并依赖。"
     },
     {
       "id": "G1-U1-L03",
