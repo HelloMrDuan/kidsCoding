@@ -3971,7 +3971,7 @@
         "title": "G0《小狐狸出场》第 3 关预测按钮被禁用，不刷新无法进入第 4 关（P0 线上缺陷）",
         "priority": "P0",
         "category": "OPS",
-        "status": "todo",
+        "status": "in_progress",
         "dependencies": [
             "OPS-041"
         ],
@@ -3991,7 +3991,7 @@
         "title": "G0《小狐狸出场》“完成本课”点击无明显结果，需核查完成/进度/奖励/同步/跳转（P0 线上缺陷）",
         "priority": "P0",
         "category": "OPS",
-        "status": "todo",
+        "status": "in_progress",
         "dependencies": [
             "OPS-041"
         ],
