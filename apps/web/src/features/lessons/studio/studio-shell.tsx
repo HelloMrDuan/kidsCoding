@@ -106,10 +106,18 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
            readable); the progress/save-message shrink with ellipsis
            instead of pushing a button off-screen; every other control
            never shrinks. No overflow:hidden here: the file menu drops
-           below the bar and must not be clipped by it. */
+           below the bar and must not be clipped by it.
+           OPS-041 E5-768: the actions container itself must be allowed
+           to shrink (flex 0 1 auto + min-width 0). It used to be
+           flex 0 0 auto, so it always took its full content width and
+           the progress's flex-shrink:1 never got a shrink constraint —
+           at 768px a long progress text (553px) pushed the help button
+           ~19px off-screen. With a shrinkable actions container the
+           progress absorbs the shrink (ellipsis); the buttons keep
+           their size. */
         .studio-topbar { height: 52px; flex: 0 0 auto; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: #ffffff; border-bottom: 1px solid #e7edf5; }
         .studio-topbar-main { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; }
-        .studio-topbar-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+        .studio-topbar-actions { display: flex; align-items: center; gap: 8px; flex: 0 1 auto; min-width: 0; }
         .studio-topbar-main > *, .studio-topbar-actions > * { flex-shrink: 0; }
         .studio-topbar h1 { margin: 0; font-size: 16px; flex: 1 1 auto; min-width: 44px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .studio-topbar a { color: #2463eb; text-decoration: none; white-space: nowrap; flex: 0 0 auto; }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-24",
+  "updatedAt": "2026-11-15",
   "policy": "11-TASK-EXECUTION-POLICY.md",
   "tasks": [
     {
@@ -3944,6 +3944,27 @@
       ],
       "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/544"},
       "notes": "2026-11-15 负责人正式开工指令：OPS-039 已合并（merge 40d0ae84）、#537 桥接已合并、前置全满足，从最新 main 建独立分支真实编码，不再写技术方案。执行：3 号 Muse（kid三号小宝）。OPS-040 验收通过后再做 OPS-042 正式迁移。"
+    },
+    {
+        "id": "OPS-041",
+        "title": "迁移 G0《小狐狸出场》lesson-01-forest-hello 到 /studio/blockly（StudioShell + LessonWorkspace slot）",
+        "priority": "P0",
+        "category": "OPS",
+        "status": "in_review",
+        "dependencies": [
+            "OPS-039"
+        ],
+        "scope": "迁移 G0 真正的《小狐狸出场》（lessonId lesson-01-forest-hello，原路由 /learn/lesson/lesson-01-forest-hello，GuidedLessonShell + Blockly），不是 G1-U1-L01。新路由 /studio/blockly/lesson-01-forest-hello：StudioShell 包 LessonWorkspace（chrome='studio'），engine='slot'，课程自有 contract/draft/judging/run-adapter/slot/stage（features/lessons/forest-hello/），EditorSlot 内嵌真实 BlocklyWorkspace（不复制第二套 Blockly 引擎），舞台复用 PlayableStage（external 模式，唯一运行入口为外壳运行按钮），判定复用 evaluateStep/evaluateObservable 规则；保留原四步教学、积木操作、运行判定、错误实验、提示、进度、本地草稿与云端同步；原路由一字不动、继续可用；旧路由只做最小改动（接共享完成 hook 与过关门控纯函数，行为不变）。分支 muse-c/ops-041-forest-hello，独立 PR，不自合；非作者复核交 4 号或首席指定人员。",
+        "acceptance": [
+            "/studio/blockly/lesson-01-forest-hello 可用：无 AppShell、100dvh、52px 单行顶栏、文档与主区均不滚动",
+            "四步教学与旧路由逐项一致：step-1 仅开始不动、step-2 走 100 步、step-3 预测 + 走 200 步到兔子身边、step-4 错误实验（缺开始）观察→回答→修好",
+            "运行判定与旧路由一致：程序正确且已运行成功方可过关；错误实验运行不计失败尝试；三层判定文本为首席批准的文案",
+            "提示三级与补课跳转保留；进度 关卡 X/4 与恢复上次步骤保留；本地草稿真实保存、刷新恢复、失败 fail-closed",
+            "云端同步在完成时真实发生，失败可重试、可仅用本机继续；完成跳 /project/lesson-01-forest-hello/complete，奖励卡发放",
+            "抽屉开合不销毁编辑器；原路由 9 个旧 E2E spec 全过；新 E2E（五视口 + 正反测试）全过；CI 全绿"
+        ],
+        "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/545"},
+        "notes": "2026-11-15 首席指令：OPS-039 合并后立即衔接 OPS-041，优先迁移 G0 真正的《小狐狸出场》lesson-01-forest-hello，不是 G1-U1-L01。2026-11-15 16:46 首席批准正式实施，七项全部裁定：goal5 从 launch-lessons.ts 与四步教学机械派生；判定 stage/task/knowledge 三层、scopeLabel='教学定向'；舞台方案 A 复用 PlayableStage（SlotRunAdapter 为唯一运行状态与判定来源）；旧 UI（语音/回到上次进度/补课/云同步失败重试/完成）全部保留接入 slot 任务区/反馈区；草稿首次访问兼容导入（只读旧键、不覆盖新草稿、不删原草稿）；OPS-044 已预分配给主号处理 G0 迁移后专属 E2E CI 接线（本 PR 不改 curriculum-content.yml、不改 workflow）；共享逻辑抽 useLaunchLessonSession（完成 hook + 过关门控纯函数），旧路由最小改动、9 个旧 spec 为证。BlocklyAdapter 为演示专用，不可用。G1-U1-L02 的 slot 在未合并 PR #530，不作为依据。台账状态说明：实施中为 in_progress；建 PR 后回填 evidence.pr 再改 in_review（门禁脚本要求 in_review 必须有真实 PR URL）。"
     }
   ]
 }

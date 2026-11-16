@@ -1,0 +1,614 @@
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { expect, test, type Page } from '@playwright/test'
+
+/**
+ * OPS-041《小狐狸出场》studio 路由 E2E — 真实 Chrome，生产构建。
+ *
+ * 新路由 /studio/blockly/lesson-01-forest-hello（StudioShell +
+ * LessonWorkspace chrome='studio'，课程自有 ForestEditorSlot /
+ * ForestStageSlot，运行与判定唯一来源 ForestRunAdapter）。旧路由
+ * /learn/lesson/lesson-01-forest-hello 不动，由原有 9 个旧 spec 回归。
+ *
+ * 正向 E1–E8 + 反向 N1–N6（plan.md §4）；五视口 1920×1080 /
+ * 1440×900 / 1366×768 / 768×1024 / 375×812。积木添加走 palette
+ * 的 lesson-add-* 按钮（与旧路由、L01 同款真实路径）；E6 另做一次
+ * 工具箱 flyout 真实拖拽（接成链并跑通）。不使用固定时长 sleep 同步：
+ * 每次等待都是条件期望（可见 testid、存储状态、文本）。
+ * 用临时 Playwright config（独立端口）运行；playwright.config.ts 不动。
+ */
+const ROUTE = '/studio/blockly/lesson-01-forest-hello'
+const KEY = 'kidscoding-draft:lesson-01-forest-hello'
+const EVIDENCE = path.resolve(__dirname, '../../test-results/forest-hello-evidence')
+fs.mkdirSync(EVIDENCE, { recursive: true })
+
+const SIZES = [
+  { name: '1920', width: 1920, height: 1080 },
+  { name: '1440', width: 1440, height: 900 },
+  { name: '1366', width: 1366, height: 768 },
+  { name: '768', width: 768, height: 1024 },
+  { name: '375', width: 375, height: 812 },
+] as const
+
+const START = { type: 'when_start' }
+const MOVE = { type: 'move_right' }
+
+type ForestDraftSeed = {
+  version: number
+  lessonId: string
+  stepIndex: number
+  programs: Record<string, Array<{ type: string }>>
+  passed: string[]
+  failures: number
+}
+
+function emptyDraft(stepIndex = 0): ForestDraftSeed {
+  return {
+    version: 1,
+    lessonId: 'lesson-01-forest-hello',
+    stepIndex,
+    programs: {
+      'step-1': [],
+      'step-2': [],
+      'step-3': [],
+      'step-4': [MOVE],
+    },
+    passed: [],
+    failures: 0,
+  }
+}
+
+async function seedDraft(page: Page, draft: ForestDraftSeed) {
+  await page.addInitScript(
+    ({ key, draft: data }) => {
+      // 只在键不存在时播种：addInitScript 会在每次导航（含 reload）时
+      // 重新执行；无此守卫时 E7 的 reload 会把已保存的程序用空种子覆盖。
+      if (window.localStorage.getItem(key) === null) {
+        window.localStorage.setItem(
+          key,
+          JSON.stringify({
+            lessonId: 'lesson-01-forest-hello',
+            savedAt: new Date().toISOString(),
+            script: data,
+            version: 1,
+          }),
+        )
+      }
+    },
+    { key: KEY, draft },
+  )
+}
+
+async function seedLegacyDraft(page: Page) {
+  await page.addInitScript(() => {
+    const at = new Date().toISOString()
+    window.sessionStorage.setItem(
+      'kc-lesson-draft:lesson-01-forest-hello:0',
+      JSON.stringify({ schemaVersion: 1, lessonId: 'lesson-01-forest-hello', stepIndex: 0, blocks: [{ type: 'when_start' }], updatedAt: at }),
+    )
+    window.sessionStorage.setItem(
+      'kc-lesson-draft:lesson-01-forest-hello:1',
+      JSON.stringify({ schemaVersion: 1, lessonId: 'lesson-01-forest-hello', stepIndex: 1, blocks: [{ type: 'when_start' }, { type: 'move_right' }], updatedAt: at }),
+    )
+  })
+}
+
+async function overflow(page: Page) {
+  return page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)
+}
+
+async function waitForShellSaved(page: Page) {
+  // Shell autosave is debounced (1000ms); only reload after the chip says saved.
+  await expect(page.getByTestId('studio-save-chip')).toContainText('已保存到本机', { timeout: 10_000 })
+}
+
+async function add(page: Page, type: string) {
+  await page.getByTestId(`lesson-add-${type}`).click()
+}
+
+async function clickRun(page: Page) {
+  // Run entry differs by viewport by shell design: >= 768px the sticky row
+  // is display:none and the stage runbar (ws-run-toggle) is the run entry;
+  // < 768px the sticky row (ws-sticky-run) is the in-flow run entry.
+  if (await page.getByTestId('ws-run-toggle').isVisible()) {
+    await page.getByTestId('ws-run-toggle').click()
+  } else {
+    await page.getByTestId('ws-sticky-run').click()
+  }
+}
+
+async function runAndExpect(page: Page, passed: boolean, text?: string) {
+  await clickRun(page)
+  const conclusion = page.getByTestId('ws-feedback-conclusion')
+  await expect(conclusion).toContainText(passed ? '已完成' : '未合格', { timeout: 20_000 })
+  if (text) await expect(conclusion).toContainText(text)
+}
+
+async function complete(page: Page) {
+  await page.getByTestId('forest-hello-complete-step').click()
+}
+
+async function draftStepIndex(page: Page) {
+  return page.evaluate((key) => {
+    const raw = window.localStorage.getItem(key)
+    if (!raw) return -1
+    const parsed = JSON.parse(raw) as { script?: { stepIndex?: number } }
+    return parsed.script?.stepIndex ?? -1
+  }, KEY)
+}
+
+async function draftProgram(page: Page, stepId: string) {
+  return page.evaluate(
+    ({ key, id }) => {
+      const raw = window.localStorage.getItem(key)
+      if (!raw) return null
+      const parsed = JSON.parse(raw) as { script?: { programs?: Record<string, unknown[]> } }
+      return parsed.script?.programs?.[id] ?? null
+    },
+    { key: KEY, id: stepId },
+  )
+}
+
+async function canvasVisibleHeight(page: Page, viewportHeight: number) {
+  const svgBox = await page.getByTestId('ws-editor-slot').locator('svg.blocklySvg').boundingBox()
+  expect(svgBox).not.toBeNull()
+  return Math.max(0, Math.min(viewportHeight, svgBox!.y + svgBox!.height) - Math.max(0, svgBox!.y))
+}
+
+async function assertShellInvariants(page: Page) {
+  await expect(page.locator('.kc-app')).toHaveCount(0)
+  await expect(page.getByTestId('studio-topbar')).toBeVisible()
+  await expect(page.getByTestId('ws-topbar')).toHaveCount(0)
+  await expect(page.getByTestId('studio-save-chip')).toBeVisible()
+  const overflowState = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+    docScrollHeight: document.scrollingElement?.scrollHeight ?? 0,
+    innerHeight: window.innerHeight,
+  }))
+  expect(overflowState.scrollWidth).toBeLessThanOrEqual(overflowState.innerWidth)
+  expect(overflowState.docScrollHeight).toBeLessThanOrEqual(overflowState.innerHeight)
+  await expect(page.getByTestId('studio-guide-drawer')).toHaveCount(0)
+}
+
+async function assertTopbarFits(page: Page, width: number) {
+  const topbarBox = await page.getByTestId('studio-topbar').boundingBox()
+  expect(topbarBox, 'topbar has a bounding box').not.toBeNull()
+  expect(topbarBox!.height, 'slim topbar height in 48–56px').toBeGreaterThanOrEqual(48)
+  expect(topbarBox!.height, 'slim topbar height in 48–56px').toBeLessThanOrEqual(56)
+  for (const id of [
+    'studio-back',
+    'studio-title',
+    'studio-progress',
+    'studio-save-chip',
+    'studio-file-menu-button',
+    'studio-stage-toggle',
+    'studio-help-button',
+    'studio-guide-button',
+  ]) {
+    const box = await page.getByTestId(id).boundingBox()
+    expect(box, `${id} has a bounding box`).not.toBeNull()
+    expect(box!.x, `${id} left edge inside viewport`).toBeGreaterThanOrEqual(0)
+    expect(box!.x + box!.width, `${id} right edge inside viewport`).toBeLessThanOrEqual(width + 0.5)
+  }
+}
+
+/**
+ * 真实拖拽：点工具箱分类（开始/移动）打开 flyout，把第一块 flyout
+ * 积木拖到画布上现有程序栈的正下方（Blockly 在连接点附近松手即接链）。
+ * 注意：本仓库 Blockly  bundle 的分类行是 `.blocklyToolboxCategoryContainer`
+ *（role=treeitem），不是 `.blocklyTreeRow`（该类不存在，E6 首轮实测 0 命中）。
+ */
+async function dragToolboxBlock(page: Page, categoryLabel: string) {
+  const category = page.getByRole('treeitem', { name: categoryLabel }).first()
+  await category.click()
+  const flyoutBlock = page.locator('.blocklyFlyout .blocklyDraggable').first()
+  await flyoutBlock.waitFor({ state: 'visible', timeout: 10_000 })
+  const box = await flyoutBlock.boundingBox()
+  expect(box).not.toBeNull()
+  const canvas = page.locator('[data-testid="ws-editor-slot"] svg.blocklySvg')
+  await canvas.waitFor({ state: 'visible', timeout: 10_000 })
+  // The stack to extend is the main canvas's when_start block. Do NOT use
+  // `.blocklyDraggable:last` here: the open flyout has its own
+  // `.blocklyBlockCanvas`, so :last would pick the flyout's move block and
+  // the drop would land by the toolbox instead of under the stack
+  // (E6 前两轮：积木以 disconnected 散块落地，根因即落点取错).
+  const lastBlock = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.when_start').first()
+  const lastBox = await lastBlock.boundingBox().catch(() => null)
+  const canvasBox = await canvas.boundingBox()
+  expect(canvasBox).not.toBeNull()
+  // Drop so the dragged block's TOP connection lands on the existing
+  // stack's bottom connection. Zelos statement connections sit at x=12
+  // from the block's LEFT edge (not the block centre), and the stack's
+  // bottom connection sits 8 workspace units above the stack's bottom
+  // edge — so the dragged block must be LEFT-ALIGNED with the stack (same
+  // left edge), not centred under it. The mouse holds the dragged block by
+  // its centre, so dropX = stackLeft + draggedWidth/2 and dropY =
+  // stackBottom - 8*scale + draggedHeight/2.
+  // (E6 root cause, OPS-041 probes v4/v5: the old centre-aligned drop put
+  // the real connection points 36.2 workspace units apart, outside
+  // Blockly's snapRadius 28, so no candidate was found and the block was
+  // bumped away unconnected. A connection-aligned drop connects first try;
+  // the E6 assertion is unchanged and the drag is still a real mouse drag.)
+  const canvasTransform = await page
+    .locator('svg.blocklySvg .blocklyBlockCanvas')
+    .evaluate((el) => el.getAttribute('transform') ?? '')
+  const scale = Number.parseFloat(/scale\(([\d.]+)\)/.exec(canvasTransform)?.[1] ?? '1') || 1
+  const dropX = lastBox ? lastBox.x + box!.width / 2 : canvasBox!.x + canvasBox!.width / 2
+  const dropY = lastBox
+    ? lastBox.y + lastBox.height - 8 * scale + box!.height / 2
+    : canvasBox!.y + 80
+  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(dropX, dropY, { steps: 20 })
+  // Let Blockly show the snap highlight before releasing; without this
+  // the release can land before the drag surface evaluates the hover.
+  await page.waitForTimeout(300)
+  await page.mouse.up()
+}
+
+test('E1 desktop 1440: load, step-1 run (only when_start, fox stays), complete to step 2', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-slot')).toBeVisible()
+  await expect(page.getByTestId('forest-hello-step-progress')).toContainText('第 1 / 4 关')
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('认识小狐狸和开始积木')
+  await expect(page.getByTestId('forest-hello-voiceover')).toContainText('先放开始积木')
+  await expect(page.getByTestId('ws-stage-box')).toBeVisible()
+  await expect(page.locator('[data-character-art="fox"]')).toBeVisible()
+  await assertShellInvariants(page)
+  await assertTopbarFits(page, 1440)
+  await page.screenshot({ path: `${EVIDENCE}/e1-desktop-start.png` })
+  // Step 1: only when_start — the fox staying put IS the expected result.
+  await add(page, 'when_start')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+  await expect(page.getByTestId('ws-feedback-stage')).toContainText('一动不动')
+  await page.screenshot({ path: `${EVIDENCE}/e1-desktop-run.png` })
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 2 关')
+})
+
+test('E2 desktop 1440: build step-2 (start + move), run to 100 steps, complete to step 3', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(1)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 2 关')
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
+  await expect(page.getByTestId('ws-feedback-task')).toContainText('任务判定：通过')
+  await expect(page.getByTestId('ws-feedback-stage')).toContainText('100 步')
+  await expect(page.getByTestId('ws-feedback-knowledge')).toContainText('知识证据：通过')
+  await page.screenshot({ path: `${EVIDENCE}/e2-desktop-pass.png` })
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 3 关')
+})
+
+test('E3 desktop 1440: step-3 prediction first, then two moves to 200 steps', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(2)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 3 关')
+  await expect(page.getByTestId('practice-task')).toBeVisible()
+  await expect(page.getByTestId('practice-need-guess')).toBeVisible()
+  // A prediction is only a prediction when made before the run: completing
+  // without one is blocked (the run button itself stays usable — the shell
+  // owns it and the slot cannot disable it; the completion gate holds).
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-notice')).toContainText('先在舞台上猜一猜')
+  await page.getByTestId('practice-answer-beside-friend').click()
+  await expect(page.getByTestId('practice-answer-reply')).toContainText('猜好啦')
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '200', { timeout: 20_000 })
+  await expect(page.getByTestId('practice-done')).toBeVisible()
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+})
+
+test('E4 desktop 1440: step-4 mistake experiment, fix, complete the lesson', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(3)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+  await expect(page.getByTestId('mistake-task')).toBeVisible()
+  await expect(page.getByTestId('mistake-setup')).toBeVisible()
+  // The pre-built wrong program runs as the experiment, not a failure.
+  await clickRun(page)
+  await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code', 'missing-start', { timeout: 20_000 })
+  await expect(page.getByTestId('stage-run-error')).toHaveCount(0)
+  await expect(page.getByTestId('mistake-observed')).toBeVisible()
+  await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('哎呀')
+  await page.screenshot({ path: `${EVIDENCE}/e4-desktop-mistake.png` })
+  // Observed but not answered: completing is blocked.
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-notice')).toContainText('先回答舞台上的问题')
+  await page.getByTestId('mistake-answer-stayed').click()
+  await expect(page.getByTestId('mistake-fix')).toBeVisible()
+  // Fix it and run again: the real failure is gone, the fix is confirmed.
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('mistake-fixed')).toBeVisible()
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
+  await complete(page)
+  // Completion navigates to the reward page (same as the old route).
+  await expect(page).toHaveURL(/\/project\/lesson-01-forest-hello\/complete/, { timeout: 20_000 })
+})
+
+for (const size of SIZES) {
+  test(`E5 ${size.name}: first screen — no AppShell, no outer scroll, topbar fits, canvas Gate 1`, async ({ page }) => {
+    test.setTimeout(240_000)
+    await page.setViewportSize({ width: size.width, height: size.height })
+    await page.goto(ROUTE)
+    // 首屏加载时 Blockly 注入较慢（本机首访常 >5s）：给画布 30s，
+    // 不是默认 5s；画布出现即继续，不用固定时长等待。
+    await expect(page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')).toBeVisible({ timeout: 30_000 })
+    await assertShellInvariants(page)
+    await assertTopbarFits(page, size.width)
+    await expect.poll(() => overflow(page), { timeout: 10_000 }).toBe(false)
+    // Gate 1: visible height is the viewport ∩ canvas rect, NOT the
+    // canvas's own height (which extends past the fold).
+    const visible = await canvasVisibleHeight(page, size.height)
+    if (size.width === 768) expect(visible).toBeGreaterThanOrEqual(300)
+    if (size.width === 375) expect(visible).toBeGreaterThanOrEqual(220)
+    // The stage and the run entry are reachable without scrolling the page.
+    // (Mobile <768px uses the sticky run row instead of the stage runbar.)
+    const stageBox = await page.getByTestId('ws-stage-box').boundingBox()
+    expect(stageBox).not.toBeNull()
+    expect(stageBox!.y).toBeLessThan(size.height)
+    const runToggle = page.getByTestId('ws-run-toggle')
+    const runEntry = (await runToggle.isVisible()) ? runToggle : page.getByTestId('ws-sticky-run')
+    const runBox = await runEntry.boundingBox()
+    expect(runBox).not.toBeNull()
+    expect(runBox!.y).toBeLessThan(size.height)
+    await page.screenshot({ path: `${EVIDENCE}/e5-first-${size.name}.png` })
+  })
+}
+
+test('E6 desktop 1440: real toolbox flyout drag connects the move block and passes', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(1)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 2 关')
+  await add(page, 'when_start')
+  await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START])
+  // Real drag: the move block comes from the toolbox flyout, not a button.
+  await dragToolboxBlock(page, '移动')
+  await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
+})
+
+test('E7 desktop 1440: save + refresh restores the step and the program', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(1)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await waitForShellSaved(page)
+  await page.reload()
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 2 关')
+  await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
+})
+
+test('E8 desktop 1440: guide drawer reveals goal5 + hints in order, toggle does not remount the editor', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(ROUTE)
+  // 首屏加载时 Blockly 注入较慢（本机首访常 >5s）：给画布 30s。
+  await expect(page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')).toBeVisible({ timeout: 30_000 })
+  // Drawer default closed; opening it must not remount the editor.
+  const svgBefore = await page.evaluate(() => {
+    const svg = document.querySelector('[data-testid="ws-editor-slot"] svg.blocklySvg')
+    if (!svg) return null
+    const probe = svg as unknown as { __forestProbe?: object }
+    probe.__forestProbe = {}
+    return probe.__forestProbe === (svg as unknown as { __forestProbe?: object }).__forestProbe
+  })
+  expect(svgBefore).toBe(true)
+  await page.getByTestId('studio-guide-button').click()
+  const drawer = page.getByTestId('studio-guide-drawer')
+  await expect(drawer).toBeVisible()
+  await expect(drawer.getByTestId('studio-goal5')).toContainText('让小狐狸向右走 100 步')
+  await expect(drawer).toContainText('小狐狸出场 · 玩法帮助')
+  await drawer.getByTestId('studio-hint-reveal-1').click()
+  await expect(drawer.getByTestId('studio-hint-1')).toContainText('先让小狐狸准备好出场')
+  await drawer.getByTestId('studio-hint-reveal-2').click()
+  await expect(drawer.getByTestId('studio-hint-2')).toContainText('把“开始时”放在最前面')
+  await drawer.getByTestId('studio-hint-reveal-3').click()
+  await expect(drawer.getByTestId('studio-hint-3')).toContainText('先看一个很短的示意')
+  await page.screenshot({ path: `${EVIDENCE}/e8-desktop-drawer.png` })
+  await page.getByTestId('studio-guide-close').click()
+  await expect(page.getByTestId('studio-guide-drawer')).toHaveCount(0)
+  const sameNode = await page.evaluate(() => {
+    const svg = document.querySelector('[data-testid="ws-editor-slot"] svg.blocklySvg') as unknown as { __forestProbe?: object } | null
+    return svg?.__forestProbe !== undefined
+  })
+  expect(sameNode).toBe(true)
+  // File menu: new / export / import / reset are all present (contract opens all).
+  await page.getByTestId('studio-file-menu-button').click()
+  await expect(page.getByTestId('studio-file-menu')).toBeVisible()
+  for (const id of ['studio-file-new', 'studio-file-save', 'studio-file-export', 'studio-file-import', 'studio-file-reset']) {
+    await expect(page.getByTestId(id)).toBeVisible()
+  }
+})
+
+test('E9 desktop 1440: a seeded step-2 draft restores both blocks into the canvas and stays intact', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  // OPS-041 修复回归：挂载时 store 采纳 effect 若读到 useSyncExternalStore
+  // 的旧快照（初始空草稿），会把已加载的草稿短暂覆成空、再翻回来；翻转期
+  // 间重建 effect（旧闭包 stepId + 实时 draftRef 混用）会把第 1 关的
+  // [when_start] 重建成画布、再经快照持久化把第 2 关的 move_right 从
+  // 存储里删掉（probe16/17/18）。本测试冷加载已保存的第 2 关草稿并断言
+  // 画布与存储都完整，才算恢复成立。
+  const draft = emptyDraft(1)
+  draft.programs['step-1'] = [START]
+  draft.programs['step-2'] = [START, MOVE]
+  draft.passed = ['step-1']
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 2 关', { timeout: 30_000 })
+  const canvas = page.getByTestId('ws-editor-slot').locator('svg.blocklySvg .blocklyBlockCanvas')
+  await expect(canvas.locator('.blocklyDraggable.when_start')).toHaveCount(1, { timeout: 30_000 })
+  await expect(canvas.locator('.blocklyDraggable.move_right')).toHaveCount(1, { timeout: 30_000 })
+  // 自动保存窗口（1000ms 防抖）过后，存储里的第 2 关程序必须仍是两块。
+  await page.waitForTimeout(2500)
+  await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+  // 再跑一次：恢复的程序必须真实通过。
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
+})
+
+test('N1 desktop 1440: a disconnected move block fails the run, fox stays', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(1)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  // Tear the move block off the main stack with a short drag.
+  const move = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.move_right').first()
+  await move.scrollIntoViewIfNeeded()
+  const box = await move.boundingBox()
+  expect(box).not.toBeNull()
+  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(box!.x + box!.width / 2 + 120, box!.y + box!.height / 2 + 80, { steps: 10 })
+  await page.mouse.up()
+  await runAndExpect(page, false)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+  await expect(page.getByTestId('ws-feedback-task')).toContainText('未通过')
+})
+
+test('N2 desktop 1440: move without start fails (missing-start)', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(1)
+  draft.programs['step-2'] = [MOVE]
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await runAndExpect(page, false)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+  await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('未合格')
+})
+
+test('N3 desktop 1440: only when_start on step 2 fails (fox never reaches 100)', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(1)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await add(page, 'when_start')
+  await runAndExpect(page, false)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+})
+
+test('N4 desktop 1440: save failure is fail-closed (localStorage quota exhausted)', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(1)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await waitForShellSaved(page)
+  // Exhaust the origin's localStorage quota for real — precisely.
+  // A coarse fill alone is NOT enough: overwriting the existing draft
+  // key with a same-size value needs no new quota, so the save would
+  // still succeed (N4 首轮：chip 始终“已保存到本机”). The binary-search
+  // fine fill leaves < 1 byte free, so any growth of the draft throws.
+  await page.evaluate(() => {
+    const chunk = 'x'.repeat(1024 * 1024)
+    let i = 0
+    try {
+      for (i = 0; i < 200; i += 1) {
+        window.localStorage.setItem(`__forest-quota-fill-${i}`, chunk)
+      }
+    } catch {
+      // Coarse fill done: free space is now < 1MB.
+    }
+    let lo = 0
+    let hi = 1024 * 1024
+    const probeKey = '__forest-quota-probe'
+    while (lo < hi) {
+      const mid = Math.floor((lo + hi + 1) / 2)
+      try {
+        window.localStorage.setItem(probeKey, 'x'.repeat(mid))
+        lo = mid
+      } catch {
+        hi = mid - 1
+      }
+    }
+    window.localStorage.setItem(probeKey, 'x'.repeat(lo))
+  })
+  // Dirty the draft so the next save must GROW it (+~24 bytes): with
+  // < 1 byte free the write throws instead of silently overwriting.
+  await page.getByTestId('lesson-add-move_right').click()
+  // Trigger a real save through the shell: the chip must report failure,
+  // never “已保存到本机”.
+  await page.getByTestId('forest-hello-save').click()
+  await expect(page.getByTestId('studio-save-chip')).toContainText('未能保存', { timeout: 10_000 })
+  await expect(page.getByTestId('studio-save-chip')).not.toContainText('已保存到本机')
+})
+
+test('N5 desktop 1440: editing after a pass invalidates the shell judgment', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const draft = emptyDraft(1)
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
+  // Editing the program must invalidate the pass.
+  await page.getByTestId('lesson-add-move_right').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0, { timeout: 10_000 })
+  // Remove the extra block again (select it, then the always-available delete)
+  // and re-run: the pass comes back.
+  await page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.move_right').last().click()
+  await page.getByTestId('lesson-delete-selected').click()
+  await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+  await runAndExpect(page, true)
+})
+
+test('N6 desktop 1440: legacy draft import is offered once, imports, and keeps the original', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await seedLegacyDraft(page)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-legacy-import')).toBeVisible()
+  await expect(page.getByTestId('forest-hello-legacy-import')).toContainText('到第 2 关')
+  await page.getByTestId('forest-hello-import-legacy').click()
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 2 关')
+  await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+  await expect(page.getByTestId('forest-hello-legacy-import')).toHaveCount(0)
+  // The original legacy draft is kept, never deleted.
+  const legacyKept = await page.evaluate(
+    () => window.sessionStorage.getItem('kc-lesson-draft:lesson-01-forest-hello:1') !== null,
+  )
+  expect(legacyKept).toBe(true)
+})

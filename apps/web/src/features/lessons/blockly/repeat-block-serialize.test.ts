@@ -1,7 +1,7 @@
 import * as Blockly from 'blockly'
 import { describe, expect, it } from 'vitest'
 
-import { buildSnapshot } from './blockly-workspace'
+import { buildSnapshot } from './blockly-snapshot'
 import { registerKidsBlocks } from './register-kids-blocks'
 
 // SYS-107: the real Blockly block serialises its count and the blocks in its mouth.
