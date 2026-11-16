@@ -399,17 +399,30 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       return
     }
     // 最后一关：完成整课（奖励 + 本机进度 + 云端同步 + 跳转）。
+    // OPS-046：每一种 outcome 都必须有可见反馈，不得静默无响应。
     if (!FOREST_SOURCE_LESSON) {
       setNotice('课程数据缺失，无法完成本课。')
       return
     }
-    const outcome = await completeLesson({
-      blocks: program,
-      lesson: FOREST_SOURCE_LESSON,
-      lessons: launchLessons,
-    })
+    let outcome: Awaited<ReturnType<typeof completeLesson>>
+    try {
+      outcome = await completeLesson({
+        blocks: program,
+        lesson: FOREST_SOURCE_LESSON,
+        lessons: launchLessons,
+      })
+    } catch {
+      // 兜底：completeLesson 本身已在各阶段做 fail-closed 处理，此处
+      // 不应再抛；万一抛错也要给孩子可见提示，而不是卡在“正在完成…”。
+      setNotice('完成时遇到问题，请再点一次“完成本课”重试。')
+      return
+    }
     if (outcome === 'local-save-failed') {
       setNotice('本机存储失败，作品和奖励尚未保存。请检查浏览器存储空间后重试完成。')
+    } else if (outcome === 'already-completing') {
+      setNotice('正在完成本课，请稍等，不要重复点击。')
+    } else if (outcome === 'navigate-failed') {
+      setNotice('奖励和进度已保存到本机，但跳转到完成页失败。请刷新页面后在学习地图查看进度。')
     }
     // 'cloud-failed' 时横幅与重试入口在下方反馈区承接；'completed' 时已跳转。
   }

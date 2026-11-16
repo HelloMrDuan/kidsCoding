@@ -115,11 +115,15 @@ describe('useLaunchLessonCompletion', () => {
     vi.restoreAllMocks()
   })
 
-  function renderCompletion() {
+  function renderCompletion(overrides?: {
+    onClearDrafts?: () => void
+    onNavigateToComplete?: () => void
+  }) {
     return renderHook(() =>
       useLaunchLessonCompletion({
         lessonId: LESSON_ID,
-        onClearDrafts,
+        onClearDrafts: overrides?.onClearDrafts ?? onClearDrafts,
+        onNavigateToComplete: overrides?.onNavigateToComplete,
       }),
     )
   }
@@ -205,5 +209,109 @@ describe('useLaunchLessonCompletion', () => {
     expect(outcome).toBe('local-save-failed')
     expect(push).not.toHaveBeenCalled()
     expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('corrupt stored progress does not fail completion silently (OPS-046)', async () => {
+    window.localStorage.setItem('kc-progress', '{not json')
+    const { result } = renderCompletion()
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('completed')
+    expect(result.current.isCompleting).toBe(false)
+    expect(push).toHaveBeenCalledWith(`/project/${LESSON_ID}/complete`)
+    expect(onClearDrafts).toHaveBeenCalledTimes(1)
+  })
+
+  it('an aborted sync (timeout) reports cloud-failed and releases the completing guard (OPS-046)', async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(
+      new DOMException('The operation was aborted.', 'AbortError'),
+    )
+    const { result } = renderCompletion()
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('cloud-failed')
+    expect(result.current.cloudSyncState).toBe('failed')
+    expect(result.current.isCompleting).toBe(false)
+    expect(push).not.toHaveBeenCalled()
+    // The guard is released: a retry can run afterwards.
+    await act(async () => {
+      await result.current.retryCloudSync()
+    })
+    expect(result.current.cloudSyncState).toBe('synced')
+    expect(push).toHaveBeenCalledWith(`/project/${LESSON_ID}/complete`)
+  })
+
+  it('a second completion while one is in flight returns already-completing, no double award (OPS-046)', async () => {
+    const { result } = renderCompletion()
+    let first: string | undefined
+    let second: string | undefined
+    await act(async () => {
+      const p1 = result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+      const p2 = result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+      ;[first, second] = await Promise.all([p1, p2])
+    })
+    expect([first, second].sort()).toEqual(['already-completing', 'completed'])
+    expect(push).toHaveBeenCalledTimes(1)
+    expect(onClearDrafts).toHaveBeenCalledTimes(1)
+    expect(result.current.isCompleting).toBe(false)
+  })
+
+  it('a throwing draft clear does not block navigation (OPS-046)', async () => {
+    const { result } = renderCompletion({
+      onClearDrafts: () => {
+        throw new Error('clear failed')
+      },
+    })
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('completed')
+    expect(push).toHaveBeenCalledWith(`/project/${LESSON_ID}/complete`)
+    expect(result.current.isCompleting).toBe(false)
+  })
+
+  it('a throwing navigation reports navigate-failed and releases the guard (OPS-046)', async () => {
+    const { result } = renderCompletion({
+      onNavigateToComplete: () => {
+        throw new Error('navigation failed')
+      },
+    })
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('navigate-failed')
+    expect(result.current.isCompleting).toBe(false)
+    expect(push).not.toHaveBeenCalled()
+    expect(onClearDrafts).toHaveBeenCalledTimes(1)
   })
 })

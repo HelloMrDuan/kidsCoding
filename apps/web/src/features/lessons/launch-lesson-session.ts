@@ -152,6 +152,7 @@ export type LaunchLessonCompletionOutcome =
   | 'local-save-failed'
   | 'cloud-failed'
   | 'already-completing'
+  | 'navigate-failed'
 
 export type UseLaunchLessonCompletionInput = {
   lessonId: string
@@ -170,13 +171,17 @@ export type UseLaunchLessonCompletion = {
   isCompleting: boolean
   /**
    * 完成整课：发奖励 → 算新进度 → 写本机 → 云端同步 → 清草稿 → 跳转。
-   * 返回 outcome 供调用方决定反馈文案：
+   * 返回 outcome 供调用方决定反馈文案（OPS-046：每一种 outcome
+   * 都必须有可见反馈，不得静默无响应）：
    * - 'completed'：已跳转；
    * - 'local-save-failed'：本机写失败，奖励与进度未保存，未跳转；
    * - 'cloud-failed'：本机已保存、云端未同步，cloudSyncState 为 'failed'，
    *   未跳转，等待调用方展示重试 / 仅用本机继续。
-   * - 'already-completing'：已有一次完成正在进行，本次调用静默忽略
-   *   （旧路由行为：直接 return，不改任何状态、不报失败）。
+   * - 'already-completing'：已有一次完成正在进行，本次调用不改任何
+   *   状态；调用方须给可见提示（新路由显示“正在完成中”；旧路由保
+   *   持原有行为，即不额外提示）。
+   * - 'navigate-failed'：本机已保存、云端已同步，但清草稿后的跳转
+   *   失败，未跳转；调用方须给可见提示（进度已保存，刷新后查看）。
    */
   completeLesson: (args: {
     blocks: ProgramBlock[]
@@ -198,6 +203,11 @@ export function useLaunchLessonCompletion({
   const [cloudSyncState, setCloudSyncState] = useState<LessonCloudSyncState>('idle')
   const [isCompleting, setIsCompleting] = useState(false)
   const pendingProgressRef = useRef<ReturnType<typeof readGuestProgress> | null>(null)
+  // OPS-046：完成守卫必须是 ref。isCompleting 是 state，同一渲染
+  // 周期内的两次调用会读到同一个旧值，双击会并发执行两次完成流程
+  // （奖励虽由 completeLaunchLesson 幂等兜底，但仍会重复写进度与
+  // 重复跳转）。ref 在调用入口同步置位，杜绝竞态。
+  const completingRef = useRef(false)
 
   const navigateToComplete = useCallback(() => {
     if (onNavigateToComplete) {
@@ -217,86 +227,146 @@ export function useLaunchLessonCompletion({
       lesson: LaunchLessonDefinition
       lessons: LaunchLessonDefinition[]
     }): Promise<LaunchLessonCompletionOutcome> => {
-      const progress = readGuestProgress()
-      const reward = awardLessonCompletion({
-        lessonId: lesson.id,
-        rewardCardId: lesson.rewardCardId,
-        isFirstProject: progress.completedProjectIds.length === 0,
-        streakDays: progress.streakDays,
-      })
-      const nextProgress = completeLaunchLesson({
-        blocks,
-        lesson,
-        lessons,
-        progress,
-        reward,
-        updatedAt: new Date().toISOString(),
-      })
-
-      if (isCompleting) {
+      // 同步守卫：同一时刻至多一次完成流程。
+      if (completingRef.current) {
         return 'already-completing'
       }
+      completingRef.current = true
       setIsCompleting(true)
 
+      // 阶段一：算奖励与新进度并写本机。任一步抛错（例如损坏的进度键、
+      // 存储已满）都按本机保存失败返回，奖励与进度未保存，未跳转。
+      let nextProgress: ReturnType<typeof readGuestProgress>
       try {
+        const progress = readGuestProgress()
+        const reward = awardLessonCompletion({
+          lessonId: lesson.id,
+          rewardCardId: lesson.rewardCardId,
+          isFirstProject: progress.completedProjectIds.length === 0,
+          streakDays: progress.streakDays,
+        })
+        nextProgress = completeLaunchLesson({
+          blocks,
+          lesson,
+          lessons,
+          progress,
+          reward,
+          updatedAt: new Date().toISOString(),
+        })
         writeGuestProgress(nextProgress)
       } catch {
+        completingRef.current = false
         setIsCompleting(false)
         return 'local-save-failed'
       }
 
-      // Cloud sync is a separate truth from the local save: a failed sync
-      // must stay visible as failed with a retry, never as success.
+      // 阶段二：云端同步（带超时，见 syncGuestSnapshot）。同步是与本机
+      // 保存分开的第二重事实：失败必须保持 failed 可见、可重试，永不
+      // 显示成功；本机保存已是真实的。
       setCloudSyncState('syncing')
-      const syncResult = await syncGuestSnapshot({
-        onboarding: readOnboardingSession(),
-        progress: nextProgress,
-      })
+      let syncResult: Awaited<ReturnType<typeof syncGuestSnapshot>>
+      try {
+        syncResult = await syncGuestSnapshot({
+          onboarding: readOnboardingSession(),
+          progress: nextProgress,
+        })
+      } catch {
+        syncResult = { ok: false, synced: false }
+      }
       if (!syncResult.ok) {
         pendingProgressRef.current = nextProgress
         setCloudSyncState('failed')
+        completingRef.current = false
         setIsCompleting(false)
         return 'cloud-failed'
       }
       setCloudSyncState(syncResult.synced ? 'synced' : 'local-only')
       pendingProgressRef.current = null
-      onClearDrafts()
-      navigateToComplete()
+
+      // 阶段三：清草稿并跳转。清草稿是 best-effort（失败也不阻塞跳转，
+      // 进度已保存）；跳转失败则明确返回 'navigate-failed'，调用方给
+      // 出可见提示，绝不静默。
+      try {
+        onClearDrafts()
+      } catch {
+        // 草稿残留不影响已保存的进度与奖励；下次打开课程时仍可清理。
+      }
+      try {
+        navigateToComplete()
+      } catch {
+        completingRef.current = false
+        setIsCompleting(false)
+        return 'navigate-failed'
+      }
+      completingRef.current = false
+      setIsCompleting(false)
       return 'completed'
     },
-    [isCompleting, navigateToComplete, onClearDrafts],
+    [navigateToComplete, onClearDrafts],
   )
 
   const retryCloudSync = useCallback(async () => {
     const pending = pendingProgressRef.current
-    if (!pending || isCompleting) {
+    if (!pending || completingRef.current) {
       return
     }
+    completingRef.current = true
     setIsCompleting(true)
     setCloudSyncState('syncing')
 
-    const syncResult = await syncGuestSnapshot({
-      onboarding: readOnboardingSession(),
-      progress: pending,
-    })
+    let syncResult: Awaited<ReturnType<typeof syncGuestSnapshot>>
+    try {
+      syncResult = await syncGuestSnapshot({
+        onboarding: readOnboardingSession(),
+        progress: pending,
+      })
+    } catch {
+      syncResult = { ok: false, synced: false }
+    }
     if (!syncResult.ok) {
       setCloudSyncState('failed')
+      completingRef.current = false
       setIsCompleting(false)
       return
     }
 
     setCloudSyncState(syncResult.synced ? 'synced' : 'local-only')
     pendingProgressRef.current = null
-    onClearDrafts()
-    navigateToComplete()
-  }, [isCompleting, navigateToComplete, onClearDrafts])
+    try {
+      onClearDrafts()
+    } catch {
+      // 同上：清草稿失败不阻塞跳转。
+    }
+    try {
+      navigateToComplete()
+    } catch {
+      // 跳转失败：云端已同步，守卫复位；用户可再点一次“完成本课”
+      // （进度幂等，不重复发奖励）重新尝试跳转。
+      completingRef.current = false
+      setIsCompleting(false)
+      return
+    }
+    completingRef.current = false
+    setIsCompleting(false)
+  }, [navigateToComplete, onClearDrafts])
 
   const continueLocalOnly = useCallback(() => {
     // Explicit choice: the local save is real, the cloud copy is missing,
     // and the next lesson completion re-syncs the full snapshot.
+    // OPS-046：清草稿与跳转均不得抛错到调用方（按钮点击无处承接
+    // 异常）；清草稿失败是 best-effort，跳转失败时保留 failed 横幅，
+    // 用户仍可重试同步或再次点击仅用本机继续。
     pendingProgressRef.current = null
-    onClearDrafts()
-    navigateToComplete()
+    try {
+      onClearDrafts()
+    } catch {
+      // 草稿残留不影响已保存的进度。
+    }
+    try {
+      navigateToComplete()
+    } catch {
+      // 跳转失败：不改 cloudSyncState，failed 横幅与重试入口仍在。
+    }
   }, [navigateToComplete, onClearDrafts])
 
   return { cloudSyncState, isCompleting, completeLesson, retryCloudSync, continueLocalOnly }

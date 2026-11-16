@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { defaultGuestProgress } from './local-progress'
-import { syncGuestSnapshot } from './sync-guest-snapshot'
+import { GUEST_SYNC_TIMEOUT_MS, syncGuestSnapshot } from './sync-guest-snapshot'
 
 const PROGRESS = defaultGuestProgress
 const ONBOARDING = {} as Parameters<typeof syncGuestSnapshot>[0]['onboarding']
@@ -78,5 +78,26 @@ describe('syncGuestSnapshot', () => {
     await expect(
       syncGuestSnapshot({ onboarding: ONBOARDING, progress: PROGRESS }),
     ).resolves.toEqual({ ok: false, synced: false })
+  })
+
+  it('a hung request aborts after the timeout and reports failure (OPS-046)', async () => {
+    vi.useFakeTimers()
+    try {
+      // A server that never responds: the mock only settles when its
+      // AbortSignal fires, exactly like a real fetch under AbortController.
+      vi.mocked(fetch).mockImplementation(
+        (_url, init) =>
+          new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () =>
+              reject(new DOMException('The operation was aborted.', 'AbortError')),
+            )
+          }),
+      )
+      const pending = syncGuestSnapshot({ onboarding: ONBOARDING, progress: PROGRESS })
+      await vi.advanceTimersByTimeAsync(GUEST_SYNC_TIMEOUT_MS)
+      await expect(pending).resolves.toEqual({ ok: false, synced: false })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
