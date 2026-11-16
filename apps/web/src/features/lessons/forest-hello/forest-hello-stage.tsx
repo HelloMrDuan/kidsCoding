@@ -15,6 +15,8 @@
  */
 'use client'
 
+import { useEffect } from 'react'
+
 import { getMistakeStep } from '@/content/curriculum/mistake-steps'
 import { getPracticeStep } from '@/content/curriculum/practice-steps'
 import { launchTemplates } from '@/content/curriculum/launch-lessons'
@@ -30,6 +32,16 @@ export function ForestStageSlot({ lessonId }: StageSlotProps) {
   const { store, runAdapter } = useForestSession()
   const sessionState = useForestSessionState()
   const draft = sessionState.draft
+
+  // OPS-045 纵深防御：切关时清理上一关的运行快照。主清理在插槽
+  // goToStep（persist 之前同步执行，新关首帧即为 idle）；此处覆盖一切
+  // 绕过 goToStep 的切关路径（例如旧草稿导入直接落在第 2 关之后）。
+  // 挂载时亦执行一次（适配器本就是 idle，无副作用）；切关不可能打断
+  // 正在播放的运行（过关门控要求本关先运行成功），故 reset 安全。
+  useEffect(() => {
+    runAdapter.reset()
+  }, [runAdapter, draft.stepIndex])
+
   const step = FOREST_STEPS[Math.min(draft.stepIndex, FOREST_STEPS.length - 1)]
   const stepId = step.id
   const blocks = draft.programs[stepId] ?? forestStarterProgram(stepId as ForestStepId)

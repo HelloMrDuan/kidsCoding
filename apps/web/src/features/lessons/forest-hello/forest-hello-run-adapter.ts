@@ -14,6 +14,13 @@
  *   330ms/帧发 frame 事件，播完发 finished。
  * - stop()：同步清定时器，running=false，保留脚本与当前舞台状态，
  *   不发 finished；不得遗留定时器 / 待回调。
+ * - reset()（OPS-045）：切关清理——快照与判定归属于跑过它的那
+ *   一关，进入新关时必须回到 idle；否则上一关的 'success'/'error'
+ *   快照泄漏到新关，PlayableStage 在 predict 模式下以 executionState
+ *   非 idle/非 error 锁住预测按钮（practiceLocked），且完成门控因缺
+ *   少 practiceAnswer 而阻塞。与 stop() 不同：stop() 只取消正在播放
+ *   的 run 并保留舞台状态（F2/F3 要求）；reset() 是关卡边界的完整
+ *   清理，由插槽在 goToStep 与舞台挂载时调用。
  * - getState() 永不抛错。validateDraft = isValidForestDraft（数据所有者
  *   优先，OPS-028 3d）。getJudgmentResult() 返回 lastJudgment（只在播放
  *   结束——或无帧直接 finished——时赋值；播放中返回旧值/null）。
@@ -141,6 +148,20 @@ export class ForestRunAdapter implements SlotRunAdapter {
     if (this.snapshot.executionState === 'running') {
       this.snapshot = { ...this.snapshot, executionState: 'idle' }
     }
+  }
+
+  /**
+   * 切关清理（OPS-045）：同步停定时器，快照、判定、帧与状态全
+   * 部回到初始值。调用点：插槽 goToStep（切关前）与舞台按关重挂载
+   * 时。不得用 stop() 代替——stop() 必须保留舞台状态（F2/F3）。
+   */
+  reset(): void {
+    this.stop()
+    this.state = { x: 0, score: 0, running: false, frames: 0 }
+    this.lastJudgment = null
+    this.snapshot = emptyForestExecutionSnapshot()
+    this.frames = []
+    this.result = null
   }
 
   getState(): EngineState {
