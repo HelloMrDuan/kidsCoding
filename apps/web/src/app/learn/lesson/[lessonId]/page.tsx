@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 
 import { getFoundationUnitByLessonId } from '@/content/curriculum/foundation-units'
 import { getMistakeStep, getMistakeStepAt } from '@/content/curriculum/mistake-steps'
-import { asksClickPrediction, getPracticeStepAt, getPracticeStepFor, isPracticeAnswered } from '@/content/curriculum/practice-steps'
+import { asksClickPrediction, getPracticeStepAt, getPracticeStepFor } from '@/content/curriculum/practice-steps'
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
@@ -23,15 +23,11 @@ import { DuoStage } from '@/features/lessons/playable-stage/duo-stage'
 import { judgeDuoProgram } from '@/features/lessons/playable-stage/duo-judge'
 import { buildHintState } from '@/features/lessons/build-hint-state'
 import { getRemedialIdForLesson } from '@/features/lessons/remedial-routing'
-import { completeLaunchLesson } from '@/features/lessons/complete-launch-lesson'
 import { getFoundationLessonFeedback } from '@/features/lessons/foundation-lesson-feedback'
 import { GuidedLessonShell } from '@/features/lessons/guided-lesson-shell'
-import type {
-  LessonCloudSyncState,
-  LessonLocalSaveState,
-} from '@/features/lessons/guided-lesson-shell'
+import type { LessonLocalSaveState } from '@/features/lessons/guided-lesson-shell'
+import { launchStepGate, useLaunchLessonCompletion } from '@/features/lessons/launch-lesson-session'
 import { TemplateStoryBuilder } from '@/features/lessons/template-story-builder'
-import { readOnboardingSession } from '@/features/onboarding/onboarding-session'
 import {
   clearLessonDraft,
   clearLessonDraftsForLesson,
@@ -39,12 +35,6 @@ import {
   readLastLessonStep,
   saveLessonDraft,
 } from '@/features/progress/lesson-draft'
-import {
-  readGuestProgress,
-  writeGuestProgress,
-} from '@/features/progress/local-progress'
-import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
-import { awardLessonCompletion } from '@/features/rewards/award-lesson-completion'
 
 // BlocklyWorkspace is client-only: @blockly/keyboard-navigation reads
 // `navigator` at module top level, which throws during SSR. Loading it
@@ -88,12 +78,21 @@ export default function LessonPage() {
   const [localSaveState, setLocalSaveState] =
     useState<LessonLocalSaveState>('unsaved')
   const restoredForRef = useRef<string | null>(null)
-  const [cloudSyncState, setCloudSyncState] =
-    useState<LessonCloudSyncState>('idle')
-  const [isCompleting, setIsCompleting] = useState(false)
-  const pendingProgressRef = useRef<ReturnType<typeof readGuestProgress> | null>(
-    null,
-  )
+  // 完成流程（奖励 + 本机进度 + 云端同步 + 重试 / 仅用本机继续 + 跳转）：
+  // 与新 studio 路由共用的共享 hook（launch-lesson-session.ts）；清草稿
+  // 仍按旧路由的按步 sessionStorage 模型（clearLessonDraftsForLesson）。
+  const {
+    cloudSyncState,
+    isCompleting,
+    completeLesson,
+    retryCloudSync,
+    continueLocalOnly,
+  } = useLaunchLessonCompletion({
+    lessonId: lessonId ?? '',
+    onClearDrafts: () => {
+      if (lessonId) clearLessonDraftsForLesson(lessonId)
+    },
+  })
   const blocksRef = useRef<Array<{ type: string }>>(blocks)
   const [feedback, setFeedback] = useState<string>(() =>
     getFoundationLessonFeedback(lessonId ?? '', 'initial'),
@@ -346,55 +345,46 @@ export default function LessonPage() {
     const needsRun=['lesson-01-forest-hello','lesson-02-forest-greeting','lesson-03-forest-story','lesson-04-meadow-scene','lesson-05-meadow-order','lesson-06-meadow-story','lesson-07-garden-click','lesson-08-garden-dialogue','lesson-09-garden-story'].includes(currentLesson.id)
     const duoLesson = ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(currentLesson.id)
     const correct=duoLesson ? hasRunSuccess : evaluateStep(step.requiredBlockTypes,blocksRef.current,judgeOptions)
-    if (mistakeStep && !mistakeObserved) {
-      // TQ-010: the designed mistake has to be seen on stage before it can be fixed.
-      // Garden steps name their real stage button (「启动点击程序」), not a generic “运行”.
-      const runButton = step.requiredBlockTypes[0] === 'when_clicked' ? '「启动点击程序」' : '运行按钮'
-      setFeedback(`先按舞台上的${runButton}，看看摆好的这段程序会让${getMainCharacterLabel(currentTemplate)}怎样，再来修好它。`)
-      return
-    }
-    if (mistakeStep && !mistakeStep.choices.some((choice) => choice.id === mistakeAnswer && choice.correct)) {
-      setFeedback(`先回答舞台上的问题：${mistakeStep.question}`)
-      return
-    }
-    if (practiceStep?.mode === 'predict' && !practiceAnswer) {
-      // TQ-011: a prediction is only a prediction when it is made before the run.
-      setFeedback(`先在舞台上猜一猜：${practiceStep.question}`)
-      return
-    }
-    if (needsRun && correct && !hasRunSuccess) {
-      // Not a mistake: the program is right but has not been run yet.
-      // TQ-011: follow the step's own start event (lesson-08's practice starts with “开始时”).
-      setFeedback(step.requiredBlockTypes[0] === 'when_clicked' ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。' : '积木拼好了，请先点击舞台上的“运行”按钮观察结果，再完成这一关。')
-      return
-    }
+    // TQ-015: the duo program itself is right — only the step activity (prediction,
+    // mistake experiment or reflection) is still open. Like the single-role
+    // “program is right but not run yet” case above, this is not a failed attempt.
+    // Duo lessons have no mistake/practice designs, so this branch fires identically
+    // before or after the shared gates; it stays in the route (not in the gate).
     if (duoLesson && !correct && judgeDuoProgram(blocksRef.current, currentLesson.id === 'lesson-12-graduation-show' ? 'graduation' : currentLesson.id === 'lesson-11-duo-rehearsal' ? 'dialogue' : 'independent', safeStepIndex).passed) {
-      // TQ-015: the duo program itself is right — only the step activity (prediction,
-      // mistake experiment or reflection) is still open. Like the single-role
-      // “program is right but not run yet” case above, this is not a failed attempt.
       setFeedback('请先运行并观察角色结果，完成本关的预测、错误实验或复盘。舞台会告诉你还缺什么。')
       return
     }
-    if (!correct) {
-      const programKey = `${stepIndex}|${JSON.stringify(blocksRef.current)}`
-      if (countedRunFailureRef.current === programKey) {
+    // 过关门控（共享纯函数，门控序列与文案与旧代码一致；点击课的
+    // needsRun 专属文案经 needsRunFeedback 传入，不可被通用文案覆盖）。
+    const gate = launchStepGate({
+      mistakeStep,
+      mistakeObserved,
+      mistakeAnswer,
+      practiceStep,
+      practiceAnswer,
+      needsRun,
+      correct,
+      hasRunSuccess,
+      runButtonLabel: step.requiredBlockTypes[0] === 'when_clicked' ? '「启动点击程序」' : '运行按钮',
+      needsRunFeedback:
+        step.requiredBlockTypes[0] === 'when_clicked'
+          ? '请先在舞台启动程序，再亲自点击蝴蝶，观察事件触发的结果。'
+          : undefined,
+      mainCharacterLabel: getMainCharacterLabel(currentTemplate),
+      failureFeedback: duoLesson
+        ? '请先运行并观察角色结果，完成本关的预测、错误实验或复盘。舞台会告诉你还缺什么。'
+        : explainRunFailure(evaluateObservable(step.requiredBlockTypes, blocksRef.current, judgeOptions), getMainCharacterLabel(currentTemplate), motionVerbForTemplate(currentLesson.templateId)) || getFoundationLessonFeedback(currentLesson.id, 'retry'),
+      alreadyCounted:
+        countedRunFailureRef.current === `${stepIndex}|${JSON.stringify(blocksRef.current)}`,
+    })
+    if (gate.outcome === 'blocked') {
+      if (gate.countFailedAttempt) {
+        setFailedAttempts((count) => count + 1)
+      } else if (!correct) {
         // This exact failed run already raised the hint tier.
         countedRunFailureRef.current = null
-      } else {
-        setFailedAttempts((count) => count + 1)
       }
-      if (duoLesson) {
-        setFeedback('请先运行并观察角色结果，完成本关的预测、错误实验或复盘。舞台会告诉你还缺什么。')
-      } else {
-        const verdict = evaluateObservable(step.requiredBlockTypes, blocksRef.current, judgeOptions)
-        setFeedback(explainRunFailure(verdict, getMainCharacterLabel(currentTemplate), motionVerbForTemplate(currentLesson.templateId)) || getFoundationLessonFeedback(currentLesson.id, 'retry'))
-      }
-      return
-    }
-
-    if (practiceStep && !isPracticeAnswered(practiceStep, practiceAnswer)) {
-      // TQ-011: the comparison is the point of the practice — answer it before moving on.
-      setFeedback(`先回答舞台上的问题：${practiceStep.question}`)
+      setFeedback(gate.feedback)
       return
     }
 
@@ -411,85 +401,17 @@ export default function LessonPage() {
       return
     }
 
-    const progress = readGuestProgress()
-    const reward = awardLessonCompletion({
-      lessonId: currentLesson.id,
-      rewardCardId: currentLesson.rewardCardId,
-      isFirstProject: progress.completedProjectIds.length === 0,
-      streakDays: progress.streakDays,
-    })
-    const nextProgress = completeLaunchLesson({
+    // 完成整课（共享 hook：奖励 + 本机进度 + 云端同步 + 跳转）。
+    // 本机写失败时沿用旧行为：hasRunSuccess 置真（以便重试完成），反馈写明失败。
+    const outcome = await completeLesson({
       blocks: blocksRef.current,
       lesson: currentLesson,
       lessons: allLessons,
-      progress,
-      reward,
-      updatedAt: new Date().toISOString(),
     })
-
-    if (isCompleting) {
-      return
-    }
-    setIsCompleting(true)
-
-    try {
-      writeGuestProgress(nextProgress)
-    } catch {
+    if (outcome === 'local-save-failed') {
       setHasRunSuccess(true)
       setFeedback('本机存储失败，作品和奖励尚未保存。请检查浏览器存储空间后重试完成。')
-      setIsCompleting(false)
-      return
     }
-
-    // Cloud sync is a separate truth from the local save: a failed sync
-    // must stay visible as failed with a retry, never as success.
-    setCloudSyncState('syncing')
-    const syncResult = await syncGuestSnapshot({
-      onboarding: readOnboardingSession(),
-      progress: nextProgress,
-    })
-    if (!syncResult.ok) {
-      pendingProgressRef.current = nextProgress
-      setCloudSyncState('failed')
-      setIsCompleting(false)
-      return
-    }
-    setCloudSyncState(syncResult.synced ? 'synced' : 'local-only')
-    pendingProgressRef.current = null
-    clearLessonDraftsForLesson(currentLesson.id)
-    router.push(`/project/${currentLesson.id}/complete`)
-  }
-
-  async function handleRetryCloudSync() {
-    const pending = pendingProgressRef.current
-    if (!pending || isCompleting) {
-      return
-    }
-    setIsCompleting(true)
-    setCloudSyncState('syncing')
-
-    const syncResult = await syncGuestSnapshot({
-      onboarding: readOnboardingSession(),
-      progress: pending,
-    })
-    if (!syncResult.ok) {
-      setCloudSyncState('failed')
-      setIsCompleting(false)
-      return
-    }
-
-    setCloudSyncState(syncResult.synced ? 'synced' : 'local-only')
-    pendingProgressRef.current = null
-    clearLessonDraftsForLesson(currentLesson.id)
-    router.push(`/project/${currentLesson.id}/complete`)
-  }
-
-  function handleContinueLocalOnly() {
-    // Explicit choice: the local save is real, the cloud copy is missing,
-    // and the next lesson completion re-syncs the full snapshot.
-    pendingProgressRef.current = null
-    clearLessonDraftsForLesson(currentLesson.id)
-    router.push(`/project/${currentLesson.id}/complete`)
   }
 
   return (
@@ -548,8 +470,8 @@ export default function LessonPage() {
           lessonTitle={currentLesson.title}
           localSaveState={localSaveState}
           onCompleteStep={handleNext}
-          onContinueLocalOnly={handleContinueLocalOnly}
-          onRetryCloudSync={handleRetryCloudSync}
+          onContinueLocalOnly={continueLocalOnly}
+          onRetryCloudSync={retryCloudSync}
           onRetryLocalSave={handleRetryLocalSave}
           onStartRemedial={handleStartRemedial}
           remedialLessonId={remedialLessonId}

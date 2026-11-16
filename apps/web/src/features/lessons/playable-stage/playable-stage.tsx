@@ -77,6 +77,20 @@ function getTemplateCharacterLabels(template?: ProjectTemplateDefinition) {
   }
 }
 
+/** OPS-041: 外部运行模式的执行快照（studio 路由专用）。 */
+export type PlayableStageExternalState = {
+  executionState: 'idle' | 'running' | 'success' | 'error'
+  /** 主角实际走的步数（与 adapter 的执行快照一致）。 */
+  characterPosition: number
+  /** 主角气泡文案（本课无对白积木时为空）。 */
+  message: string
+  /** 逐块动作日志（与 adapter 的执行快照一致）。 */
+  actionLog: string[]
+  frameIndex: number
+  /** 本次运行是否为设计错误实验（adapter 判定，见 mistake-steps.ts）。 */
+  designedMistake: boolean
+}
+
 export function PlayableStage({
   blocks,
   template,
@@ -97,6 +111,8 @@ export function PlayableStage({
   askClickPrediction,
   judge,
   successMessage,
+  runControls = 'internal',
+  externalState,
 }: {
   blocks: ProgramBlock[]
   template?: ProjectTemplateDefinition
@@ -134,22 +150,54 @@ export function PlayableStage({
   judge?: ProgramJudge
   /** TQ-012: success copy outside the classroom (no “完成这一关” button there). */
   successMessage?: string
+  /**
+   * OPS-041: 运行控制归属。默认 'internal'：舞台自带运行/重置按钮与
+   * useBlockExecutor，旧路由与 02–09 课不受影响。'external' 时舞台不跑
+   * 自己的执行器、不渲染运行/重置按钮，只渲染调用方（课程
+   * SlotRunAdapter）给出的执行快照；运行与判定以适配器为准，不调用
+   * onRunSuccess / onRunFailure（适配器经外壳上报判定），不得创建
+   * 两个互相独立的运行状态或判定来源。
+   */
+  runControls?: 'internal' | 'external'
+  /** OPS-041: 'external' 时的执行快照（internal 时忽略）。 */
+  externalState?: PlayableStageExternalState
 }) {
   const {
-    executionState,
-    characterPosition,
-    characterMessage,
-    partnerPosition,
-    partnerMessage,
-    activeActor,
-    actorActions,
-    actionLog,
+    executionState: internalExecutionState,
+    characterPosition: internalCharacterPosition,
+    characterMessage: internalCharacterMessage,
+    partnerPosition: internalPartnerPosition,
+    partnerMessage: internalPartnerMessage,
+    activeActor: internalActiveActor,
+    actorActions: internalActorActions,
+    actionLog: internalActionLog,
     stageScene,
     errorMessage,
     run,
     reset,
     clickCharacter,
   } = useBlockExecutor(blocks, requiredBlocks, stepIndex, false, judgeOptions, judge)
+
+  // OPS-041: external 模式只渲染适配器的执行快照，不跑自己的执行器。
+  // useBlockExecutor 仍无条件调用（hooks 规则），其返回值在 external
+  // 时被下面这组 effective 值覆盖，不参与渲染与回调。
+  const isExternal = runControls === 'external'
+  const executionState = isExternal ? (externalState?.executionState ?? 'idle') : internalExecutionState
+  const characterPosition = isExternal ? (externalState?.characterPosition ?? 0) : internalCharacterPosition
+  const characterMessage = isExternal ? (externalState?.message ?? '') : internalCharacterMessage
+  // 本课的伙伴（小兔子）从不移动；external 快照不带伙伴位置，恒为 0。
+  const partnerPosition = isExternal ? 0 : internalPartnerPosition
+  const partnerMessage = isExternal ? '' : internalPartnerMessage
+  const activeActor = isExternal ? 'main' : internalActiveActor
+  const actorActions = isExternal
+    ? {
+        main: executionState === 'running' ? ('moving' as const) : ('idle' as const),
+        partner: 'idle' as const,
+      }
+    : internalActorActions
+  const actionLog = isExternal ? (externalState?.actionLog ?? []) : internalActionLog
+  // TQ-010: internal 时由 handleRun 在按下运行时判定；external 时由适配器给出。
+  const externalDesignedRun = isExternal ? Boolean(externalState?.designedMistake) : false
 
   const { mainLabel, secondLabel, sceneCopy } = getTemplateCharacterLabels(template)
   // TQ-008: the same judge the executor used, explained for a 5–7 year old.
@@ -179,19 +227,24 @@ export function PlayableStage({
   // TQ-010: decided when “运行” is pressed (the verdict depends only on the blocks), so the
   // designed wrong run never shows the failure-style “哎呀” box — the mistake panel explains it.
   const [designedRun, setDesignedRun] = useState(false)
+  const effectiveDesignedRun = isExternal ? externalDesignedRun : designedRun
   const secondId = template?.starterCharacters[1]
 
   useEffect(() => {
+    // OPS-041: external 时不回调——适配器经外壳上报判定，舞台不得再报一次。
+    if (isExternal) return
     if (executionState === 'success') {
       onRunSuccess()
     }
-  }, [executionState, onRunSuccess])
+  }, [executionState, onRunSuccess, isExternal])
 
   useEffect(() => {
+    // OPS-041: external 时不回调（同上）。
+    if (isExternal) return
     if (executionState !== 'error' || reportedAttemptRef.current === attemptId) return
     reportedAttemptRef.current = attemptId
     onRunFailure?.(mistake ? { code: failureCode, message: kidReason, designedMistake: designedRun } : { code: failureCode, message: kidReason })
-  }, [executionState, attemptId, onRunFailure, failureCode, kidReason, mistake, designedRun])
+  }, [executionState, attemptId, onRunFailure, failureCode, kidReason, mistake, designedRun, isExternal])
 
   function handleRun() {
     setAttemptId((id) => id + 1)
@@ -358,7 +411,7 @@ export function PlayableStage({
                 程序已准备，但蝴蝶还没动。现在请亲自点击舞台上的蝴蝶！
               </div>
             ):null}
-            {executionState === 'error' && mistake && designedRun ? (
+            {executionState === 'error' && mistake && effectiveDesignedRun ? (
               <div className="kc-feedback" data-failure-code={failureCode ?? undefined} data-testid="mistake-run-result">
                 {mistakeAnswered ? '👍 你看懂啦！照上面 🛠 的办法修好程序，再运行一次。' : '🔍 这就是错误程序运行的样子。看看舞台，回答上面的问题吧！'}
               </div>
@@ -396,6 +449,8 @@ export function PlayableStage({
             {actionLog.map((line, i) => <li key={i}>{line}</li>)}
           </ol>
         ) : null}
+        {/* OPS-041: external 时不渲染运行/重置按钮——外壳的运行按钮是唯一运行入口。 */}
+        {!isExternal ? (
         <div className="kc-run-actions">
           <button
             type="button"
@@ -417,6 +472,7 @@ export function PlayableStage({
             重置
           </button>
         </div>
+        ) : null}
       </div>
     </section>
   )
