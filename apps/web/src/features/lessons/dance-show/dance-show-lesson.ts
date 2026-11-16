@@ -9,8 +9,9 @@
  * - step / hints 随当前步动态取该步的 goal 与三级提示——外壳抽屉
  *   每次只展示当前步的任务、操作要点与预期，提示按需逐级展开；
  * - methodSteps 是 9 步的标题与目标清单（抽屉内通览）；
- * - progress 是已通过步数（由真实评价结果得出，未检查时为 0，
- *   不伪造进度）。
+ * - progress 是当前步位置（第几步 / 共 9 步）——顶栏只显示当前步，
+ *   不常驻长篇课程目标（OPS-040 产品整改）；已通过步数在步骤面板
+ *   与检查结果里呈现，不在顶栏冒充进度。
  *
  * engine 取 'slot'：本课的编辑器是外壳 children 里直接挂载的官方
  * Scratch GUI iframe（外接编辑面），不是 LessonWorkspace 的
@@ -40,7 +41,6 @@ const GOAL5: [string, string, string, string, string] = [
 
 export function buildDanceShowStudioLesson(input: {
   currentStep: number
-  doneCount: number
 }): StudioLesson {
   const stepIndex = Math.min(
     Math.max(input.currentStep, 0),
@@ -72,18 +72,19 @@ export function buildDanceShowStudioLesson(input: {
       (s, i) => `第 ${i + 1} 步「${s.title}」：${s.goal}`,
     ),
     progress: {
-      label: '已通过步骤',
-      current: input.doneCount,
+      label: '步骤',
+      current: stepIndex + 1,
       total: DANCE_SHOW_STEPS.length,
     },
     help: {
       title: '帮助与验收说明',
       body: [
-        '检查作品：在编辑器里改好后，点右下角“检查我的作品”，课程层会经桥接直接读编辑器里正在改的作品并逐步核对，不用先导出文件。也可以点“从文件检查”，选在编辑器里“文件 → 保存到你的电脑”导出的 .sb3（备用通道）。',
-        '保存与恢复：每次检查都会把作品存入本机浏览器（IndexedDB）；下次打开本页时会自动恢复上次保存的作品，恢复完成前检查按钮会保持禁用，以免覆盖。',
+        '检查作品：在编辑器里改好后，点顶栏“检查我的作品”，课程层会经桥接直接读编辑器里正在改的作品并逐步核对，不用先导出文件。备用通道：先在编辑器里“文件 → 保存到你的电脑”导出 .sb3，再点顶栏“文件 → 导入”选那个文件。',
+        '保存与恢复：每次检查都会把作品存入本机浏览器（IndexedDB）；顶栏保存状态会显示最后保存时间——只有真的写进本机库才算已保存，写入失败会明确显示“未能保存”，不会假装成功。下次打开本页时会自动恢复上次保存的作品，恢复完成前检查按钮会保持禁用，以免覆盖。',
         '音乐验收：待真人听音验收。电脑只能证明音乐播放被触发，不能证明真的听到了——请在真实设备上确认能听到 Dance Space 音乐、点红色停止后音乐能停、保存再打开后音乐还正常。这三件要由真人听过才算通过，本页不会自动打勾。',
         '窄屏说明：编辑器在宽度不足时（约 1000px 以下）会隐藏自己的“文件”菜单，手机和平板窄屏上无法在编辑器内导入/导出 .sb3；请用大屏幕完成导入/导出，窄屏可以先看指引、步骤和舞台。',
-        '编辑器是官方 Scratch GUI（AGPL-3.0-only，standalone 独立部署）；学习引导层由 KidsCoding 提供。正式对外发布前须完成 AGPL 合规审查。',
+        '作品传递（给大人看）：主通道是受控桥接消息——学习层经桥接向 GUI 宿主页面请求当前作品（get-project），直接读 project.json 并评价；桥接只接受来源白名单里的回复（严格相等且必须来自该 iframe），单条载荷上限 5MB。作品取回后存入本机 IndexedDB，页面加载时经桥接载入恢复。',
+        '编辑器是官方 Scratch GUI（AGPL-3.0-only，standalone 独立部署）；学习引导层由 KidsCoding 提供。初始作品素材来自官方 Scratch 素材库，许可证版本待法律复核。正式对外发布前须完成 AGPL 合规审查。',
       ],
     },
   }

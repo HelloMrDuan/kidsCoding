@@ -79,6 +79,12 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
   const showFile = (key: 'canNew' | 'canSave' | 'canExport' | 'canImport' | 'canReset') =>
     file !== undefined && file.capabilities[key] !== false
   const stage = shellControl?.stage
+  // OPS-040 产品整改： workspace-reported topbar composition. Defaults
+  // preserve the OPS-039 chrome exactly (goal shown, help shown, no
+  // workspace actions) for every consumer that does not opt in.
+  const topbarActions = shellControl?.topbar?.actions ?? []
+  const showGoal = shellControl?.topbar?.showGoal !== false
+  const showHelp = shellControl?.topbar?.showHelp !== false
   const progressText = lesson.progress
     ? `${lesson.progress.label} ${lesson.progress.current}/${lesson.progress.total}`
     : lesson.step
@@ -109,6 +115,7 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
         .studio-topbar a { color: #2463eb; text-decoration: none; white-space: nowrap; flex: 0 0 auto; }
         .studio-btn { background: #2463eb; color: #ffffff; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap; flex: 0 0 auto; }
         .studio-btn-outline { background: #ffffff; color: #18243a; border: 1px solid #e7edf5; border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap; flex: 0 0 auto; }
+        .studio-btn[disabled], .studio-btn-outline[disabled] { opacity: .55; cursor: not-allowed; }
         .studio-topbar .studio-meta { color: #6f7d92; font-size: 12px; white-space: nowrap; flex: 0 0 auto; }
         .studio-topbar .studio-progress { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
         .studio-topbar .studio-save-message { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
@@ -161,12 +168,26 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
           )}
         </div>
         <div className="studio-topbar-actions">
-          <span className="studio-goal-current" data-testid="studio-goal-current">
-            {lesson.goal5[0]}
-          </span>
+          {showGoal && (
+            <span className="studio-goal-current" data-testid="studio-goal-current">
+              {lesson.goal5[0]}
+            </span>
+          )}
           <span className="studio-meta studio-progress" data-testid="studio-progress">
             {progressText}
           </span>
+          {topbarActions.map((action, index) => (
+            <button
+              key={action.testId ?? `${action.label}-${index}`}
+              type="button"
+              className={action.primary ? 'studio-btn' : 'studio-btn-outline'}
+              onClick={action.onClick}
+              disabled={action.disabled === true}
+              data-testid={action.testId}
+            >
+              {action.label}
+            </button>
+          ))}
           {file !== undefined && (
             <span className="studio-file-wrap">
               <button
@@ -258,14 +279,16 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
               {stage.visible ? '隐藏舞台' : '显示舞台'}
             </button>
           )}
-          <button
-            type="button"
-            className="studio-btn-outline"
-            onClick={() => setDrawerOpen(true)}
-            data-testid="studio-help-button"
-          >
-            帮助
-          </button>
+          {showHelp && (
+            <button
+              type="button"
+              className="studio-btn-outline"
+              onClick={() => setDrawerOpen(true)}
+              data-testid="studio-help-button"
+            >
+              帮助
+            </button>
+          )}
           <button
             type="button"
             className="studio-btn"

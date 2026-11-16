@@ -9,9 +9,14 @@
  *    按钮保持禁用并显示恢复状态；恢复过程不写 IndexedDB。
  * 3. 浮层开关不卸载编辑器：步骤面板与外壳抽屉开关前后 iframe 是
  *    同一个 DOM 元素（不重载、不丢作品的前提）。
+ * 4. 产品整改：检查入口在顶栏（不在主区浮动遮挡编辑器），顶栏不
+ *    常驻课程目标、无帮助按钮。
+ * 5. 保存状态真实性（P0）：保存成功才显示“已保存”+最后保存时间；
+ *    IndexedDB 写入失败显示“未能保存”且检查结果仍在；作品已变化
+ *    而新保存未完成时不许继续显示“已保存”；恢复成功回到“已保存”。
  */
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 function deferred<T>() {
   let resolve!: (value: T) => void
@@ -79,6 +84,10 @@ function minimalProject() {
     ],
   }
 }
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('DanceShowStudioPage (OPS-040)', () => {
   it('renders inside StudioShell with drawers closed and only real file actions', async () => {
@@ -214,6 +223,160 @@ describe('DanceShowStudioPage (OPS-040)', () => {
     })
     expect(starterBtn).toBeEnabled()
     expect(screen.getByText(/已恢复上次保存的作品/)).toBeInTheDocument()
+    expect(mockSaveToStore).not.toHaveBeenCalled()
+  })
+})
+
+describe('DanceShowStudioPage topbar + save honesty (OPS-040 产品整改)', () => {
+  /** 让桥接就绪且无已保存作品（projectReady=true 的最短路径）。 */
+  function readyWithoutSavedProject() {
+    mockWaitUntilNonEmpty.mockResolvedValue(undefined)
+    mockLoadSaved.mockResolvedValue(null)
+  }
+
+  function bridgeProject(name = 'Abby') {
+    const project = minimalProject()
+    project.targets[1].name = name
+    return {
+      project,
+      projectJson: JSON.stringify(project),
+      sb3: new ArrayBuffer(8),
+      byteLength: 8,
+    }
+  }
+
+  it('puts the check entry in the topbar, with no floating buttons over the editor and a minimal topbar', async () => {
+    readyWithoutSavedProject()
+    render(<DanceShowStudioPage />)
+
+    const checkBtn = await screen.findByTestId('dance-show-check-button')
+    // 检查按钮在外壳顶栏内，不在主区浮动。
+    expect(screen.getByTestId('studio-topbar')).toContainElement(checkBtn)
+    expect(
+      screen.getByTestId('dance-show-studio-main'),
+    ).not.toContainElement(checkBtn)
+    // 旧的右下浮动“从文件检查”按钮已移除（文件通道走顶栏文件菜单的导入）。
+    expect(
+      screen.queryByTestId('dance-show-check-file-button'),
+    ).not.toBeInTheDocument()
+    // 顶栏精简：不常驻课程目标、无帮助按钮；步骤开关也在顶栏。
+    expect(screen.queryByTestId('studio-goal-current')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('studio-help-button')).not.toBeInTheDocument()
+    expect(screen.getByTestId('studio-topbar')).toContainElement(
+      screen.getByTestId('dance-show-steps-toggle'),
+    )
+    // 顶栏显示当前步骤位置。
+    expect(screen.getByTestId('studio-progress')).toHaveTextContent('步骤 1/9')
+  })
+
+  it('shows 已保存 with the last-saved time only after the store write succeeds', async () => {
+    readyWithoutSavedProject()
+    mockGetProject.mockResolvedValue(bridgeProject())
+    mockSaveToStore.mockResolvedValue(1_700_000_000_000)
+    render(<DanceShowStudioPage />)
+
+    const checkBtn = await screen.findByTestId('dance-show-check-button')
+    await waitFor(() => expect(checkBtn).toBeEnabled())
+    // 保存前芯片是“未保存”，不预先声称已保存。
+    expect(screen.getByTestId('studio-save-chip')).toHaveTextContent('未保存')
+
+    fireEvent.click(checkBtn)
+    await waitFor(() => {
+      expect(screen.getByTestId('studio-save-chip')).toHaveTextContent(
+        '已保存到本机',
+      )
+    })
+    expect(screen.getByTestId('studio-save-message')).toHaveTextContent(
+      /最后保存/,
+    )
+    expect(mockSaveToStore).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows 未能保存 (never 已保存) when the IndexedDB write fails, while check results stay visible', async () => {
+    readyWithoutSavedProject()
+    mockGetProject.mockResolvedValue(bridgeProject())
+    mockSaveToStore.mockRejectedValue(new Error('IndexedDB 配额不足'))
+    render(<DanceShowStudioPage />)
+
+    const checkBtn = await screen.findByTestId('dance-show-check-button')
+    await waitFor(() => expect(checkBtn).toBeEnabled())
+    fireEvent.click(checkBtn)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('studio-save-chip')).toHaveTextContent(
+        '未能保存',
+      )
+    })
+    expect(screen.getByTestId('studio-save-chip')).not.toHaveTextContent(
+      '已保存',
+    )
+    // 检查结果照常呈现（检查成功 ≠ 已保存），且面板给出保存失败说明。
+    expect(screen.getByText(/通过 \d\/9 步/)).toBeInTheDocument()
+    expect(screen.getByTestId('dance-show-save-failed')).toHaveTextContent(
+      /没能保存到本机浏览器/,
+    )
+  })
+
+  it('drops the 已保存 claim while a changed project is still being saved', async () => {
+    readyWithoutSavedProject()
+    mockGetProject.mockResolvedValueOnce(bridgeProject('Abby'))
+    mockSaveToStore.mockResolvedValueOnce(1_700_000_000_000)
+    render(<DanceShowStudioPage />)
+
+    const checkBtn = await screen.findByTestId('dance-show-check-button')
+    await waitFor(() => expect(checkBtn).toBeEnabled())
+    fireEvent.click(checkBtn)
+    await waitFor(() => {
+      expect(screen.getByTestId('studio-save-chip')).toHaveTextContent(
+        '已保存到本机',
+      )
+    })
+
+    // 作品已变化（哈希不同），第二次保存悬而未决：不许继续显示已保存。
+    const pendingSave = deferred<number>()
+    mockGetProject.mockResolvedValueOnce(bridgeProject('AbbyChanged'))
+    mockSaveToStore.mockReturnValueOnce(pendingSave.promise)
+    fireEvent.click(checkBtn)
+    await waitFor(() => {
+      expect(screen.getByTestId('studio-save-chip')).toHaveTextContent(
+        '未保存',
+      )
+    })
+    expect(screen.getByTestId('studio-save-message')).toHaveTextContent(
+      /正在保存到本机/,
+    )
+
+    await act(async () => {
+      pendingSave.resolve(1_700_000_100_000)
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId('studio-save-chip')).toHaveTextContent(
+        '已保存到本机',
+      )
+    })
+  })
+
+  it('returns to 已保存 with the restored time after a verified restore', async () => {
+    const savedSb3 = new ArrayBuffer(8)
+    mockWaitUntilNonEmpty.mockResolvedValue(undefined)
+    mockLoadSaved.mockResolvedValue({
+      sb3: savedSb3,
+      savedAt: 1_699_999_000_000,
+      byteLength: 8,
+      source: 'bridge',
+    })
+    mockLoadProject.mockResolvedValue(['Stage', 'Abby'])
+    mockGetProject.mockResolvedValue(bridgeProject())
+    render(<DanceShowStudioPage />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('studio-save-chip')).toHaveTextContent(
+        '已保存到本机',
+      )
+    })
+    expect(screen.getByTestId('studio-save-message')).toHaveTextContent(
+      /最后保存/,
+    )
     expect(mockSaveToStore).not.toHaveBeenCalled()
   })
 })

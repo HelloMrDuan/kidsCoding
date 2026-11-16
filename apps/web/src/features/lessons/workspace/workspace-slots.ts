@@ -112,6 +112,22 @@ export interface FileCapabilities {
 export type SaveState = 'unsaved' | 'saved' | 'failed'
 
 /**
+ * One workspace-owned action rendered in the StudioShell topbar
+ * (OPS-040 产品整改): the workspace's single primary entry (e.g. 检查）
+ * lives in the shell's slim topbar instead of floating over the editor.
+ * Absent = no topbar actions (old behavior). `primary` uses the shell's
+ * filled button style; the shell renders `disabled` as a real disabled
+ * button, never a clickable dead control.
+ */
+export interface ShellTopbarAction {
+  label: string
+  onClick: () => void
+  disabled?: boolean
+  testId?: string
+  primary?: boolean
+}
+
+/**
  * Shell control surface (OPS-022, contract §3): the channel through which
  * a slot's own toolbar drives the shell's run/stop/save and observes
  * run/save/judgment state. This is a direct callback prop, NOT a command
@@ -154,6 +170,20 @@ export interface ShellControl {
     visible: boolean
     toggle: () => void
     canToggle: boolean
+  }
+  /**
+   * OPS-040 产品整改： topbar composition reported by the workspace.
+   * Absent = OPS-039 default chrome (goal text shown, help button shown,
+   * no workspace actions). `showGoal` / `showHelp` default to true; a
+   * workspace whose topbar must stay minimal （只留返回/课程名/当前步骤/
+   * 保存状态/主操作/指引） opts out explicitly. The guide drawer keeps
+   * the full goal list and help content either way — nothing is deleted,
+   * only the always-on topbar text/buttons are trimmed.
+   */
+  topbar?: {
+    actions?: ShellTopbarAction[]
+    showGoal?: boolean
+    showHelp?: boolean
   }
 }
 
