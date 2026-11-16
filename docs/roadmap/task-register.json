@@ -3924,6 +3924,26 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/543"
       },
       "notes": "2026-11-15 用户指令：OPS-039 合并后立即开始 OPS-043 最终结论（基底 main 40d0ae84），前期 Python 核查成果全部保留、不重复从头检查。Python 文件在 0ea26fd3..40d0ae84 间零改动，前期评估与深化结论仍有效。台账状态说明：本 PR 建 PR 前为 in_progress（门禁脚本要求 in_review 必须有真实 PR URL，空 pr + in_review 会直接失败）；建 PR 时回填 evidence.pr 并改为 in_review。实施改造须主号分配正式 Task-ID（另行 PR），本任务只做评估。"
+    },
+    {
+      "id": "OPS-040",
+      "title": "《我的舞蹈秀》全屏整改：正式入口 /studio/scratch/dance-show，StudioShell 唯一外壳",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-039"
+      ],
+      "scope": "把 OPS-038《我的舞蹈秀》接入 OPS-039 的 StudioShell 全屏课堂。分支 muse-c/ops-040-dance-show（基底 main 40d0ae84，OPS-039 合并提交）。新增正式入口 /studio/scratch/dance-show：外壳只有 StudioShell（单 52px 顶栏、100dvh、主区不滚动），页面不再自带 56px 顶栏与页脚，不继承 AppShell（无 222px 侧栏/全站顶栏/移动底部导航）；Scratch GUI 桥接宿主 iframe 恒占满主区全宽。课程契约 dance-show-lesson.ts 由既有 9 步数据构建（goal5/当前步 step 与三级提示/进度/帮助），步骤卡片与检查结果在主区左侧浮动面板（默认收起，检查后自动展开），当前步任务/提示同步进外壳指引抽屉（默认收起）。保留 OPS-038 全部真实能力且行为不变：桥接直读检查、IndexedDB 保存恢复（含 #542 恢复竞态修复：恢复完成前检查/加载按钮禁用）、.sb3 文件检查备用通道、初始作品经桥接载入、GUI 地址 fail-closed；基于 #542 已合并的 starter 托管与恢复修复继续，不覆盖。不改 /learn/dance-show 样板页、dance-show-page.tsx、桥接协议与评价引擎；外壳文件菜单只露真实能力（保存作品=桥接检查并保存、导入=文件通道、恢复初始=加载初始作品；新建/导出隐藏，导出走 GUI 自身文件菜单）。窄屏（<1024px）明确标记 GUI 文件菜单不可用，不冒充移动端完整适配。部署机器暂停期间只做本地开发与 PR/CI，线上部署验证待机器恢复，不以本地通过冒充部署成功。",
+      "acceptance": [
+        "/studio/scratch/dance-show 只有 StudioShell 一个外壳：无 AppShell 侧栏/全站顶栏、无页面自带顶栏与页脚、无整页溢出与多层滚动",
+        "Scratch GUI iframe 占满主工作区；指引抽屉与步骤面板默认收起、均为浮层，开合不改变 GUI 宽度、不卸载 iframe、不丢作品",
+        "桥接直读检查、IndexedDB 保存恢复、.sb3 文件检查、初始作品加载全部保留且真实可用（本地真实浏览器验证）",
+        "1920/1440/1366 桌面与平板、手机视口真实浏览器测试；移动端不支持的功能（GUI 内导入/导出）明确标记",
+        "独立 PR、非作者复核与 CI；不自行合并；线上部署待部署机器恢复后另行验证"
+      ],
+      "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/544"},
+      "notes": "2026-11-15 负责人正式开工指令：OPS-039 已合并（merge 40d0ae84）、#537 桥接已合并、前置全满足，从最新 main 建独立分支真实编码，不再写技术方案。执行：3 号 Muse（kid三号小宝）。OPS-040 验收通过后再做 OPS-042 正式迁移。"
     }
   ]
 }

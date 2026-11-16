@@ -219,6 +219,61 @@ describe('StudioShell file menu and stage toggle', () => {
   })
 })
 
+describe('StudioShell topbar composition (OPS-040)', () => {
+  it('renders workspace topbar actions and wires clicks and disabled state', () => {
+    const onSteps = vi.fn()
+    const onCheck = vi.fn()
+    render(
+      <StudioShell
+        lesson={lesson()}
+        shellControl={fakeControl({
+          topbar: {
+            actions: [
+              { label: '步骤', onClick: onSteps, testId: 'ws-steps' },
+              { label: '检查我的作品', onClick: onCheck, testId: 'ws-check', primary: true, disabled: true },
+            ],
+          },
+        })}
+      >
+        <div data-testid="studio-child-editor">编辑器</div>
+      </StudioShell>,
+    )
+    fireEvent.click(screen.getByTestId('ws-steps'))
+    expect(onSteps).toHaveBeenCalledTimes(1)
+    // Disabled action is a real disabled button: clicking does nothing.
+    const check = screen.getByTestId('ws-check')
+    expect(check).toBeDisabled()
+    fireEvent.click(check)
+    expect(onCheck).not.toHaveBeenCalled()
+  })
+
+  it('hides the topbar goal text and help button only when the workspace opts out', () => {
+    render(
+      <StudioShell
+        lesson={lesson()}
+        shellControl={fakeControl({ topbar: { showGoal: false, showHelp: false } })}
+      >
+        <div data-testid="studio-child-editor">编辑器</div>
+      </StudioShell>,
+    )
+    expect(screen.queryByTestId('studio-goal-current')).toBeNull()
+    expect(screen.queryByTestId('studio-help-button')).toBeNull()
+    // The guide entry and the full goal list stay available in the drawer.
+    fireEvent.click(screen.getByTestId('studio-guide-button'))
+    expect(screen.getByTestId('studio-goal5')).toBeInTheDocument()
+  })
+
+  it('keeps the OPS-039 default chrome when no topbar composition is reported', () => {
+    render(
+      <StudioShell lesson={lesson()} shellControl={fakeControl()}>
+        <div data-testid="studio-child-editor">编辑器</div>
+      </StudioShell>,
+    )
+    expect(screen.getByTestId('studio-goal-current')).toBeInTheDocument()
+    expect(screen.getByTestId('studio-help-button')).toBeInTheDocument()
+  })
+})
+
 describe('StudioShell fail-closed', () => {
   it('renders the validation errors and no editor for an invalid contract', () => {
     const bad = { ...DEMO_A.contract, backHref: '' } as unknown as StudioLesson
