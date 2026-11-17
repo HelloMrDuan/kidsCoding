@@ -764,3 +764,70 @@ test('N9 desktop 1440 (OPS-045): refresh mid-playthrough restores step 3 with pr
   await expect(page.getByTestId('practice-task')).toBeVisible()
   await page.screenshot({ path: `${EVIDENCE}/n9-refresh-step3.png` })
 })
+
+test('N10 desktop 1440 (OPS-046 F1): retry sync succeeds but navigation is blocked — navigation-failed banner and a working fallback entry', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  // Phase 1: the cloud is down (every /api/guest POST answers 500), so
+  // completing the lesson lands on the cloud-failed banner first. The
+  // flag lives on window so the test can bring the cloud back later.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __kcCloudDown?: boolean }
+    w.__kcCloudDown = true
+    const originalFetch = window.fetch.bind(window)
+    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      if (url.includes('/api/guest') && w.__kcCloudDown) {
+        return Promise.resolve(new Response(JSON.stringify({ error: 'cloud down' }), { status: 500 }))
+      }
+      return originalFetch(input, init)
+    }
+  })
+  const draft = emptyDraft(3)
+  draft.passed = ['step-1', 'step-2', 'step-3']
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+  await clickRun(page)
+  await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
+  await page.getByTestId('mistake-answer-stayed').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('mistake-fixed')).toBeVisible()
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-cloud-failed')).toBeVisible({ timeout: 20_000 })
+  await page.screenshot({ path: `${EVIDENCE}/n10-cloud-failed-first.png` })
+
+  // Phase 2: the cloud recovers, but soft navigation to the complete
+  // page is blocked (every non-document request for it is aborted).
+  // router.push() returns no promise in the App Router, so nothing
+  // throws — the arrival check must be what surfaces the failure.
+  await page.evaluate(() => {
+    ;(window as unknown as { __kcCloudDown?: boolean }).__kcCloudDown = false
+  })
+  await page.route('**/project/lesson-01-forest-hello/complete**', (route) => {
+    if (route.request().resourceType() === 'document') {
+      return route.continue()
+    }
+    return route.abort()
+  })
+  await page.getByTestId('forest-hello-retry-cloud-sync').click()
+  // The sync succeeded (cloud banner gone for good) but the page never
+  // arrives: the navigation-failed banner with the fallback entry is
+  // the only acceptable outcome — never silence (F1).
+  await expect(page.getByTestId('forest-hello-navigation-failed')).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByTestId('forest-hello-cloud-failed')).toHaveCount(0)
+  const fallback = page.getByTestId('forest-hello-open-complete-page')
+  await expect(fallback).toBeVisible()
+  await expect(fallback).toHaveAttribute('href', '/project/lesson-01-forest-hello/complete')
+  await expect(page).toHaveURL(/\/studio\/blockly\/lesson-01-forest-hello/)
+  await page.screenshot({ path: `${EVIDENCE}/n10-navigation-failed.png` })
+
+  // Phase 3: the fallback entry is a plain full-page link — it works
+  // even though client-side navigation is broken.
+  await page.unroute('**/project/lesson-01-forest-hello/complete**')
+  await fallback.click()
+  await expect(page).toHaveURL(/\/project\/lesson-01-forest-hello\/complete/, { timeout: 20_000 })
+})

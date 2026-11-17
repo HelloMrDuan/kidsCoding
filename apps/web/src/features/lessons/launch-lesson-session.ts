@@ -17,7 +17,7 @@
  * 的差异由调用方以 `onClearDrafts` 传入：旧路由清按步草稿
  * （`clearLessonDraftsForLesson`），新路由清新单键。
  */
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import type { MistakeStepDesign } from '@/content/curriculum/mistake-steps'
@@ -154,6 +154,25 @@ export type LaunchLessonCompletionOutcome =
   | 'already-completing'
   | 'navigate-failed'
 
+/**
+ * retryCloudSync 的结果（OPS-046 F1）：此前 retryCloudSync 返回 void，
+ * 云端同步成功但跳转失败时只复位守卫便静默返回——失败横幅已消失、
+ * 页面没跳走、孩子没有任何提示或恢复入口。现在每种结果都有名有姓：
+ * - 'completed'：同步成功且已发起跳转（到达核验见 navigationFailed）；
+ * - 'cloud-failed'：同步仍失败，cloudSyncState 保持 'failed'，可再重试；
+ * - 'navigate-failed'：同步已成功、本机与云端状态都成立，但跳转失败；
+ *   navigationFailed 同时置 true，调用方显示横幅与备用入口。绝不回滚
+ *   已保存的进度、奖励或已同步的云端状态，也绝不重复同步/发奖。
+ * - 'not-pending'：没有待同步进度（未失败过或已被处理），无事发生；
+ * - 'already-completing'：已有完成/重试正在进行，本次不改任何状态。
+ */
+export type LaunchLessonRetryOutcome =
+  | 'completed'
+  | 'cloud-failed'
+  | 'navigate-failed'
+  | 'not-pending'
+  | 'already-completing'
+
 export type UseLaunchLessonCompletionInput = {
   lessonId: string
   /**
@@ -169,6 +188,15 @@ export type UseLaunchLessonCompletionInput = {
 export type UseLaunchLessonCompletion = {
   cloudSyncState: LessonCloudSyncState
   isCompleting: boolean
+  /**
+   * 导航失败状态（OPS-046 F1）：跳转同步抛错，或跳转后宽限窗口内
+   * 地址仍未到达完成页（到达核验）时为 true。调用方据此显示横幅，
+   * 并用 completePath 渲染整页跳转的备用入口（<a href>，不依赖
+   * 客户端路由器，路由器坏掉时也能打开完成页）。
+   */
+  navigationFailed: boolean
+  /** 完成页路径（默认跳转目标），供调用方渲染备用导航入口。 */
+  completePath: string
   /**
    * 完成整课：发奖励 → 算新进度 → 写本机 → 云端同步 → 清草稿 → 跳转。
    * 返回 outcome 供调用方决定反馈文案（OPS-046：每一种 outcome
@@ -188,8 +216,12 @@ export type UseLaunchLessonCompletion = {
     lesson: LaunchLessonDefinition
     lessons: LaunchLessonDefinition[]
   }) => Promise<LaunchLessonCompletionOutcome>
-  /** 重试云端同步（仅当上次同步失败、仍有待同步进度时有效）。 */
-  retryCloudSync: () => Promise<void>
+  /**
+   * 重试云端同步（仅当上次同步失败、仍有待同步进度时有效）。
+   * 返回 LaunchLessonRetryOutcome：同步成功后的跳转失败会明确返回
+   * 'navigate-failed' 并置 navigationFailed，绝不静默返回。
+   */
+  retryCloudSync: () => Promise<LaunchLessonRetryOutcome>
   /** 明确选择仅用本机继续：丢弃待同步进度，清草稿并跳转。 */
   continueLocalOnly: () => void
 }
@@ -202,7 +234,22 @@ export function useLaunchLessonCompletion({
   const router = useRouter()
   const [cloudSyncState, setCloudSyncState] = useState<LessonCloudSyncState>('idle')
   const [isCompleting, setIsCompleting] = useState(false)
+  const [navigationFailed, setNavigationFailed] = useState(false)
+  const completePath = `/project/${lessonId}/complete`
   const pendingProgressRef = useRef<ReturnType<typeof readGuestProgress> | null>(null)
+  const navCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const mountedRef = useRef(true)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      if (navCheckTimerRef.current) {
+        clearTimeout(navCheckTimerRef.current)
+        navCheckTimerRef.current = null
+      }
+    }
+  }, [])
   // OPS-046：完成守卫必须是 ref。isCompleting 是 state，同一渲染
   // 周期内的两次调用会读到同一个旧值，双击会并发执行两次完成流程
   // （奖励虽由 completeLaunchLesson 幂等兜底，但仍会重复写进度与
@@ -214,8 +261,35 @@ export function useLaunchLessonCompletion({
       onNavigateToComplete()
       return
     }
-    router.push(`/project/${lessonId}/complete`)
-  }, [lessonId, onNavigateToComplete, router])
+    router.push(completePath)
+  }, [completePath, onNavigateToComplete, router])
+
+  /**
+   * 导航到达核验（OPS-046 F1）：Next.js App Router 的 router.push()
+   * 返回 void，不是导航完成的 Promise——try/catch 只能抓到同步抛错，
+   * 抓不到“调用没报错但页面没跳过去”。因此发起跳转后留一个宽限
+   * 窗口：到期时组件仍挂载且地址仍不是完成页，即判定导航失败并置
+   * navigationFailed，调用方显示横幅与整页跳转备用入口。跳转成功
+   * 时页面卸载，定时器随 cleanup 取消，不会误报。调用方提供自定义
+   * 跳转（onNavigateToComplete）时目标路径不可知，只做同步抛错检测。
+   */
+  const scheduleNavigationArrivalCheck = useCallback(() => {
+    if (onNavigateToComplete) {
+      return
+    }
+    if (navCheckTimerRef.current) {
+      clearTimeout(navCheckTimerRef.current)
+    }
+    navCheckTimerRef.current = setTimeout(() => {
+      navCheckTimerRef.current = null
+      if (!mountedRef.current) {
+        return
+      }
+      if (window.location.pathname !== completePath) {
+        setNavigationFailed(true)
+      }
+    }, 3000)
+  }, [completePath, onNavigateToComplete])
 
   const completeLesson = useCallback(
     async ({
@@ -233,6 +307,7 @@ export function useLaunchLessonCompletion({
       }
       completingRef.current = true
       setIsCompleting(true)
+      setNavigationFailed(false)
 
       // 阶段一：算奖励与新进度并写本机。任一步抛错（例如损坏的进度键、
       // 存储已满）都按本机保存失败返回，奖励与进度未保存，未跳转。
@@ -294,24 +369,30 @@ export function useLaunchLessonCompletion({
       try {
         navigateToComplete()
       } catch {
+        setNavigationFailed(true)
         completingRef.current = false
         setIsCompleting(false)
         return 'navigate-failed'
       }
+      scheduleNavigationArrivalCheck()
       completingRef.current = false
       setIsCompleting(false)
       return 'completed'
     },
-    [navigateToComplete, onClearDrafts],
+    [navigateToComplete, onClearDrafts, scheduleNavigationArrivalCheck],
   )
 
-  const retryCloudSync = useCallback(async () => {
+  const retryCloudSync = useCallback(async (): Promise<LaunchLessonRetryOutcome> => {
     const pending = pendingProgressRef.current
-    if (!pending || completingRef.current) {
-      return
+    if (!pending) {
+      return 'not-pending'
+    }
+    if (completingRef.current) {
+      return 'already-completing'
     }
     completingRef.current = true
     setIsCompleting(true)
+    setNavigationFailed(false)
     setCloudSyncState('syncing')
 
     let syncResult: Awaited<ReturnType<typeof syncGuestSnapshot>>
@@ -327,9 +408,11 @@ export function useLaunchLessonCompletion({
       setCloudSyncState('failed')
       completingRef.current = false
       setIsCompleting(false)
-      return
+      return 'cloud-failed'
     }
 
+    // 同步已成功：这是既成事实。此后无论跳转成败，都不得把状态改回
+    // failed、不得回滚本机进度/奖励、不得保留待同步进度去重复同步。
     setCloudSyncState(syncResult.synced ? 'synced' : 'local-only')
     pendingProgressRef.current = null
     try {
@@ -340,15 +423,22 @@ export function useLaunchLessonCompletion({
     try {
       navigateToComplete()
     } catch {
-      // 跳转失败：云端已同步，守卫复位；用户可再点一次“完成本课”
-      // （进度幂等，不重复发奖励）重新尝试跳转。
+      // OPS-046 F1：此前这里只复位守卫便静默返回，横幅已消失、页面
+      // 没跳走，孩子没有任何提示或恢复入口。现在明确返回
+      // 'navigate-failed' 并置 navigationFailed：调用方显示横幅，
+      // 并提供用 completePath 整页打开完成页的备用入口。
+      setNavigationFailed(true)
       completingRef.current = false
       setIsCompleting(false)
-      return
+      return 'navigate-failed'
     }
+    // router.push() 不返回导航 Promise：没抛错不等于已到达。挂上
+    // 到达核验，宽限期内没到达完成页同样置 navigationFailed。
+    scheduleNavigationArrivalCheck()
     completingRef.current = false
     setIsCompleting(false)
-  }, [navigateToComplete, onClearDrafts])
+    return 'completed'
+  }, [navigateToComplete, onClearDrafts, scheduleNavigationArrivalCheck])
 
   const continueLocalOnly = useCallback(() => {
     // Explicit choice: the local save is real, the cloud copy is missing,
@@ -365,9 +455,19 @@ export function useLaunchLessonCompletion({
     try {
       navigateToComplete()
     } catch {
-      // 跳转失败：不改 cloudSyncState，failed 横幅与重试入口仍在。
+      // 跳转失败：不改 cloudSyncState，failed 横幅与重试入口仍在；
+      // 同时置 navigationFailed，备用入口横幅一并出现。
+      setNavigationFailed(true)
     }
   }, [navigateToComplete, onClearDrafts])
 
-  return { cloudSyncState, isCompleting, completeLesson, retryCloudSync, continueLocalOnly }
+  return {
+    cloudSyncState,
+    isCompleting,
+    navigationFailed,
+    completePath,
+    completeLesson,
+    retryCloudSync,
+    continueLocalOnly,
+  }
 }

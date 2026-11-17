@@ -131,8 +131,15 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
   const countedRunFailureRef = useRef<string | null>(null)
 
   // 完成流程（奖励 + 本机进度 + 云端同步 + 跳转）：与旧路由共用的共享 hook。
-  const { cloudSyncState, isCompleting, completeLesson, retryCloudSync, continueLocalOnly } =
-    useLaunchLessonCompletion({
+  const {
+    cloudSyncState,
+    isCompleting,
+    navigationFailed,
+    completePath,
+    completeLesson,
+    retryCloudSync,
+    continueLocalOnly,
+  } = useLaunchLessonCompletion({
       lessonId: FOREST_LESSON_ID,
       onClearDrafts: () => {
         // 先重置内存草稿（外壳卸载保存写回的即是空草稿），再删存储键。
@@ -353,6 +360,16 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
     }
   }
 
+  // OPS-046 F1：重试同步的结果必须有反馈通道。同步成功但跳转失败时
+  // retryCloudSync 返回 'navigate-failed' 且 hook 置 navigationFailed，
+  // 下方横幅提供整页打开完成页的备用入口；这里再补一条 notice 文案。
+  async function handleRetryCloudSync() {
+    const outcome = await retryCloudSync()
+    if (outcome === 'navigate-failed') {
+      setNotice('进度和奖励已经保存并同步好了，但打开完成页失败了。请用下面的按钮打开完成页。')
+    }
+  }
+
   async function handleComplete() {
     const current = draftRef.current
     const program = current.programs[stepId] ?? []
@@ -561,12 +578,21 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       {cloudSyncState === 'failed' ? (
         <div data-testid="forest-hello-cloud-failed">
           <p>云端同步失败，本机进度已保存。请重试同步，或选择仅用本机继续。</p>
-          <button type="button" data-testid="forest-hello-retry-cloud-sync" onClick={() => void retryCloudSync()}>
+          <button type="button" data-testid="forest-hello-retry-cloud-sync" onClick={() => void handleRetryCloudSync()}>
             重试同步
           </button>{' '}
           <button type="button" data-testid="forest-hello-continue-local-only" onClick={continueLocalOnly}>
             仅用本机继续
           </button>
+        </div>
+      ) : null}
+
+      {navigationFailed ? (
+        <div data-testid="forest-hello-navigation-failed">
+          <p>本课的进度和奖励已经保存好了，但打开完成页失败了。点下面的按钮，用整页打开的方式打开完成页。</p>
+          <a data-testid="forest-hello-open-complete-page" href={completePath}>
+            打开完成页
+          </a>
         </div>
       ) : null}
 
