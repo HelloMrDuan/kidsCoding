@@ -4029,7 +4029,7 @@
         "title": "G2-U3-L02《接住掉落水果》Scratch GUI 全屏课堂迁移（/studio/scratch/g2-u3-l02）",
         "priority": "P1",
         "category": "OPS",
-        "status": "in_progress",
+        "status": "in_review",
         "dependencies": [
             "OPS-040"
         ],
@@ -4041,7 +4041,9 @@
             "真实浏览器 E2E 覆盖本课流程；新旧课程无回归；CI 全绿；4 号非作者复核 PASS",
             "合并后部署到预发布并在线上地址重新跑完整课程流程验证"
         ],
-        "evidence": {},
+        "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/555"
+      },
         "notes": "2026-11-17 duan 下达登记指令：3 号已完成《接住掉落水果》本地实现（真实 Chromium 报告 61/61 通过，见 Issue #552），因台账未登记无法正式提交 PR；Issue #552 有任务范围及开发证据。Task-ID 核对：OPS-042 在建任务时确认未被占用（台账 136 条、无 OPS-042 条目；开放 PR 无 OPS-042）。OPS-042 为 2026-11-15 StudioShell 指令预留给 3 号的 G2-U3-L02 迁移任务。登记通过后 3 号即推送已有实现分支并提交独立 PR。"
     }
   ]

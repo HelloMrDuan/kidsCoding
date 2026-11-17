@@ -1,0 +1,149 @@
+[
+  {
+    "file": "explore-reference.sb3",
+    "level": "explore",
+    "kind": "reference",
+    "fruitX": 100,
+    "fallSpeed": 10,
+    "endedBy": "landed",
+    "framesRun": 31,
+    "landingFrame": 28,
+    "landingBasketX": 40,
+    "totalMoves": 2,
+    "loopMoves": 2,
+    "judgment": {
+      "stage": false,
+      "task": false,
+      "knowledge": true,
+      "passed": false,
+      "stageLine": "舞台结果：水果落下时（第 28 帧），水果 x=100，篮子 x=40，相差 60，篮子能接住的范围是 40，没接到水果",
+      "knowledgeLine": "知识证据：本次程序满足循环应用要求——“重复执行”里的移动一共让篮子走了 40（执行了 2 次）"
+    }
+  },
+  {
+    "file": "solve-reference.sb3",
+    "level": "solve",
+    "kind": "reference",
+    "fruitX": 150,
+    "fallSpeed": 10,
+    "endedBy": "landed",
+    "framesRun": 31,
+    "landingFrame": 28,
+    "landingBasketX": 150,
+    "totalMoves": 15,
+    "loopMoves": 15,
+    "judgment": {
+      "stage": true,
+      "task": true,
+      "knowledge": true,
+      "passed": true,
+      "stageLine": "舞台结果：水果落下时（第 28 帧），水果 x=150，篮子 x=150，相差 0，篮子能接住的范围是 40，接到了水果",
+      "knowledgeLine": "知识证据：本次程序满足循环应用要求——“重复执行”里的移动一共让篮子走了 150（执行了 15 次）"
+    }
+  },
+  {
+    "file": "solve-buggy.sb3",
+    "level": "solve",
+    "kind": "buggy",
+    "fruitX": 150,
+    "fallSpeed": 10,
+    "endedBy": "landed",
+    "framesRun": 31,
+    "landingFrame": 28,
+    "landingBasketX": -150,
+    "totalMoves": 15,
+    "loopMoves": 15,
+    "judgment": {
+      "stage": false,
+      "task": false,
+      "knowledge": true,
+      "passed": false,
+      "stageLine": "舞台结果：水果落下时（第 28 帧），水果 x=150，篮子 x=-150，相差 300，篮子能接住的范围是 40，没接到水果",
+      "knowledgeLine": "知识证据：本次程序满足循环应用要求——“重复执行”里的移动一共让篮子走了 -150（执行了 15 次）"
+    }
+  },
+  {
+    "file": "transferLeft-reference.sb3",
+    "level": "transferLeft",
+    "kind": "reference",
+    "fruitX": -100,
+    "fallSpeed": 10,
+    "endedBy": "landed",
+    "framesRun": 31,
+    "landingFrame": 28,
+    "landingBasketX": -100,
+    "totalMoves": 10,
+    "loopMoves": 10,
+    "judgment": {
+      "stage": true,
+      "task": true,
+      "knowledge": true,
+      "passed": true,
+      "stageLine": "舞台结果：水果落下时（第 28 帧），水果 x=-100，篮子 x=-100，相差 0，篮子能接住的范围是 40，接到了水果",
+      "knowledgeLine": "知识证据：本次程序满足循环应用要求——“重复执行”里的移动一共让篮子走了 -100（执行了 10 次）"
+    }
+  },
+  {
+    "file": "transferLeft-buggy.sb3",
+    "level": "transferLeft",
+    "kind": "buggy",
+    "fruitX": -100,
+    "fallSpeed": 10,
+    "endedBy": "landed",
+    "framesRun": 31,
+    "landingFrame": 28,
+    "landingBasketX": 100,
+    "totalMoves": 10,
+    "loopMoves": 10,
+    "judgment": {
+      "stage": false,
+      "task": false,
+      "knowledge": true,
+      "passed": false,
+      "stageLine": "舞台结果：水果落下时（第 28 帧），水果 x=-100，篮子 x=100，相差 200，篮子能接住的范围是 40，没接到水果",
+      "knowledgeLine": "知识证据：本次程序满足循环应用要求——“重复执行”里的移动一共让篮子走了 100（执行了 10 次）"
+    }
+  },
+  {
+    "file": "transferFast-reference.sb3",
+    "level": "transferFast",
+    "kind": "reference",
+    "fruitX": 150,
+    "fallSpeed": 30,
+    "endedBy": "landed",
+    "framesRun": 13,
+    "landingFrame": 10,
+    "landingBasketX": 150,
+    "totalMoves": 5,
+    "loopMoves": 5,
+    "judgment": {
+      "stage": true,
+      "task": true,
+      "knowledge": true,
+      "passed": true,
+      "stageLine": "舞台结果：水果落下时（第 10 帧），水果 x=150，篮子 x=150，相差 0，篮子能接住的范围是 40，接到了水果",
+      "knowledgeLine": "知识证据：本次程序满足循环应用要求——“重复执行”里的移动一共让篮子走了 150（执行了 5 次）"
+    }
+  },
+  {
+    "file": "transferFast-buggy.sb3",
+    "level": "transferFast",
+    "kind": "buggy",
+    "fruitX": 150,
+    "fallSpeed": 30,
+    "endedBy": "landed",
+    "framesRun": 16,
+    "landingFrame": 10,
+    "landingBasketX": 100,
+    "totalMoves": 15,
+    "loopMoves": 15,
+    "judgment": {
+      "stage": false,
+      "task": false,
+      "knowledge": true,
+      "passed": false,
+      "stageLine": "舞台结果：水果落下时（第 10 帧），水果 x=150，篮子 x=100，相差 50，篮子能接住的范围是 40，没接到水果",
+      "knowledgeLine": "知识证据：本次程序满足循环应用要求——“重复执行”里的移动一共让篮子走了 100（执行了 10 次）"
+    }
+  }
+]
