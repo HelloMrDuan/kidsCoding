@@ -10,7 +10,8 @@ import { expect, test, type Page } from '@playwright/test'
  * ForestStageSlot，运行与判定唯一来源 ForestRunAdapter）。旧路由
  * /learn/lesson/lesson-01-forest-hello 不动，由原有 9 个旧 spec 回归。
  *
- * 正向 E1–E10 + 反向 N1–N6、N9（plan.md §4；E10/N9 为 OPS-045）；
+ * 正向 E1–E10 + 反向 N1–N9（plan.md §4；E10/N9 为 OPS-045，
+ * N7/N8 为 OPS-046）；
  * 五视口 1920×1080 / 1440×900 / 1366×768 / 768×1024 / 375×812。积木添加走 palette
  * 的 lesson-add-* 按钮（与旧路由、L01 同款真实路径）；E6 另做一次
  * 工具箱 flyout 真实拖拽（接成链并跑通）。不使用固定时长 sleep 同步：
@@ -673,6 +674,72 @@ test('E10 desktop 1440 (OPS-045): continuous 1->2->3->4 without refresh, step-3 
   await page.screenshot({ path: `${EVIDENCE}/e10-continuous-complete.png` })
 })
 
+test('N7 desktop 1440 (OPS-046): a hung /api/guest times out into a visible cloud failure, retry recovers', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  // Hang every cloud sync: the request never settles.
+  await page.route('**/api/guest', () => {})
+  const draft = emptyDraft(3)
+  draft.passed = ['step-1', 'step-2', 'step-3']
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+  await clickRun(page)
+  await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
+  await page.getByTestId('mistake-answer-stayed').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('mistake-fixed')).toBeVisible()
+  await complete(page)
+  // The 10s sync timeout must surface a visible failure — never a button
+  // stuck at “正在完成…” with no feedback (P0-2). No navigation yet.
+  await expect(page.getByTestId('forest-hello-cloud-failed')).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByTestId('forest-hello-retry-cloud-sync')).toBeVisible()
+  await expect(page.getByTestId('forest-hello-continue-local-only')).toBeVisible()
+  await expect(page.getByTestId('forest-hello-complete-step')).toContainText('完成本课')
+  await expect(page).not.toHaveURL(/\/project\/lesson-01-forest-hello\/complete/)
+  await page.screenshot({ path: `${EVIDENCE}/n7-cloud-failed.png` })
+  // The cloud is back: retry syncs, clears the draft, and navigates.
+  await page.unroute('**/api/guest')
+  await page.getByTestId('forest-hello-retry-cloud-sync').click()
+  await expect(page).toHaveURL(/\/project\/lesson-01-forest-hello\/complete/, { timeout: 20_000 })
+})
+
+test('N8 desktop 1440 (OPS-046): local progress write failure at completion is a visible notice, no silent stall', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  // Break only the progress key: draft saves (different key) keep working,
+  // so the lesson itself stays usable and only the completion write fails.
+  await page.addInitScript(() => {
+    const original = Storage.prototype.setItem
+    Storage.prototype.setItem = function (key: string, value: string) {
+      if (key === 'kc-progress') throw new Error('kc-progress write blocked (OPS-046 N8)')
+      return original.call(this, key, value)
+    }
+  })
+  const draft = emptyDraft(3)
+  draft.passed = ['step-1', 'step-2', 'step-3']
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+  await clickRun(page)
+  await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
+  await page.getByTestId('mistake-answer-stayed').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('mistake-fixed')).toBeVisible()
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-notice')).toContainText('本机存储失败', { timeout: 10_000 })
+  await expect(page).not.toHaveURL(/\/project\/lesson-01-forest-hello\/complete/)
+  // The guard is released: the button is clickable again, not stuck.
+  await expect(page.getByTestId('forest-hello-complete-step')).toContainText('完成本课')
+  await page.screenshot({ path: `${EVIDENCE}/n8-local-save-failed.png` })
+})
+
 test('N9 desktop 1440 (OPS-045): refresh mid-playthrough restores step 3 with prediction buttons enabled', async ({ page }) => {
   test.setTimeout(240_000)
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -696,4 +763,77 @@ test('N9 desktop 1440 (OPS-045): refresh mid-playthrough restores step 3 with pr
   await expect(page.getByTestId('practice-answer-half-way')).toBeEnabled()
   await expect(page.getByTestId('practice-task')).toBeVisible()
   await page.screenshot({ path: `${EVIDENCE}/n9-refresh-step3.png` })
+})
+
+test('N10 desktop 1440 (OPS-046 F1): retry sync succeeds but navigation is blocked — navigation-failed banner and a working fallback entry', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  // Phase 1: the cloud is down (every /api/guest POST answers 500), so
+  // completing the lesson lands on the cloud-failed banner first. The
+  // flag lives on window so the test can bring the cloud back later.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __kcCloudDown?: boolean }
+    w.__kcCloudDown = true
+    const originalFetch = window.fetch.bind(window)
+    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      if (url.includes('/api/guest') && w.__kcCloudDown) {
+        return Promise.resolve(new Response(JSON.stringify({ error: 'cloud down' }), { status: 500 }))
+      }
+      return originalFetch(input, init)
+    }
+  })
+  const draft = emptyDraft(3)
+  draft.passed = ['step-1', 'step-2', 'step-3']
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+  await clickRun(page)
+  await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
+  await page.getByTestId('mistake-answer-stayed').click()
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('mistake-fixed')).toBeVisible()
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-cloud-failed')).toBeVisible({ timeout: 20_000 })
+  await page.screenshot({ path: `${EVIDENCE}/n10-cloud-failed-first.png` })
+
+  // Phase 2: the cloud recovers, but soft navigation to the complete
+  // page is blocked (every non-document request for it is aborted).
+  // router.push() returns no promise in the App Router, so nothing
+  // throws — the arrival check must be what surfaces the failure.
+  await page.evaluate(() => {
+    ;(window as unknown as { __kcCloudDown?: boolean }).__kcCloudDown = false
+  })
+  // 注入方式（两轮实测结论）：abort 或 500 都会让 Next 把软导航回退
+  // 成整页硬导航、页面反而成功跳走；只有让完成页的请求一直挂起，
+  // 软导航才既不成功也不回退，页面留在原地——这正是生产环境里
+  // “导航请求挂死”时孩子的真实处境，由到达核验兜底出横幅。
+  await page.route('**/project/lesson-01-forest-hello/complete**', () => {})
+  await page.getByTestId('forest-hello-retry-cloud-sync').click()
+  // The sync succeeded (cloud banner gone for good) but the page never
+  // arrives: the navigation-failed banner with the fallback entry is
+  // the only acceptable outcome — never silence (F1).
+  await expect(page.getByTestId('forest-hello-navigation-failed')).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByTestId('forest-hello-cloud-failed')).toHaveCount(0)
+  const fallback = page.getByTestId('forest-hello-open-complete-page')
+  await expect(fallback).toBeVisible()
+  await expect(fallback).toHaveAttribute('href', '/project/lesson-01-forest-hello/complete')
+  await expect(page).toHaveURL(/\/studio\/blockly\/lesson-01-forest-hello/)
+  await page.screenshot({ path: `${EVIDENCE}/n10-navigation-failed.png` })
+
+  // Phase 3: the fallback entry is a plain full-page link — it works
+  // even though client-side navigation is broken. The click is issued
+  // via DOM click + waitForURL: a locator click that starts a full-page
+  // navigation can race Playwright's actionability retries (the anchor
+  // detaches as the page leaves and the click never returns — observed
+  // as a 240s timeout under load, with the navigation actually started).
+  await page.unroute('**/project/lesson-01-forest-hello/complete**')
+  await Promise.all([
+    page.waitForURL(/\/project\/lesson-01-forest-hello\/complete/, { timeout: 20_000 }),
+    fallback.evaluate((el) => (el as HTMLAnchorElement).click()),
+  ])
+  await expect(page).toHaveURL(/\/project\/lesson-01-forest-hello\/complete/)
 })

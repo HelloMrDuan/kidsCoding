@@ -16,6 +16,13 @@ export type GuestSyncResult = {
   synced: boolean
 }
 
+/**
+ * 云端同步请求的上限（OPS-046）：无超时的 fetch 一旦挂起，完成流
+ * 程会永远卡在“正在完成…”，且无任何可见反馈。超时按同步失败返回，
+ * 调用方按 'cloud-failed' 展示重试 / 仅用本机继续。
+ */
+export const GUEST_SYNC_TIMEOUT_MS = 10_000
+
 export async function syncGuestSnapshot({
   onboarding,
   progress,
@@ -25,6 +32,8 @@ export async function syncGuestSnapshot({
 }): Promise<GuestSyncResult> {
   let response: Response
 
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), GUEST_SYNC_TIMEOUT_MS)
   try {
     response = await fetch('/api/guest', {
       method: 'POST',
@@ -32,9 +41,12 @@ export async function syncGuestSnapshot({
       // TQ-013: only the minimal whitelist leaves the device; assessment answers,
       // stars, streak and other local-only fields are never uploaded.
       body: JSON.stringify(toGuestSyncPayload({ onboarding, progress })),
+      signal: controller.signal,
     })
   } catch {
     return { ok: false, synced: false }
+  } finally {
+    clearTimeout(timeoutId)
   }
 
   if (!response.ok) {

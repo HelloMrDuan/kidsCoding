@@ -45,9 +45,22 @@ export function readGuestProgress(): GuestProgress {
   }
 
   cachedGuestRaw = raw
-  cachedGuestSnapshot = raw
-    ? ({ ...defaultGuestProgress, ...JSON.parse(raw) } as GuestProgress)
-    : defaultGuestProgress
+  if (!raw) {
+    cachedGuestSnapshot = defaultGuestProgress
+    return cachedGuestSnapshot
+  }
+
+  // OPS-046：损坏的进度键不得让读取抛错——完成流程的首行就是
+  // readGuestProgress()，一旦抛错且调用方无外层 try/catch，“完成本课”
+  // 会静默失败。损坏值不可恢复，丢弃它并回到默认进度（fail-closed，
+  // 不伪造任何进度），避免同一损坏键在每次刷新后都再抛一次。
+  try {
+    cachedGuestSnapshot = { ...defaultGuestProgress, ...JSON.parse(raw) } as GuestProgress
+  } catch {
+    window.localStorage.removeItem(GUEST_PROGRESS_STORAGE_KEY)
+    cachedGuestRaw = null
+    cachedGuestSnapshot = defaultGuestProgress
+  }
 
   return cachedGuestSnapshot
 }

@@ -131,8 +131,15 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
   const countedRunFailureRef = useRef<string | null>(null)
 
   // 完成流程（奖励 + 本机进度 + 云端同步 + 跳转）：与旧路由共用的共享 hook。
-  const { cloudSyncState, isCompleting, completeLesson, retryCloudSync, continueLocalOnly } =
-    useLaunchLessonCompletion({
+  const {
+    cloudSyncState,
+    isCompleting,
+    navigationFailed,
+    completePath,
+    completeLesson,
+    retryCloudSync,
+    continueLocalOnly,
+  } = useLaunchLessonCompletion({
       lessonId: FOREST_LESSON_ID,
       onClearDrafts: () => {
         // 先重置内存草稿（外壳卸载保存写回的即是空草稿），再删存储键。
@@ -353,6 +360,16 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
     }
   }
 
+  // OPS-046 F1：重试同步的结果必须有反馈通道。同步成功但跳转失败时
+  // retryCloudSync 返回 'navigate-failed' 且 hook 置 navigationFailed，
+  // 下方横幅提供整页打开完成页的备用入口；这里再补一条 notice 文案。
+  async function handleRetryCloudSync() {
+    const outcome = await retryCloudSync()
+    if (outcome === 'navigate-failed') {
+      setNotice('进度和奖励已经保存并同步好了，但打开完成页失败了。请用下面的按钮打开完成页。')
+    }
+  }
+
   async function handleComplete() {
     const current = draftRef.current
     const program = current.programs[stepId] ?? []
@@ -399,17 +416,30 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       return
     }
     // 最后一关：完成整课（奖励 + 本机进度 + 云端同步 + 跳转）。
+    // OPS-046：每一种 outcome 都必须有可见反馈，不得静默无响应。
     if (!FOREST_SOURCE_LESSON) {
       setNotice('课程数据缺失，无法完成本课。')
       return
     }
-    const outcome = await completeLesson({
-      blocks: program,
-      lesson: FOREST_SOURCE_LESSON,
-      lessons: launchLessons,
-    })
+    let outcome: Awaited<ReturnType<typeof completeLesson>>
+    try {
+      outcome = await completeLesson({
+        blocks: program,
+        lesson: FOREST_SOURCE_LESSON,
+        lessons: launchLessons,
+      })
+    } catch {
+      // 兜底：completeLesson 本身已在各阶段做 fail-closed 处理，此处
+      // 不应再抛；万一抛错也要给孩子可见提示，而不是卡在“正在完成…”。
+      setNotice('完成时遇到问题，请再点一次“完成本课”重试。')
+      return
+    }
     if (outcome === 'local-save-failed') {
       setNotice('本机存储失败，作品和奖励尚未保存。请检查浏览器存储空间后重试完成。')
+    } else if (outcome === 'already-completing') {
+      setNotice('正在完成本课，请稍等，不要重复点击。')
+    } else if (outcome === 'navigate-failed') {
+      setNotice('奖励和进度已保存到本机，但跳转到完成页失败。请刷新页面后在学习地图查看进度。')
     }
     // 'cloud-failed' 时横幅与重试入口在下方反馈区承接；'completed' 时已跳转。
   }
@@ -548,12 +578,21 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       {cloudSyncState === 'failed' ? (
         <div data-testid="forest-hello-cloud-failed">
           <p>云端同步失败，本机进度已保存。请重试同步，或选择仅用本机继续。</p>
-          <button type="button" data-testid="forest-hello-retry-cloud-sync" onClick={() => void retryCloudSync()}>
+          <button type="button" data-testid="forest-hello-retry-cloud-sync" onClick={() => void handleRetryCloudSync()}>
             重试同步
           </button>{' '}
           <button type="button" data-testid="forest-hello-continue-local-only" onClick={continueLocalOnly}>
             仅用本机继续
           </button>
+        </div>
+      ) : null}
+
+      {navigationFailed ? (
+        <div data-testid="forest-hello-navigation-failed">
+          <p>本课的进度和奖励已经保存好了，但打开完成页失败了。点下面的按钮，用整页打开的方式打开完成页。</p>
+          <a data-testid="forest-hello-open-complete-page" href={completePath}>
+            打开完成页
+          </a>
         </div>
       ) : null}
 

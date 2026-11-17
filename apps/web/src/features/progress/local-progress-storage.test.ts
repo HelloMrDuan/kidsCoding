@@ -15,4 +15,14 @@ describe('graduation persistence failures', () => {
     expect(notification).not.toHaveBeenCalled()
     window.removeEventListener('kc-progress-change', notification)
   })
+
+  it('corrupt stored JSON is discarded and reads as default instead of throwing (OPS-046)', () => {
+    clearGuestProgress()
+    window.localStorage.setItem('kc-progress', '{not json')
+    expect(() => readGuestProgress()).not.toThrow()
+    expect(readGuestProgress()).toEqual(defaultGuestProgress)
+    // The corrupt key is gone, so a later read on a fresh page load
+    // cannot throw again on the same value.
+    expect(window.localStorage.getItem('kc-progress')).toBeNull()
+  })
 })

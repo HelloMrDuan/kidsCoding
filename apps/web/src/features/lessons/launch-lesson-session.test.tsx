@@ -115,11 +115,15 @@ describe('useLaunchLessonCompletion', () => {
     vi.restoreAllMocks()
   })
 
-  function renderCompletion() {
+  function renderCompletion(overrides?: {
+    onClearDrafts?: () => void
+    onNavigateToComplete?: () => void
+  }) {
     return renderHook(() =>
       useLaunchLessonCompletion({
         lessonId: LESSON_ID,
-        onClearDrafts,
+        onClearDrafts: overrides?.onClearDrafts ?? onClearDrafts,
+        onNavigateToComplete: overrides?.onNavigateToComplete,
       }),
     )
   }
@@ -205,5 +209,221 @@ describe('useLaunchLessonCompletion', () => {
     expect(outcome).toBe('local-save-failed')
     expect(push).not.toHaveBeenCalled()
     expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('corrupt stored progress does not fail completion silently (OPS-046)', async () => {
+    window.localStorage.setItem('kc-progress', '{not json')
+    const { result } = renderCompletion()
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('completed')
+    expect(result.current.isCompleting).toBe(false)
+    expect(push).toHaveBeenCalledWith(`/project/${LESSON_ID}/complete`)
+    expect(onClearDrafts).toHaveBeenCalledTimes(1)
+  })
+
+  it('an aborted sync (timeout) reports cloud-failed and releases the completing guard (OPS-046)', async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(
+      new DOMException('The operation was aborted.', 'AbortError'),
+    )
+    const { result } = renderCompletion()
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('cloud-failed')
+    expect(result.current.cloudSyncState).toBe('failed')
+    expect(result.current.isCompleting).toBe(false)
+    expect(push).not.toHaveBeenCalled()
+    // The guard is released: a retry can run afterwards.
+    await act(async () => {
+      await result.current.retryCloudSync()
+    })
+    expect(result.current.cloudSyncState).toBe('synced')
+    expect(push).toHaveBeenCalledWith(`/project/${LESSON_ID}/complete`)
+  })
+
+  it('a second completion while one is in flight returns already-completing, no double award (OPS-046)', async () => {
+    const { result } = renderCompletion()
+    let first: string | undefined
+    let second: string | undefined
+    await act(async () => {
+      const p1 = result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+      const p2 = result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+      ;[first, second] = await Promise.all([p1, p2])
+    })
+    expect([first, second].sort()).toEqual(['already-completing', 'completed'])
+    expect(push).toHaveBeenCalledTimes(1)
+    expect(onClearDrafts).toHaveBeenCalledTimes(1)
+    expect(result.current.isCompleting).toBe(false)
+  })
+
+  it('a throwing draft clear does not block navigation (OPS-046)', async () => {
+    const { result } = renderCompletion({
+      onClearDrafts: () => {
+        throw new Error('clear failed')
+      },
+    })
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('completed')
+    expect(push).toHaveBeenCalledWith(`/project/${LESSON_ID}/complete`)
+    expect(result.current.isCompleting).toBe(false)
+  })
+
+  it('a throwing navigation reports navigate-failed and releases the guard (OPS-046)', async () => {
+    const { result } = renderCompletion({
+      onNavigateToComplete: () => {
+        throw new Error('navigation failed')
+      },
+    })
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('navigate-failed')
+    expect(result.current.isCompleting).toBe(false)
+    expect(push).not.toHaveBeenCalled()
+    expect(onClearDrafts).toHaveBeenCalledTimes(1)
+  })
+
+  it('retry: sync succeeds but navigation throws — navigate-failed, no rollback, no re-sync (OPS-046 F1)', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    } as Response)
+    const { result } = renderCompletion({
+      onNavigateToComplete: () => {
+        throw new Error('navigation failed')
+      },
+    })
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('cloud-failed')
+    expect(result.current.navigationFailed).toBe(false)
+
+    let retryOutcome: string | undefined
+    await act(async () => {
+      retryOutcome = await result.current.retryCloudSync()
+    })
+    // 同步已成功是既成事实：状态停在 synced，导航失败单独成通道。
+    expect(retryOutcome).toBe('navigate-failed')
+    expect(result.current.navigationFailed).toBe(true)
+    expect(result.current.cloudSyncState).toBe('synced')
+    expect(result.current.completePath).toBe(`/project/${LESSON_ID}/complete`)
+    expect(result.current.isCompleting).toBe(false)
+    expect(onClearDrafts).toHaveBeenCalledTimes(1)
+    // 本机进度不回滚：完成记录还在。
+    const saved = JSON.parse(window.localStorage.getItem('kc-progress') ?? '{}') as {
+      completedLessonIds?: string[]
+    }
+    expect(saved.completedLessonIds).toContain(LESSON_ID)
+    // 待同步进度已清：再点重试是 not-pending，不会重复同步/重复发奖。
+    const fetchCalls = vi.mocked(fetch).mock.calls.length
+    let second: string | undefined
+    await act(async () => {
+      second = await result.current.retryCloudSync()
+    })
+    expect(second).toBe('not-pending')
+    expect(vi.mocked(fetch).mock.calls.length).toBe(fetchCalls)
+  })
+
+  it('retry: navigation that never arrives is caught by the arrival check, not by try/catch (OPS-046 F1)', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({}),
+      } as Response)
+      const { result } = renderCompletion()
+      await act(async () => {
+        await result.current.completeLesson({
+          blocks: GOOD_PROGRAM,
+          lesson: LESSON,
+          lessons: launchLessons,
+        })
+      })
+      expect(result.current.cloudSyncState).toBe('failed')
+      // push 是 no-op mock：调用不抛错，但页面永远不会到达完成页。
+      let retryOutcome: string | undefined
+      await act(async () => {
+        retryOutcome = await result.current.retryCloudSync()
+      })
+      expect(retryOutcome).toBe('completed')
+      expect(push).toHaveBeenCalledWith(`/project/${LESSON_ID}/complete`)
+      expect(result.current.navigationFailed).toBe(false)
+      // 宽限窗口到期、地址仍未到达完成页 → 到达核验判定导航失败。
+      await act(async () => {
+        vi.advanceTimersByTime(3000)
+      })
+      expect(result.current.navigationFailed).toBe(true)
+      expect(result.current.cloudSyncState).toBe('synced')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('retry: navigation that arrives within the window never raises navigationFailed (OPS-046 F1)', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({}),
+      } as Response)
+      const { result } = renderCompletion()
+      await act(async () => {
+        await result.current.completeLesson({
+          blocks: GOOD_PROGRAM,
+          lesson: LESSON,
+          lessons: launchLessons,
+        })
+      })
+      await act(async () => {
+        await result.current.retryCloudSync()
+      })
+      // 模拟真实到达：宽限期内地址已变成完成页。
+      window.history.pushState({}, '', `/project/${LESSON_ID}/complete`)
+      await act(async () => {
+        vi.advanceTimersByTime(3000)
+      })
+      expect(result.current.navigationFailed).toBe(false)
+      window.history.pushState({}, '', '/')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
