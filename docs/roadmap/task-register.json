@@ -4023,6 +4023,26 @@
         ],
         "evidence": {},
         "notes": "2026-11-17 09:35 duan 下达并行开发指令：新 2 号在 #548/#549 审核期间不闲置，并行开发 G0 第 2 课；P0（#548 合并后立即将 #549 正确更新到 main 交 4 号复核）优先于 P1，P0 不阻塞 P1 日常开发、P1 不得延误 P0 合并修复。Task-ID 核对：OPS-047 在建任务时确认未被占用（台账 135 条、最高 OPS-046；开放 PR 无 OPS-047）。lesson-02 为 12 节 Blockly 启蒙课之一，不计入 432 节。3 号继续 OPS-042，不参与本任务。"
+    },
+    {
+        "id": "OPS-042",
+        "title": "G2-U3-L02《接住掉落水果》Scratch GUI 全屏课堂迁移（/studio/scratch/g2-u3-l02）",
+        "priority": "P1",
+        "category": "OPS",
+        "status": "in_progress",
+        "dependencies": [
+            "OPS-040"
+        ],
+        "scope": "将 G2-U3-L02《接住掉落水果》从受限 VM 固定模型迁移为 Scratch GUI 全屏课堂，StudioShell 新入口 /studio/scratch/g2-u3-l02，保留 params.ts 试点参数、judge.ts 三层判定与四关教学结构，复用现有桥接（gui-bridge）与作品存储机制，判定改为在本机真实 Scratch VM 里运行孩子的 .sb3 采集轨迹。保留真实 Scratch GUI、真实 VM 执行判定、四关教学、保存恢复及错误程序反例。边界：不动 2 号的 G0（OPS-041 / #548 / #549），不动主线，共享 StudioShell 与桥接接口零改动（本课只消费现有接口）。负责人 3 号。",
+        "acceptance": [
+            "真实全屏 StudioShell 课堂：/studio/scratch/g2-u3-l02 可打开，真实 Scratch GUI，无 AppShell、无重复导航、无任务区遮挡",
+            "判定在本机真实 Scratch VM 里运行孩子的 .sb3 采集轨迹接 judge.ts 三层判定；四关教学结构保留；按关 IndexedDB 保存恢复真实可用",
+            "错误程序反例覆盖：参考全过 / 毛病方向反 / 未连接 / 空循环 / 无循环",
+            "真实浏览器 E2E 覆盖本课流程；新旧课程无回归；CI 全绿；4 号非作者复核 PASS",
+            "合并后部署到预发布并在线上地址重新跑完整课程流程验证"
+        ],
+        "evidence": {},
+        "notes": "2026-11-17 duan 下达登记指令：3 号已完成《接住掉落水果》本地实现（真实 Chromium 报告 61/61 通过，见 Issue #552），因台账未登记无法正式提交 PR；Issue #552 有任务范围及开发证据。Task-ID 核对：OPS-042 在建任务时确认未被占用（台账 136 条、无 OPS-042 条目；开放 PR 无 OPS-042）。OPS-042 为 2026-11-15 StudioShell 指令预留给 3 号的 G2-U3-L02 迁移任务。登记通过后 3 号即推送已有实现分支并提交独立 PR。"
     }
   ]
 }
