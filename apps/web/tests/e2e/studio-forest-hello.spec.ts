@@ -807,12 +807,11 @@ test('N10 desktop 1440 (OPS-046 F1): retry sync succeeds but navigation is block
   await page.evaluate(() => {
     ;(window as unknown as { __kcCloudDown?: boolean }).__kcCloudDown = false
   })
-  await page.route('**/project/lesson-01-forest-hello/complete**', (route) => {
-    if (route.request().resourceType() === 'document') {
-      return route.continue()
-    }
-    return route.abort()
-  })
+  // 注入方式（两轮实测结论）：abort 或 500 都会让 Next 把软导航回退
+  // 成整页硬导航、页面反而成功跳走；只有让完成页的请求一直挂起，
+  // 软导航才既不成功也不回退，页面留在原地——这正是生产环境里
+  // “导航请求挂死”时孩子的真实处境，由到达核验兜底出横幅。
+  await page.route('**/project/lesson-01-forest-hello/complete**', () => {})
   await page.getByTestId('forest-hello-retry-cloud-sync').click()
   // The sync succeeded (cloud banner gone for good) but the page never
   // arrives: the navigation-failed banner with the fallback entry is
