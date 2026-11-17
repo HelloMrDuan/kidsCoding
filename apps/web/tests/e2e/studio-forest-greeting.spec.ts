@@ -249,7 +249,9 @@ test('E1 desktop 1440: continuous playthrough of all 4 steps without refresh', a
   await add(page, 'say_line')
   await runAndExpect(page, true)
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0', { timeout: 20_000 })
-  await expect(page.getByTestId('stage-character-main')).toContainText('你好！')
+  // 第 2 关选过的对白会保留到第 3 关（选句器仍显示“大家好呀！”为选中），
+  // 所以原地说的仍是那句——这是选句状态的正常延续，不是默认值。
+  await expect(page.getByTestId('stage-character-main')).toContainText('大家好呀！')
   await expect(page.getByTestId('practice-done')).toBeVisible()
   await complete(page)
   await expect(page.getByTestId('forest-greeting-step-title')).toContainText('第 4 关')
