@@ -825,8 +825,15 @@ test('N10 desktop 1440 (OPS-046 F1): retry sync succeeds but navigation is block
   await page.screenshot({ path: `${EVIDENCE}/n10-navigation-failed.png` })
 
   // Phase 3: the fallback entry is a plain full-page link — it works
-  // even though client-side navigation is broken.
+  // even though client-side navigation is broken. The click is issued
+  // via DOM click + waitForURL: a locator click that starts a full-page
+  // navigation can race Playwright's actionability retries (the anchor
+  // detaches as the page leaves and the click never returns — observed
+  // as a 240s timeout under load, with the navigation actually started).
   await page.unroute('**/project/lesson-01-forest-hello/complete**')
-  await fallback.click()
-  await expect(page).toHaveURL(/\/project\/lesson-01-forest-hello\/complete/, { timeout: 20_000 })
+  await Promise.all([
+    page.waitForURL(/\/project\/lesson-01-forest-hello\/complete/, { timeout: 20_000 }),
+    fallback.evaluate((el) => (el as HTMLAnchorElement).click()),
+  ])
+  await expect(page).toHaveURL(/\/project\/lesson-01-forest-hello\/complete/)
 })
