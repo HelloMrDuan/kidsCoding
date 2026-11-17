@@ -11,11 +11,16 @@ export default function StudioHomePage() {
   return (
     <main style={{ padding: 24 }}>
       <h1>全屏课堂</h1>
-      <p>全屏课堂已接入第一课：</p>
+      <p>全屏课堂已接入的课程：</p>
       <ul>
         <li>
           <Link href="/studio/scratch/dance-show">
             我的舞蹈秀（Scratch GUI 全屏创作）
+          </Link>
+        </li>
+        <li>
+          <Link href="/studio/scratch/g2-u3-l02">
+            接住掉落水果（Scratch GUI 全屏课堂）
           </Link>
         </li>
       </ul>
