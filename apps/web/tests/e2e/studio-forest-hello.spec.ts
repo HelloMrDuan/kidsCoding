@@ -10,8 +10,8 @@ import { expect, test, type Page } from '@playwright/test'
  * ForestStageSlot，运行与判定唯一来源 ForestRunAdapter）。旧路由
  * /learn/lesson/lesson-01-forest-hello 不动，由原有 9 个旧 spec 回归。
  *
- * 正向 E1–E8 + 反向 N1–N6（plan.md §4）；五视口 1920×1080 /
- * 1440×900 / 1366×768 / 768×1024 / 375×812。积木添加走 palette
+ * 正向 E1–E10 + 反向 N1–N6、N9（plan.md §4；E10/N9 为 OPS-045）；
+ * 五视口 1920×1080 / 1440×900 / 1366×768 / 768×1024 / 375×812。积木添加走 palette
  * 的 lesson-add-* 按钮（与旧路由、L01 同款真实路径）；E6 另做一次
  * 工具箱 flyout 真实拖拽（接成链并跑通）。不使用固定时长 sleep 同步：
  * 每次等待都是条件期望（可见 testid、存储状态、文本）。
@@ -611,4 +611,89 @@ test('N6 desktop 1440: legacy draft import is offered once, imports, and keeps t
     () => window.sessionStorage.getItem('kc-lesson-draft:lesson-01-forest-hello:1') !== null,
   )
   expect(legacyKept).toBe(true)
+})
+
+test('E10 desktop 1440 (OPS-045): continuous 1->2->3->4 without refresh, step-3 prediction buttons stay enabled', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(ROUTE)
+  // Step 1: only when_start — the fox staying put IS the expected result.
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 1 关')
+  await add(page, 'when_start')
+  await runAndExpect(page, true)
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 2 关')
+  // Step 2: start + one move to 100 steps.
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 3 关')
+  // P0-1 regression: after a successful step-2 run, the step-3 prediction
+  // buttons must be enabled — the previous step's 'success' snapshot must
+  // not leak into this step (practiceLocked). Before the fix both were
+  // disabled here and completing step 3 was impossible without a refresh.
+  const beside = page.getByTestId('practice-answer-beside-friend')
+  const halfWay = page.getByTestId('practice-answer-half-way')
+  await expect(beside).toBeEnabled()
+  await expect(halfWay).toBeEnabled()
+  // OPS-045 文案一致：进第 3 关时上一关的运行成功反馈不得残留——
+  // 泄漏的 'success' 快照会同时点亮“运行成功了！先回答上面的问题”
+  // 与“先选一个你的猜测，运行按钮就会亮起来”，自相矛盾。
+  await expect(page.getByTestId('practice-need-answer')).toHaveCount(0)
+  await expect(page.getByTestId('practice-need-guess')).toBeVisible()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0)
+  await page.screenshot({ path: `${EVIDENCE}/e10-continuous-step3.png` })
+  await beside.click()
+  await expect(page.getByTestId('practice-answer-reply')).toContainText('猜好啦')
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '200', { timeout: 20_000 })
+  // 选对猜测且运行成功后，回复翻为“猜对啦！”（OPS-045 验收）。
+  await expect(page.getByTestId('practice-answer-reply')).toContainText('猜对啦！')
+  await expect(page.getByTestId('practice-done')).toBeVisible()
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+  // Step 4: mistake experiment, fix, complete the lesson.
+  await clickRun(page)
+  await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
+  await page.getByTestId('mistake-answer-stayed').click()
+  await expect(page.getByTestId('mistake-fix')).toBeVisible()
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await expect(page.getByTestId('mistake-fixed')).toBeVisible()
+  await complete(page)
+  await expect(page).toHaveURL(/\/project\/lesson-01-forest-hello\/complete/, { timeout: 20_000 })
+  await page.screenshot({ path: `${EVIDENCE}/e10-continuous-complete.png` })
+})
+
+test('N9 desktop 1440 (OPS-045): refresh mid-playthrough restores step 3 with prediction buttons enabled', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto(ROUTE)
+  await add(page, 'when_start')
+  await runAndExpect(page, true)
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 2 关')
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await runAndExpect(page, true)
+  await complete(page)
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 3 关')
+  await expect(page.getByTestId('practice-answer-beside-friend')).toBeEnabled()
+  // The step change must be persisted before the refresh, or the reload
+  // would drop the player back to an earlier step.
+  await expect.poll(() => draftStepIndex(page), { timeout: 10_000 }).toBe(2)
+  await page.reload()
+  await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 3 关')
+  await expect(page.getByTestId('practice-answer-beside-friend')).toBeEnabled()
+  await expect(page.getByTestId('practice-answer-half-way')).toBeEnabled()
+  await expect(page.getByTestId('practice-task')).toBeVisible()
+  await page.screenshot({ path: `${EVIDENCE}/n9-refresh-step3.png` })
 })

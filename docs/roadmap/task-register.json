@@ -3971,7 +3971,7 @@
         "title": "G0《小狐狸出场》第 3 关预测按钮被禁用，不刷新无法进入第 4 关（P0 线上缺陷）",
         "priority": "P0",
         "category": "OPS",
-        "status": "in_progress",
+        "status": "in_review",
         "dependencies": [
             "OPS-041"
         ],
@@ -3983,7 +3983,7 @@
             "旧路由 9 个 E2E spec 全过；新旧课程无回归；CI 全绿；4 号非作者复核 PASS",
             "修复后部署到预发布并在线上地址重新跑完整课程流程验证"
         ],
-        "evidence": {},
+        "evidence": {"pr": "https://github.com/HelloMrDuan/kidsCoding/pull/548"},
         "notes": "2026-11-16 17:54 duan 下达 P0 缺陷治理指令：为第 3 关预测按钮缺陷建立独立 P0 任务，负责人 2 号；duan 已单独向 2 号下达代码修复指令，主号不代替编码、不重复要求方案审批。缺陷发现于 2026-11-16 ~17:43 线上实测（部署 797291d2，浏览器真实验证）：第 3 关必须靠一次刷新才能走完。OPS-044 已预留给主号做 E2E CI 接线，本任务不用 OPS-044。Task-ID 核对：OPS-045 在建任务时确认未被占用。"
     },
     {

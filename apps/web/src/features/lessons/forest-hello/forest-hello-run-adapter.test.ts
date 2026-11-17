@@ -113,6 +113,60 @@ describe('ForestRunAdapter', () => {
     expect(adapter.getJudgmentResult()?.passed).toBe(true)
   })
 
+  it('reset() after a successful run returns the snapshot to idle and clears the judgment (OPS-045)', () => {
+    const adapter = new ForestRunAdapter()
+    adapter.runProgram(draftWith([START, MOVE], 1), () => {})
+    vi.advanceTimersByTime(FOREST_FRAME_MS)
+    expect(adapter.getExecutionSnapshot().executionState).toBe('success')
+    expect(adapter.getJudgmentResult()?.passed).toBe(true)
+
+    adapter.reset()
+    expect(adapter.getExecutionSnapshot()).toEqual({
+      executionState: 'idle',
+      foxPosition: 0,
+      message: null,
+      actionLog: [],
+      frameIndex: 0,
+      designedMistake: false,
+    })
+    expect(adapter.getJudgmentResult()).toBeNull()
+    expect(adapter.getState()).toEqual({ x: 0, score: 0, running: false, frames: 0 })
+    // A fresh run after reset behaves exactly like a first run.
+    const events: RunEvent[] = []
+    adapter.runProgram(draftWith([START, MOVE], 1), (event) => events.push(event))
+    vi.advanceTimersByTime(FOREST_FRAME_MS)
+    expect(events[events.length - 1].kind).toBe('finished')
+    expect(adapter.getJudgmentResult()?.passed).toBe(true)
+  })
+
+  it('reset() mid-run cancels playback and leaves no late frames (OPS-045)', () => {
+    const adapter = new ForestRunAdapter()
+    const events: RunEvent[] = []
+    adapter.runProgram(draftWith([START, MOVE, MOVE], 2), (event) => events.push(event))
+    vi.advanceTimersByTime(FOREST_FRAME_MS)
+    expect(events).toHaveLength(1)
+    adapter.reset()
+    expect(adapter.getState().running).toBe(false)
+    expect(adapter.getExecutionSnapshot().executionState).toBe('idle')
+    vi.advanceTimersByTime(10_000)
+    expect(events).toHaveLength(1)
+    expect(adapter.getJudgmentResult()).toBeNull()
+  })
+
+  it('reset() clears the step-4 designed-mistake error snapshot (OPS-045)', () => {
+    const adapter = new ForestRunAdapter()
+    adapter.runProgram(draftWith([MOVE], 3), () => {})
+    expect(adapter.getExecutionSnapshot()).toMatchObject({
+      executionState: 'error',
+      designedMistake: true,
+    })
+    adapter.reset()
+    expect(adapter.getExecutionSnapshot()).toMatchObject({
+      executionState: 'idle',
+      designedMistake: false,
+    })
+  })
+
   it('a new run replaces a live run (old timers never fire late)', () => {
     const adapter = new ForestRunAdapter()
     const events: RunEvent[] = []

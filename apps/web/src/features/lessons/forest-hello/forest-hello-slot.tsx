@@ -104,7 +104,7 @@ function blockLabel(block: ProgramBlock): string {
 }
 
 export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgment }: EditorSlotProps) {
-  const { store } = useForestSession()
+  const { store, runAdapter } = useForestSession()
   const sessionState = useForestSessionState()
   const [draft, setDraft] = useState<ForestSlotData>(() => coerceForestDraft(initial))
   const draftRef = useRef(draft)
@@ -334,6 +334,11 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
     setNotice(null)
     setLegacyImport(null)
     setRunPassedStep(null)
+    // OPS-045：切关前先清理上一关的运行快照与判定。适配器是路由级
+    // 单例，stop() 只清 'running'，上一关 'success'/'error' 的快照会
+    // 泄漏到新关并锁住第 3 关的预测按钮（practiceLocked）。reset() 在
+    // persist 之前同步执行，新关首帧即为 idle。
+    runAdapter.reset()
     persist({ ...current, stepIndex: index, finished: false })
   }
 
