@@ -7,7 +7,7 @@ import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 import { BLOCKLY_MEDIA_PATH } from './blockly-media'
 import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
 import { buildSnapshot, LINE_FIELD, REPEAT_BODY_INPUT, REPEAT_TIMES_FIELD } from './blockly-snapshot'
-import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
+import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, getScratchBlockTheme, registerKidsBlocks, SCRATCH_CATEGORY_COLOURS } from './register-kids-blocks'
 import { DEFAULT_REPEAT_TIMES, REPEAT_BLOCK, REPEAT_TIMES_OPTIONS, type ProgramBlock } from './program-tree'
 import { restoreBlockSequence } from './restore-block-sequence'
 import type { SayLinePreset } from './say-line-presets'
@@ -59,8 +59,8 @@ function ensureKeyboardNavigationRegistered() {
  * Falls back to an empty flyout when a lesson allows no blocks at all, so a
  * category toolbox is never injected with zero categories.
  */
-function buildKidsToolbox(allowedBlocks: string[], motionVerb: MotionVerb) {
-  const categories = buildKidsToolboxCategories(allowedBlocks)
+function buildKidsToolbox(allowedBlocks: string[], motionVerb: MotionVerb, scratchColours = false) {
+  const categories = buildKidsToolboxCategories(allowedBlocks, scratchColours ? SCRATCH_CATEGORY_COLOURS : undefined)
   if (categories.length === 0) return { kind: 'flyoutToolbox' as const, contents: [] }
   return {
     kind: 'categoryToolbox' as const,
@@ -241,6 +241,8 @@ export function BlocklyWorkspace({
   snapStartOnTop = false,
   sayLineChoices,
   motionVerb = 'walk',
+  themeVariant,
+  fillHeight = false,
 }: {
   allowedBlocks: string[]
   blocks: BlockSnapshot[]
@@ -252,6 +254,18 @@ export function BlocklyWorkspace({
   sayLineChoices?: readonly SayLinePreset[]
   /** TQ-009: the butterfly flies, so its move/repeat blocks say “飞”. */
   motionVerb?: MotionVerb
+  /**
+   * V3: Scratch 3 colour variant (event #FFBF00, looks #9966FF, control
+   * #FFAB19) for the workspace theme and toolbox category colours.
+   * Opt-in per lesson sample; the default theme is untouched.
+   */
+  themeVariant?: 'scratch'
+  /**
+   * V3: fill the parent column's height instead of the fixed 420px
+   * canvas, so the studio script column shows canvas + palette on the
+   * first screen. Opt-in; the fixed height remains the default.
+   */
+  fillHeight?: boolean
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
@@ -299,9 +313,9 @@ export function BlocklyWorkspace({
     const workspace = Blockly.inject(mountRef.current, {
       media: BLOCKLY_MEDIA_PATH,
       renderer: 'zelos',
-      theme: getKidsBlockTheme(),
+      theme: themeVariant === 'scratch' ? getScratchBlockTheme() : getKidsBlockTheme(),
       grid: { spacing: 18, length: 2, colour: '#dbe4f1', snap: false },
-      toolbox: buildKidsToolbox(stableAllowedBlocks, motionVerb),
+      toolbox: buildKidsToolbox(stableAllowedBlocks, motionVerb, themeVariant === 'scratch'),
       trashcan: true,
       move: {
         scrollbars: true,
@@ -502,12 +516,20 @@ export function BlocklyWorkspace({
   }
 
   return (
-    <section className="flex flex-col gap-3" data-testid="lesson-blockly-workspace">
+    <section
+      className="flex flex-col gap-3"
+      data-testid="lesson-blockly-workspace"
+      style={fillHeight ? { flex: '1 0 auto', minHeight: 320 } : undefined}
+    >
       {/* isolate: Blockly's flyout (z-index 20) must not paint over the sticky top bar when scrolled. */}
-      <div className="isolate overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white">
+      <div
+        className="isolate overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white"
+        style={fillHeight ? { flex: '1 1 auto', minHeight: 240, display: 'flex', flexDirection: 'column' } : undefined}
+      >
         <div
           ref={mountRef}
-          className="relative h-[420px] overflow-hidden bg-white"
+          className={fillHeight ? 'relative overflow-hidden bg-white' : 'relative h-[420px] overflow-hidden bg-white'}
+          style={fillHeight ? { flex: '1 1 auto', minHeight: 0 } : undefined}
         />
       </div>
       {/* UX-203: host for the keyboard-navigation "/" help popup (empty until opened). */}
