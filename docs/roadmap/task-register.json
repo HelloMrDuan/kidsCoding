@@ -4074,7 +4074,7 @@
         "title": "V3 Blockly 工作区专项整改（Codex 接手，G0 第一课《小狐狸出场》）",
         "priority": "P0",
         "category": "OPS",
-        "status": "in_progress",
+        "status": "in_review",
         "dependencies": [
             "OPS-041",
             "OPS-048"
@@ -4091,6 +4091,7 @@
             "合并后部署预发布并提交线上截图与真实交互结果；用户最终视觉确认前，不批量复制到更多课程，不宣称儿童试学验收通过"
         ],
         "evidence": {
+          "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/558",
           "visualEvidence": "docs/product/p0-kitten-workspace/evidence/OPS-049/README.md",
           "tests": [
             "生产 Next.js 构建和 TypeScript 通过。对应 Vitest 53 文件、455 条通过。专项 ESLint 0 错、2 条现有警告。",
