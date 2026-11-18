@@ -39,6 +39,21 @@
 @media(max-width:1150px){.content{grid-template-columns:minmax(220px,26fr) minmax(160px,22fr) minmax(310px,52fr);gap:8px;padding:8px}.topbar{gap:9px;padding:0 13px}.mission{padding:9px 12px}.step-dot{width:25px;height:25px}.stagemain{padding:9px}.scene{min-height:180px}.categories{width:55px}}
 @media(max-width:850px){.app{min-height:0;height:100dvh}.coursename{display:none}.content{display:grid;grid-template-columns:40% 60%;grid-template-rows:minmax(215px,35%) minmax(300px,65%);overflow:auto}.stagepanel{grid-column:1;grid-row:1}.palette{grid-column:1;grid-row:2}.script{grid-column:2;grid-row:1 / 3}.scene{aspect-ratio:16 / 9;max-height:175px;min-height:90px}.roles,.roleadd,.grouphead{display:none}.missionactions{display:none}.steps{display:none}.scriptstack{margin:26px 17px}.paletteblocks{padding:8px}.feedback{padding:8px 12px}.hinttag{font-size:11px}.saved{display:none}}
 @media(max-width:560px){.app{height:auto;min-height:100dvh;overflow:visible}.topbar{height:54px;padding:0 10px;gap:8px}.logo{font-size:16px}.topflag{display:none}.prototype{font-size:10px}.back{padding:7px}.mission{padding:10px 12px;min-height:85px}.missiontitle{font-size:14px}.missiondesc{font-size:12px}.missionindex{font-size:11px;padding:6px}.content{display:flex;flex-direction:column;overflow:visible;padding:8px;gap:8px}.stagepanel{height:auto}.panelhead{height:38px}.stagemain{display:flex;flex-direction:row;gap:9px;padding:8px;align-items:stretch}.scene{width:62%;height:153px;aspect-ratio:4 / 3}.stagecontrols{flex-direction:column;flex:1;align-self:center}.stagecontrols button{font-size:11px;padding:9px 2px;min-height:40px}.palette{height:180px;min-height:180px}.palettepanel{flex-direction:column}.categories{width:100%;height:53px;flex-direction:row;padding:4px;flex:none;overflow-x:auto}.cat{min-width:58px;min-height:43px;padding:2px;font-size:10px}.cat b{font-size:15px}.paletteblocks{display:flex;gap:8px;align-items:flex-start;overflow-x:auto;padding:9px;flex:1}.paletteblocks h3,.hintline{display:none}.tile{min-width:145px;width:145px;white-space:nowrap;margin:0}.script{height:390px;min-height:390px}.scripttoolbar{padding:8px}.hinttag{display:none}.scriptstack{margin:26px 18px}.canvas{min-height:290px}.code{font-size:14px;padding:12px 15px}.dropzone{font-size:11px;max-width:240px}.feedback{position:sticky;bottom:0;z-index:12;min-height:60px}.feedbacktext{font-size:11px}.feedbacktext strong{font-size:12px}.feedbacktext small{display:none}.mobileblock{display:block}.filebtn{padding:7px}.back{white-space:nowrap}}
+
+/* Scratch-3 visual geometry (review prototype only). Production uses Blockly Zelos. */
+.tile, .tile.event, .tile.motion, .tile.looks, .tile.control,
+.tile.small {display:block;width:100%;height:auto;min-height:0;margin:0 0 10px;padding:0;background:transparent;border:0;box-shadow:none;border-radius:0;line-height:0;text-align:left;overflow:visible;cursor:grab}
+.tile:active,.code:active{cursor:grabbing}
+.tile .scratch-svg{width:100%;max-width:270px;display:block;height:auto;overflow:visible;filter:drop-shadow(0 2px 1px #27395225)}
+.code, .code.event, .code.motion, .code.looks,.code.control{display:block;width:max-content;max-width:96%;height:auto;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;line-height:0;margin:-6px 0 0 0;overflow:visible;cursor:pointer}
+.code .scratch-svg{display:block;width:min(258px,100%);height:auto;overflow:visible;filter:drop-shadow(0px 2px 1px #27395233)}
+.code.bad .scratch-svg{filter:drop-shadow(0 0 3px #ef4444)}
+.scriptstack{display:flex;flex-direction:column;align-items:flex-start}
+.scriptstack .code:first-child{margin-top:0}
+.paletteblocks .tile:focus-visible,.scriptstack .code:focus-visible{outline:3px solid #83b3ff;outline-offset:3px;border-radius:10px}
+.categories .cat.on{box-shadow:inset 3px 0 0 #2365d5}
+@media(max-width:560px){.paletteblocks .tile,.paletteblocks .tile.small{min-width:152px;width:152px;flex:none;margin:0}.paletteblocks .tile .scratch-svg{width:152px}.scriptstack .code .scratch-svg{width:min(222px,100%)}}
+
 </style>
 </head>
 <body>
@@ -89,11 +104,82 @@ function showMessage(msg,sub){byId('feedbackMain').textContent=msg;byId('feedbac
 function drawStepButtons(){byId('steps').innerHTML='';lessons.forEach(function(s,i){var b=document.createElement('button');b.className='step-dot '+(i===step?'active':i<step?'done':'');b.textContent=(i<step?'✓':i+1);b.setAttribute('aria-label','查看第'+(i+1)+'关');b.onclick=function(){setStep(i)};byId('steps').appendChild(b)})}
 function paintCategories(){byId('categories').innerHTML='';categories.forEach(function(c){var b=document.createElement('button');b.className='cat '+(c.key===category?'on':'');b.innerHTML='<b>'+c.icon+'</b>'+c.label;b.onclick=function(){category=c.key;paintCategories();paintPalette()};byId('categories').appendChild(b)})}
 function addBlock(kind){if(kind==='event'&&list.includes('event')){showMessage('“开始时”已经在脚本里了。','请从运动分类找下一块积木。');return}list.push(kind);ran=false;paintStack();showMessage('已把积木加入脚本。','正式 Blockly 应通过拖拽吸附、点击无障碍补充和真实程序快照完成。')}
-function paintPalette(){var area=byId('paletteBlocks');area.innerHTML='<h3>可拖动的积木</h3><p class="hintline">桌面拖拽到右侧，点击也可加入示例脚本。手机使用触摸添加。</p>';var o=blocks[category],t=document.createElement('button');t.className='tile '+o.cls;t.textContent=o.text;t.draggable=true;t.onclick=function(){addBlock(category)};t.ondragstart=function(e){e.dataTransfer.setData('text/plain',category)};area.appendChild(t);
-if(category==='motion'){var extra=document.createElement('button');extra.className='tile small motion';extra.textContent='→  再走 100 步';extra.onclick=function(){addBlock('motion')};extra.draggable=true;extra.ondragstart=function(e){e.dataTransfer.setData('text/plain','motion')};area.appendChild(extra)}
+
+/* Geometry reference only: Scratch-like hat/stack/C block silhouettes.
+ * Production must use existing Blockly 'zelos' + real connections/fields.
+ * Do NOT turn this mock DOM representation into a second code engine.
+ */
+function scratchShape(kind, inScript){
+  var w=248,h=kind==='control'?116:68;
+  var fills={event:'#FFBF00',motion:'#4C97FF',looks:'#9966FF',control:'#FFAB19'};
+  var strokes={event:'#DBA600',motion:'#3373CC',looks:'#774DCB',control:'#CF8B17'};
+  var fill=fills[kind]||fills.motion,stroke=strokes[kind]||strokes.motion;
+  var path;
+  if(kind==='event'){
+    // Top arch (hat): starts a script; bottom connection protrudes.
+    path='M 9 23 Q 11 5 40 5 H 96 Q 119 5 130 23 H 239 Q 247 23 247 32 V 50 Q 247 57 239 57 H 66 L 58 63 H 43 L 35 57 H 9 Q 1 57 1 50 V 32 Q 1 23 9 23 Z';
+  }else if(kind==='control'){
+    // C-shaped repeat: inner mouth, top slot and bottom tab.
+    path='M 9 8 H 35 L 43 14 H 57 L 65 8 H 239 Q 247 8 247 16 V 51 H 51 V 82 H 239 Q 247 82 247 91 V 99 Q 247 106 239 106 H 65 L 57 112 H 43 L 35 106 H 9 Q 1 106 1 98 V 16 Q 1 8 9 8 Z';
+  }else{
+    // Stack block: top indent + matching bottom puzzle tongue.
+    path='M 9 8 H 35 L 43 14 H 57 L 65 8 H 239 Q 247 8 247 16 V 50 Q 247 57 239 57 H 65 L 57 63 H 43 L 35 57 H 9 Q 1 57 1 50 V 16 Q 1 8 9 8 Z';
+  }
+  var body='';
+  if(kind==='event'){
+    body='<text x="18" y="44" font-family="sans-serif" font-size="20" font-weight="800" fill="#fff">⚑</text>'+
+      '<text x="50" y="43" font-family="sans-serif" font-size="19" font-weight="800" fill="#fff">开始时</text>';
+  }else if(kind==='motion'){
+    body='<text x="17" y="40" font-family="sans-serif" font-size="18" font-weight="800" fill="#fff">向右走</text>'+
+      '<rect x="94" y="20" width="50" height="28" rx="13" fill="#fff"/>'+
+      '<text x="119" y="40" text-anchor="middle" font-family="sans-serif" font-size="17" font-weight="800" fill="#326ebf">100</text>'+
+      '<text x="153" y="40" font-family="sans-serif" font-size="18" font-weight="800" fill="#fff">步</text>';
+  }else if(kind==='looks'){
+    body='<text x="18" y="40" font-family="sans-serif" font-size="18" font-weight="800" fill="#fff">💬 说一句话</text>';
+  }else{
+    body='<text x="18" y="36" font-family="sans-serif" font-size="18" font-weight="800" fill="#fff">↻ 重复执行</text>'+
+      '<text x="62" y="71" font-family="sans-serif" font-size="12" font-weight="600" fill="#fff" opacity=".77">放入要重复的积木</text>';
+  }
+  return '<svg class="scratch-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+blocks[kind].text+'" preserveAspectRatio="xMinYMin meet">'+
+    '<path d="'+path+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2" stroke-linejoin="round"/>'+
+    '<path d="M 10 16 H 20" stroke="#fff" opacity=".2" stroke-width="1"/>'+body+'</svg>';
 }
-function paintStack(){var stack=byId('scriptStack');stack.innerHTML='';list.forEach(function(kind,i){var o=blocks[kind]||blocks.motion;var b=document.createElement('button');b.className='code '+o.cls+(step===3&&i===0&&kind!=='event'?' bad':'');b.textContent=o.text;b.title='点击此积木可将其从示例脚本删除';b.onclick=function(){if(i===0){showMessage('“开始时”是第一块，试试添加运动积木。');return}list.splice(i,1);ran=false;paintStack()};stack.appendChild(b)});
-var tip=document.createElement('div');tip.className='dropzone';tip.textContent='将左侧积木拖放到这里，或点击积木加入。正式产品应有可见的分类/素材区、吸附反馈和垃圾桶。';stack.appendChild(tip)}
+
+function paintPalette(){
+ var area=byId('paletteBlocks');
+ area.innerHTML='<h3>Scratch 风格可拖积木</h3><p class="hintline">拖到右侧脚本区，或点击加入视觉演示；正式版使用 Blockly Zelos 真实拼接。</p>';
+ var o=blocks[category],t=document.createElement('button');
+ t.type='button';t.className='tile '+o.cls;t.title=o.text;t.setAttribute('aria-label','加入积木：'+o.text);t.innerHTML=scratchShape(category,false);
+ t.draggable=true;t.onclick=function(){addBlock(category)};
+ t.ondragstart=function(e){e.dataTransfer.setData('text/plain',category)};
+ area.appendChild(t);
+ if(category==='motion'){
+   var extra=document.createElement('button');
+   extra.type='button';extra.className='tile small motion';extra.title='再走 100 步';extra.innerHTML=scratchShape('motion',false);
+   extra.setAttribute('aria-label','加入第二块运动积木');
+   extra.onclick=function(){addBlock('motion')};extra.draggable=true;
+   extra.ondragstart=function(e){e.dataTransfer.setData('text/plain','motion')};
+   area.appendChild(extra);
+ }
+}
+function paintStack(){
+ var stack=byId('scriptStack');stack.innerHTML='';
+ list.forEach(function(kind,i){
+   var o=blocks[kind]||blocks.motion,b=document.createElement('button');
+   b.type='button';b.className='code '+o.cls+(step===3&&i===0&&kind!=='event'?' bad':'');
+   b.innerHTML=scratchShape(kind,true);
+   b.title='点击可从视觉演示脚本删除这块积木';
+   b.setAttribute('aria-label','示例脚本第 '+(i+1)+' 块：'+o.text);
+   b.onclick=function(){
+     if(i===0){showMessage('“开始时”是第一块，试试添加运动积木。');return}
+     list.splice(i,1);ran=false;paintStack();
+   };
+   stack.appendChild(b);
+ });
+ var tip=document.createElement('div');tip.className='dropzone';
+ tip.textContent='将左侧积木拖放到这里，或点击加入。正式产品必须使用 Blockly Zelos 真正吸附和连接。';
+ stack.appendChild(tip);
+}
 function stageReset(){byId('foxGroup').style.setProperty('--fox-x','0px');byId('speech').classList.remove('show')}
 function run(){ran=true;stageReset();var moves=list.filter(function(v){return v==='motion'}).length;var hasEvent=list.indexOf('event')===0;byId('feedbackIcon').textContent='✓';showMessage(hasEvent?(moves?'看！小狐狸开始移动了。':'观察到了：小狐狸还没有移动。'):'还没找到正确的启动顺序。',moves?'狐狸的位移取决于程序中的运动积木，请观察舞台。':'这正是第 1 关要发现的规律。');
 if(hasEvent&&moves){setTimeout(function(){byId('foxGroup').style.setProperty('--fox-x',String(Math.min(100,moves*38))+'px')},100)}
