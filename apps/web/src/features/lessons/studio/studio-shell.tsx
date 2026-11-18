@@ -285,8 +285,12 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
               className="studio-btn-outline"
               onClick={() => stage.toggle()}
               data-testid="studio-stage-toggle"
+              aria-label={stage.visible ? '隐藏舞台' : '显示舞台'}
             >
-              {stage.visible ? '隐藏舞台' : '显示舞台'}
+              <span className={layout === 'blockly-v3' ? 'kc-v3-stage-toggle-full' : undefined}>
+                {stage.visible ? '隐藏舞台' : '显示舞台'}
+              </span>
+              {layout === 'blockly-v3' && <span className="kc-v3-stage-toggle-short" aria-hidden="true">舞台</span>}
             </button>
           )}
           {showHelp && (

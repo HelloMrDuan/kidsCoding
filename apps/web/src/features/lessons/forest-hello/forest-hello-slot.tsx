@@ -477,7 +477,7 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
           第 {draft.stepIndex + 1} / {FOREST_STEPS.length} 关{passedHere ? ' ✓' : ''}
         </p>
         <div className="kc-v3-task-copy">
-          <h2 data-testid="forest-hello-step-title">第 {draft.stepIndex + 1} 关：{step.title}</h2>
+          <h2 data-testid="forest-hello-step-title"><span className="sr-only">第 {draft.stepIndex + 1} 关：</span>{step.title}</h2>
           <p data-testid="forest-hello-instruction">{step.instruction}</p>
         </div>
         <button

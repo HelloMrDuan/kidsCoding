@@ -45,6 +45,7 @@ class NavigationDeferringToolbox extends Blockly.Toolbox {
 function ensureKeyboardNavigationRegistered() {
   if (keyboardNavigationRegistered) return
   KeyboardNavigation.registerKeyboardNavigationStyles()
+  KeyboardNavigation.registerFlyoutCursor()
   Blockly.registry.register(
     Blockly.registry.Type.TOOLBOX,
     Blockly.registry.DEFAULT,
@@ -312,6 +313,9 @@ export function BlocklyWorkspace({
   // A docked workspace updates its own flyout below, rather than re-injecting
   // when a new teaching step unlocks a block.
   const injectionBlocks = isDocked ? null : stableAllowedBlocks
+  // Legacy lessons advance by replacing the callback and restoring the next
+  // step's initial program, even when the block allowlist hasn't changed.
+  const injectionSnapshotHandler = isDocked ? null : onSnapshotChange
   const setupRef = useRef({ stableAllowedBlocks, onSnapshotChange })
   useEffect(() => {
     setupRef.current = { stableAllowedBlocks, onSnapshotChange }
@@ -417,7 +421,8 @@ export function BlocklyWorkspace({
       // Focus, selection and viewport changes do not edit the program.
       if (key !== previousSnapshot) {
         previousSnapshot = key
-        setupRef.current.onSnapshotChange(next)
+        const notifySnapshot = injectionSnapshotHandler ?? setupRef.current.onSnapshotChange
+        notifySnapshot(next)
         scheduleFit()
       } else if (event?.type === Blockly.Events.BLOCK_DRAG && !(event as Blockly.Events.BlockDrag).isStart) {
         scheduleFit()
@@ -448,7 +453,7 @@ export function BlocklyWorkspace({
       lastSelectedBlockIdRef.current = null
     }
     // choicesKey re-injects when the lesson's preset lines change (snapshotOf only reads refs).
-  }, [injectionBlocks, choicesKey, motionVerb, isDocked])
+  }, [injectionBlocks, injectionSnapshotHandler, choicesKey, motionVerb, isDocked])
 
   useEffect(() => {
     if (!isDocked) return

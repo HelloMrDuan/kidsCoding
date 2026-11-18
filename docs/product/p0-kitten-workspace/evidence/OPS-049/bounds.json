@@ -1,0 +1,495 @@
+{
+  "referenceSha": "590f01d4ccad1f7b0ee71c4eafdabaeed83f3200",
+  "browser": "157.0.8103.52",
+  "state": "First gate with the start block in the real editor",
+  "comparisons": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "reference": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 1440,
+          "bottom": 144,
+          "width": 1440,
+          "height": 82
+        },
+        "stage": {
+          "left": 12,
+          "top": 156,
+          "right": 401.8,
+          "bottom": 828,
+          "width": 389.8,
+          "height": 672
+        },
+        "material": {
+          "left": 413.8,
+          "top": 156,
+          "right": 678.2,
+          "bottom": 828,
+          "width": 264.5,
+          "height": 672
+        },
+        "script": {
+          "left": 690.2,
+          "top": 156,
+          "right": 1428,
+          "bottom": 828,
+          "width": 737.8,
+          "height": 672
+        },
+        "tile": {
+          "left": 493.8,
+          "top": 310.8,
+          "right": 666.2,
+          "bottom": 358.1,
+          "width": 172.5,
+          "height": 47.3
+        }
+      },
+      "product": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 1440,
+          "bottom": 145,
+          "width": 1440,
+          "height": 83
+        },
+        "stage": {
+          "left": 12,
+          "top": 157,
+          "right": 405.1,
+          "bottom": 830,
+          "width": 393.1,
+          "height": 673
+        },
+        "roles": {
+          "left": 25,
+          "top": 552.3,
+          "right": 392.1,
+          "bottom": 663,
+          "width": 367.1,
+          "height": 110.6
+        },
+        "materialHeading": {
+          "left": 418.1,
+          "top": 158,
+          "right": 684.5,
+          "bottom": 205,
+          "width": 266.3,
+          "height": 47
+        },
+        "scriptHeading": {
+          "left": 684.5,
+          "top": 158,
+          "right": 1427,
+          "bottom": 205,
+          "width": 742.5,
+          "height": 47
+        },
+        "categories": {
+          "left": 418.1,
+          "top": 205,
+          "right": 486.1,
+          "bottom": 769.8,
+          "width": 68,
+          "height": 564.8
+        },
+        "flyout": {
+          "left": 486.1,
+          "top": 205,
+          "right": 684.1,
+          "bottom": 770,
+          "width": 198,
+          "height": 565
+        },
+        "canvas": {
+          "left": 486.1,
+          "top": 205,
+          "right": 1427,
+          "bottom": 769.8,
+          "width": 940.9,
+          "height": 564.8
+        },
+        "tile": {
+          "left": 500.5,
+          "top": 212.2,
+          "right": 597.7,
+          "bottom": 277.5,
+          "width": 97.2,
+          "height": 65.3
+        }
+      }
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "reference": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 1366,
+          "bottom": 144,
+          "width": 1366,
+          "height": 82
+        },
+        "stage": {
+          "left": 12,
+          "top": 156,
+          "right": 381,
+          "bottom": 696,
+          "width": 369,
+          "height": 540
+        },
+        "material": {
+          "left": 393,
+          "top": 156,
+          "right": 643.5,
+          "bottom": 696,
+          "width": 250.4,
+          "height": 540
+        },
+        "script": {
+          "left": 655.5,
+          "top": 156,
+          "right": 1354,
+          "bottom": 696,
+          "width": 698.5,
+          "height": 540
+        },
+        "tile": {
+          "left": 473,
+          "top": 310.8,
+          "right": 631.5,
+          "bottom": 354.2,
+          "width": 158.4,
+          "height": 43.4
+        }
+      },
+      "product": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 1366,
+          "bottom": 145,
+          "width": 1366,
+          "height": 83
+        },
+        "stage": {
+          "left": 12,
+          "top": 157,
+          "right": 384.4,
+          "bottom": 698,
+          "width": 372.4,
+          "height": 541
+        },
+        "roles": {
+          "left": 25,
+          "top": 536.8,
+          "right": 371.4,
+          "bottom": 647.4,
+          "width": 346.4,
+          "height": 110.6
+        },
+        "materialHeading": {
+          "left": 397.4,
+          "top": 158,
+          "right": 649.7,
+          "bottom": 205,
+          "width": 252.3,
+          "height": 47
+        },
+        "scriptHeading": {
+          "left": 649.7,
+          "top": 158,
+          "right": 1353,
+          "bottom": 205,
+          "width": 703.3,
+          "height": 47
+        },
+        "categories": {
+          "left": 397.4,
+          "top": 205,
+          "right": 465.4,
+          "bottom": 637.8,
+          "width": 68,
+          "height": 432.8
+        },
+        "flyout": {
+          "left": 465.4,
+          "top": 205,
+          "right": 649.4,
+          "bottom": 638,
+          "width": 184,
+          "height": 433
+        },
+        "canvas": {
+          "left": 465.4,
+          "top": 205,
+          "right": 1353,
+          "bottom": 637.8,
+          "width": 887.6,
+          "height": 432.8
+        },
+        "tile": {
+          "left": 479.8,
+          "top": 212.2,
+          "right": 577,
+          "bottom": 277.5,
+          "width": 97.2,
+          "height": 65.3
+        }
+      }
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "reference": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 768,
+          "bottom": 144,
+          "width": 768,
+          "height": 82
+        },
+        "stage": {
+          "left": 8,
+          "top": 152,
+          "right": 308.8,
+          "bottom": 434.1,
+          "width": 300.8,
+          "height": 282.1
+        },
+        "material": {
+          "left": 8,
+          "top": 442.1,
+          "right": 308.8,
+          "bottom": 958,
+          "width": 300.8,
+          "height": 515.9
+        },
+        "script": {
+          "left": 316.8,
+          "top": 152,
+          "right": 768,
+          "bottom": 958,
+          "width": 451.2,
+          "height": 806
+        },
+        "tile": {
+          "left": 72,
+          "top": 573.3,
+          "right": 299.8,
+          "bottom": 635.7,
+          "width": 227.8,
+          "height": 62.5
+        }
+      },
+      "product": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 768,
+          "bottom": 154.5,
+          "width": 768,
+          "height": 92.5
+        },
+        "stage": {
+          "left": 8,
+          "top": 162.5,
+          "right": 233,
+          "bottom": 958,
+          "width": 225,
+          "height": 795.5
+        },
+        "roles": {
+          "left": 21,
+          "top": 432.5,
+          "right": 220,
+          "bottom": 555.9,
+          "width": 199,
+          "height": 123.3
+        },
+        "materialHeading": {
+          "left": 242,
+          "top": 163.5,
+          "right": 438,
+          "bottom": 210.5,
+          "width": 196,
+          "height": 47
+        },
+        "scriptHeading": {
+          "left": 438,
+          "top": 163.5,
+          "right": 759,
+          "bottom": 210.5,
+          "width": 321,
+          "height": 47
+        },
+        "categories": {
+          "left": 242,
+          "top": 210.5,
+          "right": 296,
+          "bottom": 897.8,
+          "width": 54,
+          "height": 687.3
+        },
+        "flyout": {
+          "left": 296,
+          "top": 210.5,
+          "right": 438,
+          "bottom": 897.5,
+          "width": 142,
+          "height": 687
+        },
+        "canvas": {
+          "left": 296,
+          "top": 210.5,
+          "right": 759,
+          "bottom": 897.8,
+          "width": 463,
+          "height": 687.3
+        },
+        "tile": {
+          "left": 310.4,
+          "top": 217.7,
+          "right": 407.6,
+          "bottom": 283,
+          "width": 97.2,
+          "height": 65.3
+        }
+      }
+    },
+    {
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "reference": {
+        "mission": {
+          "left": 0,
+          "top": 54,
+          "right": 375,
+          "bottom": 139,
+          "width": 375,
+          "height": 85
+        },
+        "stage": {
+          "left": 8,
+          "top": 147,
+          "right": 367,
+          "bottom": 356,
+          "width": 359,
+          "height": 209
+        },
+        "material": {
+          "left": 8,
+          "top": 364,
+          "right": 367,
+          "bottom": 544,
+          "width": 359,
+          "height": 180
+        },
+        "script": {
+          "left": 8,
+          "top": 552,
+          "right": 367,
+          "bottom": 942,
+          "width": 359,
+          "height": 390
+        },
+        "tile": {
+          "left": 18,
+          "top": 465,
+          "right": 170,
+          "bottom": 506.7,
+          "width": 152,
+          "height": 41.7
+        }
+      },
+      "product": {
+        "mission": {
+          "left": 0,
+          "top": 54,
+          "right": 375,
+          "bottom": 150.2,
+          "width": 375,
+          "height": 96.2
+        },
+        "stage": {
+          "left": 8,
+          "top": 158.2,
+          "right": 367,
+          "bottom": 382.2,
+          "width": 359,
+          "height": 224
+        },
+        "roles": {
+          "left": 17,
+          "top": 379.9,
+          "right": 358,
+          "bottom": 490.5,
+          "width": 341,
+          "height": 110.6
+        },
+        "materialHeading": {
+          "left": 9,
+          "top": 391.2,
+          "right": 157,
+          "bottom": 427.2,
+          "width": 148,
+          "height": 36
+        },
+        "scriptHeading": {
+          "left": 157,
+          "top": 391.2,
+          "right": 366,
+          "bottom": 427.2,
+          "width": 209,
+          "height": 36
+        },
+        "categories": {
+          "left": 9,
+          "top": 427.2,
+          "right": 366,
+          "bottom": 469.2,
+          "width": 357,
+          "height": 42
+        },
+        "flyout": {
+          "left": 9,
+          "top": 469.2,
+          "right": 157,
+          "bottom": 692.2,
+          "width": 148,
+          "height": 223
+        },
+        "canvas": {
+          "left": 9,
+          "top": 469.2,
+          "right": 366,
+          "bottom": 692,
+          "width": 357,
+          "height": 222.8
+        },
+        "tile": {
+          "left": 23.4,
+          "top": 476.4,
+          "right": 120.6,
+          "bottom": 541.6,
+          "width": 97.2,
+          "height": 65.3
+        }
+      }
+    }
+  ]
+}

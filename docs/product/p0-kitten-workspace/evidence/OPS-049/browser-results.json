@@ -1,0 +1,222 @@
+{
+  "browser": "Google Chrome 157.0.8103.52",
+  "implementation": {
+    "stats": {
+      "startTime": "2026-11-18T09:15:14.347Z",
+      "duration": 100837.689,
+      "expected": 36,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "scenarios": [
+      {
+        "title": "first forest Blockly lesson requires actual execution before each step and awards completion once",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "bad Blockly program cannot be passed off as actual execution",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "TQ-008: failed runs escalate hints 1 → 2 → 3 and tier 3 opens the matching start/sequence remedial",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "TQ-010: lesson 1 第 4 关 — the pre-built program without “开始时” is run, observed, explained and fixed",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "forest greeting lesson really moves then speaks before completion",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "forest first story walks all the way to the rabbit, then greets, through real Blockly execution",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "TQ-008: lesson 2 第 2 关 accepts every preset line (no free text) and the fox says the chosen one",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "restores block sequence after refresh and clears the step draft once completed",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "replaying a completed lesson does not add stars again",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "completing a different lesson after replay keeps adding stars",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E1 desktop 1440: load, step-1 run (only when_start, fox stays), complete to step 2",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E2 desktop 1440: build step-2 (start + move), run to 100 steps, complete to step 3",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E3 desktop 1440: step-3 prediction first, then two moves to 200 steps",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E4 desktop 1440: step-4 mistake experiment, fix, complete the lesson",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E5 1920: first screen — no AppShell, no outer scroll, topbar fits, canvas Gate 1",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E5 1440: first screen — no AppShell, no outer scroll, topbar fits, canvas Gate 1",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E5 1366: first screen — no AppShell, no outer scroll, topbar fits, canvas Gate 1",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E5 768: first screen — no AppShell, no outer scroll, topbar fits, canvas Gate 1",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E5 375: first screen — no AppShell, no outer scroll, topbar fits, canvas Gate 1",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E6 desktop 1440: real toolbox flyout drag connects the move block and passes",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "V3 768: touch-drag, connect and run without recreating the editor",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "V3 375: touch-drag, connect and run without recreating the editor",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E7 desktop 1440: save + refresh restores the step and the program",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E8 desktop 1440: guide drawer reveals goal5 + hints in order, toggle does not remount the editor",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E9 desktop 1440: a seeded step-2 draft restores both blocks into the canvas and stays intact",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N1 desktop 1440: a disconnected move block fails the run, fox stays",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N2 desktop 1440: move without start fails (missing-start)",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N3 desktop 1440: only when_start on step 2 fails (fox never reaches 100)",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N4 desktop 1440: save failure is fail-closed (localStorage quota exhausted)",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N5 desktop 1440: editing after a pass invalidates the shell judgment",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N6 desktop 1440: legacy draft import is offered once, imports, and keeps the original",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "E10 desktop 1440 (OPS-045): continuous 1->2->3->4 without refresh, step-3 prediction buttons stay enabled",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N7 desktop 1440 (OPS-046): a hung /api/guest times out into a visible cloud failure, retry recovers",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N8 desktop 1440 (OPS-046): local progress write failure at completion is a visible notice, no silent stall",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N9 desktop 1440 (OPS-045): refresh mid-playthrough restores step 3 with prediction buttons enabled",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "N10 desktop 1440 (OPS-046 F1): retry sync succeeds but navigation is blocked — navigation-failed banner and a working fallback entry",
+        "project": "desktop",
+        "status": "passed"
+      }
+    ]
+  },
+  "existingGate": {
+    "stats": {
+      "startTime": "2026-11-18T09:15:06.805Z",
+      "duration": 48945.138999999996,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "scenarios": [
+      {
+        "title": "OPS-049: the live V3 palette is visible and runs the first gate",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "OPS-049: the live V3 palette is visible and runs the first gate",
+        "project": "tablet",
+        "status": "passed"
+      },
+      {
+        "title": "OPS-049: the live V3 palette is visible and runs the first gate",
+        "project": "mobile",
+        "status": "passed"
+      }
+    ]
+  }
+}

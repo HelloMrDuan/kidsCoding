@@ -28,6 +28,9 @@ async function addStartThroughEditor(page) {
   await page.getByTestId('lesson-add-when_start').click()
   await assist.locator('summary').click()
   await page.locator('svg.blocklySvg .blocklyBlockCanvas .when_start').waitFor({ state: 'visible' })
+  await page.evaluate(() => {
+    for (const scroller of document.querySelectorAll('.kc-v3-slot-editor, .kc-v3-regions')) scroller.scrollTop = 0
+  })
 }
 
 mkdirSync(output, { recursive: true })

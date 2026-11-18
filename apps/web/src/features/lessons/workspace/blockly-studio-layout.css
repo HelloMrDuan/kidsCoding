@@ -42,6 +42,7 @@
 .kc-v3-studio .studio-guide-drawer { top: 62px; }
 .kc-v3-wordmark { font-size: 20px; font-weight: 900; letter-spacing: -.04em; padding: 0 12px; }
 .kc-v3-wordmark b { color: #72adff; }
+.kc-v3-stage-toggle-short { display: none; }
 
 .kc-v3-workspace {
   min-width: 0;
@@ -341,6 +342,8 @@
   .kc-v3-studio .studio-topbar { min-height: 54px; }
   .kc-v3-studio .studio-guide-drawer { top: 54px; }
   .kc-v3-studio .studio-topbar .studio-save-message { display: none; }
+  .kc-v3-stage-toggle-full { display: none; }
+  .kc-v3-stage-toggle-short { display: inline; }
   .kc-v3-task { padding: 7px 8px; display: grid; gap: 5px 8px; grid-template-columns: auto 1fr auto; }
   .kc-v3-task .kc-v3-step-index { margin: 0; padding: 5px; font-size: 11px; }
   .kc-v3-task h2 { font-size: 13px; }

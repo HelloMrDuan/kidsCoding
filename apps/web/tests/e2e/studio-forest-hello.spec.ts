@@ -219,7 +219,7 @@ async function dragToolboxBlock(page: Page, categoryLabel: string, touch = false
   // the drop would land by the toolbox instead of under the stack
   // (E6 前两轮：积木以 disconnected 散块落地，根因即落点取错).
   const lastBlock = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.when_start').first()
-  const lastBox = await lastBlock.boundingBox().catch(() => null)
+  const lastBox = await lastBlock.count() ? await lastBlock.boundingBox() : null
   const canvasBox = await canvas.boundingBox()
   expect(canvasBox).not.toBeNull()
   // Drop so the dragged block's TOP connection lands on the existing
