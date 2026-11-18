@@ -477,11 +477,21 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
     <div
       ref={containerRef}
       data-testid="forest-hello-slot"
-      style={{ height: '100%', minHeight: 0, overflowY: 'auto' }}
+      style={{
+        height: '100%',
+        minHeight: 0,
+        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+      }}
     >
+      {/* V3 任务带：当前关 + 一句话指令 + 完成按钮常驻画布上方——孩子不
+          打开任何抽屉也知道下一步做什么。完整指引收在下方可展开区与
+          外壳的指引抽屉里。 */}
       <div
         data-testid="forest-hello-step-header"
-        style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px' }}
+        style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px', flexShrink: 0 }}
       >
         <p data-testid="forest-hello-step-progress">
           第 {draft.stepIndex + 1} / {FOREST_STEPS.length} 关{passedHere ? ' ✓' : ''}
@@ -497,6 +507,9 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
         >
           {isCompleting ? '正在完成…' : isLastStep ? '完成本课' : '完成这一关'}
         </button>
+        <p data-testid="forest-hello-instruction" style={{ flexBasis: '100%', margin: 0 }}>
+          {step.instruction}
+        </p>
       </div>
 
       <BlocklyWorkspace
@@ -505,17 +518,9 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
         enableProgramTools={Boolean(mistakeStep || practiceStep)}
         snapStartOnTop={Boolean(mistakeStep)}
         onSnapshotChange={handleSnapshot}
+        themeVariant="scratch"
+        fillHeight
       />
-
-      <div data-testid="forest-hello-step-guide">
-        <p data-testid="forest-hello-instruction">{step.instruction}</p>
-        <p data-testid="forest-hello-voiceover">主语音：{step.voiceover}</p>
-        <div data-testid="forest-hello-help">
-          {FOREST_HELP.split('\n').map((line, i) => (
-            <p key={i}>{line}</p>
-          ))}
-        </div>
-      </div>
 
       <ol data-testid="forest-hello-block-list">
         {blocks.map((block, index) => (
@@ -546,7 +551,7 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
         ))}
       </ol>
 
-      <div>
+      <div style={{ flexShrink: 0 }}>
         <button
           type="button"
           data-testid="forest-hello-run"
@@ -597,6 +602,18 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       ) : null}
 
       {notice && <p data-testid="forest-hello-notice">{notice}</p>}
+
+      {/* V3：完整指引（主语音 + 全部帮助文案）保留在可展开区，数据一条
+          不删；任务带上只留当前关的一句话指令。 */}
+      <details data-testid="forest-hello-step-guide" style={{ flexShrink: 0 }}>
+        <summary>本关指引与玩法</summary>
+        <p data-testid="forest-hello-voiceover">主语音：{step.voiceover}</p>
+        <div data-testid="forest-hello-help">
+          {FOREST_HELP.split('\n').map((line, i) => (
+            <p key={i}>{line}</p>
+          ))}
+        </div>
+      </details>
 
       {lastRun && lastRun.frames.length > 0 ? (
         <ol data-testid="forest-hello-run-log">

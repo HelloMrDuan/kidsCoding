@@ -6,9 +6,11 @@ import { judgeForestStep } from './forest-hello-judging'
 import {
   findForestWorkspace,
   forestSnapshot,
+  insertForestBlock,
   mainForestStack,
   moveForestBlock,
   rebuildForestProgram,
+  selectForestCategory,
 } from './forest-hello-blockly-ops'
 
 /**
@@ -77,6 +79,29 @@ describe('forest-hello blockly ops (headless)', () => {
     ])
     expect(forestSnapshot(ws).map((block) => block.type)).toEqual(['move_right', 'when_start'])
     expect(judgeForestStep(forestSnapshot(ws), 1).failure).toBe('disconnected')
+    ws.dispose()
+  })
+
+  it('V3 insert: a block inserted through the ops API really connects to the chain tail', () => {
+    registerKidsBlocks()
+    const ws = new Blockly.Workspace()
+    const svg = ws as unknown as Blockly.WorkspaceSvg
+    rebuildForestProgram(svg, [{ type: 'when_start' }])
+    expect(insertForestBlock(svg, 'move_right')).toBe(true)
+    // 不是数据层面的假装：主链真实连接，快照与判定随之变化。
+    expect(mainForestStack(ws).map((block) => block.type)).toEqual(['when_start', 'move_right'])
+    expect(forestSnapshot(ws)).toEqual([{ type: 'when_start' }, { type: 'move_right' }])
+    expect(judgeForestStep(forestSnapshot(ws), 1).passed).toBe(true)
+    // 帽子块只许一块：再次插入如实拒绝。
+    expect(insertForestBlock(svg, 'when_start')).toBe(false)
+    expect(mainForestStack(ws)).toHaveLength(2)
+    ws.dispose()
+  })
+
+  it('V3 select: a headless workspace has no toolbox, so selection honestly returns null', () => {
+    registerKidsBlocks()
+    const ws = new Blockly.Workspace()
+    expect(selectForestCategory(ws as unknown as Blockly.WorkspaceSvg, '移动')).toBeNull()
     ws.dispose()
   })
 })

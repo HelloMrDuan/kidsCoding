@@ -44,12 +44,25 @@
  * 用 runAdapter 的）。
  */
 import type {
+  BlockCategory,
+  BlockInventoryItem,
   EngineAdapter,
   EngineState,
   RunEvent,
   SlotRunAdapter,
 } from '@/features/lessons/workspace/workspace-adapters'
 import type { FileCapabilities, JudgmentResult } from '@/features/lessons/workspace/workspace-slots'
+import { getKidsBlockLabel } from '@/features/lessons/blockly/block-labels'
+import {
+  buildKidsToolboxCategories,
+  SCRATCH_CATEGORY_COLOURS,
+} from '@/features/lessons/blockly/register-kids-blocks'
+
+import {
+  findForestWorkspace,
+  insertForestBlock,
+  selectForestCategory,
+} from './forest-hello-blockly-ops'
 
 import {
   coerceForestDraft,
@@ -264,11 +277,76 @@ export class ForestRunAdapter implements SlotRunAdapter {
   }
 }
 
+/**
+ * V3：外壳分类栏 / 素材清单的能力桥。由路由按会话状态提供“当前关允许
+ * 的积木”；适配器据此从与真实工具箱同一构建器（buildKidsToolboxCategories）
+ * 派生分类，分类与 flyout 永不矛盾。没有桥（如单测直接构造）时能力
+ * 方法一律返回空/false，外壳不显示分类栏——绝不凭空造分类。
+ */
+export interface ForestWorkspaceBridge {
+  getAllowedBlocks: () => string[]
+}
+
 export class ForestAdapter implements EngineAdapter {
   private draft: ForestSlotData
+  private readonly bridge?: ForestWorkspaceBridge
 
-  constructor(initial?: unknown) {
+  constructor(initial?: unknown, bridge?: ForestWorkspaceBridge) {
     this.draft = initial === undefined ? emptyForestDraft() : coerceForestDraft(initial)
+    this.bridge = bridge
+  }
+
+  private allowedBlocks(): string[] {
+    return this.bridge?.getAllowedBlocks() ?? []
+  }
+
+  /** 插槽内嵌的真实 Blockly 工作区（页面上唯一的非 flyout 工作区）。 */
+  private liveWorkspace() {
+    if (typeof document === 'undefined') return null
+    return findForestWorkspace(document.body)
+  }
+
+  /**
+   * V3：外壳分类栏的数据来源——与 BlocklyAdapter 同款派生（同一工具箱
+   * 构建器），分类 id 即分类名，与工具箱项一一对应。
+   */
+  getBlockCategories(): BlockCategory[] {
+    // 与插槽内 BlocklyWorkspace 的 Scratch 主题变体同色（开始 #FFBF00、
+    // 移动 #4C97FF），分类栏圆点与 flyout 分类色一致。
+    return buildKidsToolboxCategories(this.allowedBlocks(), SCRATCH_CATEGORY_COLOURS).map((category) => ({
+      id: category.name,
+      label: category.name,
+      color: category.colour,
+    }))
+  }
+
+  /** V3：分类栏点击落到插槽真实工作区的工具箱选中态（flyout 随之打开）。 */
+  selectCategory(id: string): string | null {
+    const workspace = this.liveWorkspace()
+    if (!workspace) return null
+    return selectForestCategory(workspace, id)
+  }
+
+  /** V3：素材清单（搜索用）：每个允许积木一条，标签取积木自身文案。 */
+  getBlockInventory(): BlockInventoryItem[] {
+    const categories = buildKidsToolboxCategories(this.allowedBlocks())
+    const categoryOf = new Map<string, string>()
+    for (const category of categories) {
+      for (const type of category.types) categoryOf.set(type, category.name)
+    }
+    return this.allowedBlocks().map((type) => ({
+      type,
+      label: getKidsBlockLabel(type),
+      categoryId: categoryOf.get(type) ?? '更多',
+    }))
+  }
+
+  /** V3：经真实工作区 API 插入一块积木；不允许或无工作区时如实返回 false。 */
+  insertBlock(type: string): boolean {
+    if (!this.allowedBlocks().includes(type)) return false
+    const workspace = this.liveWorkspace()
+    if (!workspace) return false
+    return insertForestBlock(workspace, type)
   }
 
   mount(): void {

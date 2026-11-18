@@ -24,10 +24,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { ForestAdapter, ForestRunAdapter } from '@/features/lessons/forest-hello/forest-hello-run-adapter'
 import { ForestEditorSlot } from '@/features/lessons/forest-hello/forest-hello-slot'
+import { ForestRolesSlot } from '@/features/lessons/forest-hello/forest-hello-roles'
 import { ForestStageSlot } from '@/features/lessons/forest-hello/forest-hello-stage'
 import {
   FOREST_HELP,
   FOREST_SOURCE_LESSON,
+  FOREST_STEPS,
   FOREST_WORKSPACE_CONTRACT,
 } from '@/features/lessons/forest-hello/forest-hello-contract'
 import { emptyForestDraft } from '@/features/lessons/forest-hello/forest-hello-draft'
@@ -50,7 +52,21 @@ export default function StudioForestHelloPage() {
       }),
     [store],
   )
-  const adapter = useMemo(() => new ForestAdapter(), [])
+  // V3：分类栏能力桥——当前关允许的积木随会话草稿的关号实时读取，
+  // 外壳据此渲染与真实工具箱一致的分类栏（见 ForestAdapter）。
+  const adapter = useMemo(
+    () =>
+      new ForestAdapter(undefined, {
+        getAllowedBlocks: () => {
+          const index = Math.min(
+            Math.max(store.getState().draft.stepIndex, 0),
+            FOREST_STEPS.length - 1,
+          )
+          return [...FOREST_STEPS[index].allowedBlocks]
+        },
+      }),
+    [store],
+  )
   const sessionValue = useMemo(() => ({ store, runAdapter }), [store, runAdapter])
   const initialScript = useMemo(() => emptyForestDraft(), [])
 
@@ -128,6 +144,9 @@ export default function StudioForestHelloPage() {
           adapter={adapter}
           editorSlot={ForestEditorSlot}
           stageSlot={ForestStageSlot}
+          rolesSlot={ForestRolesSlot}
+          enableAdapterRail
+          collapseFeedbackDetails
           runAdapter={runAdapter}
           initialScript={initialScript}
           chrome="studio"

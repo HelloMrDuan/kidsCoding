@@ -201,8 +201,17 @@ async function assertTopbarFits(page: Page, width: number) {
  *（role=treeitem），不是 `.blocklyTreeRow`（该类不存在，E6 首轮实测 0 命中）。
  */
 async function dragToolboxBlock(page: Page, categoryLabel: string) {
-  const category = page.getByRole('treeitem', { name: categoryLabel }).first()
-  await category.click()
+  // V3: the category entry is the shell's icon rail (the workspace's own
+  // toolbox column is hidden while the rail is on); clicking it opens the
+  // same real flyout through the adapter. Fall back to the in-canvas
+  // toolbox treeitem when no rail is rendered.
+  const railButton = page.getByTestId(`ws-rail-${categoryLabel}`)
+  if (await railButton.isVisible().catch(() => false)) {
+    await railButton.click()
+  } else {
+    const category = page.getByRole('treeitem', { name: categoryLabel }).first()
+    await category.click()
+  }
   const flyoutBlock = page.locator('.blocklyFlyout .blocklyDraggable').first()
   await flyoutBlock.waitFor({ state: 'visible', timeout: 10_000 })
   const box = await flyoutBlock.boundingBox()

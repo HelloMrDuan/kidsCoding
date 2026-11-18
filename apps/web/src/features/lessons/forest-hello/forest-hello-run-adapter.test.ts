@@ -215,4 +215,29 @@ describe('ForestAdapter', () => {
     expect(adapter.validateDraft(draft)).toBe(true)
     expect(adapter.validateDraft({ version: 9 })).toBe(false)
   })
+
+  it('V3: without a workspace bridge the rail capabilities stay honestly absent', () => {
+    const adapter = new ForestAdapter()
+    expect(adapter.getBlockCategories()).toEqual([])
+    expect(adapter.getBlockInventory()).toEqual([])
+    expect(adapter.selectCategory('开始')).toBeNull()
+    expect(adapter.insertBlock('when_start')).toBe(false)
+  })
+
+  it('V3: with a bridge, categories and inventory derive from the step’s allowed blocks', () => {
+    const adapter = new ForestAdapter(undefined, {
+      getAllowedBlocks: () => ['when_start', 'move_right'],
+    })
+    expect(adapter.getBlockCategories()).toEqual([
+      { id: '开始', label: '开始', color: '#ffbf00' },
+      { id: '移动', label: '移动', color: '#4c97ff' },
+    ])
+    const inventory = adapter.getBlockInventory()
+    expect(inventory.map((item) => item.type)).toEqual(['when_start', 'move_right'])
+    expect(inventory.find((item) => item.type === 'move_right')?.categoryId).toBe('移动')
+    // 页面上还没有真实工作区时，选择/插入如实失败，绝不冒充成功。
+    expect(adapter.selectCategory('移动')).toBeNull()
+    expect(adapter.insertBlock('move_right')).toBe(false)
+    expect(adapter.insertBlock('say_line')).toBe(false)
+  })
 })

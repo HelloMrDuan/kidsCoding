@@ -103,6 +103,78 @@ export function moveForestBlock(
 }
 
 /**
+ * V3：经真实工具箱按分类名选中一个分类（外壳分类栏点击的落点）。
+ * 与 BlocklyAdapter.selectCategory 同款鸭子类型调用：按分类名匹配
+ * 工具箱项，再次选中已选分类即取消选中（flyout 关闭）。工作区没有
+ * 工具箱或分类不存在时返回 null，绝不假装选中成功。
+ */
+export function selectForestCategory(
+  workspace: Blockly.WorkspaceSvg,
+  categoryId: string,
+): string | null {
+  try {
+    const toolbox = workspace.getToolbox() as unknown as {
+      getToolboxItems?: () => Array<{ getName?: () => string; getId?: () => string }>
+      getSelectedItem?: () => { getName?: () => string; getId?: () => string } | null
+      setSelectedItem?: (item: unknown | null) => void
+    } | null
+    if (!toolbox) return null
+    const items = toolbox.getToolboxItems?.() ?? []
+    const item = items.find(
+      (candidate) => candidate.getName?.() === categoryId || candidate.getId?.() === categoryId,
+    )
+    if (!item) return null
+    const selected = toolbox.getSelectedItem?.() ?? null
+    const selectedId = selected?.getName?.() ?? selected?.getId?.() ?? null
+    if (selectedId === categoryId) {
+      toolbox.setSelectedItem?.(null)
+      return null
+    }
+    toolbox.setSelectedItem?.(item)
+    return categoryId
+  } catch {
+    return null
+  }
+}
+
+/**
+ * V3：向主程序链尾部插入一块真实积木（外壳素材清单的插入落点，与
+ * BlocklyWorkspace 的按钮添加同语义的子集）：
+ * - “开始时”帽子块全程序只许一块，已有则返回 false，不重复造帽子。
+ * - 有主链且新块可拼接时接在链尾；否则作为散块放在画布左上区域。
+ * 快照由 BlocklyWorkspace 的变更监听自动发出，本函数不直接写草稿。
+ */
+export function insertForestBlock(workspace: Blockly.WorkspaceSvg, type: string): boolean {
+  const chain = mainForestStack(workspace)
+  if (type === 'when_start' && chain.some((block) => block.type === 'when_start')) {
+    return false
+  }
+  let block: Blockly.Block
+  try {
+    block = workspace.newBlock(type)
+  } catch {
+    return false
+  }
+  if (block instanceof Blockly.BlockSvg) {
+    block.initSvg()
+    block.render()
+  }
+  const tail = chain[chain.length - 1]
+  if (tail?.nextConnection && block.previousConnection) {
+    try {
+      tail.nextConnection.connect(block.previousConnection)
+      return true
+    } catch {
+      // 连接失败即作散块留置（下方定位），不丢块。
+    }
+  }
+  if (block instanceof Blockly.BlockSvg) {
+    block.moveTo(new Blockly.utils.Coordinate(24, chain.length > 0 ? 120 : 16))
+  }
+  return true
+}
+
+/**
  * 按程序数据重建画布上的积木（切关时调用）。只重建积木，不重建工作区：
  * 先清全部顶层栈，再按序新建、连接；Svg 块才做 initSvg/render/moveTo。
  */
