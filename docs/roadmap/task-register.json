@@ -4051,7 +4051,7 @@
         "title": "KidsCoding V3 Blockly 统一工作区样板整改（G0 第一课《小狐狸出场》）",
         "priority": "P0",
         "category": "OPS",
-        "status": "in_progress",
+        "status": "blocked",
         "dependencies": [
             "OPS-041"
         ],
@@ -4067,7 +4067,31 @@
             "合并后部署预发布并提交线上截图与真实交互结果；用户最终视觉确认前，不批量复制到更多课程，不宣称儿童试学验收通过"
         ],
         "evidence": {},
-        "notes": "2026-11-18 duan 确认新产品设计方向并下达登记指令：Scratch 3 风格积木 + Kitten 式工作区布局 + KidsCoding 品牌与原有课程体系；参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md、DESIGN.md、ACCEPTANCE.md、WORKSPACE-API.md），原型 SVG 积木与模拟运行不能作为真实产品代码。Task-ID 核对：OPS-048 在建任务时确认未被占用（台账 137 条、最高 OPS-047；开放 PR 无 OPS-048；OPS-044 已预留给主号做 E2E CI 接线，不用）。#554（OPS-047）的 F1 修复仍由 2 号在原 PR 继续（4 号复核 FAIL，review 5951842170），与本任务并行、不合并。3 号保持 Scratch GUI 路线，不参与本任务。"
+        "notes": "2026-11-18 duan 确认新产品设计方向并下达登记指令：Scratch 3 风格积木 + Kitten 式工作区布局 + KidsCoding 品牌与原有课程体系；参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md、DESIGN.md、ACCEPTANCE.md、WORKSPACE-API.md），原型 SVG 积木与模拟运行不能作为真实产品代码。Task-ID 核对：OPS-048 在建任务时确认未被占用（台账 137 条、最高 OPS-047；开放 PR 无 OPS-048；OPS-044 已预留给主号做 E2E CI 接线，不用）。#554（OPS-047）的 F1 修复仍由 2 号在原 PR 继续（4 号复核 FAIL，review 5951842170），与本任务并行、不合并。3 号保持 Scratch GUI 路线，不参与本任务。2026-11-18 16:12 duan 改派：V3 工作区专项整改现交由 Codex 独立负责；2 号暂停对共享 Blockly 工作区的并行修改，分支 muse-c/v3-forest-workspace（HEAD a1894bc9）保留供 Codex 复用；2 号不得自行合并旧 V3 实现。本条目不再推进，由 OPS-049（Codex）接手同一范围继续实施；4 号负责后续独立审核，主号负责合并部署。"
+    },
+    {
+        "id": "OPS-049",
+        "title": "V3 Blockly 工作区专项整改（Codex 接手，G0 第一课《小狐狸出场》）",
+        "priority": "P0",
+        "category": "OPS",
+        "status": "in_progress",
+        "dependencies": [
+            "OPS-041",
+            "OPS-048"
+        ],
+        "scope": "Codex 独立负责 V3 Blockly 工作区专项整改：接手 OPS-048 同一范围（G0 第一课《小狐狸出场》/studio/blockly/lesson-01-forest-hello 的 V3 样板），起点为 2 号分支 muse-c/v3-forest-workspace（HEAD a1894bc97fb8ecdf663bd94bf741cac61aec702d，merge-base 6bdc1959，领先 3 提交：V3 shell 适配器驱动分类栏与可折叠反馈详情、Blockly 满高画布与 Scratch 3 主题变体、lesson-01 真实分类栏/角色/任务带；分支保留、不得删除、不得原样合并）。Codex 在此分支基础上继续实施至可合并状态：真实组件改造（LessonWorkspace 分类栏不再依赖 isBlockly、BlocklyWorkspace 素材与画布并列、StudioShell 顶部当前任务常驻、forest-hello 路由 rolesSlot、反馈区默认简洁）、真实 Blockly Zelos 积木外观、保留 ForestRunAdapter/题目门禁/草稿/奖励/云同步及 #548/#549 修复；不改 432 节课程，不批量迁移。2 号已暂停对共享 Blockly 工作区的并行修改（可继续其他不冲突课程任务，不得自行合并旧 V3 实现）；3 号不得同时修改 Blockly 工作区。4 号负责后续独立审核，主号负责合并部署。",
+        "acceptance": [
+            "原型与真实页面同视口截图对比一致（首屏直接可见积木分类和素材、舞台、角色、真实脚本区、任务与运行）",
+            "真实积木拖拽、吸附、连接和删除（真实 Blockly Zelos，非原型 SVG）",
+            "真实四关无刷新通关（第 1 关仅开始时不走、第 2 关 100 步、第 3 关先预测再 200 步、第 4 关错误实验观察与纠错）",
+            "真实舞台执行和角色状态；运行、停止、重置和简洁反馈清晰可用",
+            "保存、刷新恢复、奖励、云同步异常（含导航失败）回归无缺口",
+            "1440×900、1366×768、768×1024、375×812 四组真实浏览器验证",
+            "4 号非作者功能与视觉复核 PASS；CI 全绿仅为必要条件，不替代产品体验验收",
+            "合并后部署预发布并提交线上截图与真实交互结果；用户最终视觉确认前，不批量复制到更多课程，不宣称儿童试学验收通过"
+        ],
+        "evidence": {},
+        "notes": "2026-11-18 16:12 duan 下达 Codex 接手指令：V3 Blockly 工作区专项整改现交由 Codex 独立负责；2 号暂停对共享 Blockly 工作区的并行修改，保留其分支 muse-c/v3-forest-workspace（HEAD a1894bc9）供 Codex 复用；4 号负责后续独立审核，主号负责合并部署；2 号可继续其他不冲突课程任务，但不得自行合并旧 V3 实现。Task-ID 核对：OPS-049 在建任务时确认未被占用（台账 138 条、最高 OPS-048；开放 PR 无 OPS-049；OPS-044 已预留给主号做 E2E CI 接线，不用）。OPS-048（2 号 V3 样板）已改为 blocked，由本任务接手同一范围继续实施。参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md），原型 SVG 积木与模拟运行不能作为真实产品代码。"
     }
   ]
 }
