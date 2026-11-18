@@ -55,3 +55,15 @@
 - 阶段 D：第一课验收 PASS 后，才将共享工作区提炼为 2 号 Blockly 课程的模板；Scratch GUI 使用独立视觉适配，不强制套同一画布几何。
 
 本评审分支仅添加原型和本文档，不改生产代码，不覆盖现存设计文件。
+
+## 6. 积木外观标准：Scratch 3 风格（2026-11-18 评审候选）
+
+本次视觉原型已把普通圆角矩形改成 **Scratch 3 风格轮廓**：
+- 事件：帽子形（hat），上方圆拱，下方拼接口；示例颜色 `#FFBF00`。
+- 运动：上下拼接的堆叠积木（stack），蓝色 `#4C97FF`；数值显示为白色椭圆输入槽。
+- 外观：带拼接接口的紫色堆叠积木 `#9966FF`。
+- 控制：带内部镂空的 C 形嵌套结构，橙色 `#FFAB19`。
+
+**生产代码重要现状**：`apps/web/src/features/lessons/blockly/blockly-workspace.tsx` 中 `Blockly.inject` 已指定 `renderer: 'zelos'`，已有真实 Scratch 风格渲染能力。禁止另写 SVG 积木引擎。正式视觉对齐应检查 `register-kids-blocks.ts` 中 `getKidsBlockTheme()` 的颜色和积木结构，再在真实 Blockly 中实现：当前 `kc_looks` 为绿色 `#3fbf6a`，`kc_control` 为青色 `#0fbdbd`，与本次 Scratch 外观候选不一致；**须待用户确认后才调整生产主题颜色**，并避免全站意外回归。
+
+原型的 SVG 只证明视觉形状（非程序语义、无真正吸附）；用户确认后要用真实 Zelos 积木的浏览器截图与原型并排核对。**不要将演示假积木接入正式课。**
