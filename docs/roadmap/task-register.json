@@ -4045,6 +4045,29 @@
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/555"
       },
         "notes": "2026-11-17 duan 下达登记指令：3 号已完成《接住掉落水果》本地实现（真实 Chromium 报告 61/61 通过，见 Issue #552），因台账未登记无法正式提交 PR；Issue #552 有任务范围及开发证据。Task-ID 核对：OPS-042 在建任务时确认未被占用（台账 136 条、无 OPS-042 条目；开放 PR 无 OPS-042）。OPS-042 为 2026-11-15 StudioShell 指令预留给 3 号的 G2-U3-L02 迁移任务。登记通过后 3 号即推送已有实现分支并提交独立 PR。"
+    },
+    {
+        "id": "OPS-048",
+        "title": "KidsCoding V3 Blockly 统一工作区样板整改（G0 第一课《小狐狸出场》）",
+        "priority": "P0",
+        "category": "OPS",
+        "status": "in_progress",
+        "dependencies": [
+            "OPS-041"
+        ],
+        "scope": "第一阶段只整改 G0 第一课《小狐狸出场》（/studio/blockly/lesson-01-forest-hello），把已批准的 V3 参考原型（Scratch 3 风格积木 + Kitten 式工作区布局 + KidsCoding 品牌与原有课程体系）实现成真实可用的儿童编程课堂；不改 432 节课程，不批量迁移。真实组件改造：LessonWorkspace 分类栏不再依赖 isBlockly（以真实 EditorSlot / 能力接口供应分类和素材）；BlocklyWorkspace 素材入口与画布并列、按可用高度响应（不再固定 420px 画布把素材挤到下方）；StudioShell 顶部当前学习任务常驻（完整指引可折叠进抽屉）；forest-hello 路由补 rolesSlot（以真实角色数据提供角色区域，无编辑能力的操作显式只读或待实现）；forest-hello-slot 调整区域承载关系（任务引导首屏可见，保留真实 Blockly）；反馈区默认简洁儿童可读，三层判定数据保留在展开详情。积木外观用真实 Blockly Zelos（Blockly.inject renderer: 'zelos' 已有），核对 register-kids-blocks.ts 的 getKidsBlockTheme() 颜色与结构；主题颜色可进入单课样板改造，正式变更须经兼容性测试与产品视觉验收；禁止另写 SVG 积木引擎、禁止再造独立假编辑器。保留 ForestRunAdapter、题目门禁、草稿、奖励、云同步及 #548/#549 修复；原有教学、判定、保存、同步、奖励全部保留。桌面、平板、手机各提供适合布局。负责人 2 号；独立审核 4 号；集成部署主号；主号负责共享文件冲突管理，3 号在本任务期间不得同时修改 Blockly 工作区。",
+        "acceptance": [
+            "原型与真实页面同视口截图对比一致（首屏直接可见积木分类和素材、舞台、角色、真实脚本区、任务与运行）",
+            "真实积木拖拽、吸附、连接和删除（真实 Blockly Zelos，非原型 SVG）",
+            "真实四关无刷新通关（第 1 关仅开始时不走、第 2 关 100 步、第 3 关先预测再 200 步、第 4 关错误实验观察与纠错）",
+            "真实舞台执行和角色状态；运行、停止、重置和简洁反馈清晰可用",
+            "保存、刷新恢复、奖励、云同步异常（含导航失败）回归无缺口",
+            "1440×900、1366×768、768×1024、375×812 四组真实浏览器验证",
+            "4 号非作者功能与视觉复核 PASS；CI 全绿仅为必要条件，不替代产品体验验收",
+            "合并后部署预发布并提交线上截图与真实交互结果；用户最终视觉确认前，不批量复制到更多课程，不宣称儿童试学验收通过"
+        ],
+        "evidence": {},
+        "notes": "2026-11-18 duan 确认新产品设计方向并下达登记指令：Scratch 3 风格积木 + Kitten 式工作区布局 + KidsCoding 品牌与原有课程体系；参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md、DESIGN.md、ACCEPTANCE.md、WORKSPACE-API.md），原型 SVG 积木与模拟运行不能作为真实产品代码。Task-ID 核对：OPS-048 在建任务时确认未被占用（台账 137 条、最高 OPS-047；开放 PR 无 OPS-048；OPS-044 已预留给主号做 E2E CI 接线，不用）。#554（OPS-047）的 F1 修复仍由 2 号在原 PR 继续（4 号复核 FAIL，review 5951842170），与本任务并行、不合并。3 号保持 Scratch GUI 路线，不参与本任务。"
     }
   ]
 }
