@@ -74,6 +74,20 @@ export type LessonWorkspaceProps = {
   stageSlot?: StageSlotComponent
   rolesSlot?: RolesSlotComponent
   /**
+   * V3（视觉契约 §3）：允许一节 slot 课的适配器凭真实分类能力驱动外壳
+   * 图标分类栏——例如编辑插槽内嵌真实 Blockly 工作区、适配器的
+   * selectCategory 能真正打开 flyout 的课。默认关：分类栏沿用既有规则
+   * （blockly 引擎 + 适配器能力）。占位适配器（如 summary 课的裸
+   * BlocklyAdapter）不得因此冒出分类栏。
+   */
+  enableAdapterRail?: boolean
+  /**
+   * V3（视觉契约 §2）：反馈卡默认只显示一句话结论，完整三层判定收进
+   * 可展开的“详细反馈”。按课选择开启，默认关（其余课保持平铺渲染，
+   * 判定数据两种渲染一条不删）。
+   */
+  collapseFeedbackDetails?: boolean
+  /**
    * Independent run adapter (OPS-022, contract §2). A slot course whose
    * run target is not its imperative adapter passes one here instead
    * (e.g. a course-owned runner). Resolution: runAdapter ?? mounted
@@ -196,6 +210,8 @@ export function LessonWorkspace({
   editorSlot,
   stageSlot,
   rolesSlot,
+  enableAdapterRail = false,
+  collapseFeedbackDetails = false,
   runAdapter,
   chrome = 'full',
   onSaveStateChange,
@@ -1261,7 +1277,13 @@ export function LessonWorkspace({
   // Icon rail + search data, probed from the adapter each render (the
   // Blockly adapter answers from its static toolbox builder, so this
   // works before mount too). Absent = no rail, no search box, never fake.
-  const railCategories = isBlockly ? (adapter.getBlockCategories?.() ?? []) : []
+  // V3（视觉契约 §3）：分类栏的数据永远来自适配器的真实能力
+  // （getBlockCategories）。blockly 引擎沿用既有规则；slot 课须由路由
+  // 显式开启 enableAdapterRail（其适配器以真实工作区为后盾时）才获得
+  // 分类栏——不再用引擎字符串把内嵌真实工作区的 slot 课挡在门外，
+  // 同时占位适配器不会凭空冒出分类栏。
+  const railCategories =
+    isBlockly || enableAdapterRail ? (adapter.getBlockCategories?.() ?? []) : []
   const railOn = railCategories.length > 0
   const blockInventory = isBlockly ? (adapter.getBlockInventory?.() ?? []) : []
   const searchResults =
@@ -2055,6 +2077,16 @@ export function LessonWorkspace({
         .ws-rail-btn[aria-pressed="true"] { border-color: #2463eb; background: #eaf1fe; }
         .ws-rail-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; }
         .ws-rail-on .ws-blockly-mount .blocklyToolbox { display: none !important; }
+        /* V3: same rule for an editor slot that embeds its own Blockly
+           workspace (e.g. the forest lessons): while the shell rail is
+           on, the workspace's own category column hides so the two
+           category surfaces never coexist; the flyout still opens from
+           the rail through the adapter. Scoped to >=768px because the
+           shell's own phone layout hides the rail wrap below 768px —
+           there the in-canvas toolbox stays the category surface. */
+        @media (min-width: 768px) {
+          .ws-rail-on .ws-editor-slot .blocklyToolbox { display: none !important; }
+        }
         /* Block search + editor zoom controls (rendered only when the
            adapter exposes the capability). */
         .ws-search-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
@@ -2596,14 +2628,31 @@ export function LessonWorkspace({
           </p>
         )}
         {judgment ? (
-          <>
-            {judgment.layers.map((layer) => (
-              <p key={layer.id} data-testid={`ws-feedback-${layer.id}`}>
-                {layer.detail}
-              </p>
-            ))}
-            <p data-testid="ws-feedback-conclusion">{judgment.conclusion}</p>
-          </>
+          collapseFeedbackDetails ? (
+            // V3（视觉契约 §2）：按课开启的反馈层级——默认只留一行孩子
+            // 能懂的结论；完整三层判定数据一条不删，收进可展开的
+            // “详细反馈”里。未开启的课保持原有平铺渲染不变。
+            <>
+              <p data-testid="ws-feedback-conclusion">{judgment.conclusion}</p>
+              <details data-testid="ws-feedback-details">
+                <summary>查看详细反馈</summary>
+                {judgment.layers.map((layer) => (
+                  <p key={layer.id} data-testid={`ws-feedback-${layer.id}`}>
+                    {layer.detail}
+                  </p>
+                ))}
+              </details>
+            </>
+          ) : (
+            <>
+              {judgment.layers.map((layer) => (
+                <p key={layer.id} data-testid={`ws-feedback-${layer.id}`}>
+                  {layer.detail}
+                </p>
+              ))}
+              <p data-testid="ws-feedback-conclusion">{judgment.conclusion}</p>
+            </>
+          )
         ) : (
           !judgmentStale &&
           (EditorSlotView ? (
