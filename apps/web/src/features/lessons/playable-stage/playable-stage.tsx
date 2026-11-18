@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
 import { isDesignedMistakeRun, type MistakeStepDesign } from '@/content/curriculum/mistake-steps'
 import { isPracticeAnswered, type PracticeStepDesign } from '@/content/curriculum/practice-steps'
@@ -113,7 +113,9 @@ export function PlayableStage({
   successMessage,
   runControls = 'internal',
   externalState,
+  sceneActions,
 }: {
+  sceneActions?: ReactNode
   blocks: ProgramBlock[]
   template?: ProjectTemplateDefinition
   requiredBlocks: string[]
@@ -324,6 +326,7 @@ export function PlayableStage({
         </div>
       </div>
 
+      {sceneActions}
       <div className="kc-stage-panel space-y-3">
       {askPrediction ? (
         <div data-testid="garden-prediction" className="rounded-[8px] border border-amber-200 bg-amber-50 p-4">
@@ -438,7 +441,7 @@ export function PlayableStage({
           {/* UX-204: running is not idle — the ready copy must not show mid-run. */}
           {executionState === 'running' ? (
             <div className="kc-feedback">运行中，看看角色怎么做。</div>
-          ) : executionState !== 'error' && executionState !== 'success' && executionState !== 'armed' ? (
+          ) : !sceneActions && executionState !== 'error' && executionState !== 'success' && executionState !== 'armed' ? (
             <div className="kc-feedback">{clickLesson ? '准备就绪。先按「启动点击程序」，再点一下蝴蝶。' : '准备就绪。点击「运行」观察角色动作与对白。'}</div>
           ) : null}
         </div>

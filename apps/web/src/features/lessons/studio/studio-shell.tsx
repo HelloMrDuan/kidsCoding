@@ -44,6 +44,7 @@ export type StudioShellProps = {
   shellControl?: ShellControl | null
   /** The editing surface (e.g. LessonWorkspace in studio chrome). Always mounted. */
   children: ReactNode
+  layout?: 'blockly-v3'
 }
 
 function saveChipText(state: SaveState): string {
@@ -52,7 +53,7 @@ function saveChipText(state: SaveState): string {
   return '未保存'
 }
 
-export function StudioShell({ lesson, saveState, saveMessage, shellControl, children }: StudioShellProps) {
+export function StudioShell({ lesson, saveState, saveMessage, shellControl, children, layout }: StudioShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [fileMenuOpen, setFileMenuOpen] = useState(false)
   const [revealedHints, setRevealedHints] = useState(0)
@@ -97,7 +98,7 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
       }))
 
   return (
-    <div className="studio-shell" data-testid="studio-shell">
+    <div className={`studio-shell${layout === 'blockly-v3' ? ' kc-v3-studio' : ''}`} data-testid="studio-shell">
       <style>{`
         .studio-shell { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; position: relative; background: #f3f6fb; color: #18243a; font-family: "PingFang SC","Microsoft YaHei",sans-serif; box-sizing: border-box; }
         .studio-shell * { box-sizing: border-box; }
@@ -162,10 +163,11 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
           <a href={lesson.backHref} data-testid="studio-back">
             ← 返回
           </a>
+          {layout === 'blockly-v3' && <span className="kc-v3-wordmark">Kids<b>Coding</b></span>}
           <h1 data-testid="studio-title">{lesson.title}</h1>
           {lesson.demo && <span className="studio-demo-badge" data-testid="studio-demo-badge">演示</span>}
           {saveState !== undefined && (
-            <span className="studio-meta" data-testid="studio-save-chip">
+            <span className="studio-meta" data-testid="studio-save-chip" data-state={saveState}>
               {saveChipText(saveState)}
             </span>
           )}
@@ -176,7 +178,7 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
           )}
         </div>
         <div className="studio-topbar-actions">
-          {showGoal && (
+          {showGoal && layout !== 'blockly-v3' && (
             <span className="studio-goal-current" data-testid="studio-goal-current">
               {lesson.goal5[0]}
             </span>

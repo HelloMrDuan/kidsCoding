@@ -14,7 +14,7 @@ import { expect, test, type Page } from '@playwright/test'
  * N7/N8 为 OPS-046）；
  * 五视口 1920×1080 / 1440×900 / 1366×768 / 768×1024 / 375×812。积木添加走 palette
  * 的 lesson-add-* 按钮（与旧路由、L01 同款真实路径）；E6 另做一次
- * 工具箱 flyout 真实拖拽（接成链并跑通）。不使用固定时长 sleep 同步：
+ * 常驻素材区真实拖拽（接成链并跑通）。其余测试按运行、保存与完成条件等待：
  * 每次等待都是条件期望（可见 testid、存储状态、文本）。
  * 用临时 Playwright config（独立端口）运行；playwright.config.ts 不动。
  */
@@ -104,7 +104,14 @@ async function waitForShellSaved(page: Page) {
 }
 
 async function add(page: Page, type: string) {
-  await page.getByTestId(`lesson-add-${type}`).click()
+  await clickProgramTool(page, `lesson-add-${type}`)
+}
+
+async function clickProgramTool(page: Page, testId: string) {
+  const assist = page.getByTestId('lesson-blockly-workspace').locator('details').first()
+  if ((await assist.getAttribute('open')) === null) await assist.locator('summary').click()
+  await page.getByTestId(testId).click()
+  await assist.locator('summary').click()
 }
 
 async function clickRun(page: Page) {
@@ -175,8 +182,7 @@ async function assertShellInvariants(page: Page) {
 async function assertTopbarFits(page: Page, width: number) {
   const topbarBox = await page.getByTestId('studio-topbar').boundingBox()
   expect(topbarBox, 'topbar has a bounding box').not.toBeNull()
-  expect(topbarBox!.height, 'slim topbar height in 48–56px').toBeGreaterThanOrEqual(48)
-  expect(topbarBox!.height, 'slim topbar height in 48–56px').toBeLessThanOrEqual(56)
+  expect(topbarBox!.height, 'V3 topbar height').toBe(width <= 650 ? 54 : 62)
   for (const id of [
     'studio-back',
     'studio-title',
@@ -195,14 +201,12 @@ async function assertTopbarFits(page: Page, width: number) {
 }
 
 /**
- * 真实拖拽：点工具箱分类（开始/移动）打开 flyout，把第一块 flyout
- * 积木拖到画布上现有程序栈的正下方（Blockly 在连接点附近松手即接链）。
- * 注意：本仓库 Blockly  bundle 的分类行是 `.blocklyToolboxCategoryContainer`
- *（role=treeitem），不是 `.blocklyTreeRow`（该类不存在，E6 首轮实测 0 命中）。
+ * 真实拖拽：切换常驻 flyout 的分类，把素材积木放到主画布现有程序栈下方。
  */
-async function dragToolboxBlock(page: Page, categoryLabel: string) {
-  const category = page.getByRole('treeitem', { name: categoryLabel }).first()
-  await category.click()
+async function dragToolboxBlock(page: Page, categoryLabel: string, touch = false) {
+  const category = page.getByTestId('v3-categories').getByRole('button', { name: categoryLabel })
+  if (touch) await category.tap()
+  else await category.click()
   const flyoutBlock = page.locator('.blocklyFlyout .blocklyDraggable').first()
   await flyoutBlock.waitFor({ state: 'visible', timeout: 10_000 })
   const box = await flyoutBlock.boundingBox()
@@ -239,7 +243,22 @@ async function dragToolboxBlock(page: Page, categoryLabel: string) {
   const dropY = lastBox
     ? lastBox.y + lastBox.height - 8 * scale + box!.height / 2
     : canvasBox!.y + 80
-  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+  const startX = box!.x + box!.width / 2
+  const startY = box!.y + box!.height / 2
+  if (touch) {
+    const cdp = await page.context().newCDPSession(page)
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: startX, y: startY }] })
+    for (let i = 1; i <= 20; i++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{
+        x: startX + (dropX - startX) * i / 20,
+        y: startY + (dropY - startY) * i / 20,
+      }] })
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    await cdp.detach()
+    return
+  }
+  await page.mouse.move(startX, startY)
   await page.mouse.down()
   await page.mouse.move(dropX, dropY, { steps: 20 })
   // Let Blockly show the snap highlight before releasing; without this
@@ -257,12 +276,13 @@ test('E1 desktop 1440: load, step-1 run (only when_start, fox stays), complete t
   await expect(page.getByTestId('forest-hello-step-title')).toContainText('认识小狐狸和开始积木')
   await expect(page.getByTestId('forest-hello-voiceover')).toContainText('先放开始积木')
   await expect(page.getByTestId('ws-stage-box')).toBeVisible()
-  await expect(page.locator('[data-character-art="fox"]')).toBeVisible()
+  await expect(page.getByTestId('stage-character-main').locator('[data-character-art="fox"]')).toBeVisible()
   await assertShellInvariants(page)
   await assertTopbarFits(page, 1440)
   await page.screenshot({ path: `${EVIDENCE}/e1-desktop-start.png` })
   // Step 1: only when_start — the fox staying put IS the expected result.
-  await add(page, 'when_start')
+  await dragToolboxBlock(page, '开始')
+  await expect.poll(() => draftProgram(page, 'step-1')).toEqual([START])
   await runAndExpect(page, true)
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
   await expect(page.getByTestId('ws-feedback-stage')).toContainText('一动不动')
@@ -339,7 +359,7 @@ test('E4 desktop 1440: step-4 mistake experiment, fix, complete the lesson', asy
   await page.getByTestId('mistake-answer-stayed').click()
   await expect(page.getByTestId('mistake-fix')).toBeVisible()
   // Fix it and run again: the real failure is gone, the fix is confirmed.
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)
@@ -376,6 +396,24 @@ for (const size of SIZES) {
     const runBox = await runEntry.boundingBox()
     expect(runBox).not.toBeNull()
     expect(runBox!.y).toBeLessThan(size.height)
+    const categories = page.getByTestId('v3-categories')
+    await expect(categories.getByRole('button')).toHaveCount(1)
+    await expect(categories.getByRole('button', { name: '开始' })).toHaveAttribute('aria-pressed', 'true')
+    const tile = page.locator('.kc-v3-engine .blocklyFlyout .when_start')
+    await expect(tile).toBeInViewport()
+    await expect(page.getByTestId('v3-mission')).toBeInViewport()
+    if (size.width >= 1280) {
+      const left = (await page.getByTestId('v3-stage-region').boundingBox())!
+      const middle = (await page.getByTestId('v3-material-heading').boundingBox())!
+      const right = (await page.getByTestId('v3-script-heading').boundingBox())!
+      const tileBounds = (await tile.boundingBox())!
+      expect(left.x + left.width).toBeLessThanOrEqual(middle.x)
+      expect(middle.x + middle.width).toBeCloseTo(right.x, 0)
+      expect(middle.width / size.width).toBeGreaterThan(0.16)
+      expect(right.width / size.width).toBeGreaterThan(0.48)
+      expect(tileBounds.x + tileBounds.width).toBeLessThan(right.x)
+      await expect(page.getByTestId('ws-roles-panel')).toBeInViewport({ ratio: 1 })
+    }
     await page.screenshot({ path: `${EVIDENCE}/e5-first-${size.name}.png` })
   })
 }
@@ -395,6 +433,36 @@ test('E6 desktop 1440: real toolbox flyout drag connects the move block and pass
   await runAndExpect(page, true)
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
 })
+
+for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) {
+  test(`V3 ${size.width}: touch-drag, connect and run without recreating the editor`, async ({ browser }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'Runs with an explicit Chrome touch context and exact viewport')
+    const context = await browser.newContext({ viewport: size, hasTouch: true, isMobile: true })
+    try {
+      const page = await context.newPage()
+      const draft = emptyDraft(1)
+      draft.programs['step-2'] = [START]
+      await seedDraft(page, draft)
+      await page.goto(ROUTE)
+      const svg = page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')
+      await expect(svg).toBeVisible({ timeout: 30_000 })
+      await expect(page.getByTestId('v3-categories').getByRole('button', { name: '移动' })).toHaveAttribute('aria-pressed', 'true')
+      const workspace = await svg.elementHandle()
+      await dragToolboxBlock(page, '移动', true)
+      await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+      await page.getByTestId('ws-run-toggle').tap()
+      await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
+      await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
+      await page.getByTestId('v3-reset-stage').tap()
+      await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+      await page.setViewportSize({ width: size.width + 15, height: size.height })
+      await expect.poll(() => workspace!.evaluate((el) => el.isConnected)).toBe(true)
+      await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+    } finally {
+      await context.close()
+    }
+  })
+}
 
 test('E7 desktop 1440: save + refresh restores the step and the program', async ({ page }) => {
   test.setTimeout(240_000)
@@ -567,9 +635,10 @@ test('N4 desktop 1440: save failure is fail-closed (localStorage quota exhausted
   })
   // Dirty the draft so the next save must GROW it (+~24 bytes): with
   // < 1 byte free the write throws instead of silently overwriting.
-  await page.getByTestId('lesson-add-move_right').click()
+  await add(page, 'move_right')
   // Trigger a real save through the shell: the chip must report failure,
   // never “已保存到本机”.
+  await page.getByText('本关指引与积木顺序', { exact: true }).click()
   await page.getByTestId('forest-hello-save').click()
   await expect(page.getByTestId('studio-save-chip')).toContainText('未能保存', { timeout: 10_000 })
   await expect(page.getByTestId('studio-save-chip')).not.toContainText('已保存到本机')
@@ -586,12 +655,12 @@ test('N5 desktop 1440: editing after a pass invalidates the shell judgment', asy
   await runAndExpect(page, true)
   await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
   // Editing the program must invalidate the pass.
-  await page.getByTestId('lesson-add-move_right').click()
+  await add(page, 'move_right')
   await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0, { timeout: 10_000 })
   // Remove the extra block again (select it, then the always-available delete)
   // and re-run: the pass comes back.
   await page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.move_right').last().click()
-  await page.getByTestId('lesson-delete-selected').click()
+  await clickProgramTool(page, 'lesson-delete-selected')
   await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
   await runAndExpect(page, true)
 })
@@ -618,6 +687,9 @@ test('E10 desktop 1440 (OPS-045): continuous 1->2->3->4 without refresh, step-3 
   test.setTimeout(240_000)
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto(ROUTE)
+  const editor = page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')
+  await expect(editor).toBeVisible()
+  const originalCanvas = await editor.elementHandle()
   // Step 1: only when_start — the fox staying put IS the expected result.
   await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 1 关')
   await add(page, 'when_start')
@@ -659,12 +731,13 @@ test('E10 desktop 1440 (OPS-045): continuous 1->2->3->4 without refresh, step-3 
   await expect(page.getByTestId('practice-done')).toBeVisible()
   await complete(page)
   await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+  await expect.poll(() => originalCanvas!.evaluate((el) => el.isConnected)).toBe(true)
   // Step 4: mistake experiment, fix, complete the lesson.
   await clickRun(page)
   await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
   await page.getByTestId('mistake-answer-stayed').click()
   await expect(page.getByTestId('mistake-fix')).toBeVisible()
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)
@@ -687,7 +760,7 @@ test('N7 desktop 1440 (OPS-046): a hung /api/guest times out into a visible clou
   await clickRun(page)
   await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
   await page.getByTestId('mistake-answer-stayed').click()
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)
@@ -727,7 +800,7 @@ test('N8 desktop 1440 (OPS-046): local progress write failure at completion is a
   await clickRun(page)
   await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
   await page.getByTestId('mistake-answer-stayed').click()
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)
@@ -791,7 +864,7 @@ test('N10 desktop 1440 (OPS-046 F1): retry sync succeeds but navigation is block
   await clickRun(page)
   await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
   await page.getByTestId('mistake-answer-stayed').click()
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)

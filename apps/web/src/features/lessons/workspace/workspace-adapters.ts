@@ -89,6 +89,8 @@ export type SlotRunAdapter = {
   runProgram: (program: unknown, onEvent: (e: RunEvent) => void) => void
   /** Synchronously cancel pending playback and pending events. */
   stop: () => void
+  /** Return the stage to its start without replacing or saving the script. */
+  reset?: () => void
   /** Same shape as EngineState. Must not throw (the shell keeps the last state on error). */
   getState: () => EngineState
   /**

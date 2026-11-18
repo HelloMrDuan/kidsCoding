@@ -1,0 +1,24 @@
+# V3 Blockly 课堂接入与维护
+
+**样板**：[《小狐狸出场》](/studio/blockly/lesson-01-forest-hello)。设计依据为 `review/kitten-forest-v3-reference` 的 `PROTOTYPE-FOREST-v3.html` 和视觉契约。产品状态由用户在预发布实机上裁定。
+
+## 接入一节课
+
+1. 按现有模式将真实 `StudioLesson`、草稿读写、课程 `SlotRunAdapter` 和 `EditorSlot` 交给 `StudioShell` / `LessonWorkspace`。选择 `StudioShell.layout="blockly-v3"` 与 `LessonWorkspace.studioLayout="blockly-v3"`。学习准入、课程完成与奖励沿用正式接口。
+2. 在编辑插槽使用 `BlocklyWorkspace`，传递本关的 `allowedBlocks`、已验证的初始程序/草稿以及稳定的 `onSnapshotChange`。加上 `docked={{ stepKey, preferredBlock }}`。优先积木由课程传入，可省略。分类及材料都从 `allowedBlocks` 推导，切换分类不改变脚本。
+3. 需要改关卡程序时，在既有工作区内更新积木及其连接。首个挂载的 `blocks` 作为恢复输入，之后的正常编辑由 Blockly 向插槽上报。样板的 `rebuildForestProgram` 示范怎样同步课程草稿，该助手只面向第一课的块类型；有对白、循环或多个栈的课应沿用自己的字段/连接恢复逻辑。
+4. 使用 `BlocklyStudioMission` 将当前进度、关卡目标、下一步和实际完成操作放进任务带。三级提示仍由 `StudioShell` 读取课程契约。完成门槛由课程控制。
+5. 通过 `stageSlot` 渲染实际舞台，通过 `rolesSlot` 提供真实角色和背景。舞台插槽把 `sceneActions` 放在场景后、额外教学活动前。只读角色用普通内容表达。适配器实现 `reset()` 时显示舞台重来，运行和停止由原有控制器驱动，反馈使用适配器的原始三层判定。
+6. 在实际 Chrome 验证本课的允许积木、原生拖拽/连接、键盘和触摸、参数（本课提供时）、运行、失败与恢复，再按单一任务走审查。第 2 课正式迁移由 Muse 在第一课产品确认后执行。
+
+## 共享边界
+
+`blockly-workspace.tsx` 仍是唯一的 Blockly 编辑器。V3 使用 Blockly 的简单工具箱和同一工作区实例拥有的 `VerticalFlyout`。主题、固定素材宽度和响应布局以选项启用。分类通过公开的 `flyout.show()` API 更新真实 Zelos 积木。编辑器的拖放、连接、删除、撤销和快照均来自原 Blockly 实例，尺寸变化只调用 `svgResize`。
+
+课程作者负责自己课节的 allowedBlocks、步骤和判断、角色、背景、初始脚本、保存及进度接线。共享壳、编辑器、主题和 Studio 组件由主 Muse 按一个 Task-ID 串行协调。改动上述共享文件时先检查主号/2 号的未合并分支和现有 PR。4 号独立复核，主号集成和部署。Scratch GUI 使用自己的真实编辑器。
+
+当前样板仅狐狸有可编辑脚本，兔子和森林为课堂固定内容。运动积木为课程规定的 100 步，样板不新增可编辑参数。课程未提供角色增删、角色脚本切换、背景编辑、造型编辑。第一关从空草稿开始，素材区只开放「开始时」，其余关按既有课程数据解锁。
+
+## 复现视觉取证
+
+启动候选生产构建，再运行 `node apps/web/scripts/capture-v3-blockly-workspace.mjs <输出目录>`。默认本地服务 3100，可通过 `KC_VISUAL_ORIGIN` 指向候选服务。默认本地远程跟踪分支为 `origin/review/kitten-forest-v3-reference`，可通过 `KC_V3_DESIGN_REF` 锁定参考提交。脚本为 1440×900、1366×768、768×1024、375×812 各保存一对截图，并记录舞台、任务、素材、画布和真实积木边界。
