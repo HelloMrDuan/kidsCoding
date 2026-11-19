@@ -418,3 +418,77 @@ test('N2 desktop 1440: legacy old-route draft is offered and imports with its ch
     { type: 'say_line', line: 'nice-to-meet' },
   ])
 })
+
+test('N10 desktop 1440 (OPS-047 F1): retry sync succeeds but navigation is blocked — navigation-failed banner and a working fallback entry', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  // Phase 1: the cloud is down (every /api/guest POST answers 500), so
+  // completing the lesson lands on the cloud-failed banner first. The
+  // flag lives on window so the test can bring the cloud back later.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __kcCloudDown?: boolean }
+    w.__kcCloudDown = true
+    const originalFetch = window.fetch.bind(window)
+    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      if (url.includes('/api/guest') && w.__kcCloudDown) {
+        return Promise.resolve(new Response(JSON.stringify({ error: 'cloud down' }), { status: 500 }))
+      }
+      return originalFetch(input, init)
+    }
+  })
+  const draft = emptyDraft(3)
+  draft.passed = ['step-1', 'step-2', 'step-3']
+  await seedDraft(page, draft)
+  await page.goto(ROUTE)
+  await expect(page.getByTestId('forest-greeting-step-title')).toContainText('第 4 关')
+  // 先观察错误实验并答题。
+  await clickRun(page)
+  await expect(page.getByTestId('mistake-run-result')).toHaveAttribute('data-failure-code', 'say-too-early', { timeout: 20_000 })
+  await page.getByTestId('mistake-answer-before-walk').click()
+  await expect(page.getByTestId('mistake-fix')).toBeVisible()
+  // 清空重拼为正确顺序并跑通。
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'move_right')
+  await add(page, 'say_line')
+  await runAndExpect(page, true)
+  await complete(page)
+  await expect(page.getByTestId('forest-greeting-cloud-failed')).toBeVisible({ timeout: 20_000 })
+  await page.screenshot({ path: `${EVIDENCE}/n10-cloud-failed-first.png` })
+
+  // Phase 2: the cloud recovers, but soft navigation to the complete
+  // page is blocked (every request for it hangs forever).
+  // 注入方式（hello N10 两轮实测结论）：abort 或 500 会让 Next 把软
+  // 导航回退成整页硬导航、页面反而成功跳走；只有让完成页的请求一直
+  // 挂起，软导航才既不成功也不回退，页面留在原地——这正是生产环境
+  // 里“导航请求挂死”时孩子的真实处境，由到达核验兜底出横幅。
+  await page.evaluate(() => {
+    ;(window as unknown as { __kcCloudDown?: boolean }).__kcCloudDown = false
+  })
+  await page.route('**/project/lesson-02-forest-greeting/complete**', () => {})
+  await page.getByTestId('forest-greeting-retry-cloud-sync').click()
+  // The sync succeeded (cloud banner gone for good) but the page never
+  // arrives: the navigation-failed banner with the fallback entry is
+  // the only acceptable outcome — never silence (F1).
+  await expect(page.getByTestId('forest-greeting-navigation-failed')).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByTestId('forest-greeting-cloud-failed')).toHaveCount(0)
+  const fallback = page.getByTestId('forest-greeting-open-complete-page')
+  await expect(fallback).toBeVisible()
+  await expect(fallback).toHaveAttribute('href', '/project/lesson-02-forest-greeting/complete')
+  await expect(page).toHaveURL(/\/studio\/blockly\/lesson-02-forest-greeting/)
+  await page.screenshot({ path: `${EVIDENCE}/n10-navigation-failed.png` })
+
+  // Phase 3: the fallback entry is a plain full-page link — it works
+  // even though client-side navigation is broken. The click is issued
+  // via DOM click + waitForURL: a locator click that starts a full-page
+  // navigation can race Playwright's actionability retries (the anchor
+  // detaches as the page leaves and the click never returns — observed
+  // as a 240s timeout under load, with the navigation actually started).
+  await page.unroute('**/project/lesson-02-forest-greeting/complete**')
+  await Promise.all([
+    page.waitForURL(/\/project\/lesson-02-forest-greeting\/complete/, { timeout: 20_000 }),
+    fallback.evaluate((el) => (el as HTMLAnchorElement).click()),
+  ])
+  await expect(page).toHaveURL(/\/project\/lesson-02-forest-greeting\/complete/)
+})

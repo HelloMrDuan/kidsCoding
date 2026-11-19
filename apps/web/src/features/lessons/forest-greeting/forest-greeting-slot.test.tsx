@@ -241,6 +241,39 @@ describe('GreetingEditorSlot (mocked Blockly surface)', () => {
     expect(window.localStorage.getItem('kc-progress')).toContain('lesson-02-forest-greeting')
   })
 
+  it('last step: navigation failure is visible (banner + full-page fallback), never silent (OPS-047 F1)', async () => {
+    // push 同步抛错：云端同步已成功、跳转失败 → hook 返回
+    // 'navigate-failed' 并置 navigationFailed；插槽必须读这个结果，
+    // 给横幅与整页备用入口。到达核验路径已由 hook 单测覆盖。
+    push.mockImplementationOnce(() => {
+      throw new Error('navigation down')
+    })
+    const draft = emptyGreetingDraft()
+    draft.stepIndex = 3
+    draft.programs['step-4'] = [START, MOVE, SAY]
+    draft.passed = ['step-1', 'step-2', 'step-3']
+    const utils = renderSlot(draft)
+    await screen.findByTestId('mock-blockly')
+    act(() => {
+      utils.store.setState({
+        observed: ['step-4'],
+        mistakeAnswers: { 'step-4': 'before-walk' },
+      })
+    })
+    const passed = buildGreetingJudgment(judgeGreetingStep([START, MOVE, SAY], 3, true), 3)
+    expect(passed.passed).toBe(true)
+    rerenderSlot(utils, draft, fakeShell({ judgment: passed }))
+    await screen.findByTestId('mock-blockly')
+    fireEvent.click(screen.getByTestId('forest-greeting-complete-step'))
+    // 导航失败必须有横幅与整页备用入口，本机进度已保存，且不跳转、不静默。
+    expect(await screen.findByTestId('forest-greeting-navigation-failed')).toHaveTextContent('打开完成页失败了')
+    expect(screen.getByTestId('forest-greeting-notice')).toHaveTextContent('跳转到完成页失败')
+    const fallback = screen.getByTestId('forest-greeting-open-complete-page')
+    expect(fallback).toHaveAttribute('href', '/project/lesson-02-forest-greeting/complete')
+    expect(push).toHaveBeenCalledWith('/project/lesson-02-forest-greeting/complete')
+    expect(window.localStorage.getItem('kc-progress')).toContain('lesson-02-forest-greeting')
+  })
+
   it('rejects a foreign-lesson import and echoes the empty draft', async () => {
     const { onChange } = renderSlot({ lessonId: 'someone-else', stepIndex: 0, programs: {} })
     await screen.findByTestId('mock-blockly')
