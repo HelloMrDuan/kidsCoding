@@ -199,9 +199,11 @@
   display: grid;
   grid-template-columns: var(--rail) calc(var(--material) - var(--rail)) minmax(0, 1fr);
   grid-template-rows: 47px minmax(220px, 1fr) auto;
-  flex: 1 0 320px;
+  /* Measure the expanded tools row as well as the canvas. The editor
+     column scrolls when both the tools and the lesson guide are open. */
+  flex: 1 0 auto;
   min-width: 0;
-  min-height: 0;
+  min-height: 320px;
 }
 .kc-v3-material-heading, .kc-v3-script-heading {
   grid-row: 1;
@@ -334,12 +336,51 @@
 @media (max-width: 850px) {
   .kc-v3-wordmark { display: none; }
   .kc-v3-studio .studio-topbar { gap: 6px; padding-inline: 8px; }
-  .kc-v3-stage-region .kc-stage-scene { min-height: 150px; }
   .kc-v3-script-heading, .kc-v3-material-heading { padding-inline: 8px; }
+  .kc-v3-regions { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(360px, 1fr); overflow-y: auto; }
+  .kc-v3-regions:not(:has(.kc-v3-stage-region:not([hidden]))) { grid-template-rows: minmax(360px, 1fr); }
+  .kc-v3-stage-region { overflow: visible; }
+  .kc-v3-stage-region .kc-stage-scene { aspect-ratio: auto; min-height: 0; }
+  .kc-v3-stage-region .kc-stage-badge { display: none; } /* The live scene chip already names the scene. */
+  .kc-v3-stage-region .kc-stage-topline { padding: 7px; }
+  .kc-v3-stage-region .kc-stage-topline > span:last-child { justify-content: flex-start; gap: 4px; }
+  .kc-v3-stage-region .kc-stage-scene-chip { font-size: 12px; padding: 3px 6px; white-space: nowrap; }
+  .kc-v3-stage-region .kc-stage-actors { bottom: 8px; }
+  .kc-v3-stage-region .kc-stage-actor-art { height: auto; }
+  .kc-v3-stage-region .ws-runbar .ws-run-btn,
+  .kc-v3-stage-region .ws-runbar .ws-stop-btn,
+  .kc-v3-stage-reset { min-height: 44px; }
+}
+
+@media (min-width: 651px) and (max-width: 850px) {
+  .kc-v3-workspace .kc-v3-stage-region .ws-stage-box { margin: 8px 10px; }
+  .kc-v3-stage-region [data-testid="lesson-playable-stage"] {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 14px;
+    align-items: start;
+  }
+  .kc-v3-stage-region .kc-stage-scene { grid-row: 1 / 3; height: 206px; }
+  .kc-v3-stage-region .ws-runbar { margin: 0 0 7px; }
+  .kc-v3-stage-region .kc-v3-roles { padding: 0; }
+  .kc-v3-stage-region .kc-v3-role-list { flex-direction: column; }
+  .kc-v3-stage-region .kc-v3-role-list strong { font-size: 14px; }
+  .kc-v3-stage-region .kc-v3-role-list small,
+  .kc-v3-stage-region .kc-v3-background { font-size: 12px; }
+  .kc-v3-stage-region .kc-stage-panel { grid-column: 1 / -1; }
+  .kc-v3-stage-region .kc-stage-panel:not(:has(> [data-testid="practice-task"], > [data-testid="mistake-task"])) > div:only-child { margin: 0; }
+  .kc-v3-stage-region .kc-stage-actors { --kc-main-w: 86px; --kc-friend-w: 76px; bottom: 16px; }
+  .kc-v3-stage-region .kc-stage-actor-main .kc-stage-actor-art { width: 83px; height: 92px; }
+  .kc-v3-stage-region .kc-stage-actor-friend .kc-stage-actor-art { width: 74px; height: 81px; }
+  .kc-v3-blockly { --material: 245px; }
 }
 
 @media (max-width: 650px) {
-  .kc-v3-studio .studio-topbar { min-height: 54px; }
+  .kc-v3-studio .studio-topbar { min-height: 54px; gap: 4px; padding-inline: 6px; }
+  .kc-v3-studio .studio-topbar-main, .kc-v3-studio .studio-topbar-actions { gap: 4px; }
+  .kc-v3-studio .studio-topbar-actions { flex: none; }
+  .kc-v3-studio .studio-topbar h1 { min-width: 0; font-size: 14px; }
   .kc-v3-studio .studio-guide-drawer { top: 54px; }
   .kc-v3-studio .studio-topbar .studio-save-message { display: none; }
   .kc-v3-stage-toggle-full { display: none; }
@@ -348,34 +389,37 @@
   .kc-v3-task .kc-v3-step-index { margin: 0; padding: 5px; font-size: 11px; }
   .kc-v3-task h2 { font-size: 13px; }
   .kc-v3-task-copy { display: contents; }
-  .kc-v3-task-copy p { grid-row: 2; grid-column: 1 / -1; font-size: 12px; }
-  .kc-v3-task button { min-height: 36px; font-size: 12px; padding: 4px 7px; }
+  .kc-v3-task-copy p { grid-row: 2; grid-column: 1 / -1; font-size: 13px; }
+  .kc-v3-task button { min-height: 44px; font-size: 13px; padding: 4px 7px; }
   .kc-v3-regions { display: flex; flex-direction: column; overflow-y: auto; }
-  .kc-v3-stage-region:not([hidden]) { flex: none; max-height: 224px; }
+  .kc-v3-stage-region:not([hidden]) { flex: none; max-height: 246px; overflow-y: auto; }
   .kc-v3-stage-region .ws-stage-head { min-height: 34px; }
   .kc-v3-workspace .kc-v3-stage-region .ws-stage-box { margin: 7px 8px 0; }
-  .kc-v3-stage-region .kc-stage-scene { aspect-ratio: auto; height: 126px; min-height: 0; }
-  .kc-v3-stage-region .kc-stage-actors { --kc-main-w: 52px; --kc-friend-w: 52px; bottom: 9px; }
-  .kc-v3-stage-region .kc-stage-actors .kc-stage-actor-art { width: 49px; height: 54px; }
-  .kc-v3-stage-region .kc-stage-topline { padding: 5px 7px; }
-  .kc-v3-stage-region .kc-stage-topline .kc-stage-badge,
-  .kc-v3-stage-region .kc-stage-topline [data-testid="stage-current-scene"],
-  .kc-v3-stage-region .kc-stage-topline [data-testid="stage-friend-distance"] { display: none; }
-  .kc-v3-stage-region .kc-stage-actors [data-testid$="-action"] { font-size: 10px; }
+  .kc-v3-stage-region .kc-stage-scene { height: 146px; }
+  .kc-v3-stage-region .kc-stage-actors { --kc-main-w: 62px; --kc-friend-w: 62px; }
+  .kc-v3-stage-region .kc-stage-actors .kc-stage-actor-art { width: 56px; height: 61px; }
+  .kc-v3-stage-region .kc-stage-topline { padding: 5px; }
+  .kc-v3-stage-region .kc-stage-scene-prefix { display: none; }
   .kc-v3-stage-region .ws-runbar { margin: 6px 0; }
-  .kc-v3-stage-region .ws-runbar .ws-run-btn,
-  .kc-v3-stage-region .ws-runbar .ws-stop-btn { min-height: 40px; }
-  .kc-v3-editor-region { flex: 1 0 350px; }
-  .kc-v3-blockly { --rail: 0px; --material: max(148px, 40%); grid-template-rows: 36px 42px minmax(220px, 1fr) auto; }
+  .kc-v3-studio .studio-file-wrap > button { min-height: 44px; min-width: 44px; }
+  .kc-v3-editor-region { flex: 1 0 420px; overflow: clip; }
+  .kc-v3-workspace .kc-v3-editor-region .ws-script { flex: 1 1 auto; }
+  .kc-v3-workspace .kc-v3-editor-region .ws-editor-slot { min-height: 0; }
+  .kc-v3-blockly { --rail: 0px; --material: max(186px, 49%); grid-template-rows: 36px 50px minmax(280px, 1fr) auto; }
   .kc-v3-categories { grid-area: 2 / 1 / 3 / -1; flex-direction: row; border-bottom: 1px solid var(--studio-line); padding: 3px 6px; }
-  .kc-v3-categories button { display: flex; align-items: center; min-height: 34px; min-width: 55px; padding: 4px 8px; }
+  .kc-v3-categories button { display: flex; align-items: center; min-height: 44px; min-width: 60px; padding: 4px 8px; }
   .kc-v3-flyout-size { grid-row: 3; }
   .kc-v3-engine { grid-row: 3; }
   .kc-v3-assist { grid-row: 4; }
   .kc-v3-blockly h2 { font-size: 12px; }
   .kc-v3-material-heading span { display: none; }
   .kc-v3-script-heading button { font-size: 11px; padding: 2px 5px; }
-  .kc-v3-shortcuts { top: 78px; }
+  .kc-v3-shortcuts { top: 86px; }
   .kc-v3-feedback { min-height: 48px; padding: 4px 8px; }
   .kc-v3-feedback-result { font-size: 12px; }
+}
+
+@media (max-width: 350px) {
+  .kc-v3-stage-region .kc-stage-scene { height: 174px; }
+  .kc-v3-stage-region:not([hidden]) { max-height: 274px; }
 }

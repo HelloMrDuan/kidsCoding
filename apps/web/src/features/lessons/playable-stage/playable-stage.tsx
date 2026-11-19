@@ -272,7 +272,7 @@ export function PlayableStage({
         <div className="kc-stage-topline">
           <span className="kc-stage-badge">{sceneCopy.badge}</span>
           <span className="flex flex-wrap justify-end gap-1.5">
-            <span data-testid="stage-current-scene" className="kc-stage-scene-chip">当前实际场景：{visualScene}</span>
+            <span data-testid="stage-current-scene" className="kc-stage-scene-chip"><span className="kc-stage-scene-prefix">当前实际</span>场景：{visualScene}</span>
             {/* TQ-009: copy says “走/飞 100 步”, so the stage shows the distance actually moved. */}
             <span data-testid="stage-walked-distance" className="kc-stage-scene-chip">{mainLabel}已{motionWord(motionVerb)} {characterPosition} 步</span>
             {/* UX-204: the friend's position is observable too, even when it stays put. */}

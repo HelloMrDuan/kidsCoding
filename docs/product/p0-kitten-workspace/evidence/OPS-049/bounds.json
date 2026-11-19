@@ -1,12 +1,17 @@
 {
   "referenceSha": "590f01d4ccad1f7b0ee71c4eafdabaeed83f3200",
   "browser": "157.0.8103.52",
-  "state": "First gate with the start block in the real editor",
+  "state": "Second gate after a real drag, snap and run to 100 steps",
   "comparisons": [
     {
       "viewport": {
         "width": 1440,
         "height": 900
+      },
+      "drag": {
+        "input": "mouse",
+        "horizontalDistance": 196,
+        "verticalDistance": 66
       },
       "reference": {
         "mission": {
@@ -77,51 +82,83 @@
         },
         "materialHeading": {
           "left": 418.1,
-          "top": 158,
+          "top": 192.7,
           "right": 684.5,
-          "bottom": 205,
+          "bottom": 239.7,
           "width": 266.3,
           "height": 47
         },
         "scriptHeading": {
           "left": 684.5,
-          "top": 158,
+          "top": 192.7,
           "right": 1427,
-          "bottom": 205,
+          "bottom": 239.7,
           "width": 742.5,
           "height": 47
         },
         "categories": {
           "left": 418.1,
-          "top": 205,
+          "top": 239.7,
           "right": 486.1,
           "bottom": 769.8,
           "width": 68,
-          "height": 564.8
+          "height": 530.1
         },
         "flyout": {
           "left": 486.1,
-          "top": 205,
+          "top": 239.7,
           "right": 684.1,
-          "bottom": 770,
+          "bottom": 769.7,
           "width": 198,
-          "height": 565
+          "height": 530
         },
         "canvas": {
           "left": 486.1,
-          "top": 205,
+          "top": 239.7,
           "right": 1427,
           "bottom": 769.8,
           "width": 940.9,
-          "height": 564.8
+          "height": 530.1
         },
         "tile": {
           "left": 500.5,
-          "top": 212.2,
-          "right": 597.7,
-          "bottom": 277.5,
-          "width": 97.2,
-          "height": 65.3
+          "top": 246.9,
+          "right": 642.4,
+          "bottom": 297.3,
+          "width": 141.9,
+          "height": 50.4
+        },
+        "scene": {
+          "left": 25,
+          "top": 217,
+          "right": 392.1,
+          "bottom": 492.3,
+          "width": 367.1,
+          "height": 275.3
+        },
+        "fox": {
+          "left": 122.2,
+          "top": 315.1,
+          "right": 214.2,
+          "bottom": 461.3,
+          "width": 92,
+          "height": 146.2
+        },
+        "rabbit": {
+          "left": 295.2,
+          "top": 315.1,
+          "right": 369.2,
+          "bottom": 461.3,
+          "width": 74,
+          "height": 146.2
+        },
+        "run": {
+          "left": 25,
+          "top": 498.3,
+          "right": 313.7,
+          "bottom": 542.3,
+          "width": 288.7,
+          "height": 44
         }
       }
     },
@@ -129,6 +166,11 @@
       "viewport": {
         "width": 1366,
         "height": 768
+      },
+      "drag": {
+        "input": "mouse",
+        "horizontalDistance": 182,
+        "verticalDistance": 66
       },
       "reference": {
         "mission": {
@@ -199,51 +241,83 @@
         },
         "materialHeading": {
           "left": 397.4,
-          "top": 158,
+          "top": 192.7,
           "right": 649.7,
-          "bottom": 205,
+          "bottom": 239.7,
           "width": 252.3,
           "height": 47
         },
         "scriptHeading": {
           "left": 649.7,
-          "top": 158,
+          "top": 192.7,
           "right": 1353,
-          "bottom": 205,
+          "bottom": 239.7,
           "width": 703.3,
           "height": 47
         },
         "categories": {
           "left": 397.4,
-          "top": 205,
+          "top": 239.7,
           "right": 465.4,
           "bottom": 637.8,
           "width": 68,
-          "height": 432.8
+          "height": 398.1
         },
         "flyout": {
           "left": 465.4,
-          "top": 205,
+          "top": 239.7,
           "right": 649.4,
-          "bottom": 638,
+          "bottom": 637.7,
           "width": 184,
-          "height": 433
+          "height": 398
         },
         "canvas": {
           "left": 465.4,
-          "top": 205,
+          "top": 239.7,
           "right": 1353,
           "bottom": 637.8,
           "width": 887.6,
-          "height": 432.8
+          "height": 398.1
         },
         "tile": {
           "left": 479.8,
-          "top": 212.2,
-          "right": 577,
-          "bottom": 277.5,
-          "width": 97.2,
-          "height": 65.3
+          "top": 246.9,
+          "right": 621.7,
+          "bottom": 297.3,
+          "width": 141.9,
+          "height": 50.4
+        },
+        "scene": {
+          "left": 25,
+          "top": 217,
+          "right": 371.4,
+          "bottom": 476.8,
+          "width": 346.4,
+          "height": 259.8
+        },
+        "fox": {
+          "left": 111.6,
+          "top": 299.5,
+          "right": 203.6,
+          "bottom": 445.8,
+          "width": 92,
+          "height": 146.2
+        },
+        "rabbit": {
+          "left": 275.7,
+          "top": 299.5,
+          "right": 349.7,
+          "bottom": 445.8,
+          "width": 74,
+          "height": 146.2
+        },
+        "run": {
+          "left": 25,
+          "top": 482.8,
+          "right": 293,
+          "bottom": 526.8,
+          "width": 268,
+          "height": 44
         }
       }
     },
@@ -251,6 +325,11 @@
       "viewport": {
         "width": 768,
         "height": 1024
+      },
+      "drag": {
+        "input": "touch",
+        "horizontalDistance": 189,
+        "verticalDistance": 66
       },
       "reference": {
         "mission": {
@@ -299,73 +378,105 @@
           "left": 0,
           "top": 62,
           "right": 768,
-          "bottom": 154.5,
+          "bottom": 145,
           "width": 768,
-          "height": 92.5
+          "height": 83
         },
         "stage": {
           "left": 8,
-          "top": 162.5,
-          "right": 233,
-          "bottom": 958,
-          "width": 225,
-          "height": 795.5
+          "top": 153,
+          "right": 760,
+          "bottom": 514.8,
+          "width": 752,
+          "height": 361.8
         },
         "roles": {
-          "left": 21,
-          "top": 432.5,
-          "right": 220,
-          "bottom": 555.9,
-          "width": 199,
-          "height": 123.3
+          "left": 510.3,
+          "top": 266,
+          "right": 749,
+          "bottom": 423.8,
+          "width": 238.7,
+          "height": 157.8
         },
         "materialHeading": {
-          "left": 242,
-          "top": 163.5,
-          "right": 438,
-          "bottom": 210.5,
-          "width": 196,
+          "left": 9,
+          "top": 558.4,
+          "right": 254,
+          "bottom": 605.4,
+          "width": 245,
           "height": 47
         },
         "scriptHeading": {
-          "left": 438,
-          "top": 163.5,
+          "left": 254,
+          "top": 558.4,
           "right": 759,
-          "bottom": 210.5,
-          "width": 321,
+          "bottom": 605.4,
+          "width": 505,
           "height": 47
         },
         "categories": {
-          "left": 242,
-          "top": 210.5,
-          "right": 296,
+          "left": 9,
+          "top": 605.4,
+          "right": 63,
           "bottom": 897.8,
           "width": 54,
-          "height": 687.3
+          "height": 292.4
         },
         "flyout": {
-          "left": 296,
-          "top": 210.5,
-          "right": 438,
-          "bottom": 897.5,
-          "width": 142,
-          "height": 687
+          "left": 63,
+          "top": 605.4,
+          "right": 254,
+          "bottom": 897.4,
+          "width": 191,
+          "height": 292
         },
         "canvas": {
-          "left": 296,
-          "top": 210.5,
+          "left": 63,
+          "top": 605.4,
           "right": 759,
           "bottom": 897.8,
-          "width": 463,
-          "height": 687.3
+          "width": 696,
+          "height": 292.4
         },
         "tile": {
-          "left": 310.4,
-          "top": 217.7,
-          "right": 407.6,
-          "bottom": 283,
-          "width": 97.2,
-          "height": 65.3
+          "left": 77.4,
+          "top": 612.6,
+          "right": 219.3,
+          "bottom": 663,
+          "width": 141.9,
+          "height": 50.4
+        },
+        "scene": {
+          "left": 19,
+          "top": 209,
+          "right": 496.3,
+          "bottom": 415,
+          "width": 477.3,
+          "height": 206
+        },
+        "fox": {
+          "left": 174.4,
+          "top": 261,
+          "right": 260.4,
+          "bottom": 398,
+          "width": 86,
+          "height": 137
+        },
+        "rabbit": {
+          "left": 390.8,
+          "top": 272,
+          "right": 466.8,
+          "bottom": 398,
+          "width": 76,
+          "height": 126
+        },
+        "run": {
+          "left": 510.3,
+          "top": 215,
+          "right": 670.6,
+          "bottom": 259,
+          "width": 160.3,
+          "height": 44
         }
       }
     },
@@ -373,6 +484,11 @@
       "viewport": {
         "width": 375,
         "height": 812
+      },
+      "drag": {
+        "input": "touch",
+        "horizontalDistance": 184,
+        "verticalDistance": 66
       },
       "reference": {
         "mission": {
@@ -421,73 +537,105 @@
           "left": 0,
           "top": 54,
           "right": 375,
-          "bottom": 150.2,
+          "bottom": 161.3,
           "width": 375,
-          "height": 96.2
+          "height": 107.3
         },
         "stage": {
           "left": 8,
-          "top": 158.2,
+          "top": 169.3,
           "right": 367,
-          "bottom": 382.2,
+          "bottom": 415.3,
           "width": 359,
-          "height": 224
+          "height": 246
         },
         "roles": {
           "left": 17,
-          "top": 379.9,
+          "top": 413.3,
           "right": 358,
-          "bottom": 490.5,
+          "bottom": 523.9,
           "width": 341,
           "height": 110.6
         },
         "materialHeading": {
           "left": 9,
-          "top": 391.2,
-          "right": 157,
-          "bottom": 427.2,
-          "width": 148,
+          "top": 459,
+          "right": 195,
+          "bottom": 495,
+          "width": 186,
           "height": 36
         },
         "scriptHeading": {
-          "left": 157,
-          "top": 391.2,
+          "left": 195,
+          "top": 459,
           "right": 366,
-          "bottom": 427.2,
-          "width": 209,
+          "bottom": 495,
+          "width": 171,
           "height": 36
         },
         "categories": {
           "left": 9,
-          "top": 427.2,
+          "top": 495,
           "right": 366,
-          "bottom": 469.2,
+          "bottom": 545,
           "width": 357,
-          "height": 42
+          "height": 50
         },
         "flyout": {
           "left": 9,
-          "top": 469.2,
-          "right": 157,
-          "bottom": 692.2,
-          "width": 148,
-          "height": 223
+          "top": 545,
+          "right": 195,
+          "bottom": 825,
+          "width": 186,
+          "height": 280
         },
         "canvas": {
           "left": 9,
-          "top": 469.2,
+          "top": 545,
           "right": 366,
-          "bottom": 692,
+          "bottom": 825,
           "width": 357,
-          "height": 222.8
+          "height": 280
         },
         "tile": {
           "left": 23.4,
-          "top": 476.4,
-          "right": 120.6,
-          "bottom": 541.6,
-          "width": 97.2,
-          "height": 65.3
+          "top": 552.2,
+          "right": 165.3,
+          "bottom": 602.6,
+          "width": 141.9,
+          "height": 50.4
+        },
+        "scene": {
+          "left": 17,
+          "top": 211.3,
+          "right": 358,
+          "bottom": 357.3,
+          "width": 341,
+          "height": 146
+        },
+        "fox": {
+          "left": 121.9,
+          "top": 242.2,
+          "right": 183.9,
+          "bottom": 348.3,
+          "width": 62,
+          "height": 106
+        },
+        "rabbit": {
+          "left": 274.7,
+          "top": 242.2,
+          "right": 336.7,
+          "bottom": 348.3,
+          "width": 62,
+          "height": 106
+        },
+        "run": {
+          "left": 17,
+          "top": 363.3,
+          "right": 279.6,
+          "bottom": 407.3,
+          "width": 262.6,
+          "height": 44
         }
       }
     }

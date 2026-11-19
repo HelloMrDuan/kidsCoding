@@ -12,5 +12,13 @@
   "movedSteps": 100,
   "speechRendered": true,
   "passedRealJudgment": true,
-  "lineRestoredAfterReload": true
+  "lineRestoredAfterReload": true,
+  "responsiveRetest": {
+    "date": "2026-11-19",
+    "environment": "isolated worktree with revised workspace layout, studio header and stage markup",
+    "input": "mouse drag from the native Zelos flyout",
+    "movedSteps": 100,
+    "speechRendered": true,
+    "lineRestoredAfterReload": true
+  }
 }

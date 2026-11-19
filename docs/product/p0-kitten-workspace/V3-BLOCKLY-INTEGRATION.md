@@ -21,7 +21,9 @@
 
 ## 复现视觉取证
 
-启动候选生产构建，再运行 `node apps/web/scripts/capture-v3-blockly-workspace.mjs <输出目录>`。默认本地服务 3100，可通过 `KC_VISUAL_ORIGIN` 指向候选服务。默认本地远程跟踪分支为 `origin/review/kitten-forest-v3-reference`，可通过 `KC_V3_DESIGN_REF` 锁定参考提交。脚本为 1440×900、1366×768、768×1024、375×812 各保存一对截图，并记录舞台、任务、素材、画布和真实积木边界。
+启动候选生产构建，再运行 `node apps/web/scripts/capture-v3-blockly-workspace.mjs <输出目录>`。默认本地服务 3100，可通过 `KC_VISUAL_ORIGIN` 指向候选服务。默认本地远程跟踪分支为 `origin/review/kitten-forest-v3-reference`，可通过 `KC_V3_DESIGN_REF` 锁定参考提交。脚本实际进入第 2 关，用桌面鼠标或平板/手机原生 Chrome 触控事件拖动运动积木。它在松手前拍摄拖拽，检查吸附后快照和 100 步执行，再保存四种尺寸的第 2 关原型/产品对照以及区域边界、拖拽距离。
+
+平板在上排安排真实舞台、运行、角色信息，素材和脚本在下排共享同一 Blockly 实例。手机把舞台放到脚本上方，素材和脚本紧邻，场景与两只角色的步数常显。迁移下一课时，改用该课角色和状态数据，确认标签在实际执行前后都与角色不重叠，并在两个窄屏视口重复触控吸附和文件菜单验证。
 
 ## 第二课复用验证
 

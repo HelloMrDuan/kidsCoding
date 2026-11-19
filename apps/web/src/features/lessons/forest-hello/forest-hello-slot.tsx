@@ -411,8 +411,8 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       goToStep(current.stepIndex + 1)
       setNotice(
         practiceStep
-          ? practiceStep.done
-          : '这一关完成啦！',
+          ? `第 ${current.stepIndex + 1} 关已完成。${practiceStep.done}`
+          : `第 ${current.stepIndex + 1} 关已完成，开始下一关吧！`,
       )
       return
     }

@@ -86,6 +86,8 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
   const topbarActions = shellControl?.topbar?.actions ?? []
   const showGoal = shellControl?.topbar?.showGoal !== false
   const showHelp = shellControl?.topbar?.showHelp !== false
+  const saveLabel = saveState === undefined ? null : saveChipText(saveState)
+  const showSaveMessage = saveMessage && (layout !== 'blockly-v3' || saveMessage !== saveLabel)
   const progressText = lesson.progress
     ? `${lesson.progress.label} ${lesson.progress.current}/${lesson.progress.total}`
     : lesson.step
@@ -166,12 +168,12 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
           {layout === 'blockly-v3' && <span className="kc-v3-wordmark">Kids<b>Coding</b></span>}
           <h1 data-testid="studio-title">{lesson.title}</h1>
           {lesson.demo && <span className="studio-demo-badge" data-testid="studio-demo-badge">演示</span>}
-          {saveState !== undefined && (
+          {saveLabel !== null && (
             <span className="studio-meta" data-testid="studio-save-chip" data-state={saveState}>
-              {saveChipText(saveState)}
+              {saveLabel}
             </span>
           )}
-          {saveMessage && (
+          {showSaveMessage && (
             <span className="studio-meta studio-save-message" data-testid="studio-save-message">
               {saveMessage}
             </span>

@@ -1,10 +1,11 @@
 {
   "browser": "Google Chrome 157.0.8103.52",
+  "environment": "Local production Next.js build",
   "implementation": {
     "stats": {
-      "startTime": "2026-11-18T09:15:14.347Z",
-      "duration": 100837.689,
-      "expected": 36,
+      "startTime": "2026-11-19T02:15:10.705Z",
+      "duration": 87956.82,
+      "expected": 40,
       "skipped": 0,
       "unexpected": 0,
       "flaky": 0
@@ -111,6 +112,26 @@
         "status": "passed"
       },
       {
+        "title": "V3 1440x900: expanded block controls and guidance do not overlap",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "V3 1366x768: expanded block controls and guidance do not overlap",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "V3 768x1024: expanded block controls and guidance do not overlap",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
+        "title": "V3 375x812: expanded block controls and guidance do not overlap",
+        "project": "desktop",
+        "status": "passed"
+      },
+      {
         "title": "V3 768: touch-drag, connect and run without recreating the editor",
         "project": "desktop",
         "status": "passed"
@@ -194,8 +215,8 @@
   },
   "existingGate": {
     "stats": {
-      "startTime": "2026-11-18T09:15:06.805Z",
-      "duration": 48945.138999999996,
+      "startTime": "2026-11-19T02:15:04.233Z",
+      "duration": 39969.458999999995,
       "expected": 3,
       "skipped": 0,
       "unexpected": 0,

@@ -434,6 +434,40 @@ test('E6 desktop 1440: real toolbox flyout drag connects the move block and pass
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
 })
 
+for (const { width, height } of SIZES.filter((size) => size.width !== 1920)) {
+  test(`V3 ${width}x${height}: expanded block controls and guidance do not overlap`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height })
+    const draft = emptyDraft(1)
+    draft.programs['step-2'] = [START, MOVE]
+    await seedDraft(page, draft)
+    await page.goto(ROUTE)
+    await expect(page.locator('.kc-v3-engine .blocklyFlyout .move_right')).toBeVisible()
+    await runAndExpect(page, true)
+
+    const assist = page.locator('.kc-v3-assist')
+    const guidance = page.locator('.kc-v3-editor-details')
+    await assist.locator('summary').click()
+    await guidance.locator('summary').click()
+    const controls = assist.getByTestId('lesson-block-palette')
+    const voiceover = guidance.getByTestId('forest-hello-voiceover')
+    await expect(controls).toBeVisible()
+    await expect(voiceover).toBeVisible()
+    const assistBox = (await assist.boundingBox())!
+    const controlsBox = (await controls.boundingBox())!
+    const guideBox = (await guidance.boundingBox())!
+    expect(controlsBox.y + controlsBox.height).toBeLessThanOrEqual(assistBox.y + assistBox.height + 1)
+    expect(assistBox.y + assistBox.height).toBeLessThanOrEqual(guideBox.y + 1)
+    const save = guidance.getByTestId('forest-hello-save')
+    await save.click()
+    await waitForShellSaved(page)
+    await expect(page.getByTestId('studio-topbar').getByText('已保存到本机', { exact: true })).toHaveCount(1)
+    await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
+    await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+    await assist.locator('summary').scrollIntoViewIfNeeded()
+    await page.screenshot({ path: testInfo.outputPath('expanded-panels.png') })
+  })
+}
+
 for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) {
   test(`V3 ${size.width}: touch-drag, connect and run without recreating the editor`, async ({ browser }, testInfo) => {
     test.skip(testInfo.project.name === 'mobile', 'Runs with an explicit Chrome touch context and exact viewport')
@@ -446,13 +480,66 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
       await page.goto(ROUTE)
       const svg = page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')
       await expect(svg).toBeVisible({ timeout: 30_000 })
+      await expect(page.getByTestId('forest-hello-instruction')).toBeInViewport({ ratio: 1 })
+      await expect(page.getByTestId('forest-hello-complete-step')).toBeInViewport({ ratio: 1 })
+      await expect(page.getByTestId('studio-save-chip')).toBeInViewport({ ratio: 1 })
+      await expect(page.getByTestId('ws-run-toggle')).toBeInViewport({ ratio: 1 })
+      const stage = page.locator('.kc-v3-stage-region .kc-stage-scene')
+      const stageBox = (await stage.boundingBox())!
+      expect(stageBox.width).toBeGreaterThanOrEqual(size.width === 768 ? 410 : 310)
+      expect((await page.getByTestId('ws-run-toggle').boundingBox())!.height).toBeGreaterThanOrEqual(44)
+      async function assertReadableStage() {
+        const rects = await stage.locator([
+          '[data-testid="stage-current-scene"]',
+          '[data-testid="stage-walked-distance"]',
+          '[data-testid="stage-friend-distance"]',
+          '[data-testid="stage-character-main"]',
+          '[data-testid="stage-character-friend"]',
+        ].join(',')).evaluateAll((elements) => elements.map((element) => {
+          const { top, left, bottom, right, width, height } = element.getBoundingClientRect()
+          return { top, left, bottom, right, width, height }
+        }))
+        expect(rects).toHaveLength(5)
+        for (const [index, rect] of rects.entries()) {
+          expect(rect.width).toBeGreaterThan(0)
+          expect(rect.height).toBeGreaterThan(0)
+          expect(rect.left).toBeGreaterThanOrEqual(stageBox.x)
+          expect(rect.right).toBeLessThanOrEqual(stageBox.x + stageBox.width)
+          expect(rect.top).toBeGreaterThanOrEqual(stageBox.y)
+          expect(rect.bottom).toBeLessThanOrEqual(stageBox.y + stageBox.height)
+          for (const other of rects.slice(index + 1)) {
+            const intersect = rect.left < other.right && rect.right > other.left && rect.top < other.bottom && rect.bottom > other.top
+            expect(intersect, 'role and live scene/distance labels have separate paint areas').toBe(false)
+          }
+        }
+      }
+      await assertReadableStage()
       await expect(page.getByTestId('v3-categories').getByRole('button', { name: '移动' })).toHaveAttribute('aria-pressed', 'true')
+      const move = page.locator('.kc-v3-engine .blocklyFlyout .move_right')
+      await expect(move).toBeInViewport({ ratio: 1 })
+      const tile = (await move.boundingBox())!
+      const scriptHeading = (await page.getByTestId('v3-script-heading').boundingBox())!
+      expect(tile.x + tile.width).toBeLessThan(scriptHeading.x)
       const workspace = await svg.elementHandle()
       await dragToolboxBlock(page, '移动', true)
       await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
       await page.getByTestId('ws-run-toggle').tap()
       await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
       await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
+      await expect(stage.getByTestId('stage-walked-distance')).toContainText('100 步')
+      await expect(stage.getByTestId('stage-friend-distance')).toContainText('0 步')
+      await assertReadableStage()
+      await expect.poll(() => overflow(page)).toBe(false)
+      const feedback = page.getByTestId('ws-feedback').getByText('查看学习反馈', { exact: true })
+      await feedback.tap()
+      await expect(page.getByTestId('ws-feedback-stage')).toBeInViewport({ ratio: 1 })
+      await feedback.tap()
+      await page.getByTestId('studio-file-menu-button').tap()
+      const save = page.getByTestId('studio-file-save')
+      await expect(save).toBeInViewport({ ratio: 1 })
+      await save.tap()
+      await waitForShellSaved(page)
+      await assertTopbarFits(page, size.width)
       await page.getByTestId('v3-reset-stage').tap()
       await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
       await page.setViewportSize({ width: size.width + 15, height: size.height })
