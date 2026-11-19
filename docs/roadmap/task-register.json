@@ -4010,7 +4010,7 @@
         "title": "G0 第 2 课《小狐狸打招呼》StudioShell / Blockly 迁移（lesson-02-forest-greeting）",
         "priority": "P1",
         "category": "OPS",
-        "status": "in_progress",
+        "status": "in_review",
         "dependencies": [
             "OPS-041"
         ],
@@ -4021,7 +4021,9 @@
             "真实浏览器 E2E 覆盖本课流程；旧路由 E2E spec 全过；新旧课程无回归；CI 全绿；4 号非作者复核 PASS",
             "合并后部署到预发布并在线上地址重新跑完整课程流程验证"
         ],
-        "evidence": {},
+        "evidence": {
+            "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/554"
+        },
         "notes": "2026-11-17 09:35 duan 下达并行开发指令：新 2 号在 #548/#549 审核期间不闲置，并行开发 G0 第 2 课；P0（#548 合并后立即将 #549 正确更新到 main 交 4 号复核）优先于 P1，P0 不阻塞 P1 日常开发、P1 不得延误 P0 合并修复。Task-ID 核对：OPS-047 在建任务时确认未被占用（台账 135 条、最高 OPS-046；开放 PR 无 OPS-047）。lesson-02 为 12 节 Blockly 启蒙课之一，不计入 432 节。3 号继续 OPS-042，不参与本任务。"
     },
     {
