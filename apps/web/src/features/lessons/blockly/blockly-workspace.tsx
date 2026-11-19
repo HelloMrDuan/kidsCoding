@@ -571,6 +571,13 @@ export function BlocklyWorkspace({
     showFromTopRef.current?.()
   }
 
+  function resetScriptZoom() {
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    workspace.setScale(workspace.options.zoomOptions.startScale)
+    workspace.scrollCenter()
+  }
+
   return (
     <section className={isDocked ? 'kc-v3-blockly' : 'flex flex-col gap-3'} data-testid="lesson-blockly-workspace">
       {isDocked && <>
@@ -594,6 +601,11 @@ export function BlocklyWorkspace({
             </button>
           ))}
         </nav>
+        <div className="kc-v3-touch-zoom" role="group" aria-label="脚本缩放">
+          <button type="button" aria-label="缩小脚本" onClick={() => workspaceRef.current?.zoomCenter(-1)}>−</button>
+          <button type="button" aria-label="重置脚本缩放" onClick={resetScriptZoom}>↺</button>
+          <button type="button" aria-label="放大脚本" onClick={() => workspaceRef.current?.zoomCenter(1)}>+</button>
+        </div>
         <div className="kc-v3-flyout-size" aria-hidden="true" ref={flyoutColumnRef} />
       </>}
       {/* isolate: Blockly's flyout (z-index 20) must not paint over the sticky top bar when scrolled. */}

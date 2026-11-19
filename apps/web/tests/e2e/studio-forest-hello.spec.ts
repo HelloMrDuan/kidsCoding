@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 /**
  * OPS-041《小狐狸出场》studio 路由 E2E — 真实 Chrome，生产构建。
@@ -200,10 +200,43 @@ async function assertTopbarFits(page: Page, width: number) {
   }
 }
 
+async function assertTouchTarget(control: Locator) {
+  await expect(control).toBeInViewport({ ratio: 1 })
+  const { width, height, receivesTouch } = await control.evaluate((element) => {
+    const { x, y, width, height } = element.getBoundingClientRect()
+    // Sample the middle of each edge as well as the center to catch clipping
+    // or an overlay that leaves the center tappable but steals part of the hit area.
+    const receivesTouch = [[.5, .5], [.1, .5], [.9, .5], [.5, .1], [.5, .9]].every(([dx, dy]) =>
+      element.contains(document.elementFromPoint(x + width * dx, y + height * dy)),
+    )
+    return { width, height, receivesTouch }
+  })
+  expect(width).toBeGreaterThanOrEqual(44)
+  expect(height).toBeGreaterThanOrEqual(44)
+  expect(receivesTouch, `${control} has a clear touch area`).toBe(true)
+}
+
+async function assertTouchZoomClear(zoom: Locator, phase: string, ...blocks: Locator[]) {
+  const controls = await zoom.getByRole('button').evaluateAll((elements) =>
+    elements.map((element) => element.getBoundingClientRect().toJSON()),
+  )
+  expect(controls).toHaveLength(3)
+  for (const block of blocks) {
+    const rect = await block.evaluate((element) => element.getBoundingClientRect().toJSON())
+    expect(rect.width).toBeGreaterThan(0)
+    expect(rect.height).toBeGreaterThan(0)
+    for (const button of controls) {
+      const intersects = rect.left < button.right && rect.right > button.left &&
+        rect.top < button.bottom && rect.bottom > button.top
+      expect(intersects, `${phase}: ${block} stays clear of the zoom buttons`).toBe(false)
+    }
+  }
+}
+
 /**
  * 真实拖拽：切换常驻 flyout 的分类，把素材积木放到主画布现有程序栈下方。
  */
-async function dragToolboxBlock(page: Page, categoryLabel: string, touch = false) {
+async function dragToolboxBlock(page: Page, categoryLabel: string, touch = false, inspectDrag?: () => Promise<void>) {
   const category = page.getByTestId('v3-categories').getByRole('button', { name: categoryLabel })
   if (touch) await category.tap()
   else await category.click()
@@ -247,15 +280,19 @@ async function dragToolboxBlock(page: Page, categoryLabel: string, touch = false
   const startY = box!.y + box!.height / 2
   if (touch) {
     const cdp = await page.context().newCDPSession(page)
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: startX, y: startY }] })
-    for (let i = 1; i <= 20; i++) {
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{
-        x: startX + (dropX - startX) * i / 20,
-        y: startY + (dropY - startY) * i / 20,
-      }] })
+    try {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: startX, y: startY }] })
+      for (let i = 1; i <= 20; i++) {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{
+          x: startX + (dropX - startX) * i / 20,
+          y: startY + (dropY - startY) * i / 20,
+        }] })
+      }
+      await inspectDrag?.()
+    } finally {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+      await cdp.detach()
     }
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
-    await cdp.detach()
     return
   }
   await page.mouse.move(startX, startY)
@@ -474,12 +511,38 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
     const context = await browser.newContext({ viewport: size, hasTouch: true, isMobile: true })
     try {
       const page = await context.newPage()
+      const phone = size.width === 375
+      const zoom = page.getByRole('group', { name: '脚本缩放' })
+      const topbarControls = ['studio-back', 'studio-file-menu-button', 'studio-stage-toggle', 'studio-help-button', 'studio-guide-button']
       const draft = emptyDraft(1)
       draft.programs['step-2'] = [START]
       await seedDraft(page, draft)
       await page.goto(ROUTE)
       const svg = page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')
       await expect(svg).toBeVisible({ timeout: 30_000 })
+      if (phone) {
+        for (const id of topbarControls) await assertTouchTarget(page.getByTestId(id))
+        const guide = page.getByTestId('studio-guide-drawer')
+        const guideButton = page.getByTestId('studio-guide-button')
+        await page.getByTestId('studio-help-button').tap()
+        await expect(guide).toBeVisible()
+        await assertTouchTarget(guideButton)
+        await guideButton.tap()
+        await expect(guide).toBeHidden()
+        await guideButton.tap()
+        await expect(guide).toBeVisible()
+        await page.getByTestId('studio-guide-close').tap()
+        await expect(guide).toBeHidden()
+        const stageToggle = page.getByTestId('studio-stage-toggle')
+        await stageToggle.tap()
+        await expect(page.locator('.kc-v3-stage-region')).toBeHidden()
+        await stageToggle.tap()
+        await expect(page.locator('.kc-v3-stage-region')).toBeVisible()
+        await expect(svg.locator('.blocklyZoom:visible')).toHaveCount(0)
+      } else {
+        await expect(zoom).toBeHidden()
+        await expect(svg.locator('.blocklyZoom:visible')).toHaveCount(3)
+      }
       await expect(page.getByTestId('forest-hello-instruction')).toBeInViewport({ ratio: 1 })
       await expect(page.getByTestId('forest-hello-complete-step')).toBeInViewport({ ratio: 1 })
       await expect(page.getByTestId('studio-save-chip')).toBeInViewport({ ratio: 1 })
@@ -514,15 +577,65 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
         }
       }
       await assertReadableStage()
-      await expect(page.getByTestId('v3-categories').getByRole('button', { name: '移动' })).toHaveAttribute('aria-pressed', 'true')
+      const categories = page.getByTestId('v3-categories')
+      await expect(categories.getByRole('button', { name: '移动' })).toHaveAttribute('aria-pressed', 'true')
       const move = page.locator('.kc-v3-engine .blocklyFlyout .move_right')
+      const start = svg.locator('.blocklyBlockCanvas .when_start')
+      const scriptMove = svg.locator('.blocklyBlockCanvas .move_right')
+      const scale = () => start.evaluate((element: SVGGraphicsElement) => element.getScreenCTM()!.a)
+      const heading = page.getByTestId('v3-script-heading')
+      const fit = heading.getByRole('button', { name: '适合画面' })
+      const undo = heading.getByRole('button', { name: '撤销' })
+      if (phone) {
+        const startCategory = categories.getByRole('button', { name: '开始' })
+        const moveCategory = categories.getByRole('button', { name: '移动' })
+        const zoomOut = zoom.getByRole('button', { name: '缩小脚本' })
+        const zoomReset = zoom.getByRole('button', { name: '重置脚本缩放' })
+        const zoomIn = zoom.getByRole('button', { name: '放大脚本' })
+        for (const control of [startCategory, moveCategory, undo, fit, zoomOut, zoomReset, zoomIn]) {
+          await assertTouchTarget(control)
+        }
+        await startCategory.tap()
+        await expect(page.locator('.kc-v3-engine .blocklyFlyout .when_start')).toBeInViewport({ ratio: 1 })
+        await moveCategory.tap()
+        await expect(move).toBeInViewport({ ratio: 1 })
+        await fit.tap()
+        const originalScale = await scale()
+        await zoomOut.tap()
+        await expect.poll(scale).toBeLessThan(originalScale)
+        await zoomIn.tap()
+        await expect.poll(scale).toBeCloseTo(originalScale, 2)
+        await zoomIn.tap()
+        await expect.poll(scale).toBeGreaterThan(originalScale)
+        await zoomReset.tap()
+        await expect.poll(scale).toBeCloseTo(.9, 2)
+        await fit.tap()
+        await expect(start).toBeInViewport({ ratio: 1 })
+        await assertTouchZoomClear(zoom, 'before drag', move, start)
+      }
       await expect(move).toBeInViewport({ ratio: 1 })
       const tile = (await move.boundingBox())!
-      const scriptHeading = (await page.getByTestId('v3-script-heading').boundingBox())!
+      const scriptHeading = (await heading.boundingBox())!
       expect(tile.x + tile.width).toBeLessThan(scriptHeading.x)
       const workspace = await svg.elementHandle()
-      await dragToolboxBlock(page, '移动', true)
+      const scaleBeforeDrag = await scale()
+      await dragToolboxBlock(page, '移动', true, phone ? async () => {
+        const dragged = page.locator('.blocklyDragging.move_right')
+        await expect(dragged).toBeVisible()
+        await assertTouchZoomClear(zoom, 'during drag', start, dragged)
+        expect(await scale()).toBeCloseTo(scaleBeforeDrag, 4)
+        await page.screenshot({ path: testInfo.outputPath('mobile-drag-with-zoom-toolbar.png') })
+      } : undefined)
       await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+      if (phone) {
+        await expect(scriptMove).toBeVisible()
+        await assertTouchZoomClear(zoom, 'after connection', start, scriptMove)
+        await undo.tap()
+        await expect(scriptMove).toHaveCount(0)
+        await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START])
+        await dragToolboxBlock(page, '移动', true)
+        await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+      }
       await page.getByTestId('ws-run-toggle').tap()
       await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
       await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
@@ -537,14 +650,22 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
       await page.getByTestId('studio-file-menu-button').tap()
       const save = page.getByTestId('studio-file-save')
       await expect(save).toBeInViewport({ ratio: 1 })
+      if (phone) await assertTouchTarget(save)
       await save.tap()
       await waitForShellSaved(page)
       await assertTopbarFits(page, size.width)
+      if (phone) for (const id of topbarControls) await assertTouchTarget(page.getByTestId(id))
       await page.getByTestId('v3-reset-stage').tap()
       await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
       await page.setViewportSize({ width: size.width + 15, height: size.height })
       await expect.poll(() => workspace!.evaluate((el) => el.isConnected)).toBe(true)
       await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+      if (phone) {
+        const back = page.getByTestId('studio-back')
+        const href = await back.getAttribute('href')
+        await back.tap()
+        await expect(page).toHaveURL(new URL(href!, page.url()).href)
+      }
     } finally {
       await context.close()
     }

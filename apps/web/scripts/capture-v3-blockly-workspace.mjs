@@ -13,6 +13,10 @@ const reference = execFileSync('git', ['show', `${designRef}:${prototype}`], { c
 const referenceSha = execFileSync('git', ['rev-parse', designRef], { cwd: repo, encoding: 'utf8' }).trim()
 const lessonId = 'lesson-01-forest-hello'
 const sizes = [{ width: 1440, height: 900 }, { width: 1366, height: 768 }, { width: 768, height: 1024 }, { width: 375, height: 812 }]
+const startBlock = 'svg.blocklySvg .blocklyBlockCanvas .when_start'
+const moveTile = '.kc-v3-engine .blocklyFlyout .move_right'
+const draggedMove = '.blocklyDragging.move_right'
+const connectedMove = 'svg.blocklySvg .blocklyBlockCanvas .move_right'
 
 function bounds(page, selectors) {
   return page.evaluate((entries) => Object.fromEntries(Object.entries(entries).map(([key, selector]) => {
@@ -23,7 +27,7 @@ function bounds(page, selectors) {
 }
 
 async function addStartThroughEditor(page) {
-  const start = page.locator('svg.blocklySvg .blocklyBlockCanvas .when_start')
+  const start = page.locator(startBlock)
   if (await start.count()) return
   const assist = page.getByTestId('lesson-blockly-workspace').locator('details').first()
   await assist.locator('summary').click()
@@ -41,14 +45,16 @@ async function scrollToWorkspaceStart(page) {
 }
 
 async function captureMoveDrag(page, filename, useTouch) {
-  const source = page.locator('.kc-v3-engine .blocklyFlyout .move_right')
-  const start = page.locator('svg.blocklySvg .blocklyBlockCanvas .when_start')
+  const source = page.locator(moveTile)
+  const start = page.locator(startBlock)
   await expect(source).toBeInViewport({ ratio: 1 })
   await expect(start).toBeInViewport({ ratio: 1 })
   const [tile, anchor] = await Promise.all([source.boundingBox(), start.boundingBox()])
   const scale = await start.evaluate((element) => element.getScreenCTM().a)
   const from = { x: tile.x + tile.width / 2, y: tile.y + tile.height / 2 }
   const to = { x: anchor.x + tile.width / 2, y: anchor.y + anchor.height - 8 * scale + tile.height / 2 }
+  const phone = page.viewportSize().width === 375
+  const mobileZoom = phone ? { beforeDrag: await measureMobileZoom(page, moveTile) } : undefined
   const cdp = useTouch ? await page.context().newCDPSession(page) : null
   try {
     if (cdp) {
@@ -64,7 +70,8 @@ async function captureMoveDrag(page, filename, useTouch) {
       await page.mouse.down()
       await page.mouse.move(to.x, to.y, { steps: 20 })
     }
-    await expect(page.locator('.blocklyDragging.move_right')).toBeVisible()
+    await expect(page.locator(draggedMove)).toBeVisible()
+    if (mobileZoom) mobileZoom.duringDrag = await measureMobileZoom(page, draggedMove)
     await page.screenshot({ path: filename })
   } finally {
     if (cdp) {
@@ -79,7 +86,24 @@ async function captureMoveDrag(page, filename, useTouch) {
   await expect.poll(() => page.evaluate((id) =>
     JSON.parse(localStorage.getItem(`kidscoding-draft:${id}`) ?? 'null')?.script.programs['step-2'], lessonId,
   )).toEqual([{ type: 'when_start' }, { type: 'move_right' }])
-  return { input: useTouch ? 'touch' : 'mouse', horizontalDistance: Math.round(to.x - from.x), verticalDistance: Math.round(to.y - from.y) }
+  if (mobileZoom) mobileZoom.afterConnection = await measureMobileZoom(page, connectedMove)
+  return { input: useTouch ? 'touch' : 'mouse', horizontalDistance: Math.round(to.x - from.x), verticalDistance: Math.round(to.y - from.y), mobileZoom }
+}
+
+async function measureMobileZoom(page, move) {
+  const rects = await bounds(page, {
+    zoomOut: '.kc-v3-touch-zoom button:nth-of-type(1)',
+    zoomReset: '.kc-v3-touch-zoom button:nth-of-type(2)',
+    zoomIn: '.kc-v3-touch-zoom button:nth-of-type(3)',
+    start: startBlock,
+    move,
+  })
+  for (const button of [rects.zoomOut, rects.zoomReset, rects.zoomIn]) {
+    for (const block of [rects.start, rects.move]) {
+      expect(button.bottom).toBeLessThanOrEqual(block.top)
+    }
+  }
+  return rects
 }
 
 mkdirSync(output, { recursive: true })

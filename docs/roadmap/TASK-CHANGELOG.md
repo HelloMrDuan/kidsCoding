@@ -464,3 +464,4 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-11-18 | OPS-049 | 《小狐狸出场》真实 Blockly 三栏与常驻 Zelos 素材，四关和失败恢复回归，四视口对照，第二课隔离复用 | [实现 PR](https://github.com/HelloMrDuan/kidsCoding/pull/558) | 待主号合并 | 待合并后复核 | in_review。4 号独立复核、预发布用户视觉验收待完成 |
 | 2026-11-19 | OPS-049 | 平板舞台与脚本两行、手机实时状态及触控整改。第 2 关四视口实拍，43 条 Chrome 测试 | [#558](https://github.com/HelloMrDuan/kidsCoding/pull/558) | 待主号合并 | 待合并后复核 | in_review。产品 HOLD，课程 CI、4 号独立审核及预发布体验待完成 |
+| 2026-11-19 | OPS-049 | 手机缩放移出画布，修复触控命中；拖拽前、松手前和连接后矩形验证通过，更新四视口截图并复跑 43 条 Chrome 测试、455 条单测 | [#558](https://github.com/HelloMrDuan/kidsCoding/pull/558) | 待主号合并 | 待合并后复核 | in_review。4 号独立复核及产品最终验收待完成，课程 CI 依赖 SYS-123 |

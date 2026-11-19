@@ -3,8 +3,8 @@
   "environment": "Local production Next.js build",
   "implementation": {
     "stats": {
-      "startTime": "2026-11-19T02:15:10.705Z",
-      "duration": 87956.82,
+      "startTime": "2026-11-19T02:55:13.901Z",
+      "duration": 166322.55299999999,
       "expected": 40,
       "skipped": 0,
       "unexpected": 0,
@@ -215,8 +215,8 @@
   },
   "existingGate": {
     "stats": {
-      "startTime": "2026-11-19T02:15:04.233Z",
-      "duration": 39969.458999999995,
+      "startTime": "2026-11-19T02:58:10.110Z",
+      "duration": 23644.161999999997,
       "expected": 3,
       "skipped": 0,
       "unexpected": 0,
