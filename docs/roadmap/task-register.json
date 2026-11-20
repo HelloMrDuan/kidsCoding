@@ -4068,10 +4068,10 @@
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/564",
         "tests": [
-          "本地生产构建、定向 ESLint 和定向 Vitest 75 条通过。验证账号/访客隔离、旧库迁移、并发事务及源码导入限制。",
+          "本地生产构建、定向 ESLint 和定向 Vitest 83 条通过。验证账号/访客隔离、旧库迁移、并发事务、源码导入限制和 Windows 课程快照路径。",
           "本地真实 Chrome 157 使用 1440×900、1366×768、768×1024 和 375×812，后两者验证触控。Scratch 保留 .sb3 往返，并验证后退/退出保护、双窗口拒写和失败恢复。",
           "真实 Python 验证 input、标准流、错误行、死循环停止与自动超时、内存/初始化失败恢复、多作品及 .py 往返。两套四视口与实际归档记录见 docs/product/scratch-create/evidence/。",
-          "本地真实 Chrome：旧 G2-U3-L01 Scratch VM 与 P0-U1-L01 Pyodide 各 1 条回归通过。"
+          "本地真实 Chrome：旧 G2-U3-L01 Scratch VM 与 P0-U1-L01 Pyodide 各 1 条、旧 Blockly 首课 4 条回归通过。"
         ]
       },
       "notes": "2026-11-20 用户授权在 #564 同一任务整改独立复核并加入 Python 创作。等待新 HEAD 非作者复核与产品验收。部署由 Muse 处理。作品仅本机保存，公开发布前须核对 Scratch 对应源码、许可及素材。"
