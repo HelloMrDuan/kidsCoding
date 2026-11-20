@@ -30,6 +30,7 @@ export function usePythonRuntime() {
   const active = useRef<Run | null>(null)
   const files = useRef<ReturnType<typeof runtimeFiles> | null>(null)
   const [ready, setReady] = useState(false)
+  const [generation, setGeneration] = useState(0)
   const [state, setState] = useState<Result>({ kind: 'idle' })
   const [output, setOutput] = useState<Entry[]>([])
 
@@ -43,17 +44,28 @@ export function usePythonRuntime() {
   }, [])
   useEffect(() => end, [end])
 
+  const terminate = useCallback(() => {
+    const startedWorker = Boolean(active.current?.port)
+    end()
+    if (startedWorker) {
+      // Tear down the owning document as well. A stop message may be lost
+      // when its port disconnects, especially during a synchronous loop.
+      setReady(false)
+      setGeneration((current) => current + 1)
+    }
+  }, [end])
+
   function deadline(run: Run, milliseconds: number, reason: string) {
     window.clearTimeout(run.timer)
     run.timer = window.setTimeout(() => {
       if (active.current !== run) return
-      end()
+      terminate()
       setState({ kind: 'failed', reason })
     }, milliseconds)
   }
 
   async function run(source: string) {
-    end()
+    if (active.current) return
     setOutput([])
     const invocation: Run = {}
     const receiver = frame.current?.contentWindow
@@ -102,10 +114,10 @@ export function usePythonRuntime() {
     }
   }
 
-  const reset = useCallback(() => { end(); setOutput([]); setState({ kind: 'idle' }) }, [end])
+  const reset = useCallback(() => { terminate(); setOutput([]); setState({ kind: 'idle' }) }, [terminate])
   return {
-    frame, state, output, ready, onLoad: () => setReady(true), run, reset,
-    stop: () => { end(); setState({ kind: 'stopped' }) },
+    frame, generation, state, output, ready, onLoad: () => setReady(true), run, reset,
+    stop: () => { terminate(); setState({ kind: 'stopped' }) },
     clear: () => setOutput([]),
     input(value: string) {
       const current = active.current

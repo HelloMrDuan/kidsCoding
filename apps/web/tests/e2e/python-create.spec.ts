@@ -96,7 +96,7 @@ test('real Python input, execution, save, reopen, isolation, and .py round trip'
   }, null, 2) + '\n')
 })
 
-test('reports stderr and actual exception lines, stops loops and restarts an isolated Worker', async ({ page }) => {
+test('reports stderr and actual exception lines, stops loops and restarts an isolated Worker', async ({ page, browser }) => {
   await create(page)
   await enterAndRun(page, 'import sys\nprint("提示", file=sys.stderr)\n1 / 0')
   await expect(output(page).locator('[data-channel="stderr"]')).toContainText('提示')
@@ -107,12 +107,27 @@ test('reports stderr and actual exception lines, stops loops and restarts an iso
   await enterAndRun(page, 'if True\n    print(1)')
   await expect(error).toContainText('SyntaxError')
   await expect(error.getByRole('button', { name: '查看第 1 行' })).toBeVisible()
-  await enterAndRun(page, 'while True:\n    pass')
-  await expect(page.getByText('正在运行', { exact: true })).toBeVisible()
-  await page.getByRole('button', { name: '停止', exact: true }).click()
-  await expect(page.getByText('已停止', { exact: true })).toBeVisible()
-  await enterAndRun(page, 'while True:\n    pass')
-  await expect(error).toContainText('程序运行超时', { timeout: 22000 })
+  const chrome = await browser.newBrowserCDPSession()
+  try {
+    const workers = async () => (await chrome.send('Target.getTargets')).targetInfos
+      .filter((target) => target.type === 'worker' && target.url.startsWith('blob:null'))
+      .map((target) => target.targetId)
+    const startLoop = async () => {
+      const previous = new Set(await workers())
+      await enterAndRun(page, 'while True:\n    pass')
+      await expect(page.getByText('正在运行', { exact: true })).toBeVisible()
+      const current = (await workers()).find((target) => !previous.has(target))
+      expect(current).toBeDefined()
+      return current!
+    }
+    const manual = await startLoop()
+    await page.getByRole('button', { name: '停止', exact: true }).click()
+    await expect(page.getByText('已停止', { exact: true })).toBeVisible()
+    await expect.poll(workers, { timeout: 5000 }).not.toContain(manual)
+    const automatic = await startLoop()
+    await expect(error).toContainText('程序运行超时', { timeout: 22000 })
+    await expect.poll(workers, { timeout: 5000 }).not.toContain(automatic)
+  } finally { await chrome.detach() }
   await enterAndRun(page, 'print("secret" in globals())\nsecret = 1\nprint({"a": [1, 2]})')
   await expect(output(page)).toContainText('False')
   await expect(output(page)).toContainText("{'a': [1, 2]}")

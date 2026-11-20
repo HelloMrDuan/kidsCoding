@@ -145,7 +145,7 @@ export function PythonCreateEditor({ id, owner }: { id: string; owner: string })
           </div>
         </section>
       </div>}
-      {record && <iframe hidden ref={runtime.frame} onLoad={runtime.onLoad} src="/python-create-sandbox.html" title="Python 浏览器执行沙箱" sandbox="allow-scripts" />}
+      {record && <iframe key={runtime.generation} hidden ref={runtime.frame} onLoad={runtime.onLoad} src="/python-create-sandbox.html" title="Python 浏览器执行沙箱" sandbox="allow-scripts" />}
       <input ref={file} hidden type="file" accept=".py" aria-label="导入 Python 文件" onChange={(event) => {
         const selected = event.target.files?.[0]
         event.target.value = ''
