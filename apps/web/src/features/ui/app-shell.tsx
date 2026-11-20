@@ -11,7 +11,7 @@ import { useState, type ReactNode } from 'react'
  * navigation bar appears. Spec: docs/design/kidscoding-v2/DESIGN-SPEC.md.
  */
 
-type IconName = 'home' | 'map' | 'lesson' | 'catalog' | 'scratch' | 'python' | 'portfolio' | 'parent' | 'cards'
+type IconName = 'home' | 'map' | 'lesson' | 'catalog' | 'scratch' | 'portfolio' | 'parent' | 'cards'
 
 type NavItem = {
   id: string
@@ -29,14 +29,13 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
       { id: 'home', label: '学习中心', short: '首页', href: '/', icon: 'home', match: (p) => p === '/' },
       { id: 'map', label: '学习地图', short: '地图', href: '/learn/map', icon: 'map', match: (p) => p.startsWith('/learn/map') },
       { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') },
-      { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') },
+      { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') || p.startsWith('/learn/python-lab') },
     ],
   },
   {
     title: 'CREATE',
     items: [
       { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || p.startsWith('/learn/scratch-lab') },
-      { id: 'python', label: 'Python 实验室', short: 'Python', href: '/learn/python-lab/P0-U1-L01', icon: 'python', match: (p) => p.startsWith('/learn/python-lab') },
       { id: 'portfolio', label: '作品中心', short: '作品', href: '/learn/portfolio', icon: 'portfolio', match: (p) => p.startsWith('/learn/portfolio') || p.startsWith('/project') },
       { id: 'cards', label: '奖励收藏', short: '收藏', href: '/cards', icon: 'cards', match: (p) => p.startsWith('/cards') },
     ],
@@ -61,7 +60,6 @@ function NavIcon({ name }: { name: IconName }) {
       {name === 'lesson' && <><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12" {...common} /></>}
       {name === 'catalog' && <><path d="M5 4.5h11.5a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2z" {...common} /><path d="M5 18a2 2 0 0 1 2-2h11.5M9 8.5h6M9 11.5h4" {...common} /></>}
       {name === 'scratch' && <><path d="M4 7.5a2 2 0 0 1 2-2h3l1.5 1.5h3L15 5.5h3a2 2 0 0 1 2 2v3H4z" {...common} /><path d="M4 13.5h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" {...common} /></>}
-      {name === 'python' && <><rect x="3" y="5" width="18" height="14" rx="2.4" {...common} /><path d="M7 10l2.5 2L7 14M12 14.5h4.5" {...common} /></>}
       {name === 'portfolio' && <><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" {...common} /><path d="M3.5 15.5l4.5-4.5 4 4 2.5-2.5 6 5" {...common} /><circle cx="15.5" cy="9" r="1.6" {...common} /></>}
       {name === 'cards' && <><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.4l-5.1 2.7 1-5.6-4.1-4 5.7-.8z" {...common} /></>}
       {name === 'parent' && <><circle cx="9" cy="8" r="3" {...common} /><path d="M3.5 19a5.5 5.5 0 0 1 11 0" {...common} /><circle cx="17" cy="10" r="2.2" {...common} /><path d="M15 19a4 4 0 0 1 6-3.4" {...common} /></>}
