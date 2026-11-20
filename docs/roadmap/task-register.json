@@ -4160,7 +4160,7 @@
       "title": "删除左侧 Python 实验室一级菜单，自由编程统一由创作中心进入",
       "priority": "P1",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "OPS-050"
       ],
@@ -4172,8 +4172,12 @@
         "AppShell 单测与 python-lab 真实 Chrome E2E 通过，PR CI 全绿"
       ],
       "evidence": {
-        "pr": "",
-        "tests": []
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/565",
+        "tests": [
+          "本地 Vitest app-shell 6/6、ESLint 改动文件 0 问题、生产构建成功；本地 Chrome for Testing 153 python-lab.spec 5/5、python-multi.spec 19/19。",
+          "本地 1440/768/375 三断点侧栏 8 项无 Python 实验室；/create 高亮创作中心，/learn/python-lab/P0-U1-L01 高亮课程体系。",
+          "tsc 基线：base 16242bb 与本 PR 均 81 条，排序清单逐行一致，改动文件 0 条。GitHub CI 以 #565 Checks 为准。"
+        ]
       },
       "notes": "2026-11-20 由 Notion AI 代理接手执行，基于 #564 HEAD 16242bb 堆叠。等待非作者复核（ChatGPT）与 Muse 部署；不自行合并 main。"
     }
