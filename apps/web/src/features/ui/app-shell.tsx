@@ -35,7 +35,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: 'CREATE',
     items: [
-      { id: 'scratch', label: 'Scratch 工作台', short: 'Scratch', href: '/learn/scratch-lab/G3-U1-L02', icon: 'scratch', match: (p) => p.startsWith('/learn/scratch-lab') },
+      { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || p.startsWith('/learn/scratch-lab') },
       { id: 'python', label: 'Python 实验室', short: 'Python', href: '/learn/python-lab/P0-U1-L01', icon: 'python', match: (p) => p.startsWith('/learn/python-lab') },
       { id: 'portfolio', label: '作品中心', short: '作品', href: '/learn/portfolio', icon: 'portfolio', match: (p) => p.startsWith('/learn/portfolio') || p.startsWith('/project') },
       { id: 'cards', label: '奖励收藏', short: '收藏', href: '/cards', icon: 'cards', match: (p) => p.startsWith('/cards') },

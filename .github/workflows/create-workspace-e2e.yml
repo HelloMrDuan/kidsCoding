@@ -1,0 +1,81 @@
+name: Creation workspaces (real Chrome)
+
+on:
+  pull_request:
+    paths: &creation_paths
+      - '.github/workflows/create-workspace-e2e.yml'
+      - 'apps/scratch-host/**'
+      - 'apps/web/package*.json'
+      - 'apps/web/public/python-create-*'
+      - 'apps/web/scripts/copy-python-create-runtime.mjs'
+      - 'apps/web/src/app/create/**'
+      - 'apps/web/src/features/create/**'
+      - 'apps/web/src/features/scratch-create/**'
+      - 'apps/web/src/features/lessons/dance-show/gui-bridge.ts'
+      - 'apps/web/playwright.scratch-create.config.ts'
+      - 'apps/web/tests/e2e/*-create.spec.ts'
+  push:
+    branches: [main]
+    paths: *creation_paths
+
+permissions:
+  contents: read
+
+jobs:
+  creation-browser:
+    name: Real Chrome (${{ matrix.editor }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        editor: [scratch, python]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+        working-directory: apps/web
+      - name: Verify real Chrome on Runner
+        working-directory: apps/web
+        run: timeout --kill-after=5s 60s node scripts/verify-runner-chrome.mjs
+      - name: Prepare fixed Scratch GUI
+        if: matrix.editor == 'scratch'
+        run: |
+          npm pack @scratch/scratch-gui@15.3.0 --pack-destination "$RUNNER_TEMP"
+          node apps/scratch-host/prepare.mjs "$RUNNER_TEMP/scratch-scratch-gui-15.3.0.tgz"
+      - name: Build Web
+        working-directory: apps/web
+        run: npm run build
+      - name: Run creation browser spec
+        env:
+          SCRATCH_CREATE_GUI_URL: http://127.0.0.1:8610/host.html
+          SCRATCH_PARENT_ORIGIN: http://127.0.0.1:3110
+          CREATE_EDITOR: ${{ matrix.editor }}
+        run: |
+          set -euo pipefail
+          mkdir -p apps/web/test-results/create-servers
+          logs="$GITHUB_WORKSPACE/apps/web/test-results/create-servers"
+          scratch_pid=''
+          if [ "$CREATE_EDITOR" = scratch ]; then
+            node apps/scratch-host/serve.mjs > "$logs/scratch.log" 2>&1 &
+            scratch_pid=$!
+          fi
+          cd apps/web
+          node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3110 > "$logs/web.log" 2>&1 &
+          web_pid=$!
+          trap 'kill "$web_pid" ${scratch_pid:+"$scratch_pid"} 2>/dev/null || true' EXIT
+          curl --fail --silent --retry 30 --retry-all-errors --retry-delay 1 http://127.0.0.1:3110/create >/dev/null
+          if [ "$CREATE_EDITOR" = scratch ]; then
+            curl --fail --silent --retry 15 --retry-all-errors --retry-delay 1 http://127.0.0.1:8610/host.html >/dev/null
+          fi
+          npx playwright test -c playwright.scratch-create.config.ts "${CREATE_EDITOR}-create.spec.ts" --workers=2
+      - name: Upload browser evidence and timing
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-chrome-${{ matrix.editor }}-creation
+          path: apps/web/test-results/

@@ -4047,6 +4047,36 @@
         "notes": "2026-11-17 duan 下达登记指令：3 号已完成《接住掉落水果》本地实现（真实 Chromium 报告 61/61 通过，见 Issue #552），因台账未登记无法正式提交 PR；Issue #552 有任务范围及开发证据。Task-ID 核对：OPS-042 在建任务时确认未被占用（台账 136 条、无 OPS-042 条目；开放 PR 无 OPS-042）。OPS-042 为 2026-11-15 StudioShell 指令预留给 3 号的 G2-U3-L02 迁移任务。登记通过后 3 号即推送已有实现分支并提交独立 PR。"
     },
     {
+      "id": "OPS-050",
+      "title": "Scratch 自由创作中心、真实编辑器及多作品",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-037",
+        "OPS-038"
+      ],
+      "scope": "Codex 在 #564 交付 /create、真实 Scratch GUI 和独立 Python 编辑器。保留完整 .sb3 与 UTF-8 .py，按核验账号或访客隔离本机作品，保护未保存修改。专项 Chrome 纳入 CI。课程入口和数据独立，工作区沿用 V2。",
+      "acceptance": [
+        "真实 Chrome 可新建空白项目、添加或删除角色、更换背景和造型、编辑声音、拖拽连接积木、绿旗运行及停止",
+        "完整 .sb3 保存、刷新和重开、自主编辑、导入与导出；多项目改名、复制、删除和失败恢复不串扰",
+        "真实 Pyodide 运行、交互输入、输出与错误行、停止和超时；Python 代码保存、重开和完整 .py 导入导出",
+        "登录账号与访客本机作品隔离；浏览器退出取消后保留编辑；双窗口写入冲突不覆盖作品；两个编辑器专项 Chrome 接入 CI",
+        "桌面 1440/1366、平板 768、手机 375 的真实操作和截图",
+        "提供 GUI 固定版本、双来源配置、许可与对应源码方案、部署验证及回滚说明"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/564",
+        "tests": [
+          "本地生产构建、定向 ESLint 和定向 Vitest 83 条通过。验证账号/访客隔离、旧库迁移、并发事务、源码导入限制和 Windows 课程快照路径。",
+          "本地真实 Chrome 157 使用 1440×900、1366×768、768×1024 和 375×812，后两者验证触控。Scratch 保留 .sb3 往返，并验证后退/退出保护、双窗口拒写和失败恢复。",
+          "真实 Python 验证 input、标准流、错误行、死循环停止与自动超时、内存/初始化失败恢复、多作品及 .py 往返。两套四视口与实际归档记录见 docs/product/scratch-create/evidence/。",
+          "本地真实 Chrome：旧 G2-U3-L01 Scratch VM 与 P0-U1-L01 Pyodide 各 1 条、旧 Blockly 首课 4 条回归通过。"
+        ]
+      },
+      "notes": "2026-11-20 用户授权在 #564 同一任务整改独立复核并加入 Python 创作。等待新 HEAD 非作者复核与产品验收。部署由 Muse 处理。作品仅本机保存，公开发布前须核对 Scratch 对应源码、许可及素材。"
+    },
+    {
         "id": "OPS-048",
         "title": "KidsCoding V3 Blockly 统一工作区样板整改（G0 第一课《小狐狸出场》）",
         "priority": "P0",

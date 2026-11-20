@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'wasm-unsafe-eval' blob:; worker-src blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Python 执行沙箱</title>
+</head>
+<body>
+<script>
+(() => {
+  'use strict';
+  // This document has an opaque origin. The worker inherits its CSP.
+  let worker;
+  let channel;
+  function stop() {
+    worker?.terminate();
+    channel?.close();
+    worker = undefined;
+    channel = undefined;
+  }
+  window.addEventListener('pagehide', stop);
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent || event.data?.kind !== 'PYTHON_CREATE' || event.ports.length !== 1) return;
+    stop();
+    const port = event.ports[0];
+    channel = port;
+    try {
+      const url = URL.createObjectURL(new Blob([event.data.workerScript], { type: 'text/javascript' }));
+      try { worker = new Worker(url); } finally { URL.revokeObjectURL(url); }
+      worker.onmessage = (message) => {
+        port.postMessage(message.data);
+        if (message.data.kind === 'done' || message.data.kind === 'failed') stop();
+      };
+      worker.onerror = () => {
+        port.postMessage({ kind: 'failed', reason: 'Python 引擎无法启动或异常退出，请重试。' });
+        stop();
+      };
+      port.onmessage = (message) => {
+        if (message.data?.kind === 'stop') stop();
+        else if (message.data?.kind === 'input') worker?.postMessage(message.data);
+      };
+      worker.postMessage({ assets: event.data.assets, source: event.data.source }, Object.values(event.data.assets));
+    } catch {
+      port.postMessage({ kind: 'failed', reason: '此浏览器无法启动 Python 执行沙箱。' });
+      stop();
+    }
+  });
+})();
+</script>
+</body>
+</html>

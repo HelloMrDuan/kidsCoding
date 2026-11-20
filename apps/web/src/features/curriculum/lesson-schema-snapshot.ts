@@ -1,6 +1,6 @@
 // SYS-105: build a CurriculumSnapshot from the real repository (node only; used by tests/CI).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { join, relative, sep } from 'node:path'
 
 import assetLicenses from '@/content/curriculum/asset-licenses-v1.json'
 import { a0u1L01SnapshotSteps } from '@/content/curriculum/a0-u1-ai-lessons'
@@ -15,6 +15,10 @@ import { EXAMPLE_DEBT_BASELINE, type CurriculumSnapshot } from './lesson-schema'
 import { getLessonMaturity, trialIntegrations } from './lesson-maturity'
 
 const WEB = join(__dirname, '..', '..', '..')
+
+function repositoryPath(root: string, file: string) {
+  return relative(root, file).split(sep).join('/')
+}
 
 function walk(dir: string): string[] {
   if (!existsSync(dir)) return []
@@ -35,8 +39,8 @@ export function readCurriculumSnapshot(): CurriculumSnapshot {
   const assetFiles = readdirSync(curriculum).filter(f => /asset-requirements-v\d+\.json$/.test(f))
   const lessonAssets = assetFiles.flatMap(f => (JSON.parse(readFileSync(join(curriculum, f), 'utf8')).assets ?? []) as CurriculumSnapshot['lessonAssets'])
   const appDir = join(WEB, 'src/app')
-  const routes = walk(appDir).filter(f => /page\.tsx$/.test(f)).map(f => relative(appDir, f).split('/').slice(0, 2).join('/'))
-  const e2eSpecs = walk(join(WEB, 'tests/e2e')).map(f => relative(WEB, f))
+  const routes = walk(appDir).filter(f => /page\.tsx$/.test(f)).map(f => repositoryPath(appDir, f).split('/').slice(0, 2).join('/'))
+  const e2eSpecs = walk(join(WEB, 'tests/e2e')).map(f => repositoryPath(WEB, f))
   const publicDir = join(WEB, 'public')
   // OPS-024: build artefacts regenerated from npm packages on every build
   // (public/blockly-media/, public/scratch-vm/) are not shipped curriculum
@@ -44,8 +48,8 @@ export function readCurriculumSnapshot(): CurriculumSnapshot {
   // they must not be scanned as unlicensed assets. Without this exclusion
   // the gate fails after any local `npm run build` (proven on pristine
   // main: 16 blockly-media errors), even though CI runs vitest before build.
-  const GENERATED_DIRS = ['blockly-media/', 'scratch-vm/']
-  const publicAssets = walk(publicDir).map(f => relative(publicDir, f)).filter(f => !f.endsWith('-sandbox.html') && !GENERATED_DIRS.some(d => f.startsWith(d)))
+  const GENERATED_DIRS = ['blockly-media/', 'scratch-vm/', 'python-create-runtime/']
+  const publicAssets = walk(publicDir).map(f => repositoryPath(publicDir, f)).filter(f => !f.endsWith('-sandbox.html') && !GENERATED_DIRS.some(d => f.startsWith(d)))
   const trialIds = Object.keys(trialIntegrations)
   const allIds = [...catalog.tracks.flatMap(t => t.units.flatMap(u => u.lessons.map(l => l.id))), ...launchLessons.map(l => l.id)]
 
