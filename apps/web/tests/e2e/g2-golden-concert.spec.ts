@@ -86,6 +86,11 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
       await advance(page, '夜晚森林')
       await page.getByRole('button', { name: '收起指引' }).click()
       await appendMotion(page, width <= 768)
+      if (width === 375 && process.env.GOLDEN_EVIDENCE_DIR) {
+        await mkdir(process.env.GOLDEN_EVIDENCE_DIR, { recursive: true })
+        await script(gui(page)).locator('.blocklyDraggable').filter({ hasText: /移动.*步/ }).last().scrollIntoViewIfNeeded()
+        await page.screenshot({ path: `${process.env.GOLDEN_EVIDENCE_DIR}/375x812-code.png` })
+      }
       const start = gui(page).getByRole('button', { name: 'Start project' })
       if (width <= 768) await start.tap()
       else await start.click()
@@ -138,6 +143,10 @@ test('G2 Golden judges native Scratch edits and opens the complete saved archive
   await frame.getByRole('button', { name: '小橘猫', exact: true }).click()
   await editText(workspace, '欢迎来到森林音乐会！', '森林的新朋友，欢迎你！')
   await advance(page, '主持人说出了你的开场词')
+  if (process.env.GOLDEN_EVIDENCE_DIR) {
+    await mkdir(process.env.GOLDEN_EVIDENCE_DIR, { recursive: true })
+    await page.screenshot({ path: `${process.env.GOLDEN_EVIDENCE_DIR}/completed.png` })
+  }
   const file = await exportProject(page)
   const archive = await JSZip.loadAsync(file)
   expect(Object.keys(archive.files).some(name => name.endsWith('.wav'))).toBe(true)
