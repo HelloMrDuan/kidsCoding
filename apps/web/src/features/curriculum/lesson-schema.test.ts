@@ -23,8 +23,8 @@ describe('SYS-105 curriculum schema gate', () => {
   it('reads the real content, not an empty snapshot', () => {
     expect(real.catalogLessonIds.length).toBe(432)
     expect(real.detailedLessons.length).toBeGreaterThanOrEqual(192)
-    expect(real.trials.length).toBe(36 + g2LabLessons) // 34 counted before + 1 G0-U3-L04 event trial (main) + 1 A0-U1-L01 classify trial (PR433)
-    expect(real.steps.length).toBe(82 + g2LabSteps) // G0-U1-L01 to L06 each gained a creative-remake step, +5 steps each for G0-U2-L01..L06 event lessons and G0-U3-L01..L04 loop lessons (Hark A) + 2 A0-U1-L01 snapshot steps (classify tools + counter-example); G2 Scratch lab steps counted from their registry
+    expect(real.trials.length).toBe(37 + g2LabLessons) // 34 counted before + 1 G0-U3-L04 event trial (main) + 1 A0-U1-L01 classify trial (PR433) + G3-U1-L01 pen trial (PR #260)
+    expect(real.steps.length).toBe(84 + g2LabSteps) // G0-U1-L01 to L06 each gained a creative-remake step, +5 steps each for G0-U2-L01..L06 event lessons and G0-U3-L01..L04 loop lessons (Hark A) + 2 A0-U1-L01 snapshot steps (classify tools + counter-example) + 2 G3-U1-L01 judged steps; G2 Scratch lab steps counted from their registry
     expect(g2LabSteps).toBe(3 * g2LabLessons) // every G2 Scratch lab lesson has exactly 3 judged steps (Hark B)
     expect(real.publicAssets).toContain('v2/hero-studio.webp')
   })
