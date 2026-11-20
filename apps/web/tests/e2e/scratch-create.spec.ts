@@ -67,28 +67,38 @@ async function pickBlock(gui: FrameLocator, category: RegExp, pattern: RegExp) {
   await gui.getByRole('treeitem', { name: category }).click()
   const block = gui.locator('.blocklyFlyout .blocklyDraggable').filter({ hasText: pattern }).first()
   await expect(block).toBeVisible()
+  await block.scrollIntoViewIfNeeded()
   return block
 }
 
 async function drag(page: Page, block: Locator, x: number, y: number, touch = false) {
-  const bounds = (await block.boundingBox())!
   // Grip the coloured block body. On Linux the text fallback can put the
   // editable number field at the bounding-box centre, which starts editing.
-  const offset = await block.evaluate((element) => {
-    const bounds = element.getBoundingClientRect()
-    const hits: string[] = []
-    for (const yFraction of [0.5, 0.4, 0.6]) {
-      for (const left of [8, 12, 16, 20]) {
-        const top = bounds.height * yFraction
-        const hit = document.elementFromPoint(bounds.left + left, bounds.top + top)
-        hits.push(`${hit?.localName}:${hit?.getAttribute('class')}`)
-        if (hit && element.contains(hit) && !hit.closest('.blocklyEditableText')) {
-          return { left, top }
+  // Wait until the category scroll has stopped and the grip is visible; an
+  // SVG block may exist while it is still clipped by the flyout.
+  const origin: { offset?: { left: number; top: number } } = {}
+  let previousPosition = ''
+  await expect.poll(async () => {
+    const grip = await block.evaluate((element) => {
+      const bounds = element.getBoundingClientRect()
+      for (const yFraction of [0.5, 0.4, 0.6]) {
+        for (const left of [8, 12, 16, 20]) {
+          const top = bounds.height * yFraction
+          const hit = document.elementFromPoint(bounds.left + left, bounds.top + top)
+          if (hit && element.contains(hit) && !hit.closest('.blocklyEditableText')) {
+            return { left, top, position: `${bounds.left},${bounds.top},${bounds.width},${bounds.height}` }
+          }
         }
       }
-    }
-    throw new Error(`No visible block body to grip (${hits.join(', ')})`)
-  })
+      return null
+    })
+    const stable = grip?.position === previousPosition
+    previousPosition = grip?.position ?? ''
+    if (grip && stable) origin.offset = grip
+    return Boolean(origin.offset)
+  }, { intervals: [100, 150, 200], message: 'Wait for a stable visible block body' }).toBe(true)
+  const offset = origin.offset!
+  const bounds = (await block.boundingBox())!
   const start = { x: bounds.x + offset.left, y: bounds.y + offset.top }
   const end = { x: x + offset.left, y: y + offset.top - bounds.height / 2 }
   if (!touch) {
