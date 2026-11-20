@@ -4051,7 +4051,7 @@
       "title": "Scratch 自由创作中心、真实编辑器及多作品",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_progress",
+      "status": "in_review",
       "dependencies": [
         "OPS-037",
         "OPS-038"
@@ -4064,9 +4064,15 @@
         "提供 GUI 固定版本、双来源配置、许可与对应源码方案、部署验证及回滚说明"
       ],
       "evidence": {
-        "tests": []
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/564",
+        "tests": [
+          "本地生产构建、定向 ESLint、72 条单测及任务台账校验通过。",
+          "本地真实 Chrome 157：创作 5 条通过，覆盖 1440×900、1366×768、768×1024 和 375×812，后两者使用触控拖拽、连接及保存。",
+          "真实 .sb3 保存、角色和素材恢复、复制隔离、导入后继续运行、损坏文件拒绝与写入失败后重试通过。截图和归档记录见 docs/product/scratch-create/evidence/。",
+          "本地真实 Chrome：旧 G2-U3-L01 Scratch VM 与 P0-U1-L01 Pyodide 各 1 条回归通过。"
+        ]
       },
-      "notes": "2026-11-20 项目负责人授权 Codex 独立交付及提交单一 PR；部署由 Muse 处理，留待非作者复核。使用新创作库和现有桥接，公开发布前须核对对应源码、许可及素材。"
+      "notes": "2026-11-20 提交 #564 待 GitHub CI、非作者复核和产品验收。部署由 Muse 处理。作品仅本机保存，公开发布前须核对对应源码、许可及素材。"
     },
     {
         "id": "OPS-048",
