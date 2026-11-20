@@ -25,6 +25,9 @@ export type GridLevel = {
   pots?: Cell[]
   /** G0-U3: footprints the program must leave, in path order (colour on each cell). */
   footprints?: Footprint[]
+  /** The exact route to trace, including the starting cell. Closed routes accept either direction. */
+  route?: Cell[]
+  goalFacing?: Facing
 }
 
 /** G0-U3 pattern lessons: a coloured footprint the fox leaves on its current cell. */
@@ -74,6 +77,8 @@ export type GridFailure =
   | 'pots_missed'
   | 'wrong_pattern'
   | 'pattern_short'
+  | 'wrong_route'
+  | 'wrong_facing'
 
 export type GridFrame = {
   blockIndex: number
@@ -260,16 +265,32 @@ export function runGridProgram(level: GridLevel, blocks: ProgramBlock[]): GridRu
     }
     if (trail.length < want.length) return result(false, 'pattern_short', `只放了 ${trail.length} 个脚印，规律要 ${want.length} 个，还差 ${want.length - trail.length} 个。数一数重复了几次。`, frames, state, steps)
   }
+  if (level.route) {
+    const route = frames.reduce<Cell[]>((cells, frame) => {
+      if (!same(cells[cells.length - 1], frame)) cells.push({ x: frame.x, y: frame.y })
+      return cells
+    }, [level.start])
+    const matches = (target: Cell[]) => route.length === target.length && route.every((cell, i) => same(target[i], cell))
+    const closed = level.route.length > 1 && same(level.route[0], level.route[level.route.length - 1])
+    if (!matches(level.route) && !(closed && matches([...level.route].reverse()))) {
+      return result(false, 'wrong_route', '实线没有沿着虚线围栏走完。找一找从哪里开始偏离，或者还差哪一条边。', frames, state, steps)
+    }
+  }
   if (!same(level.goal, state)) {
     const dx = level.goal.x - state.x
     const dy = level.goal.y - state.y
     const hint = [dx ? `往${dx > 0 ? '右' : '左'}还差 ${Math.abs(dx)} 格` : '', dy ? `往${dy > 0 ? '下' : '上'}还差 ${Math.abs(dy)} 格` : ''].filter(Boolean).join('，')
     return result(false, 'not_at_goal', `小狐狸停下了，但还没到目标：${hint}。`, frames, state, steps)
   }
+  if (level.goalFacing && state.facing !== level.goalFacing) {
+    return result(false, 'wrong_facing', '路线画对了。看一看小狐狸的箭头方向，最后是不是还少一次转弯？', frames, state, steps)
+  }
   return result(true, undefined, `到达目标！一共走了 ${steps} 格。`, frames, state, steps)
 }
 
 export const GRID_FAILURE_LABELS: Record<GridFailure, string> = {
+  wrong_route: '围栏还没画对',
+  wrong_facing: '最后朝向不对',
   no_start: '缺少开始',
   disconnected: '积木没连上',
   empty_repeat: '重复里是空的',

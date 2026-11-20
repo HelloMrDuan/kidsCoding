@@ -2685,8 +2685,8 @@
       "requiredEngineCapabilities": [
         "finite_repeat",
         "movement",
-        "visual_effect",
-        "sound"
+        "direction",
+        "route_trace"
       ],
       "prerequisiteLessonIds": [
         "G0-U3-L04"

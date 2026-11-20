@@ -9,6 +9,7 @@ export default async function GridLabPage({ params }: { params: Promise<{ lesson
   const { lessonId } = await params
   const lesson = getGridLesson(lessonId) ?? g0u3LoopLessons[lessonId] ?? null
   if (!lesson) notFound()
+  if (lesson.layoutMode === 'golden') return <main><GridLab lesson={lesson} /></main>
   return (
     <main className="min-h-screen bg-[var(--kc-canvas)]">
       <section className="kc-page-main">

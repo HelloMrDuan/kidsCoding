@@ -45,7 +45,7 @@ export type GridLessonStep = {
   /** error-lab: the starter program must be run and produce this failure before a fix counts. */
   errorLab?: { expect: GridFailure; expected: string; actual: string }
   /** creative: the child places the goal on one of these cells, then programs a route to it. */
-  creative?: { prompt: string; goalChoices: Cell[]; /** Story names for the choices, same order (e.g. who the letter goes to). */ labels?: string[]; /** G0-U3: the footprint pattern each choice asks for (same order as goalChoices). */ patterns?: Footprint[][]; /** G0-U3-L02: the puddles each choice puts on the path (same order as goalChoices). */ waters?: Cell[][]; /** G0-U3-L03: the flower pots each choice puts on the path (same order as goalChoices). */ pots?: Cell[][] }
+  creative?: { prompt: string; goalChoices: Cell[]; /** Story names for the choices, same order (e.g. who the letter goes to). */ labels?: string[]; /** G0-U3: the footprint pattern each choice asks for (same order as goalChoices). */ patterns?: Footprint[][]; /** G0-U3-L02: the puddles each choice puts on the path (same order as goalChoices). */ waters?: Cell[][]; /** G0-U3-L03: the flower pots each choice puts on the path (same order as goalChoices). */ pots?: Cell[][]; /** Full grid layout for each choice. */ layouts?: GridLevel[] }
 }
 
 export type GridLesson = {
@@ -54,6 +54,8 @@ export type GridLesson = {
   story: string
   concept: string
   objectives: string[]
+  layoutMode?: 'golden'
+  trialIntroduction?: { title: string; description: string; action: string }
   /** Lesson-specific diagnosis per engine failure, shown instead of the generic copy. */
   diagnoses: Partial<Record<GridFailure, string>>
   steps: GridLessonStep[]
@@ -64,7 +66,9 @@ export type GridLesson = {
   /** 复盘: a what-if question with its answer, shown with the mistakes the child really met. */
   review?: { whatIf: string; answer: string }
   /** Unit project: the child's own program from this step becomes a saved, replayable card. */
-  project?: { stepId: string; title: string }
+  project?: { stepId: string; title: string; passedText?: string; showInPortfolio?: boolean }
+  /** An earned lesson badge. Official rewards are handled by the published-course system. */
+  completionBadge?: string
 }
 
 const P = (...types: string[]) => ['when_start', ...types]
