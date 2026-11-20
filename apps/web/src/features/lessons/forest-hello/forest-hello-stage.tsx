@@ -28,7 +28,7 @@ import { FOREST_LESSON_ID, FOREST_SOURCE_LESSON, FOREST_STEPS } from './forest-h
 import { forestStarterProgram, type ForestStepId } from './forest-hello-draft'
 import { useForestSession, useForestSessionState } from './forest-hello-session'
 
-export function ForestStageSlot({ lessonId }: StageSlotProps) {
+export function ForestStageSlot({ lessonId, sceneActions }: StageSlotProps) {
   const { store, runAdapter } = useForestSession()
   const sessionState = useForestSessionState()
   const draft = sessionState.draft
@@ -97,6 +97,7 @@ export function ForestStageSlot({ lessonId }: StageSlotProps) {
         practiceAnswer={sessionState.practiceAnswers[stepId] ?? null}
         onPracticeAnswer={handlePracticeAnswer}
         runControls="external"
+        sceneActions={sceneActions}
         externalState={{
           executionState: snapshot.executionState,
           characterPosition: snapshot.foxPosition,

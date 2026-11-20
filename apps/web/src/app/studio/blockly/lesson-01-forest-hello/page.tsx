@@ -25,6 +25,7 @@ import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { ForestAdapter, ForestRunAdapter } from '@/features/lessons/forest-hello/forest-hello-run-adapter'
 import { ForestEditorSlot } from '@/features/lessons/forest-hello/forest-hello-slot'
 import { ForestStageSlot } from '@/features/lessons/forest-hello/forest-hello-stage'
+import { ForestRolesSlot } from '@/features/lessons/forest-hello/forest-hello-roles'
 import {
   FOREST_HELP,
   FOREST_SOURCE_LESSON,
@@ -121,6 +122,7 @@ export default function StudioForestHelloPage() {
       saveState={saveState}
       saveMessage={saveMessage}
       shellControl={shellControl}
+      layout="blockly-v3"
     >
       <ForestSessionContext.Provider value={sessionValue}>
         <LessonWorkspace
@@ -128,9 +130,11 @@ export default function StudioForestHelloPage() {
           adapter={adapter}
           editorSlot={ForestEditorSlot}
           stageSlot={ForestStageSlot}
+          rolesSlot={ForestRolesSlot}
           runAdapter={runAdapter}
           initialScript={initialScript}
           chrome="studio"
+          studioLayout="blockly-v3"
           onSaveStateChange={handleSaveStateChange}
           onShellControl={handleShellControl}
         />

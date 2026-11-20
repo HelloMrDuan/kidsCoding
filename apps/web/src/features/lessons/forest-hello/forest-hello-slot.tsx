@@ -49,11 +49,11 @@ import { launchStepGate, useLaunchLessonCompletion } from '@/features/lessons/la
 import { readGuestProgress } from '@/features/progress/local-progress'
 import { draftKeyFor } from '@/features/lessons/workspace/lesson-contract'
 import type { EditorSlotProps, JudgmentResult } from '@/features/lessons/workspace/workspace-slots'
+import { BlocklyStudioMission } from '@/features/lessons/workspace/blockly-studio-layout'
 
 import {
   findForestWorkspace,
   forestSnapshot,
-  mainForestStack,
   moveForestBlock,
   rebuildForestProgram,
 } from './forest-hello-blockly-ops'
@@ -157,7 +157,8 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
 
   const step = FOREST_STEPS[Math.min(draft.stepIndex, FOREST_STEPS.length - 1)]
   const stepId = step.id
-  const blocks: ProgramBlock[] = draft.programs[stepId] ?? forestStarterProgram(stepId as ForestStepId)
+  const savedBlocks = draft.programs[stepId]
+  const blocks: ProgramBlock[] = savedBlocks ?? forestStarterProgram(stepId as ForestStepId)
   const passedHere = draft.passed.includes(stepId)
   const mistakeStep = getMistakeStep(FOREST_LESSON_ID, stepId)
   const practiceStep = getPracticeStep(FOREST_LESSON_ID, stepId)
@@ -264,10 +265,10 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
     if (!container) return
     const workspace = findForestWorkspace(container)
     if (!workspace) return
-    const target = draft.programs[stepId] ?? forestStarterProgram(stepId as ForestStepId)
+    const target = savedBlocks ?? forestStarterProgram(stepId as ForestStepId)
     if (JSON.stringify(forestSnapshot(workspace)) === JSON.stringify(target)) return
     rebuildForestProgram(workspace, target)
-  }, [stepId, draft.programs[stepId]])
+  }, [stepId, savedBlocks])
 
   /** 运行开始时记下关号（shell.judgment 到达时可能已切关）。 */
   useEffect(() => {
@@ -410,8 +411,8 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       goToStep(current.stepIndex + 1)
       setNotice(
         practiceStep
-          ? practiceStep.done
-          : '这一关完成啦！',
+          ? `第 ${current.stepIndex + 1} 关已完成。${practiceStep.done}`
+          : `第 ${current.stepIndex + 1} 关已完成，开始下一关吧！`,
       )
       return
     }
@@ -460,35 +461,25 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
     )
   }
 
-  // 画布 Gate 1（平板 ≥300px、手机 ≥220px，有效可视高度 = 视口 ∩ 画布）：
-  // 画布上方只留一行紧凑步骤行（进度 + 标题 + 完成按钮）；指导、语音、
-  // 关间导航移到画布下方（仍在同一插槽内，testid 不变），否则
-  // 768×1024 与 375×812 首屏画布均不足（L01 同款布局，实测 241px / 40px
-  // 教训）。外壳顶栏、目标条、舞台、运行条为共享布局，本课不动。
-  //
-  // 插槽根节点自己滚动（height 100% + overflow-y auto）：studio 为
-  // 100dvh 固定壳、文档不滚动，外壳反馈条是主区底部通栏（flex 0 0 auto）。
-  // 本插槽内容（步骤行 + 画布 + 指导 + 积木列表 + 运行/保存行）高于编辑
-  // 列时，若根节点不滚动，底部“保存作品”与旧草稿导入按钮会落在反馈条
-  // 下方、无法点击（E2E N4/N6 实测：elementFromPoint 命中反馈条 h2，
-  // 且无任何可滚动祖先）。外壳不改：滚动是插槽自己的内部区域行为
-  // （OPS-039 模型“inner regions scroll on their own”）。
   return (
     <div
       ref={containerRef}
+      className="kc-v3-slot-editor"
       data-testid="forest-hello-slot"
-      style={{ height: '100%', minHeight: 0, overflowY: 'auto' }}
+      style={{ height: '100%', overflowY: 'auto' }}
     >
+      <BlocklyStudioMission>
       <div
         data-testid="forest-hello-step-header"
-        style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px' }}
+        className="kc-v3-task"
       >
-        <p data-testid="forest-hello-step-progress">
+        <p className="kc-v3-step-index" data-testid="forest-hello-step-progress">
           第 {draft.stepIndex + 1} / {FOREST_STEPS.length} 关{passedHere ? ' ✓' : ''}
         </p>
-        <h3 data-testid="forest-hello-step-title">
-          第 {draft.stepIndex + 1} 关：{step.title}
-        </h3>
+        <div className="kc-v3-task-copy">
+          <h2 data-testid="forest-hello-step-title"><span className="sr-only">第 {draft.stepIndex + 1} 关：</span>{step.title}</h2>
+          <p data-testid="forest-hello-instruction">{step.instruction}</p>
+        </div>
         <button
           type="button"
           data-testid="forest-hello-complete-step"
@@ -498,17 +489,20 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
           {isCompleting ? '正在完成…' : isLastStep ? '完成本课' : '完成这一关'}
         </button>
       </div>
+      </BlocklyStudioMission>
 
       <BlocklyWorkspace
         allowedBlocks={step.allowedBlocks}
         blocks={blocks}
+        docked={{ stepKey: stepId, preferredBlock: step.requiredBlockTypes.find((type) => type !== 'when_start') }}
         enableProgramTools={Boolean(mistakeStep || practiceStep)}
         snapStartOnTop={Boolean(mistakeStep)}
         onSnapshotChange={handleSnapshot}
       />
 
+      <details className="kc-v3-editor-details">
+        <summary>本关指引与积木顺序</summary>
       <div data-testid="forest-hello-step-guide">
-        <p data-testid="forest-hello-instruction">{step.instruction}</p>
         <p data-testid="forest-hello-voiceover">主语音：{step.voiceover}</p>
         <div data-testid="forest-hello-help">
           {FOREST_HELP.split('\n').map((line, i) => (
@@ -547,21 +541,21 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       </ol>
 
       <div>
-        <button
-          type="button"
-          data-testid="forest-hello-run"
-          disabled={!shell}
-          onClick={() => shell?.run()}
-        >
-          {running ? '停止' : '▶ 运行'}
-        </button>{' '}
         <button type="button" data-testid="forest-hello-save" disabled={!shell} onClick={() => shell?.save()}>
           保存作品
         </button>
       </div>
+      {lastRun && lastRun.frames.length > 0 ? (
+        <ol data-testid="forest-hello-run-log">
+          {lastRun.frames.map((frame, i) => (
+            <li key={i}>向右走 100 步（第 {i + 1} 块，小狐狸走到 {frame.foxPosition} 步）</li>
+          ))}
+        </ol>
+      ) : null}
+      </details>
 
       {legacyImport?.ok ? (
-        <div data-testid="forest-hello-legacy-import">
+        <div className="kc-v3-alert" data-testid="forest-hello-legacy-import">
           <p>
             发现你在旧课堂留下的草稿（到第 {legacyImport.fromStep + 1} 关，共{' '}
             {legacyImport.importedSteps} 关有程序），要一键导入吗？导入后通过记录须重新运行才能恢复。
@@ -576,7 +570,7 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       ) : null}
 
       {cloudSyncState === 'failed' ? (
-        <div data-testid="forest-hello-cloud-failed">
+        <div className="kc-v3-alert" data-testid="forest-hello-cloud-failed">
           <p>云端同步失败，本机进度已保存。请重试同步，或选择仅用本机继续。</p>
           <button type="button" data-testid="forest-hello-retry-cloud-sync" onClick={() => void handleRetryCloudSync()}>
             重试同步
@@ -588,7 +582,7 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
       ) : null}
 
       {navigationFailed ? (
-        <div data-testid="forest-hello-navigation-failed">
+        <div className="kc-v3-alert" data-testid="forest-hello-navigation-failed">
           <p>本课的进度和奖励已经保存好了，但打开完成页失败了。点下面的按钮，用整页打开的方式打开完成页。</p>
           <a data-testid="forest-hello-open-complete-page" href={completePath}>
             打开完成页
@@ -596,15 +590,8 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
         </div>
       ) : null}
 
-      {notice && <p data-testid="forest-hello-notice">{notice}</p>}
+      {notice && <p className="kc-v3-alert" data-testid="forest-hello-notice">{notice}</p>}
 
-      {lastRun && lastRun.frames.length > 0 ? (
-        <ol data-testid="forest-hello-run-log">
-          {lastRun.frames.map((frame, i) => (
-            <li key={i}>向右走 100 步（第 {i + 1} 块，小狐狸走到 {frame.foxPosition} 步）</li>
-          ))}
-        </ol>
-      ) : null}
     </div>
   )
 }
