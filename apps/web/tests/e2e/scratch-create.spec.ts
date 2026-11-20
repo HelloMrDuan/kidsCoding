@@ -100,14 +100,19 @@ async function program(page: Page, gui: FrameLocator, touch = false) {
   const hat = await pickBlock(gui, /事件|Events/, /当.*被点击/)
   await hat.scrollIntoViewIfNeeded()
   const palette = (await gui.locator('.blocklyFlyout').first().boundingBox())!
+  const flyoutRight = palette.x + palette.width
   const block = (await hat.boundingBox())!
-  await drag(page, hat, palette.x + palette.width + 5, block.y + 80, touch)
+  await drag(page, hat, flyoutRight + (touch ? 24 : 5), block.y + 80, touch)
   const placed = workspace.locator('.blocklyDraggable').filter({ hasText: /当.*被点击/ }).first()
   await expect(placed).toBeVisible()
   const move = await pickBlock(gui, /运动|Motion/, /移动.*步/)
   const anchor = (await placed.boundingBox())!
   const motion = (await move.boundingBox())!
-  await drag(page, move, anchor.x, anchor.y + anchor.height + motion.height / 2 - 4, touch)
+  // In narrow mode the flyout overlaps part of the underlying canvas. Leave
+  // room below and beside the hat for the first gesture, then snap on canvas.
+  const dropX = touch ? Math.max(anchor.x, flyoutRight + 26) : anchor.x
+  const dropY = anchor.y + anchor.height + motion.height / 2 + (touch ? 28 : -4)
+  await drag(page, move, dropX, dropY, touch)
   const placedMove = workspace.locator('.blocklyDraggable').filter({ hasText: /移动.*步/ }).first()
   await expect(placedMove).toBeVisible()
   if (touch) {
