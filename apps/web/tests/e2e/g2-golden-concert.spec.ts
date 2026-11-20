@@ -39,26 +39,32 @@ async function appendMotion(page: Page, touch: boolean) {
   const frame = gui(page)
   await frame.getByRole('button', { name: '小橘猫', exact: true }).click()
   const workspace = script(frame)
-  const say = workspace.locator('[data-id="cat_say"]')
-  await expect(say).toBeVisible()
-  const source = await pickBlock(frame, /运动|Motion/, /移动.*步/)
-  const anchor = (await say.boundingBox())!
+  const flag = await pickBlock(frame, /事件|Events/, /当.*被点击/)
   const palette = (await frame.locator('.blocklyFlyout').first().boundingBox())!
+  const flyoutRight = palette.x + palette.width
+  const hatSource = (await flag.boundingBox())!
+  await drag(page, flag, flyoutRight + (touch ? 24 : 5), hatSource.y + 80, touch)
+  const start = workspace.locator('.blocklyDraggable').filter({ hasText: /^当.*被点击$/ }).last()
+  await expect(start).toBeVisible()
+  const source = await pickBlock(frame, /运动|Motion/, /移动.*步/)
+  const anchor = (await start.boundingBox())!
   const size = (await source.boundingBox())!
-  const x = touch ? Math.max(anchor.x, palette.x + palette.width + 26) : anchor.x
-  await drag(page, source, x, anchor.y + anchor.height + size.height / 2 - 4, touch)
+  const x = touch ? Math.max(anchor.x, flyoutRight + 26) : anchor.x
+  await drag(page, source, x, anchor.y + anchor.height + size.height / 2 + (touch ? 28 : -4), touch)
   const placed = workspace.locator('.blocklyDraggable').filter({ hasText: /移动.*步/ }).last()
   await expect(placed).toBeVisible()
   const getNext = async () => {
     const archive = await JSZip.loadAsync(await exportProject(page))
     const project = JSON.parse(await archive.file('project.json')!.async('string'))
-    const blocks = project.targets.find((target: { name: string }) => target.name === '小橘猫').blocks
-    return blocks[blocks.cat_say.next]?.opcode
+    const blocks: Record<string, { opcode: string; next: string | null }> =
+      project.targets.find((target: { name: string }) => target.name === '小橘猫').blocks
+    const hat = Object.values(blocks).find(block => block.opcode === 'event_whenflagclicked')
+    return hat?.next ? blocks[hat.next]?.opcode : undefined
   }
   if (touch && await getNext() !== 'motion_movesteps') {
-    const movedSay = (await say.boundingBox())!
+    const movedStart = (await start.boundingBox())!
     const unconnected = (await placed.boundingBox())!
-    await drag(page, placed, movedSay.x, movedSay.y + movedSay.height + unconnected.height / 2 - 4, true)
+    await drag(page, placed, movedStart.x, movedStart.y + movedStart.height + unconnected.height / 2 - 4, true)
   }
   expect(await getNext()).toBe('motion_movesteps')
 }
@@ -100,7 +106,10 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
 
 test('G2 Golden judges native Scratch edits and opens the complete saved archive', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
-  await openCourse(page)
+  await page.goto('/learn/catalog/G2-U1-L03')
+  await page.getByTestId('scratch-trial-entry').click()
+  await expect(page).toHaveURL(new RegExp(courseUrl + '$'))
+  await expect(check(page)).toBeEnabled({ timeout: 45_000 })
   const frame = gui(page)
   const workspace = script(frame)
   await advance(page, '夜晚森林')
@@ -116,7 +125,10 @@ test('G2 Golden judges native Scratch edits and opens the complete saved archive
   await frame.getByRole('button', { name: '小鸟', exact: true }).click()
   await selectMenu(workspace, '叽叽', '啾啾')
   await advance(page, '播放了啾啾')
+  await advance(page, '先选择你的预测')
+  await page.getByLabel('按绿旗后，开幕铃响几次？').selectOption('响 1 次')
   await advance(page, '记录到三声开幕铃')
+  await expect(page.getByRole('status')).toContainText('你的预测：响 1 次')
   await advance(page, '响了 3 次')
   await page.getByRole('button', { name: '收起指引' }).click()
   await frame.getByLabel('Target pane').getByText('舞台', { exact: true }).click()
@@ -159,7 +171,7 @@ test('G2 Golden reports a blocked local write and saves when retried', async ({ 
   })
   const save = page.getByRole('button', { name: '保存', exact: true })
   await save.click()
-  await expect(page.getByRole('alert')).toContainText('操作失败')
+  await expect(page.locator('.kc-scratch-course-status[role="alert"]')).toContainText('操作失败')
   await save.click()
   await expect(page.getByRole('status')).toContainText('作品已保存到本机')
   await page.reload()

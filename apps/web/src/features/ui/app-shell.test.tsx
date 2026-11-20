@@ -24,6 +24,13 @@ describe('AppShell (frozen V2 global shell)', () => {
     expect(screen.getByTestId('kc-nav-lesson')).toHaveAttribute('aria-current', 'page')
   })
 
+  it('keeps Golden Scratch lessons in the learning section', () => {
+    mockPath = '/learn/scratch-lab/G2-U1-L03/golden'
+    render(<AppShell><div /></AppShell>)
+    expect(screen.getByTestId('kc-nav-lesson')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByTestId('kc-nav-scratch')).not.toHaveAttribute('aria-current')
+  })
+
   it('toggles the mobile drawer from the hamburger button', () => {
     mockPath = '/learn/catalog'
     render(<AppShell><div /></AppShell>)

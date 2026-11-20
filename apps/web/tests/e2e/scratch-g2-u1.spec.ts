@@ -439,11 +439,12 @@ const L03_SAMPLE = 'public/scratch-samples/g2-u1-l03-forest-concert.sb3.b64'
 const soundLog = (page: import('@playwright/test').Page) => page.getByTestId('g2-sound-log')
 
 test.describe('G2-U1-L03 设置背景和声音', () => {
-  test('catalog entry opens the concert lab; the VM counts 3 bell plays for the prediction; the stage backdrop switches to 绿色草地 (practice A)', async ({page}) => {
+  test('legacy concert lab: the VM counts 3 bell plays for the prediction; the stage backdrop switches to 绿色草地 (practice A)', async ({page}) => {
     test.setTimeout(150_000)
     await page.goto(`/learn/catalog/${L03}`)
     await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
-    await page.getByTestId('scratch-trial-entry').click()
+    await expect(page.getByTestId('scratch-trial-entry')).toHaveAttribute('href', `/learn/scratch-lab/${L03}/golden`)
+    await page.goto(`/learn/scratch-lab/${L03}`)
     await expect(page.getByTestId('g2-vm-status')).toContainText('已加载项目', {timeout: 60_000})
     await expect(page.getByRole('heading', {name: '设置背景和声音'})).toBeVisible()
     await expect(page.getByTestId('g2-backdrop')).toHaveText('夜晚森林')

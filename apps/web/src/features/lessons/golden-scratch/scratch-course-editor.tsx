@@ -14,6 +14,7 @@ export type ScratchGoldenActivity = {
   title: string
   goal: string
   hints: readonly string[]
+  prediction?: { question: string; choices: readonly string[] }
 }
 
 export type ScratchGoldenCourse = {
@@ -56,6 +57,7 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
   const [finished, setFinished] = useState(false)
   const [guide, setGuide] = useState(false)
   const [hint, setHint] = useState(0)
+  const [prediction, setPrediction] = useState('')
   const step = course.activities[stepIndex]
 
   useEffect(() => {
@@ -145,6 +147,11 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
   }
 
   function check() {
+    if (!finished && step.prediction && !prediction) {
+      setGuide(true)
+      setResult('先选择你的预测，再检查实际运行。')
+      return
+    }
     void act(async client => {
       const captured = edited.current
       const { sb3 } = await client.getProject()
@@ -159,9 +166,12 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
         setStepIndex(nextStep)
         setObserved(nextObserved)
         setFinished(allDone)
-        if (outcome.passed) setHint(0)
+        if (outcome.passed) {
+          setHint(0)
+          setPrediction('')
+        }
       }
-      setResult(outcome.detail)
+      setResult(prediction ? `你的预测：${prediction}。实际运行：${outcome.detail}` : outcome.detail)
       setGuide(true)
     })
   }
@@ -180,6 +190,7 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
       setObserved(false)
       setFinished(false)
       setHint(0)
+      setPrediction('')
       setResult('作品已导入。请从第一个目标开始验证。')
     })
   }
@@ -187,7 +198,7 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
   return (
     <main className="kc-scratch-course">
       <header className="kc-scratch-course-toolbar">
-        <div><h1>{course.title}</h1><p>第 {stepIndex + 1} / {course.activities.length} 关 · {dirty ? '有改动未保存' : '本机作品'}</p></div>
+        <div><h1>{course.title}</h1><p>第 {stepIndex + 1} / {course.activities.length} 关 · {step.title} · {dirty ? '有改动未保存' : '本机作品'}</p></div>
         <div className="kc-scratch-course-actions">
           <Link href={`/learn/catalog/${course.id}`} className="kc-action-surface kc-btn-outline kc-btn-sm"
             onNavigate={event => { if (dirty && !window.confirm('作品还有改动未保存。要离开吗？')) event.preventDefault() }}>返回</Link>
@@ -221,6 +232,13 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
             {course.nextLessonId && <Link href={`/learn/catalog/${course.nextLessonId}`} className="kc-action-surface kc-btn-outline kc-btn-sm"
               onNavigate={event => { if (dirty && !window.confirm('作品还有改动未保存。要离开吗？')) event.preventDefault() }}>下一课</Link>}
           </> : <p>{step.goal}</p>}
+          {!finished && step.prediction && <label className="kc-scratch-course-prediction">
+            {step.prediction.question}
+            <select value={prediction} onChange={event => setPrediction(event.target.value)}>
+              <option value="">选择你的预测</option>
+              {step.prediction.choices.map(choice => <option key={choice}>{choice}</option>)}
+            </select>
+          </label>}
           {!finished && <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" disabled={hint >= step.hints.length} onClick={() => setHint(n => n + 1)}>下一层提示</button>}
           {step.hints.slice(0, hint).map((line, index) => <p key={line}>提示 {index + 1} · {line}</p>)}
         </aside>}

@@ -22,20 +22,24 @@ type NavItem = {
   match: (path: string) => boolean
 }
 
+function isGoldenScratchClassroom(path: string) {
+  return path.startsWith('/learn/scratch-lab/') && path.endsWith('/golden')
+}
+
 const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: 'LEARNING',
     items: [
       { id: 'home', label: '学习中心', short: '首页', href: '/', icon: 'home', match: (p) => p === '/' },
       { id: 'map', label: '学习地图', short: '地图', href: '/learn/map', icon: 'map', match: (p) => p.startsWith('/learn/map') },
-      { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') },
+      { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') || isGoldenScratchClassroom(p) },
       { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') },
     ],
   },
   {
     title: 'CREATE',
     items: [
-      { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || p.startsWith('/learn/scratch-lab') },
+      { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || (p.startsWith('/learn/scratch-lab') && !isGoldenScratchClassroom(p)) },
       { id: 'python', label: 'Python 实验室', short: 'Python', href: '/learn/python-lab/P0-U1-L01', icon: 'python', match: (p) => p.startsWith('/learn/python-lab') },
       { id: 'portfolio', label: '作品中心', short: '作品', href: '/learn/portfolio', icon: 'portfolio', match: (p) => p.startsWith('/learn/portfolio') || p.startsWith('/project') },
       { id: 'cards', label: '奖励收藏', short: '收藏', href: '/cards', icon: 'cards', match: (p) => p.startsWith('/cards') },

@@ -8,6 +8,8 @@
 .kc-scratch-course-guide { position: absolute; z-index: 2; top: 12px; left: min(115px, 5vw); padding: 12px; width: min(330px, calc(100% - 32px)); max-height: 60dvh; overflow: auto; border: 1px solid var(--kc-line); border-radius: 12px; background: white; box-shadow: var(--kc-shadow-panel); }
 .kc-scratch-course-guide > * + * { margin-top: 9px; }
 .kc-scratch-course-guide h2 { font-weight: 820; }
+.kc-scratch-course-prediction { display: grid; gap: 4px; }
+.kc-scratch-course-prediction select { width: 100%; min-height: 40px; padding: 0 8px; border: 1px solid var(--kc-line); border-radius: 8px; background: white; }
 @media (max-width: 767px) {
   .kc-scratch-course-actions button, .kc-scratch-course-actions a { min-height: 40px; }
   .kc-scratch-course-editor { margin-inline: 6px; }
