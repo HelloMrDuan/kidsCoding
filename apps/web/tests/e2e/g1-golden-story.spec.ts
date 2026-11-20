@@ -73,15 +73,24 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
       await addStoryBlock(page, 'say_line')
       await addStoryBlock(page, 'move_right')
       await moveStoryBlock(page, width <= 768)
+      const lesson = page.getByTestId('golden-story')
+      const save = lesson.getByRole('button', { name: '保存', exact: true })
+      await expect.poll(() => page.evaluate(key => {
+        const program = JSON.parse(localStorage.getItem(key) ?? '{}').script?.programs?.['build-opening']
+        return program?.filter((block: { disconnected?: boolean }) => !block.disconnected)
+          .map((block: { type: string }) => block.type) ?? []
+      }, draftKey)).toEqual(['when_start', 'say_line', 'move_right'])
       if (width === 375) {
-        await page.getByTestId('golden-story').getByRole('button', { name: '运行', exact: true }).tap()
+        await lesson.getByRole('button', { name: '运行', exact: true }).tap()
+        await expect(lesson).toHaveAttribute('data-pane', 'stage')
       } else {
         await page.getByTestId('ws-run-toggle').click()
       }
       await expect(page.getByTestId('g1-u1-l01-fox')).toHaveAttribute('data-position', '100')
       await expect(page.getByTestId('g1-u1-l01-rabbit')).toHaveAttribute('data-position', '0')
-      await page.getByTestId('golden-story').getByRole('button', { name: '保存', exact: true }).click()
-      await expect(page.getByTestId('golden-story').getByRole('status').first()).toHaveText('已保存到本机')
+      await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('结论：已完成')
+      await save.click()
+      await expect(lesson.getByRole('status').first()).toHaveText('已保存到本机')
       await page.reload()
       await expect(page.getByTestId('g1-u1-l01-step-title')).toContainText('第 3 关')
       await expect(editor.locator('.blocklyBlockCanvas .blocklyDraggable.say_line')).toHaveCount(1)
