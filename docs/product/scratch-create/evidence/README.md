@@ -15,6 +15,6 @@
 
 [Python 归档与运行记录](python-roundtrip.json)包含导出源文件的 SHA-256、完整源码和重新导入后实测输出。浏览器还验证了编辑器搜索、撤销重做、字体大小、控制台输入、标准错误、异常行、手动停止、执行超时、引擎初始化失败、内存压力和恢复。两个编辑器均检查未保存内容的离开确认与本机写入失败后的重试。Scratch 双窗口用例核对旧版本拒写、导出，以及重新加载新版。
 
-首轮 [Ubuntu Scratch 作业](https://github.com/HelloMrDuan/kidsCoding/actions/runs/44669626569/job/136067218551) 的 375px 测试把第二块推到了素材面板交界处，未落入脚本区。触控用例由素材面板实际矩形计算安全落点，留出边缘空间，再用画布内真实触控手势吸附。最终仍以 `.sb3` 中的积木连接关系为断言。
+[Ubuntu Scratch 首轮日志](https://github.com/HelloMrDuan/kidsCoding/actions/runs/44669626569/job/136067218551) 和 [进一步复现](https://github.com/HelloMrDuan/kidsCoding/actions/runs/44670487175/job/136069985682) 都记录了第二块没有离开素材区。Runner 字体度量下，按积木外框中心抓取会碰到可编辑数字。测试改为对实际 SVG 积木主体做命中检测，并根据素材区实际矩形选择落点，保持真实拖拽与吸附。验收仍以 `.sb3` 中的连接关系为准。
 
 触控验收由 Playwright 在 Chrome 中执行。实际设备体验、预发布两个真实账号的完整流程、公开发布前的许可复核仍待验收。

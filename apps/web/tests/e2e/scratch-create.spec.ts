@@ -72,8 +72,25 @@ async function pickBlock(gui: FrameLocator, category: RegExp, pattern: RegExp) {
 
 async function drag(page: Page, block: Locator, x: number, y: number, touch = false) {
   const bounds = (await block.boundingBox())!
-  const start = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 }
-  const end = { x: x + bounds.width / 2, y }
+  // Grip the coloured block body. On Linux the text fallback can put the
+  // editable number field at the bounding-box centre, which starts editing.
+  const offset = await block.evaluate((element) => {
+    const bounds = element.getBoundingClientRect()
+    const hits: string[] = []
+    for (const yFraction of [0.5, 0.4, 0.6]) {
+      for (const left of [8, 12, 16, 20]) {
+        const top = bounds.height * yFraction
+        const hit = document.elementFromPoint(bounds.left + left, bounds.top + top)
+        hits.push(`${hit?.localName}:${hit?.getAttribute('class')}`)
+        if (hit && element.contains(hit) && !hit.closest('.blocklyEditableText')) {
+          return { left, top }
+        }
+      }
+    }
+    throw new Error(`No visible block body to grip (${hits.join(', ')})`)
+  })
+  const start = { x: bounds.x + offset.left, y: bounds.y + offset.top }
+  const end = { x: x + offset.left, y: y + offset.top - bounds.height / 2 }
   if (!touch) {
     await page.mouse.move(start.x, start.y)
     await page.mouse.down()
