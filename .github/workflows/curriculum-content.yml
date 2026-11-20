@@ -78,6 +78,7 @@ on:
       - 'apps/web/src/app/learn/story-lab/**'
       - 'apps/web/tests/e2e/guest-story.spec.ts'
       - 'apps/web/tests/e2e/g1-u1-l01-workspace.spec.ts'
+      - 'apps/web/tests/e2e/g1-golden-story.spec.ts'
       - 'apps/web/tests/e2e/blockly-first-run.spec.ts'
       - 'apps/web/tests/e2e/blockly-forest-sequence.spec.ts'
       - 'apps/web/tests/e2e/blockly-meadow-journey.spec.ts'
@@ -661,15 +662,15 @@ jobs:
         run: npx vitest run src/features/lessons/story/g1-u1-l01-contract.test.ts src/features/lessons/story/g1-u1-l01-draft.test.ts src/features/lessons/story/g1-u1-l01-judging.test.ts src/features/lessons/story/g1-u1-l01-blockly-ops.test.ts src/features/lessons/story/g1-u1-l01-run-adapter.test.ts src/features/lessons/story/g1-u1-l01-slot.test.tsx src/content/curriculum/g1-u1-story-lessons.test.ts
       - name: Install real Chrome for browser E2E
         run: npx playwright install chrome --with-deps
-      - name: Run G1-U1-L01 desktop shard with real Chrome (1440x900)
+      - name: Run G1-U1-L01 desktop shard and Golden four-viewport suite with real Chrome
         timeout-minutes: 7
         env:
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: test-results/g1-u1-l01-desktop/junit.xml
-        run: npx playwright test tests/e2e/g1-u1-l01-workspace.spec.ts --project=desktop --grep "E1 |E3 |E5 |E6 |E8 |E9 |E10 " --reporter=list,junit --output=test-results/g1-u1-l01-desktop
+        run: npx playwright test tests/e2e/g1-u1-l01-workspace.spec.ts tests/e2e/g1-golden-story.spec.ts --project=desktop --grep "E1 |E3 |E5 |E6 |E8 |E9 |E10 |G1-U1-L01 Golden" --reporter=list,junit --output=test-results/g1-u1-l01-desktop
       - name: Verify desktop shard counts (no silent skipping or shrinking)
         timeout-minutes: 1
         env:
-          WANT_TOTAL: '7'
+          WANT_TOTAL: '12'
           WANT_SKIPPED: '0'
         run: |
           python3 - <<'PY'

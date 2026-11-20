@@ -23,8 +23,8 @@ describe('SYS-105 curriculum schema gate', () => {
   it('reads the real content, not an empty snapshot', () => {
     expect(real.catalogLessonIds.length).toBe(432)
     expect(real.detailedLessons.length).toBeGreaterThanOrEqual(192)
-    expect(real.trials.length).toBe(37 + g2LabLessons)
-    expect(real.steps.length).toBe(87 + g2LabSteps)
+    expect(real.trials.length).toBe(38 + g2LabLessons)
+    expect(real.steps.length).toBe(91 + g2LabSteps)
     expect(g2LabSteps).toBe(3 * g2LabLessons) // every G2 Scratch lab lesson has exactly 3 judged steps (Hark B)
     expect(real.publicAssets).toContain('v2/hero-studio.webp')
   })

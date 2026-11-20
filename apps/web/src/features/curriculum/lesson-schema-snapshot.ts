@@ -8,6 +8,7 @@ import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { g0u2EventLessons } from '@/content/curriculum/g0-u2-event-lessons'
 import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
 import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
+import { openingStoryChecks } from '@/content/curriculum/g1-u1-story-lessons'
 import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { blocklyEngineCapabilities } from './engine-capabilities'
@@ -71,7 +72,9 @@ export function readCurriculumSnapshot(): CurriculumSnapshot {
       lessonId: lesson.id, stepId: step.id, positiveExamples: step.solutions.length, negativeExamples: step.counterExamples.length,
     })))).concat(Object.values(g2ScratchLessons).flatMap(lesson => lesson.steps.map(step => ({
       lessonId: lesson.id, stepId: step.id, positiveExamples: step.solutions.length, negativeExamples: step.counterExamples.length,
-    })))).concat(a0u1L01SnapshotSteps.map(step => ({
+    })))).concat(openingStoryChecks.map(step => ({
+      lessonId: 'G1-U1-L01', stepId: step.id, positiveExamples: step.solutions.length, negativeExamples: step.counterExamples.length,
+    }))).concat(a0u1L01SnapshotSteps.map(step => ({
       lessonId: 'A0-U1-L01', stepId: step.id, positiveExamples: step.positiveExamples.length, negativeExamples: step.negativeExamples.length,
     }))),
     exampleDebt: [...EXAMPLE_DEBT_BASELINE],

@@ -56,11 +56,14 @@ export function currentStoryProgram(data: StorySlotData): ProgramBlock[] {
 }
 
 export class StoryRunAdapter implements SlotRunAdapter {
+  constructor(private readonly requireCreativeChange = false) {}
+
   private timer: ReturnType<typeof setTimeout> | null = null
   private state: EngineState = { x: 0, score: 0, running: false, frames: 0 }
   private lastJudgment: JudgmentResult | null = null
   private lastStageState: Record<string, number | string | boolean> = {
     foxX: 0,
+    audienceX: 0,
     speaker: '',
     bubble: '',
     frameIndex: 0,
@@ -79,17 +82,17 @@ export class StoryRunAdapter implements SlotRunAdapter {
     this.frames = result.frames
     this.lastSpeaker = ''
     this.lastBubble = ''
-    this.lastStageState = { foxX: 0, speaker: '', bubble: '', frameIndex: 0 }
+    this.lastStageState = { foxX: 0, audienceX: 0, speaker: '', bubble: '', frameIndex: 0 }
     if (result.frames.length === 0) {
       // 空帧直接 finished，不伪造播放；判定在 finished 事件发出前赋值。
       this.state = { x: result.foxPosition, score: result.passed ? 1 : 0, running: false, frames: 0 }
-      this.lastJudgment = buildStoryJudgment(result)
+      this.lastJudgment = this.judgmentForStep(result, data.stepIndex)
       onEvent({ kind: 'finished', state: { ...this.state } })
       return
     }
     this.state = { x: 0, score: 0, running: true, frames: 0 }
     this.emitFrame(0, onEvent)
-    this.scheduleStep(1, onEvent)
+    this.scheduleStep(1, data.stepIndex, onEvent)
   }
 
   stop(): void {
@@ -131,6 +134,7 @@ export class StoryRunAdapter implements SlotRunAdapter {
     }
     this.lastStageState = {
       foxX: frame.foxPosition,
+      audienceX: frame.audiencePosition,
       speaker: this.lastSpeaker,
       bubble: this.lastBubble,
       frameIndex: index,
@@ -139,32 +143,41 @@ export class StoryRunAdapter implements SlotRunAdapter {
     onEvent({ kind: 'frame', state: { ...this.state } })
   }
 
-  private scheduleStep(nextIndex: number, onEvent: (event: RunEvent) => void): void {
+  private scheduleStep(nextIndex: number, stepIndex: number, onEvent: (event: RunEvent) => void): void {
     this.timer = setTimeout(() => {
       this.timer = null
       if (nextIndex < this.frames.length) {
         this.emitFrame(nextIndex, onEvent)
-        this.scheduleStep(nextIndex + 1, onEvent)
+        this.scheduleStep(nextIndex + 1, stepIndex, onEvent)
       } else {
-        this.finishRun(onEvent)
+        this.finishRun(onEvent, stepIndex)
       }
     }, STORY_FRAME_MS)
   }
 
-  private finishRun(onEvent: (event: RunEvent) => void): void {
+  private judgmentForStep(result: StoryJudgeResult, stepIndex: number): JudgmentResult {
+    const judgment = buildStoryJudgment(result)
+    if (this.requireCreativeChange && result.passed && G1_U1_L01_STORY_LESSON.steps[stepIndex].kind === 'creative' && !result.hasExtension) {
+      return { ...judgment, passed: false, conclusion: '开场已经成功。请在狐狸移动之后，接上“你们准备好了吗？”再运行。' }
+    }
+    return judgment
+  }
+
+  private finishRun(onEvent: (event: RunEvent) => void, stepIndex: number): void {
     const result = this.result
     if (!result) return
     // 判定只在播放结束时赋值（Q8）：播放中 getJudgmentResult() 为旧值/null。
-    this.lastJudgment = buildStoryJudgment(result)
+    this.lastJudgment = this.judgmentForStep(result, stepIndex)
     this.state = {
       x: result.foxPosition,
-      score: result.passed ? 1 : 0,
+      score: this.lastJudgment.passed ? 1 : 0,
       running: false,
       frames: this.frames.length,
     }
     this.lastStageState = {
       ...this.lastStageState,
       foxX: result.foxPosition,
+      audienceX: result.audiencePosition,
       frameIndex: Math.max(this.frames.length - 1, 0),
     }
     onEvent({ kind: 'finished', state: { ...this.state } })

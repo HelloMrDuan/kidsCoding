@@ -42,7 +42,7 @@ describe('SYS-102 single L0–L5 maturity source', () => {
   it('L3 trial lessons point at a real route and an existing e2e spec, and are not published', () => {
     const trials = [...allCatalogIds, ...launchLessons.map((l) => l.id)].filter((id) => getLessonMaturity(id)!.trialAvailable)
     expect(trials.sort()).toEqual(Object.keys(trialIntegrations).sort())
-    expect(trials).toHaveLength(37 + g2LabLessons) // Includes five G0-U3 loop lessons.
+    expect(trials).toHaveLength(38 + g2LabLessons) // Includes five G0-U3 loop lessons and one G1 Golden story.
     for (const id of trials) {
       const m = getLessonMaturity(id)!
       expect(m.level).toBe(3)
