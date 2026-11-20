@@ -312,19 +312,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
-        timeout-minutes: 4
-        run: |
-          for attempt in 1 2; do
-            if timeout 100 npx playwright install chrome --with-deps; then
-              echo "Chrome installed on attempt $attempt"
-              exit 0
-            fi
-            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
-            sleep 5
-          done
-          echo "::error::Chrome install failed after 2 attempts"
-          exit 1
+      - name: Verify runner Google Chrome with Playwright
+        run: timeout --kill-after=5s 60s node scripts/verify-runner-chrome.mjs
       - name: Run P3-U1-L01 spec (${{ matrix.viewport }} group) with real Chrome
         timeout-minutes: 7
         env:
@@ -1079,7 +1068,7 @@ jobs:
   # 预估完整需要约 9 分钟，没有余量，所以拆开而不是放宽。
   # runs-on 固定为 ubuntu-24.04（与 OPS-029 / #505 对其他浏览器 Job 的处理一致）：`ubuntu-latest` 已迁移到 ubuntu-26.04，
   # Playwright 不支持（`playwright install chrome --with-deps` 报 "does not support ffmpeg on ubuntu26.04-x64"）。
-  # 超时预算（SYS-108）：每个 Job 15 分钟（硬限制，不是目标），预算包含所有开销：checkout + npm ci 约 20 秒 + Chrome 安装最多 4 分钟 + 测试步骤（含构建）最多 7 分钟 + 核对 1 分钟。
+  # 超时预算（SYS-108）：每个 Job 15 分钟（硬限制，不是目标），预算包含所有开销：checkout + npm ci 约 20 秒 + 预装 Chrome 探测最多 65 秒 + 测试步骤（含构建）最多 7 分钟 + 核对 1 分钟。
   g2-u3-l04-browser-trial:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -1109,19 +1098,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
-        timeout-minutes: 4
-        run: |
-          for attempt in 1 2; do
-            if timeout 100 npx playwright install chrome --with-deps; then
-              echo "Chrome installed on attempt $attempt"
-              exit 0
-            fi
-            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
-            sleep 5
-          done
-          echo "::error::Chrome install failed after 2 attempts"
-          exit 1
+      - name: Verify runner Google Chrome with Playwright
+        run: timeout --kill-after=5s 60s node scripts/verify-runner-chrome.mjs
       - name: Run G2-U3-L04 classroom spec (${{ matrix.viewport }} group) with real Chrome
         timeout-minutes: 7
         env:
@@ -1175,19 +1153,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
-        timeout-minutes: 4
-        run: |
-          for attempt in 1 2; do
-            if timeout 100 npx playwright install chrome --with-deps; then
-              echo "Chrome installed on attempt $attempt"
-              exit 0
-            fi
-            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
-            sleep 5
-          done
-          echo "::error::Chrome install failed after 2 attempts"
-          exit 1
+      - name: Verify runner Google Chrome with Playwright
+        run: timeout --kill-after=5s 60s node scripts/verify-runner-chrome.mjs
       - name: Run G2-U3-L04 real VM + real renderer matrix, shared-shell Gap A and renderer spike with real Chrome
         timeout-minutes: 7
         env:
@@ -1256,19 +1223,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
-        timeout-minutes: 4
-        run: |
-          for attempt in 1 2; do
-            if timeout 100 npx playwright install chrome --with-deps; then
-              echo "Chrome installed on attempt $attempt"
-              exit 0
-            fi
-            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
-            sleep 5
-          done
-          echo "::error::Chrome install failed after 2 attempts"
-          exit 1
+      - name: Verify runner Google Chrome with Playwright
+        run: timeout --kill-after=5s 60s node scripts/verify-runner-chrome.mjs
       - name: Run G2-U3-L05 classroom spec (${{ matrix.viewport }} group) with real Chrome
         timeout-minutes: 7
         env:
@@ -1322,19 +1278,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
-        timeout-minutes: 4
-        run: |
-          for attempt in 1 2; do
-            if timeout 100 npx playwright install chrome --with-deps; then
-              echo "Chrome installed on attempt $attempt"
-              exit 0
-            fi
-            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
-            sleep 5
-          done
-          echo "::error::Chrome install failed after 2 attempts"
-          exit 1
+      - name: Verify runner Google Chrome with Playwright
+        run: timeout --kill-after=5s 60s node scripts/verify-runner-chrome.mjs
       - name: Run G2-U3-L05 real VM matrix (virtual clock) with real Chrome
         timeout-minutes: 7
         env:
@@ -1443,9 +1388,7 @@ jobs:
   # G2-U3-L03：独立、可并行的真实 Chrome 浏览器 Job（不与 L02 共用 Job，互不影响耗时和失败）。
   # 实际运行三个 spec：真实 Scratch VM 边界矩阵、三视口课堂、共享壳内的 Gap A。不使用 continue-on-error，不跳过。
   # 超时预算（SYS-108：预算含全部开销，15 分钟是硬限制、不是目标）。CI 实测（#494 两次运行）：Job 共 448～461 秒（约 7.5 分钟），
-  # 其中测试 381～411 秒，Chrome 安装成功时 27～39 秒。Chrome 安装曾在 runner 上卡住 8～12 分钟（见 PR #471 的数据），
-  # 所以安装每次最多 100 秒（成功用时的约 3 倍）、最多 2 次，两次都失败才让 Job 失败（如实报错，不掩盖）。
-  # 最坏情况（全部可复核）：checkout、setup-node、npm ci 约 1 分钟 + 安装 2×100 秒加 5 秒间隔 = 约 3.5 分钟
+  # Ubuntu 24.04 镜像预装 Chrome。启动探测最多 60 秒，超时后 5 秒强制停止。
   # + 测试步骤上限 8 分钟（实测最慢 6.9 分钟，余量约 17%）+ 核对与上传约 0.5 分钟 = 约 13 分钟；
   # 每一步都有自己的超时，因此最坏情况也是该步骤失败，而不是被 15 分钟硬限制取消。正常情况约 7.7 分钟。
   g2-u3-l03-browser-trial:
@@ -1462,19 +1405,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - name: Install real Chrome for browser E2E (bounded attempts, fails loudly)
-        timeout-minutes: 4
-        run: |
-          for attempt in 1 2; do
-            if timeout 100 npx playwright install chrome --with-deps; then
-              echo "Chrome installed on attempt $attempt"
-              exit 0
-            fi
-            echo "::warning::Chrome install attempt $attempt failed or timed out after 100s"
-            sleep 5
-          done
-          echo "::error::Chrome install failed after 2 attempts"
-          exit 1
+      - name: Verify runner Google Chrome with Playwright
+        run: timeout --kill-after=5s 60s node scripts/verify-runner-chrome.mjs
       - name: Run G2-U3-L03 real Scratch VM matrix, three-viewport classroom and shared-shell Gap A specs with real Chrome
         timeout-minutes: 8
         env:

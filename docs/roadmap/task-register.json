@@ -4103,6 +4103,38 @@
           ]
         },
         "notes": "2026-11-18 16:12 duan 下达 Codex 接手指令：V3 Blockly 工作区专项整改现交由 Codex 独立负责；2 号暂停对共享 Blockly 工作区的并行修改，保留其分支 muse-c/v3-forest-workspace（HEAD a1894bc9）供 Codex 复用；4 号负责后续独立审核，主号负责合并部署；2 号可继续其他不冲突课程任务，但不得自行合并旧 V3 实现。Task-ID 核对：OPS-049 在建任务时确认未被占用（台账 138 条、最高 OPS-048；开放 PR 无 OPS-049；OPS-044 已预留给主号做 E2E CI 接线，不用）。OPS-048（2 号 V3 样板）已改为 blocked，由本任务接手同一范围继续实施。参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md），原型 SVG 积木与模拟运行不能作为真实产品代码。"
+    },
+    {
+        "id": "SYS-123",
+        "title": "修复共享 Chrome 安装问题：预装 Chrome 候选补丁（GitHub Ubuntu 24.04 Runner）",
+        "priority": "P0",
+        "category": "SYS",
+        "status": "merged_waiting_ci",
+        "dependencies": [
+            "SYS-108"
+        ],
+        "scope": "修复共享 Chrome 安装步骤结构缺陷：CI 在 GitHub Ubuntu 24.04 Runner 上安装 Chrome 的步骤（Install real Chrome for browser E2E）反复失败——安装步骤 timeout 100 被杀后孤儿 apt-get 占 dpkg 锁，第 2 次重试仅 sleep 5 必撞锁；实证：#558 HEAD 1066258f 的 workflow run 44443329275 中 7 个 browser-trial/vm-trial 作业全部倒在 Chrome 安装步骤（真实测试步骤均 skipped、未执行），另 scratch-touch-browser 被取消。Codex 提交预装 Chrome 候选补丁：以预装 Chrome 替代每轮 apt 安装，须以 GitHub 独立分支与独立 PR 提交，不得并入 #558；须在 GitHub Ubuntu 24.04 Runner 上实测浏览器启动、Playwright 兼容性与原有课程 E2E。禁止删除失败作业、跳过测试或仅凭本机通过宣称 CI 修复。CI 恢复后，核对 #558 最终 HEAD 全部检查结果。负责人 Codex；独立审核 4 号；集成部署主号。",
+        "acceptance": [
+            "候选补丁以 GitHub 独立分支与独立 PR 提交（不并入 #558），正文申报 Task-ID: SYS-123",
+            "在 GitHub Ubuntu 24.04 Runner 上实测：浏览器正常启动、Playwright 兼容、原有课程 E2E 通过（#558 上失败的 7 个 browser-trial/vm-trial 作业与被取消的 scratch-touch-browser 在修复 PR 的 HEAD 上全部通过）",
+            "未删除任何失败作业，未跳过任何测试；修复结论以 CI 证据为准，不以本机通过宣称",
+            "合并后主线 CI 恢复（相关 browser-trial 作业全绿），符合 SYS-108 CI 执行标准（Job ≤12 分钟、硬限 15 分钟、失败分类）",
+            "CI 恢复后核对 #558 最终 HEAD 全部检查结果并记录",
+            "4 号非作者复核 PASS 且 CI 全绿后才合并"
+        ],
+        "evidence": {
+          "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/44477711899",
+          "mergeCommit": "9c2d639dfad04eeb9f82f40492198442a91beb94",
+          "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/561",
+          "tests": [
+            "候选补丁仅将六个作业定义的有界安装步骤替换为实际 Playwright Chrome 启动探测。保留课程断言、项目矩阵、超时及失败退出。",
+            "Windows 本地使用相同 Chrome channel 启动并验证 DOM。GitHub Ubuntu 24.04 Runner 与完整课程 E2E 结果以本 PR 的 Actions 为准。",
+            "基线 run 44443329275 中 scratch-touch-browser 的 Chrome 安装步骤已成功，取消发生在课程 E2E 步骤。本 PR 保持该作业流程，并单独核对这次实际结果。",
+            "主线 CI run 44477711899（main 9c2d639d）：47 作业 46 success、0 failure；Chrome 矩阵 12 作业全部 success（g2-u3-l03、g2-u3-l04 phone/tablet/desktop/vm、g2-u3-l05 desktop/phone/tablet、p3-u1-l01 phone/tablet/desktop、scratch-touch-browser），步骤级核实为真实执行（Verify Chrome + 真实课堂 spec + 执行计数校验）。",
+            "主线 CI 未全绿：唯一取消 a1-u3-l05-check，12 分钟作业超时，旧 Install real Chrome 步骤耗时 11 分 51 秒未装完，真实 Chrome 课堂 spec 未跑到；属超时分类，非测试失败、非 Chrome 安装报错。workflow 仍有 21 处旧 Install real Chrome 步骤，仅 6 处已替换为 verify-runner-chrome 探测。"
+          ]
+        },
+        "notes": "2026-11-19 10:43 duan 下达立即处理指令：OPS-049 最新 HEAD 1066258f 产品正在最后收口、暂不合并；共享 Chrome 安装问题须立即处理。Task-ID 核对：SYS-123 在建任务时确认未被占用（台账 139 条、最高 SYS-122、OPS-049；SYS-108 已完成且为历史 CI 治理规范、不得复用；开放 PR 无 SYS-123）。实证：#558（OPS-049，Codex，分支 codex/ops-049-v3-blockly，HEAD 1066258f）61 项检查 = 50 成功 + 7 失败 + 3 跳过 + 1 取消，失败的 7 项全部倒在 Install real Chrome 步骤（run 44443329275 作业明细已核），属环境故障、非代码失败；#558 暂不合并，4 号先做非作者代码及功能预审，Codex 手机整改提交新 HEAD 后再做最终增量审核；只有 CI 通过、4 号 PASS 后才进入合并，合并后主号部署预发布。主线 CI：run 44477711899（main 9c2d639d）结论 cancelled——47 作业 46 success、0 failure，唯一取消 a1-u3-l05-check（12 分钟作业超时，旧 Chrome 安装步骤耗时 11 分 51 秒未装完）；Chrome 矩阵 12 作业在主线全部 success；workflow 仍有 21 处旧 Install real Chrome 步骤（仅 6 处已替换），待后续处理；主线未恢复前不通知 Codex 更新 #558。"
     }
   ]
 }
