@@ -1,6 +1,19 @@
-# Scratch 自由创作（OPS-050）
+# 创作中心（OPS-050）
 
-`/create` 使用 V2 应用外壳。作品页沿用 V2 变量和全屏工作区形式，并提供返回、保存和导出。Scratch 原生组件提供角色、舞台、造型、声音、积木、绿旗和停止。作品页保存和导出调用 OPS-038 的严格来源桥接，持久化完整的 `.sb3`。创作作品使用独立 IndexedDB，键为随机 UUID，保存时校验版本，避免覆盖另一窗口已保存的版本或恢复已删除的作品。课程草稿、判定和进度使用原来的路径。Python 入口保留现有实验室。
+`/create` 提供 Scratch 图形化创作、Python 代码创作和本机作品库。两个编辑器共用 V2 顶栏。Scratch 原生组件提供角色、舞台、造型、声音、积木、绿旗和停止，通过 OPS-038 桥接保存与导出完整 `.sb3`。Python 代码使用 CodeMirror 6，作品可导出或从 UTF-8 `.py` 导入。课程草稿、判定、进度及原有课堂入口沿用原来的路径。
+
+## 审核整改与本机存储
+
+- 进入编辑器、从顶栏返回、进入导入页均用文档导航。修改作品后启用浏览器原生离开确认，覆盖后退、前进、刷新、关页及站内返回。取消会保留当前编辑器。浏览器被操作系统强制终止时，只能恢复最后一次成功保存。
+- IndexedDB 按经 Supabase 核验的账号或访客分库。身份核验失败时关闭对应工作区，不回退访客库。旧版 Scratch 作品保留 ID 和 `.sb3` 内容，首次打开访客库自动迁移。登录用户可在访客库导出旧作，再以账号导入。此处是应用层本机隔离，浏览器存储没有加密或云同步。
+- 保存使用事务及版本校验，另一窗口已保存后会提示冲突，可先导出当前编辑版本。删除后旧窗口无法重新写入已删除记录。账号退出后重新登录原账号可恢复其本机列表，换设备靠作品文件迁移。
+- 独立 Chrome workflow 分开运行 Scratch 与 Python 专项，上传报告、截图及失败 trace。沿用 Ubuntu 24.04 Runner 自带 Chrome 探测。见 [#564 独立复核](https://github.com/HelloMrDuan/kidsCoding/pull/564#issuecomment-7029229158)。
+
+## Python 运行能力
+
+每次执行使用新 Worker 和独立内存文件系统。隔离 iframe 采用不透明来源及禁止联网的 CSP。父页传入锁定版本的本地 Pyodide 资源，用户代码没有网页 DOM、外部网络、作品库、用户文件或第三方依赖安装权限。`input()` 通过 JSPI 等待控制台提交，再在同一个解释器里继续运行。缺少 JSPI 的浏览器会收到提示，可用最新版 Chrome 或 Edge。
+
+初始化限时 45 秒，每个执行段限时 8 秒，等待输入限时 2 分钟。Wasm 线性内存上限 256 MiB，源文件限 UTF-8 128 KiB，输出超过 64,000 字符会截断并提示。停止、重置和超时都结束 Worker，下一次运行重新初始化。
 
 ## 构建与部署
 
@@ -21,9 +34,9 @@ SCRATCH_CREATE_GUI_URL=http://127.0.0.1:8610/host.html npm start -- --hostname 1
 npx playwright test -c playwright.scratch-create.config.ts
 ```
 
-预发布时使用两个 HTTPS 来源，在 Web 进程或现有 Web 容器启动时设置 `SCRATCH_CREATE_GUI_URL`，无需重建镜像。Scratch 宿主设置 `SCRATCH_PARENT_ORIGIN` 为 Web 的准确来源。使用 HTTPS 反向代理保留 `Content-Security-Policy: frame-ancestors`，可用 `SCRATCH_PORT`、`SCRATCH_BIND` 指定监听端口和地址。宿主与 Web 均校验窗口及来源，编辑器 iframe 不接触 KidsCoding 账户凭据。测试 Playwright 以真实 Chrome 打开独立宿主，无需拦截 GUI 响应。作品存放在当前浏览器，没有账号级隔离或跨设备同步；可通过 `.sb3` 文件转移。保存和导入上限约为 3.75 MiB，沿用课程桥接的 5 MiB base64 信封限制。
+Muse 在预发布使用两个 HTTPS 来源，在 Web 进程或容器启动时设置 `SCRATCH_CREATE_GUI_URL` 为 Scratch `host.html` 的完整 URL。Scratch 宿主设置 `SCRATCH_PARENT_ORIGIN` 为 Web 的准确来源，无路径。反向代理保留 `Content-Security-Policy: frame-ancestors`，可用 `SCRATCH_PORT`、`SCRATCH_BIND` 指定监听端口和地址。Python 依赖资源由 `npm run build` 从锁定依赖复制。代理应允许访问 `/python-create-sandbox.html` 与 `/python-create-runtime/`，并保留沙箱 CSP。Scratch `.sb3` 保存和导入上限约为 3.75 MiB，沿用课程桥接限制。课程 GUI URL 与账号设置沿用部署原值。
 
-发布后核对两个服务的版本及安全头，再走新建、两份作品、保存、刷新和 .sb3 再导入 smoke。课程的现有 GUI URL 和路由维持原配置。回滚时恢复前一个 Web 构建，即可撤下创作入口。保留本机 IndexedDB，让重新上线或导出有恢复路径。需要先提供可运行的旧版本用于导出时，可保留 Scratch 宿主和故障版本记录，不清除用户浏览器存储。
+预发布核对两个服务的版本和安全头，用两个实际账号检查作品隔离。分别在 Scratch 和 Python 执行新建、编辑、保存、刷新、导出、重新导入、再运行，并复验实际触摸设备。回滚时恢复前一个 Web 镜像，保留新旧本机 IndexedDB。回滚到只读旧库的版本前先允许新版作品导出。回撤期间旧版列表无法显示新版作品，重新上线后仍可读取。
 
 ## AGPL 与素材
 

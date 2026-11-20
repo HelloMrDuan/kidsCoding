@@ -9,17 +9,23 @@
 .works { list-style: none; margin: 0; padding: 0; }
 .works li { border-top: 1px solid var(--kc-line); padding: 12px 0; }
 .works h3 { overflow-wrap: anywhere; font-weight: 700; }
+.workInfo { min-width: 0; }
+.workMeta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; color: var(--kc-text-muted); font-size: 13px; }
+.workMeta time { margin: 0; font-size: inherit; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filters button { min-height: 44px; }
 .card .error, .notice[data-error] { color: var(--kc-danger, #d64c4c); }
 .editorShell { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; color: var(--kc-text); background: var(--kc-canvas); }
 .editorBar { flex: 0 0 52px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--kc-surface); border-bottom: 1px solid var(--kc-line); }
 .editorBar h1 { flex: 1; min-width: 0; margin: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.editorBar a { color: var(--kc-action); white-space: nowrap; }
+.editorBar a:not(.editorSecondary) { color: var(--kc-action); white-space: nowrap; }
 .editorBar span { color: var(--kc-text-muted); white-space: nowrap; font-size: 12px; }
 .editorPrimary, .editorSecondary { flex: none; padding: 8px 12px; border: 1px solid var(--kc-line); border-radius: var(--kc-radius-button); white-space: nowrap; }
 .editorPrimary { color: var(--kc-surface); background: var(--kc-action); border-color: var(--kc-action); }
 .editorSecondary { color: var(--kc-text); background: var(--kc-surface); }
 .editorBar button:disabled { opacity: .55; cursor: not-allowed; }
 .editorPane { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.editorBody:not([hidden]) { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .notice { flex: none; padding: 6px 12px; font-size: 13px; background: var(--kc-surface); border-bottom: 1px solid var(--kc-line); }
 .editorFrame { width: 100%; flex: 1; min-height: 0; border: 0; }
 .editorFrame[data-loading] { pointer-events: none; }
@@ -29,5 +35,5 @@
   .editorBar { gap: 4px; padding: 0 6px; }
   .editorBar h1 { font-size: 15px; }
   .editorBar a, .editorBar button { display: inline-flex; align-items: center; min-height: 44px; }
-  .editorBar button { padding: 6px; font-size: 12px; }
+  .editorBar :is(button, .editorSecondary) { padding: 6px; font-size: 12px; }
 }

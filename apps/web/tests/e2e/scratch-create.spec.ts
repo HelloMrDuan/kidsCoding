@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { expect, test, type FrameLocator, type Locator, type Page } from '@playwright/test'
 import JSZip from 'jszip'
+import { cancelCreateLeave } from './_fixtures/cancel-create-leave'
 
 const guiFrame = (page: Page) => page.frameLocator('iframe[title="Scratch 自由创作编辑器"]')
 const sprite = (gui: FrameLocator) => gui.getByRole('button', { name: 'TestPet', exact: true })
@@ -225,7 +226,7 @@ test('a failed IndexedDB save keeps the live project available for a retry', asy
   await page.addInitScript(() => {
     const real = IDBObjectStore.prototype.put
     IDBObjectStore.prototype.put = function (...args) {
-      if (sessionStorage.getItem('fail-save') && this.transaction.db.name === 'kidscoding-scratch-create') {
+      if (sessionStorage.getItem('fail-save') && this.transaction.db.name === 'kidscoding-create' && this.name === 'works') {
         const request = real.apply(this, args)
         this.transaction.abort()
         return request
@@ -244,6 +245,42 @@ test('a failed IndexedDB save keeps the live project available for a retry', asy
   await expect(page.getByText('已保存到本机', { exact: true })).toBeVisible()
   await page.reload()
   await expect(sprite(gui)).toBeVisible()
+})
+
+test('Scratch confirms backing out, returning, reloading and closing when a native edit is unsaved', async ({ page }) => {
+  const gui = await create(page)
+  const address = page.url()
+  await addSprite(gui)
+  await expect(page.getByText('未保存', { exact: true })).toBeVisible()
+  await cancelCreateLeave(page, () => page.evaluate(() => { setTimeout(() => history.back(), 0) }))
+  await expect(page).toHaveURL(address)
+  await expect(sprite(gui)).toBeVisible()
+  await cancelCreateLeave(page, () => page.getByTestId('studio-back').click())
+  await cancelCreateLeave(page, () => page.evaluate(() => { setTimeout(() => location.reload(), 0) }))
+  await cancelCreateLeave(page, () => page.close({ runBeforeUnload: true }))
+  await expect(sprite(gui)).toBeVisible()
+  await page.getByRole('button', { name: '保存', exact: true }).click()
+  await expect(page.getByText('已保存到本机', { exact: true })).toBeVisible()
+  await page.goBack()
+  await expect(page).toHaveURL(/\/create$/)
+  await page.goForward()
+  await expect(sprite(gui)).toBeVisible()
+})
+
+test('an older Scratch editor cannot overwrite newer saved work and can export its own version', async ({ page, context }) => {
+  const original = await create(page)
+  const other = await context.newPage()
+  await other.goto(page.url())
+  const second = guiFrame(other)
+  await expect(second.getByRole('button', { name: 'Start project' })).toBeVisible()
+  await addSprite(original)
+  await page.getByRole('button', { name: '保存', exact: true }).click()
+  await expect(page.getByText('已保存到本机', { exact: true })).toBeVisible()
+  await other.getByRole('button', { name: '保存', exact: true }).click()
+  await expect(other.getByTestId('scratch-create-status')).toContainText('另一窗口已保存')
+  expect((await exportData(other)).project.targets).toHaveLength(1)
+  await other.reload()
+  await expect(sprite(second)).toBeVisible()
 })
 
 for (const size of [{ width: 1366, height: 768 }, { width: 768, height: 1024 }, { width: 375, height: 812 }]) {

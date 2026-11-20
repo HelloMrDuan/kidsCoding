@@ -1,10 +1,10 @@
 import { defineConfig } from '@playwright/test'
 
-// A separately hosted, pinned official Scratch GUI must be running. See
-// docs/product/scratch-create/README.md for the two-origin setup.
+// Scratch cases also require the pinned GUI host. Both suites use the real
+// Chrome channel and the production Web build in CI.
 export default defineConfig({
   testDir: './tests/e2e',
-  testMatch: 'scratch-create.spec.ts',
+  testMatch: ['scratch-create.spec.ts', 'python-create.spec.ts'],
   timeout: 120_000,
   expect: { timeout: 15000 },
   workers: 2,

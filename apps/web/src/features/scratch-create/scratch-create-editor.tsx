@@ -1,38 +1,29 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { BRIDGE_PROTOCOL, BRIDGE_VERSION, ScratchBridgeClient } from '@/features/lessons/dance-show/gui-bridge'
+import { workLibrary, MAX_NAME_LENGTH, type WorkSummary } from '@/features/create/project-store'
+import { useWorkspaceSession } from '@/features/create/use-workspace-session'
+import { downloadWork, Workspace, WorkspaceLink } from '@/features/create/workspace'
 import { createBlankScratchProject } from './blank-project'
 import { scratchGuiUrl } from './gui-origin'
-import { createScratchWork, MAX_NAME_LENGTH, openScratchWork, saveScratchWork, type ScratchWork } from './project-store'
 import { readScratchImport } from './read-project'
 import styles from './scratch-create.module.css'
 
 const failText = (error: unknown) => error instanceof Error ? error.message : '操作失败，请重试。'
 
-function downloadSb3(bytes: ArrayBuffer, name: string) {
-  const url = URL.createObjectURL(new Blob([bytes], { type: 'application/zip' }))
-  const link = document.createElement('a')
-  link.href = url
-  link.download = name.replace(/[<>:"/\\|?*]/g, '_') + '.sb3'
-  document.body.append(link)
-  link.click()
-  link.remove()
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000)
-}
-
-export function ScratchCreateEditor({ id, guiAddress }: { id: string; guiAddress?: string }) {
-  const router = useRouter()
+export function ScratchCreateEditor({ id, guiAddress, owner }: { id: string; guiAddress?: string; owner: string }) {
   const address = scratchGuiUrl(guiAddress)?.href
   const isImport = id === 'import'
-  const [record, setRecord] = useState<ScratchWork | null>(null)
+  const [record, setRecord] = useState<WorkSummary | null>(null)
   const [reading, setReading] = useState(true)
   const [ready, setReady] = useState(false)
   const [busy, setBusy] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [error, setError] = useState('')
+  const [saveFailed, setSaveFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  const [storageAttempt, setStorageAttempt] = useState(0)
   const [loadedFrame, setLoadedFrame] = useState(-1)
   const frame = useRef<HTMLIFrameElement>(null)
   const file = useRef<HTMLInputElement>(null)
@@ -40,15 +31,16 @@ export function ScratchCreateEditor({ id, guiAddress }: { id: string; guiAddress
   const original = useRef<ArrayBuffer | null>(null)
   const changes = useRef(0)
   const locked = useRef(false)
+  const sessionLocked = useWorkspaceSession(owner, dirty)
 
   useEffect(() => {
     let alive = true
     const stored = isImport ? createBlankScratchProject().then((sb3) => ({
-      id, name: '导入 Scratch 作品', createdAt: 0, updatedAt: 0, revision: 0, sb3,
-    })) : openScratchWork(id)
+      id, name: '导入 Scratch 作品', createdAt: 0, updatedAt: 0, revision: 0, sb3, language: 'scratch' as const,
+    })) : workLibrary(owner).open(id, 'scratch')
     stored.then((work) => {
       if (!alive) return
-      original.current = work?.sb3 ?? null
+      original.current = work?.language === 'scratch' ? work.sb3 : null
       setRecord(work)
       if (!work) setError('此作品未保存在当前浏览器。')
     }, (err) => {
@@ -57,7 +49,7 @@ export function ScratchCreateEditor({ id, guiAddress }: { id: string; guiAddress
       if (alive) setReading(false)
     })
     return () => { alive = false }
-  }, [id, isImport])
+  }, [id, isImport, owner, storageAttempt])
 
   // Save updates the revision but doesn't change which project is mounted.
   const hasWork = Boolean(record)
@@ -96,18 +88,8 @@ export function ScratchCreateEditor({ id, guiAddress }: { id: string; guiAddress
     }
   }, [address, attempt, hasWork, loadedFrame])
 
-  useEffect(() => {
-    if (!dirty) return
-    function confirmLeave(event: BeforeUnloadEvent) {
-      event.preventDefault()
-      event.returnValue = true
-    }
-    window.addEventListener('beforeunload', confirmLeave)
-    return () => window.removeEventListener('beforeunload', confirmLeave)
-  }, [dirty])
-
   async function perform(action: (bridge: ScratchBridgeClient) => Promise<void>) {
-    if (!ready || !client.current || locked.current) return
+    if (!ready || !client.current || locked.current || sessionLocked) return
     locked.current = true
     setBusy(true)
     setError('')
@@ -120,11 +102,17 @@ export function ScratchCreateEditor({ id, guiAddress }: { id: string; guiAddress
     if (!record || isImport) return
     void perform(async (bridge) => {
       const snapshot = changes.current
-      const { sb3 } = await bridge.getProject()
-      const metadata = await saveScratchWork(record.id, record.revision, sb3)
-      setRecord({ ...metadata, sb3 })
-      original.current = sb3
-      setDirty(changes.current !== snapshot)
+      try {
+        const { sb3 } = await bridge.getProject()
+        const metadata = await workLibrary(owner).save(record.id, record.revision, { language: 'scratch', sb3 })
+        setRecord(metadata)
+        original.current = sb3
+        setSaveFailed(false)
+        setDirty(changes.current !== snapshot)
+      } catch (error) {
+        setSaveFailed(true)
+        throw error
+      }
     })
   }
 
@@ -137,31 +125,27 @@ export function ScratchCreateEditor({ id, guiAddress }: { id: string; guiAddress
       const targets = await bridge.loadProject({ format: 'sb3', data: bytes })
       if (!targets.length) throw new Error('Scratch 无法打开这个作品。')
       const projectName = (selected.name.replace(/\.sb3$/i, '').trim() || '导入的 Scratch 作品').slice(0, MAX_NAME_LENGTH)
-      const work = await createScratchWork(projectName, bytes)
-      setDirty(false)
-      router.replace('/create/scratch/' + work.id)
+      const work = await workLibrary(owner).create(projectName, { language: 'scratch', sb3: bytes })
+      window.location.replace('/create/scratch/' + work.id)
     })
   }
 
-  const saveStatus = error ? '未能保存' : dirty ? '未保存' : '已保存到本机'
+  const saveStatus = saveFailed ? '未能保存' : dirty ? '未保存' : '已保存到本机'
   return (
-    <div className={styles.editorShell}>
-      <header className={styles.editorBar}>
-        <a href="/create" data-testid="studio-back">← 返回</a>
-        <h1 data-testid="studio-title">{record?.name ?? 'Scratch 自由创作'}</h1>
-        {ready && !isImport && <span aria-live="polite">{saveStatus}</span>}
-        {record && address && (isImport ? (
+    <Workspace title={sessionLocked ? 'Scratch 创作' : record?.name ?? 'Scratch 自由创作'} status={!sessionLocked && ready && !isImport ? saveStatus : undefined}
+      actions={!sessionLocked && record && address && (isImport ? (
           <button type="button" className={styles.editorPrimary} disabled={!ready || busy} onClick={() => file.current?.click()}>导入 .sb3</button>
         ) : (
           <>
             <button type="button" className={styles.editorPrimary} disabled={!ready || busy} onClick={save}>保存</button>
+            <WorkspaceLink className={styles.editorSecondary} href="/create/scratch/import">导入 .sb3</WorkspaceLink>
             <button type="button" className={styles.editorSecondary} disabled={!ready || busy} onClick={() => void perform(async (bridge) => {
-              downloadSb3((await bridge.getProject()).sb3, record.name)
+              downloadWork((await bridge.getProject()).sb3, record.name, 'sb3')
             })}>导出 .sb3</button>
           </>
-        ))}
-      </header>
-      <main className={styles.editorPane}>
+        ))}>
+        {sessionLocked && <p role="alert" className={styles.notice}>无法确认当前身份，作品已锁定。请恢复原账号或返回创作中心。</p>}
+        <div className={styles.editorBody} hidden={sessionLocked} inert={sessionLocked}>
         <div className={styles.notice} data-testid="scratch-create-status" role={error ? 'alert' : 'status'} data-error={error ? '' : undefined}>
           {error || (!address ? 'Scratch 编辑服务尚未配置。' : reading || (record && !ready) ? '正在打开 Scratch 编辑器…' :
             busy ? '正在处理作品…' : isImport ? '选择 .sb3 文件来创建独立的本机作品。' : '作品仅保存在此浏览器。请在离开前保存，换设备时先导出。')}
@@ -171,6 +155,11 @@ export function ScratchCreateEditor({ id, guiAddress }: { id: string; guiAddress
               setAttempt((current) => current + 1)
             }}>重试加载</button>
           )}
+          {error && !record && <button className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => {
+            setError('')
+            setReading(true)
+            setStorageAttempt((current) => current + 1)
+          }}>重试读取</button>}
         </div>
         {isImport && <input type="file" accept=".sb3" hidden ref={file} onChange={importFile} />}
         {record && address && <iframe
@@ -180,7 +169,7 @@ export function ScratchCreateEditor({ id, guiAddress }: { id: string; guiAddress
           referrerPolicy="no-referrer" className={styles.editorFrame} data-loading={!ready ? '' : undefined}
           tabIndex={ready ? 0 : -1}
         />}
-      </main>
-    </div>
+        </div>
+    </Workspace>
   )
 }

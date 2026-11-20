@@ -1,5 +1,5 @@
 import JSZip from 'jszip'
-import { MAX_PROJECT_BYTES } from './project-store'
+import { MAX_PROJECT_BYTES } from '@/features/create/project-store'
 
 // JSZip exposes internalStream in browsers. Its bundled declarations only
 // expose the buffering async API and the Node stream.
