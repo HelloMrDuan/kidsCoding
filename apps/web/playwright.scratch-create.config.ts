@@ -4,7 +4,7 @@ import { defineConfig } from '@playwright/test'
 // Chrome channel and the production Web build in CI.
 export default defineConfig({
   testDir: './tests/e2e',
-  testMatch: ['scratch-create.spec.ts', 'python-create.spec.ts'],
+  testMatch: ['scratch-create.spec.ts', 'python-create.spec.ts', 'g2-golden-concert.spec.ts'],
   timeout: 120_000,
   expect: { timeout: 15000 },
   workers: 2,

@@ -54,6 +54,7 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
       { engine: 'scratch-vm', route: `/learn/scratch-lab/${id}`, e2eSpec: 'tests/e2e/scratch-g2-u1.spec.ts' } satisfies TrialIntegration,
     ]),
   ),
+  'G2-U1-L03': { engine: 'scratch-vm', route: '/learn/scratch-lab/G2-U1-L03/golden', e2eSpec: 'tests/e2e/g2-golden-concert.spec.ts' },
   'P0-U1-L01': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L01', e2eSpec: 'tests/e2e/python-lab.spec.ts' },
   'P0-U1-L02': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L02', e2eSpec: 'tests/e2e/python-multi.spec.ts' },
   'P0-U1-L03': { engine: 'pyodide', route: '/learn/python-lab/P0-U1-L03', e2eSpec: 'tests/e2e/python-multi.spec.ts' },

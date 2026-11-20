@@ -1,8 +1,9 @@
 import { createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
-import { expect, test, type FrameLocator, type Locator, type Page } from '@playwright/test'
+import { expect, test, type FrameLocator, type Page } from '@playwright/test'
 import JSZip from 'jszip'
 import { cancelCreateLeave } from './_fixtures/cancel-create-leave'
+import { drag, pickBlock } from './_fixtures/scratch-block-drag'
 
 const guiFrame = (page: Page) => page.frameLocator('iframe[title="Scratch 自由创作编辑器"]')
 const sprite = (gui: FrameLocator) => gui.getByRole('button', { name: 'TestPet', exact: true })
@@ -61,65 +62,6 @@ async function exportData(page: Page) {
     }>
   }
   return { project, file, zip }
-}
-
-async function pickBlock(gui: FrameLocator, category: RegExp, pattern: RegExp) {
-  await gui.getByRole('treeitem', { name: category }).click()
-  const block = gui.locator('.blocklyFlyout .blocklyDraggable').filter({ hasText: pattern }).first()
-  await expect(block).toBeVisible()
-  await block.scrollIntoViewIfNeeded()
-  return block
-}
-
-async function drag(page: Page, block: Locator, x: number, y: number, touch = false) {
-  // Grip the coloured block body. On Linux the text fallback can put the
-  // editable number field at the bounding-box centre, which starts editing.
-  // Wait until the category scroll has stopped and the grip is visible; an
-  // SVG block may exist while it is still clipped by the flyout.
-  const origin: { offset?: { left: number; top: number } } = {}
-  let previousPosition = ''
-  await expect.poll(async () => {
-    const grip = await block.evaluate((element) => {
-      const bounds = element.getBoundingClientRect()
-      for (const yFraction of [0.5, 0.4, 0.6]) {
-        for (const left of [8, 12, 16, 20]) {
-          const top = bounds.height * yFraction
-          const hit = document.elementFromPoint(bounds.left + left, bounds.top + top)
-          if (hit && element.contains(hit) && !hit.closest('.blocklyEditableText')) {
-            return { left, top, position: `${bounds.left},${bounds.top},${bounds.width},${bounds.height}` }
-          }
-        }
-      }
-      return null
-    })
-    const stable = grip?.position === previousPosition
-    previousPosition = grip?.position ?? ''
-    if (grip && stable) origin.offset = grip
-    return Boolean(origin.offset)
-  }, { intervals: [100, 150, 200], message: 'Wait for a stable visible block body' }).toBe(true)
-  const offset = origin.offset!
-  const bounds = (await block.boundingBox())!
-  const start = { x: bounds.x + offset.left, y: bounds.y + offset.top }
-  const end = { x: x + offset.left, y: y + offset.top - bounds.height / 2 }
-  if (!touch) {
-    await page.mouse.move(start.x, start.y)
-    await page.mouse.down()
-    await page.mouse.move(end.x, end.y, { steps: 24 })
-    await page.mouse.up()
-    return
-  }
-  const cdp = await page.context().newCDPSession(page)
-  try {
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [start] })
-    for (let n = 1; n <= 24; n++) {
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{
-        x: start.x + (end.x - start.x) * n / 24, y: start.y + (end.y - start.y) * n / 24,
-      }] })
-    }
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
-  } finally {
-    await cdp.detach()
-  }
 }
 
 async function program(page: Page, gui: FrameLocator, touch = false) {

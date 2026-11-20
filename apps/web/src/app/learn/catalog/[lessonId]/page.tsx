@@ -38,7 +38,14 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
           <h3 className="mt-6 text-lg font-black">本单元最终挑战</h3>
           <p className="mt-2 leading-8 text-slate-700">{capstone?.title ?? unit.title}</p>
         </section>
-        {trial && maturity.engine === 'scratch-vm' && lesson.id.startsWith('G2-') ? (
+        {trial && maturity.engine === 'scratch-vm' && trial.endsWith('/golden') ? (
+          <section className="rounded-[2rem] border-2 border-indigo-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black">用 Scratch 完成《{lesson.title}》</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">在原生编辑器里编写脚本，用绿旗观察舞台。完整作品可保存和导出。</p>
+            <Link data-testid="scratch-trial-entry" href={trial} className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">进入 Scratch 课堂 →</Link>
+          </section>
+        ) : null}
+        {trial && maturity.engine === 'scratch-vm' && lesson.id.startsWith('G2-') && !trial.endsWith('/golden') ? (
           <section className="rounded-[2rem] border-2 border-indigo-200 bg-white p-6 shadow-sm">
             <p className="text-xs font-bold text-indigo-700">Scratch VM 真实执行 · 受限积木编辑</p>
             <h2 className="mt-2 text-xl font-black">打开本课的原创 Scratch 项目</h2>
@@ -46,7 +53,7 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
             <Link data-testid="scratch-trial-entry" href={trial} className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">体验 Scratch VM →</Link>
           </section>
         ) : null}
-        {trial && maturity.engine === 'scratch-vm' && !lesson.id.startsWith('G2-') ? (
+        {trial && maturity.engine === 'scratch-vm' && !lesson.id.startsWith('G2-') && !trial.endsWith('/golden') ? (
           <section className="rounded-[2rem] border-2 border-indigo-200 bg-white p-6 shadow-sm">
             <p className="text-xs font-bold text-indigo-700">Scratch VM 真实执行 · 受限积木编辑</p>
             <h2 className="mt-2 text-xl font-black">运行原创流星分身 Scratch 项目</h2>

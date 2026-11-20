@@ -1,0 +1,168 @@
+import { mkdir, readFile } from 'node:fs/promises'
+import { expect, test, type FrameLocator, type Locator, type Page } from '@playwright/test'
+import JSZip from 'jszip'
+import { drag, pickBlock } from './_fixtures/scratch-block-drag'
+
+const courseUrl = '/learn/scratch-lab/G2-U1-L03/golden'
+const gui = (page: Page) => page.frameLocator('iframe[title="Scratch 完整课程编辑器"]')
+const script = (frame: FrameLocator) => frame.locator('svg.blocklySvg .blocklyBlockCanvas').first()
+const check = (page: Page) => page.getByRole('button', { name: '检查任务' })
+
+async function openCourse(page: Page) {
+  await page.goto(courseUrl)
+  await expect(check(page)).toBeEnabled({ timeout: 45_000 })
+  await expect(gui(page).getByRole('button', { name: 'Start project' })).toBeVisible()
+}
+
+async function editText(workspace: Locator, original: string, updated: string) {
+  await workspace.getByText(original, { exact: true }).click()
+  const input = gui(workspace.page()).locator('input.blocklyHtmlInput')
+  await input.fill(updated)
+  await input.press('Enter')
+  await expect(workspace.getByText(updated, { exact: true })).toBeVisible()
+}
+
+async function selectMenu(workspace: Locator, original: string, updated: string) {
+  await workspace.getByText(original, { exact: true }).click()
+  await gui(workspace.page()).getByRole('option', { name: updated, exact: true }).click()
+  await expect(workspace.getByText(updated, { exact: true })).toBeVisible()
+}
+
+async function exportProject(page: Page) {
+  const received = page.waitForEvent('download')
+  await page.getByRole('button', { name: '导出 .sb3' }).click()
+  const download = await received
+  return readFile((await download.path())!)
+}
+
+async function appendMotion(page: Page, touch: boolean) {
+  const frame = gui(page)
+  await frame.getByRole('button', { name: '小橘猫', exact: true }).click()
+  const workspace = script(frame)
+  const say = workspace.locator('[data-id="cat_say"]')
+  await expect(say).toBeVisible()
+  const source = await pickBlock(frame, /运动|Motion/, /移动.*步/)
+  const anchor = (await say.boundingBox())!
+  const palette = (await frame.locator('.blocklyFlyout').first().boundingBox())!
+  const size = (await source.boundingBox())!
+  const x = touch ? Math.max(anchor.x, palette.x + palette.width + 26) : anchor.x
+  await drag(page, source, x, anchor.y + anchor.height + size.height / 2 - 4, touch)
+  const placed = workspace.locator('.blocklyDraggable').filter({ hasText: /移动.*步/ }).last()
+  await expect(placed).toBeVisible()
+  const getNext = async () => {
+    const archive = await JSZip.loadAsync(await exportProject(page))
+    const project = JSON.parse(await archive.file('project.json')!.async('string'))
+    const blocks = project.targets.find((target: { name: string }) => target.name === '小橘猫').blocks
+    return blocks[blocks.cat_say.next]?.opcode
+  }
+  if (touch && await getNext() !== 'motion_movesteps') {
+    const movedSay = (await say.boundingBox())!
+    const unconnected = (await placed.boundingBox())!
+    await drag(page, placed, movedSay.x, movedSay.y + movedSay.height + unconnected.height / 2 - 4, true)
+  }
+  expect(await getNext()).toBe('motion_movesteps')
+}
+
+async function advance(page: Page, feedback: string) {
+  await check(page).click()
+  await expect(page.getByRole('status')).toContainText(feedback, { timeout: 25_000 })
+}
+
+for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]]) {
+  test(`G2 Golden displays native Scratch and checks the starter at ${width}×${height}`, async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: { width, height }, hasTouch: width <= 768, deviceScaleFactor: 1,
+      ...(width === 375 ? { isMobile: true } : {}),
+    })
+    try {
+      const page = await context.newPage()
+      await openCourse(page)
+      await advance(page, '夜晚森林')
+      await page.getByRole('button', { name: '收起指引' }).click()
+      await appendMotion(page, width <= 768)
+      const start = gui(page).getByRole('button', { name: 'Start project' })
+      if (width <= 768) await start.tap()
+      else await start.click()
+      await expect(gui(page).getByRole('button', { name: 'Stop project' })).toBeVisible()
+      await expect(gui(page).getByRole('region', { name: 'Stage', exact: true })).toBeVisible()
+      const hostSize = await gui(page).locator('html').evaluate(node => ({ width: node.scrollWidth, viewport: node.clientWidth }))
+      expect(hostSize.width).toBeLessThanOrEqual(hostSize.viewport)
+      if (process.env.GOLDEN_EVIDENCE_DIR) {
+        await mkdir(process.env.GOLDEN_EVIDENCE_DIR, { recursive: true })
+        await page.screenshot({ path: `${process.env.GOLDEN_EVIDENCE_DIR}/${width}x${height}.png` })
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width)
+    } finally {
+      await context.close()
+    }
+  })
+}
+
+test('G2 Golden judges native Scratch edits and opens the complete saved archive', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openCourse(page)
+  const frame = gui(page)
+  const workspace = script(frame)
+  await advance(page, '夜晚森林')
+  await page.getByRole('button', { name: '下一层提示' }).click()
+  await page.getByRole('button', { name: '下一层提示' }).click()
+  await page.getByRole('button', { name: '下一层提示' }).click()
+  await expect(page.getByText(/提示 3/)).toBeVisible()
+  await page.getByRole('button', { name: '收起指引' }).click()
+  await frame.getByLabel('Target pane').getByText('舞台', { exact: true }).click()
+  await selectMenu(workspace, '夜晚森林', '绿色草地')
+  await advance(page, '真的换成了绿色草地')
+  await page.getByRole('button', { name: '收起指引' }).click()
+  await frame.getByRole('button', { name: '小鸟', exact: true }).click()
+  await selectMenu(workspace, '叽叽', '啾啾')
+  await advance(page, '播放了啾啾')
+  await advance(page, '记录到三声开幕铃')
+  await advance(page, '响了 3 次')
+  await page.getByRole('button', { name: '收起指引' }).click()
+  await frame.getByLabel('Target pane').getByText('舞台', { exact: true }).click()
+  await editText(workspace, '3', '1')
+  await advance(page, '只响了一声')
+  await page.getByRole('button', { name: '收起指引' }).click()
+  await frame.getByRole('button', { name: '小橘猫', exact: true }).click()
+  await editText(workspace, '欢迎来到森林音乐会！', '森林的新朋友，欢迎你！')
+  await advance(page, '主持人说出了你的开场词')
+  const file = await exportProject(page)
+  const archive = await JSZip.loadAsync(file)
+  expect(Object.keys(archive.files).some(name => name.endsWith('.wav'))).toBe(true)
+  expect(Object.keys(archive.files).some(name => name.endsWith('.svg'))).toBe(true)
+  expect(await archive.file('project.json')!.async('string')).toContain('森林的新朋友，欢迎你！')
+
+  await page.reload()
+  await expect(check(page)).toBeEnabled({ timeout: 45_000 })
+  await expect(page.getByText('音乐会已完成')).toBeVisible()
+  await page.getByRole('link', { name: '返回' }).click()
+  await openCourse(page)
+  await expect(page.getByText('音乐会已完成')).toBeVisible()
+  await expect((await JSZip.loadAsync(await exportProject(page))).file('project.json')!.async('string')).resolves.toContain('森林的新朋友，欢迎你！')
+  await page.locator('input[accept=".sb3"]').setInputFiles({ name: 'saved.sb3', mimeType: 'application/octet-stream', buffer: file })
+  await expect(page.getByRole('status')).toContainText('作品已导入')
+  await advance(page, '真的换成了绿色草地')
+})
+
+test('G2 Golden reports a blocked local write and saves when retried', async ({ page }) => {
+  await openCourse(page)
+  await page.evaluate(() => {
+    const original = IDBObjectStore.prototype.put
+    IDBObjectStore.prototype.put = function (...args: Parameters<typeof original>) {
+      if (this.transaction.db.name === 'kidscoding-scratch-course-projects') {
+        IDBObjectStore.prototype.put = original
+        this.transaction.abort()
+        return {} as ReturnType<typeof original>
+      }
+      return original.apply(this, args)
+    }
+  })
+  const save = page.getByRole('button', { name: '保存', exact: true })
+  await save.click()
+  await expect(page.getByRole('alert')).toContainText('操作失败')
+  await save.click()
+  await expect(page.getByRole('status')).toContainText('作品已保存到本机')
+  await page.reload()
+  await expect(check(page)).toBeEnabled({ timeout: 45_000 })
+  await advance(page, '夜晚森林')
+})

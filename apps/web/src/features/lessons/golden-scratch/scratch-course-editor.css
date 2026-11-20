@@ -1,0 +1,14 @@
+.kc-scratch-course { min-width: 0; color: var(--kc-text); }
+.kc-scratch-course-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; border-bottom: 1px solid var(--kc-line); background: white; }
+.kc-scratch-course-toolbar h1 { font-size: 20px; font-weight: 820; }
+.kc-scratch-course-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.kc-scratch-course-status { margin: 8px 12px; font-size: 13px; }
+.kc-scratch-course-editor { position: relative; margin: 0 12px 12px; min-width: 0; border-radius: 12px; border: 1px solid var(--kc-line); background: white; overflow: hidden; }
+.kc-scratch-course-editor iframe { width: 100%; height: max(600px, calc(100dvh - 157px)); display: block; border: 0; }
+.kc-scratch-course-guide { position: absolute; z-index: 2; top: 12px; left: min(115px, 5vw); padding: 12px; width: min(330px, calc(100% - 32px)); max-height: 60dvh; overflow: auto; border: 1px solid var(--kc-line); border-radius: 12px; background: white; box-shadow: var(--kc-shadow-panel); }
+.kc-scratch-course-guide > * + * { margin-top: 9px; }
+.kc-scratch-course-guide h2 { font-weight: 820; }
+@media (max-width: 767px) {
+  .kc-scratch-course-actions button, .kc-scratch-course-actions a { min-height: 40px; }
+  .kc-scratch-course-editor { margin-inline: 6px; }
+}
