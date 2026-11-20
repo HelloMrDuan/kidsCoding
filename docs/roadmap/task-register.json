@@ -4154,6 +4154,32 @@
           ]
         },
         "notes": "2026-11-19 10:43 duan 下达立即处理指令：OPS-049 最新 HEAD 1066258f 产品正在最后收口、暂不合并；共享 Chrome 安装问题须立即处理。Task-ID 核对：SYS-123 在建任务时确认未被占用（台账 139 条、最高 SYS-122、OPS-049；SYS-108 已完成且为历史 CI 治理规范、不得复用；开放 PR 无 SYS-123）。实证：#558（OPS-049，Codex，分支 codex/ops-049-v3-blockly，HEAD 1066258f）61 项检查 = 50 成功 + 7 失败 + 3 跳过 + 1 取消，失败的 7 项全部倒在 Install real Chrome 步骤（run 44443329275 作业明细已核），属环境故障、非代码失败；#558 暂不合并，4 号先做非作者代码及功能预审，Codex 手机整改提交新 HEAD 后再做最终增量审核；只有 CI 通过、4 号 PASS 后才进入合并，合并后主号部署预发布。主线 CI：run 44477711899（main 9c2d639d）结论 cancelled——47 作业 46 success、0 failure，唯一取消 a1-u3-l05-check（12 分钟作业超时，旧 Chrome 安装步骤耗时 11 分 51 秒未装完）；Chrome 矩阵 12 作业在主线全部 success；workflow 仍有 21 处旧 Install real Chrome 步骤（仅 6 处已替换），待后续处理；主线未恢复前不通知 Codex 更新 #558。"
+    },
+    {
+      "id": "OPS-051",
+      "title": "删除左侧 Python 实验室一级菜单，自由编程统一由创作中心进入",
+      "priority": "P1",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-050"
+      ],
+      "scope": "按项目负责人 2026-11-20 指令，只删除 AppShell 左侧 CREATE 分组中的「Python 实验室」一级菜单；/learn/python-lab/* 归入「课程体系」高亮。保留 10 节 Python 教学实验的路由、草稿、评测、课程体系入口与首页卡片；Scratch 与 Python 自由编程统一经「创作中心」/create 进入。不改 V2 其他布局、颜色、字体和组件视觉。",
+      "acceptance": [
+        "左侧导航与移动抽屉不再出现「Python 实验室」，创作中心仍指向 /create 并含新建 Python 作品入口",
+        "/learn/catalog/P0-U1-L01 的「进入 Python 实验室」入口仍可打开 /learn/python-lab/P0-U1-L01，评测、草稿保存与恢复不变",
+        "/learn/python-lab/* 页面左侧高亮「课程体系」，面包屑为「课程体系」",
+        "AppShell 单测与 python-lab 真实 Chrome E2E 通过，PR CI 全绿"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/565",
+        "tests": [
+          "本地 Vitest app-shell 6/6、ESLint 改动文件 0 问题、生产构建成功；本地 Chrome for Testing 153 python-lab.spec 5/5、python-multi.spec 19/19。",
+          "本地 1440/768/375 三断点侧栏 8 项无 Python 实验室；/create 高亮创作中心，/learn/python-lab/P0-U1-L01 高亮课程体系。",
+          "tsc 基线：base 16242bb 与本 PR 均 81 条，排序清单逐行一致，改动文件 0 条。GitHub CI 以 #565 Checks 为准。"
+        ]
+      },
+      "notes": "2026-11-20 由 Notion AI 代理接手执行，基于 #564 HEAD 16242bb 堆叠。等待非作者复核（ChatGPT）与 Muse 部署；不自行合并 main。"
     }
   ]
 }
