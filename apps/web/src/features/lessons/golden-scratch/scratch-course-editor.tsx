@@ -8,6 +8,7 @@ import { readScratchImport } from '@/features/scratch-create/read-project'
 import { downloadWork, WorkspaceLink } from '@/features/create/workspace'
 import { useWorkspaceSession } from '@/features/create/use-workspace-session'
 import { loadCourseProject, saveCourseProject } from './course-project-store'
+import { sameScratchContents } from './same-scratch-contents'
 import './scratch-course-editor.css'
 
 export type ScratchGoldenActivity = {
@@ -54,7 +55,8 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
   const [result, setResult] = useState('')
   const [stepIndex, setStepIndex] = useState(0)
   const [observed, setObserved] = useState(false)
-  const [finished, setFinished] = useState(false)
+  const [achievementEarned, setAchievementEarned] = useState(false)
+  const [verified, setVerified] = useState(false)
   const [guide, setGuide] = useState(false)
   const [hint, setHint] = useState(0)
   const [prediction, setPrediction] = useState('')
@@ -78,8 +80,9 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
           revision.current = draft.revision
           setStepIndex(Math.max(0, Math.min(draft.stepIndex, course.activities.length - 1)))
           setObserved(draft.observed)
-          setFinished(draft.finished)
-          setGuide(draft.finished)
+          setAchievementEarned(draft.achievementEarned)
+          setVerified(draft.verified)
+          setGuide(draft.achievementEarned)
         }
         setInitialized(true)
       } catch (cause) {
@@ -103,6 +106,7 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
           event.data?.protocol !== BRIDGE_PROTOCOL || event.data.version !== BRIDGE_VERSION ||
           event.data.type !== 'project-changed' || event.data.requestId !== 'editor') return
       edited.current += 1
+      setVerified(false)
       setDirty(true)
       setResult('')
     }
@@ -133,16 +137,19 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
     finally { busyRef.current = false; setBusy(false) }
   }
 
-  async function save(bytes: ArrayBuffer, index: number, observation: boolean, complete: boolean, captured: number) {
+  async function save(bytes: ArrayBuffer, progress: {
+    stepIndex: number; observed: boolean; achievementEarned: boolean; verified: boolean
+  }, captured: number) {
     revision.current = await saveCourseProject(owner, course.id, {
-      archive: bytes, stepIndex: index, observed: observation, finished: complete, revision: revision.current,
+      archive: bytes, ...progress, revision: revision.current,
     })
     initialArchive.current = bytes
     setDirty(edited.current !== captured)
+    setVerified(progress.verified && edited.current === captured)
   }
 
   function check() {
-    if (!finished && step.prediction && !prediction) {
+    if (!verified && step.prediction && !prediction) {
       setGuide(true)
       setResult('先选择你的预测，再检查实际运行。')
       return
@@ -155,12 +162,16 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
       if (captured !== edited.current) throw new Error('检查期间发现积木又改了。请用新的作品再检查。')
       const nextObserved = observed || !!outcome.observed
       const nextStep = outcome.passed && stepIndex < course.activities.length - 1 ? stepIndex + 1 : stepIndex
-      const allDone = finished || (outcome.passed && stepIndex === course.activities.length - 1)
-      if (outcome.passed || nextObserved !== observed) {
-        await save(bytes, nextStep, nextObserved, allDone, captured)
+      const checked = outcome.passed && stepIndex === course.activities.length - 1
+      const earned = achievementEarned || checked
+      if (!outcome.passed) setVerified(false)
+      if (outcome.passed || nextObserved !== observed || verified) {
+        await save(bytes, {
+          stepIndex: nextStep, observed: nextObserved, achievementEarned: earned, verified: checked,
+        }, captured)
         setStepIndex(nextStep)
         setObserved(nextObserved)
-        setFinished(allDone)
+        setAchievementEarned(earned)
         if (outcome.passed) {
           setHint(0)
           setPrediction('')
@@ -179,11 +190,11 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
     void act(async client => {
       const bytes = await readScratchImport(picked)
       if (!(await client.loadProject({ format: 'sb3', data: bytes })).length) throw new Error('导入的作品缺少有效舞台。')
+      setVerified(false)
       setDirty(true)
-      await save(bytes, 0, false, false, edited.current)
       setStepIndex(0)
       setObserved(false)
-      setFinished(false)
+      await save(bytes, { stepIndex: 0, observed: false, achievementEarned, verified: false }, edited.current)
       setHint(0)
       setPrediction('')
       setResult('作品已导入。请从第一个目标开始验证。')
@@ -193,13 +204,17 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
   return (
     <main className="kc-scratch-course">
       <header className="kc-scratch-course-toolbar">
-        <div><h1>{course.title}</h1><p>第 {stepIndex + 1} / {course.activities.length} 关 · {step.title} · {dirty ? '有改动未保存' : '本机作品'}</p></div>
+        <div><h1>{course.title}</h1><p>第 {stepIndex + 1} / {course.activities.length} 关 · {step.title} · {dirty ? '有改动未保存' : '本机作品'}{achievementEarned && (verified ? ' · 当前作品已通过检查' : ' · 当前作品待重新检查')}</p></div>
         <div className="kc-scratch-course-actions">
           <WorkspaceLink href={`/learn/catalog/${course.id}`} className="kc-action-surface kc-btn-outline kc-btn-sm">返回</WorkspaceLink>
           <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" onClick={() => setGuide(v => !v)} aria-expanded={guide}>任务指引</button>
           <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" disabled={!canEdit} onClick={() => void act(async client => {
             const captured = edited.current
-            await save((await client.getProject()).sb3, stepIndex, observed, finished, captured)
+            const { sb3 } = await client.getProject()
+            const bytes = await readScratchImport(new File([sb3], course.id + '.sb3'))
+            const previous = initialArchive.current
+            const sameArchive = verified && previous !== null && await sameScratchContents(previous, bytes)
+            await save(bytes, { stepIndex, observed, achievementEarned, verified: sameArchive }, captured)
             setResult('作品已保存到本机。')
           })}>保存</button>
           <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" disabled={!canEdit} onClick={() => importInput.current?.click()}>导入 .sb3</button>
@@ -221,19 +236,18 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
         {guide && <aside className="kc-scratch-course-guide" aria-label="任务指引">
           <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setGuide(false)}>收起指引</button>
           <p>{course.story}</p>
-          <h2>{finished ? course.completionTitle : step.title}</h2>
-          {finished ? <>
-            <p>本机成就 · {course.badge}</p>
-            {course.nextLessonId && <WorkspaceLink href={`/learn/catalog/${course.nextLessonId}`} className="kc-action-surface kc-btn-outline kc-btn-sm">下一课</WorkspaceLink>}
-          </> : <p>{step.goal}</p>}
-          {!finished && step.prediction && <label className="kc-scratch-course-prediction">
+          <h2>{verified ? course.completionTitle : step.title}</h2>
+          {achievementEarned && <p>历史成就 · {course.badge}</p>}
+          {verified && course.nextLessonId && <WorkspaceLink href={`/learn/catalog/${course.nextLessonId}`} className="kc-action-surface kc-btn-outline kc-btn-sm">下一课</WorkspaceLink>}
+          {!verified && <p>{step.goal}</p>}
+          {!verified && step.prediction && <label className="kc-scratch-course-prediction">
             {step.prediction.question}
             <select value={prediction} onChange={event => setPrediction(event.target.value)}>
               <option value="">选择你的预测</option>
               {step.prediction.choices.map(choice => <option key={choice}>{choice}</option>)}
             </select>
           </label>}
-          {!finished && <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" disabled={hint >= step.hints.length} onClick={() => setHint(n => n + 1)}>下一层提示</button>}
+          {!verified && <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" disabled={hint >= step.hints.length} onClick={() => setHint(n => n + 1)}>下一层提示</button>}
           {step.hints.slice(0, hint).map((line, index) => <p key={line}>提示 {index + 1} · {line}</p>)}
         </aside>}
       </div>
