@@ -170,4 +170,10 @@ test.describe('Scratch 自由创作工坊', () => {
     await page.waitForURL(`${HUB}`)
     await expect(page.getByTestId('free-create-hub')).toBeVisible()
   })
+
+  test('学习中心的“查看工作台”直达工坊，不再指向单节试玩课', async ({ page }) => {
+    await page.goto('/')
+    const card = page.getByTestId('home-track-scratch')
+    await expect(card.getByRole('link', { name: /查看工作台/ })).toHaveAttribute('href', HUB)
+  })
 })
