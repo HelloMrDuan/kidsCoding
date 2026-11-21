@@ -9,12 +9,10 @@ export type WorkData = { language: 'scratch'; sb3: ArrayBuffer } | { language: '
 export type WorkSummary = { id: string; name: string; language: WorkLanguage; createdAt: number; updatedAt: number; revision: number }
 export type Work = Omit<WorkSummary, 'language'> & WorkData
 type StoredWork = Work & { owner: string }
-type LegacyWork = Omit<WorkSummary, 'language'> & { sb3: ArrayBuffer }
 const DATABASE = 'kidscoding-create'
 const STORE = 'works'
 /** Retired standalone workshop (/studio/scratch/free). Read-only source. */
 const LEGACY_FREE_DATABASE = 'kidscoding-free-create'
-type LegacyFreeWork = { id: string; name: string; sb3: ArrayBuffer; savedAt?: number }
 
 function open(name: string, upgrade: (db: IDBDatabase) => void) {
   return new Promise<IDBDatabase>((resolve, reject) => {
@@ -54,67 +52,149 @@ async function transact<T>(db: IDBDatabase, stores: string | string[], mode: IDB
   }
 }
 
-let guestImported = false
-async function importLegacyGuestWorks(db: IDBDatabase) {
-  if (guestImported) return
-  const marker = 'scratch-library-v1'
-  if (!await transact(db, 'meta', 'readonly', (tx) => result(tx.objectStore('meta').get(marker)))) {
-    const old = await open('kidscoding-scratch-create', (database) => database.createObjectStore('projects', { keyPath: 'id' }))
-    let works: LegacyWork[]
-    try { works = await transact(old, 'projects', 'readonly', (tx) => result(tx.objectStore('projects').getAll())) }
-    finally { old.close() }
-    await transact(db, ['meta', STORE], 'readwrite', async (tx) => {
-      const meta = tx.objectStore('meta')
-      if (await result(meta.get(marker))) return
-      const store = tx.objectStore(STORE)
-      for (const work of works) store.add({ ...work, owner: 'guest', language: 'scratch' })
-      await result(meta.put(true, marker))
-    })
-  }
-  await importLegacyFreeCreateWorks(db)
-  guestImported = true
+/**
+ * Legacy libraries retired by OPS-050. They are read-only sources: the
+ * unified library never creates, rewrites or deletes them.
+ *
+ * The migration marker stores a SIGNATURE of the legacy contents (row count
+ * + newest timestamp) rather than a boolean. A work saved later — the old
+ * tab writes its first work after the user already visited /create, or
+ * the browser has no indexedDB.databases() — changes the signature and is
+ * imported on the next listing. A boolean marker would hide it forever.
+ */
+const LEGACY_LIBRARIES = [
+  { database: 'kidscoding-scratch-create', store: 'projects', marker: 'scratch-library-v1' },
+  { database: LEGACY_FREE_DATABASE, store: 'projects', marker: 'free-create-v1' },
+] as const
+
+type LegacyRecord = {
+  id: string
+  name: string
+  sb3: unknown
+  savedAt?: unknown
+  createdAt?: unknown
+  updatedAt?: unknown
+  revision?: unknown
 }
 
 /**
- * One-time, non-destructive handoff of the retired /studio/scratch/free
- * library (`kidscoding-free-create` / `projects`) into the unified guest
- * library. The legacy database is only read, never deleted or modified, so
- * an interrupted migration can be retried from the same data. Works keep
- * their old id, which lets old deep links resolve after the redirect.
+ * Open a database that is only READ, never created. IndexedDB has no
+ * "open existing" call, so opening a missing database fires
+ * `onupgradeneeded`; aborting that version-change transaction rolls the
+ * creation back. A migration probe therefore never leaves an empty legacy
+ * database behind (and cannot make "the old library exists" true itself).
  */
-async function importLegacyFreeCreateWorks(db: IDBDatabase) {
-  const marker = 'free-create-v1'
-  if (await transact(db, 'meta', 'readonly', (tx) => result(tx.objectStore('meta').get(marker)))) return
-  const works = await readLegacyFreeWorks()
-  if (works === null) return
-  await transact(db, ['meta', STORE], 'readwrite', async (tx) => {
-    const meta = tx.objectStore('meta')
-    if (await result(meta.get(marker))) return
-    const store = tx.objectStore(STORE)
-    for (const work of works) {
-      if (!isLegacyFreeWork(work)) continue
-      if (await result(store.get(['guest', work.id]))) continue
-      const stamp = typeof work.savedAt === 'number' && work.savedAt > 0 ? work.savedAt : Date.now()
-      store.put({
-        owner: 'guest',
-        id: work.id,
-        name: legacyWorkName(work.name),
-        language: 'scratch',
-        sb3: work.sb3,
-        createdAt: stamp,
-        updatedAt: stamp,
-        revision: 0,
-      } satisfies StoredWork)
+function openExisting(name: string) {
+  return new Promise<IDBDatabase | null>((resolve) => {
+    if (typeof indexedDB === 'undefined') { resolve(null); return }
+    const request = indexedDB.open(name)
+    request.onupgradeneeded = () => {
+      try { request.transaction?.abort() } catch { /* The transaction already closed. */ }
     }
-    await result(meta.put(true, marker))
+    request.onerror = () => resolve(null)
+    request.onsuccess = () => resolve(request.result)
   })
 }
 
-function isLegacyFreeWork(value: unknown): value is LegacyFreeWork {
+function legacyArchive(value: unknown): ArrayBuffer | null {
+  if (value instanceof ArrayBuffer) return value.byteLength > 0 ? value : null
+  if (ArrayBuffer.isView(value) && value.byteLength > 0) {
+    return (value.buffer as ArrayBuffer).slice(value.byteOffset, value.byteOffset + value.byteLength)
+  }
+  return null
+}
+
+function legacyStamp(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null
+}
+
+function isLegacyRecord(value: unknown): value is LegacyRecord {
   if (!value || typeof value !== 'object') return false
-  const work = value as Partial<LegacyFreeWork>
-  return typeof work.id === 'string' && work.id.length > 0 && typeof work.name === 'string' &&
-    work.sb3 instanceof ArrayBuffer && work.sb3.byteLength > 0
+  const work = value as Partial<LegacyRecord>
+  return typeof work.id === 'string' && work.id.length > 0 &&
+    typeof work.name === 'string' && legacyArchive(work.sb3) !== null
+}
+
+function normalizeLegacyWork(record: LegacyRecord): StoredWork | null {
+  const sb3 = legacyArchive(record.sb3)
+  if (!sb3) return null
+  const created = legacyStamp(record.createdAt) ?? legacyStamp(record.savedAt) ?? Date.now()
+  const updated = legacyStamp(record.updatedAt) ?? legacyStamp(record.savedAt) ?? created
+  const revision = typeof record.revision === 'number' && Number.isFinite(record.revision) && record.revision >= 0 ? record.revision : 0
+  return {
+    owner: 'guest',
+    id: record.id,
+    name: legacyWorkName(record.name),
+    language: 'scratch',
+    sb3,
+    createdAt: created,
+    updatedAt: updated,
+    revision,
+  }
+}
+
+function legacySignature(records: unknown[]) {
+  let newest = 0
+  for (const record of records) {
+    if (!record || typeof record !== 'object') continue
+    for (const key of ['savedAt', 'createdAt', 'updatedAt'] as const) {
+      const stamp = legacyStamp((record as Record<string, unknown>)[key])
+      if (stamp !== null && stamp > newest) newest = stamp
+    }
+  }
+  return `${records.length}:${newest}`
+}
+
+async function readLegacyRecords(library: (typeof LEGACY_LIBRARIES)[number]) {
+  const db = await openExisting(library.database)
+  if (!db) return null
+  try {
+    if (!db.objectStoreNames.contains(library.store)) return null
+    return await transact<unknown[]>(db, library.store, 'readonly', (tx) => result(tx.objectStore(library.store).getAll()))
+  } finally { db.close() }
+}
+
+/**
+ * Copy one legacy library into the guest library. The copy is idempotent:
+ * an existing unified work with the same owner and id is never overwritten,
+ * and the signature marker is written only after a complete successful
+ * pass, so an interrupted migration is retried instead of marked done.
+ */
+async function syncLegacyLibrary(db: IDBDatabase, library: (typeof LEGACY_LIBRARIES)[number]): Promise<'absent' | 'synced' | 'failed'> {
+  try {
+    const records = await readLegacyRecords(library)
+    if (records === null) return 'absent'
+    const signature = legacySignature(records)
+    const marker = await transact(db, 'meta', 'readonly', (tx) => result(tx.objectStore('meta').get(library.marker)))
+    if (marker === signature) return 'synced'
+    const works = records.map((record) => (isLegacyRecord(record) ? normalizeLegacyWork(record) : null))
+      .filter((work): work is StoredWork => work !== null)
+    await transact(db, ['meta', STORE], 'readwrite', async (tx) => {
+      const meta = tx.objectStore('meta')
+      const store = tx.objectStore(STORE)
+      for (const work of works) {
+        if (await result(store.get([work.owner, work.id]))) continue
+        store.put(work)
+      }
+      await result(meta.put(signature, library.marker))
+    })
+    return 'synced'
+  } catch {
+    return 'failed'
+  }
+}
+
+/**
+ * Page-session hint only. Listing always rescans (`force`), so a work that
+ * appears after the first render is picked up on the next listing — the hub
+ * re-lists on mount, focus and pageshow. Other operations skip the rescan
+ * once a scan has fully succeeded; a failed scan never latches.
+ */
+let guestLibrarySynced = false
+async function syncLegacyGuestLibraries(db: IDBDatabase, force: boolean) {
+  if (guestLibrarySynced && !force) return
+  const states = await Promise.all(LEGACY_LIBRARIES.map((library) => syncLegacyLibrary(db, library)))
+  guestLibrarySynced = states.every((state) => state !== 'failed')
 }
 
 function legacyWorkName(name: string) {
@@ -122,25 +202,13 @@ function legacyWorkName(name: string) {
   return clean.length > MAX_NAME_LENGTH ? clean.slice(0, MAX_NAME_LENGTH) : clean
 }
 
-function legacyDatabaseExists() {
-  const api = indexedDB as IDBFactory & { databases?: () => Promise<{ name?: string }[]> }
-  return typeof api.databases === 'function' ? api.databases().then((items) => items.some((item) => item.name === LEGACY_FREE_DATABASE)) : Promise.resolve(true)
-}
-
-async function readLegacyFreeWorks(): Promise<LegacyFreeWork[] | null> {
-  if (typeof indexedDB === 'undefined' || !await legacyDatabaseExists()) return null
-  const db = await open(LEGACY_FREE_DATABASE, (database) => database.createObjectStore('projects', { keyPath: 'id' }))
+async function readLegacyFreeWork(id: string): Promise<LegacyRecord | null> {
+  const db = await openExisting(LEGACY_FREE_DATABASE)
+  if (!db) return null
   try {
-    return await transact<LegacyFreeWork[]>(db, 'projects', 'readonly', (tx) => result(tx.objectStore('projects').getAll()))
-  } finally { db.close() }
-}
-
-async function readLegacyFreeWork(id: string): Promise<LegacyFreeWork | null> {
-  if (typeof indexedDB === 'undefined' || !await legacyDatabaseExists()) return null
-  const db = await open(LEGACY_FREE_DATABASE, (database) => database.createObjectStore('projects', { keyPath: 'id' }))
-  try {
-    const work = await transact<LegacyFreeWork | undefined>(db, 'projects', 'readonly', (tx) => result(tx.objectStore('projects').get(id)))
-    return isLegacyFreeWork(work) ? work : null
+    if (!db.objectStoreNames.contains('projects')) return null
+    const work = await transact<unknown>(db, 'projects', 'readonly', (tx) => result(tx.objectStore('projects').get(id)))
+    return isLegacyRecord(work) ? work : null
   } finally { db.close() }
 }
 
@@ -162,6 +230,8 @@ export async function adoptLegacyFreeCreateWork(owner: string, legacyId: string)
 
   const work = await readLegacyFreeWork(legacyId)
   if (!work) return null
+  const sb3 = legacyArchive(work.sb3)
+  if (!sb3) return null
 
   const target = await open(DATABASE, (database) => {
     database.createObjectStore(STORE, { keyPath: ['owner', 'id'] }).createIndex('owner', 'owner')
@@ -172,13 +242,13 @@ export async function adoptLegacyFreeCreateWork(owner: string, legacyId: string)
       const store = tx.objectStore(STORE)
       const again: StoredWork | undefined = await result(store.get([owner, legacyId]))
       if (again) return summary(again)
-      const stamp = typeof work.savedAt === 'number' && work.savedAt > 0 ? work.savedAt : Date.now()
+      const stamp = legacyStamp(work.savedAt) ?? Date.now()
       const adopted: StoredWork = {
         owner,
         id: work.id,
         name: legacyWorkName(work.name),
         language: 'scratch',
-        sb3: work.sb3,
+        sb3,
         createdAt: stamp,
         updatedAt: stamp,
         revision: 0,
@@ -192,13 +262,13 @@ export async function adoptLegacyFreeCreateWork(owner: string, legacyId: string)
 export function workLibrary(owner: string) {
   if (owner !== 'guest' && !owner.startsWith('user:')) throw new Error('请重新确认当前账号。')
 
-  async function withStore<T>(mode: IDBTransactionMode, act: (store: IDBObjectStore) => Promise<T>) {
+  async function withStore<T>(mode: IDBTransactionMode, act: (store: IDBObjectStore) => Promise<T>, forceSync = false) {
     const db = await open(DATABASE, (database) => {
       database.createObjectStore(STORE, { keyPath: ['owner', 'id'] }).createIndex('owner', 'owner')
       database.createObjectStore('meta')
     })
     try {
-      if (owner === 'guest') await importLegacyGuestWorks(db)
+      if (owner === 'guest') await syncLegacyGuestLibraries(db, forceSync)
       return await transact(db, STORE, mode, (tx) => act(tx.objectStore(STORE)))
     } finally { db.close() }
   }
@@ -212,6 +282,8 @@ export function workLibrary(owner: string) {
   }
 
   return {
+    // A listing is the moment the user looks at their works: always rescan
+    // the legacy libraries so a work saved after the first render appears.
     list: () => withStore('readonly', (store) => new Promise<WorkSummary[]>((resolve, reject) => {
       const items: WorkSummary[] = []
       const request = store.index('owner').openCursor(owner)
@@ -222,7 +294,7 @@ export function workLibrary(owner: string) {
         items.push(summary(cursor.value))
         cursor.continue()
       }
-    })),
+    }), true),
     open: (id: string, language: WorkLanguage) => withStore('readonly', async (store) => {
       const work: StoredWork | undefined = await result(store.get([owner, id]))
       return work?.language === language ? work : null

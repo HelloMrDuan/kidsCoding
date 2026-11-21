@@ -15,8 +15,7 @@ const CREATE_HUB = '/create'
 const LEGACY_HUB = '/studio/scratch/free'
 const SAMPLE_PATH = resolve(process.cwd(), 'public/scratch-samples/meteor-clones.sb3')
 
-async function seedLegacyWork(page: Page, id: string, name: string, bytes: Buffer) {
-  await page.goto('/')
+async function putLegacyWork(page: Page, id: string, name: string, bytes: Buffer) {
   await page.evaluate(
     async ({ id, name, data }) => {
       await new Promise<void>((resolve, reject) => {
@@ -44,6 +43,11 @@ async function seedLegacyWork(page: Page, id: string, name: string, bytes: Buffe
     },
     { id, name, data: [...bytes] },
   )
+}
+
+async function seedLegacyWork(page: Page, id: string, name: string, bytes: Buffer) {
+  await page.goto('/')
+  await putLegacyWork(page, id, name, bytes)
 }
 
 test.describe('统一创作入口', () => {
@@ -122,6 +126,58 @@ test.describe('统一创作入口', () => {
     await expect(
       page.getByRole('link', { name: /创作中心（统一入口/ }),
     ).toHaveAttribute('href', CREATE_HUB)
+  })
+
+  test('旧库先为空、第一份作品稍后出现时，同一次访问内仍会同步', async ({ page }) => {
+    const sample = await readFile(SAMPLE_PATH)
+    // The retired library exists but has no works yet.
+    await page.goto('/')
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve, reject) => {
+          const request = indexedDB.open('kidscoding-free-create', 1)
+          request.onupgradeneeded = () => {
+            const db = request.result
+            if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects', { keyPath: 'id' })
+          }
+          request.onerror = () => reject(request.error)
+          request.onsuccess = () => { request.result.close(); resolve() }
+        }),
+    )
+    await page.goto(CREATE_HUB)
+    await expect(page.getByText('这里还没有作品。')).toBeVisible()
+
+    // The old tab saves its first work without reloading /create.
+    await putLegacyWork(page, 'legacy-free-create-003', '同一次访问里出现的作品', sample)
+    // The hub re-lists on focus, in the same document and IndexedDB session.
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await expect(
+      page.getByTestId('scratch-work-row').filter({ hasText: '同一次访问里出现的作品' }),
+    ).toBeVisible()
+  })
+
+  test('旧库不存在时，迁移检查不会创建旧数据库，也不会写迁移标记', async ({ page }) => {
+    await page.goto(CREATE_HUB)
+    await expect(page.getByRole('heading', { name: '创作中心' })).toBeVisible()
+    await expect(page.getByText('这里还没有作品。')).toBeVisible()
+    const state = await page.evaluate(async () => {
+      const names = (await indexedDB.databases()).map((database) => database.name)
+      const markers = await new Promise<string[]>((resolve, reject) => {
+        const request = indexedDB.open('kidscoding-create')
+        request.onerror = () => reject(request.error)
+        request.onsuccess = () => {
+          const db = request.result
+          const keys = db.transaction('meta', 'readonly').objectStore('meta').getAllKeys()
+          keys.onsuccess = () => { db.close(); resolve(keys.result.map(String)) }
+          keys.onerror = () => reject(keys.error)
+        }
+      })
+      return { names, markers }
+    })
+    expect(state.names).not.toContain('kidscoding-free-create')
+    expect(state.names).not.toContain('kidscoding-scratch-create')
+    expect(state.markers).not.toContain('free-create-v1')
+    expect(state.markers).not.toContain('scratch-library-v1')
   })
 
   test('768px 与 375px 下创作中心不横向溢出', async ({ page }) => {
