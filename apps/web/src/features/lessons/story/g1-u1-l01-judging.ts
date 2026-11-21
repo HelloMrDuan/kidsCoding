@@ -121,7 +121,6 @@ export function judgeStoryProgram(
   const positions = { fox: 0, audience: 0 }
   let greetingDone = false
   let movedAfterGreeting = false
-  let movedAny = false
   let seenSay = false
   let hasExtension = false
   const log: string[] = []
@@ -138,7 +137,7 @@ export function judgeStoryProgram(
     if (block.type === 'say_line') {
       seenSay = true
       const text = resolveSayText(block.line, choices)
-      if (movedAny) hasExtension = true
+      if (movedAfterGreeting && text === '你们准备好了吗？') hasExtension = true
       if (actor !== 'fox' && !greetingDone) {
         frames.push({ kind: 'say', actor, text, foxPosition: positions.fox, audiencePosition: positions.audience })
         return fail('wrong_actor', '对白给错人：开场对白必须属于狐狸', snapshot())
@@ -165,8 +164,7 @@ export function judgeStoryProgram(
       frames.push({ kind: 'say', actor, text, foxPosition: positions.fox, audiencePosition: positions.audience })
     } else if (block.type === 'move_right') {
       positions[actor] += STORY_MOVE_STEP
-      movedAny = true
-      if (greetingDone) movedAfterGreeting = true
+      if (greetingDone && actor === 'fox') movedAfterGreeting = true
       log.push(`${actorLabel(actor)}移动到${positions[actor]}`)
       frames.push({ kind: 'move', actor, foxPosition: positions.fox, audiencePosition: positions.audience })
     } else if (block.type === 'switch_character') {

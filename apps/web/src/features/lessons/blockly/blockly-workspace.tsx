@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import * as Blockly from 'blockly'
 import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 
@@ -100,6 +100,39 @@ export type DockedBlocklyOptions = {
   /** A changed key selects a fresh default category without remounting the engine. */
   stepKey: string
   preferredBlock?: string
+}
+
+/**
+ * The "point to add / delete / keyboard" tools panel. Docked V3 lessons keep it
+ * collapsed under a plain summary; Golden lessons can expand it from a labelled
+ * summary; legacy lessons keep the always-visible header row.
+ */
+function BlocklyToolsPanel({ mode, children }: { mode: 'docked' | 'golden' | 'legacy'; children: ReactNode }) {
+  if (mode === 'docked') {
+    return (
+      <details className="kc-v3-assist">
+        <summary>点按添加 · 删除 · 键盘</summary>
+        <div className="kc-v3-assist-content">{children}</div>
+      </details>
+    )
+  }
+  if (mode === 'golden') {
+    return (
+      <details className="rounded-[8px] border border-[#e8eef8] bg-[#f3f6fc] p-3">
+        <summary className="cursor-pointer text-sm font-bold" data-testid="golden-block-tools">辅助工具 · 点按添加或编辑积木</summary>
+        {children}
+      </details>
+    )
+  }
+  return (
+    <div className="rounded-[8px] border border-[#e8eef8] bg-[#f3f6fc] p-3">
+      <div className="flex items-center justify-between gap-3">
+        <b className="text-[12px]">本节可用积木</b>
+        <span className="kc-text-muted text-[11px]">不会拖也可以点按钮</span>
+      </div>
+      {children}
+    </div>
+  )
 }
 
 /**
@@ -269,6 +302,8 @@ export function BlocklyWorkspace({
   sayLineChoices,
   motionVerb = 'walk',
   docked,
+  layoutMode = 'legacy',
+  highlightIndex,
 }: {
   allowedBlocks: string[]
   blocks: BlockSnapshot[]
@@ -281,6 +316,9 @@ export function BlocklyWorkspace({
   /** TQ-009: the butterfly flies, so its move/repeat blocks say “飞”. */
   motionVerb?: MotionVerb
   docked?: DockedBlocklyOptions
+  layoutMode?: 'legacy' | 'golden'
+  /** Position in the connected program, with the event hat at index zero. */
+  highlightIndex?: number
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const flyoutColumnRef = useRef<HTMLDivElement | null>(null)
@@ -401,12 +439,13 @@ export function BlocklyWorkspace({
     showFromTopRef.current = () => scheduleFit(true)
 
     const handleResize = () => {
+      if (layoutMode === 'golden' && (!mountRef.current?.offsetWidth || workspace.isDragging())) return
       const flyout = workspace.getFlyout()
       if (flyout instanceof DockedFlyout && flyoutColumnRef.current) {
         flyout.reservedWidth = flyoutColumnRef.current.offsetWidth
       }
       Blockly.svgResize(workspace)
-      scheduleFit()
+      if (layoutMode === 'legacy' || pendingFromTop) scheduleFit()
     }
 
     let previousSnapshot = JSON.stringify(latestBlocksRef.current)
@@ -423,9 +462,10 @@ export function BlocklyWorkspace({
         previousSnapshot = key
         const notifySnapshot = injectionSnapshotHandler ?? setupRef.current.onSnapshotChange
         notifySnapshot(next)
-        scheduleFit()
+        if (layoutMode === 'legacy') scheduleFit()
       } else if (event?.type === Blockly.Events.BLOCK_DRAG && !(event as Blockly.Events.BlockDrag).isStart) {
-        scheduleFit()
+        if (layoutMode === 'legacy') scheduleFit()
+        else handleResize()
       }
     }
 
@@ -453,7 +493,7 @@ export function BlocklyWorkspace({
       lastSelectedBlockIdRef.current = null
     }
     // choicesKey re-injects when the lesson's preset lines change (snapshotOf only reads refs).
-  }, [injectionBlocks, injectionSnapshotHandler, choicesKey, motionVerb, isDocked])
+  }, [injectionBlocks, injectionSnapshotHandler, choicesKey, motionVerb, isDocked, layoutMode])
 
   useEffect(() => {
     if (!isDocked) return
@@ -466,6 +506,15 @@ export function BlocklyWorkspace({
     Blockly.svgResize(workspace)
     showFromTopRef.current?.()
   }, [isDocked, selectedCategory, motionVerb, choicesKey])
+
+  useEffect(() => {
+    if (layoutMode !== 'golden') return
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    let block: Blockly.Block | null = highlightIndex === undefined ? null : workspace.getTopBlocks(true)[0] ?? null
+    for (let index = 0; block && index < (highlightIndex ?? 0); index += 1) block = block.getNextBlock()
+    workspace.highlightBlock(block?.id ?? null)
+  }, [highlightIndex, layoutMode])
 
   function addBlock(type: string) {
     const workspace = workspaceRef.current
@@ -612,19 +661,15 @@ export function BlocklyWorkspace({
       <div className={isDocked ? 'kc-v3-engine' : 'isolate overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white'}>
         <div
           ref={mountRef}
-          className={isDocked ? 'kc-v3-engine-mount' : 'relative h-[420px] overflow-hidden bg-white'}
+          className={isDocked
+            ? 'kc-v3-engine-mount'
+            : `relative overflow-hidden bg-white ${layoutMode === 'golden' ? 'kc-golden-blockly-mount' : 'h-[420px]'}`}
         />
       </div>
       {/* UX-203: host for the keyboard-navigation "/" help popup (empty until opened). */}
       <div id="shortcuts" className={isDocked ? 'kc-v3-shortcuts' : undefined} />
 
-      <details className={isDocked ? 'kc-v3-assist' : undefined} open={isDocked ? undefined : true}>
-        <summary className={isDocked ? undefined : 'hidden'}>点按添加 · 删除 · 键盘</summary>
-        <div className={isDocked ? 'kc-v3-assist-content' : 'rounded-[8px] border border-[#e8eef8] bg-[#f3f6fc] p-3'}>
-        {!isDocked && <div className="flex items-center justify-between gap-3">
-          <b className="text-[12px]">本节可用积木</b>
-          <span className="kc-text-muted text-[11px]">不会拖也可以点按钮</span>
-        </div>}
+      <BlocklyToolsPanel mode={isDocked ? 'docked' : layoutMode === 'golden' ? 'golden' : 'legacy'}>
         <div className="mt-2 flex flex-wrap gap-2" data-testid="lesson-block-palette">
           {/* UX-203: delete is core workspace UX like the trashcan, so it is
               not gated with the practice-only 撤回 / 清空 tools. */}
@@ -706,8 +751,7 @@ export function BlocklyWorkspace({
             </div>
           </div>
         ) : null}
-        </div>
-      </details>
+      </BlocklyToolsPanel>
     </section>
   )
 }

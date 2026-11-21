@@ -2,6 +2,7 @@ import type { FootColor, Footprint } from '@/features/lessons/grid/grid-engine'
 import type { ProgramBlock } from '@/features/lessons/blockly/program-tree'
 
 import type { GridLesson } from './g0-u1-grid-lessons'
+import { fenceLesson } from './g0-u3-fence-lesson'
 
 /**
  * G0-U3 循环与规律 (Hark A): lessons on the SYS-106 grid engine with the SYS-107
@@ -491,4 +492,4 @@ const L03: GridLesson = {
   project: { stepId: 'my-garden', title: '我的小花园' },
 }
 
-export const g0u3LoopLessons: Record<string, GridLesson> = { 'G0-U3-L01': L01, 'G0-U3-L02': L02, 'G0-U3-L03': L03 }
+export const g0u3LoopLessons: Record<string, GridLesson> = { 'G0-U3-L01': L01, 'G0-U3-L02': L02, 'G0-U3-L03': L03, [fenceLesson.id]: fenceLesson }

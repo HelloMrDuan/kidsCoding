@@ -8,6 +8,35 @@ import { toGridBlocks } from './g0-u1-grid-lessons'
 import { g0u3LoopLessons } from './g0-u3-loop-lessons'
 
 const lessons = Object.values(g0u3LoopLessons)
+
+describe('G0-U3-L05 fence route', () => {
+  const lesson = g0u3LoopLessons['G0-U3-L05']
+  const creative = lesson.steps.find(step => step.kind === 'creative')!
+  const loop = (times: number, ...types: string[]): ProgramBlock => ({
+    type: 'repeat_times', times, body: types.map(type => ({ type })),
+  })
+  const program = (side: number): ProgramBlock[] => [
+    { type: 'when_start' },
+    loop(4, ...Array<string>(side).fill('move_forward'), 'turn_right'),
+  ]
+
+  it('uses the selected map and rejects a different edge length, even if the fox still returns home', () => {
+    for (const [i, goal] of creative.creative!.goalChoices.entries()) {
+      const level = stepLevel(creative, { creative: { [creative.id]: { goal } } })
+      expect(runGridProgram(level, program(i + 2)).passed).toBe(true)
+      expect(runGridProgram(level, program(i === 0 ? 3 : 2)).failure).toBe('wrong_route')
+    }
+  })
+
+  it('checks the full trail and final direction, including a reverse route and a motionless run', () => {
+    const practice = lesson.steps.find(step => step.kind === 'practice-a')!
+    const results = practice.solutions.map(solution => runGridProgram(practice.level, toGridBlocks(solution)))
+    expect(results.map(result => [result.final.x, result.final.y, result.final.facing, result.steps])).toEqual([
+      [0, 0, 'right', 8], [0, 0, 'right', 8],
+    ])
+    expect(runGridProgram(practice.level, [{ type: 'when_start' }]).failure).toBe('repeat_required')
+  })
+})
 const usesRepeat = (program: Array<string | ProgramBlock>) => program.some(b => typeof b !== 'string' && b.type === 'repeat_times')
 const typesIn = (program: Array<string | ProgramBlock>) => {
   const out: string[] = []

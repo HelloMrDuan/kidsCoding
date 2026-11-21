@@ -356,7 +356,12 @@ export function GridStage({ level, state, trail = [], stamps = [], watered = [],
       <rect x="-8" y="-8" width={w + 16} height={h + 16} rx="22" fill="#7cc35b" />
       {tiles}
       {level.water?.map(c => <Water key={`w${c.x}-${c.y}`} {...c} />)}
-      {trail.map((c, i) => <circle key={`t${i}`} cx={c.x * T + 32} cy={c.y * T + 32} r="5" fill="#fff" opacity=".7" />)}
+      {level.route ? (
+        <>
+          <polyline data-grid-item="route-target" points={level.route.map(c => `${c.x * T + 32},${c.y * T + 32}`).join(' ')} fill="none" stroke="#fff" strokeWidth="8" strokeDasharray="8 7" strokeLinejoin="round" />
+          {trail.length > 1 && <polyline data-grid-item="route-trace" points={trail.map(c => `${c.x * T + 32},${c.y * T + 32}`).join(' ')} fill="none" stroke="#8a4a23" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />}
+        </>
+      ) : trail.map((c, i) => <circle key={`t${i}`} cx={c.x * T + 32} cy={c.y * T + 32} r="5" fill="#fff" opacity=".7" />)}
       {level.footprints?.map((p, i) => <Paw key={`g${i}`} {...p} ghost />)}
       {stamps.map((p, i) => <Paw key={`p${i}`} {...p} />)}
       {level.pots?.map(c => <Pot key={`pot${c.x}-${c.y}`} {...c} wet={watered.some(w => w.x === c.x && w.y === c.y)} />)}
@@ -409,5 +414,5 @@ export function useGridPlayback(level: GridLevel, run: GridRun | null, intervalM
   const stamps = frames.slice(0, index + 1).flatMap(f => (f.stamp ? [f.stamp] : []))
   const watered = frames.slice(0, index + 1).flatMap(f => (f.water ? [f.water] : []))
   const done = !!run && index >= frames.length - 1
-  return { state, trail, stamps, watered, done }
+  return { state, trail, stamps, watered, done, blockIndex: frames[index]?.blockIndex }
 }

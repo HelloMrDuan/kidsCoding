@@ -84,6 +84,17 @@ const OPENING: ProgramBlock[] = [
   { type: 'move_right' },
 ]
 
+const NO_DIALOGUE: ProgramBlock[] = [{ type: 'when_start' }, { type: 'move_right' }]
+const REPLY: ProgramBlock[] = [...OPENING, { type: 'switch_character' }, { type: 'say_line', line: 'ready' }]
+
+/** Programs exercised by the engine for the Golden classroom's judged activities. */
+export const openingStoryChecks = [
+  { id: 'build-opening', solutions: [OPENING], counterExamples: [NO_DIALOGUE] },
+  { id: 'run-verify', solutions: [OPENING], counterExamples: [[OPENING[0], OPENING[2], OPENING[1]]] },
+  { id: 'error-lab', solutions: [OPENING], counterExamples: [NO_DIALOGUE] },
+  { id: 'creative-encore', solutions: [REPLY], counterExamples: [OPENING] },
+]
+
 export const G1_U1_L01_STORY_LESSON: StoryLesson = {
   id: 'G1-U1-L01',
   title: '给狐狸一个开场',

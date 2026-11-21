@@ -4,11 +4,16 @@ import { notFound } from 'next/navigation'
 import { getGridLesson } from '@/content/curriculum/g0-u1-grid-lessons'
 import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { GridLab } from '@/features/lessons/grid/grid-lab'
+import { currentLessonDraftOwner } from '@/features/lessons/draft-identity'
 
 export default async function GridLabPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params
   const lesson = getGridLesson(lessonId) ?? g0u3LoopLessons[lessonId] ?? null
   if (!lesson) notFound()
+  if (lesson.layoutMode === 'golden') {
+    const owner = await currentLessonDraftOwner()
+    return <main><GridLab key={owner} lesson={lesson} draftOwner={owner} /></main>
+  }
   return (
     <main className="min-h-screen bg-[var(--kc-canvas)]">
       <section className="kc-page-main">

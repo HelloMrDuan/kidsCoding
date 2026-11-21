@@ -1,7 +1,13 @@
 import { expect, test, type Page } from '@playwright/test'
 
 async function add(page: Page, type: string, times = 1) {
+  await openFenceTools(page)
   for (let i = 0; i < times; i += 1) await page.getByTestId(`lesson-add-${type}`).click()
+}
+
+async function openFenceTools(page: Page) {
+  const tools = page.getByTestId('golden-block-tools')
+  if (await tools.isVisible() && !await tools.evaluate(el => el.parentElement?.hasAttribute('open'))) await tools.click()
 }
 async function runAndExpect(page: Page, tone: 'success' | 'error', text?: string) {
   await page.getByTestId('grid-run').click()
@@ -11,6 +17,314 @@ async function runAndExpect(page: Page, tone: 'success' | 'error', text?: string
 }
 async function next(page: Page) {
   await page.getByTestId('lesson-complete-step').click()
+}
+
+const fenceId = 'G0-U3-L05'
+const fenceUrl = '/learn/grid-lab/' + fenceId
+const oldFenceKey = 'kids-grid-lesson-v1:' + fenceId
+const fenceKey = 'kids-lesson-owner-v1:guest:' + oldFenceKey
+
+async function fencePane(page: Page, pane: 'task' | 'code' | 'stage') {
+  if (await page.getByTestId('lesson-mobile-tabs').isVisible()) {
+    await page.getByTestId('lesson-mobile-tab-' + pane).tap()
+  } else if ((page.viewportSize()?.width ?? 0) >= 768 && (page.viewportSize()?.width ?? 0) < 1200) {
+    const open = await page.getByTestId('golden-lesson').getAttribute('data-tablet-task-open') === 'true'
+    if (open !== (pane === 'task')) await page.getByTestId('golden-task-toggle').click()
+  }
+}
+
+async function openFence(page: Page) {
+  await page.goto('/learn/catalog/' + fenceId)
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+  await expect(page.getByTestId('grid-trial-entry')).toContainText('开始画围栏')
+  await page.getByTestId('grid-trial-entry').click()
+  await expect(page.locator('svg.blocklySvg')).toBeVisible()
+  await expect(page.getByTestId('lesson-cloud-privacy-note')).toHaveCount(0)
+}
+
+async function enterFenceCorner(page: Page) {
+  await fencePane(page, 'task')
+  await page.getByTestId('grid-predict-choice-1').click()
+  await fencePane(page, 'stage')
+  await runAndExpect(page, 'error', '左边还留着一个缺口')
+  await fencePane(page, 'code')
+  await openFenceTools(page)
+  await page.getByTestId('lesson-repeat-times-4').click()
+  await fencePane(page, 'stage')
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('lesson-task-card')).toContainText('先走一边，再转弯')
+}
+
+async function dragFenceTurn(page: Page, touch: boolean) {
+  const editor = page.locator('svg.blocklySvg')
+  const turn = editor.locator('.blocklyBlockCanvas .blocklyDraggable.turn_right').first()
+  const lastForward = page.locator('.blocklyBlockCanvas .blocklyDraggable.move_forward').last().locator(':scope > .blocklyPath')
+  const centerEditor = () => editor.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }))
+  await centerEditor()
+  const path = turn.locator(':scope > .blocklyPath:not(.blocklyPathSelected)').first()
+  const box = await path.boundingBox()
+  expect(box).toBeTruthy()
+  const start = { x: box!.x + 22, y: box!.y + box!.height / 2 }
+  const tailBefore = (await lastForward.boundingBox())!
+  const end = { x: start.x + 48, y: start.y + 35 }
+  const client = touch ? await page.context().newCDPSession(page) : null
+  const drag = async (from: typeof start, to: typeof end) => {
+    expect(await page.evaluate(({ x, y }) => !!document.elementFromPoint(x, y)?.closest('.blocklyDraggable.turn_right'), from)).toBe(true)
+    if (client) {
+      await client.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [from] })
+      for (let i = 1; i <= 10; i++) {
+        const point = { x: from.x + (to.x - from.x) * i / 10, y: from.y + (to.y - from.y) * i / 10 }
+        await client.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [point] })
+      }
+      await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    } else {
+      await page.mouse.move(from.x, from.y)
+      await page.mouse.down()
+      await page.mouse.move(to.x, to.y, { steps: 12 })
+      await page.mouse.up()
+    }
+  }
+  const canvas = page.locator('svg.blocklySvg .blocklyBlockCanvas')
+  await drag(start, end)
+  await expect(canvas.locator(':scope > g.blocklyDraggable')).toHaveCount(2)
+  await fencePane(page, 'stage')
+  await runAndExpect(page, 'error', '掉队')
+  await fencePane(page, 'code')
+  await centerEditor()
+  const dropped = (await path.boundingBox())!
+  const tailAfter = (await lastForward.boundingBox())!
+  const from = { x: dropped.x + 22, y: dropped.y + dropped.height / 2 }
+  await drag(from, { x: tailAfter.x + start.x - tailBefore.x, y: tailAfter.y + start.y - tailBefore.y })
+  await expect(canvas.locator(':scope > g.blocklyDraggable')).toHaveCount(1)
+  await expect.poll(() => page.evaluate(key => {
+    const draft = JSON.parse(localStorage.getItem(key) ?? '{}')
+    return draft.programs?.['one-corner']?.map((item: { type: string }) => item.type)
+  }, fenceKey)).toEqual(['when_start', 'move_forward', 'move_forward', 'turn_right'])
+  await client?.detach()
+}
+
+async function dragFenceTurnFromToolbox(page: Page) {
+  const editor = page.locator('svg.blocklySvg')
+  const tail = editor.locator('.blocklyBlockCanvas .blocklyDraggable.move_forward').last().locator(':scope > .blocklyPath')
+  await editor.evaluate(el => el.scrollIntoView({ block: 'center', behavior: 'instant' }))
+  await page.locator('.blocklyToolboxCategory', { hasText: '移动' }).click()
+  const flyout = page.locator('svg.blocklyFlyout .blocklyDraggable.turn_right > .blocklyPath')
+  await expect(flyout).toBeVisible()
+  const from = (await flyout.boundingBox())!
+  const last = (await tail.boundingBox())!
+  const surface = (await editor.boundingBox())!
+  await page.mouse.move(from.x + 22, from.y + from.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(surface.x + surface.width * 0.75, from.y + from.height / 2 + 14, { steps: 10 })
+  await page.mouse.move(last.x + 22, last.y + last.height - 7 + from.height / 2, { steps: 14 })
+  await page.mouse.up()
+  await expect.poll(() => page.evaluate(key => {
+    const draft = JSON.parse(localStorage.getItem(key) ?? '{}')
+    return draft.programs?.['one-corner']?.map((item: { type: string }) => item.type)
+  }, fenceKey)).toEqual(['when_start', 'move_forward', 'move_forward', 'turn_right'])
+}
+
+test('G0-U3-L05 fence: five steps, three hints, failed storage retry, portfolio and continued editing', async ({ page }) => {
+  test.setTimeout(150_000)
+  await openFence(page)
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await enterFenceCorner(page)
+
+  await runAndExpect(page, 'error', '箭头')
+  await expect(page.getByTestId('lesson-hint')).toContainText('不会移动')
+  await page.getByTestId('grid-more-hint').click()
+  await expect(page.getByTestId('lesson-hint')).toContainText('走到角上')
+  await page.getByTestId('grid-more-hint').click()
+  await expect(page.getByTestId('lesson-hint')).toContainText('开始时 →')
+  await dragFenceTurnFromToolbox(page)
+  await dragFenceTurn(page, false)
+  await page.getByTestId('golden-file-tools').click()
+  const [file] = await Promise.all([page.waitForEvent('download'), page.getByTestId('golden-export').click()])
+  const downloaded = await file.path()
+  expect(downloaded).toBeTruthy()
+  await openFenceTools(page)
+  await page.getByTestId('lesson-clear-program').click()
+  await page.getByTestId('golden-import').setInputFiles(downloaded!)
+  await expect(page.getByTestId('golden-file-status')).toContainText('积木已导入')
+  await page.getByTestId('golden-import').setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{}') })
+  await expect(page.getByTestId('golden-file-status')).toContainText('这一关')
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('grid-stage')).toHaveAttribute('data-fox-facing', 'down')
+  await next(page)
+
+  const fileMenu = page.getByTestId('golden-file-tools')
+  if (!await fileMenu.evaluate(el => el.parentElement?.hasAttribute('open'))) await fileMenu.click()
+  await page.getByTestId('golden-import').setInputFiles({
+    name: 'previous-nested-program.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({
+      schema: 1, lessonId: fenceId, stepId: 'nested-square',
+      blocks: [{ type: 'when_start' }, { type: 'repeat_times', times: 4, body: [
+        { type: 'repeat_times', times: 2, body: [{ type: 'move_forward' }] }, { type: 'turn_right' },
+      ] }],
+    })),
+  })
+  await expect(page.getByTestId('golden-file-status')).toContainText('积木已导入')
+  await runAndExpect(page, 'error', '只用一层重复')
+  await openFenceTools(page)
+  await page.getByTestId('lesson-clear-program').click()
+  await add(page, 'when_start')
+  await add(page, 'repeat_times')
+  await add(page, 'move_forward', 2)
+  await add(page, 'turn_right')
+  await page.getByTestId('lesson-repeat-times-4').click()
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  await runAndExpect(page, 'error', '箭头')
+  await add(page, 'turn_right')
+  await runAndExpect(page, 'success')
+  await next(page)
+
+  await page.getByTestId('grid-run').click()
+  await expect(page.getByTestId('grid-feedback')).toContainText('先选围栏的边长')
+  await page.getByTestId('grid-goal-choice-1').click()
+  await add(page, 'when_start')
+  await add(page, 'repeat_times')
+  await add(page, 'move_forward', 3)
+  await add(page, 'turn_right')
+  await page.evaluate(key => {
+    const saved = Storage.prototype.setItem
+    Storage.prototype.setItem = function (name, value) {
+      if (name === key) throw new DOMException('Course storage test', 'QuotaExceededError')
+      saved.call(this, name, value)
+    }
+    window.addEventListener('restore-course-storage', () => { Storage.prototype.setItem = saved }, { once: true })
+  }, fenceKey)
+  await page.getByTestId('lesson-repeat-times-4').click()
+  await expect(page.getByTestId('lesson-save-local')).toContainText('本机保存失败')
+  page.once('dialog', dialog => dialog.dismiss())
+  await page.getByRole('link', { name: '返回课程' }).click()
+  await expect(page).toHaveURL(new RegExp(fenceUrl + '$'))
+  await page.evaluate(() => window.dispatchEvent(new Event('restore-course-storage')))
+  await page.getByTestId('lesson-save-retry').click()
+  await expect(page.getByTestId('lesson-save-local')).toContainText('已保存到本机')
+  await page.reload()
+  await expect(page.getByTestId('grid-goal-choice-1')).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByTestId('lesson-repeat-times-4')).toHaveAttribute('aria-pressed', 'true')
+  await runAndExpect(page, 'success')
+  await expect(page.getByTestId('grid-stage')).toHaveAttribute('data-fox-cell', '1,0')
+  await expect(page.getByTestId('grid-stage')).toHaveAttribute('data-fox-facing', 'right')
+  await next(page)
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await expect(page.getByTestId('grid-completion-badge')).toHaveText('本机成就 · 围栏工程师')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+  await page.getByRole('link', { name: '查看作品中心' }).click()
+  const work = page.getByTestId('portfolio-work-' + fenceId)
+  await expect(work).toContainText('我的花圃围栏')
+  await work.locator('a[href="' + fenceUrl + '"]').click()
+  await expect(page.getByTestId('grid-completion-badge')).toHaveText('本机成就 · 围栏工程师')
+  await expect(page.getByTestId('grid-project-status')).toContainText('围栏已闭合')
+  await page.getByTestId('grid-project-play').click()
+  await expect(page.getByTestId('grid-project-play')).toBeEnabled({ timeout: 15_000 })
+  await expect(page.locator('[data-grid-item="route-trace"]')).toBeVisible()
+  if (process.env.KC_FENCE_EVIDENCE_DIR) {
+    await page.getByTestId('grid-project-card').screenshot({ path: `${process.env.KC_FENCE_EVIDENCE_DIR}/reopened-project.png` })
+  }
+  await page.getByTestId('grid-replay-my-fence').click()
+  await openFenceTools(page)
+  await page.getByTestId('lesson-repeat-times-3').click()
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('先按')
+  await runAndExpect(page, 'error')
+
+  await page.evaluate(({ scoped, legacy }) => localStorage.setItem(legacy, localStorage.getItem(scoped)!), { scoped: fenceKey, legacy: oldFenceKey })
+  await page.context().addCookies([{ name: 'kc_guest_id', value: 'another-learner', url: new URL(page.url()).origin }])
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(page.getByText(/当前账号无法确认，课堂草稿已锁定/)).toBeVisible()
+  await page.reload()
+  await expect(page.getByTestId('lesson-task-card')).toContainText('观察少掉的一边')
+  await page.goto('/learn/portfolio')
+  await expect(page.getByTestId('portfolio-work-' + fenceId)).toHaveCount(0)
+  await page.context().clearCookies({ name: 'kc_guest_id' })
+  await page.goto('/learn/portfolio')
+  await expect(page.getByTestId('portfolio-work-' + fenceId)).toBeVisible()
+})
+
+test('G0-U3-L05 golden desktop frees editor space, keeps the workspace and stops without progress', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openFence(page)
+  const editor = page.locator('svg.blocklySvg')
+  const scene = page.getByTestId('grid-stage')
+  const shell = page.getByTestId('golden-lesson')
+  const mount = await editor.elementHandle()
+  const initialSize = (await editor.boundingBox())!
+  expect(initialSize.height).toBeGreaterThan(540)
+  await expect(page.getByTestId('lesson-add-turn_right')).toBeHidden()
+  await page.getByTestId('golden-task-toggle').click()
+  await expect(shell).toHaveAttribute('data-task-open', 'false')
+  await expect.poll(async () => (await editor.boundingBox())!.width).toBeGreaterThan(initialSize.width + 190)
+  const collapsedSize = (await editor.boundingBox())!
+  await expect(scene).toBeVisible()
+  await test.info().attach('editor geometry', { contentType: 'application/json', body: JSON.stringify({ beforeHeight: 420, expanded: initialSize, collapsed: collapsedSize }) })
+  if (process.env.KC_FENCE_EVIDENCE_DIR) {
+    await page.screenshot({ path: `${process.env.KC_FENCE_EVIDENCE_DIR}/1440x900-task-collapsed.png` })
+  }
+  expect(await editor.evaluate((current, prior) => current.isSameNode(prior), mount)).toBe(true)
+  await page.getByTestId('golden-fullscreen').click()
+  await expect(page.getByTestId('golden-fullscreen')).toHaveText('退出全屏')
+  expect(await editor.evaluate((current, prior) => current.isSameNode(prior), mount)).toBe(true)
+  await page.getByTestId('golden-fullscreen').click()
+  await expect(page.getByTestId('golden-fullscreen')).toHaveText('全屏')
+  await page.getByTestId('grid-run').click()
+  await expect(page.getByTestId('grid-stop')).toBeEnabled()
+  await page.getByTestId('grid-stop').click()
+  await expect(scene).toHaveAttribute('data-fox-cell', '0,0')
+  await expect(page.getByTestId('grid-feedback')).toContainText('已停止')
+  await next(page)
+  await expect(page.getByTestId('grid-feedback')).toContainText('先按原样运行')
+  await page.getByTestId('golden-save').click()
+  await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
+})
+
+for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]]) {
+  test(`G0-U3-L05 viewport ${width}x${height} edits and runs connected Blockly`, async ({ browser }) => {
+    test.setTimeout(70_000)
+    const touch = width <= 768
+    const context = await browser.newContext({ viewport: { width, height }, hasTouch: touch, isMobile: width === 375 })
+    try {
+      const page = await context.newPage()
+      await page.goto(fenceUrl)
+      await enterFenceCorner(page)
+      await fencePane(page, 'code')
+      const svg = page.locator('svg.blocklySvg')
+      await expect(svg).toBeVisible()
+      const original = await svg.elementHandle()
+      if (touch) {
+        await openFenceTools(page)
+        await page.getByTestId('lesson-add-turn_right').tap()
+      }
+      else await add(page, 'turn_right')
+      await dragFenceTurn(page, touch)
+      if (width === 375) {
+        await expect(page.getByTestId('golden-save')).toBeInViewport()
+        await expect(page.getByTestId('grid-run')).toBeInViewport()
+      }
+      await fencePane(page, 'stage')
+      await runAndExpect(page, 'success')
+      await expect(page.getByTestId('grid-stage')).toHaveAttribute('data-fox-facing', 'down')
+      expect(await svg.evaluate((current, prior) => current.isSameNode(prior), original)).toBe(true)
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
+      if (process.env.KC_FENCE_EVIDENCE_DIR) {
+        await page.getByTestId('grid-lab-title-row').scrollIntoViewIfNeeded()
+        await page.screenshot({ path: `${process.env.KC_FENCE_EVIDENCE_DIR}/${width}x${height}.png` })
+        if (width === 375) {
+          await fencePane(page, 'code')
+          await page.getByTestId('grid-lab-title-row').scrollIntoViewIfNeeded()
+          await page.screenshot({ path: `${process.env.KC_FENCE_EVIDENCE_DIR}/375x812-blockly.png` })
+        }
+      }
+    } finally {
+      await context.close()
+    }
+  })
 }
 
 test('G0-U1-L01 formal course: error lab, two practices, creative remake, review, saved and reopened', async ({ page }) => {
