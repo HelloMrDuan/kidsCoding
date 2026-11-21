@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 
 import { getCatalogLesson, getUnitProject } from '@/features/curriculum/full-catalog-access'
 import { getLessonMaturity } from '@/features/curriculum/lesson-maturity'
+import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 
 export default async function CatalogLessonPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params
@@ -12,6 +13,7 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
   const capstone = getUnitProject(unit.id)
   const maturity = getLessonMaturity(lesson.id)!
   const trial = maturity.trialAvailable ? maturity.trialRoute : null
+  const gridIntroduction = g0u3LoopLessons[lesson.id]?.trialIntroduction
   return (
     <main className="min-h-screen bg-[linear-gradient(150deg,#eaf7f0_0%,#f7faff_65%,#fff9ea_100%)] p-5 md:p-10">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -65,9 +67,9 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
         {trial && maturity.engine === 'blockly' && !trial.startsWith('/learn/event-lab/') ? (
           <section className="rounded-[2rem] border-2 border-amber-200 bg-white p-6 shadow-sm">
             <p className="text-xs font-bold text-amber-700">Blockly 真运行 · 森林网格 · 浏览器草稿</p>
-            <h2 className="mt-2 text-xl font-black">用积木带小狐狸走格子</h2>
-            <p className="mt-2 text-sm leading-7 text-slate-600">四关都要真的运行到目标才算过；走错会告诉你撞到了什么、差几格。程序自动保存在本机，正式课程仍未发布。</p>
-            <Link href={trial} data-testid="grid-trial-entry" className="mt-4 inline-flex rounded-full bg-amber-500 px-6 py-3 font-bold text-white">开始森林寻路 →</Link>
+            <h2 className="mt-2 text-xl font-black">{gridIntroduction?.title ?? '用积木带小狐狸走格子'}</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">{gridIntroduction?.description ?? '四关都要真的运行到目标才算过；走错会告诉你撞到了什么、差几格。程序自动保存在本机，正式课程仍未发布。'}</p>
+            <Link href={trial} data-testid="grid-trial-entry" className="mt-4 inline-flex rounded-full bg-amber-500 px-6 py-3 font-bold text-white">{gridIntroduction?.action ?? '开始森林寻路'} →</Link>
           </section>
         ) : null}
         {trial && maturity.engine === 'pyodide' && lesson.id !== 'P0-U1-L01' ? (
