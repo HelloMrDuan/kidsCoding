@@ -15,7 +15,17 @@ export async function showLessonPane(
   // nothing until the shell is really on screen (desktop and tablet satisfy
   // this too), otherwise the hidden-tab check below would silently no-op and
   // leave the phone on the default 任务 pane.
-  await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible({ timeout: 15_000 })
+  //
+  // Only on classroom routes: finishing a lesson (and reloading) lands on
+  // /project/<id>/complete, which renders its own saved-project workbench and
+  // no lesson shell, yet the specs call this helper again there to run the
+  // saved program. Waiting for a lesson shell on that page can never pass.
+  const pathname = new URL(page.url()).pathname
+  if (/^\/learn\/(lesson|grid-lab|event-lab|story-lab|catalog)(\/|$)/.test(pathname)) {
+    await expect(
+      page.locator('[data-testid="lesson-workbench-shell"], [data-testid="golden-lesson"]').first(),
+    ).toBeVisible({ timeout: 15_000 })
+  }
   const tabs = page.getByTestId('lesson-mobile-tabs')
   if (await tabs.isVisible()) {
     await expect(tabs).toBeVisible()
