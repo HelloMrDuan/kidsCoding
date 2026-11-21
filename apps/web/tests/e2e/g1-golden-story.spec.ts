@@ -152,7 +152,7 @@ test('G1-U1-L01 Golden verifies wrong program, an independently edited encore an
   await expect(page.getByTestId('golden-story-badge')).toBeVisible()
   // The classic and Golden routes share the same owned story, even on one device.
   await page.goto('/learn/story-lab/G1-U1-L01')
-  await expect(page.getByTestId('g1-u1-l01-step-title')).toContainText('第 7 关')
+  await expect(page.getByText(/给狐狸一个开场：7 关全部真的跑通了/)).toBeVisible()
   await page.evaluate(key => {
     localStorage.setItem('kidscoding-draft:G1-U1-L01', localStorage.getItem(key)!)
   }, draftKey)
