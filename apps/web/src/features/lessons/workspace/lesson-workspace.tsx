@@ -20,7 +20,8 @@
  * reverted).
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { LessonDraftOwnerContext } from '../lesson-draft-boundary'
 
 import {
   DEMO_HAT,
@@ -249,6 +250,8 @@ export function LessonWorkspace({
   const [judgmentStale, setJudgmentStale] = useState(false)
   const [runError, setRunError] = useState<string | null>(null)
   const [saveState, setSaveState] = useState<SaveState>('unsaved')
+  const draftOwner = useContext(LessonDraftOwnerContext)
+  const draftOwnerRef = useRef(draftOwner)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [fileMenuOpen, setFileMenuOpen] = useState(false)
@@ -364,7 +367,7 @@ export function LessonWorkspace({
         setSaveMessageAndRef('演示保存失败（测试钩子）：未能保存')
         return
       }
-      const result = saveDraftToLocal(contractRef.current.lessonId, script)
+      const result = saveDraftToLocal(contractRef.current.lessonId, script, draftOwnerRef.current)
       if (result.ok) {
         lastSavedJsonRef.current = json
         setSaveState('saved')
@@ -395,7 +398,7 @@ export function LessonWorkspace({
   /** Editor-slot counterpart of loadIntoAdapter (draft or initial, no adapter). */
   const loadEditorSlotData = useCallback(
     (targetContract: LessonContract, targetInitial: unknown) => {
-      const draft = loadDraftFromLocal(targetContract.lessonId)
+      const draft = loadDraftFromLocal(targetContract.lessonId, draftOwnerRef.current)
       let loaded: unknown = null
       let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
@@ -450,7 +453,7 @@ export function LessonWorkspace({
     (targetContract: LessonContract, targetInitial: unknown) => {
       const entry = mountedAdapterRef.current
       if (!entry) return
-      const draft = loadDraftFromLocal(targetContract.lessonId)
+      const draft = loadDraftFromLocal(targetContract.lessonId, draftOwnerRef.current)
       let loaded = false
       let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
@@ -541,6 +544,7 @@ export function LessonWorkspace({
           saveDraftToLocal(
             mountedLessonRef.current ?? contractRef.current.lessonId,
             editorDataRef.current ?? null,
+            draftOwnerRef.current,
           )
         } catch {
           // Unmount save is best effort; explicit 保存 is the reliable path.
@@ -550,7 +554,7 @@ export function LessonWorkspace({
     const prev = mountedAdapterRef.current
     if (prev && prev.engine !== engine) {
       try {
-        saveDraftToLocal(contractRef.current.lessonId, prev.adapter.getScript())
+        saveDraftToLocal(contractRef.current.lessonId, prev.adapter.getScript(), draftOwnerRef.current)
       } catch {
         // Best effort on engine switch; the contract-change effect also saves.
       }
@@ -627,6 +631,7 @@ export function LessonWorkspace({
         saveDraftToLocal(
           mountedLessonRef.current ?? contractRef.current.lessonId,
           useSlotData ? (editorDataRef.current ?? null) : (active?.getScript() ?? null),
+          draftOwnerRef.current,
         )
       } catch {
         // Unmount save is best effort; explicit 保存 is the reliable path.
@@ -674,13 +679,13 @@ export function LessonWorkspace({
     if (mountedLessonRef.current === prevId) {
       if (editorSlot) {
         try {
-          saveDraftToLocal(prevId, editorDataRef.current ?? null)
+          saveDraftToLocal(prevId, editorDataRef.current ?? null, draftOwnerRef.current)
         } catch {
           // Best effort; explicit 保存 remains available.
         }
       } else if (entry) {
         try {
-          saveDraftToLocal(prevId, entry.adapter.getScript())
+          saveDraftToLocal(prevId, entry.adapter.getScript(), draftOwnerRef.current)
         } catch {
           // Best effort; explicit 保存 remains available.
         }
@@ -913,7 +918,7 @@ export function LessonWorkspace({
       }
       script = entry.adapter.getScript()
     }
-    const result = saveDraftToLocal(contract.lessonId, script)
+    const result = saveDraftToLocal(contract.lessonId, script, draftOwnerRef.current)
     if (result.ok) {
       lastSavedJsonRef.current = scriptToJson(script)
       setSaveState('saved')

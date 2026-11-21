@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 const route = '/learn/story-lab/G1-U1-L01/golden'
-const draftKey = 'kidscoding-draft:G1-U1-L01'
+const draftKey = 'kids-lesson-owner-v1:guest:kidscoding-draft:G1-U1-L01'
 
 async function moveStoryBlock(page: Page, touch: boolean) {
   const editor = page.locator('svg.blocklySvg')
@@ -104,7 +104,7 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
 }
 
 test('G1-U1-L01 Golden verifies wrong program, an independently edited encore and recovery', async ({ page }) => {
-  test.setTimeout(100_000)
+  test.setTimeout(120_000)
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/learn/catalog/G1-U1-L01')
   await page.getByTestId('story-trial-entry').click()
@@ -150,4 +150,24 @@ test('G1-U1-L01 Golden verifies wrong program, an independently edited encore an
   await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key) ?? '{}').script?.finished ?? false, draftKey)).toBe(true)
   await page.reload()
   await expect(page.getByTestId('golden-story-badge')).toBeVisible()
+  // The classic and Golden routes share the same owned story, even on one device.
+  await page.goto('/learn/story-lab/G1-U1-L01')
+  await expect(page.getByTestId('g1-u1-l01-step-title')).toContainText('第 7 关')
+  await page.evaluate(key => {
+    localStorage.setItem('kidscoding-draft:G1-U1-L01', localStorage.getItem(key)!)
+  }, draftKey)
+  const origin = new URL(page.url()).origin
+  await page.context().addCookies([{ name: 'kc_guest_id', value: 'another-story-family', url: origin }])
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(page.getByText(/当前账号无法确认，课堂草稿已锁定/)).toBeVisible()
+  await expect(page.locator('svg.blocklySvg')).toHaveCount(0)
+  await page.reload()
+  await expect(page.getByTestId('g1-u1-l01-step-title')).toContainText('第 1 关')
+  await page.goto(route)
+  await expect(page.getByTestId('g1-u1-l01-step-title')).toContainText('第 1 关')
+  await expect(page.getByTestId('golden-story-badge')).toHaveCount(0)
+  await page.context().clearCookies({ name: 'kc_guest_id' })
+  await page.reload()
+  await expect(page.getByTestId('golden-story-badge')).toBeVisible()
+
 })

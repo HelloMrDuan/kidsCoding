@@ -49,14 +49,6 @@ import {
 import { coerceStoryDraft, emptyStoryDraft, type StorySlotData } from './g1-u1-l01-draft'
 import { judgeStoryProgram } from './g1-u1-l01-judging'
 
-/**
- * 会话内最近一次好草稿（模块级，仅本页会话内有效）：外壳把外来课节的
- * 导入载荷交给插槽时（OPS-028 例外：壳不代判他课数据），插槽拒绝该载荷
- * 并把当前作品回显给外壳，避免外来数据被自动保存进本课键（L02 同款）。
- * 全新加载时 initial 只会是本课草稿或空草稿，lastGood 为空时回显空草稿。
- */
-let lastGoodStoryDraft: StorySlotData | null = null
-
 const BlocklyWorkspace = dynamic(
   () => import('@/features/lessons/blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
   { ssr: false },
@@ -104,23 +96,21 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
 
   const persist = useCallback((next: StorySlotData) => {
     draftRef.current = next
-    lastGoodStoryDraft = next
     setDraft(next)
     onChangeRef.current(next)
   }, [])
 
   /**
    * 挂载时一次性处理外来课节导入：initial 的 lessonId 不是本课时，拒绝该
-   * 载荷并回显会话内最近的好草稿（或空草稿），绝不把外来数据存进本课键。
+   * 载荷并显示空草稿。正常导入由外壳先校验，保留当前草稿。
    * 正常挂载（本课草稿 / 空草稿）不触发。
    */
   useEffect(() => {
     const raw = initial as { lessonId?: unknown } | null
     if (raw && typeof raw === 'object' && raw.lessonId !== undefined && raw.lessonId !== 'G1-U1-L01') {
       setNotice('导入文件属于其他课节，已拒绝，原作品未变。')
-      const fallback = lastGoodStoryDraft ?? emptyStoryDraft()
+      const fallback = emptyStoryDraft()
       draftRef.current = fallback
-      lastGoodStoryDraft = fallback
       setDraft(fallback)
       onChangeRef.current(fallback)
       // 回显的作品可能与画布上以外来数据挂载的程序不一致：按回显数据重建画布。

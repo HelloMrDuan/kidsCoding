@@ -17,6 +17,12 @@
  */
 
 import { draftKeyFor } from './lesson-contract'
+import { scopedLessonDraftKey } from '../scoped-draft-key'
+
+function storageKey(lessonId: string, owner?: string) {
+  const key = draftKeyFor(lessonId)
+  return owner ? scopedLessonDraftKey(owner, key) : key
+}
 
 /** Draft byte cap: 64KB. Refuse over-cap, never truncate. */
 export const DRAFT_MAX_BYTES = 64 * 1024
@@ -60,6 +66,7 @@ export function saveDraft(
   storage: StorageLike | null,
   lessonId: string,
   script: unknown,
+  owner?: string,
 ): SaveResult {
   if (!storage) return { ok: false, reason: '本机存储不可用，未能保存' }
   let text: string
@@ -78,18 +85,18 @@ export function saveDraft(
     return { ok: false, reason: `草稿超过 64KB 上限（${DRAFT_MAX_BYTES} 字节），未能保存` }
   }
   try {
-    storage.setItem(draftKeyFor(lessonId), text)
+    storage.setItem(storageKey(lessonId, owner), text)
   } catch {
     return { ok: false, reason: '写入本机存储失败，未能保存' }
   }
   return { ok: true }
 }
 
-export function loadDraft(storage: StorageLike | null, lessonId: string): LoadResult {
+export function loadDraft(storage: StorageLike | null, lessonId: string, owner?: string): LoadResult {
   if (!storage) return { data: null, reason: '本机存储不可用' }
   let raw: string | null
   try {
-    raw = storage.getItem(draftKeyFor(lessonId))
+    raw = storage.getItem(storageKey(lessonId, owner))
   } catch {
     return { data: null, reason: '读取本机存储失败' }
   }
@@ -134,10 +141,10 @@ export function loadDraftForSwitch(storage: StorageLike | null, lessonId: string
 }
 
 /** localStorage-backed convenience wrappers for the shell. */
-export function saveDraftToLocal(lessonId: string, script: unknown): SaveResult {
-  return saveDraft(defaultStorage(), lessonId, script)
+export function saveDraftToLocal(lessonId: string, script: unknown, owner?: string): SaveResult {
+  return saveDraft(defaultStorage(), lessonId, script, owner)
 }
 
-export function loadDraftFromLocal(lessonId: string): LoadResult {
-  return loadDraft(defaultStorage(), lessonId)
+export function loadDraftFromLocal(lessonId: string, owner?: string): LoadResult {
+  return loadDraft(defaultStorage(), lessonId, owner)
 }
