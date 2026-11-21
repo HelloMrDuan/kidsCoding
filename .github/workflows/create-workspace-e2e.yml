@@ -15,6 +15,7 @@ on:
       - 'apps/web/playwright.scratch-create.config.ts'
       - 'apps/web/tests/e2e/*-create.spec.ts'
       - 'apps/web/tests/e2e/g2-golden-concert.spec.ts'
+      - 'apps/web/tests/e2e/g3-golden-meteor.spec.ts'
       - 'apps/web/src/features/lessons/golden-scratch/**'
   push:
     branches: [main]
@@ -76,7 +77,7 @@ jobs:
           fi
           files=("${CREATE_EDITOR}-create.spec.ts")
           if [ "$CREATE_EDITOR" = scratch ]; then
-            files+=(g2-golden-concert.spec.ts)
+            files+=(g2-golden-concert.spec.ts g3-golden-meteor.spec.ts)
           fi
           npx playwright test -c playwright.scratch-create.config.ts "${files[@]}" --workers=2
       - name: Upload browser evidence and timing

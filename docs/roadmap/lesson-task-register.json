@@ -2047,7 +2047,7 @@
       "unitId": "G3-U1",
       "focusConcept": "自制积木",
       "plannedLearningOutcome": "能使用自制积木解释并完成「克隆流星雨」中的关键操作，并展示可运行的结果或设计证据。",
-      "status": "todo",
+      "status": "in_progress",
       "catalogStatus": "outline_not_playable",
       "detailAssetPresent": true,
       "prerequisiteLessonIds": [
@@ -2063,10 +2063,10 @@
         "pr": null,
         "mergeCommit": null,
         "mainCI": null,
-        "realE2E": null,
+        "realE2E": "apps/web/tests/e2e/g3-golden-meteor.spec.ts；旧实验回归 apps/web/tests/e2e/scratch-vm.spec.ts",
         "lessonReview": null
       },
-      "notes": "全量目录仍为 outline_not_playable；本行是待实施任务，非已经可玩或发布。"
+      "notes": "Golden 接入原生 Scratch GUI 和分身行为判定，保留旧实验入口；新增预测、错误观察、退场修复、自制积木与可重开的 .sb3 作品。暂为 L3 试玩，等待代码复核、许可确认、儿童试学与正式发布验收。"
     },
     {
       "id": "G3-U1-L03",
