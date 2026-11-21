@@ -49,7 +49,7 @@ export function readCurriculumSnapshot(): CurriculumSnapshot {
   // they must not be scanned as unlicensed assets. Without this exclusion
   // the gate fails after any local `npm run build` (proven on pristine
   // main: 16 blockly-media errors), even though CI runs vitest before build.
-  const GENERATED_DIRS = ['blockly-media/', 'scratch-vm/']
+  const GENERATED_DIRS = ['blockly-media/', 'scratch-vm/', 'python-create-runtime/']
   const publicAssets = walk(publicDir).map(f => repositoryPath(publicDir, f)).filter(f => !f.endsWith('-sandbox.html') && !GENERATED_DIRS.some(d => f.startsWith(d)))
   const trialIds = Object.keys(trialIntegrations)
   const allIds = [...catalog.tracks.flatMap(t => t.units.flatMap(u => u.lessons.map(l => l.id))), ...launchLessons.map(l => l.id)]

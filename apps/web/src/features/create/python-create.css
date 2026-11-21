@@ -1,0 +1,32 @@
+.kc-python-create { min-height: 0; flex: 1 1 auto; overflow: auto; }
+.kc-python-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: stretch; gap: 14px; padding: 14px; min-height: calc(100% - 32px); }
+.kc-python-panel { min-width: 0; display: flex; flex-direction: column; background: var(--kc-surface); border: 1px solid var(--kc-line); border-radius: var(--kc-radius-panel); overflow: hidden; }
+.kc-python-panel-bar { min-height: 50px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 4px 12px; border-bottom: 1px solid var(--kc-line); }
+.kc-python-panel-bar h2 { font-size: 15px; font-weight: 750; margin: 0; }
+.kc-python-panel-bar [role="status"] { font-size: 13px; color: var(--kc-text-muted); }
+.kc-python-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.kc-python-panel-bar :is(button, select) { min-height: 40px; min-width: 42px; padding: 0 8px; border: 1px solid var(--kc-line); border-radius: var(--kc-radius-button); background: var(--kc-surface); font-size: 13px; }
+.kc-python-panel-bar label { font-size: 13px; color: var(--kc-text-muted); white-space: nowrap; }
+.kc-python-editor-box { display: flex; flex: 1; min-height: 0; }
+.kc-python-code { min-width: 0; flex: 1; }
+.kc-python-code .cm-editor { height: clamp(290px, 67dvh, 1200px); font-size: var(--python-font, 16px); }
+.kc-python-code .cm-scroller { font: inherit; line-height: 1.6; }
+.kc-python-code :is(.cm-content, .cm-gutters) { padding-block: 10px; }
+.kc-python-code .cm-content { font-family: ui-monospace, Consolas, monospace; }
+.kc-python-log { flex: 1; min-height: 180px; max-height: 69dvh; overflow: auto; background: var(--kc-nav); color: #e8f1ff; padding: 14px; font-family: ui-monospace, Consolas, monospace; font-size: 14px; line-height: 1.55; }
+.kc-python-log pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.kc-python-empty { color: var(--kc-nav-text); }
+.kc-python-log [data-channel="stderr"], .kc-python-exception { color: #ffb7b7; }
+.kc-python-exception button { text-decoration: underline; margin: 8px 0; min-height: 36px; }
+.kc-python-run, .kc-python-input { padding: 10px 12px; border-top: 1px solid var(--kc-line); }
+.kc-python-run button, .kc-python-input button { min-height: 44px; }
+.kc-python-run button:disabled { opacity: .55; cursor: not-allowed; }
+.kc-python-input label { display: block; margin-bottom: 6px; overflow-wrap: anywhere; }
+.kc-python-input > div { display: flex; gap: 8px; }
+.kc-python-input input { flex: 1; min-width: 0; min-height: 44px; border: 1px solid var(--kc-line); padding: 6px 10px; border-radius: var(--kc-radius-button); }
+@media (max-width: 860px) {
+  .kc-python-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 8px; }
+  .kc-python-code .cm-editor { height: clamp(220px, 35dvh, 440px); }
+  .kc-python-log { min-height: 120px; max-height: 40dvh; }
+  .kc-python-panel-bar :is(button, select) { min-height: 44px; }
+}

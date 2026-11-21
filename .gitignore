@@ -19,3 +19,4 @@ apps/web/.npm-cache/
 Thumbs.db
 apps/web/public/blockly-media/
 apps/web/public/scratch-vm/
+apps/web/public/python-create-runtime/
