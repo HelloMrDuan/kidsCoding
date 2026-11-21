@@ -19,6 +19,7 @@ import { ResetIcon } from '@/features/ui/reset-icon'
 import { runGridProgram, type GridFailure, type GridLevel, type GridRun } from './grid-engine'
 import { GridStage, useGridPlayback } from './grid-stage'
 import { parseGridDraft, gridDraftKey, type GridDraft } from './grid-draft'
+import { useDraftOwnerLock } from '../use-draft-owner-lock'
 import { GRID_PROGRAM_MAX_BYTES, parseGridProgram, serializeGridProgram } from './grid-program-file'
 
 type Block = ProgramBlock
@@ -64,6 +65,7 @@ export const MISTAKE_LABELS: Record<GridFailure, string> = {
   no_start: '忘了“开始时”',
   disconnected: '有积木掉队',
   empty_repeat: '重复里面是空的',
+  repeat_required: '忘了用重复积木',
   too_deep: '重复套了太多层',
   stamp_twice: '同一格放了两个脚印',
   no_pot_here: '在没有花盆的地方浇水',
@@ -90,7 +92,15 @@ export const MISTAKE_LABELS: Record<GridFailure, string> = {
  * workspace and the SYS-106 engine. A step passes only after a real run
  * reaches the goal; the child's program for every step is saved locally.
  */
-export function GridLab({ lesson }: { lesson: GridLesson }) {
+export function GridLab({ lesson, draftOwner }: { lesson: GridLesson; draftOwner?: string | null }) {
+  const locked = useDraftOwnerLock(draftOwner)
+  if (locked || (lesson.layoutMode === 'golden' && !draftOwner)) {
+    return <p role="alert">当前账号无法确认，课堂草稿已锁定。请恢复原账号后重新打开课堂。</p>
+  }
+  return <GridLabSession key={draftOwner} lesson={lesson} draftKey={gridDraftKey(lesson.id, draftOwner ?? undefined)} />
+}
+
+function GridLabSession({ lesson, draftKey }: { lesson: GridLesson; draftKey: string }) {
   const [draft, setDraft] = useState<GridDraft>({ stepIndex: 0, programs: {}, passed: [], savedAt: null })
   const [hydrated, setHydrated] = useState(false)
   const [resumedFrom, setResumedFrom] = useState<number | null>(null)
@@ -119,7 +129,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
-        const saved = parseGridDraft(lesson, window.localStorage.getItem(gridDraftKey(lesson.id)))
+        const saved = parseGridDraft(lesson, window.localStorage.getItem(draftKey))
         if (saved) {
           setDraft(saved)
           if (saved.stepIndex > 0 || saved.passed.length) setResumedFrom(saved.stepIndex)
@@ -130,18 +140,18 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
       setHydrated(true)
     }, 0)
     return () => clearTimeout(timer)
-  }, [lesson])
+  }, [draftKey, lesson])
 
   const persist = useCallback((next: GridDraft) => {
     setDraft(next)
     try {
       const value = { ...next, savedAt: new Date().toISOString() }
-      window.localStorage.setItem(gridDraftKey(lesson.id), JSON.stringify(value))
+      window.localStorage.setItem(draftKey, JSON.stringify(value))
       setSaveState('saved')
     } catch {
       setSaveState('failed')
     }
-  }, [lesson.id])
+  }, [draftKey])
 
   const handleSnapshot = useCallback((next: Block[]) => {
     if (!hydrated) return
@@ -151,14 +161,14 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
       if (JSON.stringify(prev.programs[key] ?? current.starterBlocks ?? []) === JSON.stringify(next)) return prev
       const updated = { ...prev, programs: { ...prev.programs, [key]: next }, passed: prev.passed.filter(id => id !== key) }
       try {
-        window.localStorage.setItem(gridDraftKey(lesson.id), JSON.stringify({ ...updated, savedAt: new Date().toISOString() }))
+        window.localStorage.setItem(draftKey, JSON.stringify({ ...updated, savedAt: new Date().toISOString() }))
         setSaveState('saved')
       } catch { setSaveState('failed') }
       return updated
     })
     setRun(null)
     setNotice(null)
-  }, [hydrated, lesson])
+  }, [draftKey, hydrated, lesson])
 
   const recordResult = useCallback((result: GridRun) => {
     if (recordedRun.current === result) return

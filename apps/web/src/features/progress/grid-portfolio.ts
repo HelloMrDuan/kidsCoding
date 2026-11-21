@@ -3,11 +3,11 @@ import { gridDraftKey, parseGridDraft } from '@/features/lessons/grid/grid-draft
 import { countBlocks } from '@/features/lessons/blockly/program-tree'
 import type { PortfolioWork } from './portfolio-works'
 
-export function collectGridWorks(storage: Storage): PortfolioWork[] {
+export function collectGridWorks(storage: Storage, owner?: string | null): PortfolioWork[] {
   return Object.values(g0u3LoopLessons).flatMap(lesson => {
     const project = lesson.project
-    if (!project?.showInPortfolio) return []
-    const draft = parseGridDraft(lesson, storage.getItem(gridDraftKey(lesson.id)))
+    if (!project?.showInPortfolio || (lesson.layoutMode === 'golden' && !owner)) return []
+    const draft = parseGridDraft(lesson, storage.getItem(gridDraftKey(lesson.id, lesson.layoutMode === 'golden' ? owner! : undefined)))
     const blocks = draft?.programs[project.stepId]
     if (!draft?.savedAt || !blocks?.length || !draft.creative?.[project.stepId]) return []
     return [{
@@ -19,11 +19,11 @@ export function collectGridWorks(storage: Storage): PortfolioWork[] {
   })
 }
 
-export function removeGridWork(storage: Storage, lessonId: string) {
+export function removeGridWork(storage: Storage, lessonId: string, owner?: string | null) {
   const lesson = g0u3LoopLessons[lessonId]
   const project = lesson?.project
-  if (!project?.showInPortfolio) return
-  const key = gridDraftKey(lessonId)
+  if (!project?.showInPortfolio || (lesson.layoutMode === 'golden' && !owner)) return
+  const key = gridDraftKey(lessonId, lesson.layoutMode === 'golden' ? owner! : undefined)
   const draft = parseGridDraft(lesson, storage.getItem(key))
   if (!draft) return
   delete draft.programs[project.stepId]

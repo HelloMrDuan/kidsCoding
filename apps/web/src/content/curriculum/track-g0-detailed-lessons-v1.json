@@ -2676,7 +2676,7 @@
       "lessonTitle": "用循环画围栏",
       "stage": "循环画围栏",
       "story": "小熊要给方形花圃建围栏，重复相同的直走和转弯。",
-      "focusConcept": "循环嵌套与几何图案",
+      "focusConcept": "单层重复与转向",
       "ageRange": "5-7",
       "engine": "blockly",
       "contentStage": "detailed_script",
@@ -2692,7 +2692,7 @@
         "G0-U3-L04"
       ],
       "learningObjectives": [
-        "能够解释「循环嵌套与几何图案」在「用循环画围栏」中的作用",
+        "能够解释「单层重复与转向」在「用循环画围栏」中的作用",
         "在作品中完成可观察的模式操作并预测结果",
         "能对照任务目标指出一次运行差异并尝试修正"
       ],
@@ -2754,17 +2754,17 @@
       "commonMistakes": [
         {
           "symptom": "只重复前进忘记转弯",
-          "diagnosis": "检查「循环嵌套与几何图案」的输入条件与对象。",
+          "diagnosis": "检查「单层重复与转向」的输入条件与对象。",
           "recovery": "方形有几条边"
         },
         {
           "symptom": "转角不是90度",
-          "diagnosis": "检查「循环嵌套与几何图案」的积木连接或动作次数。",
+          "diagnosis": "检查「单层重复与转向」的积木连接或动作次数。",
           "recovery": "走完一边需要做什么"
         },
         {
           "symptom": "循环次数不足四次",
-          "diagnosis": "检查「循环嵌套与几何图案」的运行验证与完成条件。",
+          "diagnosis": "检查「单层重复与转向」的运行验证与完成条件。",
           "recovery": "最后能回到起点吗"
         }
       ],
@@ -2783,12 +2783,12 @@
           {
             "criterion": "程序顺序与逻辑",
             "weight": 25,
-            "evidence": "能够说明循环嵌套与几何图案关键步骤的先后或触发条件"
+            "evidence": "能够说明单层重复与转向关键步骤的先后或触发条件"
           },
           {
             "criterion": "测试调试",
             "weight": 20,
-            "evidence": "用一次错误或边界测试说明为何这样安排循环嵌套与几何图案"
+            "evidence": "用一次错误或边界测试说明为何这样安排单层重复与转向"
           },
           {
             "criterion": "作品表达",
@@ -2810,7 +2810,7 @@
       "codePlan": {
         "kind": "blockly_conceptual_not_executable",
         "entry": "开始或指定事件",
-        "logic": "循环嵌套与几何图案",
+        "logic": "单层重复与转向",
         "expectedRun": "四条边等长且闭合，角色最终回到原始方向",
         "capabilityGapNotice": "本课程教案不代表现有 Blockly 引擎支持其中全部积木；禁止据此直接解锁课程。"
       },

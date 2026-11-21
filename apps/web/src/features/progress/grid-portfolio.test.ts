@@ -4,7 +4,9 @@ import { toGridBlocks } from '@/content/curriculum/g0-u1-grid-lessons'
 import { gridDraftKey, parseGridDraft } from '@/features/lessons/grid/grid-draft'
 import { collectGridWorks, removeGridWork } from './grid-portfolio'
 
-const key = gridDraftKey(fenceLesson.id)
+const owner = 'user:alice'
+const other = 'user:bob'
+const key = gridDraftKey(fenceLesson.id, owner)
 
 beforeEach(() => window.localStorage.clear())
 
@@ -19,11 +21,17 @@ describe('grid portfolio', () => {
       programs: { [first.id]: toGridBlocks(first.solutions[0]), [project.id]: toGridBlocks(project.solutions[0]) },
       creative: { [project.id]: { goal: project.level.goal } },
     }))
-    expect(collectGridWorks(window.localStorage)).toEqual([expect.objectContaining({
+    window.localStorage.setItem(gridDraftKey(fenceLesson.id), window.localStorage.getItem(key)!)
+    expect(collectGridWorks(window.localStorage, other)).toEqual([])
+    expect(collectGridWorks(window.localStorage, 'guest')).toEqual([])
+    expect(collectGridWorks(window.localStorage, null)).toEqual([])
+    removeGridWork(window.localStorage, fenceLesson.id, other)
+    expect(collectGridWorks(window.localStorage, owner)).toEqual([expect.objectContaining({
       id: 'grid:G0-U3-L05', href: '/learn/grid-lab/G0-U3-L05', localPassed: true,
     })])
-    removeGridWork(window.localStorage, fenceLesson.id)
-    expect(collectGridWorks(window.localStorage)).toEqual([])
+    removeGridWork(window.localStorage, fenceLesson.id, owner)
+    expect(collectGridWorks(window.localStorage, owner)).toEqual([])
+    expect(window.localStorage.getItem(gridDraftKey(fenceLesson.id))).not.toBeNull()
     const remaining = parseGridDraft(fenceLesson, window.localStorage.getItem(key))
     expect(remaining?.passed).toEqual([first.id])
     expect(remaining?.programs[first.id]).toBeDefined()

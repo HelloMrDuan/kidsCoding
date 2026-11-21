@@ -21,7 +21,8 @@ async function next(page: Page) {
 
 const fenceId = 'G0-U3-L05'
 const fenceUrl = '/learn/grid-lab/' + fenceId
-const fenceKey = 'kids-grid-lesson-v1:' + fenceId
+const oldFenceKey = 'kids-grid-lesson-v1:' + fenceId
+const fenceKey = 'kids-lesson-owner-v1:guest:' + oldFenceKey
 
 async function fencePane(page: Page, pane: 'task' | 'code' | 'stage') {
   if (await page.getByTestId('lesson-mobile-tabs').isVisible()) {
@@ -153,6 +154,20 @@ test('G0-U3-L05 fence: five steps, three hints, failed storage retry, portfolio 
   await expect(page.getByTestId('grid-stage')).toHaveAttribute('data-fox-facing', 'down')
   await next(page)
 
+  const fileMenu = page.getByTestId('golden-file-tools')
+  if (!await fileMenu.evaluate(el => el.parentElement?.hasAttribute('open'))) await fileMenu.click()
+  await page.getByTestId('golden-import').setInputFiles({
+    name: 'previous-nested-program.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({
+      schema: 1, lessonId: fenceId, stepId: 'nested-square',
+      blocks: [{ type: 'when_start' }, { type: 'repeat_times', times: 4, body: [
+        { type: 'repeat_times', times: 2, body: [{ type: 'move_forward' }] }, { type: 'turn_right' },
+      ] }],
+    })),
+  })
+  await expect(page.getByTestId('golden-file-status')).toContainText('积木已导入')
+  await runAndExpect(page, 'error', '只用一层重复')
+  await openFenceTools(page)
+  await page.getByTestId('lesson-clear-program').click()
   await add(page, 'when_start')
   await add(page, 'repeat_times')
   await add(page, 'move_forward', 2)
@@ -218,6 +233,18 @@ test('G0-U3-L05 fence: five steps, three hints, failed storage retry, portfolio 
   await next(page)
   await expect(page.getByTestId('grid-feedback')).toContainText('先按')
   await runAndExpect(page, 'error')
+
+  await page.evaluate(({ scoped, legacy }) => localStorage.setItem(legacy, localStorage.getItem(scoped)!), { scoped: fenceKey, legacy: oldFenceKey })
+  await page.context().addCookies([{ name: 'kc_guest_id', value: 'another-learner', url: new URL(page.url()).origin }])
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(page.getByRole('alert')).toContainText('草稿已锁定')
+  await page.reload()
+  await expect(page.getByTestId('lesson-task-card')).toContainText('观察少掉的一边')
+  await page.goto('/learn/portfolio')
+  await expect(page.getByTestId('portfolio-work-' + fenceId)).toHaveCount(0)
+  await page.context().clearCookies({ name: 'kc_guest_id' })
+  await page.goto('/learn/portfolio')
+  await expect(page.getByTestId('portfolio-work-' + fenceId)).toBeVisible()
 })
 
 test('G0-U3-L05 golden desktop frees editor space, keeps the workspace and stops without progress', async ({ page }) => {

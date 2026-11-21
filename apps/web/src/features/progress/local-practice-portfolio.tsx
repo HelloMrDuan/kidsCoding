@@ -11,8 +11,10 @@ import { buildScratchWork } from './scratch-portfolio'
 import { readScratchDraftMeta, removeScratchDraft } from '@/features/scratch-vm/scratch-local-draft'
 import { findUploadConflicts } from './cloud-upload-conflict'
 import { collectGridWorks, removeGridWork } from './grid-portfolio'
+import { useDraftOwnerLock } from '@/features/lessons/use-draft-owner-lock'
 
-export function LocalPracticePortfolio() {
+export function LocalPracticePortfolio({ gridOwner }: { gridOwner?: string | null } = {}) {
+  const gridLocked = useDraftOwnerLock(gridOwner)
   const [items, setItems] = useState<LocalPractice[]>([])
   const [loaded, setLoaded] = useState(false)
   const [cloudBusy, setCloudBusy] = useState(false)
@@ -29,7 +31,7 @@ export function LocalPracticePortfolio() {
   function refresh() {
     try {
       setItems(collectLocalPractices(window.localStorage))
-      setGridWorks(collectGridWorks(window.localStorage))
+      setGridWorks(collectGridWorks(window.localStorage, gridOwner))
     } catch {
       setItems([])
       setGridWorks([])
@@ -180,7 +182,8 @@ export function LocalPracticePortfolio() {
         window.localStorage.removeItem(PRACTICE_STORAGE_PREFIX + work.lessonId)
         refresh()
       } else if (work.id.startsWith('grid:')) {
-        removeGridWork(window.localStorage, work.lessonId)
+        if (gridLocked) return
+        removeGridWork(window.localStorage, work.lessonId, gridOwner)
         refresh()
       } else {
         const current = readGuestProgress()
@@ -193,9 +196,9 @@ export function LocalPracticePortfolio() {
   }
 
   const works = useMemo(() => {
-    const merged = [...buildPortfolioWorks({ progress, practices: items, cloudDrafts }), ...scratchWorks, ...gridWorks]
+    const merged = [...buildPortfolioWorks({ progress, practices: items, cloudDrafts }), ...scratchWorks, ...(gridLocked ? [] : gridWorks)]
     return merged.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
-  }, [progress, items, cloudDrafts, scratchWorks, gridWorks])
+  }, [progress, items, cloudDrafts, scratchWorks, gridWorks, gridLocked])
   const shown = filter === 'all' ? works : works.filter((work) => work.kind === filter)
   const pages = Math.max(1, Math.ceil(shown.length / PAGE_SIZE))
   const current = Math.min(page, pages)
