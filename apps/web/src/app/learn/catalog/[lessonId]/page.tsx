@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { WorkspaceLink } from '@/features/create/workspace'
 
 import { getCatalogLesson, getUnitProject } from '@/features/curriculum/full-catalog-access'
 import { getLessonMaturity } from '@/features/curriculum/lesson-maturity'
@@ -42,7 +43,7 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
           <section className="rounded-[2rem] border-2 border-indigo-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black">用 Scratch 完成《{lesson.title}》</h2>
             <p className="mt-2 text-sm leading-7 text-slate-600">在原生编辑器里编写脚本，用绿旗观察舞台。完整作品可保存和导出。</p>
-            <Link data-testid="scratch-trial-entry" href={trial} className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">进入 Scratch 课堂 →</Link>
+            <WorkspaceLink data-testid="scratch-trial-entry" href={trial} className="mt-4 inline-flex rounded-full bg-indigo-700 px-6 py-3 font-bold text-white">进入 Scratch 课堂 →</WorkspaceLink>
           </section>
         ) : null}
         {trial && maturity.engine === 'scratch-vm' && lesson.id.startsWith('G2-') && !trial.endsWith('/golden') ? (

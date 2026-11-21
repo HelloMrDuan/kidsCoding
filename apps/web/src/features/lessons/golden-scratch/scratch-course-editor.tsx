@@ -1,12 +1,12 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { BRIDGE_PROTOCOL, BRIDGE_VERSION, ScratchBridgeClient } from '@/features/lessons/dance-show/gui-bridge'
 import { decodeSampleArchive } from '@/features/scratch-g2/scratch-g2-draft'
 import { scratchGuiUrl } from '@/features/scratch-create/gui-origin'
 import { readScratchImport } from '@/features/scratch-create/read-project'
-import { downloadWork } from '@/features/create/workspace'
+import { downloadWork, WorkspaceLink } from '@/features/create/workspace'
+import { useWorkspaceSession } from '@/features/create/use-workspace-session'
 import { loadCourseProject, saveCourseProject } from './course-project-store'
 import './scratch-course-editor.css'
 
@@ -58,6 +58,8 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
   const [guide, setGuide] = useState(false)
   const [hint, setHint] = useState(0)
   const [prediction, setPrediction] = useState('')
+  const sessionLocked = useWorkspaceSession(owner, dirty)
+  const canEdit = ready && !busy && !sessionLocked
   const step = course.activities[stepIndex]
 
   useEffect(() => {
@@ -121,15 +123,8 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
     }
   }, [address, attempt, initialized, loaded])
 
-  useEffect(() => {
-    if (!dirty) return
-    const protect = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = '' }
-    window.addEventListener('beforeunload', protect)
-    return () => window.removeEventListener('beforeunload', protect)
-  }, [dirty])
-
   async function act(operation: (client: ScratchBridgeClient) => Promise<void>) {
-    if (!bridge.current || !ready || busyRef.current) return
+    if (!bridge.current || !ready || busyRef.current || sessionLocked) return
     busyRef.current = true
     setBusy(true)
     setError('')
@@ -200,27 +195,27 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
       <header className="kc-scratch-course-toolbar">
         <div><h1>{course.title}</h1><p>第 {stepIndex + 1} / {course.activities.length} 关 · {step.title} · {dirty ? '有改动未保存' : '本机作品'}</p></div>
         <div className="kc-scratch-course-actions">
-          <Link href={`/learn/catalog/${course.id}`} className="kc-action-surface kc-btn-outline kc-btn-sm"
-            onNavigate={event => { if (dirty && !window.confirm('作品还有改动未保存。要离开吗？')) event.preventDefault() }}>返回</Link>
+          <WorkspaceLink href={`/learn/catalog/${course.id}`} className="kc-action-surface kc-btn-outline kc-btn-sm">返回</WorkspaceLink>
           <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" onClick={() => setGuide(v => !v)} aria-expanded={guide}>任务指引</button>
-          <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" disabled={!ready || busy} onClick={() => void act(async client => {
+          <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" disabled={!canEdit} onClick={() => void act(async client => {
             const captured = edited.current
             await save((await client.getProject()).sb3, stepIndex, observed, finished, captured)
             setResult('作品已保存到本机。')
           })}>保存</button>
-          <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" disabled={!ready || busy} onClick={() => importInput.current?.click()}>导入 .sb3</button>
+          <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" disabled={!canEdit} onClick={() => importInput.current?.click()}>导入 .sb3</button>
           <input type="file" ref={importInput} accept=".sb3" hidden onChange={importProject} />
-          <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" disabled={!ready || busy} onClick={() => void act(async client => {
+          <button className="kc-action-surface kc-btn-outline kc-btn-sm" type="button" disabled={!canEdit} onClick={() => void act(async client => {
             downloadWork((await client.getProject()).sb3, course.title, 'sb3')
           })}>导出 .sb3</button>
-          <button className="kc-action-surface kc-btn-sm" type="button" disabled={!ready || busy} onClick={check}>{busy ? '正在处理…' : '检查任务'}</button>
+          <button className="kc-action-surface kc-btn-sm" type="button" disabled={!canEdit} onClick={check}>{busy ? '正在处理…' : '检查任务'}</button>
         </div>
       </header>
-      <p role={error ? 'alert' : 'status'} className="kc-scratch-course-status">
-        {error || (!address ? 'Scratch 编辑服务尚未配置。' : !ready ? '正在加载 Scratch 编辑器…' : result || '在 Scratch 中用绿旗运行、用红色按钮停止，再检查任务。')}
+      <p role={error || sessionLocked ? 'alert' : 'status'} className="kc-scratch-course-status">
+        {sessionLocked ? '当前账号无法确认，课堂作品已锁定。请恢复原账号或返回课程。' :
+          error || (!address ? 'Scratch 编辑服务尚未配置。' : !ready ? '正在加载 Scratch 编辑器…' : result || '在 Scratch 中用绿旗运行、用红色按钮停止，再检查任务。')}
         {error && !ready && <button type="button" onClick={() => { setError(''); setInitialized(false); setLoaded(undefined); setAttempt(n => n + 1) }}>重试</button>}
       </p>
-      <div className="kc-scratch-course-editor">
+      <div className="kc-scratch-course-editor" hidden={sessionLocked} inert={sessionLocked}>
         {initialized && address && <iframe ref={frame} key={attempt} src={address} title="Scratch 完整课程编辑器"
           sandbox="allow-scripts allow-same-origin allow-downloads" onLoad={() => setLoaded(attempt)} />}
         {guide && <aside className="kc-scratch-course-guide" aria-label="任务指引">
@@ -229,8 +224,7 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
           <h2>{finished ? course.completionTitle : step.title}</h2>
           {finished ? <>
             <p>本机成就 · {course.badge}</p>
-            {course.nextLessonId && <Link href={`/learn/catalog/${course.nextLessonId}`} className="kc-action-surface kc-btn-outline kc-btn-sm"
-              onNavigate={event => { if (dirty && !window.confirm('作品还有改动未保存。要离开吗？')) event.preventDefault() }}>下一课</Link>}
+            {course.nextLessonId && <WorkspaceLink href={`/learn/catalog/${course.nextLessonId}`} className="kc-action-surface kc-btn-outline kc-btn-sm">下一课</WorkspaceLink>}
           </> : <p>{step.goal}</p>}
           {!finished && step.prediction && <label className="kc-scratch-course-prediction">
             {step.prediction.question}

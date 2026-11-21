@@ -28,7 +28,7 @@
 - `concert-runtime.test.ts` 使用真实 Scratch VM 运行错误初始稿和已修改的 .sb3。
 - `g2-golden-concert.spec.ts` 通过原生控件修正背景、歌曲、铃声和对白。验证一份保存的 .sb3 重开仍含脚本、背景和声音。四个视口均拖入并连接真实积木，平板和手机使用 Chrome 触控协议。
 - 与原型对照：[桌面设计目标](evidence/reference-desktop.png) · [1440×900](evidence/1440x900.png) · [1366×768](evidence/1366x768.png) · [768×1024](evidence/768x1024.png) · [375×812](evidence/375x812.png)。平板和手机在宿主内滚动，测试验证脚本区可拖放、舞台无水平溢出。
-- 生产构建与 TypeScript 通过，66 项范围内单测通过。真实 Chrome 验证 6 项 Golden 测试及 11 项旧音乐会实验和 Scratch 创作中心回归。[手机脚本](evidence/375x812-code.png) · [通关并保存](evidence/completed.png)。
+- 生产构建、TypeScript、范围内 ESLint 和 66 项单测通过。真实 Chrome 验证 7 项 Golden 测试及 11 项旧音乐会实验和 Scratch 创作中心回归。未保存时，测试验证浏览器后退、站内导航和刷新均触发离开确认，并在保存后通过历史记录重开。[手机脚本](evidence/375x812-code.png) · [通关并保存](evidence/completed.png)。
 - 本课接入的背景、角色和声音来自仓库既有原创森林音乐会作品。宿主版本和对应源码分发沿用 OPS-050 门禁，预发布前仍需完成许可和产品审核。
 - 当前是 L3 真实试玩，保存和成就在当前浏览器。正式成绩、云同步、平台奖励、实体设备和儿童试学等待相应验收。
 - 回滚时恢复课程目录中的旧试验入口，旧实验稿保持原存储。Golden 用户可在回滚前导出 .sb3。无需清理 IndexedDB。

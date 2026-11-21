@@ -2,6 +2,7 @@ import { mkdir, readFile } from 'node:fs/promises'
 import { expect, test, type FrameLocator, type Locator, type Page } from '@playwright/test'
 import JSZip from 'jszip'
 import { drag, pickBlock } from './_fixtures/scratch-block-drag'
+import { cancelCreateLeave } from './_fixtures/cancel-create-leave'
 
 const courseUrl = '/learn/scratch-lab/G2-U1-L03/golden'
 const gui = (page: Page) => page.frameLocator('iframe[title="Scratch 完整课程编辑器"]')
@@ -186,4 +187,27 @@ test('G2 Golden reports a blocked local write and saves when retried', async ({ 
   await page.reload()
   await expect(check(page)).toBeEnabled({ timeout: 45_000 })
   await advance(page, '夜晚森林')
+})
+
+test('G2 Golden protects an unsaved edit on Back, site navigation and reload', async ({ page }) => {
+  await page.goto('/learn/catalog/G2-U1-L03')
+  await page.getByTestId('scratch-trial-entry').click()
+  await expect(check(page)).toBeEnabled({ timeout: 45_000 })
+  const address = page.url()
+  const frame = gui(page)
+  await frame.getByLabel('Target pane').getByText('舞台', { exact: true }).click()
+  await selectMenu(script(frame), '夜晚森林', '绿色草地')
+  await expect(page.getByText(/有改动未保存/)).toBeVisible()
+  await cancelCreateLeave(page, () => page.evaluate(() => { setTimeout(() => history.back(), 0) }))
+  await cancelCreateLeave(page, () => page.getByTestId('kc-nav-map').click())
+  await cancelCreateLeave(page, () => page.evaluate(() => { setTimeout(() => location.reload(), 0) }))
+  await expect(page).toHaveURL(address)
+  await expect(script(frame).getByText('绿色草地', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: '保存', exact: true }).click()
+  await expect(page.getByRole('status')).toContainText('作品已保存到本机')
+  await page.goBack()
+  await expect(page).toHaveURL(/\/learn\/catalog\/G2-U1-L03$/)
+  await page.goForward()
+  await expect(check(page)).toBeEnabled({ timeout: 45_000 })
+  await advance(page, '真的换成了绿色草地')
 })
