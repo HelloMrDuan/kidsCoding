@@ -637,7 +637,8 @@ export function BlocklyWorkspace({
         <header className="kc-v3-script-heading" data-testid="v3-script-heading">
           <h2>脚本工作区</h2>
           <div>
-            <button type="button" onClick={() => workspaceRef.current?.undo(false)}>撤销</button>
+            <button type="button" data-testid="v3-undo" onClick={() => workspaceRef.current?.undo(false)}>撤销</button>
+            <button type="button" data-testid="v3-redo" onClick={() => workspaceRef.current?.undo(true)}>重做</button>
             <button type="button" onClick={() => showFromTopRef.current?.()}>适合画面</button>
           </div>
         </header>

@@ -28,6 +28,12 @@ describe('AppShell (frozen V2 global shell)', () => {
     mockPath = '/learn/scratch-lab/G2-U1-L03/golden'
     render(<AppShell><div /></AppShell>)
     expect(screen.getByTestId('kc-nav-lesson')).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('points the Scratch entry at the unified creation centre', () => {
+    mockPath = '/learn/catalog'
+    render(<AppShell><div /></AppShell>)
+    expect(screen.getByTestId('kc-nav-scratch')).toHaveAttribute('href', '/create')
     expect(screen.getByTestId('kc-nav-scratch')).not.toHaveAttribute('aria-current')
   })
 

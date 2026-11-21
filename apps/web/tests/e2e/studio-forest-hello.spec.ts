@@ -586,13 +586,14 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
       const heading = page.getByTestId('v3-script-heading')
       const fit = heading.getByRole('button', { name: '适合画面' })
       const undo = heading.getByRole('button', { name: '撤销' })
+      const redo = heading.getByRole('button', { name: '重做' })
       if (phone) {
         const startCategory = categories.getByRole('button', { name: '开始' })
         const moveCategory = categories.getByRole('button', { name: '移动' })
         const zoomOut = zoom.getByRole('button', { name: '缩小脚本' })
         const zoomReset = zoom.getByRole('button', { name: '重置脚本缩放' })
         const zoomIn = zoom.getByRole('button', { name: '放大脚本' })
-        for (const control of [startCategory, moveCategory, undo, fit, zoomOut, zoomReset, zoomIn]) {
+        for (const control of [startCategory, moveCategory, undo, redo, fit, zoomOut, zoomReset, zoomIn]) {
           await assertTouchTarget(control)
         }
         await startCategory.tap()
@@ -630,6 +631,12 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
       if (phone) {
         await expect(scriptMove).toBeVisible()
         await assertTouchZoomClear(zoom, 'after connection', start, scriptMove)
+        await undo.tap()
+        await expect(scriptMove).toHaveCount(0)
+        await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START])
+        await redo.tap()
+        await expect(scriptMove).toHaveCount(1)
+        await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
         await undo.tap()
         await expect(scriptMove).toHaveCount(0)
         await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START])
