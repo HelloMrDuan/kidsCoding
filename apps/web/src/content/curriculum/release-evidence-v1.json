@@ -676,11 +676,11 @@
       },
       "engineProductionReady": {
         "status": "unchecked",
-        "note": "Scratch VM 渲染/存储未完成"
+        "note": "Golden 课堂使用独立 Scratch GUI 宿主，Scratch VM 实测分身轨迹、清理和自制积木。暂为本机作品，正式发布仍待核对宿主与许可。"
       },
       "assessmentE2EPassed": {
         "status": "unchecked",
-        "note": "仍在正反例欠账名单中"
+        "note": "使用 g3-golden-meteor.spec.ts 核对原生课堂。正式发布仍需 PR、main CI 和独立产品验收。"
       },
       "licensedAssetsReady": {
         "status": "unchecked",

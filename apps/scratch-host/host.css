@@ -15,4 +15,5 @@ body { font-family: system-ui, sans-serif; overflow: hidden; }
   #scratch-root [aria-label="放大舞台"], #scratch-root [aria-label="进入全屏模式"] { display: none; }
   /* Keep room next to Scratch's native fixed-width flyout for the script. */
   #scratch-root [class*="gui_editor-wrapper"] { width: 125%; height: max(665px, 94dvh); zoom: .8; }
+  #scratch-root[data-layout="fit-phone"] [class*="gui_editor-wrapper"] { width: 100%; }
 }

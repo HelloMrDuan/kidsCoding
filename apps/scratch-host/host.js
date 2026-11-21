@@ -8,6 +8,9 @@
     root.textContent = '请从已配置的 KidsCoding 创作中心打开 Scratch。'
     return
   }
+  if (new URLSearchParams(location.search).get('layout') === 'fit-phone') {
+    root.dataset.layout = 'fit-phone'
+  }
 
   const editorState = new GUI.EditorState({ locale: 'zh-cn' })
   const phone = matchMedia('(max-width: 450px)')
