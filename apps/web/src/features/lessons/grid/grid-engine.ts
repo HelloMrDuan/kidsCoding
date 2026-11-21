@@ -2,7 +2,7 @@
 // Pure and deterministic: the stage animates the trace, and lesson checks
 // judge the observed outcome, never a pre-recorded answer animation.
 
-import { countBlocks, expandProgram, type ProgramBlock } from '../blockly/program-tree'
+import { countBlocks, expandProgram, programDepth, type ProgramBlock } from '../blockly/program-tree'
 
 export type Facing = 'up' | 'right' | 'down' | 'left'
 export type Cell = { x: number; y: number }
@@ -28,6 +28,7 @@ export type GridLevel = {
   /** The exact route to trace, including the starting cell. Closed routes accept either direction. */
   route?: Cell[]
   goalFacing?: Facing
+  repeatMode?: 'single-layer' | 'single-layer-required'
 }
 
 /** G0-U3 pattern lessons: a coloured footprint the fox leaves on its current cell. */
@@ -71,6 +72,7 @@ export type GridFailure =
   | 'not_at_goal'
   | 'empty_repeat'
   | 'too_deep'
+  | 'repeat_required'
   | 'stamp_twice'
   | 'no_pot_here'
   | 'watered_twice'
@@ -133,6 +135,13 @@ export function runGridProgram(level: GridLevel, blocks: ProgramBlock[]): GridRu
   if (blocks.some(b => b.disconnected)) return result(false, 'disconnected', '有积木没接在“开始时”下面，掉队的积木不会运行。', frames, state, 0)
   const program = blocks.slice(1)
   if (countBlocks(program) > GRID_MAX_ACTIONS) return result(false, 'too_many', `一次最多 ${GRID_MAX_ACTIONS} 块积木。`, frames, state, 0)
+  if (level.repeatMode) {
+    const depth = programDepth(program)
+    if (depth > 1) return result(false, 'too_deep', '这一课只用一层重复。把每边的前进积木和右转直接接进重复里。', frames, state, 0)
+    if (!depth && level.repeatMode === 'single-layer-required') {
+      return result(false, 'repeat_required', '这一关请用一个重复积木来围花圃。把走一边和转弯的动作放进重复里。', frames, state, 0)
+    }
+  }
   // SYS-107: unroll “重复 N 次” into the actions that really run.
   const expanded = expandProgram(program, GRID_MAX_STEPS)
   if (!expanded.ok) {
@@ -300,6 +309,7 @@ export const GRID_FAILURE_LABELS: Record<GridFailure, string> = {
   watered_twice: '同一盆花浇了两次',
   pots_missed: '有花盆漏浇了',
   wrong_pattern: '脚印规律不对',
+  repeat_required: '还没用重复积木',
   pattern_short: '脚印不够',
   unknown_block: '积木不能用',
   too_many: '积木太多',

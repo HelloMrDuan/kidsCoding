@@ -18,9 +18,9 @@ const fence = (side: number, x = 0): GridLevel => {
     ...moves.map(step => ({ x: x + side - step, y: side })),
     ...moves.map(step => ({ x, y: side - step })),
   ]
-  return { cols: 5, rows: 4, start: home, goal: home, route, goalFacing: 'right' }
+  return { cols: 5, rows: 4, start: home, goal: home, route, goalFacing: 'right', repeatMode: 'single-layer' }
 }
-const square = (side: number) => [start, cycle(4, cycle(side, forward), right)]
+const square = (side: number) => [start, cycle(4, ...Array<string>(side).fill(forward), right)]
 const unit = [forward, forward, right]
 const two = fence(2)
 const three = fence(3, 1)
@@ -30,8 +30,8 @@ export const fenceLesson: GridLesson = {
   title: '用循环画围栏',
   layoutMode: 'golden',
   story: '小熊刚播下花种。小狐狸带来一卷围栏，走过一格就能铺好一段。循着花圃边上的虚线，帮小熊把四边围起来。',
-  concept: '一边走几格，转一次弯。把四条边的相同做法装进外层循环。',
-  objectives: ['预测走完四边后的位置和方向', '用内层循环控制边长、外层循环控制边数', '根据舞台轨迹定位少走的一边或漏掉的转弯'],
+  concept: '一边走几格，转一次弯。把走一边的动作放进一个重复积木，做四遍。',
+  objectives: ['预测走完四边后的位置和方向', '用一层重复积木把“走一边、转一次”执行四遍', '根据舞台轨迹定位少走的一边或漏掉的转弯'],
   trialIntroduction: {
     title: '用积木帮小狐狸围起花圃',
     description: '五关分别练习补围栏、转弯、套用循环、检查朝向和自选边长。舞台会画出小狐狸真正走过的路径，程序和作品自动保存在本机。',
@@ -49,8 +49,8 @@ export const fenceLesson: GridLesson = {
       predictChoices: [{ text: '会回到出发点', when: 'pass' }, { text: '还留下一个缺口', when: 'wrong_route' }],
       errorLab: { expect: 'wrong_route', expected: '四段实线和虚线围栏重合。', actual: '只走了三条边，左边还留着一个缺口。' },
       level: two, allowedBlocks, starterBlocks: toGridBlocks([start, cycle(3, ...unit)]),
-      hints: ['左边还是白色虚线。', '一次重复铺一条边，方形有四边。', '把外层的 3 改成 4。'],
-      solutions: [[start, cycle(4, ...unit)], square(2)],
+      hints: ['左边还是白色虚线。', '一次重复铺一条边，方形有四边。', '把重复积木的 3 改成 4。'],
+      solutions: [square(2)],
       counterExamples: [{ program: [start, cycle(3, ...unit)], failure: 'wrong_route' }, { program: [start], failure: 'wrong_route' }],
     },
     {
@@ -66,12 +66,12 @@ export const fenceLesson: GridLesson = {
     },
     {
       id: 'nested-square', kind: 'practice-a', title: '把一条边装进循环',
-      instruction: '四条边都是两格。先用小循环走完一边，再把走一边和转弯放进大循环。也可以用其他办法沿虚线走完。',
-      predict: '大循环转弯的次数和小循环走路的次数一样吗？',
-      level: two, allowedBlocks,
-      hints: ['每到转角前，先数小狐狸走了几格。', '小循环管一边的长度，大循环管边数。', '大循环重复 4 次，里面先重复走 2 格，再右转。'],
-      solutions: [square(2), [start, cycle(4, ...unit)], [start, right, cycle(4, forward, forward, left), left]],
-      counterExamples: [{ program: [start, cycle(4, forward, right)], failure: 'wrong_route' }, { program: [start, cycle(5, ...unit)], failure: 'wrong_route' }],
+      instruction: '四条边都是两格。把两块“向前走”和一块“向右转”放进同一个重复积木，让这组动作做四遍。',
+      predict: '这个重复积木做四遍，狐狸会转几次弯？',
+      level: { ...two, repeatMode: 'single-layer-required' }, allowedBlocks,
+      hints: ['每到转角前，先数小狐狸走了几格。', '重复一次，狐狸就走完一条边并转一次弯。', '把两块前进和一块右转直接放进“重复 4 次”。'],
+      solutions: [square(2), [start, right, cycle(4, forward, forward, left), left]],
+      counterExamples: [{ program: [start, cycle(4, forward, right)], failure: 'wrong_route' }, { program: [start, cycle(5, ...unit)], failure: 'wrong_route' }, { program: [start, cycle(4, cycle(2, forward), right)], failure: 'too_deep' }, { program: [start, ...unit, ...unit, ...unit, ...unit], failure: 'repeat_required' }],
     },
     {
       id: 'facing-check', kind: 'practice-b', title: '回到起点后面朝哪里？',
@@ -85,15 +85,15 @@ export const fenceLesson: GridLesson = {
     {
       id: 'my-fence', kind: 'creative', title: '为花圃选一个围栏',
       instruction: '给花苗选两格边长或三格边长。完成你的围栏后，可以回到作品卡播放。',
-      predict: '如果每条边多一格，应该改哪个循环？',
+      predict: '如果每条边多一格，每次重复里要多放哪块积木？',
       level: two, allowedBlocks,
       creative: { prompt: '花圃每条边多长？', goalChoices: [two.goal, three.goal], labels: ['每边两格', '每边三格'], layouts: [two, three] },
-      hints: ['每个转角都要踩到。', '边数一直是四，边长可以改变。', '如果选三格，内层改成 3，外层仍是 4。'],
-      solutions: [square(2), [start, cycle(4, ...unit)]],
+      hints: ['每个转角都要踩到。', '边数一直是四，边长可以改变。', '选三格时，在“重复 4 次”里放三块前进，再接一块右转。'],
+      solutions: [square(2), [start, right, cycle(4, forward, forward, left), left]],
       counterExamples: [{ program: [start, cycle(4, forward, right)], failure: 'wrong_route' }, { program: [start, cycle(3, ...unit)], failure: 'wrong_route' }],
     },
   ],
-  reflection: '让小狐狸绕一个更大的正方形时，为什么外层还要重复四次？',
+  reflection: '让小狐狸绕一个更大的正方形时，为什么还要重复四次？',
   reflectionCheck: {
     question: '每边从 2 格改成 3 格，哪一个次数要变？',
     options: [{ text: '每边前进的次数', correct: true }, { text: '绕四条边的次数', correct: false }],

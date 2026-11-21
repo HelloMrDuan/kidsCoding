@@ -17,7 +17,7 @@ describe('G0-U3-L05 fence route', () => {
   })
   const program = (side: number): ProgramBlock[] => [
     { type: 'when_start' },
-    { type: 'repeat_times', times: 4, body: [loop(side, 'move_forward'), { type: 'turn_right' }] },
+    loop(4, ...Array<string>(side).fill('move_forward'), 'turn_right'),
   ]
 
   it('uses the selected map and rejects a different edge length, even if the fox still returns home', () => {
@@ -32,9 +32,9 @@ describe('G0-U3-L05 fence route', () => {
     const practice = lesson.steps.find(step => step.kind === 'practice-a')!
     const results = practice.solutions.map(solution => runGridProgram(practice.level, toGridBlocks(solution)))
     expect(results.map(result => [result.final.x, result.final.y, result.final.facing, result.steps])).toEqual([
-      [0, 0, 'right', 8], [0, 0, 'right', 8], [0, 0, 'right', 8],
+      [0, 0, 'right', 8], [0, 0, 'right', 8],
     ])
-    expect(runGridProgram(practice.level, [{ type: 'when_start' }]).failure).toBe('wrong_route')
+    expect(runGridProgram(practice.level, [{ type: 'when_start' }]).failure).toBe('repeat_required')
   })
 })
 const usesRepeat = (program: Array<string | ProgramBlock>) => program.some(b => typeof b !== 'string' && b.type === 'repeat_times')
