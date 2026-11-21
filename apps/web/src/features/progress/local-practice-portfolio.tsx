@@ -10,8 +10,11 @@ import { collectLocalPractices, PRACTICE_STORAGE_PREFIX, type LocalPractice } fr
 import { buildScratchWork } from './scratch-portfolio'
 import { readScratchDraftMeta, removeScratchDraft } from '@/features/scratch-vm/scratch-local-draft'
 import { findUploadConflicts } from './cloud-upload-conflict'
+import { collectGridWorks, removeGridWork } from './grid-portfolio'
+import { useDraftOwnerLock } from '@/features/lessons/use-draft-owner-lock'
 
-export function LocalPracticePortfolio() {
+export function LocalPracticePortfolio({ gridOwner }: { gridOwner?: string | null } = {}) {
+  const gridLocked = useDraftOwnerLock(gridOwner)
   const [items, setItems] = useState<LocalPractice[]>([])
   const [loaded, setLoaded] = useState(false)
   const [cloudBusy, setCloudBusy] = useState(false)
@@ -21,14 +24,17 @@ export function LocalPracticePortfolio() {
   const [filter, setFilter] = useState<'all' | WorkKind>('all')
   const [page, setPage] = useState(1)
   const [scratchWorks, setScratchWorks] = useState<PortfolioWork[]>([])
+  const [gridWorks, setGridWorks] = useState<PortfolioWork[]>([])
   const [deleteMessage, setDeleteMessage] = useState('')
   const progress = useSyncExternalStore(subscribeGuestProgress, readGuestProgress, () => defaultGuestProgress)
 
   function refresh() {
     try {
       setItems(collectLocalPractices(window.localStorage))
+      setGridWorks(collectGridWorks(window.localStorage, gridOwner))
     } catch {
       setItems([])
+      setGridWorks([])
     }
     setLoaded(true)
   }
@@ -175,6 +181,10 @@ export function LocalPracticePortfolio() {
       } else if (work.kind === 'python') {
         window.localStorage.removeItem(PRACTICE_STORAGE_PREFIX + work.lessonId)
         refresh()
+      } else if (work.id.startsWith('grid:')) {
+        if (gridLocked) return
+        removeGridWork(window.localStorage, work.lessonId, gridOwner)
+        refresh()
       } else {
         const current = readGuestProgress()
         writeGuestProgress({ ...current, projectSnapshots: current.projectSnapshots.filter((snapshot) => snapshot.lessonId !== work.lessonId) })
@@ -186,9 +196,9 @@ export function LocalPracticePortfolio() {
   }
 
   const works = useMemo(() => {
-    const merged = [...buildPortfolioWorks({ progress, practices: items, cloudDrafts }), ...scratchWorks]
+    const merged = [...buildPortfolioWorks({ progress, practices: items, cloudDrafts }), ...scratchWorks, ...(gridLocked ? [] : gridWorks)]
     return merged.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
-  }, [progress, items, cloudDrafts, scratchWorks])
+  }, [progress, items, cloudDrafts, scratchWorks, gridWorks, gridLocked])
   const shown = filter === 'all' ? works : works.filter((work) => work.kind === filter)
   const pages = Math.max(1, Math.ceil(shown.length / PAGE_SIZE))
   const current = Math.min(page, pages)

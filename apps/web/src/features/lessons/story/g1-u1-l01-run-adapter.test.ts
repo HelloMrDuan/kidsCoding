@@ -37,7 +37,7 @@ describe('StoryRunAdapter', () => {
     expect(events[0].state).toEqual({ x: 0, score: 0, running: true, frames: 1 })
     expect(adapter.getState().running).toBe(true)
     expect(adapter.getJudgmentResult()).toBeNull()
-    expect(adapter.getStageState()).toEqual({ foxX: 0, speaker: 'fox', bubble: '欢迎来到森林剧场', frameIndex: 0 })
+    expect(adapter.getStageState()).toEqual({ foxX: 0, audienceX: 0, speaker: 'fox', bubble: '欢迎来到森林剧场', frameIndex: 0 })
 
     vi.advanceTimersByTime(450)
     expect(events).toHaveLength(2)
@@ -62,6 +62,33 @@ describe('StoryRunAdapter', () => {
     expect(events).toEqual([{ kind: 'finished', state: { x: 0, score: 0, running: false, frames: 0 } }])
     expect(adapter.getJudgmentResult()?.passed).toBe(false)
     expect(adapter.getJudgmentResult()?.layers[1].detail).toContain('程序为空')
+  })
+
+  it('Golden creative step requires a new closing line and animates the selected performer', () => {
+    const adapter = new StoryRunAdapter(true)
+    const draft = draftWith([START, SAY_OPENING, MOVE])
+    draft.stepIndex = 5
+    draft.programs['creative-encore'] = [START, SAY_OPENING, MOVE]
+    adapter.runProgram(draft, () => {})
+    vi.runAllTimers()
+    expect(adapter.getJudgmentResult()?.passed).toBe(false)
+    expect(adapter.getState().score).toBe(0)
+
+    draft.programs['creative-encore'].push({ type: 'switch_character' }, MOVE, { type: 'say_line', line: 'ready' })
+    adapter.runProgram(draft, () => {})
+    vi.runAllTimers()
+    expect(adapter.getJudgmentResult()?.passed).toBe(true)
+    expect(adapter.getStageState()).toMatchObject({
+      foxX: 100, audienceX: 100, speaker: 'audience', bubble: '你们准备好了吗？',
+    })
+  })
+
+  it('rejects only the rabbit moving after the fox welcomes the audience', () => {
+    const adapter = new StoryRunAdapter(true)
+    adapter.runProgram(draftWith([START, SAY_OPENING, { type: 'switch_character' }, MOVE]), () => {})
+    vi.runAllTimers()
+    expect(adapter.getJudgmentResult()?.passed).toBe(false)
+    expect(adapter.getStageState()).toMatchObject({ foxX: 0, audienceX: 100 })
   })
 
   it('stop() cancels pending frames synchronously, keeps the script and stage, never finishes', () => {

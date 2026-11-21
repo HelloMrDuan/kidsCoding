@@ -15,7 +15,7 @@ import { expect, test, type Page } from '@playwright/test'
  * 里的逐块路径，见 E8。
  */
 const ROUTE = '/learn/story-lab/G1-U1-L01'
-const KEY = 'kidscoding-draft:G1-U1-L01'
+const KEY = 'kids-lesson-owner-v1:guest:kidscoding-draft:G1-U1-L01'
 const LEGACY_KEY = 'kids-story-lesson-v1:G1-U1-L01'
 // Evidence is resolved relative to this spec file so it works on any
 // machine (CI Runner included), not just the author's workstation:

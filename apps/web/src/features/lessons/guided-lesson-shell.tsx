@@ -57,6 +57,7 @@ type GuidedLessonShellProps = {
   /** Step the child was actually on when this session restored a saved draft. */
   resumedFromStep?: number | null
   localSaveState?: LessonLocalSaveState
+  cloudSyncSupported?: boolean
   cloudSyncState?: LessonCloudSyncState
   isCompleting?: boolean
   onRetryLocalSave?: () => void
@@ -108,6 +109,7 @@ export function GuidedLessonShell({
   stepCount,
   resumedFromStep,
   localSaveState = 'unsaved',
+  cloudSyncSupported = true,
   cloudSyncState = 'idle',
   isCompleting = false,
   onRetryLocalSave,
@@ -150,7 +152,7 @@ export function GuidedLessonShell({
   const progressPercent = showProgress
     ? Math.min(100, Math.max(0, ((stepIndex + 1) / stepCount) * 100))
     : 0
-  const showCloudChip = cloudSyncState !== 'idle'
+  const showCloudChip = cloudSyncSupported && cloudSyncState !== 'idle'
   const localChipClass =
     localSaveState === 'failed'
       ? 'kc-chip-warning'
@@ -268,7 +270,7 @@ export function GuidedLessonShell({
                 {CLOUD_SYNC_COPY[cloudSyncState]}
               </span>
             ) : null}
-            {cloudSyncState !== 'local-only' ? (
+            {cloudSyncSupported && cloudSyncState !== 'local-only' ? (
               // TQ-013: say plainly what is uploaded at the sync point, before it happens.
               // Darker V2 text token (--kc-text): muted grey is only ~4.2:1 at 12px on white.
               <span

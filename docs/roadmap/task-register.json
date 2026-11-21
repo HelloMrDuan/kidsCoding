@@ -4074,7 +4074,7 @@
         "title": "V3 Blockly 工作区专项整改（Codex 接手，G0 第一课《小狐狸出场》）",
         "priority": "P0",
         "category": "OPS",
-        "status": "in_progress",
+        "status": "in_review",
         "dependencies": [
             "OPS-041",
             "OPS-048"
@@ -4090,7 +4090,18 @@
             "4 号非作者功能与视觉复核 PASS；CI 全绿仅为必要条件，不替代产品体验验收",
             "合并后部署预发布并提交线上截图与真实交互结果；用户最终视觉确认前，不批量复制到更多课程，不宣称儿童试学验收通过"
         ],
-        "evidence": {},
+        "evidence": {
+          "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/558",
+          "visualEvidence": "docs/product/p0-kitten-workspace/evidence/OPS-049/README.md",
+          "tests": [
+            "手机整改后复跑生产 Next.js 构建、TypeScript 和修改文件 lint（0 错误、1 条既有未用参数警告）。53 文件、455 条相关单测通过。",
+            "Chrome：40 条样板与旧课回归、3 条共享门禁全部通过。四关连续、鼠标与触控积木连接、预测、纠错、旧课堂、奖励幂等均实跑。",
+            "再次注入本机存储、同步超时和导航失败。保存刷新恢复、失败后重试及备用完成页均通过。",
+            "四组第二关原型/生产构建与真实拖拽截图，代码快照证明吸附后运行走 100 步。平板和手机断言实际角色与状态矩形不重叠。",
+            "375px 使用画布外 44×44px 缩放按钮。真实 Chrome 触控和 DOM 矩形验证拖拽前、松手前、连接后与积木分离，并验证顶栏、分类、撤销、适合画面及保存入口可操作。768px 平板布局初审通过。",
+            "第二课隔离复用再次通过：真实对白积木、气泡、保存和刷新。产品继续 HOLD，等待课程全量 CI、4 号独立审核和预发布用户验收。"
+          ]
+        },
         "notes": "2026-11-18 16:12 duan 下达 Codex 接手指令：V3 Blockly 工作区专项整改现交由 Codex 独立负责；2 号暂停对共享 Blockly 工作区的并行修改，保留其分支 muse-c/v3-forest-workspace（HEAD a1894bc9）供 Codex 复用；4 号负责后续独立审核，主号负责合并部署；2 号可继续其他不冲突课程任务，但不得自行合并旧 V3 实现。Task-ID 核对：OPS-049 在建任务时确认未被占用（台账 138 条、最高 OPS-048；开放 PR 无 OPS-049；OPS-044 已预留给主号做 E2E CI 接线，不用）。OPS-048（2 号 V3 样板）已改为 blocked，由本任务接手同一范围继续实施。参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md），原型 SVG 积木与模拟运行不能作为真实产品代码。"
     },
     {

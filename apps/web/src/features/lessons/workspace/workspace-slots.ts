@@ -21,7 +21,7 @@
  *   `shouldAutosavePreservePrompt`).
  */
 
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 
 /** One structured hint level. Cumulative reveal: revealing level N shows 1..N. */
 export interface StructuredHint {
@@ -217,6 +217,8 @@ export type EditorSlotComponent = ComponentType<EditorSlotProps>
 /** Props the shell passes to a course-provided stage component. */
 export interface StageSlotProps {
   lessonId: string
+  /** Place the shared V3 run controls immediately after the live scene. */
+  sceneActions?: ReactNode
   /** Current engine state snapshot (x/score/running/frames), if any. */
   state: { x: number; score: number; running: boolean; frames?: number }
   running: boolean
