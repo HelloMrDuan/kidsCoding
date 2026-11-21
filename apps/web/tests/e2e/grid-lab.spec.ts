@@ -237,7 +237,7 @@ test('G0-U3-L05 fence: five steps, three hints, failed storage retry, portfolio 
   await page.evaluate(({ scoped, legacy }) => localStorage.setItem(legacy, localStorage.getItem(scoped)!), { scoped: fenceKey, legacy: oldFenceKey })
   await page.context().addCookies([{ name: 'kc_guest_id', value: 'another-learner', url: new URL(page.url()).origin }])
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
-  await expect(page.getByRole('alert')).toContainText('草稿已锁定')
+  await expect(page.getByText(/当前账号无法确认，课堂草稿已锁定/)).toBeVisible()
   await page.reload()
   await expect(page.getByTestId('lesson-task-card')).toContainText('观察少掉的一边')
   await page.goto('/learn/portfolio')
