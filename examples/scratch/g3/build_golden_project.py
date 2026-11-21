@@ -21,9 +21,13 @@ def build_golden() -> None:
             meteor = next(target for target in project['targets'] if target['name'] == '流星')
             blocks = meteor['blocks']
             blocks['repeat']['inputs']['TIMES'][1][1] = '6'
+            meteor['visible'] = False
+            blocks['flag']['next'] = 'repeat'
+            blocks['repeat']['parent'] = 'flag'
+            del blocks['hide']
             # Keep both entry scripts in view without horizontal panning on touch screens.
             blocks['clone_flag']['x'] = blocks['flag']['x']
-            blocks['clone_flag']['y'] = 255
+            blocks['clone_flag']['y'] = 340
             blocks['down']['next'] = None
             del blocks['delete']
             with zipfile.ZipFile(DESTINATION, 'w', compression=zipfile.ZIP_DEFLATED) as output:

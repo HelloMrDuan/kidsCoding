@@ -18,11 +18,14 @@ export async function drag(page: Page, block: Locator, x: number, y: number, tou
   await expect.poll(async () => {
     const grip = await block.evaluate((element) => {
       const bounds = element.getBoundingClientRect()
+      const outline = element.matches('path.blocklyPath')
+      const draggable = outline ? element.closest('.blocklyDraggable') : element
       for (const yFraction of [0.5, 0.4, 0.6]) {
         for (const left of [8, 12, 16, 20]) {
           const top = bounds.height * yFraction
           const hit = document.elementFromPoint(bounds.left + left, bounds.top + top)
-          if (hit && element.contains(hit) && !hit.closest('.blocklyEditableText')) {
+          const hitWanted = outline ? hit?.closest('.blocklyDraggable') === draggable : element.contains(hit)
+          if (hit && hitWanted && !hit.closest('.blocklyEditableText')) {
             return { left, top, position: `${bounds.left},${bounds.top},${bounds.width},${bounds.height}` }
           }
         }

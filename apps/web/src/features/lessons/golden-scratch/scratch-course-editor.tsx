@@ -22,6 +22,7 @@ export type ScratchGoldenCourse = {
   title: string
   story: string
   sample: string
+  fitPhone?: boolean
   completionTitle: string
   badge: string
   nextLessonId?: string
@@ -36,7 +37,9 @@ export function ScratchCourseEditor({ course, owner, host, judge }: {
   host?: string
   judge: (bytes: ArrayBuffer, stepIndex: number, observed: boolean) => Promise<CourseJudgment>
 }) {
-  const address = scratchGuiUrl(host)?.href
+  const hostUrl = scratchGuiUrl(host)
+  if (course.fitPhone) hostUrl?.searchParams.set('layout', 'fit-phone')
+  const address = hostUrl?.href
   const frame = useRef<HTMLIFrameElement>(null)
   const importInput = useRef<HTMLInputElement>(null)
   const bridge = useRef<ScratchBridgeClient | null>(null)

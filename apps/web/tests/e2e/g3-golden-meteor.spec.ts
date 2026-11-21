@@ -47,12 +47,9 @@ async function blocks(page: Page) {
 }
 
 async function below(page: Page, source: Locator, anchor: Locator, touch = false, fromPalette = false) {
-  if (touch) {
-    await anchor.evaluate(element => element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }))
-  } else {
-    await anchor.scrollIntoViewIfNeeded()
-  }
-  const target = (await anchor.boundingBox())!
+  const outline = anchor.locator(':scope > path.blocklyPath').first()
+  await outline.evaluate(element => element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }))
+  const target = (await outline.boundingBox())!
   const grip = (await source.boundingBox())!
   let x = target.x
   if (touch && fromPalette) {
@@ -117,14 +114,33 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
     try {
       const page = await context.newPage()
       await open(page)
+      const frame = gui(page)
+      const producer = workspace(frame).locator('[data-id="flag"]')
+      const clone = workspace(frame).locator('[data-id="clone_flag"]')
+      await expect(producer).toBeAttached()
+      await expect(clone).toBeAttached()
+      const material = (await producer.boundingBox())!
+      const lifecycle = (await clone.boundingBox())!
+      expect(material.y + material.height).toBeLessThan(lifecycle.y)
       await setCount(page, touch)
       await checkRun(page, '生成了十颗流星')
       await predictPile(page)
       await checkRun(page, '舞台上还有 10 颗分身')
       await collapse(page)
+      if (width === 375) {
+        const originalTransform = await workspace(frame).getAttribute('transform')
+        await frame.locator('.blocklyZoomOut').tap()
+        await expect(workspace(frame)).not.toHaveAttribute('transform', originalTransform ?? '')
+      }
       await attachDelete(page, touch)
       await checkRun(page, '到底后删除')
       await collapse(page)
+      if (width === 375 && process.env.GOLDEN_EVIDENCE_DIR) {
+        await mkdir(process.env.GOLDEN_EVIDENCE_DIR, { recursive: true })
+        await workspace(frame).getByText('删除此克隆体', { exact: true }).evaluate(element =>
+          element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }))
+        await page.screenshot({ path: `${process.env.GOLDEN_EVIDENCE_DIR}/375x812-code.png` })
+      }
       const start = gui(page).getByRole('button', { name: 'Start project' })
       if (touch) await start.tap()
       else await start.click()
@@ -179,9 +195,12 @@ test('G3 Golden observes the bug, repairs clone deletion and verifies a custom b
   await expect(definition).toBeVisible()
   const hat = (await definition.boundingBox())!
   await drag(page, definition, hat.x + 260, hat.y + hat.height / 2 + 70)
-  await below(page, script.locator('[data-id="down"]'), definition)
+  await below(page, script.locator('[data-id="show"] > .blocklyPath').first(), definition)
+  expect(Object.values(await blocks(page)).find(block => block.opcode === 'procedures_definition')?.next).toBe('show')
   const call = await pickBlock(frame, /自制积木|My Blocks/, /安排下落/)
-  await below(page, call, script.locator('[data-id="set_y"]'), false, true)
+  await below(page, call, script.locator('[data-id="clone_flag"]'), false, true)
+  const scriptBlocks = await blocks(page)
+  expect(scriptBlocks[scriptBlocks.clone_flag.next!]?.opcode).toBe('procedures_call')
   await checkRun(page, '十颗流星完成下落')
   await expect(page.getByText('流星雨项目已完成')).toBeVisible()
   if (process.env.GOLDEN_EVIDENCE_DIR) {
