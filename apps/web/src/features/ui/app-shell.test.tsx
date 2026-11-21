@@ -48,4 +48,22 @@ describe('AppShell (frozen V2 global shell)', () => {
     expect(mask).not.toHaveClass('is-open')
     expect(document.getElementById('kc-sidebar')).not.toHaveClass('is-open')
   })
+
+  it('has no top-level Python 实验室 item; free coding is entered through 创作中心', () => {
+    mockPath = '/create'
+    render(<AppShell><div /></AppShell>)
+    expect(screen.queryByTestId('kc-nav-python')).toBeNull()
+    expect(screen.queryByText('Python 实验室')).toBeNull()
+    expect(document.querySelectorAll('.kc-sidebar .kc-nav-item')).toHaveLength(8)
+    const create = screen.getByTestId('kc-nav-scratch')
+    expect(create).toHaveAttribute('href', '/create')
+    expect(create).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('keeps Python teaching lessons under 课程体系 so the breadcrumb stays meaningful', () => {
+    mockPath = '/learn/python-lab/P0-U1-L01'
+    render(<AppShell><div /></AppShell>)
+    expect(screen.getByTestId('kc-nav-catalog')).toHaveAttribute('aria-current', 'page')
+    expect(document.querySelector('.kc-breadcrumb b')?.textContent).toBe('课程体系')
+  })
 })
