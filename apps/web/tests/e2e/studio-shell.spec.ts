@@ -314,9 +314,9 @@ test('studio home lists only connected courses and mounts no editor', async ({ p
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto(STUDIO_HOME)
   await expect(page.getByRole('heading', { name: '全屏课堂' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Scratch 创作工坊（自由创作：新建 / 导入 / 保存自己的作品）' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: /创作中心（统一入口/ })).toHaveAttribute(
     'href',
-    '/studio/scratch/free',
+    '/create',
   )
   await expect(page.getByRole('link', { name: '我的舞蹈秀（Scratch GUI 全屏创作）' })).toHaveAttribute(
     'href',

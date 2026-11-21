@@ -12,6 +12,9 @@ type StoredWork = Work & { owner: string }
 type LegacyWork = Omit<WorkSummary, 'language'> & { sb3: ArrayBuffer }
 const DATABASE = 'kidscoding-create'
 const STORE = 'works'
+/** Retired standalone workshop (/studio/scratch/free). Read-only source. */
+const LEGACY_FREE_DATABASE = 'kidscoding-free-create'
+type LegacyFreeWork = { id: string; name: string; sb3: ArrayBuffer; savedAt?: number }
 
 function open(name: string, upgrade: (db: IDBDatabase) => void) {
   return new Promise<IDBDatabase>((resolve, reject) => {
@@ -68,7 +71,122 @@ async function importLegacyGuestWorks(db: IDBDatabase) {
       await result(meta.put(true, marker))
     })
   }
+  await importLegacyFreeCreateWorks(db)
   guestImported = true
+}
+
+/**
+ * One-time, non-destructive handoff of the retired /studio/scratch/free
+ * library (`kidscoding-free-create` / `projects`) into the unified guest
+ * library. The legacy database is only read, never deleted or modified, so
+ * an interrupted migration can be retried from the same data. Works keep
+ * their old id, which lets old deep links resolve after the redirect.
+ */
+async function importLegacyFreeCreateWorks(db: IDBDatabase) {
+  const marker = 'free-create-v1'
+  if (await transact(db, 'meta', 'readonly', (tx) => result(tx.objectStore('meta').get(marker)))) return
+  const works = await readLegacyFreeWorks()
+  if (works === null) return
+  await transact(db, ['meta', STORE], 'readwrite', async (tx) => {
+    const meta = tx.objectStore('meta')
+    if (await result(meta.get(marker))) return
+    const store = tx.objectStore(STORE)
+    for (const work of works) {
+      if (!isLegacyFreeWork(work)) continue
+      if (await result(store.get(['guest', work.id]))) continue
+      const stamp = typeof work.savedAt === 'number' && work.savedAt > 0 ? work.savedAt : Date.now()
+      store.put({
+        owner: 'guest',
+        id: work.id,
+        name: legacyWorkName(work.name),
+        language: 'scratch',
+        sb3: work.sb3,
+        createdAt: stamp,
+        updatedAt: stamp,
+        revision: 0,
+      } satisfies StoredWork)
+    }
+    await result(meta.put(true, marker))
+  })
+}
+
+function isLegacyFreeWork(value: unknown): value is LegacyFreeWork {
+  if (!value || typeof value !== 'object') return false
+  const work = value as Partial<LegacyFreeWork>
+  return typeof work.id === 'string' && work.id.length > 0 && typeof work.name === 'string' &&
+    work.sb3 instanceof ArrayBuffer && work.sb3.byteLength > 0
+}
+
+function legacyWorkName(name: string) {
+  const clean = name.trim() || '未命名作品'
+  return clean.length > MAX_NAME_LENGTH ? clean.slice(0, MAX_NAME_LENGTH) : clean
+}
+
+function legacyDatabaseExists() {
+  const api = indexedDB as IDBFactory & { databases?: () => Promise<{ name?: string }[]> }
+  return typeof api.databases === 'function' ? api.databases().then((items) => items.some((item) => item.name === LEGACY_FREE_DATABASE)) : Promise.resolve(true)
+}
+
+async function readLegacyFreeWorks(): Promise<LegacyFreeWork[] | null> {
+  if (typeof indexedDB === 'undefined' || !await legacyDatabaseExists()) return null
+  const db = await open(LEGACY_FREE_DATABASE, (database) => database.createObjectStore('projects', { keyPath: 'id' }))
+  try {
+    return await transact<LegacyFreeWork[]>(db, 'projects', 'readonly', (tx) => result(tx.objectStore('projects').getAll()))
+  } finally { db.close() }
+}
+
+async function readLegacyFreeWork(id: string): Promise<LegacyFreeWork | null> {
+  if (typeof indexedDB === 'undefined' || !await legacyDatabaseExists()) return null
+  const db = await open(LEGACY_FREE_DATABASE, (database) => database.createObjectStore('projects', { keyPath: 'id' }))
+  try {
+    const work = await transact<LegacyFreeWork | undefined>(db, 'projects', 'readonly', (tx) => result(tx.objectStore('projects').get(id)))
+    return isLegacyFreeWork(work) ? work : null
+  } finally { db.close() }
+}
+
+/**
+ * Adopt one work opened through an old /studio/scratch/free/<id> bookmark.
+ * Copies the record under the CURRENT owner (the old page had no owner
+ * scoping) and never overwrites an existing work with the same key.
+ */
+export async function adoptLegacyFreeCreateWork(owner: string, legacyId: string): Promise<WorkSummary | null> {
+  if (owner !== 'guest' && !owner.startsWith('user:')) throw new Error('请重新确认当前账号。')
+  const db = await open(DATABASE, (database) => {
+    database.createObjectStore(STORE, { keyPath: ['owner', 'id'] }).createIndex('owner', 'owner')
+    database.createObjectStore('meta')
+  })
+  try {
+    const existing = await transact<StoredWork | undefined>(db, STORE, 'readonly', (tx) => result(tx.objectStore(STORE).get([owner, legacyId])))
+    if (existing) return summary(existing)
+  } finally { db.close() }
+
+  const work = await readLegacyFreeWork(legacyId)
+  if (!work) return null
+
+  const target = await open(DATABASE, (database) => {
+    database.createObjectStore(STORE, { keyPath: ['owner', 'id'] }).createIndex('owner', 'owner')
+    database.createObjectStore('meta')
+  })
+  try {
+    return await transact<WorkSummary>(target, STORE, 'readwrite', async (tx) => {
+      const store = tx.objectStore(STORE)
+      const again: StoredWork | undefined = await result(store.get([owner, legacyId]))
+      if (again) return summary(again)
+      const stamp = typeof work.savedAt === 'number' && work.savedAt > 0 ? work.savedAt : Date.now()
+      const adopted: StoredWork = {
+        owner,
+        id: work.id,
+        name: legacyWorkName(work.name),
+        language: 'scratch',
+        sb3: work.sb3,
+        createdAt: stamp,
+        updatedAt: stamp,
+        revision: 0,
+      }
+      await result(store.add(adopted))
+      return summary(adopted)
+    })
+  } finally { target.close() }
 }
 
 export function workLibrary(owner: string) {

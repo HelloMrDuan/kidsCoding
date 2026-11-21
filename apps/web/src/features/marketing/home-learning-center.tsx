@@ -22,9 +22,10 @@ import {
 
 const TRACKS = [
   { id: 'blockly', cls: 'kc-v2h-t-block', title: '图形化编程启蒙', lines: ['事件、顺序、角色动作', '从第一段积木程序开始'], cta: '进入课程', href: '/learn/map' },
-  // "查看工作台" now opens the standalone workshop; the old target was one
-  // G3 trial lesson, which duplicated the workbench claim with a single course.
-  { id: 'scratch', cls: 'kc-v2h-t-scratch', title: 'Scratch 创意编程', lines: ['动画、交互与小游戏', '把奇思妙想变成作品'], cta: '查看工作台', href: '/studio/scratch/free' },
+  // "查看工作台" opens the single creation centre (OPS-050 #564). The old
+  // target was one G3 trial lesson; a second standalone workshop is not
+  // allowed on top of the unified centre.
+  { id: 'scratch', cls: 'kc-v2h-t-scratch', title: 'Scratch 创意编程', lines: ['动画、交互与小游戏', '把奇思妙想变成作品'], cta: '查看工作台', href: '/create' },
   { id: 'python', cls: 'kc-v2h-t-python', title: 'Python 项目编程', lines: ['变量、逻辑与真实项目', '逐步迈向文字代码'], cta: '查看实验室', href: '/learn/python-lab/P0-U1-L01' },
 ] as const
 

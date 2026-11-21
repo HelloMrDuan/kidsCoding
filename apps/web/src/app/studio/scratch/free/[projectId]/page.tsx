@@ -1,15 +1,15 @@
-// Scratch 自由创作工坊 · 单份作品的创作页。
-// 作品从本机作品库读取；编辑环境为部署时配置的 Scratch GUI（桥接受控通信）。
+// Old deep link (/studio/scratch/free/<id>): migrate the work into the unified
+// library under the current owner, then open it in the unified editor.
 import type { Metadata } from 'next'
 
-import { FreeCreateEditor } from '@/features/lessons/studio/free-create/free-create-editor'
+import { LegacyFreeCreateHandoff } from '@/features/create/legacy-free-create-handoff'
 
 export const metadata: Metadata = {
-  title: '我的 Scratch 作品 · KidsCoding',
+  title: '打开旧作品 · KidsCoding',
   robots: { index: false },
 }
 
 export default async function Page({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params
-  return <FreeCreateEditor projectId={projectId} />
+  return <LegacyFreeCreateHandoff legacyId={projectId} />
 }

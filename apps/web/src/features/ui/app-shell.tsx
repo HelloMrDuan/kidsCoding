@@ -33,13 +33,15 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
       { id: 'home', label: '学习中心', short: '首页', href: '/', icon: 'home', match: (p) => p === '/' },
       { id: 'map', label: '学习地图', short: '地图', href: '/learn/map', icon: 'map', match: (p) => p.startsWith('/learn/map') },
       { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') || isGoldenScratchClassroom(p) },
-      { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') },
+      // OPS-051 (#565): the Python lab has no top-level menu; its teaching
+      // lessons stay under 课程体系 so the breadcrumb keeps its meaning.
+      { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') || p.startsWith('/learn/python-lab') },
     ],
   },
   {
     title: 'CREATE',
     items: [
-      { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || (p.startsWith('/learn/scratch-lab') && !isGoldenScratchClassroom(p)) },
+      { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || (p.startsWith('/learn/scratch-lab') && !isGoldenScratchClassroom(p)) },
       { id: 'portfolio', label: '作品中心', short: '作品', href: '/learn/portfolio', icon: 'portfolio', match: (p) => p.startsWith('/learn/portfolio') || p.startsWith('/project') },
       { id: 'cards', label: '奖励收藏', short: '收藏', href: '/cards', icon: 'cards', match: (p) => p.startsWith('/cards') },
     ],
