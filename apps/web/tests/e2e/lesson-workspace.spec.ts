@@ -19,6 +19,33 @@ const DEMO_S = '/learn/workspace/demo-s'
 const DEMO_SLOT = '/learn/workspace/demo-slot'
 const DEMO_SCRATCH = '/learn/workspace/demo-scratch'
 
+test('OPS-049: the live V3 palette is visible and runs the first gate', async ({ page }, testInfo) => {
+  await page.goto('/studio/blockly/lesson-01-forest-hello')
+  const material = page.getByTestId('v3-categories')
+  const start = page.locator('.kc-v3-engine .blocklyFlyout .when_start')
+  await expect(start).toBeInViewport({ timeout: 30_000 })
+  await expect(material.getByRole('button')).toHaveCount(1)
+  await expect(material.getByRole('button', { name: '开始' })).toHaveAttribute('aria-pressed', 'true')
+  const script = await page.getByTestId('v3-script-heading').boundingBox()
+  const source = await start.boundingBox()
+  expect(source!.x + source!.width).toBeLessThan(script!.x)
+  const workspace = page.getByTestId('lesson-blockly-workspace')
+  const assist = workspace.locator('details summary').first()
+  const add = workspace.getByTestId('lesson-add-when_start')
+  if (testInfo.project.name === 'desktop') {
+    await assist.press('Enter')
+    await add.press('Enter')
+  } else {
+    await assist.click()
+    await add.click()
+  }
+  await expect(workspace.locator('svg.blocklySvg .blocklyBlockCanvas .when_start')).toBeVisible()
+  await page.getByTestId('ws-run-toggle').click()
+  await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
+  await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+  await expect(start).toBeVisible()
+})
+
 async function dragFlyoutBlockToWorkspace(
   page: import('@playwright/test').Page,
   categoryLabel: string,
