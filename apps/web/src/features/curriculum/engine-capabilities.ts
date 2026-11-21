@@ -15,6 +15,7 @@ export const blocklyEngineCapabilities: Record<string, string> = {
   batch_action: 'grid/grid-engine.ts (G0-U3-L03 water_plant on level pots: each pot exactly once; no_pot_here / watered_twice / pots_missed)',
   jump_over: 'grid/grid-engine.ts (G0-U3-L02 jump_forward hops over one cell: puddles yes, rocks / locked doors no)',
   pattern_stamp: 'grid/grid-engine.ts (G0-U3 stamp_red / stamp_blue footprints judged against the level pattern)',
+  route_trace: 'grid/grid-engine.ts + grid/grid-stage.tsx (judge and draw the visited route and final heading)',
 }
 
 export function missingEngineCapabilities(required: readonly string[] | undefined | null) {

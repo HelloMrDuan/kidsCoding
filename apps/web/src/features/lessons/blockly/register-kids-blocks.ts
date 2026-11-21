@@ -72,6 +72,40 @@ export function getKidsBlockTheme() {
   return cartoonTheme
 }
 
+/**
+ * V3 Scratch 3 风格主题变体（视觉契约 §6）：在默认卡通主题基础上把
+ * 事件改 #FFBF00、外观改紫 #9966FF、控制改橙 #FFAB19（与 Scratch 3 的
+ * 分类色一致）；运动蓝、场景、朋友、物品与默认主题相同。仅供明确选择
+ * 变体的课节样板使用，默认主题（getKidsBlockTheme）一字不变。
+ */
+let scratchTheme: Blockly.Theme | null = null
+
+export function getScratchBlockTheme() {
+  scratchTheme ??= Blockly.Theme.defineTheme('kidscoding-scratch-v3', {
+    name: 'kidscoding-scratch-v3',
+    base: Blockly.Themes.Classic,
+    blockStyles: {
+      kc_event: { colourPrimary: '#ffbf00', colourSecondary: '#ffd34d', colourTertiary: '#d9a400', hat: 'cap' },
+      kc_event_click: { colourPrimary: '#ff8c1a', colourSecondary: '#ffb366', colourTertiary: '#d9700f', hat: 'cap' },
+      kc_motion: { colourPrimary: '#4c97ff', colourSecondary: '#7db5ff', colourTertiary: '#3373cc' },
+      kc_looks: { colourPrimary: '#9966ff', colourSecondary: '#b994ff', colourTertiary: '#774dcb' },
+      kc_scene: { colourPrimary: '#9966ff', colourSecondary: '#b994ff', colourTertiary: '#774dcb' },
+      kc_friend: { colourPrimary: '#ff6680', colourSecondary: '#ff94a6', colourTertiary: '#d94a63' },
+      kc_item: { colourPrimary: '#cf63cf', colourSecondary: '#e08fe0', colourTertiary: '#a63fa6' },
+      kc_control: { colourPrimary: '#ffab19', colourSecondary: '#ffc861', colourTertiary: '#cf8b17' },
+    },
+    componentStyles: {
+      workspaceBackgroundColour: '#ffffff',
+      flyoutBackgroundColour: '#f4f8ff',
+      flyoutOpacity: 1,
+      scrollbarColour: '#c9d6ea',
+      scrollbarOpacity: 0.8,
+    },
+    fontStyle: { family: '"PingFang SC","Microsoft YaHei",sans-serif', weight: '700', size: 13 },
+  })
+  return scratchTheme
+}
+
 let isRegistered = false
 
 const KIDS_BLOCK_DEFINITIONS = [
@@ -373,10 +407,25 @@ const KIDS_TOOLBOX_CATEGORIES: Array<{ name: string; colour: string; styles: str
   { name: '控制', colour: '#0fbdbd', styles: ['kc_control'] },
 ]
 
-export function buildKidsToolboxCategories(allowedBlocks: string[]): KidsToolboxCategory[] {
+/**
+ * V3（视觉契约 §6）Scratch 3 风格分类色覆盖：事件 #FFBF00、外观（说话）
+ * #9966FF、控制 #FFAB19（运动 #4C97FF 与现行一致，不在覆盖内）。仅在
+ * 采用 Scratch 主题变体的课节样板中使用，默认主题与分类色不变，避免
+ * 全站积木配色在未经视觉验收时被一并改动。
+ */
+export const SCRATCH_CATEGORY_COLOURS: Record<string, string> = {
+  开始: '#ffbf00',
+  说话: '#9966ff',
+  控制: '#ffab19',
+}
+
+export function buildKidsToolboxCategories(
+  allowedBlocks: string[],
+  colourOverrides?: Record<string, string>,
+): KidsToolboxCategory[] {
   const grouped = KIDS_TOOLBOX_CATEGORIES.map((category) => ({
     name: category.name,
-    colour: category.colour,
+    colour: colourOverrides?.[category.name] ?? category.colour,
     types: allowedBlocks.filter((type) => category.styles.includes(KIDS_BLOCK_STYLE_BY_TYPE[type] ?? '')),
   })).filter((category) => category.types.length > 0)
   // A lesson allowing a block this file does not define yet keeps it usable

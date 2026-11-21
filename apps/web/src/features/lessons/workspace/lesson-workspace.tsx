@@ -20,7 +20,9 @@
  * reverted).
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { LessonDraftOwnerContext } from '../lesson-draft-boundary'
+import { BlocklyStudioLayout } from './blockly-studio-layout'
 
 import {
   DEMO_HAT,
@@ -92,6 +94,8 @@ export type LessonWorkspaceProps = {
    * workspace in both modes; StudioShell adds no second run button.
    */
   chrome?: 'full' | 'studio'
+  /** Opt in from a studio route with an editor slot that supplies a docked Blockly palette. */
+  studioLayout?: 'blockly-v3'
   /**
    * OPS-039: report the save state upward so StudioShell can render the
    * save chip in its own topbar. Called from an effect on every change;
@@ -198,6 +202,7 @@ export function LessonWorkspace({
   rolesSlot,
   runAdapter,
   chrome = 'full',
+  studioLayout,
   onSaveStateChange,
   onShellControl,
 }: LessonWorkspaceProps) {
@@ -206,6 +211,7 @@ export function LessonWorkspace({
   // OPS-039: in studio chrome StudioShell owns the topbar / goal strip /
   // task drawer; this shell renders only the editing surface.
   const isStudio = chrome === 'studio'
+  const blocklyV3 = isStudio && studioLayout === 'blockly-v3'
   // JSX needs capitalised aliases to render the slot component types.
   const StageSlotView = stageSlot ?? null
   const EditorSlotView = editorSlot ?? null
@@ -249,6 +255,8 @@ export function LessonWorkspace({
   const [judgmentStale, setJudgmentStale] = useState(false)
   const [runError, setRunError] = useState<string | null>(null)
   const [saveState, setSaveState] = useState<SaveState>('unsaved')
+  const draftOwner = useContext(LessonDraftOwnerContext)
+  const draftOwnerRef = useRef(draftOwner)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [fileMenuOpen, setFileMenuOpen] = useState(false)
@@ -364,7 +372,7 @@ export function LessonWorkspace({
         setSaveMessageAndRef('演示保存失败（测试钩子）：未能保存')
         return
       }
-      const result = saveDraftToLocal(contractRef.current.lessonId, script)
+      const result = saveDraftToLocal(contractRef.current.lessonId, script, draftOwnerRef.current)
       if (result.ok) {
         lastSavedJsonRef.current = json
         setSaveState('saved')
@@ -395,7 +403,7 @@ export function LessonWorkspace({
   /** Editor-slot counterpart of loadIntoAdapter (draft or initial, no adapter). */
   const loadEditorSlotData = useCallback(
     (targetContract: LessonContract, targetInitial: unknown) => {
-      const draft = loadDraftFromLocal(targetContract.lessonId)
+      const draft = loadDraftFromLocal(targetContract.lessonId, draftOwnerRef.current)
       let loaded: unknown = null
       let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
@@ -450,7 +458,7 @@ export function LessonWorkspace({
     (targetContract: LessonContract, targetInitial: unknown) => {
       const entry = mountedAdapterRef.current
       if (!entry) return
-      const draft = loadDraftFromLocal(targetContract.lessonId)
+      const draft = loadDraftFromLocal(targetContract.lessonId, draftOwnerRef.current)
       let loaded = false
       let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
@@ -541,6 +549,7 @@ export function LessonWorkspace({
           saveDraftToLocal(
             mountedLessonRef.current ?? contractRef.current.lessonId,
             editorDataRef.current ?? null,
+            draftOwnerRef.current,
           )
         } catch {
           // Unmount save is best effort; explicit 保存 is the reliable path.
@@ -550,7 +559,7 @@ export function LessonWorkspace({
     const prev = mountedAdapterRef.current
     if (prev && prev.engine !== engine) {
       try {
-        saveDraftToLocal(contractRef.current.lessonId, prev.adapter.getScript())
+        saveDraftToLocal(contractRef.current.lessonId, prev.adapter.getScript(), draftOwnerRef.current)
       } catch {
         // Best effort on engine switch; the contract-change effect also saves.
       }
@@ -627,6 +636,7 @@ export function LessonWorkspace({
         saveDraftToLocal(
           mountedLessonRef.current ?? contractRef.current.lessonId,
           useSlotData ? (editorDataRef.current ?? null) : (active?.getScript() ?? null),
+          draftOwnerRef.current,
         )
       } catch {
         // Unmount save is best effort; explicit 保存 is the reliable path.
@@ -674,13 +684,13 @@ export function LessonWorkspace({
     if (mountedLessonRef.current === prevId) {
       if (editorSlot) {
         try {
-          saveDraftToLocal(prevId, editorDataRef.current ?? null)
+          saveDraftToLocal(prevId, editorDataRef.current ?? null, draftOwnerRef.current)
         } catch {
           // Best effort; explicit 保存 remains available.
         }
       } else if (entry) {
         try {
-          saveDraftToLocal(prevId, entry.adapter.getScript())
+          saveDraftToLocal(prevId, entry.adapter.getScript(), draftOwnerRef.current)
         } catch {
           // Best effort; explicit 保存 remains available.
         }
@@ -913,7 +923,7 @@ export function LessonWorkspace({
       }
       script = entry.adapter.getScript()
     }
-    const result = saveDraftToLocal(contract.lessonId, script)
+    const result = saveDraftToLocal(contract.lessonId, script, draftOwnerRef.current)
     if (result.ok) {
       lastSavedJsonRef.current = scriptToJson(script)
       setSaveState('saved')
@@ -1590,6 +1600,54 @@ export function LessonWorkspace({
     </div>
   ) : null
 
+  const stageRunBar = (
+      <div className="ws-runbar">
+        {/* OPS-022: no run target, no run button — never a dead one. The
+            zoom group stays: stage zoom is independent of running. */}
+        {hasRunTarget && (
+          <button
+            type="button"
+            className={`kc-action-surface kc-btn-dark ${engineState.running ? 'ws-stop-btn' : 'ws-run-btn'}`}
+            onClick={handleRunToggle}
+            data-testid="ws-run-toggle"
+          >
+            {engineState.running ? '停止' : '运行作品'}
+          </button>
+        )}
+        {blocklyV3 && runAdapter?.reset && (
+          <button type="button" className="kc-v3-stage-reset" data-testid="v3-reset-stage"
+            onClick={() => {
+              handleRunStop()
+              runAdapter.reset?.()
+              setEngineState(runAdapter.getState())
+              setJudgment(null)
+              setJudgmentStale(false)
+              setRunError(null)
+            }}>
+            ↺ 重来
+          </button>
+        )}
+        {!blocklyV3 && <span className="ws-zoom-group">
+          舞台缩放：
+          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('small')} data-testid="ws-zoom-small">
+            缩小
+          </button>{' '}
+          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('medium')} data-testid="ws-zoom-medium">
+            正常
+          </button>{' '}
+          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('large')} data-testid="ws-zoom-large">
+            放大
+          </button>
+        </span>}
+      </div>
+  )
+
+  const integratedRoles = blocklyV3 && RolesSlotView ? (
+    <section className="kc-v3-roles" data-testid="ws-roles-panel" aria-label="角色与背景">
+      <RolesSlotView lessonId={contract.lessonId} />
+    </section>
+  ) : null
+
   const stagePanel = (
     <section className="ws-stage" data-panel="stage" data-testid="ws-stage-panel">
       <div className="ws-stage-head">
@@ -1603,7 +1661,7 @@ export function LessonWorkspace({
         {/* Phone roles entry: the roles strip starts collapsed on phones
             (see the mount effect) and opens here. Tablet/desktop show the
             strip unconditionally, so this button hides there via CSS. */}
-        {RolesSlotView && (
+        {RolesSlotView && !blocklyV3 && (
           <button
             type="button"
             className="kc-action-surface kc-btn-outline kc-btn-sm ws-roles-toggle"
@@ -1622,6 +1680,7 @@ export function LessonWorkspace({
             state={engineState}
             running={engineState.running}
             stageState={runAdapter?.getStageState?.() ?? adapter.getStageState?.()}
+            sceneActions={blocklyV3 ? <>{stageRunBar}{integratedRoles}</> : undefined}
           />
         ) : isScratch ? (
           <div ref={scratchMountRef} data-testid="ws-scratch-mount" style={{ width: '100%', height: '100%' }} />
@@ -1639,32 +1698,8 @@ export function LessonWorkspace({
       {StageSlotView && isScratch && adapter && (
         <div ref={scratchMountRef} aria-hidden="true" data-testid="ws-adapter-mount" />
       )}
-      <div className="ws-runbar">
-        {/* OPS-022: no run target, no run button — never a dead one. The
-            zoom group stays: stage zoom is independent of running. */}
-        {hasRunTarget && (
-          <button
-            type="button"
-            className={`kc-action-surface kc-btn-dark ${engineState.running ? 'ws-stop-btn' : 'ws-run-btn'}`}
-            onClick={handleRunToggle}
-            data-testid="ws-run-toggle"
-          >
-            {engineState.running ? '停止' : '运行作品'}
-          </button>
-        )}
-        <span className="ws-zoom-group">
-          舞台缩放：
-          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('small')} data-testid="ws-zoom-small">
-            缩小
-          </button>{' '}
-          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('medium')} data-testid="ws-zoom-medium">
-            正常
-          </button>{' '}
-          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => setStageZoom('large')} data-testid="ws-zoom-large">
-            放大
-          </button>
-        </span>
-      </div>
+      {(!blocklyV3 || !StageSlotView) && stageRunBar}
+      {!StageSlotView && integratedRoles}
     </section>
   )
 
@@ -1742,7 +1777,7 @@ export function LessonWorkspace({
           is gated on hasRunTarget alone: a targetless course must never
           render a dead run button here, even when it has no editor slot
           (OPS-026). */}
-      {hasRunTarget && (
+      {hasRunTarget && (!blocklyV3 || !stageVisible) && (
         <div className="ws-sticky-actions">
           <button
             type="button"
@@ -1966,7 +2001,7 @@ export function LessonWorkspace({
 
   return (
     <div
-      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}${hasStage && !stageVisible ? ' ws-stage-hidden' : ''}${isStudio ? ' ws-studio' : ''}${isStudio && isScratch ? ' ws-scratch' : ''}`}
+      className={`ws-root ws-zoom-${stageZoom}${railOn ? ' ws-rail-on' : ''}${!hasStage && EditorSlotView ? ' ws-summary-wide' : ''}${hasStage && !stageVisible ? ' ws-stage-hidden' : ''}${isStudio ? ' ws-studio' : ''}${isStudio && isScratch ? ' ws-scratch' : ''}${blocklyV3 ? ' kc-v3-workspace' : ''}`}
       data-testid="ws-root"
       style={{ '--ws-stage-w': `${stageWidth}px` } as CSSProperties}
     >
@@ -2534,6 +2569,30 @@ export function LessonWorkspace({
           via the task drawer); on tablet/desktop the grid lays panels
           out. The mount divs stay in the DOM either way — visibility
           switches never remount the adapter. */}
+      {blocklyV3 ? (
+        <BlocklyStudioLayout
+          stage={hasStage && <div className="kc-v3-stage-region" data-testid="v3-stage-region" hidden={!stageVisible}>{stagePanel}</div>}
+          editor={scriptPanel}
+          feedback={
+            <section className="kc-v3-feedback" data-testid="ws-feedback" aria-label="学习反馈">
+              <div className="kc-v3-feedback-result" role="status">
+                {runError && <p data-testid="ws-run-error">{runError}</p>}
+                {notice && <p data-testid="ws-notice">{notice}</p>}
+                {judgmentStale && <p data-testid="ws-judgment-stale">积木改好了，重新运行看看。</p>}
+                {judgment
+                  ? <p data-testid="ws-feedback-conclusion">{judgment.conclusion}</p>
+                  : !runError && !notice && !judgmentStale && <p>{engineState.running ? '运行中，看看舞台。' : '运行作品后，在这里看结果。'}</p>}
+              </div>
+              {judgment && <details>
+                <summary>查看学习反馈</summary>
+                <div className="kc-v3-feedback-details">
+                  {judgment.layers.map((layer) => <p key={layer.id} data-testid={`ws-feedback-${layer.id}`}>{layer.detail}</p>)}
+                </div>
+              </details>}
+            </section>
+          }
+        />
+      ) : <>
       <div
         className={`ws-grid${hasStage && RolesSlotView ? ' ws-has-roles' : ''}${railOn ? ' ws-has-rail' : ''}`}
         data-testid="ws-grid"
@@ -2617,6 +2676,7 @@ export function LessonWorkspace({
           ))
         )}
       </section>
+      </>}
     </div>
   )
 }

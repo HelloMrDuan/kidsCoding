@@ -642,6 +642,34 @@
         "status": "unchecked"
       }
     },
+    "G0-U3-L05": {
+      "engineProductionReady": {
+        "status": "unchecked",
+        "note": "真实 Blockly 和网格判定已本地验证，等待独立复核及产品体验。"
+      },
+      "assessmentE2EPassed": {
+        "status": "unchecked",
+        "evidence": [
+          { "kind": "file", "ref": "docs/product/g0-grid-template/evidence/README.md" }
+        ]
+      },
+      "progressVerified": {
+        "status": "unchecked",
+        "note": "实验课本机进度和作品已验证，正式进度尚未接入。"
+      }
+    },
+    "G1-U1-L01": {
+      "engineProductionReady": {
+        "status": "unchecked",
+        "note": "复用原课程 Blockly、故事引擎与本机草稿。Golden 版本保留独立教研、体验和发布门禁。"
+      },
+      "assessmentE2EPassed": {
+        "status": "unchecked",
+        "evidence": [
+          { "kind": "file", "ref": "apps/web/tests/e2e/g1-golden-story.spec.ts" }
+        ]
+      }
+    },
     "G3-U1-L02": {
       "contentReviewed": {
         "status": "unchecked"

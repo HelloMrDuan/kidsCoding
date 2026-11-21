@@ -1,0 +1,24 @@
+{
+  "lessonId": "lesson-02-forest-greeting",
+  "secondLessonSource": "86a3a58d67b011db72fb721ff85dd8a4f7ce025e",
+  "sharedImplementation": "2397a2b7c9673995f37a62167d8e4035ec6af39b",
+  "browser": "157.0.8103.52",
+  "environment": "isolated local worktree",
+  "program": [
+    { "type": "when_start" },
+    { "type": "move_right" },
+    { "type": "say_line", "line": "hello" }
+  ],
+  "movedSteps": 100,
+  "speechRendered": true,
+  "passedRealJudgment": true,
+  "lineRestoredAfterReload": true,
+  "responsiveRetest": {
+    "date": "2026-11-19",
+    "environment": "isolated worktree with revised workspace layout, studio header and stage markup",
+    "input": "mouse drag from the native Zelos flyout",
+    "movedSteps": 100,
+    "speechRendered": true,
+    "lineRestoredAfterReload": true
+  }
+}

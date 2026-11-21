@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { GridLesson, GridLessonStep } from '@/content/curriculum/g0-u1-grid-lessons'
 import type { ProgramBlock } from '@/features/lessons/blockly/program-tree'
@@ -13,11 +13,14 @@ const BlocklyWorkspace = dynamic(
 )
 import { getKidsBlockLabel } from '@/features/lessons/blockly/register-kids-blocks'
 import { GuidedLessonShell, type LessonLocalSaveState } from '@/features/lessons/guided-lesson-shell'
+import { GoldenLessonLayout } from '@/features/lessons/golden/golden-lesson-layout'
 import { ReadAloudButton } from '@/features/lessons/voice/read-aloud'
 import { ResetIcon } from '@/features/ui/reset-icon'
 import { runGridProgram, type GridFailure, type GridLevel, type GridRun } from './grid-engine'
 import { GridStage, useGridPlayback } from './grid-stage'
 import { parseGridDraft, gridDraftKey, type GridDraft } from './grid-draft'
+import { useDraftOwnerLock } from '../use-draft-owner-lock'
+import { GRID_PROGRAM_MAX_BYTES, parseGridProgram, serializeGridProgram } from './grid-program-file'
 
 type Block = ProgramBlock
 
@@ -43,6 +46,11 @@ export function stepLevel(step: GridLessonStep, draft: Pick<GridDraft, 'creative
   }
   const waters = step.creative?.waters
   const pots = step.creative?.pots
+  const layouts = step.creative?.layouts
+  if (layouts && goal) {
+    const i = step.creative!.goalChoices.findIndex(c => c.x === goal.x && c.y === goal.y)
+    if (i >= 0) return layouts[i]
+  }
   if (waters || pots) {
     // G0-U3-L02 / L03: each goal choice comes with its own puddles or flower pots.
     const i = goal ? step.creative!.goalChoices.findIndex(c => c.x === goal.x && c.y === goal.y) : -1
@@ -57,6 +65,7 @@ export const MISTAKE_LABELS: Record<GridFailure, string> = {
   no_start: '忘了“开始时”',
   disconnected: '有积木掉队',
   empty_repeat: '重复里面是空的',
+  repeat_required: '忘了用重复积木',
   too_deep: '重复套了太多层',
   stamp_twice: '同一格放了两个脚印',
   no_pot_here: '在没有花盆的地方浇水',
@@ -64,6 +73,8 @@ export const MISTAKE_LABELS: Record<GridFailure, string> = {
   pots_missed: '有花盆漏浇了',
   wrong_pattern: '脚印规律乱了',
   pattern_short: '脚印放得不够',
+  wrong_route: '围栏走偏了或没有走完',
+  wrong_facing: '最后的朝向不对',
   unknown_block: '用了这关没有的积木',
   too_many: '积木太多',
   out_of_bounds: '走出了地图',
@@ -81,7 +92,15 @@ export const MISTAKE_LABELS: Record<GridFailure, string> = {
  * workspace and the SYS-106 engine. A step passes only after a real run
  * reaches the goal; the child's program for every step is saved locally.
  */
-export function GridLab({ lesson }: { lesson: GridLesson }) {
+export function GridLab({ lesson, draftOwner }: { lesson: GridLesson; draftOwner?: string | null }) {
+  const locked = useDraftOwnerLock(draftOwner)
+  if (locked || (lesson.layoutMode === 'golden' && !draftOwner)) {
+    return <p role="alert">当前账号无法确认，课堂草稿已锁定。请恢复原账号后重新打开课堂。</p>
+  }
+  return <GridLabSession key={draftOwner} lesson={lesson} draftKey={gridDraftKey(lesson.id, draftOwner ?? undefined)} />
+}
+
+function GridLabSession({ lesson, draftKey }: { lesson: GridLesson; draftKey: string }) {
   const [draft, setDraft] = useState<GridDraft>({ stepIndex: 0, programs: {}, passed: [], savedAt: null })
   const [hydrated, setHydrated] = useState(false)
   const [resumedFrom, setResumedFrom] = useState<number | null>(null)
@@ -91,19 +110,26 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
   const [notice, setNotice] = useState<string | null>(null)
   const [finished, setFinished] = useState(false)
   const [guess, setGuess] = useState<number | null>(null)
+  const [editorRevision, setEditorRevision] = useState(0)
+  const [fileStatus, setFileStatus] = useState('')
+  const recordedRun = useRef<GridRun | null>(null)
+  const fileRequest = useRef(0)
+  const golden = lesson.layoutMode === 'golden'
 
   const step = lesson.steps[Math.min(draft.stepIndex, lesson.steps.length - 1)]
-  const blocks: Block[] = draft.programs[step.id] ?? step.starterBlocks ?? []
+  const blocks = useMemo(() => draft.programs[step.id] ?? step.starterBlocks ?? [], [draft.programs, step])
   const passedHere = draft.passed.includes(step.id)
   const level = stepLevel(step, draft)
   const needsGoal = !!step.creative && !draft.creative?.[step.id]
+  const goalPrompt = step.creative?.layouts ? '先选围栏的边长，再运行。' : step.creative?.patterns ? '先选一种脚印节奏，再运行。' : step.creative?.waters ? '先选有几个水坑，再运行。' : step.creative?.pots ? '先选要浇哪一种花园，再运行。' : '先选一格，把蘑菇屋搬过去，再运行。'
   const observedHere = !step.errorLab || !!draft.observed?.includes(step.id)
-  const { state, trail, stamps, watered, done } = useGridPlayback(level, run)
+  const { state, trail, stamps, watered, done, blockIndex } = useGridPlayback(level, run)
+  const playing = !!run && !done
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
-        const saved = parseGridDraft(lesson, window.localStorage.getItem(gridDraftKey(lesson.id)))
+        const saved = parseGridDraft(lesson, window.localStorage.getItem(draftKey))
         if (saved) {
           setDraft(saved)
           if (saved.stepIndex > 0 || saved.passed.length) setResumedFrom(saved.stepIndex)
@@ -114,43 +140,39 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
       setHydrated(true)
     }, 0)
     return () => clearTimeout(timer)
-  }, [lesson])
+  }, [draftKey, lesson])
 
   const persist = useCallback((next: GridDraft) => {
     setDraft(next)
     try {
       const value = { ...next, savedAt: new Date().toISOString() }
-      window.localStorage.setItem(gridDraftKey(lesson.id), JSON.stringify(value))
+      window.localStorage.setItem(draftKey, JSON.stringify(value))
       setSaveState('saved')
     } catch {
       setSaveState('failed')
     }
-  }, [lesson.id])
+  }, [draftKey])
 
   const handleSnapshot = useCallback((next: Block[]) => {
     if (!hydrated) return
     setDraft(prev => {
-      const key = lesson.steps[Math.min(prev.stepIndex, lesson.steps.length - 1)].id
-      if (JSON.stringify(prev.programs[key] ?? null) === JSON.stringify(next)) return prev
-      const updated = { ...prev, programs: { ...prev.programs, [key]: next } }
+      const current = lesson.steps[Math.min(prev.stepIndex, lesson.steps.length - 1)]
+      const key = current.id
+      if (JSON.stringify(prev.programs[key] ?? current.starterBlocks ?? []) === JSON.stringify(next)) return prev
+      const updated = { ...prev, programs: { ...prev.programs, [key]: next }, passed: prev.passed.filter(id => id !== key) }
       try {
-        window.localStorage.setItem(gridDraftKey(lesson.id), JSON.stringify({ ...updated, savedAt: new Date().toISOString() }))
+        window.localStorage.setItem(draftKey, JSON.stringify({ ...updated, savedAt: new Date().toISOString() }))
         setSaveState('saved')
       } catch { setSaveState('failed') }
       return updated
     })
     setRun(null)
     setNotice(null)
-  }, [hydrated, lesson])
+  }, [draftKey, hydrated, lesson])
 
-  function handleRun() {
-    if (needsGoal) {
-      setNotice(step.creative?.patterns ? '先选一种脚印节奏，再运行。' : step.creative?.waters ? '先选有几个水坑，再运行。' : step.creative?.pots ? '先选要浇哪一种花园，再运行。' : '先选一格，把蘑菇屋搬过去，再运行。')
-      return
-    }
-    const result = runGridProgram(level, blocks)
-    setRun(result)
-    setNotice(null)
+  const recordResult = useCallback((result: GridRun) => {
+    if (recordedRun.current === result) return
+    recordedRun.current = result
     if (result.passed) {
       // An error-lab fix only counts after the planned mistake was really run and seen.
       if (!passedHere && observedHere) persist({ ...draft, passed: [...draft.passed, step.id] })
@@ -166,6 +188,33 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
         })
       }
     }
+  }, [draft, observedHere, passedHere, persist, step])
+
+  useEffect(() => {
+    if (!golden || !run || !done) return
+    const timer = window.setTimeout(() => recordResult(run), 0)
+    return () => clearTimeout(timer)
+  }, [done, golden, recordResult, run])
+
+  useEffect(() => {
+    if (!golden || saveState !== 'failed') return
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [golden, saveState])
+
+  function handleRun() {
+    if (needsGoal) {
+      setNotice(goalPrompt)
+      return
+    }
+    const result = runGridProgram(level, blocks)
+    setRun(result)
+    setNotice(null)
+    if (!golden) recordResult(result)
   }
 
   function chooseGoal(index: number) {
@@ -179,7 +228,8 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
   function restoreStarter() {
     setRun(null)
     setNotice(null)
-    persist({ ...draft, programs: { ...draft.programs, [step.id]: step.starterBlocks ?? [] } })
+    if (golden) setEditorRevision(n => n + 1)
+    persist({ ...draft, programs: { ...draft.programs, [step.id]: step.starterBlocks ?? [] }, passed: draft.passed.filter(id => id !== step.id) })
   }
 
   function handleReset() {
@@ -188,20 +238,50 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
   }
 
   function goToStep(index: number) {
+    fileRequest.current += 1
     setRun(null)
     setGuess(null)
     setFailures(0)
     setNotice(null)
+    setFileStatus('')
     persist({ ...draft, stepIndex: index })
   }
 
+  function exportProgram() {
+    const source = new Blob([serializeGridProgram(lesson.id, step.id, blocks)], { type: 'application/json' })
+    const url = URL.createObjectURL(source)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${lesson.id}-${step.id}.json`
+    link.click()
+    setTimeout(() => URL.revokeObjectURL(url), 0)
+  }
+
+  async function importProgram(file: File) {
+    const request = ++fileRequest.current
+    try {
+      if (file.size > GRID_PROGRAM_MAX_BYTES) throw new Error('积木文件太大。')
+      const raw = await file.text()
+      if (request !== fileRequest.current) return
+      const imported = parseGridProgram(raw, lesson.id, step.id, step.allowedBlocks)
+      handleSnapshot(imported)
+      setEditorRevision(n => n + 1)
+      setFileStatus('积木已导入。请重新运行检查。')
+    } catch (error) {
+      if (request !== fileRequest.current) return
+      setFileStatus(error instanceof Error ? error.message : '导入失败，当前积木已保留。')
+    }
+  }
+
   function handleComplete() {
+    if (golden && playing) return false
     if (!passedHere) {
-      setNotice(needsGoal ? (step.creative?.patterns ? '先选一种脚印节奏，再拼程序运行。' : step.creative?.waters ? '先选有几个水坑，再拼程序运行。' : step.creative?.pots ? '先选要浇哪一种花园，再拼程序运行。' : '先选一格，把蘑菇屋搬过去，再拼程序运行。') : !observedHere ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。' : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
-      return
+      setNotice(needsGoal ? goalPrompt : !observedHere ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。' : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。')
+      return false
     }
     if (draft.stepIndex < lesson.steps.length - 1) goToStep(draft.stepIndex + 1)
     else setFinished(true)
+    return true
   }
 
   const feedback = useMemo(() => {
@@ -227,14 +307,19 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
 
   const hintLayer = failures === 0 ? -1 : Math.min(failures - 1, 2)
   const hintCopy = hintLayer >= 0 ? `（第 ${hintLayer + 1} 层）${step.hints[hintLayer]}` : undefined
+  const stepTitle = `第 ${draft.stepIndex + 1} 关：${step.title}`
 
   if (finished) {
     return (
       <section className="kc-lesson-shell p-6" data-testid="grid-lesson-finished">
         <div className="kc-feedback kc-feedback-success">
           <p className="kc-feedback-title">🎉 {lesson.title}：{lesson.steps.length} 关全部真的跑通了！</p>
+          {lesson.completionBadge ? <p className="mt-2" data-testid="grid-completion-badge">本机成就 · {lesson.completionBadge}</p> : null}
           <p className="mt-2 kc-text-muted">给家长：{lesson.parentQuestion}</p>
           <p className="mt-2 kc-text-muted">这是实验课，成绩只保存在本机，不是正式课程成绩。</p>
+          {saveState === 'failed' ? (
+            <button type="button" className="kc-action-surface kc-btn-outline mt-2" onClick={() => persist(draft)}>本机保存失败，重试保存</button>
+          ) : null}
         </div>
         <ReviewCard lesson={lesson} mistakes={draft.mistakes ?? []} />
         <ReflectionCheck lesson={lesson} chosen={draft.reflection} onChoose={i => persist({ ...draft, reflection: i })} />
@@ -245,32 +330,21 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
               onClick={() => { setFinished(false); goToStep(i) }}>再玩：{s.title}</button>
           ))}
           <Link className="kc-action-surface kc-btn-sm" href={`/learn/catalog/${lesson.id}`}>回到课程介绍</Link>
+          {lesson.project?.showInPortfolio && saveState === 'saved' ? (
+            <Link className="kc-action-surface kc-btn-outline kc-btn-sm" href="/learn/portfolio">查看作品中心</Link>
+          ) : null}
         </div>
       </section>
     )
   }
 
-  return (
-    <GuidedLessonShell
-      completionPreview={`在森林网格里用积木亲手走完 ${lesson.steps.length} 关，包括一关修好别人的程序。`}
-      codeSlot={
-        hydrated ? (
-          <BlocklyWorkspace key={step.id} allowedBlocks={step.allowedBlocks} blocks={blocks} enableProgramTools snapStartOnTop onSnapshotChange={handleSnapshot} />
-        ) : null
-      }
-      feedback={undefined}
-      hintCopy={hintCopy}
-      instruction={step.instruction}
-      isLocked={false}
-      lessonGoal={lesson.objectives.join('；')}
-      lessonTitle={lesson.title}
-      localSaveState={saveState}
-      onCompleteStep={handleComplete}
-      onStartRemedial={() => {}}
-      resumedFromStep={resumedFrom}
-      stageSlot={
-        <section className="flex flex-1 flex-col" data-testid="grid-lab-stage">
-          <div className="kc-stage-panel pb-0">
+  const editor = hydrated ? (
+    <BlocklyWorkspace key={`${step.id}:${editorRevision}`} allowedBlocks={step.allowedBlocks} blocks={blocks} enableProgramTools snapStartOnTop
+      onSnapshotChange={handleSnapshot} layoutMode={golden ? 'golden' : 'legacy'} highlightIndex={golden && (playing || !!run?.failure) ? blockIndex : undefined} />
+  ) : null
+
+  const taskTools = (
+          <div className={golden ? 'space-y-2' : 'kc-stage-panel pb-0'}>
             <div className="flex flex-wrap items-center gap-2 rounded-[8px] border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-950" data-testid="grid-predict">
               <span className="flex-1">🤔 {step.predict}</span>
               <ReadAloudButton key={step.id} testId="grid-read-instruction" text={`第 ${draft.stepIndex + 1} 关，${step.title}。${step.instruction}。${step.predict}`} />
@@ -299,6 +373,21 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
               </div>
             ) : null}
           </div>
+  )
+  const runControls = (showStage?: () => void) => (
+    <>
+      <button type="button" className="kc-action-surface disabled:opacity-50" data-testid="grid-run" disabled={playing}
+        onClick={() => { showStage?.(); handleRun() }}>
+        {playing ? '运行中…' : '▶ 运行'}
+      </button>
+      {golden && <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-stop" disabled={!playing}
+        onClick={() => { setRun(null); setNotice('已停止。积木还在，可以改完再运行。') }}>停止</button>}
+      <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-reset" disabled={playing} onClick={handleReset}><ResetIcon />回到起点</button>
+    </>
+  )
+  const stage = (
+        <section className="flex flex-1 flex-col" data-testid="grid-lab-stage">
+          {golden ? null : taskTools}
           <div className="kc-stage-panel">
             <GridStage level={level} state={state} trail={run ? trail : []} stamps={run ? stamps : []} watered={run ? watered : []} />
           </div>
@@ -313,10 +402,7 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
               </div>
             </div>
             <div className="kc-run-actions flex-wrap">
-              <button type="button" className="kc-action-surface disabled:opacity-50" data-testid="grid-run" disabled={!!run && !done} onClick={handleRun}>
-                {run && !done ? '运行中…' : '▶ 运行'}
-              </button>
-              <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-reset" disabled={!!run && !done} onClick={handleReset}><ResetIcon />回到起点</button>
+              {golden ? null : runControls()}
               {step.errorLab && !observedHere && JSON.stringify(blocks) !== JSON.stringify(step.starterBlocks ?? []) ? (
                 <button type="button" className="kc-action-surface kc-btn-outline" data-testid="grid-restore-starter" onClick={restoreStarter}>换回原来的错误程序</button>
               ) : null}
@@ -326,11 +412,56 @@ export function GridLab({ lesson }: { lesson: GridLesson }) {
             </div>
           </div>
         </section>
-      }
+  )
+  if (golden) {
+    return (
+      <GoldenLessonLayout lessonId={lesson.id} title={lesson.title} stepTitle={stepTitle} stepIndex={draft.stepIndex} stepCount={lesson.steps.length}
+        saveState={saveState} resumedFromStep={resumedFrom} editor={editor} stage={stage} runControls={runControls}
+        onSave={() => persist(draft)} onComplete={handleComplete} completeDisabled={playing}
+        task={<>
+          <p>{step.instruction}</p>
+          {taskTools}
+          <div className="kc-objective"><b>学习目标</b><ul className="mt-1 list-disc pl-4">{lesson.objectives.map(text => <li key={text}>{text}</li>)}</ul></div>
+          {hintCopy && <p className="kc-hint" data-testid="lesson-hint">{hintCopy}</p>}
+          <details>
+            <summary className="cursor-pointer font-bold" data-testid="golden-file-tools">积木文件</summary>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" data-testid="golden-export" onClick={exportProgram}>导出积木</button>
+              <label className="kc-action-surface kc-btn-outline kc-btn-sm">
+                导入积木<input type="file" accept=".json,application/json" className="sr-only" data-testid="golden-import"
+                  onChange={event => {
+                    const file = event.currentTarget.files?.[0]
+                    if (file) void importProgram(file)
+                    event.currentTarget.value = ''
+                  }} />
+              </label>
+            </div>
+            {fileStatus && <p role="status" className="mt-2" data-testid="golden-file-status">{fileStatus}</p>}
+          </details>
+        </>}
+      />
+    )
+  }
+
+  return (
+    <GuidedLessonShell
+      cloudSyncSupported={false}
+      completionPreview={`在森林网格里用积木亲手走完 ${lesson.steps.length} 关，包括一关修好别人的程序。`}
+      codeSlot={editor}
+      hintCopy={hintCopy}
+      instruction={step.instruction}
+      isLocked={false}
+      lessonGoal={lesson.objectives.join('；')}
+      lessonTitle={lesson.title}
+      localSaveState={saveState}
+      onCompleteStep={handleComplete}
+      onRetryLocalSave={() => persist(draft)}
+      onStartRemedial={() => {}}
+      resumedFromStep={resumedFrom}
+      stageSlot={stage}
       stepCount={lesson.steps.length}
       stepIndex={draft.stepIndex}
-      stepTitle={`第 ${draft.stepIndex + 1} 关：${step.title}`}
-      voiceover={undefined}
+      stepTitle={stepTitle}
     />
   )
 }
@@ -355,7 +486,7 @@ function ProjectCard({ lesson, draft }: { lesson: GridLesson; draft: GridDraft }
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-lg font-black">🗺️ {project.title}</h3>
         <span className={`kc-chip ${verdict.passed ? 'kc-chip-success' : 'kc-chip-warning'}`} data-testid="grid-project-status">
-          {verdict.passed ? '真实运行能走到蘑菇屋' : '这张卡还走不到，回去改一改'}
+          {verdict.passed ? project.passedText ?? '真实运行能走到蘑菇屋' : '这张卡还没达到目标，回去改一改'}
         </span>
       </div>
       <ol className="mt-3 flex flex-wrap gap-2" data-testid="grid-project-steps">

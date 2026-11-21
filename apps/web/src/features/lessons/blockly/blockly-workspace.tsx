@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import * as Blockly from 'blockly'
 import { KeyboardNavigation } from '@blockly/keyboard-navigation'
 
 import { BLOCKLY_MEDIA_PATH } from './blockly-media'
 import { VERB_LABELLED_BLOCKS, type MotionVerb } from './block-labels'
 import { buildSnapshot, LINE_FIELD, REPEAT_BODY_INPUT, REPEAT_TIMES_FIELD } from './blockly-snapshot'
-import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, registerKidsBlocks } from './register-kids-blocks'
+import { BLOCK_LABEL_FIELD, buildKidsToolboxCategories, getKidsBlockLabel, getKidsBlockTheme, getScratchBlockTheme, registerKidsBlocks, SCRATCH_CATEGORY_COLOURS } from './register-kids-blocks'
 import { DEFAULT_REPEAT_TIMES, REPEAT_BLOCK, REPEAT_TIMES_OPTIONS, type ProgramBlock } from './program-tree'
 import { restoreBlockSequence } from './restore-block-sequence'
 import type { SayLinePreset } from './say-line-presets'
@@ -45,6 +45,7 @@ class NavigationDeferringToolbox extends Blockly.Toolbox {
 function ensureKeyboardNavigationRegistered() {
   if (keyboardNavigationRegistered) return
   KeyboardNavigation.registerKeyboardNavigationStyles()
+  KeyboardNavigation.registerFlyoutCursor()
   Blockly.registry.register(
     Blockly.registry.Type.TOOLBOX,
     Blockly.registry.DEFAULT,
@@ -68,13 +69,70 @@ function buildKidsToolbox(allowedBlocks: string[], motionVerb: MotionVerb) {
       kind: 'category' as const,
       name: category.name,
       colour: category.colour,
-      contents: category.types.map((type) =>
-        VERB_LABELLED_BLOCKS.includes(type)
-          ? { kind: 'block' as const, type, fields: { [BLOCK_LABEL_FIELD]: getKidsBlockLabel(type, motionVerb) } }
-          : { kind: 'block' as const, type },
-      ),
+      contents: flyoutBlocks(category.types, motionVerb),
     })),
   }
+}
+
+function flyoutBlocks(types: string[], verb: MotionVerb): Blockly.utils.toolbox.FlyoutItemInfoArray {
+  return types.map((type) => VERB_LABELLED_BLOCKS.includes(type)
+    ? { kind: 'block', type, fields: { [BLOCK_LABEL_FIELD]: getKidsBlockLabel(type, verb) } }
+    : { kind: 'block', type })
+}
+
+const DOCKED_FLYOUT = 'kidscoding-docked-flyout'
+
+/** A simple toolbox reserves flyout space in Blockly's own viewport metrics. */
+class DockedFlyout extends Blockly.VerticalFlyout {
+  reservedWidth = 0
+
+  override getWidth() {
+    return Math.max(this.reservedWidth, super.getWidth())
+  }
+
+  override getFlyoutScale() {
+    // Keep material readable and in the same column while zooming the script.
+    return 0.9
+  }
+}
+
+export type DockedBlocklyOptions = {
+  /** A changed key selects a fresh default category without remounting the engine. */
+  stepKey: string
+  preferredBlock?: string
+}
+
+/**
+ * The "point to add / delete / keyboard" tools panel. Docked V3 lessons keep it
+ * collapsed under a plain summary; Golden lessons can expand it from a labelled
+ * summary; legacy lessons keep the always-visible header row.
+ */
+function BlocklyToolsPanel({ mode, children }: { mode: 'docked' | 'golden' | 'legacy'; children: ReactNode }) {
+  if (mode === 'docked') {
+    return (
+      <details className="kc-v3-assist">
+        <summary>点按添加 · 删除 · 键盘</summary>
+        <div className="kc-v3-assist-content">{children}</div>
+      </details>
+    )
+  }
+  if (mode === 'golden') {
+    return (
+      <details className="rounded-[8px] border border-[#e8eef8] bg-[#f3f6fc] p-3">
+        <summary className="cursor-pointer text-sm font-bold" data-testid="golden-block-tools">辅助工具 · 点按添加或编辑积木</summary>
+        {children}
+      </details>
+    )
+  }
+  return (
+    <div className="rounded-[8px] border border-[#e8eef8] bg-[#f3f6fc] p-3">
+      <div className="flex items-center justify-between gap-3">
+        <b className="text-[12px]">本节可用积木</b>
+        <span className="kc-text-muted text-[11px]">不会拖也可以点按钮</span>
+      </div>
+      {children}
+    </div>
+  )
 }
 
 /**
@@ -90,7 +148,7 @@ function buildKidsToolbox(allowedBlocks: string[], motionVerb: MotionVerb) {
  * (“开始时”/“被点击时”) is never cut off at the top edge. Dragging keeps the child's view.
  */
 /** Returns false only when the fit must wait (mid-drag or hidden pane). */
-function fitBlocksToView(workspace: Blockly.WorkspaceSvg, fromTop = false): boolean {
+function fitBlocksToView(workspace: Blockly.WorkspaceSvg, fromTop = false, docked = false): boolean {
   if (workspace.isDragging()) return false
   if (workspace.getTopBlocks(false).length === 0) return true
   const box = workspace.getBlocksBoundingBox()
@@ -113,8 +171,10 @@ function fitBlocksToView(workspace: Blockly.WorkspaceSvg, fromTop = false): bool
   const flyoutWidth = workspace.getFlyout()?.getWidth() ?? 0
   const fitScale = Math.min(
     BASE_SCALE,
-    (pixelView.width + flyoutWidth - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) /
-      (contentWidth + flyoutWidth / workspace.scale),
+    docked
+      ? (pixelView.width - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) / contentWidth
+      : (pixelView.width + flyoutWidth - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) /
+        (contentWidth + flyoutWidth / workspace.scale),
     (pixelView.height - FIT_MARGIN * 2 - SCROLLBAR_ALLOWANCE) / contentHeight,
   )
   const targetScale = Math.max(MIN_FIT_SCALE, fitScale)
@@ -241,6 +301,9 @@ export function BlocklyWorkspace({
   snapStartOnTop = false,
   sayLineChoices,
   motionVerb = 'walk',
+  docked,
+  layoutMode = 'legacy',
+  highlightIndex,
 }: {
   allowedBlocks: string[]
   blocks: BlockSnapshot[]
@@ -252,8 +315,13 @@ export function BlocklyWorkspace({
   sayLineChoices?: readonly SayLinePreset[]
   /** TQ-009: the butterfly flies, so its move/repeat blocks say “飞”. */
   motionVerb?: MotionVerb
+  docked?: DockedBlocklyOptions
+  layoutMode?: 'legacy' | 'golden'
+  /** Position in the connected program, with the event hat at index zero. */
+  highlightIndex?: number
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
+  const flyoutColumnRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
   const showFromTopRef = useRef<(() => void) | null>(null)
   const lastSelectedBlockIdRef = useRef<string | null>(null)
@@ -273,6 +341,23 @@ export function BlocklyWorkspace({
     () => (allowedBlockKey ? allowedBlockKey.split('|') : []),
     [allowedBlockKey],
   )
+  const isDocked = docked !== undefined
+  const categories = useMemo(() => buildKidsToolboxCategories(stableAllowedBlocks, SCRATCH_CATEGORY_COLOURS), [stableAllowedBlocks])
+  const defaultCategory = categories.find((category) => category.types.includes(docked?.preferredBlock ?? '')) ?? categories[0]
+  const [selection, setSelection] = useState<{ step: string; name: string }>()
+  const selectedCategory = (selection && selection.step === docked?.stepKey
+    ? categories.find((category) => category.name === selection.name)
+    : undefined) ?? defaultCategory
+  // A docked workspace updates its own flyout below, rather than re-injecting
+  // when a new teaching step unlocks a block.
+  const injectionBlocks = isDocked ? null : stableAllowedBlocks
+  // Legacy lessons advance by replacing the callback and restoring the next
+  // step's initial program, even when the block allowlist hasn't changed.
+  const injectionSnapshotHandler = isDocked ? null : onSnapshotChange
+  const setupRef = useRef({ stableAllowedBlocks, onSnapshotChange })
+  useEffect(() => {
+    setupRef.current = { stableAllowedBlocks, onSnapshotChange }
+  }, [stableAllowedBlocks, onSnapshotChange])
 
   useEffect(() => {
     latestBlocksRef.current = blocks
@@ -291,6 +376,9 @@ export function BlocklyWorkspace({
   useEffect(() => {
     registerKidsBlocks()
     ensureKeyboardNavigationRegistered()
+    if (isDocked && !Blockly.registry.hasItem(Blockly.registry.Type.FLYOUTS_VERTICAL_TOOLBOX, DOCKED_FLYOUT)) {
+      Blockly.registry.register(Blockly.registry.Type.FLYOUTS_VERTICAL_TOOLBOX, DOCKED_FLYOUT, DockedFlyout)
+    }
 
     if (!mountRef.current) {
       return
@@ -299,9 +387,12 @@ export function BlocklyWorkspace({
     const workspace = Blockly.inject(mountRef.current, {
       media: BLOCKLY_MEDIA_PATH,
       renderer: 'zelos',
-      theme: getKidsBlockTheme(),
+      theme: isDocked ? getScratchBlockTheme() : getKidsBlockTheme(),
       grid: { spacing: 18, length: 2, colour: '#dbe4f1', snap: false },
-      toolbox: buildKidsToolbox(stableAllowedBlocks, motionVerb),
+      toolbox: injectionBlocks
+        ? buildKidsToolbox(injectionBlocks, motionVerb)
+        : { kind: 'flyoutToolbox', contents: [] },
+      plugins: isDocked ? { flyoutsVerticalToolbox: DOCKED_FLYOUT } : undefined,
       trashcan: true,
       move: {
         scrollbars: true,
@@ -321,7 +412,7 @@ export function BlocklyWorkspace({
     const keyboardNav = new KeyboardNavigation(workspace)
     const restoredBlocks = restoreBlockSequence(
       latestBlocksRef.current,
-      stableAllowedBlocks,
+      setupRef.current.stableAllowedBlocks,
     )
 
     restoredBlocks.forEach((snapshot) => {
@@ -342,14 +433,19 @@ export function BlocklyWorkspace({
       if (fromTop) pendingFromTop = true
       cancelAnimationFrame(fitFrame)
       fitFrame = requestAnimationFrame(() => {
-        if (fitBlocksToView(workspace, pendingFromTop)) pendingFromTop = false
+        if (fitBlocksToView(workspace, pendingFromTop, isDocked)) pendingFromTop = false
       })
     }
     showFromTopRef.current = () => scheduleFit(true)
 
     const handleResize = () => {
+      if (layoutMode === 'golden' && (!mountRef.current?.offsetWidth || workspace.isDragging())) return
+      const flyout = workspace.getFlyout()
+      if (flyout instanceof DockedFlyout && flyoutColumnRef.current) {
+        flyout.reservedWidth = flyoutColumnRef.current.offsetWidth
+      }
       Blockly.svgResize(workspace)
-      scheduleFit()
+      if (layoutMode === 'legacy' || pendingFromTop) scheduleFit()
     }
 
     let previousSnapshot = JSON.stringify(latestBlocksRef.current)
@@ -364,10 +460,12 @@ export function BlocklyWorkspace({
       // Focus, selection and viewport changes do not edit the program.
       if (key !== previousSnapshot) {
         previousSnapshot = key
-        onSnapshotChange(next)
-        scheduleFit()
+        const notifySnapshot = injectionSnapshotHandler ?? setupRef.current.onSnapshotChange
+        notifySnapshot(next)
+        if (layoutMode === 'legacy') scheduleFit()
       } else if (event?.type === Blockly.Events.BLOCK_DRAG && !(event as Blockly.Events.BlockDrag).isStart) {
-        scheduleFit()
+        if (layoutMode === 'legacy') scheduleFit()
+        else handleResize()
       }
     }
 
@@ -395,7 +493,28 @@ export function BlocklyWorkspace({
       lastSelectedBlockIdRef.current = null
     }
     // choicesKey re-injects when the lesson's preset lines change (snapshotOf only reads refs).
-  }, [allowedBlockKey, onSnapshotChange, stableAllowedBlocks, choicesKey, motionVerb])
+  }, [injectionBlocks, injectionSnapshotHandler, choicesKey, motionVerb, isDocked, layoutMode])
+
+  useEffect(() => {
+    if (!isDocked) return
+    const workspace = workspaceRef.current
+    const flyout = workspace?.getFlyout()
+    if (!workspace || !(flyout instanceof DockedFlyout)) return
+    flyout.reservedWidth = flyoutColumnRef.current?.offsetWidth ?? 0
+    flyout.show(flyoutBlocks(selectedCategory?.types ?? [], motionVerb))
+    flyout.scrollToStart()
+    Blockly.svgResize(workspace)
+    showFromTopRef.current?.()
+  }, [isDocked, selectedCategory, motionVerb, choicesKey])
+
+  useEffect(() => {
+    if (layoutMode !== 'golden') return
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    let block: Blockly.Block | null = highlightIndex === undefined ? null : workspace.getTopBlocks(true)[0] ?? null
+    for (let index = 0; block && index < (highlightIndex ?? 0); index += 1) block = block.getNextBlock()
+    workspace.highlightBlock(block?.id ?? null)
+  }, [highlightIndex, layoutMode])
 
   function addBlock(type: string) {
     const workspace = workspaceRef.current
@@ -501,23 +620,56 @@ export function BlocklyWorkspace({
     showFromTopRef.current?.()
   }
 
+  function resetScriptZoom() {
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    workspace.setScale(workspace.options.zoomOptions.startScale)
+    workspace.scrollCenter()
+  }
+
   return (
-    <section className="flex flex-col gap-3" data-testid="lesson-blockly-workspace">
+    <section className={isDocked ? 'kc-v3-blockly' : 'flex flex-col gap-3'} data-testid="lesson-blockly-workspace">
+      {isDocked && <>
+        <header className="kc-v3-material-heading" data-testid="v3-material-heading">
+          <h2>积木素材</h2>
+          <span>拖到脚本区</span>
+        </header>
+        <header className="kc-v3-script-heading" data-testid="v3-script-heading">
+          <h2>脚本工作区</h2>
+          <div>
+            <button type="button" onClick={() => workspaceRef.current?.undo(false)}>撤销</button>
+            <button type="button" onClick={() => showFromTopRef.current?.()}>适合画面</button>
+          </div>
+        </header>
+        <nav className="kc-v3-categories" data-testid="v3-categories" aria-label="积木分类">
+          {categories.map((category) => (
+            <button type="button" key={category.name} aria-pressed={selectedCategory?.name === category.name}
+              onClick={() => setSelection({ step: docked.stepKey, name: category.name })}>
+              <span style={{ background: category.colour }} aria-hidden="true" />
+              {category.name}
+            </button>
+          ))}
+        </nav>
+        <div className="kc-v3-touch-zoom" role="group" aria-label="脚本缩放">
+          <button type="button" aria-label="缩小脚本" onClick={() => workspaceRef.current?.zoomCenter(-1)}>−</button>
+          <button type="button" aria-label="重置脚本缩放" onClick={resetScriptZoom}>↺</button>
+          <button type="button" aria-label="放大脚本" onClick={() => workspaceRef.current?.zoomCenter(1)}>+</button>
+        </div>
+        <div className="kc-v3-flyout-size" aria-hidden="true" ref={flyoutColumnRef} />
+      </>}
       {/* isolate: Blockly's flyout (z-index 20) must not paint over the sticky top bar when scrolled. */}
-      <div className="isolate overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white">
+      <div className={isDocked ? 'kc-v3-engine' : 'isolate overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white'}>
         <div
           ref={mountRef}
-          className="relative h-[420px] overflow-hidden bg-white"
+          className={isDocked
+            ? 'kc-v3-engine-mount'
+            : `relative overflow-hidden bg-white ${layoutMode === 'golden' ? 'kc-golden-blockly-mount' : 'h-[420px]'}`}
         />
       </div>
       {/* UX-203: host for the keyboard-navigation "/" help popup (empty until opened). */}
-      <div id="shortcuts" />
+      <div id="shortcuts" className={isDocked ? 'kc-v3-shortcuts' : undefined} />
 
-      <div className="rounded-[8px] border border-[#e8eef8] bg-[#f3f6fc] p-3">
-        <div className="flex items-center justify-between gap-3">
-          <b className="text-[12px]">本节可用积木</b>
-          <span className="kc-text-muted text-[11px]">不会拖也可以点按钮</span>
-        </div>
+      <BlocklyToolsPanel mode={isDocked ? 'docked' : layoutMode === 'golden' ? 'golden' : 'legacy'}>
         <div className="mt-2 flex flex-wrap gap-2" data-testid="lesson-block-palette">
           {/* UX-203: delete is core workspace UX like the trashcan, so it is
               not gated with the practice-only 撤回 / 清空 tools. */}
@@ -599,7 +751,7 @@ export function BlocklyWorkspace({
             </div>
           </div>
         ) : null}
-      </div>
+      </BlocklyToolsPanel>
     </section>
   )
 }

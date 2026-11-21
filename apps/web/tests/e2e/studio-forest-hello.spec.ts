@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 /**
  * OPS-041《小狐狸出场》studio 路由 E2E — 真实 Chrome，生产构建。
@@ -14,7 +14,7 @@ import { expect, test, type Page } from '@playwright/test'
  * N7/N8 为 OPS-046）；
  * 五视口 1920×1080 / 1440×900 / 1366×768 / 768×1024 / 375×812。积木添加走 palette
  * 的 lesson-add-* 按钮（与旧路由、L01 同款真实路径）；E6 另做一次
- * 工具箱 flyout 真实拖拽（接成链并跑通）。不使用固定时长 sleep 同步：
+ * 常驻素材区真实拖拽（接成链并跑通）。其余测试按运行、保存与完成条件等待：
  * 每次等待都是条件期望（可见 testid、存储状态、文本）。
  * 用临时 Playwright config（独立端口）运行；playwright.config.ts 不动。
  */
@@ -104,7 +104,14 @@ async function waitForShellSaved(page: Page) {
 }
 
 async function add(page: Page, type: string) {
-  await page.getByTestId(`lesson-add-${type}`).click()
+  await clickProgramTool(page, `lesson-add-${type}`)
+}
+
+async function clickProgramTool(page: Page, testId: string) {
+  const assist = page.getByTestId('lesson-blockly-workspace').locator('details').first()
+  if ((await assist.getAttribute('open')) === null) await assist.locator('summary').click()
+  await page.getByTestId(testId).click()
+  await assist.locator('summary').click()
 }
 
 async function clickRun(page: Page) {
@@ -175,8 +182,7 @@ async function assertShellInvariants(page: Page) {
 async function assertTopbarFits(page: Page, width: number) {
   const topbarBox = await page.getByTestId('studio-topbar').boundingBox()
   expect(topbarBox, 'topbar has a bounding box').not.toBeNull()
-  expect(topbarBox!.height, 'slim topbar height in 48–56px').toBeGreaterThanOrEqual(48)
-  expect(topbarBox!.height, 'slim topbar height in 48–56px').toBeLessThanOrEqual(56)
+  expect(topbarBox!.height, 'V3 topbar height').toBe(width <= 650 ? 54 : 62)
   for (const id of [
     'studio-back',
     'studio-title',
@@ -194,15 +200,46 @@ async function assertTopbarFits(page: Page, width: number) {
   }
 }
 
+async function assertTouchTarget(control: Locator) {
+  await expect(control).toBeInViewport({ ratio: 1 })
+  const { width, height, receivesTouch } = await control.evaluate((element) => {
+    const { x, y, width, height } = element.getBoundingClientRect()
+    // Sample the middle of each edge as well as the center to catch clipping
+    // or an overlay that leaves the center tappable but steals part of the hit area.
+    const receivesTouch = [[.5, .5], [.1, .5], [.9, .5], [.5, .1], [.5, .9]].every(([dx, dy]) =>
+      element.contains(document.elementFromPoint(x + width * dx, y + height * dy)),
+    )
+    return { width, height, receivesTouch }
+  })
+  expect(width).toBeGreaterThanOrEqual(44)
+  expect(height).toBeGreaterThanOrEqual(44)
+  expect(receivesTouch, `${control} has a clear touch area`).toBe(true)
+}
+
+async function assertTouchZoomClear(zoom: Locator, phase: string, ...blocks: Locator[]) {
+  const controls = await zoom.getByRole('button').evaluateAll((elements) =>
+    elements.map((element) => element.getBoundingClientRect().toJSON()),
+  )
+  expect(controls).toHaveLength(3)
+  for (const block of blocks) {
+    const rect = await block.evaluate((element) => element.getBoundingClientRect().toJSON())
+    expect(rect.width).toBeGreaterThan(0)
+    expect(rect.height).toBeGreaterThan(0)
+    for (const button of controls) {
+      const intersects = rect.left < button.right && rect.right > button.left &&
+        rect.top < button.bottom && rect.bottom > button.top
+      expect(intersects, `${phase}: ${block} stays clear of the zoom buttons`).toBe(false)
+    }
+  }
+}
+
 /**
- * 真实拖拽：点工具箱分类（开始/移动）打开 flyout，把第一块 flyout
- * 积木拖到画布上现有程序栈的正下方（Blockly 在连接点附近松手即接链）。
- * 注意：本仓库 Blockly  bundle 的分类行是 `.blocklyToolboxCategoryContainer`
- *（role=treeitem），不是 `.blocklyTreeRow`（该类不存在，E6 首轮实测 0 命中）。
+ * 真实拖拽：切换常驻 flyout 的分类，把素材积木放到主画布现有程序栈下方。
  */
-async function dragToolboxBlock(page: Page, categoryLabel: string) {
-  const category = page.getByRole('treeitem', { name: categoryLabel }).first()
-  await category.click()
+async function dragToolboxBlock(page: Page, categoryLabel: string, touch = false, inspectDrag?: () => Promise<void>) {
+  const category = page.getByTestId('v3-categories').getByRole('button', { name: categoryLabel })
+  if (touch) await category.tap()
+  else await category.click()
   const flyoutBlock = page.locator('.blocklyFlyout .blocklyDraggable').first()
   await flyoutBlock.waitFor({ state: 'visible', timeout: 10_000 })
   const box = await flyoutBlock.boundingBox()
@@ -215,7 +252,7 @@ async function dragToolboxBlock(page: Page, categoryLabel: string) {
   // the drop would land by the toolbox instead of under the stack
   // (E6 前两轮：积木以 disconnected 散块落地，根因即落点取错).
   const lastBlock = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.when_start').first()
-  const lastBox = await lastBlock.boundingBox().catch(() => null)
+  const lastBox = await lastBlock.count() ? await lastBlock.boundingBox() : null
   const canvasBox = await canvas.boundingBox()
   expect(canvasBox).not.toBeNull()
   // Drop so the dragged block's TOP connection lands on the existing
@@ -239,7 +276,26 @@ async function dragToolboxBlock(page: Page, categoryLabel: string) {
   const dropY = lastBox
     ? lastBox.y + lastBox.height - 8 * scale + box!.height / 2
     : canvasBox!.y + 80
-  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+  const startX = box!.x + box!.width / 2
+  const startY = box!.y + box!.height / 2
+  if (touch) {
+    const cdp = await page.context().newCDPSession(page)
+    try {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: startX, y: startY }] })
+      for (let i = 1; i <= 20; i++) {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{
+          x: startX + (dropX - startX) * i / 20,
+          y: startY + (dropY - startY) * i / 20,
+        }] })
+      }
+      await inspectDrag?.()
+    } finally {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+      await cdp.detach()
+    }
+    return
+  }
+  await page.mouse.move(startX, startY)
   await page.mouse.down()
   await page.mouse.move(dropX, dropY, { steps: 20 })
   // Let Blockly show the snap highlight before releasing; without this
@@ -257,12 +313,13 @@ test('E1 desktop 1440: load, step-1 run (only when_start, fox stays), complete t
   await expect(page.getByTestId('forest-hello-step-title')).toContainText('认识小狐狸和开始积木')
   await expect(page.getByTestId('forest-hello-voiceover')).toContainText('先放开始积木')
   await expect(page.getByTestId('ws-stage-box')).toBeVisible()
-  await expect(page.locator('[data-character-art="fox"]')).toBeVisible()
+  await expect(page.getByTestId('stage-character-main').locator('[data-character-art="fox"]')).toBeVisible()
   await assertShellInvariants(page)
   await assertTopbarFits(page, 1440)
   await page.screenshot({ path: `${EVIDENCE}/e1-desktop-start.png` })
   // Step 1: only when_start — the fox staying put IS the expected result.
-  await add(page, 'when_start')
+  await dragToolboxBlock(page, '开始')
+  await expect.poll(() => draftProgram(page, 'step-1')).toEqual([START])
   await runAndExpect(page, true)
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
   await expect(page.getByTestId('ws-feedback-stage')).toContainText('一动不动')
@@ -339,7 +396,7 @@ test('E4 desktop 1440: step-4 mistake experiment, fix, complete the lesson', asy
   await page.getByTestId('mistake-answer-stayed').click()
   await expect(page.getByTestId('mistake-fix')).toBeVisible()
   // Fix it and run again: the real failure is gone, the fix is confirmed.
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)
@@ -376,6 +433,24 @@ for (const size of SIZES) {
     const runBox = await runEntry.boundingBox()
     expect(runBox).not.toBeNull()
     expect(runBox!.y).toBeLessThan(size.height)
+    const categories = page.getByTestId('v3-categories')
+    await expect(categories.getByRole('button')).toHaveCount(1)
+    await expect(categories.getByRole('button', { name: '开始' })).toHaveAttribute('aria-pressed', 'true')
+    const tile = page.locator('.kc-v3-engine .blocklyFlyout .when_start')
+    await expect(tile).toBeInViewport()
+    await expect(page.getByTestId('v3-mission')).toBeInViewport()
+    if (size.width >= 1280) {
+      const left = (await page.getByTestId('v3-stage-region').boundingBox())!
+      const middle = (await page.getByTestId('v3-material-heading').boundingBox())!
+      const right = (await page.getByTestId('v3-script-heading').boundingBox())!
+      const tileBounds = (await tile.boundingBox())!
+      expect(left.x + left.width).toBeLessThanOrEqual(middle.x)
+      expect(middle.x + middle.width).toBeCloseTo(right.x, 0)
+      expect(middle.width / size.width).toBeGreaterThan(0.16)
+      expect(right.width / size.width).toBeGreaterThan(0.48)
+      expect(tileBounds.x + tileBounds.width).toBeLessThan(right.x)
+      await expect(page.getByTestId('ws-roles-panel')).toBeInViewport({ ratio: 1 })
+    }
     await page.screenshot({ path: `${EVIDENCE}/e5-first-${size.name}.png` })
   })
 }
@@ -395,6 +470,207 @@ test('E6 desktop 1440: real toolbox flyout drag connects the move block and pass
   await runAndExpect(page, true)
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100', { timeout: 20_000 })
 })
+
+for (const { width, height } of SIZES.filter((size) => size.width !== 1920)) {
+  test(`V3 ${width}x${height}: expanded block controls and guidance do not overlap`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height })
+    const draft = emptyDraft(1)
+    draft.programs['step-2'] = [START, MOVE]
+    await seedDraft(page, draft)
+    await page.goto(ROUTE)
+    await expect(page.locator('.kc-v3-engine .blocklyFlyout .move_right')).toBeVisible()
+    await runAndExpect(page, true)
+
+    const assist = page.locator('.kc-v3-assist')
+    const guidance = page.locator('.kc-v3-editor-details')
+    await assist.locator('summary').click()
+    await guidance.locator('summary').click()
+    const controls = assist.getByTestId('lesson-block-palette')
+    const voiceover = guidance.getByTestId('forest-hello-voiceover')
+    await expect(controls).toBeVisible()
+    await expect(voiceover).toBeVisible()
+    const assistBox = (await assist.boundingBox())!
+    const controlsBox = (await controls.boundingBox())!
+    const guideBox = (await guidance.boundingBox())!
+    expect(controlsBox.y + controlsBox.height).toBeLessThanOrEqual(assistBox.y + assistBox.height + 1)
+    expect(assistBox.y + assistBox.height).toBeLessThanOrEqual(guideBox.y + 1)
+    const save = guidance.getByTestId('forest-hello-save')
+    await save.click()
+    await waitForShellSaved(page)
+    await expect(page.getByTestId('studio-topbar').getByText('已保存到本机', { exact: true })).toHaveCount(1)
+    await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
+    await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+    await assist.locator('summary').scrollIntoViewIfNeeded()
+    await page.screenshot({ path: testInfo.outputPath('expanded-panels.png') })
+  })
+}
+
+for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) {
+  test(`V3 ${size.width}: touch-drag, connect and run without recreating the editor`, async ({ browser }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'Runs with an explicit Chrome touch context and exact viewport')
+    const context = await browser.newContext({ viewport: size, hasTouch: true, isMobile: true })
+    try {
+      const page = await context.newPage()
+      const phone = size.width === 375
+      const zoom = page.getByRole('group', { name: '脚本缩放' })
+      const topbarControls = ['studio-back', 'studio-file-menu-button', 'studio-stage-toggle', 'studio-help-button', 'studio-guide-button']
+      const draft = emptyDraft(1)
+      draft.programs['step-2'] = [START]
+      await seedDraft(page, draft)
+      await page.goto(ROUTE)
+      const svg = page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')
+      await expect(svg).toBeVisible({ timeout: 30_000 })
+      if (phone) {
+        for (const id of topbarControls) await assertTouchTarget(page.getByTestId(id))
+        const guide = page.getByTestId('studio-guide-drawer')
+        const guideButton = page.getByTestId('studio-guide-button')
+        await page.getByTestId('studio-help-button').tap()
+        await expect(guide).toBeVisible()
+        await assertTouchTarget(guideButton)
+        await guideButton.tap()
+        await expect(guide).toBeHidden()
+        await guideButton.tap()
+        await expect(guide).toBeVisible()
+        await page.getByTestId('studio-guide-close').tap()
+        await expect(guide).toBeHidden()
+        const stageToggle = page.getByTestId('studio-stage-toggle')
+        await stageToggle.tap()
+        await expect(page.locator('.kc-v3-stage-region')).toBeHidden()
+        await stageToggle.tap()
+        await expect(page.locator('.kc-v3-stage-region')).toBeVisible()
+        await expect(svg.locator('.blocklyZoom:visible')).toHaveCount(0)
+      } else {
+        await expect(zoom).toBeHidden()
+        await expect(svg.locator('.blocklyZoom:visible')).toHaveCount(3)
+      }
+      await expect(page.getByTestId('forest-hello-instruction')).toBeInViewport({ ratio: 1 })
+      await expect(page.getByTestId('forest-hello-complete-step')).toBeInViewport({ ratio: 1 })
+      await expect(page.getByTestId('studio-save-chip')).toBeInViewport({ ratio: 1 })
+      await expect(page.getByTestId('ws-run-toggle')).toBeInViewport({ ratio: 1 })
+      const stage = page.locator('.kc-v3-stage-region .kc-stage-scene')
+      const stageBox = (await stage.boundingBox())!
+      expect(stageBox.width).toBeGreaterThanOrEqual(size.width === 768 ? 410 : 310)
+      expect((await page.getByTestId('ws-run-toggle').boundingBox())!.height).toBeGreaterThanOrEqual(44)
+      async function assertReadableStage() {
+        const rects = await stage.locator([
+          '[data-testid="stage-current-scene"]',
+          '[data-testid="stage-walked-distance"]',
+          '[data-testid="stage-friend-distance"]',
+          '[data-testid="stage-character-main"]',
+          '[data-testid="stage-character-friend"]',
+        ].join(',')).evaluateAll((elements) => elements.map((element) => {
+          const { top, left, bottom, right, width, height } = element.getBoundingClientRect()
+          return { top, left, bottom, right, width, height }
+        }))
+        expect(rects).toHaveLength(5)
+        for (const [index, rect] of rects.entries()) {
+          expect(rect.width).toBeGreaterThan(0)
+          expect(rect.height).toBeGreaterThan(0)
+          expect(rect.left).toBeGreaterThanOrEqual(stageBox.x)
+          expect(rect.right).toBeLessThanOrEqual(stageBox.x + stageBox.width)
+          expect(rect.top).toBeGreaterThanOrEqual(stageBox.y)
+          expect(rect.bottom).toBeLessThanOrEqual(stageBox.y + stageBox.height)
+          for (const other of rects.slice(index + 1)) {
+            const intersect = rect.left < other.right && rect.right > other.left && rect.top < other.bottom && rect.bottom > other.top
+            expect(intersect, 'role and live scene/distance labels have separate paint areas').toBe(false)
+          }
+        }
+      }
+      await assertReadableStage()
+      const categories = page.getByTestId('v3-categories')
+      await expect(categories.getByRole('button', { name: '移动' })).toHaveAttribute('aria-pressed', 'true')
+      const move = page.locator('.kc-v3-engine .blocklyFlyout .move_right')
+      const start = svg.locator('.blocklyBlockCanvas .when_start')
+      const scriptMove = svg.locator('.blocklyBlockCanvas .move_right')
+      const scale = () => start.evaluate((element: SVGGraphicsElement) => element.getScreenCTM()!.a)
+      const heading = page.getByTestId('v3-script-heading')
+      const fit = heading.getByRole('button', { name: '适合画面' })
+      const undo = heading.getByRole('button', { name: '撤销' })
+      if (phone) {
+        const startCategory = categories.getByRole('button', { name: '开始' })
+        const moveCategory = categories.getByRole('button', { name: '移动' })
+        const zoomOut = zoom.getByRole('button', { name: '缩小脚本' })
+        const zoomReset = zoom.getByRole('button', { name: '重置脚本缩放' })
+        const zoomIn = zoom.getByRole('button', { name: '放大脚本' })
+        for (const control of [startCategory, moveCategory, undo, fit, zoomOut, zoomReset, zoomIn]) {
+          await assertTouchTarget(control)
+        }
+        await startCategory.tap()
+        await expect(page.locator('.kc-v3-engine .blocklyFlyout .when_start')).toBeInViewport({ ratio: 1 })
+        await moveCategory.tap()
+        await expect(move).toBeInViewport({ ratio: 1 })
+        await fit.tap()
+        const originalScale = await scale()
+        await zoomOut.tap()
+        await expect.poll(scale).toBeLessThan(originalScale)
+        await zoomIn.tap()
+        await expect.poll(scale).toBeCloseTo(originalScale, 2)
+        await zoomIn.tap()
+        await expect.poll(scale).toBeGreaterThan(originalScale)
+        await zoomReset.tap()
+        await expect.poll(scale).toBeCloseTo(.9, 2)
+        await fit.tap()
+        await expect(start).toBeInViewport({ ratio: 1 })
+        await assertTouchZoomClear(zoom, 'before drag', move, start)
+      }
+      await expect(move).toBeInViewport({ ratio: 1 })
+      const tile = (await move.boundingBox())!
+      const scriptHeading = (await heading.boundingBox())!
+      expect(tile.x + tile.width).toBeLessThan(scriptHeading.x)
+      const workspace = await svg.elementHandle()
+      const scaleBeforeDrag = await scale()
+      await dragToolboxBlock(page, '移动', true, phone ? async () => {
+        const dragged = page.locator('.blocklyDragging.move_right')
+        await expect(dragged).toBeVisible()
+        await assertTouchZoomClear(zoom, 'during drag', start, dragged)
+        expect(await scale()).toBeCloseTo(scaleBeforeDrag, 4)
+        await page.screenshot({ path: testInfo.outputPath('mobile-drag-with-zoom-toolbar.png') })
+      } : undefined)
+      await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+      if (phone) {
+        await expect(scriptMove).toBeVisible()
+        await assertTouchZoomClear(zoom, 'after connection', start, scriptMove)
+        await undo.tap()
+        await expect(scriptMove).toHaveCount(0)
+        await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START])
+        await dragToolboxBlock(page, '移动', true)
+        await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+      }
+      await page.getByTestId('ws-run-toggle').tap()
+      await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
+      await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
+      await expect(stage.getByTestId('stage-walked-distance')).toContainText('100 步')
+      await expect(stage.getByTestId('stage-friend-distance')).toContainText('0 步')
+      await assertReadableStage()
+      await expect.poll(() => overflow(page)).toBe(false)
+      const feedback = page.getByTestId('ws-feedback').getByText('查看学习反馈', { exact: true })
+      await feedback.tap()
+      await expect(page.getByTestId('ws-feedback-stage')).toBeInViewport({ ratio: 1 })
+      await feedback.tap()
+      await page.getByTestId('studio-file-menu-button').tap()
+      const save = page.getByTestId('studio-file-save')
+      await expect(save).toBeInViewport({ ratio: 1 })
+      if (phone) await assertTouchTarget(save)
+      await save.tap()
+      await waitForShellSaved(page)
+      await assertTopbarFits(page, size.width)
+      if (phone) for (const id of topbarControls) await assertTouchTarget(page.getByTestId(id))
+      await page.getByTestId('v3-reset-stage').tap()
+      await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+      await page.setViewportSize({ width: size.width + 15, height: size.height })
+      await expect.poll(() => workspace!.evaluate((el) => el.isConnected)).toBe(true)
+      await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
+      if (phone) {
+        const back = page.getByTestId('studio-back')
+        const href = await back.getAttribute('href')
+        await back.tap()
+        await expect(page).toHaveURL(new URL(href!, page.url()).href)
+      }
+    } finally {
+      await context.close()
+    }
+  })
+}
 
 test('E7 desktop 1440: save + refresh restores the step and the program', async ({ page }) => {
   test.setTimeout(240_000)
@@ -567,9 +843,10 @@ test('N4 desktop 1440: save failure is fail-closed (localStorage quota exhausted
   })
   // Dirty the draft so the next save must GROW it (+~24 bytes): with
   // < 1 byte free the write throws instead of silently overwriting.
-  await page.getByTestId('lesson-add-move_right').click()
+  await add(page, 'move_right')
   // Trigger a real save through the shell: the chip must report failure,
   // never “已保存到本机”.
+  await page.getByText('本关指引与积木顺序', { exact: true }).click()
   await page.getByTestId('forest-hello-save').click()
   await expect(page.getByTestId('studio-save-chip')).toContainText('未能保存', { timeout: 10_000 })
   await expect(page.getByTestId('studio-save-chip')).not.toContainText('已保存到本机')
@@ -586,12 +863,12 @@ test('N5 desktop 1440: editing after a pass invalidates the shell judgment', asy
   await runAndExpect(page, true)
   await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
   // Editing the program must invalidate the pass.
-  await page.getByTestId('lesson-add-move_right').click()
+  await add(page, 'move_right')
   await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0, { timeout: 10_000 })
   // Remove the extra block again (select it, then the always-available delete)
   // and re-run: the pass comes back.
   await page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.move_right').last().click()
-  await page.getByTestId('lesson-delete-selected').click()
+  await clickProgramTool(page, 'lesson-delete-selected')
   await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
   await runAndExpect(page, true)
 })
@@ -618,6 +895,9 @@ test('E10 desktop 1440 (OPS-045): continuous 1->2->3->4 without refresh, step-3 
   test.setTimeout(240_000)
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto(ROUTE)
+  const editor = page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')
+  await expect(editor).toBeVisible()
+  const originalCanvas = await editor.elementHandle()
   // Step 1: only when_start — the fox staying put IS the expected result.
   await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 1 关')
   await add(page, 'when_start')
@@ -659,12 +939,13 @@ test('E10 desktop 1440 (OPS-045): continuous 1->2->3->4 without refresh, step-3 
   await expect(page.getByTestId('practice-done')).toBeVisible()
   await complete(page)
   await expect(page.getByTestId('forest-hello-step-title')).toContainText('第 4 关')
+  await expect.poll(() => originalCanvas!.evaluate((el) => el.isConnected)).toBe(true)
   // Step 4: mistake experiment, fix, complete the lesson.
   await clickRun(page)
   await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
   await page.getByTestId('mistake-answer-stayed').click()
   await expect(page.getByTestId('mistake-fix')).toBeVisible()
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)
@@ -687,7 +968,7 @@ test('N7 desktop 1440 (OPS-046): a hung /api/guest times out into a visible clou
   await clickRun(page)
   await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
   await page.getByTestId('mistake-answer-stayed').click()
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)
@@ -727,7 +1008,7 @@ test('N8 desktop 1440 (OPS-046): local progress write failure at completion is a
   await clickRun(page)
   await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
   await page.getByTestId('mistake-answer-stayed').click()
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)
@@ -791,7 +1072,7 @@ test('N10 desktop 1440 (OPS-046 F1): retry sync succeeds but navigation is block
   await clickRun(page)
   await expect(page.getByTestId('mistake-observed')).toBeVisible({ timeout: 20_000 })
   await page.getByTestId('mistake-answer-stayed').click()
-  await page.getByTestId('lesson-clear-program').click()
+  await clickProgramTool(page, 'lesson-clear-program')
   await add(page, 'when_start')
   await add(page, 'move_right')
   await runAndExpect(page, true)

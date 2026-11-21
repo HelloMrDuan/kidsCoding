@@ -1,0 +1,771 @@
+{
+  "referenceSha": "590f01d4ccad1f7b0ee71c4eafdabaeed83f3200",
+  "browser": "157.0.8103.52",
+  "state": "Second gate after a real drag, snap and run to 100 steps",
+  "comparisons": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "drag": {
+        "input": "mouse",
+        "horizontalDistance": 196,
+        "verticalDistance": 66
+      },
+      "reference": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 1440,
+          "bottom": 144,
+          "width": 1440,
+          "height": 82
+        },
+        "stage": {
+          "left": 12,
+          "top": 156,
+          "right": 401.8,
+          "bottom": 828,
+          "width": 389.8,
+          "height": 672
+        },
+        "material": {
+          "left": 413.8,
+          "top": 156,
+          "right": 678.2,
+          "bottom": 828,
+          "width": 264.5,
+          "height": 672
+        },
+        "script": {
+          "left": 690.2,
+          "top": 156,
+          "right": 1428,
+          "bottom": 828,
+          "width": 737.8,
+          "height": 672
+        },
+        "tile": {
+          "left": 493.8,
+          "top": 310.8,
+          "right": 666.2,
+          "bottom": 358.1,
+          "width": 172.5,
+          "height": 47.3
+        }
+      },
+      "product": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 1440,
+          "bottom": 145,
+          "width": 1440,
+          "height": 83
+        },
+        "stage": {
+          "left": 12,
+          "top": 157,
+          "right": 405.1,
+          "bottom": 830,
+          "width": 393.1,
+          "height": 673
+        },
+        "roles": {
+          "left": 25,
+          "top": 552.3,
+          "right": 392.1,
+          "bottom": 663,
+          "width": 367.1,
+          "height": 110.6
+        },
+        "materialHeading": {
+          "left": 418.1,
+          "top": 192.7,
+          "right": 684.5,
+          "bottom": 239.7,
+          "width": 266.3,
+          "height": 47
+        },
+        "scriptHeading": {
+          "left": 684.5,
+          "top": 192.7,
+          "right": 1427,
+          "bottom": 239.7,
+          "width": 742.5,
+          "height": 47
+        },
+        "categories": {
+          "left": 418.1,
+          "top": 239.7,
+          "right": 486.1,
+          "bottom": 769.8,
+          "width": 68,
+          "height": 530.1
+        },
+        "flyout": {
+          "left": 486.1,
+          "top": 239.7,
+          "right": 684.1,
+          "bottom": 769.7,
+          "width": 198,
+          "height": 530
+        },
+        "canvas": {
+          "left": 486.1,
+          "top": 239.7,
+          "right": 1427,
+          "bottom": 769.8,
+          "width": 940.9,
+          "height": 530.1
+        },
+        "tile": {
+          "left": 500.5,
+          "top": 246.9,
+          "right": 642.4,
+          "bottom": 297.3,
+          "width": 141.9,
+          "height": 50.4
+        },
+        "scene": {
+          "left": 25,
+          "top": 217,
+          "right": 392.1,
+          "bottom": 492.3,
+          "width": 367.1,
+          "height": 275.3
+        },
+        "fox": {
+          "left": 122.2,
+          "top": 315.1,
+          "right": 214.2,
+          "bottom": 461.3,
+          "width": 92,
+          "height": 146.2
+        },
+        "rabbit": {
+          "left": 295.2,
+          "top": 315.1,
+          "right": 369.2,
+          "bottom": 461.3,
+          "width": 74,
+          "height": 146.2
+        },
+        "run": {
+          "left": 25,
+          "top": 498.3,
+          "right": 313.7,
+          "bottom": 542.3,
+          "width": 288.7,
+          "height": 44
+        }
+      }
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "drag": {
+        "input": "mouse",
+        "horizontalDistance": 182,
+        "verticalDistance": 66
+      },
+      "reference": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 1366,
+          "bottom": 144,
+          "width": 1366,
+          "height": 82
+        },
+        "stage": {
+          "left": 12,
+          "top": 156,
+          "right": 381,
+          "bottom": 696,
+          "width": 369,
+          "height": 540
+        },
+        "material": {
+          "left": 393,
+          "top": 156,
+          "right": 643.5,
+          "bottom": 696,
+          "width": 250.4,
+          "height": 540
+        },
+        "script": {
+          "left": 655.5,
+          "top": 156,
+          "right": 1354,
+          "bottom": 696,
+          "width": 698.5,
+          "height": 540
+        },
+        "tile": {
+          "left": 473,
+          "top": 310.8,
+          "right": 631.5,
+          "bottom": 354.2,
+          "width": 158.4,
+          "height": 43.4
+        }
+      },
+      "product": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 1366,
+          "bottom": 145,
+          "width": 1366,
+          "height": 83
+        },
+        "stage": {
+          "left": 12,
+          "top": 157,
+          "right": 384.4,
+          "bottom": 698,
+          "width": 372.4,
+          "height": 541
+        },
+        "roles": {
+          "left": 25,
+          "top": 536.8,
+          "right": 371.4,
+          "bottom": 647.4,
+          "width": 346.4,
+          "height": 110.6
+        },
+        "materialHeading": {
+          "left": 397.4,
+          "top": 192.7,
+          "right": 649.7,
+          "bottom": 239.7,
+          "width": 252.3,
+          "height": 47
+        },
+        "scriptHeading": {
+          "left": 649.7,
+          "top": 192.7,
+          "right": 1353,
+          "bottom": 239.7,
+          "width": 703.3,
+          "height": 47
+        },
+        "categories": {
+          "left": 397.4,
+          "top": 239.7,
+          "right": 465.4,
+          "bottom": 637.8,
+          "width": 68,
+          "height": 398.1
+        },
+        "flyout": {
+          "left": 465.4,
+          "top": 239.7,
+          "right": 649.4,
+          "bottom": 637.7,
+          "width": 184,
+          "height": 398
+        },
+        "canvas": {
+          "left": 465.4,
+          "top": 239.7,
+          "right": 1353,
+          "bottom": 637.8,
+          "width": 887.6,
+          "height": 398.1
+        },
+        "tile": {
+          "left": 479.8,
+          "top": 246.9,
+          "right": 621.7,
+          "bottom": 297.3,
+          "width": 141.9,
+          "height": 50.4
+        },
+        "scene": {
+          "left": 25,
+          "top": 217,
+          "right": 371.4,
+          "bottom": 476.8,
+          "width": 346.4,
+          "height": 259.8
+        },
+        "fox": {
+          "left": 111.6,
+          "top": 299.5,
+          "right": 203.6,
+          "bottom": 445.8,
+          "width": 92,
+          "height": 146.2
+        },
+        "rabbit": {
+          "left": 275.7,
+          "top": 299.5,
+          "right": 349.7,
+          "bottom": 445.8,
+          "width": 74,
+          "height": 146.2
+        },
+        "run": {
+          "left": 25,
+          "top": 482.8,
+          "right": 293,
+          "bottom": 526.8,
+          "width": 268,
+          "height": 44
+        }
+      }
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "drag": {
+        "input": "touch",
+        "horizontalDistance": 189,
+        "verticalDistance": 66
+      },
+      "reference": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 768,
+          "bottom": 144,
+          "width": 768,
+          "height": 82
+        },
+        "stage": {
+          "left": 8,
+          "top": 152,
+          "right": 308.8,
+          "bottom": 434.1,
+          "width": 300.8,
+          "height": 282.1
+        },
+        "material": {
+          "left": 8,
+          "top": 442.1,
+          "right": 308.8,
+          "bottom": 958,
+          "width": 300.8,
+          "height": 515.9
+        },
+        "script": {
+          "left": 316.8,
+          "top": 152,
+          "right": 768,
+          "bottom": 958,
+          "width": 451.2,
+          "height": 806
+        },
+        "tile": {
+          "left": 72,
+          "top": 573.3,
+          "right": 299.8,
+          "bottom": 635.7,
+          "width": 227.8,
+          "height": 62.5
+        }
+      },
+      "product": {
+        "mission": {
+          "left": 0,
+          "top": 62,
+          "right": 768,
+          "bottom": 145,
+          "width": 768,
+          "height": 83
+        },
+        "stage": {
+          "left": 8,
+          "top": 153,
+          "right": 760,
+          "bottom": 514.8,
+          "width": 752,
+          "height": 361.8
+        },
+        "roles": {
+          "left": 510.3,
+          "top": 266,
+          "right": 749,
+          "bottom": 423.8,
+          "width": 238.7,
+          "height": 157.8
+        },
+        "materialHeading": {
+          "left": 9,
+          "top": 558.4,
+          "right": 254,
+          "bottom": 605.4,
+          "width": 245,
+          "height": 47
+        },
+        "scriptHeading": {
+          "left": 254,
+          "top": 558.4,
+          "right": 759,
+          "bottom": 605.4,
+          "width": 505,
+          "height": 47
+        },
+        "categories": {
+          "left": 9,
+          "top": 605.4,
+          "right": 63,
+          "bottom": 897.8,
+          "width": 54,
+          "height": 292.4
+        },
+        "flyout": {
+          "left": 63,
+          "top": 605.4,
+          "right": 254,
+          "bottom": 897.4,
+          "width": 191,
+          "height": 292
+        },
+        "canvas": {
+          "left": 63,
+          "top": 605.4,
+          "right": 759,
+          "bottom": 897.8,
+          "width": 696,
+          "height": 292.4
+        },
+        "tile": {
+          "left": 77.4,
+          "top": 612.6,
+          "right": 219.3,
+          "bottom": 663,
+          "width": 141.9,
+          "height": 50.4
+        },
+        "scene": {
+          "left": 19,
+          "top": 209,
+          "right": 496.3,
+          "bottom": 415,
+          "width": 477.3,
+          "height": 206
+        },
+        "fox": {
+          "left": 174.4,
+          "top": 261,
+          "right": 260.4,
+          "bottom": 398,
+          "width": 86,
+          "height": 137
+        },
+        "rabbit": {
+          "left": 390.8,
+          "top": 272,
+          "right": 466.8,
+          "bottom": 398,
+          "width": 76,
+          "height": 126
+        },
+        "run": {
+          "left": 510.3,
+          "top": 215,
+          "right": 670.6,
+          "bottom": 259,
+          "width": 160.3,
+          "height": 44
+        }
+      }
+    },
+    {
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "drag": {
+        "input": "touch",
+        "horizontalDistance": 184,
+        "verticalDistance": 66,
+        "mobileZoom": {
+          "beforeDrag": {
+            "zoomOut": {
+              "left": 226,
+              "top": 508,
+              "right": 270,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "zoomReset": {
+              "left": 272,
+              "top": 508,
+              "right": 316,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "zoomIn": {
+              "left": 318,
+              "top": 508,
+              "right": 362,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "start": {
+              "left": 207,
+              "top": 568,
+              "right": 304.2,
+              "bottom": 633.2,
+              "width": 97.2,
+              "height": 65.3
+            },
+            "move": {
+              "left": 23.4,
+              "top": 563.2,
+              "right": 165.3,
+              "bottom": 613.6,
+              "width": 141.9,
+              "height": 50.4
+            }
+          },
+          "duringDrag": {
+            "zoomOut": {
+              "left": 226,
+              "top": 508,
+              "right": 270,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "zoomReset": {
+              "left": 272,
+              "top": 508,
+              "right": 316,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "zoomIn": {
+              "left": 318,
+              "top": 508,
+              "right": 362,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "start": {
+              "left": 207,
+              "top": 568,
+              "right": 348.9,
+              "bottom": 676.4,
+              "width": 141.9,
+              "height": 108.5
+            },
+            "move": {
+              "left": 197.8,
+              "top": 626.3,
+              "right": 339.8,
+              "bottom": 676.7,
+              "width": 141.9,
+              "height": 50.4
+            }
+          },
+          "afterConnection": {
+            "zoomOut": {
+              "left": 226,
+              "top": 508,
+              "right": 270,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "zoomReset": {
+              "left": 272,
+              "top": 508,
+              "right": 316,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "zoomIn": {
+              "left": 318,
+              "top": 508,
+              "right": 362,
+              "bottom": 552,
+              "width": 44,
+              "height": 44
+            },
+            "start": {
+              "left": 207,
+              "top": 568,
+              "right": 348.9,
+              "bottom": 676.4,
+              "width": 141.9,
+              "height": 108.5
+            },
+            "move": {
+              "left": 207,
+              "top": 626,
+              "right": 348.9,
+              "bottom": 676.4,
+              "width": 141.9,
+              "height": 50.4
+            }
+          }
+        }
+      },
+      "reference": {
+        "mission": {
+          "left": 0,
+          "top": 54,
+          "right": 375,
+          "bottom": 139,
+          "width": 375,
+          "height": 85
+        },
+        "stage": {
+          "left": 8,
+          "top": 147,
+          "right": 367,
+          "bottom": 356,
+          "width": 359,
+          "height": 209
+        },
+        "material": {
+          "left": 8,
+          "top": 364,
+          "right": 367,
+          "bottom": 544,
+          "width": 359,
+          "height": 180
+        },
+        "script": {
+          "left": 8,
+          "top": 552,
+          "right": 367,
+          "bottom": 942,
+          "width": 359,
+          "height": 390
+        },
+        "tile": {
+          "left": 18,
+          "top": 465,
+          "right": 170,
+          "bottom": 506.7,
+          "width": 152,
+          "height": 41.7
+        }
+      },
+      "product": {
+        "mission": {
+          "left": 0,
+          "top": 54,
+          "right": 375,
+          "bottom": 161.3,
+          "width": 375,
+          "height": 107.3
+        },
+        "stage": {
+          "left": 8,
+          "top": 169.3,
+          "right": 367,
+          "bottom": 415.3,
+          "width": 359,
+          "height": 246
+        },
+        "roles": {
+          "left": 17,
+          "top": 413.3,
+          "right": 358,
+          "bottom": 523.9,
+          "width": 341,
+          "height": 110.6
+        },
+        "materialHeading": {
+          "left": 9,
+          "top": 459,
+          "right": 195,
+          "bottom": 505,
+          "width": 186,
+          "height": 46
+        },
+        "scriptHeading": {
+          "left": 195,
+          "top": 459,
+          "right": 366,
+          "bottom": 505,
+          "width": 171,
+          "height": 46
+        },
+        "categories": {
+          "left": 9,
+          "top": 505,
+          "right": 195,
+          "bottom": 556,
+          "width": 186,
+          "height": 51
+        },
+        "flyout": {
+          "left": 9,
+          "top": 556,
+          "right": 195,
+          "bottom": 836,
+          "width": 186,
+          "height": 280
+        },
+        "canvas": {
+          "left": 9,
+          "top": 556,
+          "right": 366,
+          "bottom": 836,
+          "width": 357,
+          "height": 280
+        },
+        "tile": {
+          "left": 23.4,
+          "top": 563.2,
+          "right": 165.3,
+          "bottom": 613.6,
+          "width": 141.9,
+          "height": 50.4
+        },
+        "scene": {
+          "left": 17,
+          "top": 211.3,
+          "right": 358,
+          "bottom": 357.3,
+          "width": 341,
+          "height": 146
+        },
+        "fox": {
+          "left": 121.9,
+          "top": 242.2,
+          "right": 183.9,
+          "bottom": 348.3,
+          "width": 62,
+          "height": 106
+        },
+        "rabbit": {
+          "left": 274.7,
+          "top": 242.2,
+          "right": 336.7,
+          "bottom": 348.3,
+          "width": 62,
+          "height": 106
+        },
+        "run": {
+          "left": 17,
+          "top": 363.3,
+          "right": 279.6,
+          "bottom": 407.3,
+          "width": 262.6,
+          "height": 44
+        }
+      }
+    }
+  ]
+}

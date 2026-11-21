@@ -10,22 +10,42 @@ export async function showLessonPane(
   page: Page,
   pane: 'task' | 'code' | 'stage',
 ) {
-  if (await page.getByTestId('lesson-mobile-tabs').isVisible()) {
-    await page.getByTestId(`lesson-mobile-tab-${pane}`).click()
+  // Trial-entry opens the classroom through client-side navigation, so the
+  // caller can arrive here before the classroom is mounted at all. Decide
+  // nothing until the shell is really on screen (desktop and tablet satisfy
+  // this too), otherwise the hidden-tab check below would silently no-op and
+  // leave the phone on the default 任务 pane.
+  //
+  // Only on classroom routes: finishing a lesson (and reloading) lands on
+  // /project/<id>/complete, which renders its own saved-project workbench and
+  // no lesson shell, yet the specs call this helper again there to run the
+  // saved program. Waiting for a lesson shell on that page can never pass.
+  const pathname = new URL(page.url()).pathname
+  if (/^\/learn\/(lesson|grid-lab|event-lab|story-lab|catalog)(\/|$)/.test(pathname)) {
+    await expect(
+      page.locator('[data-testid="lesson-workbench-shell"], [data-testid="golden-lesson"]').first(),
+    ).toBeVisible({ timeout: 15_000 })
+  }
+  const tabs = page.getByTestId('lesson-mobile-tabs')
+  if (await tabs.isVisible()) {
+    await expect(tabs).toBeVisible()
+    const tab = page.getByTestId(`lesson-mobile-tab-${pane}`)
+    const column = page.getByTestId(`lesson-${pane}-column`)
+    await tab.click()
     // The tab button is visible in SSR HTML before hydration attaches its
     // handler, so a click can land with no effect and the pane stays put
     // (CI run 40597421905: the code pane never became visible and the next
-    // click timed out on an existing-but-hidden button). Verify the pane
-    // really switched; if it did not, click again once handlers are live,
-    // then assert for real. No force, no sleep, no skipped assertion, no
-    // mock: a genuine regression still fails the final expect below.
-    const column = page.getByTestId(`lesson-${pane}-column`)
+    // click timed out on an existing-but-hidden button). Assert the tab's own
+    // selected state first; only when that state proves the click was lost do
+    // we click once more. No force, no sleep, no skipped assertion, no mock:
+    // a genuine regression still fails the final visibility expect below.
     try {
-      await expect(column).toBeVisible({ timeout: 5_000 })
+      await expect(tab).toHaveAttribute('aria-selected', 'true', { timeout: 5_000 })
     } catch {
-      await page.getByTestId(`lesson-mobile-tab-${pane}`).click()
-      await expect(column).toBeVisible()
+      await tab.click()
+      await expect(tab).toHaveAttribute('aria-selected', 'true')
     }
+    await expect(column).toBeVisible()
   }
 }
 
