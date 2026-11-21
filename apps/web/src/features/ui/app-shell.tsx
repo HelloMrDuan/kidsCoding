@@ -22,20 +22,24 @@ type NavItem = {
   match: (path: string) => boolean
 }
 
+function isGoldenScratchClassroom(path: string) {
+  return path.startsWith('/learn/scratch-lab/') && path.endsWith('/golden')
+}
+
 const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: 'LEARNING',
     items: [
       { id: 'home', label: '学习中心', short: '首页', href: '/', icon: 'home', match: (p) => p === '/' },
       { id: 'map', label: '学习地图', short: '地图', href: '/learn/map', icon: 'map', match: (p) => p.startsWith('/learn/map') },
-      { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') },
-      { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') || p.startsWith('/learn/python-lab') },
+      { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') || isGoldenScratchClassroom(p) },
+      { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') },
     ],
   },
   {
     title: 'CREATE',
     items: [
-      { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || p.startsWith('/learn/scratch-lab') },
+      { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || (p.startsWith('/learn/scratch-lab') && !isGoldenScratchClassroom(p)) },
       { id: 'portfolio', label: '作品中心', short: '作品', href: '/learn/portfolio', icon: 'portfolio', match: (p) => p.startsWith('/learn/portfolio') || p.startsWith('/project') },
       { id: 'cards', label: '奖励收藏', short: '收藏', href: '/cards', icon: 'cards', match: (p) => p.startsWith('/cards') },
     ],
@@ -71,14 +75,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? '/'
   const [drawerOpen, setDrawerOpen] = useState(false)
   const current = ALL_ITEMS.find((i) => i.match(pathname))
+  // Golden lessons use document history so the editor's beforeunload protection also covers navigation.
+  const ShellLink = isGoldenScratchClassroom(pathname) ? 'a' : Link
 
   return (
     <div className="kc-app" data-testid="kc-app-shell">
       <aside className={`kc-sidebar${drawerOpen ? ' is-open' : ''}`} aria-label="主导航" id="kc-sidebar">
-        <Link href="/" className="kc-logo" aria-label="KidsCoding 首页">
+        <ShellLink href="/" className="kc-logo" aria-label="KidsCoding 首页">
           <span className="kc-logo-mark" aria-hidden="true" />
           <span className="kc-logo-text">KidsCoding</span>
-        </Link>
+        </ShellLink>
         <nav className="kc-nav">
           {NAV_GROUPS.map((group) => (
             <div key={group.title}>
@@ -86,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               {group.items.map((item) => {
                 const active = item.match(pathname)
                 return (
-                  <Link
+                  <ShellLink
                     key={item.id}
                     href={item.href}
                     className={`kc-nav-item${active ? ' is-active' : ''}`}
@@ -97,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <span className="kc-nav-ico"><NavIcon name={item.icon} /></span>
                     <span className="kc-nav-name">{item.label}</span>
-                  </Link>
+                  </ShellLink>
                 )
               })}
             </div>
@@ -125,13 +131,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="kc-breadcrumb">KidsCoding / <b>{current?.label ?? '学习中心'}</b></span>
           </div>
           <div className="kc-top-actions">
-            <Link href="/learn/catalog" className="kc-top-search">
+            <ShellLink href="/learn/catalog" className="kc-top-search">
               <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M16 16l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
               <span>查找课程和知识点</span>
-            </Link>
-            <Link href="/parent/overview" className="kc-avatar" aria-label="家长中心">
+            </ShellLink>
+            <ShellLink href="/parent/overview" className="kc-avatar" aria-label="家长中心">
               <NavIcon name="parent" />
-            </Link>
+            </ShellLink>
           </div>
         </header>
         <div className="kc-shell-main">{children}</div>
@@ -140,10 +146,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         {MOBILE_ITEMS.map((item) => {
           const active = item.match(pathname)
           return (
-            <Link key={item.id} href={item.href} className={active ? 'is-active' : undefined} aria-current={active ? 'page' : undefined}>
+            <ShellLink key={item.id} href={item.href} className={active ? 'is-active' : undefined} aria-current={active ? 'page' : undefined}>
               <NavIcon name={item.icon} />
               <span>{item.short}</span>
-            </Link>
+            </ShellLink>
           )
         })}
       </nav>
