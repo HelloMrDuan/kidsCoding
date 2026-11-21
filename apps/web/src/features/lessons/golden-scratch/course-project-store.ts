@@ -2,8 +2,17 @@ type ScratchCourseProject = {
   archive: ArrayBuffer
   stepIndex: number
   observed: boolean
-  finished: boolean
+  achievementEarned: boolean
+  verified: boolean
   revision: number
+}
+
+type PreviousCourseProject = Omit<ScratchCourseProject, 'achievementEarned' | 'verified'> & { finished: boolean }
+
+export function restoreCourseProject(project: ScratchCourseProject | PreviousCourseProject | undefined) {
+  if (!project || !('finished' in project)) return project
+  const { finished, ...draft } = project
+  return { ...draft, achievementEarned: finished, verified: false }
 }
 
 const DATABASE = 'kidscoding-scratch-course-projects'
@@ -24,7 +33,7 @@ export async function loadCourseProject(owner: string, lessonId: string) {
   try {
     return await new Promise<ScratchCourseProject | undefined>((resolve, reject) => {
       const request = db.transaction(STORE).objectStore(STORE).get([owner, lessonId])
-      request.onsuccess = () => resolve(request.result)
+      request.onsuccess = () => resolve(restoreCourseProject(request.result))
       request.onerror = () => reject(request.error)
     })
   } finally {

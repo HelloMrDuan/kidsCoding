@@ -34,3 +34,7 @@
 - 回滚时恢复课程目录中的旧试验入口，旧实验稿保持原存储。Golden 用户可在回滚前导出 .sb3。无需清理 IndexedDB。
 
 复跑时使用生产 Web 构建和 OPS-050 的固定版宿主。Web 设置 `SCRATCH_CREATE_GUI_URL`，Scratch 宿主设置 `SCRATCH_PARENT_ORIGIN`，两者使用不同源。Web 与宿主启动后，在 `apps/web` 运行 `npx playwright test -c playwright.scratch-create.config.ts g2-golden-concert.spec.ts`。如果 Web 端口不同，设置 `KC_SCRATCH_E2E_ORIGIN`。课程 CI 另行运行真 Scratch VM 单测。
+
+### 复核后的验收与历史成就
+
+IndexedDB 在同一事务存储完整 .sb3、关卡、历史成就和当前作品的检查结果。编辑会立即撤销当前通过；仅真实 Scratch VM 检查通过后恢复。保存未改作品时按实际 ZIP 条目比较，ZIP 时间戳不影响检查结果。旧记录的 finished 仅恢复历史成就，当前作品须重新检查。Chrome 用原生 Scratch 修改主持词、保存、重开、检查失败、修复并再次通过。
