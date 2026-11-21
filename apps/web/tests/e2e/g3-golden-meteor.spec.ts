@@ -34,6 +34,15 @@ async function setCount(page: Page, touch = false) {
   await expect(workspace(gui(page)).locator('[data-id="repeat"]').getByText('10', { exact: true })).toBeVisible()
 }
 
+async function editNumber(page: Page, blockId: string, from: string, to: string) {
+  const block = workspace(gui(page)).locator('[data-id="' + blockId + '"]')
+  await block.getByText(from, { exact: true }).click()
+  const input = gui(page).locator('input.blocklyHtmlInput')
+  await input.fill(to)
+  await input.press('Enter')
+  await expect(block.getByText(to, { exact: true })).toBeVisible()
+}
+
 async function exportBytes(page: Page) {
   const received = page.waitForEvent('download')
   await page.getByRole('button', { name: '导出 .sb3' }).click()
@@ -157,6 +166,7 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
 }
 
 test('G3 Golden observes the bug, repairs clone deletion and verifies a custom block and saved project', async ({ page }) => {
+  test.setTimeout(150_000)
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/learn/catalog/G3-U1-L02')
   await page.getByTestId('scratch-trial-entry').click()
@@ -170,6 +180,12 @@ test('G3 Golden observes the bug, repairs clone deletion and verifies a custom b
   await expect(page.getByText(/提示 3/)).toBeVisible()
   await collapse(page)
   await setCount(page)
+  const waitId = Object.entries(await blocks(page)).find(([, block]) => block.opcode === 'control_wait')![0]
+  await editNumber(page, waitId, '0.3', '0.6')
+  await checkRun(page, '检测到 10 颗分身')
+  await expect(page.getByText(/第 1 \/ 4 关/)).toBeVisible()
+  await collapse(page)
+  await editNumber(page, waitId, '0.6', '0.3')
   await checkRun(page, '生成了十颗流星')
   await checkRun(page, '先选择你的预测')
   await predictPile(page)
@@ -215,6 +231,23 @@ test('G3 Golden observes the bug, repairs clone deletion and verifies a custom b
   await page.getByRole('link', { name: '返回' }).click()
   await open(page)
   await checkRun(page, '十颗流星完成下落')
+
+  await collapse(page)
+  await frame.getByRole('button', { name: '流星', exact: true }).click()
+  await editNumber(page, 'repeat', '10', '9')
+  await expect(page.getByText(/当前作品待重新检查/)).toBeVisible()
+  await page.getByRole('button', { name: '保存', exact: true }).click()
+  await expect(page.getByRole('status')).toContainText('作品已保存到本机')
+  await page.reload()
+  await expect(check(page)).toBeEnabled({ timeout: 45_000 })
+  await expect(page.getByText(/历史成就/)).toBeVisible()
+  await expect(page.getByText('流星雨项目已完成')).toHaveCount(0)
+  await checkRun(page, '检测到 9 颗分身')
+  await collapse(page)
+  await frame.getByRole('button', { name: '流星', exact: true }).click()
+  await editNumber(page, 'repeat', '9', '10')
+  await checkRun(page, '十颗流星完成下落')
+  await expect(page.getByText('流星雨项目已完成')).toBeVisible()
   await page.locator('input[accept=".sb3"]').setInputFiles({ name: 'meteor.sb3', buffer: archived, mimeType: 'application/octet-stream' })
   await expect(page.getByRole('status')).toContainText('作品已导入')
   await checkRun(page, '生成了十颗流星')

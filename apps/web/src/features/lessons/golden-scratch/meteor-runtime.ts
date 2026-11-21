@@ -20,6 +20,8 @@ type MeteorVm = {
     _step(): void
     _primitives: Record<string, Primitive>
     currentStepTime: number
+    currentMSecs: number
+    updateCurrentMSecs(): void
     threads: unknown[]
     targets: Meteor[]
   }
@@ -35,7 +37,18 @@ export type MeteorRun = {
   finished: boolean
 }
 
-export async function observeMeteorShower(bytes: ArrayBuffer): Promise<MeteorRun> {
+const TICKS_PER_SECOND = 30
+const FRAME_MS = 1000 / TICKS_PER_SECOND
+const MAX_TICKS = 8 * TICKS_PER_SECOND
+
+function yieldToBrowser() {
+  return new Promise<void>(resolve => setTimeout(resolve, 0))
+}
+
+export async function observeMeteorShower(
+  bytes: ArrayBuffer,
+  yieldBetweenBatches = yieldToBrowser,
+): Promise<MeteorRun> {
   const { VirtualMachine, ScratchStorage } = await loadVmEngine()
   const vm: MeteorVm = new VirtualMachine()
 
@@ -47,7 +60,12 @@ export async function observeMeteorShower(bytes: ArrayBuffer): Promise<MeteorRun
 
     const clones = new Map<Meteor, CloneRun>()
     const primitives = vm.runtime._primitives
-    const start = Date.now()
+    let tick = 0
+    const time = () => Math.round(tick * FRAME_MS)
+    // The real VM's wait blocks use runtime.currentMSecs through BlockUtility.
+    // Pin that clock to simulation ticks without changing timers outside this VM.
+    vm.runtime.updateCurrentMSecs = () => { vm.runtime.currentMSecs = time() }
+    vm.runtime.updateCurrentMSecs()
     const procedureFlights = new Set<Meteor>()
 
     function observeTargets() {
@@ -59,7 +77,7 @@ export async function observeMeteorShower(bytes: ArrayBuffer): Promise<MeteorRun
           known.visibleInFlight ||= target.visible
         } else {
           clones.set(target, {
-            createdAt: Date.now() - start,
+            createdAt: time(),
             startY: target.y,
             lowestY: target.y,
             removedAtY: null,
@@ -104,12 +122,12 @@ export async function observeMeteorShower(bytes: ArrayBuffer): Promise<MeteorRun
       }
     }
 
-    vm.runtime.currentStepTime = 1000 / 30
+    vm.runtime.currentStepTime = FRAME_MS
     vm.greenFlag()
-    while (vm.runtime.threads.length && Date.now() - start < 8_000 && clones.size <= 30) {
+    for (tick = 1; tick <= MAX_TICKS && vm.runtime.threads.length && clones.size <= 30; tick++) {
       vm.runtime._step()
       observeTargets()
-      if (vm.runtime.threads.length) await new Promise<void>(resolve => setTimeout(resolve, 20))
+      if (tick % 12 === 0 && vm.runtime.threads.length) await yieldBetweenBatches()
     }
 
     return {
@@ -133,6 +151,7 @@ export function hasCompletedFlight(flight: CloneRun) {
 export function hasRegularBursts(clones: CloneRun[]) {
   return clones.length === 10 && clones.slice(1).every((clone, index) => {
     const gap = clone.createdAt - clones[index].createdAt
-    return gap >= 230 && gap <= 500
+    // A 300 ms wait plus a small number of real scheduler frames.
+    return gap >= 250 && gap <= 400
   })
 }

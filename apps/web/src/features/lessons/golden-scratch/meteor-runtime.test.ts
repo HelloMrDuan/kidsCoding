@@ -26,6 +26,35 @@ describe('Golden meteor assessment with the Scratch VM', () => {
     expect(run.clones.every(hasCompletedFlight)).toBe(true)
   }, 20_000)
 
+  it('produces the same real VM trace when the browser yields at uneven intervals', async () => {
+    const sample = await loadArchive('public/scratch-samples/meteor-clones.sb3')
+    const normal = await observeMeteorShower(sample)
+    let yieldCount = 0
+    const delayed = await observeMeteorShower(sample, async () => {
+      yieldCount += 1
+      await new Promise<void>(resolve => setTimeout(resolve, yieldCount % 2 ? 1 : 85))
+    })
+    expect(yieldCount).toBeGreaterThan(1)
+    expect(delayed).toEqual(normal)
+    expect(hasRegularBursts(delayed.clones)).toBe(true)
+  }, 20_000)
+
+  it.each(['0.1', '0.6'])('rejects a %s second wait even with ten complete real flights', async seconds => {
+    const zip = await JSZip.loadAsync(await loadArchive('public/scratch-samples/meteor-clones.sb3'))
+    const project = JSON.parse(await zip.file('project.json')!.async('string'))
+    const meteor = project.targets.find((target: { name: string }) => target.name === '流星')
+    const wait = Object.values(meteor.blocks).find(block => (block as { opcode: string }).opcode === 'control_wait') as {
+      inputs: { DURATION: [number, [number, string]] }
+    }
+    wait.inputs.DURATION[1][1] = seconds
+    zip.file('project.json', JSON.stringify(project))
+
+    const run = await observeMeteorShower(await zip.generateAsync({ type: 'arraybuffer' }))
+    expect(run.clones).toHaveLength(10)
+    expect(run.clones.every(hasCompletedFlight)).toBe(true)
+    expect(hasRegularBursts(run.clones)).toBe(false)
+  }, 20_000)
+
   it('rejects deletion before individual meteors reach the bottom', async () => {
     const zip = await JSZip.loadAsync(await loadArchive('public/scratch-samples/meteor-clones.sb3'))
     const project = JSON.parse(await zip.file('project.json')!.async('string'))

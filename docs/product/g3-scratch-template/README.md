@@ -27,3 +27,9 @@
 - 同 G2 使用不同的 Web 与 Scratch 宿主源，分别配置 `SCRATCH_CREATE_GUI_URL` 和 `SCRATCH_PARENT_ORIGIN`。[G2 宿主及复用文档](../g2-scratch-template/README.md)。运行 `npx playwright test -c playwright.scratch-create.config.ts g3-golden-meteor.spec.ts`。
 - 当前为 L3 真实试玩。本机学习状态和作品能重开。正式成绩、平台奖励、设备实测、儿童试学、许可与最终产品复核另有发布门禁。
 - 回滚将课程目录恢复旧试验入口并保留隔离存储。当前 Golden 工程可通过 .sb3 导出备份再迁移。
+
+### 复核后的节拍与作品恢复
+
+评测使用独立的真实 Scratch VM。逻辑时钟按 30 帧每秒推进，实际等待积木和分身创建记录读取同一 VM 时钟。协作让出线程的时间不计入节拍。分别实测 0.1 秒及 0.6 秒等待无效，并用不均匀调度验证原项目的行为轨迹不变。
+
+继承 G2 的历史成就和当前 .sb3 验收状态。正式浏览器用 Scratch 原生积木编辑器验证节拍过慢时不进入下一关，并验证已完成后改为九颗、保存、重开仍须重新检查，修复后通过。
