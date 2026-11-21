@@ -32,6 +32,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   G1_U1_L01_STORY_LESSON,
   STORY_SAY_CHOICES,
+  openingStoryChecks,
   resolveStorySayText,
 } from '@/content/curriculum/g1-u1-story-lessons'
 import { getKidsBlockLabel } from '@/features/lessons/blockly/block-labels'
@@ -48,14 +49,6 @@ import {
 import { coerceStoryDraft, emptyStoryDraft, type StorySlotData } from './g1-u1-l01-draft'
 import { judgeStoryProgram } from './g1-u1-l01-judging'
 
-/**
- * 会话内最近一次好草稿（模块级，仅本页会话内有效）：外壳把外来课节的
- * 导入载荷交给插槽时（OPS-028 例外：壳不代判他课数据），插槽拒绝该载荷
- * 并把当前作品回显给外壳，避免外来数据被自动保存进本课键（L02 同款）。
- * 全新加载时 initial 只会是本课草稿或空草稿，lastGood 为空时回显空草稿。
- */
-let lastGoodStoryDraft: StorySlotData | null = null
-
 const BlocklyWorkspace = dynamic(
   () => import('@/features/lessons/blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
   { ssr: false },
@@ -69,7 +62,9 @@ function blockLabel(block: ProgramBlock): string {
   return base
 }
 
-export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment }: EditorSlotProps) {
+type StoryEditorProps = EditorSlotProps & { goldenLayout?: boolean }
+
+export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment, goldenLayout = false }: StoryEditorProps) {
   const lesson = G1_U1_L01_STORY_LESSON
   const [draft, setDraft] = useState<StorySlotData>(() => coerceStoryDraft(initial))
   const draftRef = useRef(draft)
@@ -101,23 +96,21 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
 
   const persist = useCallback((next: StorySlotData) => {
     draftRef.current = next
-    lastGoodStoryDraft = next
     setDraft(next)
     onChangeRef.current(next)
   }, [])
 
   /**
    * 挂载时一次性处理外来课节导入：initial 的 lessonId 不是本课时，拒绝该
-   * 载荷并回显会话内最近的好草稿（或空草稿），绝不把外来数据存进本课键。
+   * 载荷并显示空草稿。正常导入由外壳先校验，保留当前草稿。
    * 正常挂载（本课草稿 / 空草稿）不触发。
    */
   useEffect(() => {
     const raw = initial as { lessonId?: unknown } | null
     if (raw && typeof raw === 'object' && raw.lessonId !== undefined && raw.lessonId !== 'G1-U1-L01') {
       setNotice('导入文件属于其他课节，已拒绝，原作品未变。')
-      const fallback = lastGoodStoryDraft ?? emptyStoryDraft()
+      const fallback = emptyStoryDraft()
       draftRef.current = fallback
-      lastGoodStoryDraft = fallback
       setDraft(fallback)
       onChangeRef.current(fallback)
       // 回显的作品可能与画布上以外来数据挂载的程序不一致：按回显数据重建画布。
@@ -137,9 +130,13 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
       const current = draftRef.current
       const key = lesson.steps[Math.min(current.stepIndex, lesson.steps.length - 1)].id
       if (JSON.stringify(current.programs[key] ?? null) === JSON.stringify(next)) return
-      persist({ ...current, programs: { ...current.programs, [key]: next } })
+      persist({
+        ...current,
+        programs: { ...current.programs, [key]: next },
+        passed: goldenLayout ? current.passed.filter(id => id !== key) : current.passed,
+      })
     },
-    [lesson, persist],
+    [goldenLayout, lesson, persist],
   )
 
   /** 切关：画布按新关程序重建积木，工作区实例不重建（快照一致时跳过）。 */
@@ -184,6 +181,10 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
     if (!runStep) return
     const result = judgeStoryProgram(current.programs[runStep.id] ?? [])
     if (result.passed) {
+      if (goldenLayout && runStep.kind === 'creative' && !result.hasExtension) {
+        setNotice('开场已经成功。加一句移动后的提问对白，再运行试试。')
+        return
+      }
       if (runStep.errorLab && !current.observed.includes(runStep.id)) {
         if (current.stepIndex === runStepIndex) {
           setNotice('程序成功了！不过这是错误实验：先按原样运行一次，看看错在哪，再来修。')
@@ -206,7 +207,7 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
       })
       onJudgmentRef.current?.(judgment)
     }
-  }, [judgment, lesson, persist])
+  }, [judgment, lesson, persist, goldenLayout])
 
   /** 最近一次运行的日志（仅当判定仍有效且仍在运行那一关时展示）。 */
   const lastRun = useMemo(() => {
@@ -233,6 +234,18 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
 
   function handleComplete() {
     const current = draftRef.current
+    if (goldenLayout && step.kind === 'review') {
+      const missing = openingStoryChecks.find(activity => !current.passed.includes(activity.id))
+      const creative = judgeStoryProgram(current.programs['creative-encore'] ?? [])
+      if (missing || !creative.passed || !creative.hasExtension) {
+        setNotice('还要完成搭建、演出、纠错和自己的加演，才能完成这节课。')
+        return
+      }
+      if (current.reflection === undefined || !lesson.reflection.options[current.reflection]?.correct) {
+        setNotice('请选择能解释这场演出为什么成功的答案。')
+        return
+      }
+    }
     if (step.kind === 'guided' || step.kind === 'design' || step.kind === 'review') {
       if (current.stepIndex < lesson.steps.length - 1) goToStep(current.stepIndex + 1)
       else {
@@ -279,10 +292,12 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
     )
   }
 
-  if (draft.finished) {
+  if (draft.finished && (!goldenLayout || (openingStoryChecks.every(activity => draft.passed.includes(activity.id))
+    && judgeStoryProgram(draft.programs['creative-encore'] ?? []).hasExtension))) {
     return (
       <section data-testid="g1-u1-l01-finished">
         <p>🎉 {lesson.title}：{lesson.steps.length} 关全部真的跑通了！</p>
+        {goldenLayout && <p data-testid="golden-story-badge">本机成就 · 森林小导演</p>}
         <p>给家长：{lesson.parentQuestion}</p>
         <p>这是实验课，成绩只保存在本机，不是正式课程成绩。</p>
         <div>
@@ -332,6 +347,7 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
       <BlocklyWorkspace
         allowedBlocks={step.allowedBlocks}
         blocks={blocks}
+        layoutMode={goldenLayout ? 'golden' : 'legacy'}
         enableProgramTools
         snapStartOnTop
         sayLineChoices={STORY_SAY_CHOICES}

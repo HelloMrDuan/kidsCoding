@@ -1,0 +1,82 @@
+.kc-golden-story-workspace { position: relative; padding: 12px 18px; min-width: 0; }
+.kc-golden-story .ws-topbar,
+.kc-golden-story .ws-goalstrip,
+.kc-golden-story .ws-sticky-actions { display: none; }
+.kc-golden-story .ws-script-wrap { min-width: 0; }
+.kc-golden-story .ws-stage-box { width: 100%; }
+.kc-golden-story [data-testid="ws-task-panel"] { height: auto; }
+.kc-golden-story-runbar { display: none; }
+.kc-golden-story .kc-golden-story-tablet-task { display: none; }
+.kc-golden-story-file { position: relative; }
+.kc-golden-story-file > summary { cursor: pointer; }
+.kc-golden-story-file > div {
+  position: absolute;
+  z-index: 32;
+  top: 100%;
+  right: 0;
+  width: 136px;
+  padding: 8px;
+  border: 1px solid var(--kc-line);
+  border-radius: 8px;
+  background: white;
+  box-shadow: var(--kc-shadow-panel);
+}
+.kc-golden-story-file button { display: block; width: 100%; text-align: left; padding: 8px; }
+
+@media (min-width: 1200px) {
+  .kc-golden-story .ws-root .ws-grid {
+    grid-template-columns: var(--golden-task-width) minmax(0, 1fr) minmax(270px, 28%);
+    grid-template-areas: "task script stage";
+    align-items: start;
+  }
+  .kc-golden-story .ws-root .ws-task-wrap { display: block; grid-area: task; }
+  .kc-golden-story[data-task-open="false"] .ws-root .ws-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(270px, 28%);
+    grid-template-areas: "script stage";
+  }
+  .kc-golden-story[data-task-open="false"] .ws-root .ws-task-wrap { display: none; }
+  .kc-golden-story .ws-root .ws-stage-wrap { grid-area: stage; }
+  .kc-golden-story .ws-root .ws-script-wrap { grid-area: script; }
+  .kc-golden-story [data-testid="ws-task-button"] { display: none; }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .kc-golden-story .ws-root .ws-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "stage" "script"; }
+  .kc-golden-story .ws-root .ws-stage-wrap { grid-area: stage; }
+  .kc-golden-story .ws-root .ws-script-wrap { grid-area: script; }
+  .kc-golden-story .ws-root .ws-task-wrap, .kc-golden-story-task-toggle { display: none; }
+  .kc-golden-story .kc-golden-story-tablet-task { display: inline-flex; }
+  .kc-golden-story[data-tablet-task-open="true"] .ws-root .ws-task-wrap {
+    display: block;
+    position: absolute;
+    top: 12px;
+    left: 18px;
+    z-index: 25;
+    width: 320px;
+    max-height: 60dvh;
+    overflow: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .kc-golden-story-workspace { padding: 8px 12px; }
+  .kc-golden-story .ws-root .ws-grid { display: block; }
+  .kc-golden-story .ws-root .ws-stage-wrap,
+  .kc-golden-story .ws-root .ws-task-wrap,
+  .kc-golden-story .ws-root .ws-script-wrap,
+  .kc-golden-story [data-testid="ws-task-button"],
+  .kc-golden-story [data-testid="ws-task-drawer"],
+  .kc-golden-story-task-toggle { display: none; }
+  .kc-golden-story[data-pane="stage"] .ws-root .ws-stage-wrap,
+  .kc-golden-story[data-pane="task"] .ws-root .ws-task-wrap,
+  .kc-golden-story[data-pane="code"] .ws-root .ws-script-wrap { display: block; }
+  .kc-golden-story { padding-bottom: 64px; }
+  .kc-golden-story-runbar {
+    display: flex;
+    position: fixed;
+    inset: auto 12px 62px;
+    margin: 0;
+  }
+  .kc-golden-story:fullscreen .kc-golden-story-runbar,
+  .kc-golden-story[data-focus-mode="true"] .kc-golden-story-runbar { bottom: 0; }
+}

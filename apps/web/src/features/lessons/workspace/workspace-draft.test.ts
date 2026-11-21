@@ -35,6 +35,24 @@ describe('workspace drafts (spec key kidscoding-draft:{lessonId})', () => {
     expect(loaded.data).toEqual(script)
   })
 
+  it('isolates signed-in story drafts and keeps the unowned legacy copy untouched', () => {
+    const storage = mapStorage()
+    const lesson = 'G1-U1-L01'
+    const legacy = [{ type: 'legacy' }]
+    const alice = [{ type: 'when_start' }, { type: 'say_line' }]
+    const bob = [{ type: 'when_start' }, { type: 'move_right' }]
+    saveDraft(storage, lesson, legacy)
+    saveDraft(storage, lesson, alice, 'user:alice')
+
+    expect(loadDraft(storage, lesson, 'user:bob').data).toBeNull()
+    expect(loadDraft(storage, lesson, 'guest').data).toBeNull()
+    saveDraft(storage, lesson, bob, 'user:bob')
+
+    expect(loadDraft(storage, lesson, 'user:alice').data).toEqual(alice)
+    expect(loadDraft(storage, lesson, 'user:bob').data).toEqual(bob)
+    expect(loadDraft(storage, lesson).data).toEqual(legacy)
+  })
+
   it('rejects corrupt JSON without overwriting the good draft', () => {
     const storage = mapStorage()
     const script = [{ type: 'when_start' }]
