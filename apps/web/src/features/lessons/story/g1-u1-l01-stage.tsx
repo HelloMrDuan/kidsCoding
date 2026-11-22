@@ -22,7 +22,7 @@ function StoryActorArt({ id, name, position, start, speaking }: StoryActor) {
   )
 }
 
-export function StoryStageSlot({ state, stageState }: StageSlotProps) {
+export function StoryStageSlot({ state, stageState, sceneActions }: StageSlotProps) {
   const foxPosition = typeof stageState?.foxX === 'number' ? stageState.foxX : state.x
   const audiencePosition = typeof stageState?.audienceX === 'number' ? stageState.audienceX : 0
   const speaker = stageState?.speaker
@@ -45,6 +45,7 @@ export function StoryStageSlot({ state, stageState }: StageSlotProps) {
           </div>
         )}
       </div>
+      {sceneActions}
     </div>
   )
 }

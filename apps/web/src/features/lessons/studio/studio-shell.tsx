@@ -174,14 +174,27 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
 
       <header className="studio-topbar" data-testid="studio-topbar">
         <div className="studio-topbar-main">
-          <a href={lesson.backHref} data-testid="studio-back">
-            ← 返回
+          <a href={lesson.backHref} data-testid="studio-back" className={layout === 'blockly-v3' ? 'studio-back-control' : undefined}>
+            ← <span className="studio-back-label">返回</span>
           </a>
-          {layout === 'blockly-v3' && <span className="kc-v3-wordmark">Kids<b>Coding</b></span>}
-          <h1 data-testid="studio-title">{lesson.title}</h1>
+          {layout === 'blockly-v3' ? (
+            <>
+              <span className="kc-v3-brand">
+                <span className="kc-v3-brand-icon" aria-hidden="true">K</span>
+                <span className="kc-v3-wordmark">Kids<b>Coding</b></span>
+              </span>
+              <span className="kc-v3-topbar-divider" aria-hidden="true" />
+              <div className="kc-v3-topbar-heading">
+                <span className="kc-v3-breadcrumb">编程课堂 / Blockly 创意编程</span>
+                <h1 data-testid="studio-title">{lesson.title}</h1>
+              </div>
+            </>
+          ) : (
+            <h1 data-testid="studio-title">{lesson.title}</h1>
+          )}
           {lesson.demo && <span className="studio-demo-badge" data-testid="studio-demo-badge">演示</span>}
           {saveLabel !== null && (
-            <span className="studio-meta" data-testid="studio-save-chip" data-state={saveState}>
+            <span className="studio-meta" data-testid="studio-save-chip" data-state={saveState} role="status" aria-live="polite">
               {saveLabel}
             </span>
           )}

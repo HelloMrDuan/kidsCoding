@@ -1,12 +1,43 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 let mockPath = '/learn/map'
 vi.mock('next/navigation', () => ({ usePathname: () => mockPath }))
 
+const { mockResolveClassroomHref } = vi.hoisted(() => ({ mockResolveClassroomHref: vi.fn() }))
+vi.mock('@/features/lessons/classroom-entry', () => ({
+  COURSE_PICKER_HREF: '/learn/catalog',
+  resolveClassroomHref: () => mockResolveClassroomHref(),
+}))
+
 import { AppShell } from './app-shell'
 
 describe('AppShell (frozen V2 global shell)', () => {
+  beforeEach(() => {
+    mockResolveClassroomHref.mockReset()
+    mockResolveClassroomHref.mockResolvedValue('/learn/catalog')
+  })
+
+  it('continues the recorded lesson from 编程课堂, else offers the course picker', async () => {
+    mockPath = '/'
+    mockResolveClassroomHref.mockResolvedValueOnce('/learn/lesson/lesson-02-forest-greeting')
+    render(<AppShell><div /></AppShell>)
+    const nav = screen.getByTestId('kc-nav-lesson')
+    // Server render stays on the picker; the guest record resolves after mount.
+    expect(nav).toHaveAttribute('href', '/learn/catalog')
+    await waitFor(() => {
+      expect(nav).toHaveAttribute('href', '/learn/lesson/lesson-02-forest-greeting')
+    })
+  })
+
+  it('does not hard-code the demo studio lesson in the lesson nav', async () => {
+    mockPath = '/'
+    render(<AppShell><div /></AppShell>)
+    const nav = screen.getByTestId('kc-nav-lesson')
+    expect(nav).not.toHaveAttribute('href', '/studio/blockly/lesson-01-forest-hello')
+    await waitFor(() => expect(nav).toHaveAttribute('href', '/learn/catalog'))
+  })
+
   it('renders sidebar navigation with the current section active and in the breadcrumb', () => {
     mockPath = '/learn/map'
     render(<AppShell><main>内容</main></AppShell>)
@@ -37,7 +68,7 @@ describe('AppShell (frozen V2 global shell)', () => {
     expect(screen.getByTestId('kc-nav-scratch')).not.toHaveAttribute('aria-current')
   })
 
-  it('toggles the mobile drawer from the hamburger button', () => {
+  it('toggles the mobile drawer from the hamburger button', async () => {
     mockPath = '/learn/catalog'
     render(<AppShell><div /></AppShell>)
     const button = screen.getByRole('button', { name: '展开导航' })
@@ -47,9 +78,10 @@ describe('AppShell (frozen V2 global shell)', () => {
     expect(document.getElementById('kc-sidebar')).toHaveClass('is-open')
     fireEvent.click(screen.getByRole('button', { name: '关闭导航' }))
     expect(button).toHaveAttribute('aria-expanded', 'false')
+    await waitFor(() => expect(screen.getByTestId('kc-nav-lesson')).toHaveAttribute('href', '/learn/catalog'))
   })
 
-  it('keeps the drawer mask mounted and toggles its is-open class with the drawer', () => {
+  it('keeps the drawer mask mounted and toggles its is-open class with the drawer', async () => {
     mockPath = '/learn/catalog'
     render(<AppShell><div /></AppShell>)
     const mask = screen.getByRole('button', { name: '关闭导航' })
@@ -60,6 +92,7 @@ describe('AppShell (frozen V2 global shell)', () => {
     fireEvent.click(mask)
     expect(mask).not.toHaveClass('is-open')
     expect(document.getElementById('kc-sidebar')).not.toHaveClass('is-open')
+    await waitFor(() => expect(screen.getByTestId('kc-nav-lesson')).toHaveAttribute('href', '/learn/catalog'))
   })
 
   it('has no top-level Python 实验室 item; free coding is entered through 创作中心', () => {

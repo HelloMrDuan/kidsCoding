@@ -26,9 +26,10 @@ test('OPS-049: the live V3 palette is visible and runs the first gate', async ({
   await expect(start).toBeInViewport({ timeout: 30_000 })
   await expect(material.getByRole('button')).toHaveCount(1)
   await expect(material.getByRole('button', { name: '开始' })).toHaveAttribute('aria-pressed', 'true')
-  const script = await page.getByTestId('v3-script-heading').boundingBox()
+  const materialColumn = await page.getByTestId('v3-flyout').boundingBox()
   const source = await start.boundingBox()
-  expect(source!.x + source!.width).toBeLessThan(script!.x)
+  // The docked palette tile sits inside the material column, left of the script canvas.
+  expect(source!.x + source!.width).toBeLessThanOrEqual(materialColumn!.x + materialColumn!.width + 1)
   const workspace = page.getByTestId('lesson-blockly-workspace')
   const assist = workspace.locator('details summary').first()
   const add = workspace.getByTestId('lesson-add-when_start')
@@ -40,9 +41,14 @@ test('OPS-049: the live V3 palette is visible and runs the first gate', async ({
     await add.click()
   }
   await expect(workspace.locator('svg.blocklySvg .blocklyBlockCanvas .when_start')).toBeVisible()
-  await page.getByTestId('ws-run-toggle').click()
+  // ≤1040 the V3 shell shows one pane at a time; the run button lives in the
+  // stage pane, so open that tab before pressing 运行.
+  const runToggle = page.getByTestId('ws-run-toggle')
+  if (!(await runToggle.isVisible())) await page.getByTestId('v3-pane-stage').click()
+  await runToggle.click()
   await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+  if (!(await start.isVisible())) await page.getByTestId('v3-pane-code').click()
   await expect(start).toBeVisible()
 })
 
@@ -846,11 +852,13 @@ test('round4 fix 2: one material surface at a time (rail flyout vs palette drawe
 
 test('round4 mobile touch: touchscreen taps open the drawer, add a block, and run to pass', async ({
   page,
-}) => {
+}, testInfo) => {
   // Touchscreen.tap needs a touch context; the desktop/tablet projects
-  // skip honestly instead of faking a tap with a mouse click.
-  const touchPoints = await page.evaluate(() => navigator.maxTouchPoints)
-  test.skip(touchPoints === 0, 'needs a touch-capable browser context')
+  // skip honestly instead of faking a tap with a mouse click. The check must
+  // read the context's hasTouch flag: on a touch-screen laptop Chrome reports
+  // navigator.maxTouchPoints > 0 even in a non-touch context, and tap() then
+  // throws "hasTouch must be enabled on the browser context".
+  test.skip(!testInfo.project.use.hasTouch, 'needs a touch-capable browser context')
   await page.setViewportSize({ width: 375, height: 812 })
   await page.goto(DEMO_A)
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)

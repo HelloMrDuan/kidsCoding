@@ -22,7 +22,7 @@
 
 import { useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { LessonDraftOwnerContext } from '../lesson-draft-boundary'
-import { BlocklyStudioLayout } from './blockly-studio-layout'
+import { BlocklyStudioLayout, type StudioPane } from './blockly-studio-layout'
 
 import {
   DEMO_HAT,
@@ -42,6 +42,7 @@ import {
   type RolesSlotComponent,
   type SaveState,
   type ShellControl,
+  type ShellTopbarAction,
   type StageSlotComponent,
 } from './workspace-slots'
 
@@ -109,6 +110,19 @@ export type LessonWorkspaceProps = {
    * no global command bus. Called from an effect on every change.
    */
   onShellControl?: (control: ShellControl) => void
+  /**
+   * V3 classroom plumbing: the classroom may own the pane switch (G1's
+   * `golden-story-pane-*` tabs and `data-pane`) and the desktop task
+   * collapse, and may need extra topbar buttons (保存 / 全屏) that drive
+   * this same surface. All optional; absent = the layout keeps its own
+   * state and the topbar stays exactly as StudioShell renders it.
+   */
+  studioPane?: StudioPane
+  onStudioPaneChange?: (pane: StudioPane) => void
+  paneTestIdPrefix?: string
+  missionCollapsed?: boolean
+  onMissionToggle?: () => void
+  topbarActions?: ShellTopbarAction[]
 }
 
 /** Autosave debounce (R4/C8 proposal value; #470's 350ms is reference only). */
@@ -205,6 +219,12 @@ export function LessonWorkspace({
   studioLayout,
   onSaveStateChange,
   onShellControl,
+  studioPane,
+  onStudioPaneChange,
+  paneTestIdPrefix,
+  missionCollapsed,
+  onMissionToggle,
+  topbarActions,
 }: LessonWorkspaceProps) {
   const contractErrors = useMemo(() => validateLessonContract(contract), [contract])
   const hasStage = contract.hasStage !== false
@@ -1286,7 +1306,7 @@ export function LessonWorkspace({
         <strong>任务简报：</strong>
         {contract.brief}
       </p>
-      <p>
+      <p className="ws-task-step">
         <strong>当前步骤：</strong>
         {contract.step}
       </p>
@@ -1467,6 +1487,9 @@ export function LessonWorkspace({
         toggle: () => setStageVisible((v) => !v),
         canToggle: hasStage,
       },
+      // V3 classroom-owned topbar actions (e.g. G1's 保存 / 全屏). Absent
+      // keeps StudioShell's OPS-039 composition byte-for-byte.
+      ...(topbarActions !== undefined ? { topbar: { actions: topbarActions } } : {}),
     }),
     [
       handleRunToggle,
@@ -1481,6 +1504,7 @@ export function LessonWorkspace({
       fileCaps,
       stageVisible,
       hasStage,
+      topbarActions,
     ],
   )
 
@@ -1611,7 +1635,7 @@ export function LessonWorkspace({
             onClick={handleRunToggle}
             data-testid="ws-run-toggle"
           >
-            {engineState.running ? '停止' : '运行作品'}
+            {engineState.running ? '停止' : blocklyV3 ? '运行' : '运行作品'}
           </button>
         )}
         {blocklyV3 && runAdapter?.reset && (
@@ -1647,6 +1671,27 @@ export function LessonWorkspace({
       <RolesSlotView lessonId={contract.lessonId} />
     </section>
   ) : null
+
+  /* V3 classroom feedback lives in the stage column, under run/reset and
+     the roles strip — the same order as the approved prototype. */
+  const feedbackPanel = (
+    <section className="kc-v3-feedback" data-testid="ws-feedback" aria-label="学习反馈">
+      <div className="kc-v3-feedback-result" role="status">
+        {runError && <p data-testid="ws-run-error">{runError}</p>}
+        {notice && <p data-testid="ws-notice">{notice}</p>}
+        {judgmentStale && <p data-testid="ws-judgment-stale">积木改好了，重新运行看看。</p>}
+        {judgment
+          ? <p data-testid="ws-feedback-conclusion">{judgment.conclusion}</p>
+          : !runError && !notice && !judgmentStale && <p>{engineState.running ? '运行中，看看舞台。' : '运行作品后，在这里看结果。'}</p>}
+      </div>
+      {judgment && <details>
+        <summary>查看学习反馈</summary>
+        <div className="kc-v3-feedback-details">
+          {judgment.layers.map((layer) => <p key={layer.id} data-testid={`ws-feedback-${layer.id}`}>{layer.detail}</p>)}
+        </div>
+      </details>}
+    </section>
+  )
 
   const stagePanel = (
     <section className="ws-stage" data-panel="stage" data-testid="ws-stage-panel">
@@ -1700,6 +1745,7 @@ export function LessonWorkspace({
       )}
       {(!blocklyV3 || !StageSlotView) && stageRunBar}
       {!StageSlotView && integratedRoles}
+      {blocklyV3 && feedbackPanel}
     </section>
   )
 
@@ -2571,26 +2617,16 @@ export function LessonWorkspace({
           switches never remount the adapter. */}
       {blocklyV3 ? (
         <BlocklyStudioLayout
-          stage={hasStage && <div className="kc-v3-stage-region" data-testid="v3-stage-region" hidden={!stageVisible}>{stagePanel}</div>}
+          mission={taskContent}
           editor={scriptPanel}
-          feedback={
-            <section className="kc-v3-feedback" data-testid="ws-feedback" aria-label="学习反馈">
-              <div className="kc-v3-feedback-result" role="status">
-                {runError && <p data-testid="ws-run-error">{runError}</p>}
-                {notice && <p data-testid="ws-notice">{notice}</p>}
-                {judgmentStale && <p data-testid="ws-judgment-stale">积木改好了，重新运行看看。</p>}
-                {judgment
-                  ? <p data-testid="ws-feedback-conclusion">{judgment.conclusion}</p>
-                  : !runError && !notice && !judgmentStale && <p>{engineState.running ? '运行中，看看舞台。' : '运行作品后，在这里看结果。'}</p>}
-              </div>
-              {judgment && <details>
-                <summary>查看学习反馈</summary>
-                <div className="kc-v3-feedback-details">
-                  {judgment.layers.map((layer) => <p key={layer.id} data-testid={`ws-feedback-${layer.id}`}>{layer.detail}</p>)}
-                </div>
-              </details>}
-            </section>
-          }
+          stageVisible={hasStage && stageVisible}
+          stage={hasStage && <div className="kc-v3-stage-region" data-testid="v3-stage-region" hidden={!stageVisible}>{stagePanel}</div>}
+          pane={studioPane}
+          onPaneChange={onStudioPaneChange}
+          paneTestIdPrefix={paneTestIdPrefix}
+          missionCollapsed={missionCollapsed}
+          onMissionToggle={onMissionToggle}
+          missionMeta="分步任务"
         />
       ) : <>
       <div

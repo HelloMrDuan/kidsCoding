@@ -35,7 +35,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { getMistakeStep } from '@/content/curriculum/mistake-steps'
 import { getPracticeStep } from '@/content/curriculum/practice-steps'
@@ -49,7 +49,7 @@ import { launchStepGate, useLaunchLessonCompletion } from '@/features/lessons/la
 import { readGuestProgress } from '@/features/progress/local-progress'
 import { draftKeyFor } from '@/features/lessons/workspace/lesson-contract'
 import type { EditorSlotProps, JudgmentResult } from '@/features/lessons/workspace/workspace-slots'
-import { BlocklyStudioMission } from '@/features/lessons/workspace/blockly-studio-layout'
+import { BlocklyStudioMission, BlocklyStudioSteps } from '@/features/lessons/workspace/blockly-studio-layout'
 
 import {
   findForestWorkspace,
@@ -490,6 +490,27 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
         </button>
       </div>
       </BlocklyStudioMission>
+
+      <BlocklyStudioSteps>
+        <div className="kc-v3-stepbar-pills" data-testid="forest-hello-stepbar">
+          {FOREST_STEPS.map((item, index) => (
+            <Fragment key={item.id}>
+              {index > 0 && <span className="kc-v3-step-line" aria-hidden="true" />}
+              <span
+                className={`kc-v3-step-pill${index < draft.stepIndex ? ' is-complete' : index === draft.stepIndex ? ' is-active' : ''}`}
+                aria-current={index === draft.stepIndex ? 'step' : undefined}
+                data-testid={`forest-hello-stepbar-${index + 1}`}
+              >
+                <span className="kc-v3-step-dot" aria-hidden="true">
+                  {index < draft.stepIndex ? '✓' : index + 1}
+                </span>
+                {item.title}
+              </span>
+            </Fragment>
+          ))}
+        </div>
+        <span className="kc-v3-step-note">第 {draft.stepIndex + 1} / {FOREST_STEPS.length} 关 · {step.title}</span>
+      </BlocklyStudioSteps>
 
       <BlocklyWorkspace
         allowedBlocks={step.allowedBlocks}

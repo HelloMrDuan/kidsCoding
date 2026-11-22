@@ -38,6 +38,7 @@ import {
 import { getKidsBlockLabel } from '@/features/lessons/blockly/block-labels'
 import type { ProgramBlock } from '@/features/lessons/blockly/program-tree'
 import type { EditorSlotProps, JudgmentResult } from '@/features/lessons/workspace/workspace-slots'
+import { BlocklyStudioMission, BlocklyStudioSteps } from '@/features/lessons/workspace/blockly-studio-layout'
 
 import {
   findStoryWorkspace,
@@ -62,9 +63,19 @@ function blockLabel(block: ProgramBlock): string {
   return base
 }
 
-type StoryEditorProps = EditorSlotProps & { goldenLayout?: boolean }
+type StoryEditorProps = EditorSlotProps & {
+  goldenLayout?: boolean
+  /**
+   * V3 classroom (shared layout): the step card portals into the mission
+   * panel, the step pills into the step bar, and Blockly renders the docked
+   * palette. The run button keeps its test id and calls `onRunRequest`
+   * (which runs through the same shell and reveals the stage on phones).
+   */
+  v3?: boolean
+  onRunRequest?: () => void
+}
 
-export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment, goldenLayout = false }: StoryEditorProps) {
+export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment, goldenLayout = false, v3 = false, onRunRequest }: StoryEditorProps) {
   const lesson = G1_U1_L01_STORY_LESSON
   const [draft, setDraft] = useState<StorySlotData>(() => coerceStoryDraft(initial))
   const draftRef = useRef(draft)
@@ -328,12 +339,19 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
   // E7（2026-11-12）：通过标记只写 ✓ 不写“（已通过）”，否则第 3 关
   // 通过后步骤行换行、画布顶再下沉约 30px。
   return (
-    <div ref={containerRef} data-testid="g1-u1-l01-slot">
+    <div
+      ref={containerRef}
+      data-testid="g1-u1-l01-slot"
+      className={v3 ? 'kc-v3-slot-editor kc-v3-slot-editor--guide' : undefined}
+      style={v3 ? { height: '100%', overflowY: 'auto' } : undefined}
+    >
+      <BlocklyStudioMission>
       <div
         data-testid="g1-u1-l01-step-header"
+        className={v3 ? 'kc-v3-task' : undefined}
         style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px' }}
       >
-        <p data-testid="g1-u1-l01-step-progress">
+        <p data-testid="g1-u1-l01-step-progress" className={v3 ? 'kc-v3-step-index' : undefined}>
           第 {draft.stepIndex + 1} / {lesson.steps.length} 关{passedHere ? ' ✓' : ''}
         </p>
         <h3 data-testid="g1-u1-l01-step-title">
@@ -343,11 +361,13 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
           {draft.stepIndex === lesson.steps.length - 1 ? '完成本课' : '完成这一关'}
         </button>
       </div>
+      </BlocklyStudioMission>
 
       <BlocklyWorkspace
         allowedBlocks={step.allowedBlocks}
         blocks={blocks}
-        layoutMode={goldenLayout ? 'golden' : 'legacy'}
+        layoutMode={goldenLayout && !v3 ? 'golden' : 'legacy'}
+        docked={v3 ? { stepKey: step.id, preferredBlock: step.allowedBlocks.find((type) => type !== 'when_start') } : undefined}
         enableProgramTools
         snapStartOnTop
         sayLineChoices={STORY_SAY_CHOICES}
@@ -384,7 +404,8 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
           </div>
         ) : null}
 
-        <div data-testid="g1-u1-l01-step-nav">
+        <BlocklyStudioSteps>
+        <div data-testid="g1-u1-l01-step-nav" className={v3 ? 'kc-v3-stepbar-pills' : undefined}>
           {lesson.steps.map((s, i) => (
             <button
               key={s.id}
@@ -397,6 +418,7 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
             </button>
           ))}
         </div>
+        </BlocklyStudioSteps>
       </div>
 
       <p data-testid="g1-u1-l01-line-note">
@@ -453,9 +475,9 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
           type="button"
           data-testid="g1-u1-l01-run"
           disabled={!shell}
-          onClick={() => shell?.run()}
+          onClick={() => (onRunRequest ?? shell?.run)?.()}
         >
-          {running ? '停止' : '▶ 运行'}
+          {running ? '停止' : v3 ? '运行' : '▶ 运行'}
         </button>{' '}
         <button type="button" data-testid="g1-u1-l01-save" disabled={!shell} onClick={() => shell?.save()}>
           保存作品
