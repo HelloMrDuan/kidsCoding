@@ -14,6 +14,11 @@ export default function StudioHomePage() {
       <p>全屏课堂已接入的课程：</p>
       <ul>
         <li>
+          <Link href="/create">
+            创作中心（统一入口：Scratch / Python，新建 / 导入 / 保存自己的作品）
+          </Link>
+        </li>
+        <li>
           <Link href="/studio/scratch/dance-show">
             我的舞蹈秀（Scratch GUI 全屏创作）
           </Link>

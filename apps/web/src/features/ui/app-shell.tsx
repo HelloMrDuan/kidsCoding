@@ -11,7 +11,7 @@ import { useState, type ReactNode } from 'react'
  * navigation bar appears. Spec: docs/design/kidscoding-v2/DESIGN-SPEC.md.
  */
 
-type IconName = 'home' | 'map' | 'lesson' | 'catalog' | 'scratch' | 'python' | 'portfolio' | 'parent' | 'cards'
+type IconName = 'home' | 'map' | 'lesson' | 'catalog' | 'scratch' | 'portfolio' | 'parent' | 'cards'
 
 type NavItem = {
   id: string
@@ -22,21 +22,26 @@ type NavItem = {
   match: (path: string) => boolean
 }
 
+function isGoldenScratchClassroom(path: string) {
+  return path.startsWith('/learn/scratch-lab/') && path.endsWith('/golden')
+}
+
 const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: 'LEARNING',
     items: [
       { id: 'home', label: '学习中心', short: '首页', href: '/', icon: 'home', match: (p) => p === '/' },
       { id: 'map', label: '学习地图', short: '地图', href: '/learn/map', icon: 'map', match: (p) => p.startsWith('/learn/map') },
-      { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') },
-      { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') },
+      { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') || isGoldenScratchClassroom(p) },
+      // OPS-051 (#565): the Python lab has no top-level menu; its teaching
+      // lessons stay under 课程体系 so the breadcrumb keeps its meaning.
+      { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') || p.startsWith('/learn/python-lab') },
     ],
   },
   {
     title: 'CREATE',
     items: [
-      { id: 'scratch', label: 'Scratch 工作台', short: 'Scratch', href: '/learn/scratch-lab/G3-U1-L02', icon: 'scratch', match: (p) => p.startsWith('/learn/scratch-lab') },
-      { id: 'python', label: 'Python 实验室', short: 'Python', href: '/learn/python-lab/P0-U1-L01', icon: 'python', match: (p) => p.startsWith('/learn/python-lab') },
+      { id: 'scratch', label: '创作中心', short: '创作', href: '/create', icon: 'scratch', match: (p) => p === '/create' || p.startsWith('/create/') || (p.startsWith('/learn/scratch-lab') && !isGoldenScratchClassroom(p)) },
       { id: 'portfolio', label: '作品中心', short: '作品', href: '/learn/portfolio', icon: 'portfolio', match: (p) => p.startsWith('/learn/portfolio') || p.startsWith('/project') },
       { id: 'cards', label: '奖励收藏', short: '收藏', href: '/cards', icon: 'cards', match: (p) => p.startsWith('/cards') },
     ],
@@ -61,7 +66,6 @@ function NavIcon({ name }: { name: IconName }) {
       {name === 'lesson' && <><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12" {...common} /></>}
       {name === 'catalog' && <><path d="M5 4.5h11.5a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2z" {...common} /><path d="M5 18a2 2 0 0 1 2-2h11.5M9 8.5h6M9 11.5h4" {...common} /></>}
       {name === 'scratch' && <><path d="M4 7.5a2 2 0 0 1 2-2h3l1.5 1.5h3L15 5.5h3a2 2 0 0 1 2 2v3H4z" {...common} /><path d="M4 13.5h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" {...common} /></>}
-      {name === 'python' && <><rect x="3" y="5" width="18" height="14" rx="2.4" {...common} /><path d="M7 10l2.5 2L7 14M12 14.5h4.5" {...common} /></>}
       {name === 'portfolio' && <><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" {...common} /><path d="M3.5 15.5l4.5-4.5 4 4 2.5-2.5 6 5" {...common} /><circle cx="15.5" cy="9" r="1.6" {...common} /></>}
       {name === 'cards' && <><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.4l-5.1 2.7 1-5.6-4.1-4 5.7-.8z" {...common} /></>}
       {name === 'parent' && <><circle cx="9" cy="8" r="3" {...common} /><path d="M3.5 19a5.5 5.5 0 0 1 11 0" {...common} /><circle cx="17" cy="10" r="2.2" {...common} /><path d="M15 19a4 4 0 0 1 6-3.4" {...common} /></>}
@@ -73,14 +77,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? '/'
   const [drawerOpen, setDrawerOpen] = useState(false)
   const current = ALL_ITEMS.find((i) => i.match(pathname))
+  // Golden lessons use document history so the editor's beforeunload protection also covers navigation.
+  const ShellLink = isGoldenScratchClassroom(pathname) ? 'a' : Link
 
   return (
     <div className="kc-app" data-testid="kc-app-shell">
       <aside className={`kc-sidebar${drawerOpen ? ' is-open' : ''}`} aria-label="主导航" id="kc-sidebar">
-        <Link href="/" className="kc-logo" aria-label="KidsCoding 首页">
+        <ShellLink href="/" className="kc-logo" aria-label="KidsCoding 首页">
           <span className="kc-logo-mark" aria-hidden="true" />
           <span className="kc-logo-text">KidsCoding</span>
-        </Link>
+        </ShellLink>
         <nav className="kc-nav">
           {NAV_GROUPS.map((group) => (
             <div key={group.title}>
@@ -88,7 +94,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               {group.items.map((item) => {
                 const active = item.match(pathname)
                 return (
-                  <Link
+                  <ShellLink
                     key={item.id}
                     href={item.href}
                     className={`kc-nav-item${active ? ' is-active' : ''}`}
@@ -99,7 +105,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <span className="kc-nav-ico"><NavIcon name={item.icon} /></span>
                     <span className="kc-nav-name">{item.label}</span>
-                  </Link>
+                  </ShellLink>
                 )
               })}
             </div>
@@ -127,13 +133,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="kc-breadcrumb">KidsCoding / <b>{current?.label ?? '学习中心'}</b></span>
           </div>
           <div className="kc-top-actions">
-            <Link href="/learn/catalog" className="kc-top-search">
+            <ShellLink href="/learn/catalog" className="kc-top-search">
               <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M16 16l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
               <span>查找课程和知识点</span>
-            </Link>
-            <Link href="/parent/overview" className="kc-avatar" aria-label="家长中心">
+            </ShellLink>
+            <ShellLink href="/parent/overview" className="kc-avatar" aria-label="家长中心">
               <NavIcon name="parent" />
-            </Link>
+            </ShellLink>
           </div>
         </header>
         <div className="kc-shell-main">{children}</div>
@@ -142,10 +148,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         {MOBILE_ITEMS.map((item) => {
           const active = item.match(pathname)
           return (
-            <Link key={item.id} href={item.href} className={active ? 'is-active' : undefined} aria-current={active ? 'page' : undefined}>
+            <ShellLink key={item.id} href={item.href} className={active ? 'is-active' : undefined} aria-current={active ? 'page' : undefined}>
               <NavIcon name={item.icon} />
               <span>{item.short}</span>
-            </Link>
+            </ShellLink>
           )
         })}
       </nav>

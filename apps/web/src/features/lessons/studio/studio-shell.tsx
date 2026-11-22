@@ -152,8 +152,20 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
         }
         @media (max-width: 479px) {
           .studio-topbar { gap: 4px; padding: 0 6px; }
-          .studio-btn, .studio-btn-outline { padding: 6px 6px; }
-          .studio-topbar .studio-progress { max-width: 40px; }
+          /* OPS-039 chief ruling: all eight topbar controls stay inside a
+             375px viewport. The actions row is the only unshrinkable group;
+             at the old 8px gap / 6px button padding its content ended at
+             390.7px (guide button clipped). 4px keeps every control live.
+             min-width: max-content stops the row from being squeezed below
+             its buttons (which pushed the guide button out of the shell);
+             the shrink goes to the title instead, which keeps its 44px
+             floor. */
+          .studio-topbar-actions { gap: 4px; min-width: max-content; }
+          .studio-btn, .studio-btn-outline { padding: 6px 4px; }
+          /* Progress keeps a visible floor: with the actions row at its
+             minimum the free width went to zero (the control collapsed
+             instead of ellipsising). The title absorbs the 32px. */
+          .studio-topbar .studio-progress { max-width: 40px; min-width: 32px; }
           /* The lesson title already carries 演示：, so the badge is
              redundant here — hiding it keeps all 8 controls in view. */
           .studio-demo-badge { display: none; }

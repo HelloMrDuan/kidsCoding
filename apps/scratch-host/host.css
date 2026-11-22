@@ -1,0 +1,19 @@
+html, body { width: 100%; height: 100%; margin: 0; }
+body { font-family: system-ui, sans-serif; overflow: hidden; }
+#scratch-root { height: calc(100% - 23px); }
+.source { display: block; height: 23px; line-height: 23px; padding: 0 10px; font-size: 12px; color: #2463eb; background: #fff; }
+@media (max-width: 1023px) {
+  body { overflow-y: auto; overflow-x: hidden; }
+  #scratch-root { height: auto; }
+  #scratch-root [class*="gui_flex-wrapper"] { flex-direction: column; height: auto; overflow: visible; align-items: stretch; }
+  #scratch-root [class*="gui_editor-wrapper"] { min-width: 0; width: 100%; flex: 0 0 auto; height: max(530px, 76dvh); }
+  #scratch-root [class*="gui_stage-and-target-wrapper"] { order: -1; margin-inline: auto; width: fit-content; max-width: 100%; flex: 0 0 auto; }
+  #scratch-root [class*="gui_target-wrapper"] { min-height: 180px; }
+}
+@media (max-width: 450px) {
+  #scratch-root { overflow-x: clip; }
+  #scratch-root [aria-label="放大舞台"], #scratch-root [aria-label="进入全屏模式"] { display: none; }
+  /* Keep room next to Scratch's native fixed-width flyout for the script. */
+  #scratch-root [class*="gui_editor-wrapper"] { width: 125%; height: max(665px, 94dvh); zoom: .8; }
+  #scratch-root[data-layout="fit-phone"] [class*="gui_editor-wrapper"] { width: 100%; }
+}

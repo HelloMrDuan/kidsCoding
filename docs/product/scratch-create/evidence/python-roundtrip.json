@@ -1,0 +1,7 @@
+{
+  "sha256": "9f6bd5b1c0c18181dbb425c97825d52247915f487caccfb071d4a9d8f2d85e02",
+  "bytes": 156,
+  "program": "from math import sqrt\nname = input(\"你叫什么名字？\")\nprint(\"你好，\" + name)\nfor i in range(1, 6):\n    print(\"第\", i, \"次运行\")\nprint(sqrt(81))",
+  "reopened": true,
+  "importedOutput": "你叫什么名字？ 小宇\n你好，小宇\n第 1 次运行\n第 2 次运行\n第 3 次运行\n第 4 次运行\n第 5 次运行\n9.0\n"
+}

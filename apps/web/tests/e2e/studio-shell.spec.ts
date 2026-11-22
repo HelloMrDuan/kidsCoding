@@ -306,10 +306,27 @@ test('save failure is fail-closed: chip reports 未能保存, no fake success', 
   await expect(page.getByTestId('studio-save-chip')).toContainText('未能保存')
 })
 
-test('studio home is an honest empty state: no editor, no usable claim', async ({ page }) => {
+test('studio home lists only connected courses and mounts no editor', async ({ page }) => {
+  // OPS-040/042 connected real full-screen courses, so the old "no lessons
+  // yet" copy is gone by design. The honest-state contract still holds:
+  // only actually connected routes are linked, the page says it is
+  // incremental, and no editor/workspace is mounted here.
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto(STUDIO_HOME)
-  await expect(page.getByText('这里还没有可上的课')).toBeVisible()
+  await expect(page.getByRole('heading', { name: '全屏课堂' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /创作中心（统一入口/ })).toHaveAttribute(
+    'href',
+    '/create',
+  )
+  await expect(page.getByRole('link', { name: '我的舞蹈秀（Scratch GUI 全屏创作）' })).toHaveAttribute(
+    'href',
+    '/studio/scratch/dance-show',
+  )
+  await expect(page.getByRole('link', { name: '接住掉落水果（Scratch GUI 全屏课堂）' })).toHaveAttribute(
+    'href',
+    '/studio/scratch/g2-u3-l02',
+  )
+  await expect(page.getByText('其他课程还在逐课接入中，这里先不列出。')).toBeVisible()
   await expect(page.getByTestId('studio-shell')).toHaveCount(0)
   await expect(page.getByTestId('ws-root')).toHaveCount(0)
 })

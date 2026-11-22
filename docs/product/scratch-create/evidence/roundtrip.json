@@ -1,0 +1,32 @@
+{
+  "sha256": "07013f6208a1d2c62d46b138da3820a0e0f5b36224d8a949f33e2e8206b6442f",
+  "bytes": 3727,
+  "backdrops": [
+    "空白背景",
+    "TestBackdrop"
+  ],
+  "sprite": "TestPet",
+  "costumes": [
+    "TestPet",
+    "TestCostume"
+  ],
+  "sounds": [
+    "TestSound"
+  ],
+  "connectedOpcodes": [
+    "event_whenflagclicked",
+    "motion_movesteps"
+  ],
+  "x": {
+    "beforeRun": 4,
+    "afterSave": 14,
+    "afterImportedRun": 24
+  },
+  "verified": [
+    "refresh restored the project",
+    "copied project edited independently",
+    "corrupt import rejected",
+    "new blank project unaffected",
+    "original project restored without changes"
+  ]
+}

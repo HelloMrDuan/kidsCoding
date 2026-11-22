@@ -676,11 +676,11 @@
       },
       "engineProductionReady": {
         "status": "unchecked",
-        "note": "Scratch VM 渲染/存储未完成"
+        "note": "Golden 课堂使用独立 Scratch GUI 宿主，Scratch VM 实测分身轨迹、清理和自制积木。暂为本机作品，正式发布仍待核对宿主与许可。"
       },
       "assessmentE2EPassed": {
         "status": "unchecked",
-        "note": "仍在正反例欠账名单中"
+        "note": "使用 g3-golden-meteor.spec.ts 核对原生课堂。正式发布仍需 PR、main CI 和独立产品验收。"
       },
       "licensedAssetsReady": {
         "status": "unchecked",
@@ -1222,11 +1222,11 @@
       },
       "engineProductionReady": {
         "status": "unchecked",
-        "note": "G2 受限 Scratch VM 实验：未接 WebGL 渲染器与音频引擎、无云端保存、scratch-vm 走 jsDelivr CDN"
+        "note": "Golden 课堂使用独立宿主的原生 Scratch GUI、渲染和音频。判定在自托管 Scratch VM 上运行完整 .sb3。暂仅本机保存，公开发布前待核对宿主配置和许可。"
       },
       "assessmentE2EPassed": {
         "status": "unchecked",
-        "note": "scratch-g2-u1.spec.ts（L03 用例）需在 PR 与 main CI 真 Chrome 通过后再登记"
+        "note": "g2-golden-concert.spec.ts 和 scratch-g2-u1.spec.ts 现分别覆盖 Golden 与旧实验。需取得对应 PR 与 main 真 Chrome 回执及独立产品确认。"
       },
       "licensedAssetsReady": {
         "status": "unchecked",
