@@ -73,6 +73,13 @@ export type LessonContract = {
   scopeGap?: string
   progress?: { label: string; current: number; total: number }
   activities?: { level: 1 | 2 | 3; title: string; text: string }[]
+  /**
+   * V3 classroom: keep only the current goal/step and the tiered hints in the
+   * task panel, and fold methodSteps / scopeGap / progress / activities into
+   * an auxiliary disclosure. No learner content is removed. Off by default so
+   * shared lessons keep their current task panel.
+   */
+  foldTaskExtras?: boolean
   fileCapabilities?: FileCapabilities
   hasStage?: boolean
 }
@@ -204,6 +211,9 @@ export function validateLessonContract(contract: unknown): string[] {
   }
   if (c.hasStage !== undefined && typeof c.hasStage !== 'boolean') {
     errors.push('hasStage 必须是布尔值')
+  }
+  if (c.foldTaskExtras !== undefined && typeof c.foldTaskExtras !== 'boolean') {
+    errors.push('foldTaskExtras 必须是布尔值')
   }
   return errors
 }

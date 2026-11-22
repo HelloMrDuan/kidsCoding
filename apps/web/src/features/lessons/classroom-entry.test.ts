@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { COURSE_PICKER_HREF, readLearningRecord, resolveClassroomHref } from './classroom-entry'
 import { getLessonMaturity } from '@/features/curriculum/lesson-maturity'
-import { GUEST_PROGRESS_STORAGE_KEY } from '@/features/progress/local-progress'
+import { GUEST_PROGRESS_OWNER_STORAGE_KEY, GUEST_PROGRESS_STORAGE_KEY } from '@/features/progress/local-progress'
 
 const scoped = (owner: string, legacyKey: string) =>
   `kids-lesson-owner-v1:${encodeURIComponent(owner)}:${legacyKey}`
@@ -131,5 +131,47 @@ describe('编程课堂 account isolation', () => {
     expect(readLearningRecord('someone-else')).toBeNull()
     await expect(resolveClassroomHref()).resolves.toBe(COURSE_PICKER_HREF)
     await expect(resolveClassroomHref(null)).resolves.toBe(COURSE_PICKER_HREF)
+  })
+})
+
+describe('编程课堂 guest progress isolation (kc-progress claim)', () => {
+  it('claims legacy unmarked progress for the first confirmed guest and keeps it readable', async () => {
+    // Existing guest data written before the claim existed must stay usable.
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('lesson-02-forest-greeting'))
+    expect(readLearningRecord('guest:family-a')).toEqual({ lessonId: 'lesson-02-forest-greeting' })
+    expect(window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)).toBe('guest:family-a')
+    await expect(resolveClassroomHref('guest:family-a')).resolves.toBe('/learn/lesson/lesson-02-forest-greeting')
+  })
+
+  it('never lets guest:B continue guest:A\'s progress in the same browser', async () => {
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('G1-U1-L01'))
+    expect(readLearningRecord('guest:family-a')?.lessonId).toBe('G1-U1-L01')
+
+    // B has no scoped draft of its own: A's progress is not B's learning.
+    expect(readLearningRecord('guest:family-b')).toBeNull()
+    await expect(resolveClassroomHref('guest:family-b')).resolves.toBe(COURSE_PICKER_HREF)
+    // The failed read must not delete A's real data.
+    expect(window.localStorage.getItem(GUEST_PROGRESS_STORAGE_KEY)).not.toBeNull()
+
+    // Switching back restores A.
+    expect(readLearningRecord('guest:family-a')?.lessonId).toBe('G1-U1-L01')
+  })
+
+  it('adopts progress written before the guest id cookie existed', async () => {
+    // The id cookie is minted on the first cloud sync, after the first lesson.
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('lesson-02-forest-greeting'))
+    expect(readLearningRecord('guest')).toEqual({ lessonId: 'lesson-02-forest-greeting' })
+    expect(window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)).toBe('guest')
+
+    expect(readLearningRecord('guest:family-a')?.lessonId).toBe('lesson-02-forest-greeting')
+    expect(window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)).toBe('guest:family-a')
+    // Once adopted by the concrete id, the bare guest no longer reads it.
+    expect(readLearningRecord('guest')).toBeNull()
+  })
+
+  it('never gives guest progress or a guest claim to a signed-in account', () => {
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('G1-U1-L01'))
+    expect(readLearningRecord('user:a')).toBeNull()
+    expect(window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)).toBeNull()
   })
 })

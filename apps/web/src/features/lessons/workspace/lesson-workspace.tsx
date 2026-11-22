@@ -1300,17 +1300,18 @@ export function LessonWorkspace({
       : blockInventory.filter((item) => item.label.includes(searchText.trim()))
   const hasEditorZoom = Boolean(adapter.zoomIn && adapter.zoomOut && adapter.zoomReset)
 
-  const taskContent = (
-    <div data-testid="ws-task-content">
-      <p>
-        <strong>任务简报：</strong>
-        {contract.brief}
-      </p>
-      <p className="ws-task-step">
-        <strong>当前步骤：</strong>
-        {contract.step}
-      </p>
-      {/* Course-info extension: drawer-only, never in the editing area. */}
+  // Course-info extension fields. `foldTaskExtras` (G1 V3) keeps the task
+  // panel focused on this gate's goal + step + hints and folds the long
+  // extension copy into one disclosure; nothing is removed, and shared
+  // lessons without the flag render exactly as before.
+  const hasTaskExtras = Boolean(
+    (contract.methodSteps && contract.methodSteps.length > 0) ||
+      contract.scopeGap ||
+      contract.progress ||
+      (contract.activities && contract.activities.length > 0),
+  )
+  const taskExtras = (
+    <>
       {contract.methodSteps && contract.methodSteps.length > 0 && (
         <div data-testid="ws-method-steps">
           <strong>方法步骤：</strong>
@@ -1344,6 +1345,29 @@ export function LessonWorkspace({
             ))}
           </ol>
         </div>
+      )}
+    </>
+  )
+
+  const taskContent = (
+    <div data-testid="ws-task-content">
+      <p>
+        <strong>任务简报：</strong>
+        {contract.brief}
+      </p>
+      <p className="ws-task-step">
+        <strong>当前步骤：</strong>
+        {contract.step}
+      </p>
+      {contract.foldTaskExtras ? (
+        hasTaskExtras ? (
+          <details className="ws-task-extras" data-testid="ws-task-extras">
+            <summary>课程拓展：方法步骤、适用边界与三层活动</summary>
+            {taskExtras}
+          </details>
+        ) : null
+      ) : (
+        taskExtras
       )}
       <div>
         <strong>三级提示（按顺序揭示，不提前展示答案）：</strong>

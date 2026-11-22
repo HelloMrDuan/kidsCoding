@@ -1,4 +1,7 @@
-import { GUEST_PROGRESS_STORAGE_KEY } from '@/features/progress/local-progress'
+import {
+  GUEST_PROGRESS_OWNER_STORAGE_KEY,
+  GUEST_PROGRESS_STORAGE_KEY,
+} from '@/features/progress/local-progress'
 
 import { scopedLessonDraftKey } from './scoped-draft-key'
 
@@ -89,12 +92,51 @@ function savedAtOf(raw: string | null): number {
 }
 
 /**
+ * `kc-progress` is one browser-global envelope, so it carries a claimant
+ * stamp (`kc-progress-owner-v1`) when a confirmed guest reads it.
+ *
+ * Policy (PR #573 review):
+ * - legacy/unstamped progress is claimed by the first confirmed guest that
+ *   reads it; existing guest data therefore stays available;
+ * - a stamp of the bare `guest` (written before the id cookie is minted on
+ *   first sync) is adopted and rewritten by the concrete `guest:<id>`;
+ * - a concrete `guest:<id>` stamp is readable only by that same id, so
+ *   guest:A → guest:B in one browser reads nothing of A's;
+ * - the bare `guest` never reads a concrete guest's claimed envelope, and a
+ *   user-stamped envelope is never guest data. Unknown ≠ adoptable.
+ * Reads never delete another guest's progress (fail closed, not destroy).
+ */
+function guestProgressClaim(owner: string): boolean {
+  let stamped: string | null = null
+  try {
+    stamped = window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)
+  } catch {
+    return false
+  }
+  if (!stamped) return true
+  if (stamped === owner) return true
+  if (stamped === 'guest' && owner !== 'guest') return owner.startsWith('guest:')
+  return false
+}
+
+function claimGuestProgress(owner: string) {
+  try {
+    const stamped = window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)
+    if (!stamped || stamped === 'guest' || stamped === owner) {
+      window.localStorage.setItem(GUEST_PROGRESS_OWNER_STORAGE_KEY, owner)
+    }
+  } catch {
+    // Storage unavailable: the read stays a read-only best effort.
+  }
+}
+
+/**
  * The child's own learning record, scoped to the resolved owner.
  *
  * Isolation rules (PR #573 review):
  * - an unknown owner reads nothing, so 编程课堂 falls back to the picker;
- * - `kc-progress` belongs to the browser guest, never to a signed-in
- *   account that happens to use the same browser;
+ * - `kc-progress` belongs to the browser guest that claimed it, never to a
+ *   signed-in account and never to a different guest id in the same browser;
  * - only this owner's scoped drafts count; legacy unscoped drafts are
  *   guest-only. Account A and account B can therefore share a browser
  *   without ever seeing each other's lesson or draft.
@@ -103,12 +145,16 @@ export function readLearningRecord(owner?: string | null): LearningRecord | null
   if (typeof window === 'undefined') return null
   if (!isKnownOwner(owner)) return null
 
-  if (isGuestOwner(owner)) {
+  if (isGuestOwner(owner) && guestProgressClaim(owner)) {
     try {
       const raw = window.localStorage.getItem(GUEST_PROGRESS_STORAGE_KEY)
       if (raw) {
         const parsed: unknown = JSON.parse(raw)
-        if (hasProgressActivity(parsed)) return { lessonId: parsed.currentLessonId }
+        if (hasProgressActivity(parsed)) {
+          // Claim before returning: a readable envelope becomes this guest's.
+          claimGuestProgress(owner)
+          return { lessonId: parsed.currentLessonId }
+        }
       }
     } catch {
       // Corrupt progress: fall through to drafts instead of inventing a lesson.

@@ -461,6 +461,38 @@ describe('LessonWorkspace shell: slots + R1–R8 regressions', () => {
     expect(screen.getByTestId('ws-activities')).toHaveTextContent('活动一')
   })
 
+  it('folds long course info into one auxiliary disclosure when foldTaskExtras is on', () => {
+    const fake = new FakeAdapter()
+    const folded: LessonContract = {
+      ...DEMO_A.contract,
+      methodSteps: ['观察', '预测', '验证'],
+      scopeGap: '仅适用于本演示舞台',
+      activities: [{ level: 1, title: '活动一', text: '做一做' }],
+      foldTaskExtras: true,
+    }
+    render(<LessonWorkspace contract={folded} adapter={fake} initialScript={DEMO_A.initialScript} />)
+
+    const extras = screen.getByTestId('ws-task-extras')
+    expect(extras.tagName).toBe('DETAILS')
+    // Collapsed by default: the current goal/step and hints keep the panel.
+    expect(extras).not.toHaveAttribute('open')
+    // No learner content is removed: it all lives inside the disclosure.
+    expect(extras).toContainElement(screen.getByTestId('ws-method-steps'))
+    expect(extras).toContainElement(screen.getByTestId('ws-scope-gap'))
+    expect(extras).toContainElement(screen.getByTestId('ws-activities'))
+    expect(screen.getByTestId('ws-task-content')).toHaveTextContent('任务简报')
+    // The tiered hint reveal stays outside the fold.
+    expect(extras).not.toContainElement(screen.getByTestId('ws-hint-reveal-1'))
+  })
+
+  it('keeps the flat task panel when foldTaskExtras is off (shared lessons unchanged)', () => {
+    const fake = new FakeAdapter()
+    const flat: LessonContract = { ...DEMO_A.contract, methodSteps: ['观察', '预测', '验证'] }
+    render(<LessonWorkspace contract={flat} adapter={fake} initialScript={DEMO_A.initialScript} />)
+    expect(screen.queryByTestId('ws-task-extras')).toBeNull()
+    expect(screen.getByTestId('ws-method-steps')).toHaveTextContent('预测')
+  })
+
   it('mounts a real React summary editor through the slot, with no stage or run button', async () => {
     const { DEMO_S } = await import('./demo-contracts')
     const { DemoSummaryEditor } = await import('./demo-summary-editor')

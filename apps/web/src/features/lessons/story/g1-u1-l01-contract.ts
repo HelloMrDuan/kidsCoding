@@ -140,6 +140,10 @@ export const G1_WORKSPACE_CONTRACT_FIELDS: Omit<LessonContract, 'engine'> = {
   structuredHints: G1_CONTRACT.hints,
   methodSteps: G1_CONTRACT.methodSteps,
   scopeGap: G1_CONTRACT.scopeGap,
+  // V3 task panel: the portaled step card already carries this gate's goal
+  // and instruction, so long course-extension content folds into one
+  // disclosure instead of pushing the current-gate copy down.
+  foldTaskExtras: true,
   activities: [
     { level: 1, title: '探索预测：先猜再运行', text: '第 1 关预测狐狸先做什么，第 5 关预测只有移动算不算完成。' },
     { level: 2, title: '独立解决：自己搭建并验收', text: '第 2–4 关自己定顺序、拼三块积木程序并运行验证。' },

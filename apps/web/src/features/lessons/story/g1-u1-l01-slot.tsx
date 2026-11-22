@@ -227,11 +227,23 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
     return judgeStoryProgram(draft.programs[step.id] ?? [])
   }, [judgment, draft, step.id, lastRunStep])
 
-  function goToStep(index: number) {
+  /**
+   * `passedId` is set when the move is a completion (「完成这一关」): thinking
+   * gates (guided / design / review) have no run judgment, so without it the
+   * V3 step pill could never show the ✓ completed state for them.
+   */
+  function goToStep(index: number, passedId?: string) {
     const current = draftRef.current
     setGuess(null)
     setNotice(null)
-    persist({ ...current, stepIndex: index, finished: false })
+    persist({
+      ...current,
+      stepIndex: index,
+      finished: false,
+      passed: passedId && !current.passed.includes(passedId)
+        ? [...current.passed, passedId]
+        : current.passed,
+    })
   }
 
   function restoreStarter() {
@@ -258,9 +270,10 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
       }
     }
     if (step.kind === 'guided' || step.kind === 'design' || step.kind === 'review') {
-      if (current.stepIndex < lesson.steps.length - 1) goToStep(current.stepIndex + 1)
+      const passed = current.passed.includes(step.id) ? current.passed : [...current.passed, step.id]
+      if (current.stepIndex < lesson.steps.length - 1) goToStep(current.stepIndex + 1, step.id)
       else {
-        persist({ ...current, finished: true })
+        persist({ ...current, passed, finished: true })
       }
       return
     }
@@ -332,7 +345,10 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
 
   /**
    * V3 step nav reuses the approved G0 step pills (dot = number or ✓,
-   * current = is-active, passed = is-complete). At ≤670px the shared V3 CSS
+   * current = is-active, passed = is-complete). The pill shows the gate's
+   * short name (the part before "：") because seven full titles cannot fit a
+   * single 45px step bar even at 1440; the full title stays in `title`,
+   * `aria-label` and the task card heading. At ≤670px the shared V3 CSS
    * converges it to dots plus the current label. `data-testid` and the click
    * target stay exactly as before; the classic (non-V3) layout keeps its
    * compact button row below the canvas.
@@ -341,6 +357,7 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
     <div data-testid="g1-u1-l01-step-nav" className={v3 ? 'kc-v3-stepbar-pills' : undefined}>
       {lesson.steps.map((s, i) => {
         const complete = draft.passed.includes(s.id) && i !== draft.stepIndex
+        const shortTitle = s.title.split(/[：:]/)[0]?.trim() || s.title
         return (
           <Fragment key={s.id}>
             {v3 && i > 0 ? <span className="kc-v3-step-line" aria-hidden="true" /> : null}
@@ -351,12 +368,14 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
                 ? `kc-v3-step-pill${complete ? ' is-complete' : i === draft.stepIndex ? ' is-active' : ''}`
                 : undefined}
               aria-current={i === draft.stepIndex ? 'step' : undefined}
+              aria-label={v3 ? `第 ${i + 1} 关：${s.title}` : undefined}
+              title={v3 ? s.title : undefined}
               onClick={() => goToStep(i)}
             >
               {v3 ? (
                 <>
                   <span className="kc-v3-step-dot" aria-hidden="true">{complete ? '✓' : i + 1}</span>
-                  {s.title}
+                  <span className="kc-v3-step-label">{shortTitle}</span>
                 </>
               ) : (
                 <>第 {i + 1} 关{complete ? ' ✓' : ''}</>
@@ -458,14 +477,33 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
       <button
         type="button"
         data-testid="g1-u1-l01-run"
+        data-running={running ? 'true' : 'false'}
+        aria-pressed={running}
+        className={v3 ? 'kc-v3-run-primary' : undefined}
         disabled={!shell}
         onClick={() => (onRunRequest ?? shell?.run)?.()}
       >
-        {running ? '停止' : v3 ? '运行' : '▶ 运行'}
-      </button>{' '}
-      <button type="button" data-testid="g1-u1-l01-save" disabled={!shell} onClick={() => shell?.save()}>
-        保存作品
-      </button>{' '}
+        {v3 ? (
+          <>
+            <span aria-hidden="true">{running ? '■' : '▶'}</span>
+            {running ? '停止' : '运行'}
+          </>
+        ) : running ? (
+          '停止'
+        ) : (
+          '▶ 运行'
+        )}
+      </button>
+      <button
+        type="button"
+        data-testid="g1-u1-l01-save"
+        data-save-state={shell?.saveState ?? 'unsaved'}
+        className={v3 ? 'kc-v3-run-secondary' : undefined}
+        disabled={!shell}
+        onClick={() => shell?.save()}
+      >
+        {shell?.saveState === 'saved' ? '✓ 已保存' : shell?.saveState === 'failed' ? '⚠ 保存失败' : '保存作品'}
+      </button>
       {step.errorLab && !observedHere && JSON.stringify(blocks) !== JSON.stringify(step.starterBlocks ?? []) ? (
         <button type="button" data-testid="g1-u1-l01-restore-starter" onClick={restoreStarter}>
           换回原来的错误程序

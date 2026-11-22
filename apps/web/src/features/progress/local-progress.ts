@@ -1,6 +1,14 @@
 import type { SnapshotBlock } from './project-snapshot'
 
 export const GUEST_PROGRESS_STORAGE_KEY = 'kc-progress'
+/**
+ * `kc-progress` is browser-global, so it carries a claimant stamp: the
+ * confirmed guest identity that first read it (`guest:<kc_guest_id>`, or the
+ * bare `guest` before the id cookie is minted). The classroom entry reads the
+ * envelope only for that claimant, so switching the guest cookie from guest:A
+ * to guest:B in one browser never continues A's lesson.
+ */
+export const GUEST_PROGRESS_OWNER_STORAGE_KEY = 'kc-progress-owner-v1'
 const CHANGE_EVENT = 'kc-progress-change'
 
 export type GuestProgress = {
@@ -58,6 +66,7 @@ export function readGuestProgress(): GuestProgress {
     cachedGuestSnapshot = { ...defaultGuestProgress, ...JSON.parse(raw) } as GuestProgress
   } catch {
     window.localStorage.removeItem(GUEST_PROGRESS_STORAGE_KEY)
+    window.localStorage.removeItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)
     cachedGuestRaw = null
     cachedGuestSnapshot = defaultGuestProgress
   }
@@ -99,5 +108,6 @@ export function clearGuestProgress() {
   cachedGuestRaw = null
   cachedGuestSnapshot = defaultGuestProgress
   window.localStorage.removeItem(GUEST_PROGRESS_STORAGE_KEY)
+  window.localStorage.removeItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)
   window.dispatchEvent(new Event(CHANGE_EVENT))
 }
