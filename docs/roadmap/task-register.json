@@ -4121,7 +4121,7 @@
             "合并后部署预发布并提交线上截图与真实交互结果；用户最终视觉确认前，不批量复制到更多课程，不宣称儿童试学验收通过"
         ],
         "evidence": {
-          "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/558",
+          "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/573",
           "visualEvidence": "docs/product/p0-kitten-workspace/evidence/OPS-049/README.md",
           "tests": [
             "手机整改后复跑生产 Next.js 构建、TypeScript 和修改文件 lint（0 错误、1 条既有未用参数警告）。53 文件、455 条相关单测通过。",
@@ -4129,10 +4129,12 @@
             "再次注入本机存储、同步超时和导航失败。保存刷新恢复、失败后重试及备用完成页均通过。",
             "四组第二关原型/生产构建与真实拖拽截图，代码快照证明吸附后运行走 100 步。平板和手机断言实际角色与状态矩形不重叠。",
             "375px 使用画布外 44×44px 缩放按钮。真实 Chrome 触控和 DOM 矩形验证拖拽前、松手前、连接后与积木分离，并验证顶栏、分类、撤销、适合画面及保存入口可操作。768px 平板布局初审通过。",
-            "第二课隔离复用再次通过：真实对白积木、气泡、保存和刷新。产品继续 HOLD，等待课程全量 CI、4 号独立审核和预发布用户验收。"
+            "第二课隔离复用再次通过：真实对白积木、气泡、保存和刷新。产品继续 HOLD，等待课程全量 CI、4 号独立审核和预发布用户验收。",
+            "2026-11-22 #573：真实 Chrome 21 块长脚本探针在 1440×900、768×1024、375×812 三断点通过（滚轮平移/续滚、空白拖拽平移、底部拆分与重连、底部删除、fit 与双向缩放、素材与画布滚轮互不串扰；起始/底/中/顶四视图 0 遮挡、可见滚动条 0、页面滚动 0、文档溢出 0）。",
+            "2026-11-22 #573：Playwright g1-golden-story + lesson-workspace + studio-forest-hello 139 passed / 3 skipped / 0 failed；classroom-entry 6/6；app-shell 单测 10/10；classroom-entry 单测通过。tsc 81 条与基线一致，改动文件 0 条。Vitest 全量失败集合与基线相同（4 文件 / 3 用例 / 2 expected fail）。"
           ]
         },
-        "notes": "2026-11-18 16:12 duan 下达 Codex 接手指令：V3 Blockly 工作区专项整改现交由 Codex 独立负责；2 号暂停对共享 Blockly 工作区的并行修改，保留其分支 muse-c/v3-forest-workspace（HEAD a1894bc9）供 Codex 复用；4 号负责后续独立审核，主号负责合并部署；2 号可继续其他不冲突课程任务，但不得自行合并旧 V3 实现。Task-ID 核对：OPS-049 在建任务时确认未被占用（台账 138 条、最高 OPS-048；开放 PR 无 OPS-049；OPS-044 已预留给主号做 E2E CI 接线，不用）。OPS-048（2 号 V3 样板）已改为 blocked，由本任务接手同一范围继续实施。参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md），原型 SVG 积木与模拟运行不能作为真实产品代码。"
+        "notes": "2026-11-22 #573（Codex）：长脚本整改与编程课堂入口统一提交独立 PR，状态保持 in_review；#554/OPS-047 未改实现，待原负责人 rebase 到最新 main 并适配共享 V3 组件；旧版第二课双滚动条/页面溢出仍为已知缺口，不由本 PR 声称解决。2026-11-18 16:12 duan 下达 Codex 接手指令：V3 Blockly 工作区专项整改现交由 Codex 独立负责；2 号暂停对共享 Blockly 工作区的并行修改，保留其分支 muse-c/v3-forest-workspace（HEAD a1894bc9）供 Codex 复用；4 号负责后续独立审核，主号负责合并部署；2 号可继续其他不冲突课程任务，但不得自行合并旧 V3 实现。Task-ID 核对：OPS-049 在建任务时确认未被占用（台账 138 条、最高 OPS-048；开放 PR 无 OPS-049；OPS-044 已预留给主号做 E2E CI 接线，不用）。OPS-048（2 号 V3 样板）已改为 blocked，由本任务接手同一范围继续实施。参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md），原型 SVG 积木与模拟运行不能作为真实产品代码。"
     },
     {
         "id": "SYS-123",
