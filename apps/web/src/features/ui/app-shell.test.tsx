@@ -1,13 +1,16 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 let mockPath = '/learn/map'
 vi.mock('next/navigation', () => ({ usePathname: () => mockPath }))
 
-const { mockResolveClassroomHref } = vi.hoisted(() => ({ mockResolveClassroomHref: vi.fn() }))
+const { mockResolveClassroomHref, mockFetch } = vi.hoisted(() => ({
+  mockResolveClassroomHref: vi.fn(),
+  mockFetch: vi.fn(),
+}))
 vi.mock('@/features/lessons/classroom-entry', () => ({
   COURSE_PICKER_HREF: '/learn/catalog',
-  resolveClassroomHref: () => mockResolveClassroomHref(),
+  resolveClassroomHref: (owner: string | null) => mockResolveClassroomHref(owner),
 }))
 
 import { AppShell } from './app-shell'
@@ -16,6 +19,13 @@ describe('AppShell (frozen V2 global shell)', () => {
   beforeEach(() => {
     mockResolveClassroomHref.mockReset()
     mockResolveClassroomHref.mockResolvedValue('/learn/catalog')
+    mockFetch.mockReset()
+    mockFetch.mockResolvedValue({ ok: true, json: async () => ({ owner: 'guest' }) })
+    vi.stubGlobal('fetch', mockFetch)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 
   it('continues the recorded lesson from 编程课堂, else offers the course picker', async () => {
@@ -28,6 +38,40 @@ describe('AppShell (frozen V2 global shell)', () => {
     await waitFor(() => {
       expect(nav).toHaveAttribute('href', '/learn/lesson/lesson-02-forest-greeting')
     })
+    expect(mockResolveClassroomHref).toHaveBeenCalledWith('guest')
+  })
+
+  it('re-resolves 编程课堂 from each account\'s own record when the browser switches account', async () => {
+    mockPath = '/'
+    mockFetch.mockResolvedValue({ ok: true, json: async () => ({ owner: 'user:a' }) })
+    mockResolveClassroomHref.mockImplementation(async (owner: string | null) =>
+      owner === 'user:a'
+        ? '/learn/story-lab/G1-U1-L01/golden'
+        : owner === 'user:b'
+          ? '/learn/story-lab/G1-U1-L02/golden'
+          : '/learn/catalog')
+    render(<AppShell><div /></AppShell>)
+    const nav = screen.getByTestId('kc-nav-lesson')
+    await waitFor(() => {
+      expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
+    })
+    mockFetch.mockResolvedValue({ ok: true, json: async () => ({ owner: 'user:b' }) })
+    fireEvent(window, new Event('focus'))
+    await waitFor(() => {
+      expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L02/golden')
+    })
+  })
+
+  it('fails closed to the course picker when the account cannot be confirmed', async () => {
+    mockPath = '/'
+    mockFetch.mockResolvedValue({ ok: true, json: async () => ({ owner: null }) })
+    mockResolveClassroomHref.mockResolvedValue('/learn/lesson/lesson-02-forest-greeting')
+    render(<AppShell><div /></AppShell>)
+    const nav = screen.getByTestId('kc-nav-lesson')
+    await waitFor(() => expect(mockFetch).toHaveBeenCalled())
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(nav).toHaveAttribute('href', '/learn/catalog')
+    expect(mockResolveClassroomHref).not.toHaveBeenCalled()
   })
 
   it('does not hard-code the demo studio lesson in the lesson nav', async () => {

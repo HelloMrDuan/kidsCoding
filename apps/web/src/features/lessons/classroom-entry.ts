@@ -1,5 +1,7 @@
 import { GUEST_PROGRESS_STORAGE_KEY } from '@/features/progress/local-progress'
 
+import { scopedLessonDraftKey } from './scoped-draft-key'
+
 /**
  * Where the main-nav 「编程课堂」 entry points.
  *
@@ -24,6 +26,25 @@ export type LearningRecord = {
   lessonId: string
 }
 
+/**
+ * Owner strings come from the one existing identity source,
+ * `currentLessonDraftOwner()`: `user:<supabase id>` for a signed-in account,
+ * `guest:<kc_guest_id>` or `guest` for the browser guest. Anything else is
+ * an unknown identity and reads nothing (the nav falls back to the course
+ * picker).
+ */
+export function isGuestOwner(owner: string): boolean {
+  return owner === 'guest' || owner.startsWith('guest:')
+}
+
+function isUserOwner(owner: string): boolean {
+  return owner.startsWith('user:')
+}
+
+function isKnownOwner(owner: string | null | undefined): owner is string {
+  return typeof owner === 'string' && (isGuestOwner(owner) || isUserOwner(owner))
+}
+
 function hasProgressActivity(value: unknown): value is { currentLessonId: string } {
   if (!value || typeof value !== 'object') return false
   const progress = value as Record<string, unknown>
@@ -35,11 +56,16 @@ function hasProgressActivity(value: unknown): value is { currentLessonId: string
   })
 }
 
-function lessonIdFromDraftKey(key: string): string | null {
-  // Guest drafts are either the scoped envelope or the legacy unscoped key.
-  // Another owner's drafts are not this child's learning record.
-  const scopedPrefix = 'kids-lesson-owner-v1:guest:'
-  if (key.startsWith('kids-lesson-owner-v1:') && !key.startsWith(scopedPrefix)) return null
+function lessonIdFromDraftKey(key: string, owner: string): string | null {
+  if (key.startsWith('kids-lesson-owner-v1:')) {
+    // Another account's (or another guest's) drafts are never this child's
+    // record, even when they live in the same browser localStorage.
+    if (!key.startsWith(scopedLessonDraftKey(owner, ''))) return null
+  } else if (!isGuestOwner(owner)) {
+    // Legacy unscoped drafts predate owner isolation. They can only belong
+    // to the browser guest; a signed-in account must not inherit them.
+    return null
+  }
   const markerIndex = key.lastIndexOf(DRAFT_MARKER)
   if (markerIndex < 0) return null
   const lessonId = key.slice(markerIndex + DRAFT_MARKER.length)
@@ -62,17 +88,31 @@ function savedAtOf(raw: string | null): number {
   return 0
 }
 
-export function readLearningRecord(): LearningRecord | null {
+/**
+ * The child's own learning record, scoped to the resolved owner.
+ *
+ * Isolation rules (PR #573 review):
+ * - an unknown owner reads nothing, so 编程课堂 falls back to the picker;
+ * - `kc-progress` belongs to the browser guest, never to a signed-in
+ *   account that happens to use the same browser;
+ * - only this owner's scoped drafts count; legacy unscoped drafts are
+ *   guest-only. Account A and account B can therefore share a browser
+ *   without ever seeing each other's lesson or draft.
+ */
+export function readLearningRecord(owner?: string | null): LearningRecord | null {
   if (typeof window === 'undefined') return null
+  if (!isKnownOwner(owner)) return null
 
-  try {
-    const raw = window.localStorage.getItem(GUEST_PROGRESS_STORAGE_KEY)
-    if (raw) {
-      const parsed: unknown = JSON.parse(raw)
-      if (hasProgressActivity(parsed)) return { lessonId: parsed.currentLessonId }
+  if (isGuestOwner(owner)) {
+    try {
+      const raw = window.localStorage.getItem(GUEST_PROGRESS_STORAGE_KEY)
+      if (raw) {
+        const parsed: unknown = JSON.parse(raw)
+        if (hasProgressActivity(parsed)) return { lessonId: parsed.currentLessonId }
+      }
+    } catch {
+      // Corrupt progress: fall through to drafts instead of inventing a lesson.
     }
-  } catch {
-    // Corrupt progress: fall through to drafts instead of inventing a lesson.
   }
 
   const latest = new Map<string, number>()
@@ -80,7 +120,7 @@ export function readLearningRecord(): LearningRecord | null {
     for (let index = 0; index < window.localStorage.length; index += 1) {
       const key = window.localStorage.key(index)
       if (!key) continue
-      const lessonId = lessonIdFromDraftKey(key)
+      const lessonId = lessonIdFromDraftKey(key, owner)
       if (!lessonId) continue
       const savedAt = savedAtOf(window.localStorage.getItem(key))
       latest.set(lessonId, Math.max(latest.get(lessonId) ?? 0, savedAt))
@@ -118,8 +158,13 @@ export async function resolveLessonHref(lessonId: string): Promise<string> {
   return maturity.trialRoute ?? `/learn/catalog/${lessonId}`
 }
 
-export async function resolveClassroomHref(): Promise<string> {
-  const record = readLearningRecord()
+/**
+ * One resolver for every classroom entry, for the current owner only.
+ * Unknown identity fails closed to the picker before any storage read.
+ */
+export async function resolveClassroomHref(owner?: string | null): Promise<string> {
+  if (!isKnownOwner(owner)) return COURSE_PICKER_HREF
+  const record = readLearningRecord(owner)
   if (!record) return COURSE_PICKER_HREF
   return resolveLessonHref(record.lessonId)
 }

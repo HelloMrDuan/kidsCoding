@@ -94,6 +94,13 @@
   display: flex; align-items: center; gap: 8px; flex: none;
   color: #788aa3; font-size: 12px; font-weight: 700; white-space: nowrap;
 }
+/* Navigable step pills (G1's seven gates) look identical to G0's status
+   pills; only the element differs (button, so it keeps its keyboard/click
+   affordance and original test id). */
+.kc-v3-stepbar-pills > button.kc-v3-step-pill {
+  padding: 0; border: 0; background: transparent; font-family: inherit;
+  line-height: inherit; cursor: pointer;
+}
 .kc-v3-step-dot {
   display: flex; align-items: center; justify-content: center;
   width: 25px; height: 25px; flex: none;
@@ -214,6 +221,9 @@
 }
 .kc-v3-mission-portal .kc-v3-task-copy { grid-area: copy; min-width: 0; }
 .kc-v3-mission-portal .kc-v3-task h2 { margin: 0; font-size: 15px; font-weight: 850; line-height: 1.45; }
+/* Lesson slots that already used an h3 keep their heading level; the step
+   card's visual hierarchy is the same as the approved h2 baseline. */
+.kc-v3-mission-portal .kc-v3-task h3 { margin: 0; font-size: 15px; font-weight: 850; line-height: 1.45; }
 .kc-v3-mission-portal .kc-v3-task-copy p { margin: 4px 0 0; font-size: 12px; line-height: 1.7; color: var(--studio-muted); }
 .kc-v3-mission-portal .kc-v3-task button {
   grid-area: action; justify-self: end;
@@ -349,6 +359,15 @@
 .kc-v3-editor-details button {
   min-height: 32px; border: 1px solid #e3e9f3; background: #fff;
   border-radius: 7px; padding: 2px 7px; margin: 1px;
+}
+/* Primary run/save stay reachable without opening the guide collapse. */
+.kc-v3-run-row {
+  flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 8px 14px; border-top: 1px solid #ecf1f8; background: #fafcff;
+}
+.kc-v3-run-row button {
+  min-height: 32px; border: 1px solid #e3e9f3; background: #fff;
+  border-radius: 7px; padding: 2px 10px; font-size: 11px; color: #33517a;
 }
 .kc-v3-slot-editor { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; }
 /* Slots that also render their guide/list under the canvas must not let
@@ -583,7 +602,7 @@
   .kc-v3-secondary, .kc-v3-stage-column .ws-stage-state-pill { font-size: 10px; padding: 4px 6px; }
   .kc-v3-mission-body { padding: 13px; }
   .kc-v3-mission-portal .kc-v3-task { padding: 12px 13px 0; gap: 8px; }
-  .kc-v3-mission-portal .kc-v3-task h2 { font-size: 14px; }
+  .kc-v3-mission-portal .kc-v3-task h2, .kc-v3-mission-portal .kc-v3-task h3 { font-size: 14px; }
   .kc-v3-mission-portal .kc-v3-task button { min-height: 44px; max-width: 96px; white-space: normal; line-height: 1.3; }
   .kc-v3-blockly {
     /* 51px = 44px category target + 3px gutter each side + 1px rail border.

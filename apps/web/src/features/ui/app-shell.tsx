@@ -79,7 +79,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   // 「编程课堂」 continues the lesson in the child's own record (the same
   // route the course system opens); with no record it is a course picker.
-  // Resolved after mount because the guest record lives in localStorage.
+  // The owner is resolved from the same identity source the classroom uses
+  // (`/api/lesson-draft-owner` → user:<id> or guest:<id>), and reads are
+  // scoped to it: switching accounts in one browser must never inherit the
+  // previous account's lesson or drafts. Unknown identity fails closed to
+  // the picker.
   const [lessonHref, setLessonHref] = useState(COURSE_PICKER_HREF)
   const current = ALL_ITEMS.find((i) => i.match(pathname))
   // Golden lessons use document history so the editor's beforeunload protection also covers navigation.
@@ -87,19 +91,49 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true
-    const sync = () => {
-      resolveClassroomHref().then(
-        (href) => { if (active) setLessonHref(href) },
-        () => { /* fail closed to the course picker */ },
-      )
+    let request = 0
+    const sync = async () => {
+      const token = ++request
+      // Do not keep the previous account's route while identity is checked.
+      if (active) setLessonHref(COURSE_PICKER_HREF)
+      let owner: string | null = null
+      try {
+        const response = await fetch('/api/lesson-draft-owner', { cache: 'no-store' })
+        if (response.ok) {
+          const body = (await response.json()) as { owner?: unknown }
+          owner = typeof body.owner === 'string' ? body.owner : null
+        }
+      } catch {
+        // The account cannot be confirmed: stay on the course picker.
+      }
+      if (!active || token !== request) return
+      // No confirmed identity: the picker is already set, so do not guess.
+      if (owner === null) return
+      try {
+        const href = await resolveClassroomHref(owner)
+        if (active && token === request) setLessonHref(href)
+      } catch {
+        /* fail closed to the course picker */
+      }
     }
-    sync()
-    window.addEventListener('kc-progress-change', sync)
-    window.addEventListener('storage', sync)
+    void sync()
+    const resync = () => { void sync() }
+    const visible = () => {
+      if (document.visibilityState === 'visible') void sync()
+    }
+    window.addEventListener('kc-progress-change', resync)
+    window.addEventListener('storage', resync)
+    window.addEventListener('focus', resync)
+    window.addEventListener('pageshow', resync)
+    document.addEventListener('visibilitychange', visible)
     return () => {
       active = false
-      window.removeEventListener('kc-progress-change', sync)
-      window.removeEventListener('storage', sync)
+      request += 1
+      window.removeEventListener('kc-progress-change', resync)
+      window.removeEventListener('storage', resync)
+      window.removeEventListener('focus', resync)
+      window.removeEventListener('pageshow', resync)
+      document.removeEventListener('visibilitychange', visible)
     }
   }, [pathname])
 

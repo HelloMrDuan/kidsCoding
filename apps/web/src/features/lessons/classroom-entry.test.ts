@@ -9,38 +9,38 @@ const scoped = (owner: string, legacyKey: string) =>
 const draft = (lessonId: string, savedAt: string) =>
   JSON.stringify({ lessonId, savedAt, script: { stepIndex: 0, programs: {} } })
 
+const progress = (lessonId: string) => JSON.stringify({
+  currentLessonId: lessonId,
+  completedLessonIds: [lessonId],
+  completedProjectIds: [],
+  projectSnapshots: [],
+})
+
+const routeFor = (lessonId: string) =>
+  getLessonMaturity(lessonId)?.trialRoute ?? `/learn/catalog/${lessonId}`
+
 beforeEach(() => {
   window.localStorage.clear()
 })
 
 describe('classroom entry for 编程课堂', () => {
   it('offers the course picker when there is no learning record', async () => {
-    expect(readLearningRecord()).toBeNull()
-    await expect(resolveClassroomHref()).resolves.toBe(COURSE_PICKER_HREF)
+    expect(readLearningRecord('guest')).toBeNull()
+    await expect(resolveClassroomHref('guest')).resolves.toBe(COURSE_PICKER_HREF)
     expect(COURSE_PICKER_HREF).toBe('/learn/catalog')
   })
 
   it('continues the launch lesson recorded in guest progress at its original URL', async () => {
-    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, JSON.stringify({
-      currentLessonId: 'lesson-02-forest-greeting',
-      completedLessonIds: ['lesson-01-forest-hello'],
-      completedProjectIds: [],
-      projectSnapshots: [],
-    }))
-    expect(readLearningRecord()).toEqual({ lessonId: 'lesson-02-forest-greeting' })
-    await expect(resolveClassroomHref()).resolves.toBe('/learn/lesson/lesson-02-forest-greeting')
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('lesson-02-forest-greeting'))
+    expect(readLearningRecord('guest')).toEqual({ lessonId: 'lesson-02-forest-greeting' })
+    await expect(resolveClassroomHref('guest')).resolves.toBe('/learn/lesson/lesson-02-forest-greeting')
   })
 
   it('opens the same route the catalog card uses for a catalog lesson', async () => {
-    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, JSON.stringify({
-      currentLessonId: 'G1-U1-L01',
-      completedLessonIds: ['G1-U1-L01'],
-      completedProjectIds: [],
-      projectSnapshots: [],
-    }))
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('G1-U1-L01'))
     const catalogRoute = getLessonMaturity('G1-U1-L01')?.trialRoute
     expect(catalogRoute).toBe('/learn/story-lab/G1-U1-L01/golden')
-    await expect(resolveClassroomHref()).resolves.toBe(catalogRoute)
+    await expect(resolveClassroomHref('guest')).resolves.toBe(catalogRoute)
   })
 
   it('falls back to the newest saved classroom draft, not the demo lesson', async () => {
@@ -52,9 +52,8 @@ describe('classroom entry for 编程课堂', () => {
       scoped('guest', 'kidscoding-draft:G1-U1-L02'),
       draft('G1-U1-L02', '2026-11-21T10:00:00.000Z'),
     )
-    expect(readLearningRecord()?.lessonId).toBe('G1-U1-L02')
-    const expected = getLessonMaturity('G1-U1-L02')?.trialRoute ?? '/learn/catalog/G1-U1-L02'
-    await expect(resolveClassroomHref()).resolves.toBe(expected)
+    expect(readLearningRecord('guest')?.lessonId).toBe('G1-U1-L02')
+    await expect(resolveClassroomHref('guest')).resolves.toBe(routeFor('G1-U1-L02'))
   })
 
   it('ignores an empty progress envelope and still finds the draft', async () => {
@@ -65,20 +64,72 @@ describe('classroom entry for 编程课堂', () => {
       projectSnapshots: [],
     }))
     window.localStorage.setItem('kidscoding-draft:lesson-01-forest-hello', draft('lesson-01-forest-hello', '2026-11-22T08:00:00.000Z'))
-    expect(readLearningRecord()).toEqual({ lessonId: 'lesson-01-forest-hello' })
-    await expect(resolveClassroomHref()).resolves.toBe('/learn/lesson/lesson-01-forest-hello')
+    expect(readLearningRecord('guest')).toEqual({ lessonId: 'lesson-01-forest-hello' })
+    await expect(resolveClassroomHref('guest')).resolves.toBe('/learn/lesson/lesson-01-forest-hello')
   })
 
   it('fails closed to the course picker for an unknown lesson id', async () => {
     window.localStorage.setItem('kidscoding-draft:not-a-lesson', draft('not-a-lesson', '2026-11-22T08:00:00.000Z'))
-    expect(readLearningRecord()).toEqual({ lessonId: 'not-a-lesson' })
-    await expect(resolveClassroomHref()).resolves.toBe(COURSE_PICKER_HREF)
+    expect(readLearningRecord('guest')).toEqual({ lessonId: 'not-a-lesson' })
+    await expect(resolveClassroomHref('guest')).resolves.toBe(COURSE_PICKER_HREF)
   })
 
   it('survives corrupt progress and draft payloads', async () => {
     window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, '{not json')
     window.localStorage.setItem('kidscoding-draft:broken', '{not json')
-    const record = readLearningRecord()
-    expect(record).toEqual({ lessonId: 'broken' })
+    expect(readLearningRecord('guest')).toEqual({ lessonId: 'broken' })
+  })
+})
+
+describe('编程课堂 account isolation', () => {
+  it('reads only the signed-in account\'s own scoped drafts', async () => {
+    window.localStorage.setItem(
+      scoped('user:a', 'kidscoding-draft:G1-U1-L01'),
+      draft('G1-U1-L01', '2026-11-20T10:00:00.000Z'),
+    )
+    window.localStorage.setItem(
+      scoped('user:b', 'kidscoding-draft:G1-U1-L02'),
+      draft('G1-U1-L02', '2026-11-21T10:00:00.000Z'),
+    )
+    expect(readLearningRecord('user:a')).toEqual({ lessonId: 'G1-U1-L01' })
+    expect(readLearningRecord('user:b')).toEqual({ lessonId: 'G1-U1-L02' })
+    await expect(resolveClassroomHref('user:a')).resolves.toBe(routeFor('G1-U1-L01'))
+    await expect(resolveClassroomHref('user:b')).resolves.toBe(routeFor('G1-U1-L02'))
+  })
+
+  it('never gives account B account A\'s lesson when both share one browser', async () => {
+    window.localStorage.setItem(
+      scoped('user:a', 'kidscoding-draft:G1-U1-L01'),
+      draft('G1-U1-L01', '2026-11-21T10:00:00.000Z'),
+    )
+    // B has no record of its own: A's draft is not evidence of B's learning.
+    expect(readLearningRecord('user:b')).toBeNull()
+    await expect(resolveClassroomHref('user:b')).resolves.toBe(COURSE_PICKER_HREF)
+  })
+
+  it('does not attribute browser guest progress or legacy drafts to a signed-in account', async () => {
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('G1-U1-L01'))
+    window.localStorage.setItem('kidscoding-draft:lesson-02-forest-greeting', draft('lesson-02-forest-greeting', '2026-11-22T08:00:00.000Z'))
+    expect(readLearningRecord('user:a')).toBeNull()
+    await expect(resolveClassroomHref('user:a')).resolves.toBe(COURSE_PICKER_HREF)
+  })
+
+  it('does not read a different guest\'s scoped drafts', async () => {
+    window.localStorage.setItem(
+      scoped('guest:account-a', 'kidscoding-draft:G1-U1-L01'),
+      draft('G1-U1-L01', '2026-11-21T10:00:00.000Z'),
+    )
+    expect(readLearningRecord('guest:account-b')).toBeNull()
+    expect(readLearningRecord('guest:account-a')).toEqual({ lessonId: 'G1-U1-L01' })
+  })
+
+  it('fails closed when the owner is unknown or ambiguous', async () => {
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('G1-U1-L01'))
+    expect(readLearningRecord(undefined)).toBeNull()
+    expect(readLearningRecord(null)).toBeNull()
+    expect(readLearningRecord('')).toBeNull()
+    expect(readLearningRecord('someone-else')).toBeNull()
+    await expect(resolveClassroomHref()).resolves.toBe(COURSE_PICKER_HREF)
+    await expect(resolveClassroomHref(null)).resolves.toBe(COURSE_PICKER_HREF)
   })
 })

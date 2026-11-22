@@ -1208,3 +1208,47 @@ test('slot tablet + mobile: editor stays wide, check + save/restore on phone', a
   await page.reload()
   await expect(page.getByTestId('ws-demo-slot-item-2')).toBeChecked({ timeout: 10000 })
 })
+
+/**
+ * PR #573 review: 编程课堂 must continue the signed-in account's own lesson.
+ * Two accounts share one browser; the entry is resolved from the same owner
+ * the classroom uses, and an unconfirmed identity fails closed to the picker.
+ */
+test('account isolation: 编程课堂 continues each account\'s own lesson in one browser', async ({
+  page,
+}) => {
+  let owner: string | null = 'user:a'
+  await page.route('**/api/lesson-draft-owner', async (route) => {
+    await route.fulfill({ json: { owner } })
+  })
+  await page.addInitScript(() => {
+    const draft = (lessonId: string) =>
+      JSON.stringify({ lessonId, savedAt: '2026-11-21T10:00:00.000Z', script: { stepIndex: 0, programs: {} } })
+    localStorage.setItem(
+      'kids-lesson-owner-v1:user%3Aa:kidscoding-draft:G1-U1-L01',
+      draft('G1-U1-L01'),
+    )
+    localStorage.setItem(
+      'kids-lesson-owner-v1:user%3Ab:kidscoding-draft:lesson-02-forest-greeting',
+      draft('lesson-02-forest-greeting'),
+    )
+  })
+  await page.goto('/learn/catalog')
+  const nav = page.getByTestId('kc-nav-lesson')
+  await expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
+
+  // Switch to account B: A's lesson and draft must not leak into B's entry.
+  owner = 'user:b'
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(nav).toHaveAttribute('href', '/learn/lesson/lesson-02-forest-greeting')
+
+  // Unconfirmed identity: the picker, never the previous account's lesson.
+  owner = null
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(nav).toHaveAttribute('href', '/learn/catalog')
+
+  // Switching back restores A's own record, not B's.
+  owner = 'user:a'
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
+})

@@ -45,6 +45,15 @@ async function addStoryBlock(page: Page, type: string) {
   await page.getByTestId('lesson-add-' + type).click()
 }
 
+/** V3 G1 folds the guide, block list and reflection into the G0-style
+ *  auxiliary collapse; open it before touching those controls. */
+async function openEditorGuide(page: Page) {
+  const details = page.locator('details.kc-v3-editor-details')
+  if (!await details.evaluate(el => (el as HTMLDetailsElement).open)) {
+    await details.locator('summary').click()
+  }
+}
+
 for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]]) {
   test(`G1-U1-L01 Golden keeps one editor at ${width}×${height}`, async ({ browser }) => {
     test.setTimeout(70_000)
@@ -149,11 +158,13 @@ test('G1-U1-L01 Golden verifies wrong program, an independently edited encore an
   await expect(verdict).toContainText('请在狐狸移动之后')
   await addStoryBlock(page, 'switch_character')
   await addStoryBlock(page, 'say_line')
+  await openEditorGuide(page)
   await page.getByTestId('g1-u1-l01-block-line-4').selectOption('ready')
   await run()
   await expect(verdict).toContainText('拓展也做到了')
   await expect(page.getByTestId('g1-u1-l01-rabbit')).toHaveAttribute('data-speaking', 'true')
   await goTo('review')
+  await openEditorGuide(page)
   await page.getByTestId('g1-u1-l01-reflection-option-0').click()
   await page.getByTestId('g1-u1-l01-complete-step').click()
   await expect(page.getByTestId('golden-story-badge')).toBeVisible()
