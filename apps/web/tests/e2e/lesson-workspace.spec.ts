@@ -139,8 +139,27 @@ test('OPS-049: a 21-block script stays reachable and editable without overlay sc
   expect(hitType).toBe(bottom.type)
 
   // Edit the bottom block of the long script: select it and delete it.
+  // The tool drawer reflows the canvas, so a rect measured before it opens is
+  // stale and the click can land beside the block (CI desktop caught this).
+  // Open it first, then pan/measure again and verify the click target paints
+  // that exact block before deleting.
   if (!(await toolsOpen())) await tools.click()
-  await page.mouse.click(bottom.x + bottom.w - 8, bottom.y + bottom.h - 6)
+  await expect.poll(async () => {
+    if (await bottomFullyInCanvas()) return true
+    await page.mouse.move(panX, panY)
+    await page.mouse.wheel(0, 500)
+    return false
+  }, { timeout: 20_000, intervals: [200] }).toBe(true)
+  const target = await bottomRect()
+  const targetHit = await page.evaluate(({ x, y }) => {
+    const el = document.elementFromPoint(x, y)
+    const g = el?.closest('g.blocklyBlock')
+    return g?.classList[0] ?? null
+  }, { x: target.x + target.w / 2, y: target.y + target.h / 2 })
+  expect(targetHit).toBe(target.type)
+  await page.mouse.click(target.x + target.w / 2, target.y + target.h / 2)
+  const selected = page.locator('.kc-v3-blockly svg.blocklySvg g.blocklyBlock.blocklySelected')
+  await expect(selected).toHaveCount(1)
   await page.getByTestId('lesson-delete-selected').click()
   await expect(blocks).toHaveCount(20)
   if (await toolsOpen()) await tools.click()
