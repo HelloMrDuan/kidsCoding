@@ -52,6 +52,122 @@ test('OPS-049: the live V3 palette is visible and runs the first gate', async ({
   await expect(start).toBeVisible()
 })
 
+/**
+ * OPS-049 long-script regression: the V3 docked canvas hides Blockly's own
+ * overlay scrollbars, so a 21-block script has to stay reachable through the
+ * replacement gestures (wheel pan), editable at the bottom of the stack, and
+ * must never reintroduce a page scrollbar or occlude the block it shows.
+ * This is the CI version of the real-Chrome long-script probe.
+ */
+test('OPS-049: a 21-block script stays reachable and editable without overlay scrollbars', async ({ page }) => {
+  await page.goto('/learn/story-lab/G1-U1-L01/golden')
+  const canvas = page.locator('.kc-v3-blockly svg.blocklySvg').first()
+  await expect(canvas).toBeVisible({ timeout: 30_000 })
+  const canvasTransform = () =>
+    page.locator('.kc-v3-blockly svg.blocklySvg .blocklyBlockCanvas').first()
+      .evaluate((el) => el.getAttribute('transform') ?? '')
+
+  // The extra block types unlock on the second step; at ≤1040 the step list
+  // and the canvas live in separate panes.
+  const width = page.viewportSize()?.width ?? 1440
+  if (width <= 1040) {
+    await page.getByTestId('golden-story-pane-task').click()
+    await page.getByTestId('g1-u1-l01-complete-step').click()
+    await page.getByTestId('g1-u1-l01-complete-step').click()
+    await page.getByTestId('golden-story-pane-code').click()
+  } else {
+    await page.getByTestId('g1-u1-l01-complete-step').click()
+    await page.getByTestId('g1-u1-l01-complete-step').click()
+  }
+
+  const tools = page.getByTestId('golden-block-tools')
+  const toolsOpen = () => tools.evaluate((el) => el.parentElement?.hasAttribute('open') ?? false)
+  if (!(await toolsOpen())) await tools.click()
+  for (const type of [...Array(10).fill('say_line'), ...Array(10).fill('move_right')]) {
+    await page.getByTestId(`lesson-add-${type}`).click()
+  }
+  const blocks = page.locator('.kc-v3-blockly svg.blocklySvg .blocklyBlockCanvas g.blocklyBlock')
+  await expect(blocks).toHaveCount(21)
+  if (await toolsOpen()) await tools.click()
+  await expect(page.getByTestId('lesson-add-say_line')).toBeHidden()
+  // The shell scrolls the editor into place after hydration; measure only
+  // once the canvas has settled inside the viewport.
+  await canvas.scrollIntoViewIfNeeded()
+  await expect(canvas).toBeInViewport({ ratio: 0.9 })
+
+  const blockRects = () => page.evaluate(() =>
+    [...document.querySelectorAll('.kc-v3-blockly svg.blocklySvg .blocklyBlockCanvas g.blocklyBlock > .blocklyPath')]
+      .map((path) => {
+        const g = path.parentElement
+        const r = path.getBoundingClientRect()
+        return { type: g?.classList[0] ?? '?', x: r.x, y: r.y, w: r.width, h: r.height }
+      }))
+  const bottomRect = async () => {
+    const rects = await blockRects()
+    return rects.reduce((a, b) => (b.y + b.h > a.y + a.h ? b : a))
+  }
+  const bottomFullyInCanvas = async () => {
+    const box = await canvas.boundingBox()
+    const bottom = await bottomRect()
+    return !!box && bottom.y >= box.y - 1 && bottom.y + bottom.h <= box.y + box.height + 1
+  }
+
+  // Pan from the free strip right of the flyout, exactly as the class does.
+  const box = (await canvas.boundingBox())!
+  const panX = box.x + box.width * 0.85
+  const panY = box.y + 40
+  const beforeWheel = await canvasTransform()
+  await page.mouse.move(panX, panY)
+  await page.mouse.wheel(0, 400)
+  await expect.poll(canvasTransform, { timeout: 10_000 }).not.toBe(beforeWheel)
+
+  // Keep panning until the bottom of the 21-block stack is fully in view.
+  await expect.poll(async () => {
+    if (await bottomFullyInCanvas()) return true
+    await page.mouse.move(panX, panY)
+    await page.mouse.wheel(0, 500)
+    return false
+  }, { timeout: 20_000, intervals: [200] }).toBe(true)
+
+  // The visible bottom block paints itself (not covered by a panel or overlay).
+  const bottom = await bottomRect()
+  const hitType = await page.evaluate(({ x, y }) => {
+    const el = document.elementFromPoint(x, y)
+    const g = el?.closest('g.blocklyBlock')
+    return g?.classList[0] ?? null
+  }, { x: bottom.x + bottom.w / 2, y: bottom.y + bottom.h / 2 })
+  expect(hitType).toBe(bottom.type)
+
+  // Edit the bottom block of the long script: select it and delete it.
+  if (!(await toolsOpen())) await tools.click()
+  await page.mouse.click(bottom.x + bottom.w - 8, bottom.y + bottom.h - 6)
+  await page.getByTestId('lesson-delete-selected').click()
+  await expect(blocks).toHaveCount(20)
+  if (await toolsOpen()) await tools.click()
+
+  // Fit the long script: pan away from the fitted view first, then 适应 must
+  // bring the view back (a no-op at an already-fitted view proves nothing).
+  const beforePanUp = await canvasTransform()
+  await page.mouse.move(panX, panY)
+  await page.mouse.wheel(0, -600)
+  await expect.poll(canvasTransform, { timeout: 10_000 }).not.toBe(beforePanUp)
+  const beforeFit = await canvasTransform()
+  await page.getByTestId('v3-fit').click()
+  await expect.poll(canvasTransform, { timeout: 10_000 }).not.toBe(beforeFit)
+  await expect(canvas).toBeInViewport()
+  const viewport = await canvas.boundingBox()
+  expect(viewport!.width).toBeGreaterThan(0)
+  expect(viewport!.height).toBeGreaterThan(0)
+  const visibleScrollbars = await page.evaluate(() =>
+    [...document.querySelectorAll('.blocklyMainWorkspaceScrollbar, .blocklyFlyoutScrollbar')]
+      .filter((el) => {
+        const r = el.getBoundingClientRect()
+        return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'
+      }).length)
+  expect(visibleScrollbars).toBe(0)
+  expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1)
+})
+
 async function dragFlyoutBlockToWorkspace(
   page: import('@playwright/test').Page,
   categoryLabel: string,
