@@ -2,6 +2,7 @@ import {
   readGuestProgress,
 } from '@/features/progress/local-progress'
 
+import { launchLessonHref } from './launch-lesson-routes'
 import { LESSON_DRAFT_OWNER_STORAGE_KEY, scopedLessonDraftKey } from './scoped-draft-key'
 
 /**
@@ -9,8 +10,9 @@ import { LESSON_DRAFT_OWNER_STORAGE_KEY, scopedLessonDraftKey } from './scoped-d
  *
  * The classroom entry must never be a second, parallel classroom: it reuses the
  * exact route the course system uses for the same lesson.
- * - launch lessons (lesson-01…lesson-12) keep their original classroom URL,
- *   id and draft archive;
+ * - launch lessons keep their original classroom URL, id and draft archive,
+ *   except lesson-01 which has exactly one official entry: its V3 studio
+ *   workspace (`launchLessonHref`);
  * - catalog lessons use the same `trialRoute` the catalog card links to;
  * - no learning record → the course picker (课程体系), never the demo lesson.
  *
@@ -181,15 +183,16 @@ export function readLearningRecord(owner?: string | null): LearningRecord | null
 }
 
 /**
- * One resolver for every classroom entry. Launch lessons keep their original
- * classroom URL; catalog lessons return the catalog's `trialRoute` (the same
- * page and engine the 课程体系 card opens), or the course detail page when no
- * trial runner exists. Unknown ids fail closed to the course picker.
+ * One resolver for every classroom entry. Launch lessons resolve through
+ * `launchLessonHref` (lesson-01 → its V3 workspace; lesson-02…12 keep the
+ * original classroom URL); catalog lessons return the catalog's `trialRoute`
+ * (the same page and engine the 课程体系 card opens), or the course detail
+ * page when no trial runner exists. Unknown ids fail closed to the picker.
  */
 export async function resolveLessonHref(lessonId: string): Promise<string> {
   const { launchLessons } = await import('@/content/curriculum/launch-lessons')
   if (launchLessons.some((lesson) => lesson.id === lessonId)) {
-    return `/learn/lesson/${lessonId}`
+    return launchLessonHref(lessonId)
   }
 
   const { getLessonMaturity } = await import('@/features/curriculum/lesson-maturity')

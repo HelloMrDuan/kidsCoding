@@ -5,11 +5,8 @@ import { useSyncExternalStore } from 'react'
 
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
-import {
-  defaultGuestProgress,
-  readGuestProgress,
-  subscribeGuestProgress,
-} from '@/features/progress/local-progress'
+import { launchLessonHref } from '@/features/lessons/launch-lesson-routes'
+import { useOwnerProgress } from '@/features/progress/use-owner-progress'
 
 /**
  * UX-601 home = frozen V2 学习中心 (docs/design/kidscoding-v2/prototype.html
@@ -55,7 +52,9 @@ function todayIndex() {
 export function HomeLearningCenter() {
   const curriculum = useLaunchCurriculum()
   const { allLessons } = buildLaunchMap(curriculum.lessons)
-  const progress = useSyncExternalStore(subscribeGuestProgress, readGuestProgress, () => defaultGuestProgress)
+  // Progress is read for the resolved owner only: an unresolved identity
+  // shows the not-started state instead of the browser-wide legacy record.
+  const { progress } = useOwnerProgress()
   const hello = useSyncExternalStore(() => () => {}, greeting, () => '你好')
   const today = useSyncExternalStore(() => () => {}, todayIndex, () => -1)
 
@@ -107,7 +106,7 @@ export function HomeLearningCenter() {
             </div>
             <div className="kc-v2h-hero-buttons">
               {started && nextLesson ? (
-                <Link className="kc-v2h-btn" data-testid="home-continue" href={`/learn/lesson/${nextLesson.id}`}>继续学习 ↗</Link>
+                <Link className="kc-v2h-btn" data-testid="home-continue" href={launchLessonHref(nextLesson.id)}>继续学习 ↗</Link>
               ) : (
                 <Link className="kc-v2h-btn" data-testid="home-start" href="/onboarding/age">开始学第一节</Link>
               )}

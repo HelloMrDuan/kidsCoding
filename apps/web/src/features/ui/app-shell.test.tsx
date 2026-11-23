@@ -74,12 +74,18 @@ describe('AppShell (frozen V2 global shell)', () => {
     expect(mockResolveClassroomHref).not.toHaveBeenCalled()
   })
 
-  it('does not hard-code the demo studio lesson in the lesson nav', async () => {
+  it('points 编程课堂 at the one official V3 entry when lesson-01 is the recorded lesson', async () => {
     mockPath = '/'
+    mockResolveClassroomHref.mockResolvedValueOnce('/studio/blockly/lesson-01-forest-hello')
     render(<AppShell><div /></AppShell>)
     const nav = screen.getByTestId('kc-nav-lesson')
-    expect(nav).not.toHaveAttribute('href', '/studio/blockly/lesson-01-forest-hello')
-    await waitFor(() => expect(nav).toHaveAttribute('href', '/learn/catalog'))
+    // Before the owner resolves the nav stays on the picker; then it must take
+    // the resolver's lesson-01 answer (the V3 workspace), not the old URL.
+    expect(nav).toHaveAttribute('href', '/learn/catalog')
+    await waitFor(() => {
+      expect(nav).toHaveAttribute('href', '/studio/blockly/lesson-01-forest-hello')
+    })
+    expect(nav).not.toHaveAttribute('href', '/learn/lesson/lesson-01-forest-hello')
   })
 
   it('renders sidebar navigation with the current section active and in the breadcrumb', () => {

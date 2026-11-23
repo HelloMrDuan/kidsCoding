@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { COURSE_PICKER_HREF, readLearningRecord, resolveClassroomHref } from './classroom-entry'
+import {
+  COURSE_PICKER_HREF,
+  readLearningRecord,
+  resolveClassroomHref,
+  resolveLessonHref,
+} from './classroom-entry'
 import { getLessonMaturity } from '@/features/curriculum/lesson-maturity'
 import { GUEST_PROGRESS_OWNER_STORAGE_KEY, GUEST_PROGRESS_STORAGE_KEY } from '@/features/progress/local-progress'
 import { LESSON_DRAFT_OWNER_STORAGE_KEY } from './scoped-draft-key'
@@ -37,6 +42,18 @@ describe('classroom entry for 编程课堂', () => {
     await expect(resolveClassroomHref('guest')).resolves.toBe('/learn/lesson/lesson-02-forest-greeting')
   })
 
+  it('gives lesson-01 exactly one official entry and leaves lesson-02…12 on the old URL', async () => {
+    await expect(resolveLessonHref('lesson-01-forest-hello')).resolves.toBe(
+      '/studio/blockly/lesson-01-forest-hello',
+    )
+    await expect(resolveLessonHref('lesson-02-forest-greeting')).resolves.toBe(
+      '/learn/lesson/lesson-02-forest-greeting',
+    )
+    await expect(resolveLessonHref('lesson-12-graduation-show')).resolves.toBe(
+      '/learn/lesson/lesson-12-graduation-show',
+    )
+  })
+
   it('opens the same route the catalog card uses for a catalog lesson', async () => {
     window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('G1-U1-L01'))
     const catalogRoute = getLessonMaturity('G1-U1-L01')?.trialRoute
@@ -66,7 +83,7 @@ describe('classroom entry for 编程课堂', () => {
     }))
     window.localStorage.setItem('kidscoding-draft:lesson-01-forest-hello', draft('lesson-01-forest-hello', '2026-11-22T08:00:00.000Z'))
     expect(readLearningRecord('guest')).toEqual({ lessonId: 'lesson-01-forest-hello' })
-    await expect(resolveClassroomHref('guest')).resolves.toBe('/learn/lesson/lesson-01-forest-hello')
+    await expect(resolveClassroomHref('guest')).resolves.toBe('/studio/blockly/lesson-01-forest-hello')
   })
 
   it('fails closed to the course picker for an unknown lesson id', async () => {

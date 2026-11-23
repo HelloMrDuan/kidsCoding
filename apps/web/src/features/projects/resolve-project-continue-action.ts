@@ -1,5 +1,7 @@
 import type { LaunchLessonDefinition } from '@/features/domain/types'
 
+import { launchLessonHref } from '@/features/lessons/launch-lesson-routes'
+
 type ProjectContinueAction = {
   href: string
   label: string
@@ -39,7 +41,7 @@ export function resolveProjectContinueAction(
   }
 
   return {
-    href: `/learn/lesson/${nextLesson.id}`,
+    href: launchLessonHref(nextLesson.id),
     label: currentLesson.sortOrder % 3 === 0 ? '进入下一单元' : '继续下一课',
   }
 }

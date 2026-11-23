@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 
 import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { RemedialPractice } from '@/features/lessons/remedial-practice'
+import { launchLessonHref } from '@/features/lessons/launch-lesson-routes'
 
 export default function RemedialLessonPage() {
   const params = useParams<{ remedialId: string }>()
@@ -48,7 +49,7 @@ export default function RemedialLessonPage() {
         <div className="flex flex-col gap-4 sm:flex-row">
           <Link
             className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-4 text-lg font-bold text-white"
-            href={`/learn/lesson/${returnLessonId}`}
+            href={launchLessonHref(returnLessonId)}
           >
             回到刚才的课程
           </Link>
