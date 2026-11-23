@@ -16,7 +16,11 @@ import { LessonDraftOwnerContext } from './lesson-draft-boundary'
  * write fails closed instead of touching another owner's data.
  *
  * Identity is re-checked on focus/pageshow/visibility/storage so an account
- * switch in another tab cannot keep writing under the previous owner.
+ * switch in another tab cannot keep writing under the previous owner. Every
+ * re-check fails closed first: the previous owner is dropped immediately, and
+ * the new owner is only adopted once the API confirms it. Without that window,
+ * an A → B switch would keep showing A's progress (and A's "continue" entry)
+ * until the request finishes.
  */
 export function useResolvedDraftOwner(): string | null {
   const contextOwner = useContext(LessonDraftOwnerContext)
@@ -28,6 +32,10 @@ export function useResolvedDraftOwner(): string | null {
     let request = 0
     const sync = async () => {
       const token = ++request
+      // PR #573 review: revalidation is fail-closed from the start. Until this
+      // request answers, no owner is confirmed, so home/map read the empty
+      // default instead of the previous account's envelope.
+      if (active) setFetchedOwner(null)
       let owner: string | null = null
       try {
         const response = await fetch('/api/lesson-draft-owner', { cache: 'no-store' })

@@ -164,3 +164,76 @@ test('home and learning map keep guest A → B → A progress isolated', async (
     '/learn/lesson/lesson-02-forest-greeting',
   )
 })
+
+test('same-page A → B re-check is fail-closed while the owner API is delayed', async ({ page }) => {
+  // A's record would be readable if the hook kept using A's owner while the
+  // re-check is in flight; the delayed API makes that window observable.
+  await seedProgress(page, {
+    currentLessonId: 'lesson-02-forest-greeting',
+    completedLessonIds: ['lesson-01-forest-hello'],
+    completedProjectIds: [],
+    projectSnapshots: [],
+  })
+
+  const identity = { owner: 'guest:family-a' }
+  const control: {
+    gate: Promise<void> | null
+    release: (() => void) | null
+    started: (() => void) | null
+  } = { gate: null, release: null, started: null }
+
+  await page.route('**/api/lesson-draft-owner', async (route) => {
+    const started = control.started
+    control.started = null
+    started?.()
+    if (control.gate) await control.gate
+    await route.fulfill({ json: { owner: identity.owner } })
+  })
+
+  const switchTo = async (owner: string) => {
+    identity.owner = owner
+    control.gate = new Promise<void>((resolve) => {
+      control.release = resolve
+    })
+    const started = new Promise<void>((resolve) => {
+      control.started = resolve
+    })
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await started
+    return () => {
+      control.gate = null
+      control.release?.()
+      control.release = null
+    }
+  }
+
+  await page.goto('/')
+  await expect(page.getByTestId('home-continue')).toHaveAttribute(
+    'href',
+    '/learn/lesson/lesson-02-forest-greeting',
+  )
+
+  // A → B: while the identity API is held open, nothing of A may be shown.
+  const releaseB = await switchTo('guest:family-b')
+  await expect(page.getByTestId('home-continue')).toHaveCount(0)
+  await expect(page.getByTestId('home-start')).toBeVisible()
+  await expect(page.getByTestId('home-next-lesson')).toContainText('小狐狸出场')
+  releaseB()
+  await expect(page.getByTestId('home-start')).toBeVisible()
+  await expect(page.getByTestId('home-continue')).toHaveCount(0)
+  // B's read must not destroy A's saved envelope.
+  expect(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('kc-progress') ?? '{}').currentLessonId,
+    ),
+  ).toBe('lesson-02-forest-greeting')
+
+  // B → A: still fail-closed while delayed, then A's own entry returns.
+  const releaseA = await switchTo('guest:family-a')
+  await expect(page.getByTestId('home-continue')).toHaveCount(0)
+  releaseA()
+  await expect(page.getByTestId('home-continue')).toHaveAttribute(
+    'href',
+    '/learn/lesson/lesson-02-forest-greeting',
+  )
+})
