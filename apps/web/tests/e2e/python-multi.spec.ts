@@ -322,3 +322,91 @@ for (const vp of L01_VIEWPORTS) {
     expect(overflow).toBe(0)
   })
 }
+
+// P3-U1-L04: JSON filename batch cleaning. Three tests per viewport,
+// mirroring the P3-U1-L01 OPS-031 shape (titles carry a [viewport] tag so a
+// future dedicated job can shard with --grep "P3-U1-L04.*\\[<viewport>\\]").
+// The solution string is the verified reference implementation: it must pass
+// all six graded cases exactly (see python-multi-grade.ts).
+const L04_VIEWPORTS = [
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'tablet', width: 768, height: 1024 },
+  { name: 'phone', width: 375, height: 812 },
+] as const
+
+const L04_SOLUTION = [
+  'import json',
+  'import re',
+  '',
+  'def clean_filenames(json_text, sep):',
+  '    if not sep:',
+  '        raise ValueError("分隔符为空")',
+  '    try:',
+  '        names = json.loads(json_text)',
+  '    except Exception:',
+  '        raise ValueError("JSON 解析失败")',
+  '    if not isinstance(names, list):',
+  '        raise ValueError("输入不是列表")',
+  '    cleaned = []',
+  '    for name in names:',
+  '        if not isinstance(name, str):',
+  '            raise ValueError("文件名不是字符串")',
+  "        s = name.strip().replace(' ', sep)",
+  "        s = re.sub(r'[/\\\\:*?\"<>|]', '', s)",
+  '        if not s:',
+  '            raise ValueError("清理后为空")',
+  '        cleaned.append(s)',
+  '    return json.dumps(cleaned, ensure_ascii=False)',
+].join('\n')
+
+for (const vp of L04_VIEWPORTS) {
+  test(`P3-U1-L04 [${vp.name}] clean_filenames runs six real JSON cases and restores the draft after reload`, async ({page})=>{
+    test.setTimeout(180_000)
+    await page.setViewportSize({width:vp.width,height:vp.height})
+    await page.goto('/learn/python-lab/P3-U1-L04')
+    await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+    await page.getByTestId('python-multi-run').click()
+    await expect(page.getByTestId('python-multi-count')).toHaveText('0/6',{timeout:70_000})
+    await page.getByTestId('python-multi-source').fill(L04_SOLUTION)
+    await page.getByTestId('python-multi-run').click()
+    await expect(page.getByTestId('python-multi-passed')).toBeVisible({timeout:70_000})
+    await expect(page.getByTestId('python-multi-count')).toHaveText('6/6')
+    await expect(page.getByTestId('python-case-0')).toContainText('我的_日记.txt')
+    await expect(page.getByTestId('python-case-4')).toContainText('ERROR:ValueError')
+    await expect(page.getByTestId('python-local-save')).toContainText('已在本机保存')
+    await page.reload()
+    await expect(page.getByTestId('python-multi-source')).toHaveValue(/clean_filenames/)
+  })
+
+  test(`P3-U1-L04 [${vp.name}] second practice runs new filenames and reports bad JSON as a real error`, async ({page})=>{
+    test.setTimeout(180_000)
+    await page.setViewportSize({width:vp.width,height:vp.height})
+    await page.goto('/learn/python-lab/P3-U1-L04')
+    await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+    await page.getByTestId('python-multi-source').fill(L04_SOLUTION)
+    await page.getByTestId('python-custom-arg-0').fill('["新 文件.txt", "旧:报告.md"]')
+    await page.getByTestId('python-custom-arg-1').fill('_')
+    await page.getByTestId('python-custom-run').click()
+    await expect(page.getByTestId('python-custom-result')).toContainText('新_文件.txt', {timeout:70_000})
+    await expect(page.getByTestId('python-custom-result')).toContainText('旧报告.md')
+    await expect(page.getByTestId('python-custom-done')).toBeVisible()
+    await page.getByTestId('python-custom-arg-0').fill('不是 JSON')
+    await page.getByTestId('python-custom-run').click()
+    await expect(page.getByTestId('python-custom-result')).toContainText('ERROR:ValueError', {timeout:70_000})
+    await page.reload()
+    await expect(page.getByTestId('python-custom-done')).toBeVisible()
+  })
+
+  test(`P3-U1-L04 [${vp.name}] viewport fits without horizontal overflow and keeps editor, run, output and feedback operable`, async ({page})=>{
+    test.setTimeout(120_000)
+    await page.setViewportSize({width:vp.width,height:vp.height})
+    await page.goto('/learn/python-lab/P3-U1-L04')
+    await expect(page.getByTestId('python-multi-run')).toBeEnabled({timeout:15_000})
+    await expect(page.getByTestId('python-multi-run')).toBeVisible()
+    await expect(page.getByTestId('python-multi-source')).toBeVisible()
+    await expect(page.getByTestId('python-custom-arg-0')).toBeVisible()
+    await expect(page.getByTestId('python-custom-run')).toBeVisible()
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    expect(overflow).toBe(0)
+  })
+}
