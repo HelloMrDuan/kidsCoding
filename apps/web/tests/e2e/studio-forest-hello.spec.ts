@@ -19,7 +19,14 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
  * 用临时 Playwright config（独立端口）运行；playwright.config.ts 不动。
  */
 const ROUTE = '/studio/blockly/lesson-01-forest-hello'
-const KEY = 'kidscoding-draft:lesson-01-forest-hello'
+// The V3 studio route resolves the draft owner on the server
+// (`LessonDraftBoundary`), so LessonWorkspace reads and writes the
+// owner-scoped envelope. This spec's contexts carry no `kc_guest_id`
+// cookie, so the resolved owner is the bare browser guest and the scoped
+// key is `kids-lesson-owner-v1:guest:kidscoding-draft:…`. The unscoped
+// legacy key is intentionally not read by scoped readers
+// (`scopedLessonDraftKey`), matching the isolation contract.
+const KEY = 'kids-lesson-owner-v1:guest:kidscoding-draft:lesson-01-forest-hello'
 const EVIDENCE = path.resolve(__dirname, '../../test-results/forest-hello-evidence')
 fs.mkdirSync(EVIDENCE, { recursive: true })
 
