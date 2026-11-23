@@ -1,5 +1,5 @@
 import {expect,test,type Page} from '@playwright/test'
-import {expectProgramFromTop,expectStageWalk,showLessonPane,clickLessonControl} from './lesson-pane-helpers'
+import {expectProgramFromTop,expectStageWalk,showLessonPane,clickLessonControl,seedForestV3Draft} from './lesson-pane-helpers'
 
 /**
  * TQ-011 (= TQ-002e): each Blockly lesson 01–09 has one second practice whose goal differs
@@ -155,6 +155,19 @@ for(const viewport of VIEWPORTS){
       test.setTimeout(180_000)
       for(const item of LOADED_PROGRAMS){
         await page.goto('/learn/catalog')
+        if(item.lessonId==='lesson-01-forest-hello'){
+          // lesson-01 has one official workspace: the V3 studio. Its draft is
+          // owner-scoped localStorage, and 第 4 关 keeps its own program.
+          await seedForestV3Draft(page,item.stepIndex,{'step-4':item.blocks.map((type)=>({type}))})
+          // The old bookmarked URL must land on that same V3 workspace.
+          await page.goto('/learn/lesson/lesson-01-forest-hello')
+          await expect(page).toHaveURL(/\/studio\/blockly\/lesson-01-forest-hello$/)
+          await expect(page.getByTestId('forest-hello-slot')).toBeVisible()
+          await expect(page.getByTestId('forest-hello-step-progress')).toContainText(`第 ${item.stepIndex+1} / 4 关`)
+          await expectProgramFromTop(page)
+          await showLessonPane(page,'task')
+          continue
+        }
         await page.evaluate(({lessonId,stepIndex,blocks})=>{
           sessionStorage.clear()
           sessionStorage.setItem(`kc-lesson-draft:${lessonId}:${stepIndex}`,JSON.stringify({schemaVersion:1,lessonId,stepIndex,blocks:blocks.map((type)=>({type})),updatedAt:new Date().toISOString()}))

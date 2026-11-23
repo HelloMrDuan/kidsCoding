@@ -105,8 +105,15 @@ for (const [name, width, height] of [
         seenHrefs.add((await card.getAttribute('href')) ?? '')
       }
     }
+    // P0-1: lesson-01's only official workspace is the V3 studio, so its map
+    // card is the one node that no longer uses the old /learn/lesson URL;
+    // lessons 02–12 keep it. Every lesson still appears exactly once.
     expect([...seenHrefs].sort()).toEqual(
-      ALL_LESSONS.map((id) => `/learn/lesson/${id}`).sort(),
+      ALL_LESSONS.map((id) =>
+        id === 'lesson-01-forest-hello'
+          ? '/studio/blockly/lesson-01-forest-hello'
+          : `/learn/lesson/${id}`,
+      ).sort(),
     )
 
     // Bottom action follows the selected unit's next lesson.

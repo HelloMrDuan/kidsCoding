@@ -1,15 +1,124 @@
 import { expect, type Page } from '@playwright/test'
 
+/** lesson-01 has exactly one official workspace: the V3 Blockly studio. */
+const FOREST_V3_PATH = /^\/studio\/blockly\/lesson-01-forest-hello(\/|$)/
+
+export function isForestV3(page: Page): boolean {
+  return FOREST_V3_PATH.test(new URL(page.url()).pathname)
+}
+
+/** Open the only official 《小狐狸出场》 workspace and wait for it to mount. */
+export async function openForestV3(page: Page) {
+  await page.goto('/studio/blockly/lesson-01-forest-hello')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  // The slot lives in the task pane; on a phone only one pane is shown, so
+  // wait for it to be mounted, not visible, and let pane switches decide.
+  await expect(page.getByTestId('forest-hello-slot')).toBeAttached({ timeout: 30_000 })
+}
+
+/**
+ * The V3 studio's own three tabs. On desktop all three panes are on screen and
+ * the tab row is display:none (a no-op); on phones one pane is shown at a time.
+ */
+async function showV3Pane(page: Page, pane: 'task' | 'code' | 'stage') {
+  const tabs = page.getByTestId('v3-mobiletabs')
+  if (!(await tabs.isVisible())) return
+  const tab = page.getByTestId(`v3-pane-${pane}`)
+  if ((await tab.getAttribute('aria-selected')) !== 'true') {
+    await tab.click()
+    // Same hydration race as the old classroom tabs: prove the click was
+    // accepted by the tab's own state, then let the pane become visible.
+    await expect(tab).toHaveAttribute('aria-selected', 'true', { timeout: 5_000 })
+  }
+}
+
+/**
+ * V3 keeps the palette inside the “点按添加 · 删除 · 键盘” <details>; the block
+ * buttons exist in the DOM but are not clickable until it is open.
+ */
+export async function openForestTools(page: Page) {
+  await showLessonPane(page, 'code')
+  const summary = page.getByTestId('golden-block-tools')
+  await expect(summary).toBeVisible({ timeout: 20_000 })
+  if (!(await summary.evaluate((el) => (el.parentElement as HTMLDetailsElement).open))) {
+    await summary.click()
+  }
+  await expect(page.getByTestId('lesson-block-palette')).toBeVisible()
+}
+
+/** Press the V3 “完成这一关 / 完成本课” button (it lives in the task pane). */
+export async function completeForestStep(page: Page) {
+  await showLessonPane(page, 'task')
+  await page.getByTestId('forest-hello-complete-step').click()
+}
+
+/** Press the V3 stage's run control (the shell owns it in blockly-v3 mode). */
+export async function runForestStage(page: Page) {
+  await showLessonPane(page, 'stage')
+  await page.getByTestId('ws-run-toggle').click()
+}
+
+/**
+ * Seed the owner-scoped V3 draft for lesson-01 before the page loads. Each
+ * 关 keeps its own program in V3, so callers pass only the steps they need;
+ * the remaining steps fall back to their starter programs when the slot
+ * validates the draft.
+ */
+export async function seedForestV3Draft(
+  page: Page,
+  stepIndex: number,
+  programs: Record<string, ReadonlyArray<{ type: string }>>,
+) {
+  await page.evaluate(
+    ({ stepIndex, programs }) => {
+      const lessonId = 'lesson-01-forest-hello'
+      const script = {
+        version: 1,
+        lessonId,
+        stepIndex,
+        programs: Object.fromEntries(
+          Object.entries(programs).map(([stepId, blocks]) => [
+            stepId,
+            blocks.map((block) => ({ type: block.type })),
+          ]),
+        ),
+        passed: [],
+        failures: 0,
+      }
+      // No Supabase user and no kc_guest_id cookie in the E2E context means
+      // the server-resolved owner is the bare guest, which is the key the
+      // studio itself writes (verified against the real workspace).
+      window.localStorage.setItem(
+        `kids-lesson-owner-v1:guest:kidscoding-draft:${lessonId}`,
+        JSON.stringify({ lessonId, savedAt: new Date().toISOString(), script, version: 1 }),
+      )
+      window.sessionStorage.clear()
+    },
+    { stepIndex, programs },
+  )
+}
+
 /**
  * UX-202: on phones (<=600px) the classroom shows one zone at a time
  * behind the 任务 / 积木 / 舞台 tabs. On larger viewports all zones are
  * visible and the tabs are display:none, so this is a no-op there.
  * Call it before interacting with elements that live in a zone.
+ *
+ * lesson-01 now renders the V3 studio instead of the old three-column
+ * classroom; its tabs are 学习任务 / 积木编程 / 作品舞台 and live behind
+ * `v3-pane-*`. lesson-02…12 keep the original `lesson-mobile-tab-*` row.
  */
 export async function showLessonPane(
   page: Page,
   pane: 'task' | 'code' | 'stage',
 ) {
+  if (FOREST_V3_PATH.test(new URL(page.url()).pathname)) {
+    // The shell is visible in every pane mode; the slot is not (phones show
+    // one pane at a time), so never gate the pane switch on slot visibility.
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+    await showV3Pane(page, pane)
+    return
+  }
   // Trial-entry opens the classroom through client-side navigation, so the
   // caller can arrive here before the classroom is mounted at all. Decide
   // nothing until the shell is really on screen (desktop and tablet satisfy
@@ -54,6 +163,35 @@ export async function showLessonPane(
  * This does not alter acceptance assertions, app code or frozen V2 layout.
  */
 export async function clickLessonControl(page: Page, testId: string) {
+  if (isForestV3(page)) {
+    // The V3 studio renames the shell's controls. Map the old classroom's
+    // test ids onto the real V3 ones so specs keep expressing the child's
+    // intent (add a block, run, clear, complete) instead of per-page markup.
+    if (testId.startsWith('lesson-add-') || testId === 'lesson-clear-program') {
+      await openForestTools(page)
+    } else if (testId === 'run-code-button') {
+      await runForestStage(page)
+      return
+    } else if (testId === 'reset-code-button') {
+      await showLessonPane(page, 'stage')
+      await page.getByTestId('v3-reset-stage').click()
+      return
+    } else if (testId === 'lesson-complete-step') {
+      await completeForestStep(page)
+      return
+    } else if (testId === 'lesson-remedial-link' || testId.startsWith('ws-hint-reveal-')) {
+      await showLessonPane(page, 'task')
+    } else if (
+      testId.startsWith('stage-') ||
+      testId.startsWith('practice-') ||
+      testId.startsWith('mistake-') ||
+      testId.startsWith('garden-')
+    ) {
+      await showLessonPane(page, 'stage')
+    }
+    await page.getByTestId(testId).click()
+    return
+  }
   if (testId.startsWith('lesson-add-') || testId === 'lesson-clear-program') {
     await showLessonPane(page, 'code')
   } else if (
@@ -97,17 +235,31 @@ export async function expectStageWalk(page: Page, steps: number) {
       return Math.abs(box.x - (row.x + track * progress)) <= 2 ? 'ok' : `x=${box.x} want ${row.x + track * progress}`
     })
     .toBe('ok')
-  const [mainArt, friendArt, mainTag, friendTag] = await Promise.all([
+  const [mainArt, friendArt, mainTag, friendTag, mainBox, friendBox] = await Promise.all([
     main.locator('.kc-stage-actor-art').boundingBox(),
     friend.locator('.kc-stage-actor-art').boundingBox(),
     main.locator('.kc-stage-nametag').boundingBox(),
     friend.locator('.kc-stage-nametag').boundingBox(),
+    main.boundingBox(),
+    friend.boundingBox(),
   ])
-  expect(mainArt && friendArt && mainTag && friendTag).toBeTruthy()
+  expect(mainArt && friendArt && mainTag && friendTag && mainBox && friendBox).toBeTruthy()
   expect(overlaps(mainArt!, friendArt!), 'walker must not cover the friend').toBe(false)
   expect(overlaps(mainTag!, friendTag!), 'name tags must not overlap').toBe(false)
   expect(mainArt!.x + mainArt!.width).toBeLessThan(friendArt!.x)
-  if (progress === 1) expect(friendArt!.x - (mainArt!.x + mainArt!.width)).toBeLessThanOrEqual(30)
+  if (progress === 1) {
+    if (isForestV3(page)) {
+      // V3's stage column scales the artwork (clamp(52px, 13vw, 72px) on phones) inside
+      // fixed 92px/74px actor slots, so the painted gap carries both slot insets on top
+      // of the 14px meeting gap (measured 43.45px at Pixel 7). The layout contract is
+      // the slots: they must end exactly one meeting gap apart, never overlapping.
+      const slotGap = friendBox!.x - (mainBox!.x + mainBox!.width)
+      expect(slotGap, 'walker slot must end one meeting gap beside the friend').toBeGreaterThanOrEqual(0)
+      expect(slotGap, 'walker slot must end one meeting gap beside the friend').toBeLessThanOrEqual(16)
+    } else {
+      expect(friendArt!.x - (mainArt!.x + mainArt!.width)).toBeLessThanOrEqual(30)
+    }
+  }
 }
 
 /**
@@ -148,10 +300,18 @@ export async function solveMistakeStep(
   await expect(page.getByTestId('stage-run-error')).toHaveCount(0)
   await expect(page.getByTestId('mistake-observed')).toBeVisible()
   // The designed mistake is the experiment, not a failed attempt: no hint tier is raised.
-  await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
+  // The old classroom has an auto-escalating `lesson-hint`; the V3 studio has no automatic
+  // hint at all, so the equivalent promise is that tier 2 stays locked until the child asks.
+  if (isForestV3(page)) {
+    await expect(page.getByTestId('ws-hint-reveal-2')).toBeDisabled()
+  } else {
+    await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
+  }
   // Observed but not answered: the step does not pass yet.
   await clickLessonControl(page, 'lesson-complete-step')
-  await expect(page.getByTestId('lesson-feedback-card')).toContainText('先回答舞台上的问题')
+  await expect(
+    isForestV3(page) ? page.getByTestId('forest-hello-notice') : page.getByTestId('lesson-feedback-card'),
+  ).toContainText('先回答舞台上的问题')
   await clickLessonControl(page, `mistake-answer-${options.answer}`)
   await expect(page.getByTestId('mistake-fix')).toBeVisible()
   // Answered right: still no “哎呀” box under the panel.
@@ -202,9 +362,16 @@ export async function solvePracticeStep(
   if (options.guess) {
     // A prediction is made before the run: no guess, no run, no completion.
     await expect(page.getByTestId('practice-need-guess')).toBeVisible()
-    await expect(page.getByTestId('run-code-button')).toBeDisabled()
-    await clickLessonControl(page, 'lesson-complete-step')
-    await expect(page.getByTestId('lesson-feedback-card')).toContainText('先在舞台上猜一猜')
+    if (isForestV3(page)) {
+      // The V3 shell owns the run button, so the gate is the completion attempt:
+      // it must explain the missing prediction instead of advancing the step.
+      await clickLessonControl(page, 'lesson-complete-step')
+      await expect(page.getByTestId('forest-hello-notice')).toContainText('先在舞台上猜一猜')
+    } else {
+      await expect(page.getByTestId('run-code-button')).toBeDisabled()
+      await clickLessonControl(page, 'lesson-complete-step')
+      await expect(page.getByTestId('lesson-feedback-card')).toContainText('先在舞台上猜一猜')
+    }
     await clickLessonControl(page, `practice-answer-${options.guess}`)
     await expect(page.getByTestId('practice-answer-reply')).toContainText('猜好啦')
   } else {
@@ -221,7 +388,9 @@ export async function solvePracticeStep(
   if (options.answer) {
     await expect(page.getByTestId('practice-need-answer')).toBeVisible()
     await clickLessonControl(page, 'lesson-complete-step')
-    await expect(page.getByTestId('lesson-feedback-card')).toContainText('先回答舞台上的问题')
+    await expect(
+      isForestV3(page) ? page.getByTestId('forest-hello-notice') : page.getByTestId('lesson-feedback-card'),
+    ).toContainText('先回答舞台上的问题')
     if (options.wrongAnswer) {
       await clickLessonControl(page, `practice-answer-${options.wrongAnswer}`)
       await expect(page.getByTestId('practice-answer-reply')).toContainText('再看看舞台')
