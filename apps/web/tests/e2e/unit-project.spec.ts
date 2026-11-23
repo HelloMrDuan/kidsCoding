@@ -204,7 +204,8 @@ test('storage full: saving says honestly that the project is not saved', async (
   await page.evaluate(() => {
     const original = Storage.prototype.setItem
     Storage.prototype.setItem = function (key, value) {
-      if (key === 'kc-progress') throw new DOMException('Storage full', 'QuotaExceededError')
+      // Block every progress envelope (legacy + owner-scoped), like a real quota failure.
+      if (key.endsWith('kc-progress')) throw new DOMException('Storage full', 'QuotaExceededError')
       return original.call(this, key, value)
     }
   })

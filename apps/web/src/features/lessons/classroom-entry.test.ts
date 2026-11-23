@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { COURSE_PICKER_HREF, readLearningRecord, resolveClassroomHref } from './classroom-entry'
 import { getLessonMaturity } from '@/features/curriculum/lesson-maturity'
 import { GUEST_PROGRESS_OWNER_STORAGE_KEY, GUEST_PROGRESS_STORAGE_KEY } from '@/features/progress/local-progress'
+import { LESSON_DRAFT_OWNER_STORAGE_KEY } from './scoped-draft-key'
 
 const scoped = (owner: string, legacyKey: string) =>
   `kids-lesson-owner-v1:${encodeURIComponent(owner)}:${legacyKey}`
@@ -173,5 +174,73 @@ describe('编程课堂 guest progress isolation (kc-progress claim)', () => {
     window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('G1-U1-L01'))
     expect(readLearningRecord('user:a')).toBeNull()
     expect(window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)).toBeNull()
+  })
+})
+
+describe('编程课堂 legacy ownerless draft isolation (PR #573 review P1-1)', () => {
+  it('claims an ownerless legacy draft for the first guest and keeps the old key', () => {
+    window.localStorage.setItem(
+      'kidscoding-draft:G1-U1-L03',
+      draft('G1-U1-L03', '2026-11-20T10:00:00.000Z'),
+    )
+    // Existing guest work from before owner scoping stays usable.
+    expect(readLearningRecord('guest:family-a')).toEqual({ lessonId: 'G1-U1-L03' })
+    expect(window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)).toBe('guest:family-a')
+    // The claim must not destroy the historical draft.
+    expect(window.localStorage.getItem('kidscoding-draft:G1-U1-L03')).not.toBeNull()
+  })
+
+  it('never exposes guest:A\'s ownerless draft to guest:B in the same browser', async () => {
+    window.localStorage.setItem(
+      'kidscoding-draft:G1-U1-L03',
+      draft('G1-U1-L03', '2026-11-20T10:00:00.000Z'),
+    )
+    expect(readLearningRecord('guest:family-a')?.lessonId).toBe('G1-U1-L03')
+
+    // B has no scoped draft of its own: A's old draft is not B's record.
+    expect(readLearningRecord('guest:family-b')).toBeNull()
+    await expect(resolveClassroomHref('guest:family-b')).resolves.toBe(COURSE_PICKER_HREF)
+    // Fail closed, never delete: A still sees the draft afterwards.
+    expect(window.localStorage.getItem('kidscoding-draft:G1-U1-L03')).not.toBeNull()
+    expect(readLearningRecord('guest:family-a')?.lessonId).toBe('G1-U1-L03')
+  })
+
+  it('adopts a bare-guest claim once the id cookie is minted', () => {
+    window.localStorage.setItem(
+      'kidscoding-draft:G1-U1-L03',
+      draft('G1-U1-L03', '2026-11-20T10:00:00.000Z'),
+    )
+    expect(readLearningRecord('guest')?.lessonId).toBe('G1-U1-L03')
+    expect(window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)).toBe('guest')
+
+    expect(readLearningRecord('guest:family-a')?.lessonId).toBe('G1-U1-L03')
+    expect(window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)).toBe('guest:family-a')
+    // Once adopted by the concrete id, the bare guest no longer sees it.
+    expect(readLearningRecord('guest')).toBeNull()
+  })
+
+  it('never gives an ownerless legacy draft to a signed-in account', () => {
+    window.localStorage.setItem(
+      'kidscoding-draft:G1-U1-L03',
+      draft('G1-U1-L03', '2026-11-20T10:00:00.000Z'),
+    )
+    expect(readLearningRecord('user:a')).toBeNull()
+    expect(window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)).toBeNull()
+  })
+
+  it('finds guest:B\'s own scoped progress after A claimed the browser envelope', () => {
+    // A claims the legacy browser envelope.
+    window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('lesson-02-forest-greeting'))
+    expect(readLearningRecord('guest:family-a')?.lessonId).toBe('lesson-02-forest-greeting')
+
+    // B's completion is written to B's own scoped envelope (P1-2); the nav
+    // must still find it even though B never claimed kc-progress.
+    window.localStorage.setItem(
+      `kids-progress-owner-v1:${encodeURIComponent('guest:family-b')}:kc-progress`,
+      progress('G1-U1-L05'),
+    )
+    expect(readLearningRecord('guest:family-b')).toEqual({ lessonId: 'G1-U1-L05' })
+    // A's record is unchanged.
+    expect(readLearningRecord('guest:family-a')?.lessonId).toBe('lesson-02-forest-greeting')
   })
 })

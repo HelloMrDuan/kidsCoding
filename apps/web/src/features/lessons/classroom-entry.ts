@@ -1,9 +1,8 @@
 import {
-  GUEST_PROGRESS_OWNER_STORAGE_KEY,
-  GUEST_PROGRESS_STORAGE_KEY,
+  readGuestProgress,
 } from '@/features/progress/local-progress'
 
-import { scopedLessonDraftKey } from './scoped-draft-key'
+import { LESSON_DRAFT_OWNER_STORAGE_KEY, scopedLessonDraftKey } from './scoped-draft-key'
 
 /**
  * Where the main-nav 「编程课堂」 entry points.
@@ -59,14 +58,47 @@ function hasProgressActivity(value: unknown): value is { currentLessonId: string
   })
 }
 
-function lessonIdFromDraftKey(key: string, owner: string): string | null {
+/**
+ * Legacy unscoped drafts (`kidscoding-draft:<lessonId>`) predate owner
+ * isolation. They stay readable for compatibility, but only for their
+ * claimant — the same claim policy as `kc-progress`:
+ * - unstamped drafts are claimed by the first confirmed guest that reads them;
+ * - a bare `guest` claim (pre-cookie) is adopted by the concrete `guest:<id>`;
+ * - a concrete claim belongs to that guest only;
+ * - a signed-in account never inherits browser-guest drafts.
+ */
+function legacyDraftClaimable(owner: string, stamped: string | null): boolean {
+  if (!isGuestOwner(owner)) return false
+  if (!stamped) return true
+  if (stamped === owner) return true
+  return stamped === 'guest' && owner.startsWith('guest:')
+}
+
+function readLegacyDraftClaim(): string | null {
+  try {
+    return window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)
+  } catch {
+    return null
+  }
+}
+
+function claimLegacyDrafts(owner: string) {
+  try {
+    const stamped = window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)
+    if (!stamped || stamped === 'guest' || stamped === owner) {
+      window.localStorage.setItem(LESSON_DRAFT_OWNER_STORAGE_KEY, owner)
+    }
+  } catch {
+    // Storage unavailable: the read stays a read-only best effort.
+  }
+}
+
+function lessonIdFromDraftKey(key: string, owner: string, legacyReadable: boolean): string | null {
   if (key.startsWith('kids-lesson-owner-v1:')) {
     // Another account's (or another guest's) drafts are never this child's
     // record, even when they live in the same browser localStorage.
     if (!key.startsWith(scopedLessonDraftKey(owner, ''))) return null
-  } else if (!isGuestOwner(owner)) {
-    // Legacy unscoped drafts predate owner isolation. They can only belong
-    // to the browser guest; a signed-in account must not inherit them.
+  } else if (!legacyReadable) {
     return null
   }
   const markerIndex = key.lastIndexOf(DRAFT_MARKER)
@@ -92,88 +124,50 @@ function savedAtOf(raw: string | null): number {
 }
 
 /**
- * `kc-progress` is one browser-global envelope, so it carries a claimant
- * stamp (`kc-progress-owner-v1`) when a confirmed guest reads it.
- *
- * Policy (PR #573 review):
- * - legacy/unstamped progress is claimed by the first confirmed guest that
- *   reads it; existing guest data therefore stays available;
- * - a stamp of the bare `guest` (written before the id cookie is minted on
- *   first sync) is adopted and rewritten by the concrete `guest:<id>`;
- * - a concrete `guest:<id>` stamp is readable only by that same id, so
- *   guest:A → guest:B in one browser reads nothing of A's;
- * - the bare `guest` never reads a concrete guest's claimed envelope, and a
- *   user-stamped envelope is never guest data. Unknown ≠ adoptable.
- * Reads never delete another guest's progress (fail closed, not destroy).
- */
-function guestProgressClaim(owner: string): boolean {
-  let stamped: string | null = null
-  try {
-    stamped = window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)
-  } catch {
-    return false
-  }
-  if (!stamped) return true
-  if (stamped === owner) return true
-  if (stamped === 'guest' && owner !== 'guest') return owner.startsWith('guest:')
-  return false
-}
-
-function claimGuestProgress(owner: string) {
-  try {
-    const stamped = window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)
-    if (!stamped || stamped === 'guest' || stamped === owner) {
-      window.localStorage.setItem(GUEST_PROGRESS_OWNER_STORAGE_KEY, owner)
-    }
-  } catch {
-    // Storage unavailable: the read stays a read-only best effort.
-  }
-}
-
-/**
  * The child's own learning record, scoped to the resolved owner.
  *
  * Isolation rules (PR #573 review):
  * - an unknown owner reads nothing, so 编程课堂 falls back to the picker;
- * - `kc-progress` belongs to the browser guest that claimed it, never to a
+ * - progress comes from the owner-scoped store (`readGuestProgress(owner)`):
+ *   `kc-progress` belongs to the browser guest that claimed it, never to a
  *   signed-in account and never to a different guest id in the same browser;
  * - only this owner's scoped drafts count; legacy unscoped drafts are
- *   guest-only. Account A and account B can therefore share a browser
- *   without ever seeing each other's lesson or draft.
+ *   readable only by the guest that claimed them, so guest:A → guest:B in
+ *   one browser never exposes A's old drafts to B. Claims never delete the
+ *   historical draft keys.
  */
 export function readLearningRecord(owner?: string | null): LearningRecord | null {
   if (typeof window === 'undefined') return null
   if (!isKnownOwner(owner)) return null
 
-  if (isGuestOwner(owner) && guestProgressClaim(owner)) {
-    try {
-      const raw = window.localStorage.getItem(GUEST_PROGRESS_STORAGE_KEY)
-      if (raw) {
-        const parsed: unknown = JSON.parse(raw)
-        if (hasProgressActivity(parsed)) {
-          // Claim before returning: a readable envelope becomes this guest's.
-          claimGuestProgress(owner)
-          return { lessonId: parsed.currentLessonId }
-        }
-      }
-    } catch {
-      // Corrupt progress: fall through to drafts instead of inventing a lesson.
-    }
+  // The scoped store also handles the legacy claim for its claimant, so a
+  // guest:B's own completion (scoped key only) is still found here.
+  const progress = readGuestProgress(owner)
+  if (hasProgressActivity(progress)) {
+    return { lessonId: progress.currentLessonId }
   }
 
+  const legacyReadable =
+    isGuestOwner(owner) && legacyDraftClaimable(owner, readLegacyDraftClaim())
   const latest = new Map<string, number>()
+  let sawLegacyDraft = false
   try {
     for (let index = 0; index < window.localStorage.length; index += 1) {
       const key = window.localStorage.key(index)
       if (!key) continue
-      const lessonId = lessonIdFromDraftKey(key, owner)
+      const lessonId = lessonIdFromDraftKey(key, owner, legacyReadable)
       if (!lessonId) continue
+      if (!key.startsWith('kids-lesson-owner-v1:')) sawLegacyDraft = true
       const savedAt = savedAtOf(window.localStorage.getItem(key))
       latest.set(lessonId, Math.max(latest.get(lessonId) ?? 0, savedAt))
     }
   } catch {
     return null
   }
+
+  // Claim before returning: a readable legacy draft becomes this guest's,
+  // and the next guest in this browser no longer sees it.
+  if (sawLegacyDraft) claimLegacyDrafts(owner)
 
   let best: LearningRecord | null = null
   let bestTime = -1

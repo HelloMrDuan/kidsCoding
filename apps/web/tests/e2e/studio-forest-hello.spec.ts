@@ -1063,7 +1063,8 @@ test('N8 desktop 1440 (OPS-046): local progress write failure at completion is a
   await page.addInitScript(() => {
     const original = Storage.prototype.setItem
     Storage.prototype.setItem = function (key: string, value: string) {
-      if (key === 'kc-progress') throw new Error('kc-progress write blocked (OPS-046 N8)')
+      // Block every progress envelope (legacy + owner-scoped), like a real quota failure.
+      if (key.endsWith('kc-progress')) throw new Error('kc-progress write blocked (OPS-046 N8)')
       return original.call(this, key, value)
     }
   })

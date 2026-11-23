@@ -176,6 +176,13 @@ export type LaunchLessonRetryOutcome =
 export type UseLaunchLessonCompletionInput = {
   lessonId: string
   /**
+   * 本课进度/奖励的归属人（`user:<id>` 或 `guest:<id>`，由
+   * `useResolvedDraftOwner` 从服务端同一身份源解析）。不传保持旧的
+   * 浏览器全局读写（仅兼容旧调用方与单测）；传 `null` 表示身份未确认，
+   * 本机写入会失败并返回 'local-save-failed'，绝不写到他人进度上。
+   */
+  owner?: string | null
+  /**
    * 完成时清草稿（调用方按自己的草稿模型实现）：
    * 旧路由：clearLessonDraftsForLesson(lessonId)（按步 sessionStorage）；
    * 新路由：清 LessonWorkspace 单键 kidscoding-draft:{lessonId}。
@@ -228,6 +235,7 @@ export type UseLaunchLessonCompletion = {
 
 export function useLaunchLessonCompletion({
   lessonId,
+  owner,
   onClearDrafts,
   onNavigateToComplete,
 }: UseLaunchLessonCompletionInput): UseLaunchLessonCompletion {
@@ -313,7 +321,7 @@ export function useLaunchLessonCompletion({
       // 存储已满）都按本机保存失败返回，奖励与进度未保存，未跳转。
       let nextProgress: ReturnType<typeof readGuestProgress>
       try {
-        const progress = readGuestProgress()
+        const progress = readGuestProgress(owner)
         const reward = awardLessonCompletion({
           lessonId: lesson.id,
           rewardCardId: lesson.rewardCardId,
@@ -328,7 +336,7 @@ export function useLaunchLessonCompletion({
           reward,
           updatedAt: new Date().toISOString(),
         })
-        writeGuestProgress(nextProgress)
+        writeGuestProgress(nextProgress, owner)
       } catch {
         completingRef.current = false
         setIsCompleting(false)
@@ -379,7 +387,7 @@ export function useLaunchLessonCompletion({
       setIsCompleting(false)
       return 'completed'
     },
-    [navigateToComplete, onClearDrafts, scheduleNavigationArrivalCheck],
+    [navigateToComplete, onClearDrafts, owner, scheduleNavigationArrivalCheck],
   )
 
   const retryCloudSync = useCallback(async (): Promise<LaunchLessonRetryOutcome> => {

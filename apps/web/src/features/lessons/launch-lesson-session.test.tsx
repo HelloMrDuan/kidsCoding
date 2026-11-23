@@ -7,6 +7,11 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }))
 import { getMistakeStep } from '@/content/curriculum/mistake-steps'
 import { getPracticeStep } from '@/content/curriculum/practice-steps'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
+import {
+  GUEST_PROGRESS_STORAGE_KEY,
+  progressStorageKeyFor,
+  readGuestProgress,
+} from '@/features/progress/local-progress'
 import { launchStepGate, useLaunchLessonCompletion } from './launch-lesson-session'
 
 const LESSON_ID = 'lesson-01-forest-hello'
@@ -116,12 +121,14 @@ describe('useLaunchLessonCompletion', () => {
   })
 
   function renderCompletion(overrides?: {
+    owner?: string | null
     onClearDrafts?: () => void
     onNavigateToComplete?: () => void
   }) {
     return renderHook(() =>
       useLaunchLessonCompletion({
         lessonId: LESSON_ID,
+        owner: overrides?.owner,
         onClearDrafts: overrides?.onClearDrafts ?? onClearDrafts,
         onNavigateToComplete: overrides?.onNavigateToComplete,
       }),
@@ -425,5 +432,55 @@ describe('useLaunchLessonCompletion', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+
+  it('real completion path attributes guest:A and guest:B separately (PR #573 P1-2)', async () => {
+    const otherLesson = launchLessons.find((lesson) => lesson.id === 'lesson-02-forest-greeting')!
+    const a = renderCompletion({ owner: 'guest:family-a' })
+    let aOutcome: string | undefined
+    await act(async () => {
+      aOutcome = await a.result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(aOutcome).toBe('completed')
+
+    const b = renderCompletion({ owner: 'guest:family-b' })
+    let bOutcome: string | undefined
+    await act(async () => {
+      bOutcome = await b.result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: otherLesson,
+        lessons: launchLessons,
+      })
+    })
+    expect(bOutcome).toBe('completed')
+
+    // Each guest reads exactly its own completion.
+    expect(readGuestProgress('guest:family-a').completedLessonIds).toEqual([LESSON_ID])
+    expect(readGuestProgress('guest:family-b').completedLessonIds).toEqual([otherLesson.id])
+    // B's write never landed on A's claimed legacy envelope.
+    const legacy = JSON.parse(
+      window.localStorage.getItem(GUEST_PROGRESS_STORAGE_KEY) ?? '{}',
+    ) as { completedLessonIds?: string[] }
+    expect(legacy.completedLessonIds).toEqual([LESSON_ID])
+    expect(window.localStorage.getItem(progressStorageKeyFor('guest:family-b'))).not.toBeNull()
+  })
+
+  it('refuses to complete under an unresolved owner instead of writing shared progress (PR #573 P1-2)', async () => {
+    const { result } = renderCompletion({ owner: null })
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.completeLesson({
+        blocks: GOOD_PROGRAM,
+        lesson: LESSON,
+        lessons: launchLessons,
+      })
+    })
+    expect(outcome).toBe('local-save-failed')
+    expect(window.localStorage.getItem(GUEST_PROGRESS_STORAGE_KEY)).toBeNull()
+    expect(push).not.toHaveBeenCalled()
   })
 })

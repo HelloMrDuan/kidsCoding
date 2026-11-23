@@ -14,6 +14,7 @@ import {
 } from '@/features/onboarding/onboarding-session'
 import { readGuestProgress } from '@/features/progress/local-progress'
 import { syncGuestSnapshot } from '@/features/progress/sync-guest-snapshot'
+import { useResolvedDraftOwner } from '@/features/lessons/use-resolved-draft-owner'
 
 export default function AssessmentPage() {
   const router = useRouter()
@@ -27,6 +28,9 @@ export default function AssessmentPage() {
   const [session, setSession] =
     useState<OnboardingSession>(defaultOnboardingSession)
   const [loaded, setLoaded] = useState(false)
+  // The snapshot synced up must be the child's own local progress, never
+  // another guest's legacy envelope.
+  const draftOwner = useResolvedDraftOwner()
 
   // Why the synchronous initial load below is required (not derivable
   // during render): the session is client-only localStorage state, so the
@@ -98,7 +102,7 @@ export default function AssessmentPage() {
             writeOnboardingSession(nextSession)
             await syncGuestSnapshot({
               onboarding: nextSession,
-              progress: readGuestProgress(),
+              progress: readGuestProgress(draftOwner),
             })
             router.push('/learn/map')
           }}

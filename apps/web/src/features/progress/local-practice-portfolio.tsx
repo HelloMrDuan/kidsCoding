@@ -15,6 +15,9 @@ import { useDraftOwnerLock } from '@/features/lessons/use-draft-owner-lock'
 
 export function LocalPracticePortfolio({ gridOwner }: { gridOwner?: string | null } = {}) {
   const gridLocked = useDraftOwnerLock(gridOwner)
+  // `gridOwner` is the server-resolved draft/progress owner; use it for the
+  // progress envelope too so the works list and deletes never cross accounts.
+  const progressOwner = gridOwner
   const [items, setItems] = useState<LocalPractice[]>([])
   const [loaded, setLoaded] = useState(false)
   const [cloudBusy, setCloudBusy] = useState(false)
@@ -26,7 +29,11 @@ export function LocalPracticePortfolio({ gridOwner }: { gridOwner?: string | nul
   const [scratchWorks, setScratchWorks] = useState<PortfolioWork[]>([])
   const [gridWorks, setGridWorks] = useState<PortfolioWork[]>([])
   const [deleteMessage, setDeleteMessage] = useState('')
-  const progress = useSyncExternalStore(subscribeGuestProgress, readGuestProgress, () => defaultGuestProgress)
+  const progress = useSyncExternalStore(
+    subscribeGuestProgress,
+    () => readGuestProgress(progressOwner),
+    () => defaultGuestProgress,
+  )
 
   function refresh() {
     try {
@@ -186,8 +193,8 @@ export function LocalPracticePortfolio({ gridOwner }: { gridOwner?: string | nul
         removeGridWork(window.localStorage, work.lessonId, gridOwner)
         refresh()
       } else {
-        const current = readGuestProgress()
-        writeGuestProgress({ ...current, projectSnapshots: current.projectSnapshots.filter((snapshot) => snapshot.lessonId !== work.lessonId) })
+        const current = readGuestProgress(progressOwner)
+        writeGuestProgress({ ...current, projectSnapshots: current.projectSnapshots.filter((snapshot) => snapshot.lessonId !== work.lessonId) }, progressOwner)
       }
       setDeleteMessage(cloudCopy ? `已删除《${work.title}》的本机副本；账号云端仍有副本。` : `已删除《${work.title}》。`)
     } catch {

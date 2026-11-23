@@ -18,15 +18,17 @@ import {
   readGuestProgress,
   subscribeGuestProgress,
 } from '@/features/progress/local-progress'
+import { useResolvedDraftOwner } from '@/features/lessons/use-resolved-draft-owner'
 
 export default function ProjectCompletePage() {
   const params = useParams<{ projectId: string }>()
   const projectId = Array.isArray(params.projectId)
     ? params.projectId[0]
     : params.projectId
+  const draftOwner = useResolvedDraftOwner()
   const progress = useSyncExternalStore(
     subscribeGuestProgress,
-    readGuestProgress,
+    () => readGuestProgress(draftOwner),
     () => defaultGuestProgress,
   )
   const curriculum = useLaunchCurriculum()
@@ -80,8 +82,8 @@ export default function ProjectCompletePage() {
         key={`${lesson.id}-${replayCount}`}
         blocks={snapshotBlocks}
         playableProject={unitProject
-          ? <UnitProject lessonId={lesson.id} key={lesson.id} initialBlocks={snapshotBlocks}/>
-          : ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lesson.id) ? <DuoProject lessonId={lesson.id} key={`${lesson.id}:${snapshotBlocks.length > 0}`} initialBlocks={snapshotBlocks}/> : undefined}
+          ? <UnitProject lessonId={lesson.id} key={lesson.id} initialBlocks={snapshotBlocks} owner={draftOwner}/>
+          : ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lesson.id) ? <DuoProject lessonId={lesson.id} key={`${lesson.id}:${snapshotBlocks.length > 0}`} initialBlocks={snapshotBlocks} owner={draftOwner}/> : undefined}
         completionCopy={completionCopy}
         isFoundationGraduate={isFoundationGraduate}
         lessonTitle={lesson.title}
