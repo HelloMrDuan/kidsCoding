@@ -1,0 +1,423 @@
+/**
+ * OPS-052：G0-U1 六节 grid 课共用的 V3 编辑器插槽（GridEditorSlot）。
+ *
+ * 六节课共用这一个插槽（禁止每课复制工作台外壳）：内容全部来自
+ * `GridLesson` 课程数据，插槽只负责把真实 BlocklyWorkspace 与四步教学、
+ * 旧草稿兼容导入接进 V3 外壳。任务简报、方法步骤、三级提示、反馈三行、
+ * 文件菜单由外壳渲染。
+ *
+ * 数据流（与 lesson-01-forest-hello 同一套，只经 onChange 交外壳）：
+ * - 编辑（快照变化）→ persist → onChange → 外壳防抖自动保存 + 判定失效。
+ * - 运行由外壳经 GridRunAdapter 完成；插槽观测 shell.judgment，用运行
+ *   快照里的那一关真实复算结果并应用副作用：
+ *   · 通过且错误实验已亲眼看到过错误 → 记 passed；
+ *   · 错误实验成功但还没看过错 → 只提示，不记通过（旧课堂语义）；
+ *   · 真实失败 → failures+1、记下真实失败码；跑出设计错误并因此看到
+ *     错误 → 同时记 observed（这些都是同机真实运行记录）。
+ * - 创意关目标格、恢复错误程序、再给点提示、复盘选择由舞台插槽经路由
+ *   store 写回草稿；本插槽的采纳 effect 接到后自动保存并重建画布。
+ * - 切关（goToStep）先 runAdapter.reset() 再 persist：适配器是路由级
+ *   单例，stop() 只清 running，上一关的 success/error 会泄漏到新关。
+ * - 关卡通过的硬证据只有真实运行；编辑会清掉本关通过记录（旧课堂语义）。
+ *
+ * 旧课堂草稿（`kids-grid-lesson-v1:<id>`，G0-U1 未按账号分键）只读兼容：
+ * 仅当新草稿为空且旧草稿存在、旧草稿尚未走完全部关时提示一键导入；
+ * 导入后旧键原样保留，永不删除、永不覆盖（调用方不写旧键）。
+ */
+'use client'
+
+import dynamic from 'next/dynamic'
+import { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react'
+
+import type { GridLesson } from '@/content/curriculum/g0-u1-grid-lessons'
+import { getKidsBlockLabel } from '@/features/lessons/blockly/register-kids-blocks'
+import type { ProgramBlock } from '@/features/lessons/blockly/program-tree'
+import { LessonDraftOwnerContext } from '@/features/lessons/lesson-draft-boundary'
+import { BlocklyStudioMission, BlocklyStudioSteps } from '@/features/lessons/workspace/blockly-studio-layout'
+import type { EditorSlotProps, JudgmentResult } from '@/features/lessons/workspace/workspace-slots'
+
+import {
+  coerceGridDraft,
+  emptyGridDraft,
+  gridStarterProgram,
+  hasLegacyGridDraft,
+  importLegacyGridDraft,
+  isEmptyGridDraft,
+  type GridSlotData,
+} from './grid-v3-draft'
+import { useGridSession, useGridSessionState } from './grid-v3-session'
+
+const BlocklyWorkspace = dynamic(
+  () => import('@/features/lessons/blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
+  { ssr: false },
+)
+
+/**
+ * 会话内最近一次好草稿（模块级，仅本页会话内有效）：外壳把外来课节的
+ * 导入载荷交给插槽时（壳不代判他课数据），插槽拒绝该载荷并把当前作品
+ * 回显给外壳，避免外来数据被自动保存进本课键。
+ */
+let lastGoodGridDraft: GridSlotData | null = null
+
+/** 仅单测用：把模块级 lastGood 复位到全新加载状态。 */
+export function resetGridSlotLastGoodForTest(): void {
+  lastGoodGridDraft = null
+}
+
+/** 创意关未选目标格时的提示（与旧课堂同一组文案）。 */
+function goalPromptFor(step: GridLesson['steps'][number]): string {
+  const creative = step.creative
+  if (creative?.layouts) return '先选围栏的边长，再运行。'
+  if (creative?.patterns) return '先选一种脚印节奏，再运行。'
+  if (creative?.waters) return '先选有几个水坑，再运行。'
+  if (creative?.pots) return '先选要浇哪一种花园，再运行。'
+  return '先选一格，把蘑菇屋搬过去，再运行。'
+}
+
+function blockLabel(block: ProgramBlock): string {
+  return getKidsBlockLabel(block.type)
+}
+
+export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment }: EditorSlotProps) {
+  // 进度归属人来自外壳边界（路由在服务端解析）；单测直接渲染插槽时没有
+  // 边界，保持 undefined → 旧草稿只读未分键版本。
+  const draftOwner = useContext(LessonDraftOwnerContext)
+  const { lesson, store, runAdapter } = useGridSession()
+  const sessionState = useGridSessionState()
+  const [draft, setDraft] = useState<GridSlotData>(() => coerceGridDraft(lesson, initial))
+  const draftRef = useRef(draft)
+  draftRef.current = draft
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
+  const onJudgmentRef = useRef(onJudgment)
+  onJudgmentRef.current = onJudgment
+  const [notice, setNotice] = useState<string | null>(null)
+  /** 旧草稿导入提示（仅当新草稿为空且旧草稿可导入时出现）。 */
+  const [legacyImport, setLegacyImport] = useState<ReturnType<typeof importLegacyGridDraft> | null>(null)
+  /** 已应用过副作用的那个判定对象（同一对象只应用一次）。 */
+  const appliedJudgmentRef = useRef<JudgmentResult | null>(null)
+
+  const stepIndex = Math.min(Math.max(draft.stepIndex, 0), lesson.steps.length - 1)
+  const step = lesson.steps[stepIndex]
+  const stepId = step.id
+  const blocks: ProgramBlock[] = draft.programs[stepId] ?? gridStarterProgram(step)
+  const passedHere = draft.passed.includes(stepId)
+  const isLastStep = stepIndex >= lesson.steps.length - 1
+  const running = shell?.running ?? false
+  const judgment = shell?.judgment ?? null
+  const snapshot = runAdapter.getExecutionSnapshot()
+  const playing = snapshot.playing
+  const frame = snapshot.frameIndex >= 0 ? snapshot.run?.frames[snapshot.frameIndex] : undefined
+  const highlightIndex =
+    snapshot.run && (snapshot.playing || snapshot.run.failure) && snapshot.frameIndex >= 0
+      ? frame?.blockIndex
+      : undefined
+
+  const persist = useCallback(
+    (next: GridSlotData) => {
+      draftRef.current = next
+      lastGoodGridDraft = next
+      setDraft(next)
+      store.setState({ draft: next })
+      onChangeRef.current(next)
+    },
+    [store],
+  )
+
+  /**
+   * 挂载时一次性处理：
+   * 1. 外来课节导入：initial 的 lessonId 不是本课时，拒绝载荷并回显会话内
+   *    最近的好草稿（或空草稿），绝不把外来数据存进本课键；画布按重挂载
+   *    计数重建，确保不会留着外来的积木。
+   * 2. 会话 store 的草稿镜像初始化（舞台插槽读它）。
+   * 3. 旧草稿导入提示：新草稿为空、旧课堂留有草稿、且旧草稿尚未走完全部
+   *    关时尝试导入；有效则提示一键导入，无效则如实提示原因。
+   */
+  useEffect(() => {
+    const raw = initial as { lessonId?: unknown } | null
+    if (raw && typeof raw === 'object' && raw.lessonId !== undefined && raw.lessonId !== lesson.id) {
+      setNotice('导入文件属于其他课节，已拒绝，原作品未变。')
+      const fallback = lastGoodGridDraft ?? emptyGridDraft(lesson)
+      draftRef.current = fallback
+      lastGoodGridDraft = fallback
+      setDraft(fallback)
+      store.setState({
+        draft: fallback,
+        editorRevision: store.getState().editorRevision + 1,
+      })
+      onChangeRef.current(fallback)
+      return
+    }
+    const coerced = coerceGridDraft(lesson, initial)
+    store.setState({ draft: coerced })
+    if (isEmptyGridDraft(lesson, coerced) && hasLegacyGridDraft(lesson, draftOwner ?? undefined)) {
+      const imported = importLegacyGridDraft(lesson, draftOwner ?? undefined)
+      if (imported.ok) {
+        const completed = imported.data.finished === true
+        if (!completed) setLegacyImport(imported)
+      } else {
+        setNotice(`旧课堂的草稿没能导入：${imported.reason}`)
+      }
+    }
+    // 仅挂载时执行一次；initial 在插槽生命周期内只由外壳在挂载/重置时给。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  /**
+   * 采纳会话 store 的草稿变更（舞台插槽写回创意目标格、恢复错误程序、
+   * 再给点提示、复盘选择、重玩某关）：JSON 比较防循环——本插槽自己的
+   * persist 已同步写过 store，内容一致时跳过。读 store 的实时值而不是
+   * 渲染快照，避免挂载那一拍把已加载草稿短暂覆成空草稿。
+   */
+  useEffect(() => {
+    const storeDraft = store.getState().draft
+    if (JSON.stringify(storeDraft) !== JSON.stringify(draftRef.current)) {
+      draftRef.current = storeDraft
+      lastGoodGridDraft = storeDraft
+      setDraft(storeDraft)
+      onChangeRef.current(storeDraft)
+    }
+  }, [sessionState.draft, store])
+
+  /** 快照变化即 persist（与旧课堂 handleSnapshot 同语义，含去重）。 */
+  const handleSnapshot = useCallback(
+    (next: ProgramBlock[]) => {
+      const current = draftRef.current
+      const index = Math.min(Math.max(current.stepIndex, 0), lesson.steps.length - 1)
+      const key = lesson.steps[index].id
+      const fallback = gridStarterProgram(lesson.steps[index])
+      if (JSON.stringify(current.programs[key] ?? fallback) === JSON.stringify(next)) return
+      // 程序变了：本关的通过记录与整课完成状态都不再被这份程序证明。
+      persist({
+        ...current,
+        programs: { ...current.programs, [key]: next },
+        passed: current.passed.filter((id) => id !== key),
+        finished: false,
+      })
+      runAdapter.reset()
+      setNotice(null)
+    },
+    [lesson, persist, runAdapter],
+  )
+
+  /**
+   * 判定到达：按运行快照定位真实运行的那一关（含关号），应用副作用
+   * 且只应用一次。persist 会触发外壳判定失效，必须把同一判定对象经
+   * onJudgment 原样再上报一次；appliedJudgmentRef 防重复应用、防循环。
+   */
+  useEffect(() => {
+    if (!judgment) return
+    const execution = runAdapter.getExecutionSnapshot()
+    const runStepIndex = execution.stepIndex
+    const run = execution.run
+    if (runStepIndex === null || run === null) return
+    if (appliedJudgmentRef.current === judgment) return
+    appliedJudgmentRef.current = judgment
+    const runStep = lesson.steps[runStepIndex]
+    if (!runStep) return
+    const current = draftRef.current
+    const observed = current.observed?.includes(runStep.id) ?? false
+    if (run.passed) {
+      if (runStep.errorLab && !observed) {
+        // 错误实验：先按原样跑出错、亲眼看到，修好才算通过。
+        if (Math.min(current.stepIndex, lesson.steps.length - 1) === runStepIndex) {
+          setNotice('程序成功了！不过这是错误实验：先按原样运行一次，看看错在哪，再来修。')
+        }
+        return
+      }
+      if (!current.passed.includes(runStep.id)) {
+        persist({ ...current, passed: [...current.passed, runStep.id] })
+        onJudgmentRef.current?.(judgment)
+      }
+      return
+    }
+    const failure = run.failure
+    if (!failure) return
+    const designedMistake =
+      runStep.errorLab && failure === runStep.errorLab.expect && !observed
+    const mistakes = current.mistakes ?? []
+    persist({
+      ...current,
+      failures: current.failures + 1,
+      ...(mistakes.includes(failure) ? {} : { mistakes: [...mistakes, failure] }),
+      ...(designedMistake
+        ? { observed: [...(current.observed ?? []), runStep.id] }
+        : {}),
+    })
+    onJudgmentRef.current?.(judgment)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [judgment])
+
+  function goToStep(index: number) {
+    const current = draftRef.current
+    setNotice(null)
+    setLegacyImport(null)
+    // 关卡边界：先同步清掉上一关的运行快照与判定，再切关。
+    runAdapter.reset()
+    store.setState({ guess: null })
+    persist({ ...current, stepIndex: index, failures: 0, finished: false })
+  }
+
+  function handleComplete() {
+    const current = draftRef.current
+    const currentStep = lesson.steps[Math.min(current.stepIndex, lesson.steps.length - 1)]
+    if (runAdapter.getExecutionSnapshot().playing) return
+    if (!current.passed.includes(currentStep.id)) {
+      const observed = !currentStep.errorLab || !!current.observed?.includes(currentStep.id)
+      setNotice(
+        currentStep.creative && !current.creative?.[currentStep.id]
+          ? goalPromptFor(currentStep)
+          : !observed
+            ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。'
+            : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。',
+      )
+      return
+    }
+    if (current.stepIndex < lesson.steps.length - 1) {
+      goToStep(current.stepIndex + 1)
+      setNotice(`第 ${current.stepIndex + 1} 关已完成，开始下一关吧！`)
+      return
+    }
+    persist({ ...current, finished: true })
+    setNotice('全部关卡都真的跑通了！看看舞台上的复盘和作品卡吧。')
+  }
+
+  function handleImportLegacy() {
+    if (!legacyImport || !legacyImport.ok) return
+    setLegacyImport(null)
+    setNotice(
+      `已导入旧课堂的草稿（到第 ${legacyImport.fromStep + 1} 关，共 ${legacyImport.importedSteps} 关有程序），原来的通过记录也一起带过来了。`,
+    )
+    persist(legacyImport.data)
+    // 旧草稿可能改了当前关程序：重建画布，确保显示的是导入后的积木。
+    store.setState({ editorRevision: store.getState().editorRevision + 1 })
+  }
+
+  if (!editable) {
+    return (
+      <div data-testid="grid-slot-readonly">
+        <p>本课为只读预览：{lesson.title}，共 {lesson.steps.length} 关。</p>
+        <p>当前是第 {stepIndex + 1} 关：{step.title}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="kc-v3-slot-editor" data-testid="grid-slot" style={{ height: '100%', overflowY: 'auto' }}>
+      <BlocklyStudioMission>
+        <div data-testid="grid-step-header" className="kc-v3-task">
+          <p className="kc-v3-step-index" data-testid="grid-step-progress">
+            第 {stepIndex + 1} / {lesson.steps.length} 关{passedHere ? ' ✓' : ''}
+          </p>
+          <div className="kc-v3-task-copy">
+            <h2 data-testid="grid-step-title">
+              <span className="sr-only">第 {stepIndex + 1} 关：</span>
+              {step.title}
+            </h2>
+            <p data-testid="grid-instruction">{step.instruction}</p>
+          </div>
+          <button
+            type="button"
+            data-testid="grid-complete-step"
+            disabled={playing || running}
+            onClick={handleComplete}
+          >
+            {isLastStep ? '完成本课' : '完成这一关'}
+          </button>
+        </div>
+      </BlocklyStudioMission>
+
+      <BlocklyStudioSteps>
+        <div className="kc-v3-stepbar-pills" data-testid="grid-stepbar">
+          {lesson.steps.map((item, index) => (
+            <Fragment key={item.id}>
+              {index > 0 && <span className="kc-v3-step-line" aria-hidden="true" />}
+              <span
+                className={`kc-v3-step-pill${index < stepIndex ? ' is-complete' : index === stepIndex ? ' is-active' : ''}`}
+                aria-current={index === stepIndex ? 'step' : undefined}
+                data-testid={`grid-stepbar-${index + 1}`}
+                data-passed={draft.passed.includes(item.id) ? 'true' : 'false'}
+              >
+                <span className="kc-v3-step-dot" aria-hidden="true">
+                  {index < stepIndex ? '✓' : index + 1}
+                </span>
+                {item.title}
+              </span>
+            </Fragment>
+          ))}
+        </div>
+        <span className="kc-v3-step-note">
+          第 {stepIndex + 1} / {lesson.steps.length} 关 · {step.title}
+        </span>
+      </BlocklyStudioSteps>
+
+      <BlocklyWorkspace
+        key={`${step.id}:${sessionState.editorRevision}`}
+        allowedBlocks={step.allowedBlocks}
+        blocks={blocks}
+        enableProgramTools
+        snapStartOnTop
+        layoutMode="golden"
+        highlightIndex={highlightIndex}
+        onSnapshotChange={handleSnapshot}
+      />
+
+      <details className="kc-v3-editor-details">
+        <summary>本关目标、三级提示与积木清单</summary>
+        <div data-testid="grid-step-guide">
+          <div data-testid="grid-objectives">
+            <b>学习目标</b>
+            <ul>
+              {lesson.objectives.map((text) => (
+                <li key={text}>{text}</li>
+              ))}
+            </ul>
+          </div>
+          <ol data-testid="grid-hints">
+            {step.hints.map((text, index) => (
+              <li key={text} data-testid={`grid-hint-${index + 1}`}>
+                第 {index + 1} 层：{text}
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <ol data-testid="grid-block-list">
+          {blocks.map((block, index) => (
+            <li key={`${block.type}-${index}`} data-testid={`grid-block-${index}`} data-block={block.type}>
+              {index + 1}. {blockLabel(block)}
+              {block.disconnected ? '（散块，不计入运行）' : ''}
+            </li>
+          ))}
+        </ol>
+
+        <div>
+          <button type="button" data-testid="grid-save" disabled={!shell} onClick={() => shell?.save()}>
+            保存作品
+          </button>
+        </div>
+      </details>
+
+      {legacyImport?.ok ? (
+        <div className="kc-v3-alert" data-testid="grid-legacy-import">
+          <p>
+            发现你在旧课堂留下的草稿（到第 {legacyImport.fromStep + 1} 关，共{' '}
+            {legacyImport.importedSteps} 关有程序），要一键导入吗？原来的通过记录会一起带过来。
+          </p>
+          <button type="button" data-testid="grid-import-legacy" onClick={handleImportLegacy}>
+            一键导入旧草稿
+          </button>{' '}
+          <button type="button" data-testid="grid-dismiss-legacy" onClick={() => setLegacyImport(null)}>
+            不用了
+          </button>
+        </div>
+      ) : null}
+
+      {notice && (
+        <p className="kc-v3-alert" data-testid="grid-notice" role="status">
+          {notice}
+        </p>
+      )}
+    </div>
+  )
+}
