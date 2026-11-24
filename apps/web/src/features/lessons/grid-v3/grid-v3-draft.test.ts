@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
 import { gridDraftKey } from '../grid/grid-draft'
+import { LESSON_DRAFT_OWNER_STORAGE_KEY } from '../scoped-draft-key'
 import {
   coerceGridDraft,
   emptyGridDraft,
@@ -9,6 +10,7 @@ import {
   gridCurrentStep,
   gridStarterProgram,
   hasLegacyGridDraft,
+  hasUnclaimableLegacyGridDraft,
   importLegacyGridDraft,
   isEmptyGridDraft,
   isValidGridDraft,
@@ -146,29 +148,61 @@ describe('coerceGridDraft (field-level repair)', () => {
   })
 })
 
-describe('legacy classroom draft (read-only compatibility)', () => {
-  it('offers the scoped key first, then the unscoped G0-U1 key', () => {
-    expect(legacyGridDraftKeys(L01.id)).toEqual([gridDraftKey(L01.id)])
-    expect(legacyGridDraftKeys(L01.id, 'owner-a')[0]).toBe(gridDraftKey(L01.id, 'owner-a'))
-    expect(legacyGridDraftKeys(L01.id, 'owner-a')[1]).toBe(gridDraftKey(L01.id))
+describe('legacy classroom draft (owner-isolated read-only compatibility)', () => {
+  const GUEST_A = 'guest:family-a'
+  const GUEST_B = 'guest:family-b'
+  const USER_A = 'user:a'
+  const USER_B = 'user:b'
+  const old = {
+    stepIndex: 2,
+    programs: {
+      [L01.steps[1].id]: [START, RIGHT, RIGHT, RIGHT],
+      [L01.steps[2].id]: [START, RIGHT, RIGHT],
+    },
+    passed: [L01.steps[1].id, L01.steps[2].id],
+    savedAt: '2026-10-01T00:00:00.000Z',
+    reflection: 1,
+    observed: [L01.steps[0].id],
+    mistakes: ['no_start', 'not_at_goal'],
+  }
+  const finishedOld = {
+    stepIndex: 4,
+    programs: Object.fromEntries(L01.steps.map((step) => [step.id, [START]])),
+    passed: L01.steps.map((step) => step.id),
+    // 创意关的通过记录必须带着孩子当时选的目标格，旧解析器才认。
+    creative: { [L01.steps[4].id]: { goal: { x: 2, y: 0 } } },
+    reflection: 0,
+    savedAt: null,
+  }
+  const seedUnscoped = (value: unknown = old) => {
+    window.localStorage.setItem(gridDraftKey(L01.id), JSON.stringify(value))
+  }
+  const stamp = () => window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)
+
+  it('unknown identity reads no legacy key at all (fail-closed)', () => {
+    seedUnscoped()
+    for (const owner of [undefined, null, '', 'owner-a', 'someone-else']) {
+      expect(legacyGridDraftKeys(L01.id, owner)).toEqual([])
+      expect(hasLegacyGridDraft(L01, owner)).toBe(false)
+      expect(importLegacyGridDraft(L01, owner).ok).toBe(false)
+      expect(hasUnclaimableLegacyGridDraft(L01, owner)).toBe(true)
+    }
+    expect(stamp()).toBeNull()
+    expect(window.localStorage.getItem(gridDraftKey(L01.id))).toBe(JSON.stringify(old))
   })
 
-  it('imports a real old draft (programs, passes, observation, reflection, mistakes)', () => {
-    const old = {
-      stepIndex: 2,
-      programs: {
-        [L01.steps[1].id]: [START, RIGHT, RIGHT, RIGHT],
-        [L01.steps[2].id]: [START, RIGHT, RIGHT],
-      },
-      passed: [L01.steps[1].id, L01.steps[2].id],
-      savedAt: '2026-10-01T00:00:00.000Z',
-      reflection: 1,
-      observed: [L01.steps[0].id],
-      mistakes: ['no_start', 'not_at_goal'],
-    }
-    window.localStorage.setItem(gridDraftKey(L01.id), JSON.stringify(old))
-    expect(hasLegacyGridDraft(L01)).toBe(true)
-    const imported = importLegacyGridDraft(L01)
+  it('offers the owner-scoped key first; the unscoped key only to a guest that may claim it', () => {
+    expect(legacyGridDraftKeys(L01.id, GUEST_A)).toEqual([gridDraftKey(L01.id, GUEST_A), gridDraftKey(L01.id)])
+    expect(legacyGridDraftKeys(L01.id, USER_A)).toEqual([gridDraftKey(L01.id, USER_A)])
+    window.localStorage.setItem(LESSON_DRAFT_OWNER_STORAGE_KEY, GUEST_A)
+    expect(legacyGridDraftKeys(L01.id, GUEST_B)).toEqual([gridDraftKey(L01.id, GUEST_B)])
+  })
+
+  it('imports a real old draft for its claiming guest and stamps the claim without touching the old key', () => {
+    seedUnscoped()
+    expect(hasLegacyGridDraft(L01, GUEST_A)).toBe(true)
+    expect(hasUnclaimableLegacyGridDraft(L01, GUEST_A)).toBe(false)
+    const imported = importLegacyGridDraft(L01, GUEST_A)
     expect(imported.ok).toBe(true)
     if (!imported.ok) return
     expect(imported.fromStep).toBe(2)
@@ -183,47 +217,100 @@ describe('legacy classroom draft (read-only compatibility)', () => {
     expect(imported.data.mistakes).toEqual(['no_start', 'not_at_goal'])
     expect(imported.data.failures).toBe(0)
     expect(imported.data.finished).toBeUndefined()
-    // 旧键原样保留：导入不写、不删旧草稿。
+    expect(stamp()).toBe(GUEST_A)
+    // 旧键原样保留：导入不写、不删、不复制旧草稿。
+    expect(window.localStorage.getItem(gridDraftKey(L01.id))).toBe(JSON.stringify(old))
+    expect(window.localStorage.getItem(gridDraftKey(L01.id, GUEST_A))).toBeNull()
+  })
+
+  it('guest A then B then A: B never reads the old draft A claimed, A still can', () => {
+    seedUnscoped()
+    expect(importLegacyGridDraft(L01, GUEST_A).ok).toBe(true)
+    expect(hasLegacyGridDraft(L01, GUEST_B)).toBe(false)
+    expect(importLegacyGridDraft(L01, GUEST_B)).toEqual({ ok: false, reason: '旧课堂没有找到可导入的草稿。' })
+    expect(hasUnclaimableLegacyGridDraft(L01, GUEST_B)).toBe(true)
+    expect(stamp()).toBe(GUEST_A)
+    const again = importLegacyGridDraft(L01, GUEST_A)
+    expect(again.ok).toBe(true)
+    if (again.ok) expect(again.data.passed).toEqual(old.passed)
     expect(window.localStorage.getItem(gridDraftKey(L01.id))).toBe(JSON.stringify(old))
   })
 
-  it('marks a fully-passed old draft as finished', () => {
-    const old = {
-      stepIndex: 4,
-      programs: Object.fromEntries(L01.steps.map((step) => [step.id, [START]])),
-      passed: L01.steps.map((step) => step.id),
-      // 创意关的通过记录必须带着孩子当时选的目标格，旧解析器才认。
-      creative: { [L01.steps[4].id]: { goal: { x: 2, y: 0 } } },
-      savedAt: null,
+  it('a pre-cookie bare guest claim is adopted by the concrete guest id, then closed to the bare guest', () => {
+    seedUnscoped()
+    expect(importLegacyGridDraft(L01, 'guest').ok).toBe(true)
+    expect(stamp()).toBe('guest')
+    expect(importLegacyGridDraft(L01, GUEST_A).ok).toBe(true)
+    expect(stamp()).toBe(GUEST_A)
+    expect(hasLegacyGridDraft(L01, 'guest')).toBe(false)
+    expect(hasLegacyGridDraft(L01, GUEST_B)).toBe(false)
+  })
+
+  it('user A then B then A: signed-in accounts never read the unscoped draft, only their own scoped one', () => {
+    seedUnscoped()
+    window.localStorage.setItem(
+      gridDraftKey(L01.id, USER_A),
+      JSON.stringify({ stepIndex: 1, programs: { [L01.steps[1].id]: [START, RIGHT] }, passed: [], savedAt: null }),
+    )
+    const a = importLegacyGridDraft(L01, USER_A)
+    expect(a.ok).toBe(true)
+    if (a.ok) {
+      expect(a.data.stepIndex).toBe(1)
+      expect(a.data.programs[L01.steps[1].id]).toEqual([START, RIGHT])
+      expect(a.data.passed).toEqual([])
     }
-    window.localStorage.setItem(gridDraftKey(L01.id), JSON.stringify(old))
-    const imported = importLegacyGridDraft(L01)
+    expect(hasLegacyGridDraft(L01, USER_B)).toBe(false)
+    expect(importLegacyGridDraft(L01, USER_B).ok).toBe(false)
+    expect(hasUnclaimableLegacyGridDraft(L01, USER_B)).toBe(true)
+    expect(hasUnclaimableLegacyGridDraft(L01, USER_A)).toBe(false)
+    expect(importLegacyGridDraft(L01, USER_A).ok).toBe(true)
+    // 账号从不认领访客旧草稿：认领戳不变，旧键不变。
+    expect(stamp()).toBeNull()
+    expect(window.localStorage.getItem(gridDraftKey(L01.id))).toBe(JSON.stringify(old))
+  })
+
+  it('a signed-in account with only an unscoped old draft gets nothing to import', () => {
+    seedUnscoped(finishedOld)
+    expect(hasLegacyGridDraft(L01, USER_A)).toBe(false)
+    expect(hasUnclaimableLegacyGridDraft(L01, USER_A)).toBe(true)
+    expect(stamp()).toBeNull()
+  })
+
+  it('restores a fully-passed old draft as finished, keeping passes, reflection and the creative work', () => {
+    seedUnscoped(finishedOld)
+    const imported = importLegacyGridDraft(L01, GUEST_A)
     expect(imported.ok).toBe(true)
     if (!imported.ok) return
     expect(imported.data.finished).toBe(true)
+    expect(imported.data.passed).toEqual(L01.steps.map((step) => step.id))
+    expect(imported.data.reflection).toBe(0)
+    expect(imported.data.creative).toEqual({ [L01.steps[4].id]: { goal: { x: 2, y: 0 } } })
     expect(isValidGridDraft(L01, imported.data)).toBe(true)
+    // 恢复后的完成态经外壳信封往返（coerce）仍保持完成。
+    expect(coerceGridDraft(L01, JSON.parse(JSON.stringify(imported.data))).finished).toBe(true)
   })
 
   it('reports malformed / missing old drafts honestly and never throws', () => {
-    expect(importLegacyGridDraft(L01)).toEqual({
+    expect(importLegacyGridDraft(L01, GUEST_A)).toEqual({
       ok: false,
       reason: '旧课堂没有找到可导入的草稿。',
     })
+    expect(hasUnclaimableLegacyGridDraft(L01, GUEST_A)).toBe(false)
     window.localStorage.setItem(gridDraftKey(L01.id), '{not json')
-    expect(importLegacyGridDraft(L01)).toEqual({
+    expect(importLegacyGridDraft(L01, GUEST_A)).toEqual({
       ok: false,
       reason: '旧课堂的草稿格式不对，无法导入。',
     })
   })
 
-  it('reads a scoped old draft when the classroom once used the golden layout', () => {
+  it('reads an owner-scoped old draft when the classroom once used the golden layout', () => {
     window.localStorage.setItem(
-      gridDraftKey(L01.id, 'owner-a'),
+      gridDraftKey(L01.id, USER_A),
       JSON.stringify({ stepIndex: 1, programs: {}, passed: [], savedAt: null }),
     )
-    expect(hasLegacyGridDraft(L01, 'owner-a')).toBe(true)
+    expect(hasLegacyGridDraft(L01, USER_A)).toBe(true)
+    expect(hasLegacyGridDraft(L01, USER_B)).toBe(false)
     expect(hasLegacyGridDraft(L01)).toBe(false)
-    const imported = importLegacyGridDraft(L01, 'owner-a')
-    expect(imported.ok).toBe(true)
+    expect(importLegacyGridDraft(L01, USER_A).ok).toBe(true)
   })
 })

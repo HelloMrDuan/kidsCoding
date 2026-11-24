@@ -38,28 +38,43 @@ async function switchGuest(context: BrowserContext, guestId: string) {
   ])
 }
 
-test('no learning record → 编程课堂 opens the course picker, not the V3 studio lesson', async ({ page }) => {
-  await page.goto('/')
-  const nav = page.getByTestId('kc-nav-lesson')
-  await expect(nav).toHaveAttribute('href', '/learn/catalog')
-  await expect(nav).not.toHaveAttribute('href', V3)
+test('OPS-052: no top-level 编程课堂 menu in the sidebar, icon rail or bottom bar', async ({ page }) => {
+  const ownerRequests: string[] = []
+  page.on('request', (request) => {
+    if (request.url().includes('/api/lesson-draft-owner')) ownerRequests.push(request.url())
+  })
+  // The bottom bar is display:none on desktop, so count DOM links, not
+  // accessible ones; the sidebar/icon rail/bottom bar are the same markup at
+  // every breakpoint.
+  for (const path of ['/', '/learn/catalog']) {
+    await page.goto(path)
+    await expect(page.getByTestId('kc-app-shell')).toBeVisible()
+    await expect(page.getByTestId('kc-nav-lesson')).toHaveCount(0)
+    await expect(page.locator('.kc-sidebar')).not.toContainText('编程课堂')
+    const bottom = page.locator('.kc-mobile-bottom')
+    await expect(bottom.locator('a')).toHaveCount(4)
+    await expect(bottom).not.toContainText('课堂')
+  }
+  // The shell no longer resolves identity just to build a menu link. `/` is
+  // not used for this check: the home page's own 「继续学习」 entry resolves the
+  // owner for its progress card (kept, owner-isolated). The catalog page reads
+  // no progress, so any request there could only come from the shell.
+  ownerRequests.length = 0
+  await page.goto('/learn/catalog')
+  await expect(page.getByTestId('kc-app-shell')).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  expect(ownerRequests).toEqual([])
 })
 
-test('recorded catalog lesson → 编程课堂 opens the same route the catalog card uses', async ({ page }) => {
-  await seedProgress(page, {
-    currentLessonId: 'G1-U1-L01',
-    completedLessonIds: ['G1-U1-L01'],
-    completedProjectIds: [],
-    projectSnapshots: [],
-  })
-  await page.goto('/')
-  const nav = page.getByTestId('kc-nav-lesson')
-  await expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
-  // At phone widths the sidebar is a drawer; the bottom bar is the visible
-  // 编程课堂 entry, and it must carry the same resolved route.
-  const entry = (await nav.isVisible()) ? nav : page.locator('.kc-mobile-bottom').getByRole('link', { name: '课堂' })
-  await expect(entry).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
-  await entry.click()
+test('OPS-052: 课程体系 course card → 试玩 entry still opens the catalog lesson workspace', async ({ page }) => {
+  await page.goto('/learn/catalog?track=G1')
+  const card = page.getByTestId('catalog-lesson-G1-U1-L01')
+  await expect(card).toHaveAttribute('href', '/learn/catalog/G1-U1-L01')
+  await card.click()
+  await expect(page).toHaveURL(/\/learn\/catalog\/G1-U1-L01$/)
+  const trial = page.getByTestId('story-trial-entry')
+  await expect(trial).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
+  await trial.click()
   await expect(page).toHaveURL(/\/learn\/story-lab\/G1-U1-L01\/golden$/)
   await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
 })
@@ -88,9 +103,9 @@ test('recorded lesson-01 → every formal entry resolves to the V3 workspace', a
     projectSnapshots: [],
   })
 
-  // Global nav continues the recorded lesson-01.
+  // OPS-052: there is no global 编程课堂 menu any more.
   await page.goto('/')
-  await expect(page.getByTestId('kc-nav-lesson')).toHaveAttribute('href', V3)
+  await expect(page.getByTestId('kc-nav-lesson')).toHaveCount(0)
 
   // Home "继续学习": next incomplete is lesson-01.
   await expect(page.getByTestId('home-continue')).toHaveAttribute('href', V3)

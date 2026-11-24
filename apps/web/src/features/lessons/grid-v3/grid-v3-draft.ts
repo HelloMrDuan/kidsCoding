@@ -9,8 +9,9 @@
  *
  * 草稿键由外壳信封管理，键名必须是 kidscoding-draft:<lessonId>
  * （契约校验）。旧课堂的草稿在未按账号分键的 kids-grid-lesson-v1:<id>；
- * 本模块只读旧键做一次性兼容导入（不写、不删旧键），旧课堂若曾是 golden
- * 布局（按账号分键）则优先读分键版本。
+ * 本模块只读旧键做一次性兼容导入（不写、不删、不复制旧键），且只读当前
+ * owner 归属已确认的旧草稿：分键版本优先；未分键版本按共享认领戳策略
+ * （legacy-draft-claim.ts）判断，已登录账号、其他访客、身份未知一律不可读。
  *
  * 校验分层（与 lesson-01-forest-hello 同一策略）：
  * - isValidGridDraft：严格形状，任一字段不对即 false；外壳恢复/导入时
@@ -25,6 +26,7 @@ import { sanitizeProgram, type ProgramBlock } from '@/features/lessons/blockly/p
 
 import { GRID_MAX_ACTIONS, type Cell, type GridFailure } from '../grid/grid-engine'
 import { gridDraftKey, parseGridDraft } from '../grid/grid-draft'
+import { canReadLegacyDrafts, claimLegacyDrafts, isKnownOwner } from '../legacy-draft-claim'
 
 const MAX_PROGRAM_BLOCKS = GRID_MAX_ACTIONS + 1
 
@@ -302,25 +304,28 @@ export function coerceGridDraft(lesson: GridLesson, value: unknown): GridSlotDat
 }
 
 /**
- * 旧课堂草稿键（只读）：
- * - G0-U1 六课在旧课堂不是 golden 布局，草稿写在未分键的
- *   `kids-grid-lesson-v1:<lessonId>`；
- * - 若旧课堂曾以 golden 布局按账号分键写过，则优先读分键版本。
- * 返回按优先级排列的候选键（先分键、后未分键），由读取方取第一个有值的。
+ * 旧课堂草稿键（只读），只返回当前 owner 归属已确认的候选键：
+ * - 当前 owner 的分键旧草稿 `gridDraftKey(id, owner)`（旧课堂若曾以 golden
+ *   布局按账号分键写过）——归属由键本身证明，优先读取；
+ * - 未分键的 `kids-grid-lesson-v1:<lessonId>`（G0-U1 旧课堂实际写入位置）
+ *   没有归属信息，复用已审核的认领戳策略（legacy-draft-claim.ts，与
+ *   kc-progress / 编程课堂同一套）：仅对戳为空、戳等于本人、或裸 guest 被
+ *   guest:<id> 接管的访客可读；已登录账号、其他访客、身份未知一律不可读。
+ * 身份未知（含 undefined / 空串 / 非 user:/guest: 前缀）返回空列表。
  */
-export function legacyGridDraftKeys(lessonId: string, owner?: string): string[] {
-  const keys: string[] = []
-  if (owner) keys.push(gridDraftKey(lessonId, owner))
-  keys.push(gridDraftKey(lessonId))
+export function legacyGridDraftKeys(lessonId: string, owner?: string | null): string[] {
+  if (!isKnownOwner(owner)) return []
+  const keys = [gridDraftKey(lessonId, owner)]
+  if (canReadLegacyDrafts(owner)) keys.push(gridDraftKey(lessonId))
   return keys
 }
 
-function readLegacyRaw(lessonId: string, owner?: string): string | null {
+function readLegacy(lessonId: string, owner?: string | null): { key: string; raw: string } | null {
   if (typeof window === 'undefined') return null
   for (const key of legacyGridDraftKeys(lessonId, owner)) {
     try {
       const raw = window.localStorage.getItem(key)
-      if (raw) return raw
+      if (raw) return { key, raw }
     } catch {
       // 存储被禁：视为没有旧草稿；本课仍可用。
       return null
@@ -329,9 +334,24 @@ function readLegacyRaw(lessonId: string, owner?: string): string | null {
   return null
 }
 
-/** 旧课堂是否留有可读草稿。 */
-export function hasLegacyGridDraft(lesson: GridLesson, owner?: string): boolean {
-  return readLegacyRaw(lesson.id, owner) !== null
+/**
+ * 未分键旧草稿存在、但当前 owner 无法确认归属（已登录账号 / 其他访客已认领 /
+ * 身份未知）：不读内容、不展示、不导入，只供提示“无法自动恢复”。旧键保留。
+ */
+export function hasUnclaimableLegacyGridDraft(lesson: GridLesson, owner?: string | null): boolean {
+  if (typeof window === 'undefined') return false
+  if (isKnownOwner(owner) && canReadLegacyDrafts(owner)) return false
+  if (readLegacy(lesson.id, owner)) return false
+  try {
+    return window.localStorage.getItem(gridDraftKey(lesson.id)) !== null
+  } catch {
+    return false
+  }
+}
+
+/** 旧课堂是否留有当前 owner 归属已确认的可读草稿。 */
+export function hasLegacyGridDraft(lesson: GridLesson, owner?: string | null): boolean {
+  return readLegacy(lesson.id, owner) !== null
 }
 
 export type LegacyGridImport =
@@ -356,15 +376,18 @@ export type LegacyGridImport =
  *   从旧草稿恢复，归零。
  * - 缺失关按本关初始程序回填（error-lab 关回填预置错误程序）。
  */
-export function importLegacyGridDraft(lesson: GridLesson, owner?: string): LegacyGridImport {
-  const raw = readLegacyRaw(lesson.id, owner)
-  if (raw === null) {
+export function importLegacyGridDraft(lesson: GridLesson, owner?: string | null): LegacyGridImport {
+  const found = readLegacy(lesson.id, owner)
+  if (found === null) {
     return { ok: false, reason: '旧课堂没有找到可导入的草稿。' }
   }
-  const parsed = parseGridDraft(lesson, raw)
+  const parsed = parseGridDraft(lesson, found.raw)
   if (!parsed) {
     return { ok: false, reason: '旧课堂的草稿格式不对，无法导入。' }
   }
+  // 读到的是未分键旧草稿：按共享认领策略盖戳（只写认领戳，不改、不删、不复制
+  // 旧键），此后同一浏览器里的其他访客 / 账号不再能读到它。
+  if (found.key === gridDraftKey(lesson.id) && isKnownOwner(owner)) claimLegacyDrafts(owner)
   const programs: Record<string, ProgramBlock[]> = {}
   let importedSteps = 0
   for (const step of lesson.steps) {

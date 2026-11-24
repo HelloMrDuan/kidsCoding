@@ -2227,3 +2227,164 @@ test('OPS-052 three breakpoints: the six entries and a real L05 run work at 1440
     await page.screenshot({ path: `${OPS052_EVIDENCE}/ops-052-${viewport.name}.png` })
   }
 })
+
+/**
+ * OPS-052 review #7126618285: the old G0-U1 classroom wrote ownerless drafts
+ * (`kids-grid-lesson-v1:<id>`). These tests seed that real legacy key and
+ * prove the V3 import only reaches the owner whose claim is confirmed, keeps
+ * the old key untouched, restores finished lessons, and never overwrites an
+ * existing V3 draft.
+ */
+const LEGACY_L01_KEY = 'kids-grid-lesson-v1:G0-U1-L01'
+const LEGACY_CLAIM_KEY = 'kc-lesson-draft-owner-v1'
+
+async function switchGuestCookie(page: Page, guestId: string) {
+  await page.context().clearCookies()
+  await page.context().addCookies([{ name: 'kc_guest_id', value: guestId, url: 'http://127.0.0.1:3100' }])
+}
+
+async function seedLegacy(page: Page, raw: string) {
+  await page.evaluate(({ key, value }) => localStorage.setItem(key, value), { key: LEGACY_L01_KEY, value: raw })
+}
+
+const readKey = (page: Page, key: string) => page.evaluate((k) => localStorage.getItem(k), key)
+
+test('OPS-052 legacy grid draft is owner-isolated: guest A imports it, guest B cannot read it, A still can', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'legacy isolation runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const A = 'guest:ops052-legacy-a'
+  const B = 'guest:ops052-legacy-b'
+  const canvasBlocks = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable')
+  const legacy = JSON.stringify({
+    stepIndex: 1,
+    passed: ['leave-treehouse'],
+    observed: ['leave-treehouse'],
+    programs: {
+      'leave-treehouse': [{ type: 'when_start' }, { type: 'move_right_cell' }],
+      'mushroom-house': [{ type: 'when_start' }, { type: 'move_right_cell' }],
+    },
+    savedAt: null,
+  })
+
+  await switchGuestCookie(page, 'ops052-legacy-a')
+  await page.goto('/studio/blockly/grid/G0-U1-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await seedLegacy(page, legacy)
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBeNull()
+
+  // A: the unstamped legacy draft is offered to the first confirmed guest.
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-legacy-import')).toBeVisible({ timeout: 15_000 })
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBe(A)
+  // Offering it does not import it: A's V3 key is still empty.
+  expect(await readKey(page, v3DraftKey('G0-U1-L01', A))).toBeNull()
+
+  // B on the same browser: nothing of A's draft is shown or read.
+  await switchGuestCookie(page, 'ops052-legacy-b')
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-notice')).toContainText('不能自动恢复', { timeout: 15_000 })
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+  await expect(canvasBlocks).toHaveCount(1)
+  expect(await readKey(page, v3DraftKey('G0-U1-L01', B))).toBeNull()
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBe(A)
+  expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
+
+  // Back to A: the import is still offered and works; the old key survives.
+  await switchGuestCookie(page, 'ops052-legacy-a')
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-legacy-import')).toBeVisible({ timeout: 15_000 })
+  await codeClick(page, 'grid-import-legacy')
+  await expect(page.getByTestId('grid-notice')).toContainText('已导入旧课堂的草稿')
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 2 /')
+  await waitForSaved(page)
+  expect(await readKey(page, v3DraftKey('G0-U1-L01', A))).not.toBeNull()
+  expect(await readKey(page, v3DraftKey('G0-U1-L01', B))).toBeNull()
+  expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
+})
+
+test('OPS-052 a finished legacy lesson restores as finished, autosaves and stays finished after refresh', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'finished restore runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const owner = 'guest:ops052-legacy-done'
+  const program = [{ type: 'when_start' }, { type: 'move_right_cell' }, { type: 'move_right_cell' }]
+  const legacy = JSON.stringify({
+    stepIndex: 4,
+    passed: ['leave-treehouse', 'mushroom-house', 'stop-before-river', 'fix-loose-block', 'my-start-card'],
+    observed: ['leave-treehouse'],
+    creative: { 'my-start-card': { goal: { x: 2, y: 0 } } },
+    reflection: 0,
+    programs: {
+      'leave-treehouse': [{ type: 'when_start' }, { type: 'move_right_cell' }],
+      'mushroom-house': [{ type: 'when_start' }, { type: 'move_right_cell' }, { type: 'move_right_cell' }, { type: 'move_right_cell' }],
+      'stop-before-river': program,
+      'fix-loose-block': [{ type: 'when_start' }, { type: 'move_right_cell' }, { type: 'move_right_cell' }, { type: 'move_right_cell' }],
+      'my-start-card': program,
+    },
+    savedAt: null,
+  })
+
+  await switchGuestCookie(page, 'ops052-legacy-done')
+  await page.goto('/studio/blockly/grid/G0-U1-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await seedLegacy(page, legacy)
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-legacy-import-finished')).toBeVisible({ timeout: 15_000 })
+
+  await codeClick(page, 'grid-import-legacy')
+  await expect(page.getByTestId('grid-notice')).toContainText('已恢复旧课堂里完成的这节课')
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await expect(page.getByTestId('grid-reflection-option-0')).toHaveAttribute('data-chosen', 'true')
+  await waitForSaved(page)
+  const saved = await readKey(page, v3DraftKey('G0-U1-L01', owner))
+  expect(saved).not.toBeNull()
+
+  // Refresh: the restored lesson is still finished, with its reflection, and
+  // no second import is offered because the V3 draft is no longer empty.
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByTestId('grid-reflection-option-0')).toHaveAttribute('data-chosen', 'true')
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
+})
+
+test('OPS-052 an existing V3 draft is never overwritten or prompted over by a legacy draft', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'no-overwrite runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const owner = 'guest:ops052-legacy-keep'
+  const canvasBlocks = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable')
+
+  await switchGuestCookie(page, 'ops052-legacy-keep')
+  await page.goto('/studio/blockly/grid/G0-U1-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await runAndExpect(page, 'error', '预想')
+  await add(page, 'when_start')
+  await waitForSaved(page)
+  const savedV3 = await readKey(page, v3DraftKey('G0-U1-L01', owner))
+  expect(savedV3).not.toBeNull()
+
+  const legacy = JSON.stringify({
+    stepIndex: 2,
+    passed: ['leave-treehouse', 'mushroom-house'],
+    observed: ['leave-treehouse'],
+    programs: { 'stop-before-river': [{ type: 'when_start' }] },
+    savedAt: null,
+  })
+  await seedLegacy(page, legacy)
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(canvasBlocks).toHaveCount(2)
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  await expect(page.getByTestId('grid-notice')).toHaveCount(0)
+  expect(await readKey(page, v3DraftKey('G0-U1-L01', owner))).toBe(savedV3)
+  expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
+})

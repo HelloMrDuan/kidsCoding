@@ -21,8 +21,10 @@
  * - 关卡通过的硬证据只有真实运行；编辑会清掉本关通过记录（旧课堂语义）。
  *
  * 旧课堂草稿（`kids-grid-lesson-v1:<id>`，G0-U1 未按账号分键）只读兼容：
- * 仅当新草稿为空且旧草稿存在、旧草稿尚未走完全部关时提示一键导入；
- * 导入后旧键原样保留，永不删除、永不覆盖（调用方不写旧键）。
+ * 仅当新草稿为空、且旧草稿归属当前 owner 已确认（共享认领戳策略）时提示
+ * 一键导入；已完成的历史课同样可导入，保留完成态、通过记录、反思与作品。
+ * 归属无法确认（已登录账号 / 其他访客 / 身份未知）时不读内容，只如实提示
+ * 不能自动恢复。导入后旧键原样保留，永不删除、永不覆盖（调用方不写旧键）。
  */
 'use client'
 
@@ -41,6 +43,7 @@ import {
   emptyGridDraft,
   gridStarterProgram,
   hasLegacyGridDraft,
+  hasUnclaimableLegacyGridDraft,
   importLegacyGridDraft,
   isEmptyGridDraft,
   type GridSlotData,
@@ -80,7 +83,7 @@ function blockLabel(block: ProgramBlock): string {
 
 export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment }: EditorSlotProps) {
   // 进度归属人来自外壳边界（路由在服务端解析）；单测直接渲染插槽时没有
-  // 边界，保持 undefined → 旧草稿只读未分键版本。
+  // 边界，保持 undefined → 身份未知，旧草稿一律不读（fail-closed）。
   const draftOwner = useContext(LessonDraftOwnerContext)
   const { lesson, store, runAdapter } = useGridSession()
   const sessionState = useGridSessionState()
@@ -150,13 +153,20 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
     }
     const coerced = coerceGridDraft(lesson, initial)
     store.setState({ draft: coerced })
-    if (isEmptyGridDraft(lesson, coerced) && hasLegacyGridDraft(lesson, draftOwner ?? undefined)) {
-      const imported = importLegacyGridDraft(lesson, draftOwner ?? undefined)
-      if (imported.ok) {
-        const completed = imported.data.finished === true
-        if (!completed) setLegacyImport(imported)
-      } else {
-        setNotice(`旧课堂的草稿没能导入：${imported.reason}`)
+    if (isEmptyGridDraft(lesson, coerced)) {
+      if (hasLegacyGridDraft(lesson, draftOwner)) {
+        // 归属已确认：未完成与已完成的历史课都提示导入（已完成的保留完成态、
+        // 通过记录、反思与作品）；新版草稿非空时根本不进这里，绝不覆盖。
+        const imported = importLegacyGridDraft(lesson, draftOwner)
+        if (imported.ok) {
+          setLegacyImport(imported)
+        } else {
+          setNotice(`旧课堂的草稿没能导入：${imported.reason}`)
+        }
+      } else if (hasUnclaimableLegacyGridDraft(lesson, draftOwner)) {
+        // 本浏览器有旧草稿但无法确认属于当前账号：不读内容、不展示、不导入，
+        // 旧键原样保留。
+        setNotice('这台设备上有旧课堂留下的草稿，但无法确认属于当前账号，不能自动恢复；原草稿已原样保留。')
       }
     }
     // 仅挂载时执行一次；initial 在插槽生命周期内只由外壳在挂载/重置时给。
@@ -286,7 +296,9 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
     if (!legacyImport || !legacyImport.ok) return
     setLegacyImport(null)
     setNotice(
-      `已导入旧课堂的草稿（到第 ${legacyImport.fromStep + 1} 关，共 ${legacyImport.importedSteps} 关有程序），原来的通过记录也一起带过来了。`,
+      legacyImport.data.finished === true
+        ? `已恢复旧课堂里完成的这节课（共 ${legacyImport.importedSteps} 关有程序），完成状态、通过记录、复盘选择和作品都带过来了。`
+        : `已导入旧课堂的草稿（到第 ${legacyImport.fromStep + 1} 关，共 ${legacyImport.importedSteps} 关有程序），原来的通过记录也一起带过来了。`,
     )
     persist(legacyImport.data)
     // 旧草稿可能改了当前关程序：重建画布，确保显示的是导入后的积木。
@@ -400,10 +412,16 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
 
       {legacyImport?.ok ? (
         <div className="kc-v3-alert" data-testid="grid-legacy-import">
-          <p>
-            发现你在旧课堂留下的草稿（到第 {legacyImport.fromStep + 1} 关，共{' '}
-            {legacyImport.importedSteps} 关有程序），要一键导入吗？原来的通过记录会一起带过来。
-          </p>
+          {legacyImport.data.finished === true ? (
+            <p data-testid="grid-legacy-import-finished">
+              发现你在旧课堂已经完成了这节课（共 {legacyImport.importedSteps} 关有程序），要一键恢复吗？完成状态、通过记录、复盘选择和作品会一起带过来。
+            </p>
+          ) : (
+            <p>
+              发现你在旧课堂留下的草稿（到第 {legacyImport.fromStep + 1} 关，共{' '}
+              {legacyImport.importedSteps} 关有程序），要一键导入吗？原来的通过记录会一起带过来。
+            </p>
+          )}
           <button type="button" data-testid="grid-import-legacy" onClick={handleImportLegacy}>
             一键导入旧草稿
           </button>{' '}

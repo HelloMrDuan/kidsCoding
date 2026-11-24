@@ -3,10 +3,22 @@ import {
 } from '@/features/progress/local-progress'
 
 import { launchLessonHref } from './launch-lesson-routes'
-import { LESSON_DRAFT_OWNER_STORAGE_KEY, scopedLessonDraftKey } from './scoped-draft-key'
+import {
+  claimLegacyDrafts,
+  isGuestOwner,
+  isKnownOwner,
+  legacyDraftClaimable,
+  readLegacyDraftClaim,
+} from './legacy-draft-claim'
+import { scopedLessonDraftKey } from './scoped-draft-key'
 
 /**
- * Where the main-nav 「编程课堂」 entry points.
+ * Learning-record → classroom route resolution (owner-isolated).
+ *
+ * OPS-052: the global 「编程课堂」 menu that used to consume this was removed;
+ * the app shell no longer imports it. The resolver and its owner-isolation
+ * tests are kept unchanged (no other behaviour depends on removing them) so a
+ * later task can reuse or retire them explicitly.
  *
  * The classroom entry must never be a second, parallel classroom: it reuses the
  * exact route the course system uses for the same lesson.
@@ -35,19 +47,10 @@ export type LearningRecord = {
  * `currentLessonDraftOwner()`: `user:<supabase id>` for a signed-in account,
  * `guest:<kc_guest_id>` or `guest` for the browser guest. Anything else is
  * an unknown identity and reads nothing (the nav falls back to the course
- * picker).
+ * picker). The owner helpers and the legacy claim policy live in
+ * `legacy-draft-claim.ts` so every legacy-draft reader shares them.
  */
-export function isGuestOwner(owner: string): boolean {
-  return owner === 'guest' || owner.startsWith('guest:')
-}
-
-function isUserOwner(owner: string): boolean {
-  return owner.startsWith('user:')
-}
-
-function isKnownOwner(owner: string | null | undefined): owner is string {
-  return typeof owner === 'string' && (isGuestOwner(owner) || isUserOwner(owner))
-}
+export { isGuestOwner }
 
 function hasProgressActivity(value: unknown): value is { currentLessonId: string } {
   if (!value || typeof value !== 'object') return false
@@ -60,40 +63,12 @@ function hasProgressActivity(value: unknown): value is { currentLessonId: string
   })
 }
 
-/**
+/*
  * Legacy unscoped drafts (`kidscoding-draft:<lessonId>`) predate owner
  * isolation. They stay readable for compatibility, but only for their
- * claimant — the same claim policy as `kc-progress`:
- * - unstamped drafts are claimed by the first confirmed guest that reads them;
- * - a bare `guest` claim (pre-cookie) is adopted by the concrete `guest:<id>`;
- * - a concrete claim belongs to that guest only;
- * - a signed-in account never inherits browser-guest drafts.
+ * claimant — the shared policy in `legacy-draft-claim.ts` (same as
+ * `kc-progress`).
  */
-function legacyDraftClaimable(owner: string, stamped: string | null): boolean {
-  if (!isGuestOwner(owner)) return false
-  if (!stamped) return true
-  if (stamped === owner) return true
-  return stamped === 'guest' && owner.startsWith('guest:')
-}
-
-function readLegacyDraftClaim(): string | null {
-  try {
-    return window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)
-  } catch {
-    return null
-  }
-}
-
-function claimLegacyDrafts(owner: string) {
-  try {
-    const stamped = window.localStorage.getItem(LESSON_DRAFT_OWNER_STORAGE_KEY)
-    if (!stamped || stamped === 'guest' || stamped === owner) {
-      window.localStorage.setItem(LESSON_DRAFT_OWNER_STORAGE_KEY, owner)
-    }
-  } catch {
-    // Storage unavailable: the read stays a read-only best effort.
-  }
-}
 
 function lessonIdFromDraftKey(key: string, owner: string, legacyReadable: boolean): string | null {
   if (key.startsWith('kids-lesson-owner-v1:')) {
