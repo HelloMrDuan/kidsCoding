@@ -3,8 +3,24 @@ import { expect, type Page } from '@playwright/test'
 /** lesson-01 has exactly one official workspace: the V3 Blockly studio. */
 const FOREST_V3_PATH = /^\/studio\/blockly\/lesson-01-forest-hello(\/|$)/
 
+/**
+ * OPS-052: the six G0-U1 grid lessons also have exactly one official
+ * workspace — the same V3 studio under /studio/blockly/grid/<lessonId>.
+ * The old /learn/grid-lab/<lessonId> classroom entries redirect there.
+ */
+const GRID_V3_PATH = /^\/studio\/blockly\/grid(\/|$)/
+
 export function isForestV3(page: Page): boolean {
   return FOREST_V3_PATH.test(new URL(page.url()).pathname)
+}
+
+export function isGridV3(page: Page): boolean {
+  return GRID_V3_PATH.test(new URL(page.url()).pathname)
+}
+
+/** Any lesson that renders the V3 studio (one shell, no per-lesson copies). */
+export function isLessonStudioV3(page: Page): boolean {
+  return isForestV3(page) || isGridV3(page)
 }
 
 /** Open the only official 《小狐狸出场》 workspace and wait for it to mount. */
@@ -112,7 +128,9 @@ export async function showLessonPane(
   page: Page,
   pane: 'task' | 'code' | 'stage',
 ) {
-  if (FOREST_V3_PATH.test(new URL(page.url()).pathname)) {
+  const isV3 = (path: string) => FOREST_V3_PATH.test(path) || GRID_V3_PATH.test(path)
+  let pathname = new URL(page.url()).pathname
+  if (isV3(pathname)) {
     // The shell is visible in every pane mode; the slot is not (phones show
     // one pane at a time), so never gate the pane switch on slot visibility.
     await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
@@ -129,11 +147,23 @@ export async function showLessonPane(
   // /project/<id>/complete, which renders its own saved-project workbench and
   // no lesson shell, yet the specs call this helper again there to run the
   // saved program. Waiting for a lesson shell on that page can never pass.
-  const pathname = new URL(page.url()).pathname
   if (/^\/learn\/(lesson|grid-lab|event-lab|story-lab|catalog)(\/|$)/.test(pathname)) {
+    // OPS-052: a trial entry can now land on the V3 studio instead of the old
+    // classroom, so the URL read above may predate the client navigation that
+    // is still in flight. Accept either real shell, then dispatch from the
+    // route that actually settled.
     await expect(
-      page.locator('[data-testid="lesson-workbench-shell"], [data-testid="golden-lesson"]').first(),
+      page
+        .locator(
+          '[data-testid="studio-shell"], [data-testid="lesson-workbench-shell"], [data-testid="golden-lesson"]',
+        )
+        .first(),
     ).toBeVisible({ timeout: 15_000 })
+    pathname = new URL(page.url()).pathname
+    if (isV3(pathname)) {
+      await showV3Pane(page, pane)
+      return
+    }
   }
   const tabs = page.getByTestId('lesson-mobile-tabs')
   if (await tabs.isVisible()) {
