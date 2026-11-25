@@ -1007,7 +1007,7 @@ test('G0-U1-L06 unit project formal course: wrong-order error lab, two practices
   await waitForSaved(page)
 })
 
-// G0-U2 event lessons run on the event stage (/learn/event-lab); their E2E lives here because this spec is in CI.
+// OPS-053: G0-U2 event lessons run on the shared V3 studio (/studio/blockly/event); old /learn/event-lab URLs 308 there. Their E2E lives here because this spec is in CI.
 test('G0-U2-L01 formal course on the event stage: hat-below error lab, order, click-only wake, debug the woken rabbit, pick a friend, saved and reopened', async ({ page }) => {
   test.setTimeout(200_000)
   const q = async (...types: string[]) => { for (const t of types) await add(page, t) }
@@ -1028,8 +1028,10 @@ test('G0-U2-L01 formal course on the event stage: hat-below error lab, order, cl
   }
 
   // Step 1 — error lab: “开始时” sits below the actions, so the start flag never reaches them.
+  // OPS-053: the V3 slot shows the error-lab reminder as its own notice in the code pane.
   await next(page)
-  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await lessonPane(page, 'code')
+  await expect(page.getByTestId('grid-notice')).toContainText('错误实验')
   await stageClick(page, 'grid-predict-choice-0')
   await runAndExpect(page, 'error', '预想')
   await expect(page.getByTestId('grid-feedback')).toContainText('猜错也没关系')
@@ -1073,7 +1075,7 @@ test('G0-U2-L01 formal course on the event stage: hat-below error lab, order, cl
   await next(page)
 
   // Creative remake: pick the bird; blocks on the fox do nothing for the bird; blocks on the bird pass.
-  await stageClick(page, 'grid-run')
+  await gridRun(page)
   await expect(page.getByTestId('grid-feedback')).toContainText('先在上面选好')
   await stageClick(page, 'grid-goal-choice-2') // 小鸟
   await codeClick(page, 'event-edit-fox')
@@ -1084,6 +1086,7 @@ test('G0-U2-L01 formal course on the event stage: hat-below error lab, order, cl
   await q('when_clicked', 'wake_up', 'say_hello')
   await runAndExpect(page, 'success')
   await next(page)
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
 
   // 复盘: the mistakes this child really met, and the what-if.
@@ -1096,7 +1099,9 @@ test('G0-U2-L01 formal course on the event stage: hat-below error lab, order, cl
   await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
 
   // Close and reopen: the card replays for real — only the bird wakes.
+  await waitForSaved(page)
   await page.reload()
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
   await page.getByTestId('grid-project-play').click()
   const card = page.getByTestId('grid-project-card')
@@ -1113,7 +1118,7 @@ test('G0-U2-L01 formal course on the event stage: hat-below error lab, order, cl
   await codeClick(page, 'event-edit-rabbit')
   await q('when_clicked', 'wake_up', 'say_hello')
   await runAndExpect(page, 'success')
-  await expect(page.getByTestId('lesson-save-local')).toHaveText('已保存到本机')
+  await waitForSaved(page)
 })
 
 test('G0-U2-L02 formal course on the opening stage: flag-first error lab, start-flag opening, invite the bird, two start hats, pick a host, saved and reopened', async ({ page }) => {
@@ -1131,7 +1136,8 @@ test('G0-U2-L02 formal course on the opening stage: flag-first error lab, start-
 
   // Step 1 — error lab: “升起彩旗” sits above the opening words, so the flag goes up first.
   await next(page)
-  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await lessonPane(page, 'code')
+  await expect(page.getByTestId('grid-notice')).toContainText('错误实验')
   await stageClick(page, 'grid-predict-choice-0')
   await runAndExpect(page, 'error', '预想')
   await expect(page.getByTestId('grid-feedback')).toContainText('彩旗先升起')
@@ -1186,6 +1192,7 @@ test('G0-U2-L02 formal course on the opening stage: flag-first error lab, start-
   await q('when_start', 'say_hello', 'raise_flag')
   await runAndExpect(page, 'success')
   await next(page)
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
 
   const mistakes = page.getByTestId('grid-review-mistakes')
@@ -1197,7 +1204,9 @@ test('G0-U2-L02 formal course on the opening stage: flag-first error lab, start-
   await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
 
   // Close and reopen: the programme replays for real — the rabbit speaks, then the flag goes up.
+  await waitForSaved(page)
   await page.reload()
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
   const card = page.getByTestId('grid-project-card')
   await expect(card.locator('[data-grid-item="stage-flags"]')).toHaveAttribute('data-flag-up', 'false')
@@ -1223,7 +1232,8 @@ test('G0-U2-L03 formal course at the bell tree: swapped sender/receiver error la
 
   // Step 1 — error lab: the squirrel waits for the bell and the rabbit waits for a tap, so nobody rings.
   await next(page)
-  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await lessonPane(page, 'code')
+  await expect(page.getByTestId('grid-notice')).toContainText('错误实验')
   await stageClick(page, 'grid-predict-choice-0')
   await runAndExpect(page, 'error', '预想')
   await expect(page.getByTestId('grid-feedback')).toContainText('没有人先摇铃')
@@ -1289,6 +1299,7 @@ test('G0-U2-L03 formal course at the bell tree: swapped sender/receiver error la
   await codeClick(page, 'lesson-clear-program')
   await runAndExpect(page, 'success')
   await next(page)
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
 
   const mistakes = page.getByTestId('grid-review-mistakes')
@@ -1300,7 +1311,9 @@ test('G0-U2-L03 formal course at the bell tree: swapped sender/receiver error la
   await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
 
   // Close and reopen: the card replays for real — the bell rings and only the fox is surprised.
+  await waitForSaved(page)
   await page.reload()
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
   const card = page.getByTestId('grid-project-card')
   await page.getByTestId('grid-project-play').click()
@@ -1325,7 +1338,8 @@ test('G0-U2-L04 formal course in the forest theatre: script on the wrong friend,
 
   // Step 1 — error lab: the fox's opening was built under the bird, so the bird rushes on first.
   await next(page)
-  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await lessonPane(page, 'code')
+  await expect(page.getByTestId('grid-notice')).toContainText('错误实验')
   await stageClick(page, 'grid-predict-choice-0')
   await runAndExpect(page, 'error', '预想')
   await expect(page.getByTestId('grid-feedback')).toContainText('小鸟抢先上台')
@@ -1391,6 +1405,7 @@ test('G0-U2-L04 formal course in the forest theatre: script on the wrong friend,
   await q('when_clicked', 'enter_stage', 'say_hello')
   await runAndExpect(page, 'success')
   await next(page)
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
 
   const mistakes = page.getByTestId('grid-review-mistakes')
@@ -1402,7 +1417,9 @@ test('G0-U2-L04 formal course in the forest theatre: script on the wrong friend,
   await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
 
   // Close and reopen: the programme replays — the fox, then the frog; the bird and rabbit stay backstage.
+  await waitForSaved(page)
   await page.reload()
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
   const card = page.getByTestId('grid-project-card')
   await page.getByTestId('grid-project-play').click()
@@ -1429,7 +1446,8 @@ test('G0-U2-L05 formal course in the apple orchard: event on the tree, only the 
 
   // Step 1 — error lab: the click event sits on the tree, so tapping the apple does nothing.
   await next(page)
-  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await lessonPane(page, 'code')
+  await expect(page.getByTestId('grid-notice')).toContainText('错误实验')
   await stageClick(page, 'grid-predict-choice-0')
   await runAndExpect(page, 'error', '预想')
   await expect(page.getByTestId('grid-feedback')).toContainText('苹果一动不动')
@@ -1493,6 +1511,7 @@ test('G0-U2-L05 formal course in the apple orchard: event on the tree, only the 
   await codeClick(page, 'lesson-clear-program')
   await runAndExpect(page, 'success')
   await next(page)
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
 
   const mistakes = page.getByTestId('grid-review-mistakes')
@@ -1504,7 +1523,9 @@ test('G0-U2-L05 formal course in the apple orchard: event on the tree, only the 
   await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
 
   // Close and reopen: the card replays — the apple falls and only the bird is surprised.
+  await waitForSaved(page)
   await page.reload()
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
   const card = page.getByTestId('grid-project-card')
   await page.getByTestId('grid-project-play').click()
@@ -1531,7 +1552,8 @@ test('G0-U2-L06 unit project at the meet-and-greet: everyone on start, open and 
 
   // Step 1 — error lab: all three listen to the start flag, so everyone moves at once.
   await next(page)
-  await expect(page.getByTestId('grid-feedback')).toContainText('错误实验')
+  await lessonPane(page, 'code')
+  await expect(page.getByTestId('grid-notice')).toContainText('错误实验')
   await stageClick(page, 'grid-predict-choice-0')
   await runAndExpect(page, 'error', '预想')
   await expect(page.getByTestId('grid-feedback')).toContainText('三位一起动起来了')
@@ -1581,6 +1603,7 @@ test('G0-U2-L06 unit project at the meet-and-greet: everyone on start, open and 
   await clear()
   await runAndExpect(page, 'success')
   await next(page)
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
 
   const mistakes = page.getByTestId('grid-review-mistakes')
@@ -1592,7 +1615,9 @@ test('G0-U2-L06 unit project at the meet-and-greet: everyone on start, open and 
   await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
 
   // Close and reopen: the meeting replays — fox opens, rabbit rings, only the squirrel comes on.
+  await waitForSaved(page)
   await page.reload()
+  await lessonPane(page, 'stage')
   await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
   const card = page.getByTestId('grid-project-card')
   await page.getByTestId('grid-project-play').click()
@@ -2451,5 +2476,432 @@ test('OPS-052 editing after the import prompt revokes it: the stale legacy draft
   await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
   expect(await readKey(page, v3DraftKey('G0-U1-L01', owner))).toBe(savedV3)
   expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBe(owner)
+})
+
+/**
+ * OPS-053 batch 2 (G0-U2): the six event lessons run on the same V3 studio
+ * under /studio/blockly/event/<id>. The per-lesson tests above prove each
+ * lesson's pedagogy on the real multi-character engine; these prove the shared
+ * migration contract: one entry system (old URLs 308 here, G0-U3 untouched),
+ * real Blockly editing, owner-scoped save/restore, the three breakpoints and
+ * the owner-isolated, read-only legacy event-draft import.
+ */
+const G0_U2_EVENT_IDS = ['G0-U2-L01', 'G0-U2-L02', 'G0-U2-L03', 'G0-U2-L04', 'G0-U2-L05', 'G0-U2-L06']
+const OPS053_EVIDENCE = path.resolve(__dirname, '../../test-results/ops-053-evidence')
+fs.mkdirSync(OPS053_EVIDENCE, { recursive: true })
+const LEGACY_EVENT_L01_KEY = 'kids-event-lesson-v1:G0-U2-L01'
+
+/** One character's program in one step, as persisted in the owner-scoped V3 envelope. */
+async function v3EventProgramLength(page: Page, lessonId: string, stepId: string, actor: string, owner = 'guest') {
+  return page.evaluate(
+    ({ key, stepId: id, actor: who }) => {
+      const raw = window.localStorage.getItem(key)
+      if (!raw) return -1
+      const parsed = JSON.parse(raw) as { script?: { programs?: Record<string, Record<string, unknown[]>> } }
+      return parsed.script?.programs?.[id]?.[who]?.length ?? -1
+    },
+    { key: v3DraftKey(lessonId, owner), stepId, actor },
+  )
+}
+
+async function seedLegacyEvent(page: Page, raw: string, claim?: string) {
+  await page.evaluate(
+    ({ key, value, claimKey, claimValue }) => {
+      localStorage.setItem(key, value)
+      if (claimValue) localStorage.setItem(claimKey, claimValue)
+    },
+    { key: LEGACY_EVENT_L01_KEY, value: raw, claimKey: LEGACY_CLAIM_KEY, claimValue: claim ?? '' },
+  )
+}
+
+/** Watch the designed error of L01 step 1 for real (predict, then run the starter as-is). */
+async function observeEventErrorLab(page: Page) {
+  await stageClick(page, 'grid-predict-choice-0')
+  await runAndExpect(page, 'error', '预想')
+}
+
+test('OPS-053 entry matrix: all six G0-U2 lessons open the one V3 workspace; old event-lab URLs 308 there; G0-U3 keeps its own page', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'entry matrix runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+
+  for (const id of G0_U2_EVENT_IDS) {
+    // The old formal URL is a permanent redirect, not a second classroom.
+    const response = await page.goto(`/learn/event-lab/${id}`)
+    expect(response?.status(), id).toBe(200)
+    expect(response?.request().redirectedFrom()?.url(), id).toMatch(new RegExp(`/learn/event-lab/${id}$`))
+    await expect(page).toHaveURL(new RegExp(`/studio/blockly/event/${id}$`))
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByTestId('event-slot')).toBeAttached()
+    await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+    await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+    await expect(page.getByTestId('event-stage').first()).toBeVisible()
+  }
+
+  // The catalog trial entry resolves to the same workspace (client navigation).
+  await page.goto('/learn/catalog/G0-U2-L03')
+  await expect(page.getByTestId('event-trial-entry')).toBeVisible({ timeout: 15_000 })
+  await page.getByTestId('event-trial-entry').click()
+  await expect(page).toHaveURL(/\/studio\/blockly\/event\/G0-U2-L03$/)
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+
+  // Fail-closed: lessons outside batch 2 are not served on the event studio…
+  for (const foreign of ['G0-U3-L04', 'G0-U1-L01']) {
+    const res = await page.goto(`/studio/blockly/event/${foreign}`)
+    expect(res?.status(), foreign).toBe(404)
+  }
+  // …and the G0-U3 event+loop lesson keeps its own working event-lab page.
+  const legacy = await page.goto('/learn/event-lab/G0-U3-L04')
+  expect(legacy?.status()).toBe(200)
+  await expect(page).toHaveURL(/\/learn\/event-lab\/G0-U3-L04$/)
+  await expect(page.getByTestId('studio-shell')).toHaveCount(0)
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  await expect(page.locator('[data-grid-item="firefly-night"]').first()).toBeVisible()
+})
+
+test('OPS-053 real Blockly editing on the V3 event studio: build, drag, disconnect, delete, run and advance', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'real mouse drag runs once, on desktop')
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/studio/blockly/event/G0-U2-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+
+  const canvasBlocks = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable')
+  const topStacks = page.locator('svg.blocklySvg .blocklyBlockCanvas > g')
+
+  // Step 1 is the error lab: the starter puts “开始时” under the actions.
+  await expect(page.getByTestId('grid-block-0')).toContainText('睁开眼睛')
+  await observeEventErrorLab(page)
+
+  // Rebuild from an empty canvas with the real palette: a real connected stack.
+  await codeClick(page, 'lesson-clear-program')
+  await expect(canvasBlocks).toHaveCount(0)
+  await add(page, 'when_start')
+  await add(page, 'wake_up')
+  await add(page, 'say_hello')
+  await expect(canvasBlocks).toHaveCount(3)
+  await expect(topStacks).toHaveCount(1)
+  await expect(page.getByTestId('grid-block-0')).toContainText('开始时')
+
+  // Real in-canvas drag of the whole stack: nothing is lost, still one stack.
+  const stack = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.when_start')
+  await stack.scrollIntoViewIfNeeded()
+  const stackBox = (await stack.boundingBox())!
+  await page.mouse.move(stackBox.x + 30, stackBox.y + 12)
+  await page.mouse.down()
+  await page.mouse.move(stackBox.x + 90, stackBox.y + 52, { steps: 10 })
+  await page.mouse.up()
+  await expect.poll(() => v3EventProgramLength(page, 'G0-U2-L01', 'hello-above-start', 'fox')).toBe(3)
+  await expect(topStacks).toHaveCount(1)
+
+  // Real disconnect: pull “说早上好” out of the stack; the real engine judges it.
+  const hello = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable.say_hello')
+  await hello.scrollIntoViewIfNeeded()
+  const helloBox = (await hello.boundingBox())!
+  await page.mouse.move(helloBox.x + 20, helloBox.y + helloBox.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(helloBox.x + 180, helloBox.y + 140, { steps: 12 })
+  await page.mouse.up()
+  await expect(topStacks).toHaveCount(2)
+  await runAndExpect(page, 'error')
+
+  // Real delete of the selected loose block, then rebuild and pass for real.
+  await hello.click()
+  await codeClick(page, 'lesson-delete-selected')
+  await expect(canvasBlocks).toHaveCount(2)
+  await add(page, 'say_hello')
+  await expect(topStacks).toHaveCount(1)
+  await runAndExpect(page, 'success')
+  await next(page)
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 2 /')
+})
+
+test('OPS-053 save, refresh and restore are owner-scoped: guest A’s event draft never leaks to guest B', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'owner isolation runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const KEY_A = v3DraftKey('G0-U2-L01', 'guest')
+  const KEY_B = v3DraftKey('G0-U2-L01', 'guest:ops053-b')
+
+  await page.goto('/studio/blockly/event/G0-U2-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  expect(await readKey(page, KEY_A)).toBeNull()
+
+  await observeEventErrorLab(page)
+  await codeClick(page, 'lesson-clear-program')
+  await add(page, 'when_start')
+  await add(page, 'wake_up')
+  await waitForSaved(page)
+  const savedA = await readKey(page, KEY_A)
+  expect(savedA).not.toBeNull()
+  expect(await v3EventProgramLength(page, 'G0-U2-L01', 'hello-above-start', 'fox')).toBe(2)
+
+  // Refresh: the child's own program comes back, not the starter.
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-block-0')).toContainText('开始时', { timeout: 15_000 })
+  await expect(page.getByTestId('grid-block-2')).toHaveCount(0)
+
+  // Guest B on the same browser: the starter, no key of its own, A untouched.
+  await page.context().addCookies([{ name: 'kc_guest_id', value: 'ops053-b', url: 'http://127.0.0.1:3100' }])
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-block-0')).toContainText('睁开眼睛', { timeout: 15_000 })
+  expect(await readKey(page, KEY_B)).toBeNull()
+  expect(await readKey(page, KEY_A)).toBe(savedA)
+
+  // B's own work writes only B's key.
+  await observeEventErrorLab(page)
+  await waitForSaved(page)
+  expect(await v3EventProgramLength(page, 'G0-U2-L01', 'hello-above-start', 'fox', 'guest:ops053-b')).toBe(3)
+  expect(await readKey(page, KEY_A)).toBe(savedA)
+
+  // Back to A: A's own program is still there.
+  await page.context().clearCookies()
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-block-0')).toContainText('开始时', { timeout: 15_000 })
+  await expect(page.getByTestId('grid-block-2')).toHaveCount(0)
+})
+
+test('OPS-053 three breakpoints: the six entries and a real L01 run work at 1440×900, 768×1024 and 375×812', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'explicit viewports run once, on desktop')
+  test.setTimeout(300_000)
+  const overflow = () => page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)
+  const viewports = [
+    { name: 'desktop-1440x900', width: 1440, height: 900 },
+    { name: 'tablet-768x1024', width: 768, height: 1024 },
+    { name: 'phone-375x812', width: 375, height: 812 },
+  ]
+
+  for (const viewport of viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height })
+    for (const id of G0_U2_EVENT_IDS) {
+      await page.goto(`/learn/event-lab/${id}`)
+      await expect(page).toHaveURL(new RegExp(`/studio/blockly/event/${id}$`))
+      await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+      await expect.poll(overflow, { timeout: 10_000 }).toBe(false)
+    }
+
+    await page.goto('/studio/blockly/event/G0-U2-L01')
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+    const tabs = page.getByTestId('v3-mobiletabs')
+    if (viewport.width < 1040) {
+      await expect(tabs).toBeVisible()
+      for (const pane of ['task', 'code', 'stage'] as const) {
+        await page.getByTestId(`v3-pane-${pane}`).click()
+        await expect(page.getByTestId(`v3-pane-${pane}`)).toHaveAttribute('aria-selected', 'true')
+        await expect(page.getByTestId('ws-grid')).toHaveAttribute('data-pane', pane)
+      }
+    } else {
+      await expect(tabs).toBeHidden()
+      await expect(page.getByTestId('v3-mission')).toBeVisible()
+      await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+      await expect(page.getByTestId('event-stage').first()).toBeVisible()
+    }
+    await observeEventErrorLab(page)
+    await expect(page.getByTestId('grid-feedback')).toBeVisible()
+    // Characters stay inside the stage at every breakpoint.
+    const stageBox = (await page.getByTestId('event-stage').first().boundingBox())!
+    for (const id of ['fox', 'rabbit']) {
+      const box = (await page.getByTestId(`event-actor-${id}`).first().boundingBox())!
+      expect(box.y + box.height, `${viewport.name} ${id}`).toBeLessThanOrEqual(stageBox.y + stageBox.height + 1)
+    }
+    await expect.poll(overflow, { timeout: 10_000 }).toBe(false)
+    await page.screenshot({ path: `${OPS053_EVIDENCE}/ops-053-${viewport.name}.png` })
+  }
+})
+
+/**
+ * OPS-053: the old G0-U2 event classroom wrote ownerless drafts
+ * (`kids-event-lesson-v1:<id>`). The V3 import reaches only the owner whose
+ * claim already matches, never writes the claim or the old key, restores a
+ * finished lesson, never overwrites existing V3 work, and re-checks on click.
+ */
+const legacyEventDraft = JSON.stringify({
+  stepIndex: 2,
+  programs: {
+    'wake-then-hello': { fox: [{ type: 'when_start' }, { type: 'wake_up' }, { type: 'say_hello' }] },
+    'click-to-wake': { fox: [{ type: 'when_clicked' }, { type: 'wake_up' }, { type: 'say_hello' }] },
+  },
+  passed: ['wake-then-hello', 'click-to-wake'],
+  observed: ['hello-above-start'],
+  savedAt: null,
+})
+
+test('OPS-053 legacy event draft is owner-isolated: an unclaimed draft is never read; only a matching claim imports', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'legacy isolation runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const A = 'guest:ops053-legacy-a'
+  const B = 'guest:ops053-legacy-b'
+  const expectNothing = async (owner: string) => {
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByTestId('grid-notice')).toContainText('原草稿已原样保留', { timeout: 15_000 })
+    await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+    await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+    expect(await readKey(page, v3DraftKey('G0-U2-L01', owner))).toBeNull()
+    expect(await readKey(page, LEGACY_EVENT_L01_KEY)).toBe(legacyEventDraft)
+  }
+
+  // B opens first on a browser holding an unclaimed old draft: nothing, nothing claimed.
+  await switchGuestCookie(page, 'ops053-legacy-b')
+  await page.goto('/studio/blockly/event/G0-U2-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await seedLegacyEvent(page, legacyEventDraft)
+  await page.reload()
+  await expectNothing(B)
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBeNull()
+
+  // A without ownership evidence: the same.
+  await switchGuestCookie(page, 'ops053-legacy-a')
+  await page.reload()
+  await expectNothing(A)
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBeNull()
+
+  // A's claim on the device: B still gets nothing, A is offered the import.
+  await page.evaluate(({ key, value }) => localStorage.setItem(key, value), { key: LEGACY_CLAIM_KEY, value: A })
+  await switchGuestCookie(page, 'ops053-legacy-b')
+  await page.reload()
+  await expectNothing(B)
+
+  await switchGuestCookie(page, 'ops053-legacy-a')
+  await page.reload()
+  await expect(page.getByTestId('grid-legacy-import')).toBeVisible({ timeout: 15_000 })
+  await codeClick(page, 'grid-import-legacy')
+  await expect(page.getByTestId('grid-notice')).toContainText('已导入旧课堂的草稿')
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 3 /')
+  await waitForSaved(page)
+  expect(await v3EventProgramLength(page, 'G0-U2-L01', 'click-to-wake', 'fox', A)).toBe(3)
+  expect(await readKey(page, v3DraftKey('G0-U2-L01', B))).toBeNull()
+  expect(await readKey(page, LEGACY_EVENT_L01_KEY)).toBe(legacyEventDraft)
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBe(A)
+})
+
+test('OPS-053 the import click re-checks ownership: a claim that changed after the prompt imports nothing', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'click-time recheck runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const owner = 'guest:ops053-legacy-recheck'
+  await switchGuestCookie(page, 'ops053-legacy-recheck')
+  await page.goto('/studio/blockly/event/G0-U2-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await seedLegacyEvent(page, legacyEventDraft, owner)
+  await page.reload()
+  await expect(page.getByTestId('grid-legacy-import')).toBeVisible({ timeout: 15_000 })
+
+  // The device's claim moves to someone else while the prompt is on screen.
+  await page.evaluate(({ key }) => localStorage.setItem(key, 'guest:someone-else'), { key: LEGACY_CLAIM_KEY })
+  await codeClick(page, 'grid-import-legacy')
+  await expect(page.getByTestId('grid-notice')).toContainText('无法再确认旧草稿属于当前账号')
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+  expect(await readKey(page, v3DraftKey('G0-U2-L01', owner))).toBeNull()
+  expect(await readKey(page, LEGACY_EVENT_L01_KEY)).toBe(legacyEventDraft)
+})
+
+test('OPS-053 a finished legacy event lesson restores as finished, keeps the creative pick, and stays finished after refresh', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'finished restore runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const owner = 'guest:ops053-legacy-done'
+  const card = [{ type: 'when_clicked' }, { type: 'wake_up' }, { type: 'say_hello' }]
+  const legacy = JSON.stringify({
+    stepIndex: 4,
+    programs: {
+      'hello-above-start': { fox: [{ type: 'when_start' }, { type: 'wake_up' }, { type: 'say_hello' }] },
+      'wake-then-hello': { fox: [{ type: 'when_start' }, { type: 'wake_up' }, { type: 'say_hello' }] },
+      'click-to-wake': { fox: card },
+      'woke-too-early': { fox: card, rabbit: [] },
+      'my-wake-card': { bird: card },
+    },
+    passed: ['hello-above-start', 'wake-then-hello', 'click-to-wake', 'woke-too-early', 'my-wake-card'],
+    observed: ['hello-above-start'],
+    creative: { 'my-wake-card': { target: 'bird' } },
+    reflection: 0,
+    savedAt: null,
+  })
+
+  await switchGuestCookie(page, 'ops053-legacy-done')
+  await page.goto('/studio/blockly/event/G0-U2-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await seedLegacyEvent(page, legacy, owner)
+  await page.reload()
+  await expect(page.getByTestId('grid-legacy-import-finished')).toBeVisible({ timeout: 15_000 })
+  await codeClick(page, 'grid-import-legacy')
+  await expect(page.getByTestId('grid-notice')).toContainText('已恢复旧课堂里完成的这节课')
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await expect(page.getByTestId('grid-project-status')).toContainText('点小鸟才会醒')
+  await waitForSaved(page)
+  expect(await readKey(page, v3DraftKey('G0-U2-L01', owner))).not.toBeNull()
+
+  // Refresh: still finished, the card replays for real (only the bird wakes), no second prompt.
+  await page.reload()
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  await page.getByTestId('grid-project-play').click()
+  const projectCard = page.getByTestId('grid-project-card')
+  await expect(projectCard.getByTestId('event-actor-bird')).toHaveAttribute('data-awake', 'true', { timeout: 15_000 })
+  await expect(projectCard.getByTestId('event-actor-fox')).toHaveAttribute('data-awake', 'false')
+  expect(await readKey(page, LEGACY_EVENT_L01_KEY)).toBe(legacy)
+})
+
+test('OPS-053 an existing V3 event draft is never overwritten or prompted over by a legacy draft', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'no-overwrite runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const owner = 'guest:ops053-legacy-keep'
+  await switchGuestCookie(page, 'ops053-legacy-keep')
+  await page.goto('/studio/blockly/event/G0-U2-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await observeEventErrorLab(page)
+  await codeClick(page, 'lesson-clear-program')
+  await add(page, 'when_start')
+  await waitForSaved(page)
+  const savedV3 = await readKey(page, v3DraftKey('G0-U2-L01', owner))
+  expect(savedV3).not.toBeNull()
+
+  await seedLegacyEvent(page, legacyEventDraft, owner)
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-block-0')).toContainText('开始时', { timeout: 15_000 })
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  await expect(page.getByTestId('grid-notice')).toHaveCount(0)
+  expect(await readKey(page, v3DraftKey('G0-U2-L01', owner))).toBe(savedV3)
+  expect(await readKey(page, LEGACY_EVENT_L01_KEY)).toBe(legacyEventDraft)
+})
+
+test('OPS-053 editing after the import prompt revokes it: the stale legacy event draft never overwrites the new work', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'revoke-on-edit runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const owner = 'guest:ops053-legacy-revoke'
+  await switchGuestCookie(page, 'ops053-legacy-revoke')
+  await page.goto('/studio/blockly/event/G0-U2-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await seedLegacyEvent(page, legacyEventDraft, owner)
+  await page.reload()
+  await expect(page.getByTestId('grid-legacy-import')).toBeVisible({ timeout: 15_000 })
+
+  // A real edit on the canvas, autosaved: the import qualification is gone.
+  await codeClick(page, 'lesson-clear-program')
+  await add(page, 'when_start')
+  await waitForSaved(page)
+  const savedV3 = await readKey(page, v3DraftKey('G0-U2-L01', owner))
+  expect(savedV3).not.toBeNull()
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  await expect(page.getByTestId('grid-import-legacy')).toHaveCount(0)
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-block-0')).toContainText('开始时', { timeout: 15_000 })
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  expect(await readKey(page, v3DraftKey('G0-U2-L01', owner))).toBe(savedV3)
+  expect(await readKey(page, LEGACY_EVENT_L01_KEY)).toBe(legacyEventDraft)
   expect(await readKey(page, LEGACY_CLAIM_KEY)).toBe(owner)
 })

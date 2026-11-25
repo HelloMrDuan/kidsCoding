@@ -419,6 +419,7 @@ export function BlocklyWorkspace({
   docked,
   layoutMode = 'legacy',
   highlightIndex,
+  reportMountNormalization = true,
 }: {
   allowedBlocks: string[]
   blocks: BlockSnapshot[]
@@ -434,6 +435,13 @@ export function BlocklyWorkspace({
   layoutMode?: 'legacy' | 'golden'
   /** Position in the connected program, with the event hat at index zero. */
   highlightIndex?: number
+  /**
+   * Report the canvas once on mount even when nobody edited it (default, all
+   * existing callers). OPS-053's event studio turns this off: its starter
+   * programs keep a start hat below other blocks on purpose, Blockly rebuilds
+   * that as a separate stack, and reporting it would count as an edit.
+   */
+  reportMountNormalization?: boolean
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const flyoutColumnRef = useRef<HTMLDivElement | null>(null)
@@ -441,6 +449,9 @@ export function BlocklyWorkspace({
   const showFromTopRef = useRef<(() => void) | null>(null)
   const lastSelectedBlockIdRef = useRef<string | null>(null)
   const latestBlocksRef = useRef(blocks)
+  // Fixed for the component's lifetime (callers re-key to remount) and read
+  // only inside the injection effect, so it never triggers a re-injection.
+  const reportMountNormalizationRef = useRef(reportMountNormalization)
   const choicesKey = sayLineChoices?.map((choice) => `${choice.id}:${choice.text}`).join('|') ?? ''
   const choicesRef = useRef(sayLineChoices)
   const lastChosenLineRef = useRef<string | undefined>(sayLineChoices?.[0]?.id)
@@ -615,7 +626,15 @@ export function BlocklyWorkspace({
       handleResize()
     })
     window.addEventListener('resize', handleResize)
-    handleChange()
+    if (reportMountNormalizationRef.current) {
+      handleChange()
+    } else {
+      // OPS-053: loading a stored program is not an edit. When Blockly cannot
+      // rebuild it verbatim (e.g. a start hat stored below other blocks comes
+      // back as a separate stack), remember the canvas form without reporting
+      // it; the next real edit reports the whole canvas as usual.
+      previousSnapshot = JSON.stringify(snapshotOf(workspace))
+    }
 
     return () => {
       cancelAnimationFrame(fitFrame)
