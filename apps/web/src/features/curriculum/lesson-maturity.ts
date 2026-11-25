@@ -4,6 +4,7 @@ import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
 import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
+import { gridV3Route } from '@/features/lessons/grid-v3/grid-v3-lessons'
 import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
 import { validTrialsFor } from './child-trial'
 import { EXAMPLE_DEBT_BASELINE } from './lesson-schema'
@@ -68,10 +69,13 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
   // and never claims to grade reason quality.
   'A0-U1-L01': { engine: 'classify', route: '/learn/classify-lab/A0-U1-L01', e2eSpec: 'tests/e2e/classify-a0-u1.spec.ts' },
   // EDU-104: G0-U1 rewritten lessons on the SYS-106 grid engine.
+  // OPS-052: the six G0-U1 lessons now open the V3 studio workspace; the old
+  // /learn/grid-lab/<id> entry 308-redirects to the same lesson. E2E still
+  // lives in grid-lab.spec.ts (it covers both the new entry and the redirect).
   ...Object.fromEntries(
     Object.keys(g0u1GridLessons).map((id) => [
       id,
-      { engine: 'blockly', route: `/learn/grid-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
+      { engine: 'blockly', route: gridV3Route(id), e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
     ]),
   ),
   // G0-U3 (Hark A): loop lessons on the grid engine with the SYS-107 repeat block; E2E in grid-lab.spec.ts.

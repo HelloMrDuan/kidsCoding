@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState, type ReactNode } from 'react'
-import { COURSE_PICKER_HREF, resolveClassroomHref } from '@/features/lessons/classroom-entry'
+import { useState, type ReactNode } from 'react'
 
 /**
  * Frozen V2 global shell: 222px navy sidebar + 76px white top bar.
@@ -12,7 +11,7 @@ import { COURSE_PICKER_HREF, resolveClassroomHref } from '@/features/lessons/cla
  * navigation bar appears. Spec: docs/design/kidscoding-v2/DESIGN-SPEC.md.
  */
 
-type IconName = 'home' | 'map' | 'lesson' | 'catalog' | 'scratch' | 'portfolio' | 'parent' | 'cards'
+type IconName = 'home' | 'map' | 'catalog' | 'scratch' | 'portfolio' | 'parent' | 'cards'
 
 type NavItem = {
   id: string
@@ -27,13 +26,25 @@ function isGoldenScratchClassroom(path: string) {
   return path.startsWith('/learn/scratch-lab/') && path.endsWith('/golden')
 }
 
+/**
+ * OPS-052 P1-1：没有匹配一级菜单时的面包屑。/learn/ 下未匹配的路由都是选课后
+ * 进入的课程课堂（含 golden scratch-lab），显示「课程学习」，不再误显示「学习中心」；
+ * 自由创作（/create、非 golden scratch-lab）已由「创作中心」匹配，不会落到这里。
+ * 其余未匹配路由保持原有「学习中心」回落。
+ */
+function breadcrumbFallback(path: string) {
+  return path.startsWith('/learn/') ? '课程学习' : '学习中心'
+}
+
 const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: 'LEARNING',
     items: [
       { id: 'home', label: '学习中心', short: '首页', href: '/', icon: 'home', match: (p) => p === '/' },
       { id: 'map', label: '学习地图', short: '地图', href: '/learn/map', icon: 'map', match: (p) => p.startsWith('/learn/map') },
-      { id: 'lesson', label: '编程课堂', short: '课堂', href: COURSE_PICKER_HREF, icon: 'lesson', match: (p) => p.startsWith('/studio/blockly') || p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') || isGoldenScratchClassroom(p) },
+      // OPS-052：课程课堂是选课之后进入的教学页面，不再作为全局一级菜单；
+      // 学习中心「继续学习」、学习地图课程卡、课程体系「开始学习 / 试玩」
+      // 各自进入对应工作台。
       // OPS-051 (#565): the Python lab has no top-level menu; its teaching
       // lessons stay under 课程体系 so the breadcrumb keeps its meaning.
       { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') || p.startsWith('/learn/python-lab') },
@@ -56,7 +67,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
 ]
 
 const ALL_ITEMS = NAV_GROUPS.flatMap((g) => g.items)
-const MOBILE_ITEMS = ['home', 'map', 'lesson', 'portfolio', 'parent'].map((id) => ALL_ITEMS.find((i) => i.id === id)!)
+const MOBILE_ITEMS = ['home', 'map', 'portfolio', 'parent'].map((id) => ALL_ITEMS.find((i) => i.id === id)!)
 
 function NavIcon({ name }: { name: IconName }) {
   const common = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
@@ -64,7 +75,6 @@ function NavIcon({ name }: { name: IconName }) {
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
       {name === 'home' && <><rect x="3.5" y="3.5" width="7" height="7" rx="1.6" {...common} /><rect x="13.5" y="3.5" width="7" height="7" rx="1.6" {...common} /><rect x="3.5" y="13.5" width="7" height="7" rx="1.6" {...common} /><rect x="13.5" y="13.5" width="7" height="7" rx="1.6" {...common} /></>}
       {name === 'map' && <><path d="M3.5 6.5l5.5-2.5 6 2.5 5.5-2.5v13.5l-5.5 2.5-6-2.5-5.5 2.5z" {...common} /><path d="M9 4v13.5M15 6.5V20" {...common} /></>}
-      {name === 'lesson' && <><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12" {...common} /></>}
       {name === 'catalog' && <><path d="M5 4.5h11.5a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2z" {...common} /><path d="M5 18a2 2 0 0 1 2-2h11.5M9 8.5h6M9 11.5h4" {...common} /></>}
       {name === 'scratch' && <><path d="M4 7.5a2 2 0 0 1 2-2h3l1.5 1.5h3L15 5.5h3a2 2 0 0 1 2 2v3H4z" {...common} /><path d="M4 13.5h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" {...common} /></>}
       {name === 'portfolio' && <><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" {...common} /><path d="M3.5 15.5l4.5-4.5 4 4 2.5-2.5 6 5" {...common} /><circle cx="15.5" cy="9" r="1.6" {...common} /></>}
@@ -77,67 +87,9 @@ function NavIcon({ name }: { name: IconName }) {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? '/'
   const [drawerOpen, setDrawerOpen] = useState(false)
-  // 「编程课堂」 continues the lesson in the child's own record (the same
-  // route the course system opens); with no record it is a course picker.
-  // The owner is resolved from the same identity source the classroom uses
-  // (`/api/lesson-draft-owner` → user:<id> or guest:<id>), and reads are
-  // scoped to it: switching accounts in one browser must never inherit the
-  // previous account's lesson or drafts. Unknown identity fails closed to
-  // the picker.
-  const [lessonHref, setLessonHref] = useState(COURSE_PICKER_HREF)
   const current = ALL_ITEMS.find((i) => i.match(pathname))
   // Golden lessons use document history so the editor's beforeunload protection also covers navigation.
   const ShellLink = isGoldenScratchClassroom(pathname) ? 'a' : Link
-
-  useEffect(() => {
-    let active = true
-    let request = 0
-    const sync = async () => {
-      const token = ++request
-      // Do not keep the previous account's route while identity is checked.
-      if (active) setLessonHref(COURSE_PICKER_HREF)
-      let owner: string | null = null
-      try {
-        const response = await fetch('/api/lesson-draft-owner', { cache: 'no-store' })
-        if (response.ok) {
-          const body = (await response.json()) as { owner?: unknown }
-          owner = typeof body.owner === 'string' ? body.owner : null
-        }
-      } catch {
-        // The account cannot be confirmed: stay on the course picker.
-      }
-      if (!active || token !== request) return
-      // No confirmed identity: the picker is already set, so do not guess.
-      if (owner === null) return
-      try {
-        const href = await resolveClassroomHref(owner)
-        if (active && token === request) setLessonHref(href)
-      } catch {
-        /* fail closed to the course picker */
-      }
-    }
-    void sync()
-    const resync = () => { void sync() }
-    const visible = () => {
-      if (document.visibilityState === 'visible') void sync()
-    }
-    window.addEventListener('kc-progress-change', resync)
-    window.addEventListener('storage', resync)
-    window.addEventListener('focus', resync)
-    window.addEventListener('pageshow', resync)
-    document.addEventListener('visibilitychange', visible)
-    return () => {
-      active = false
-      request += 1
-      window.removeEventListener('kc-progress-change', resync)
-      window.removeEventListener('storage', resync)
-      window.removeEventListener('focus', resync)
-      window.removeEventListener('pageshow', resync)
-      document.removeEventListener('visibilitychange', visible)
-    }
-  }, [pathname])
-
-  const hrefFor = (item: NavItem) => (item.id === 'lesson' ? lessonHref : item.href)
 
   return (
     <div className="kc-app" data-testid="kc-app-shell">
@@ -155,7 +107,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 return (
                   <ShellLink
                     key={item.id}
-                    href={hrefFor(item)}
+                    href={item.href}
                     className={`kc-nav-item${active ? ' is-active' : ''}`}
                     aria-current={active ? 'page' : undefined}
                     title={item.label}
@@ -189,7 +141,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
             </button>
-            <span className="kc-breadcrumb">KidsCoding / <b>{current?.label ?? '学习中心'}</b></span>
+            <span className="kc-breadcrumb">KidsCoding / <b>{current?.label ?? breadcrumbFallback(pathname)}</b></span>
           </div>
           <div className="kc-top-actions">
             <ShellLink href="/learn/catalog" className="kc-top-search">
@@ -207,7 +159,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {MOBILE_ITEMS.map((item) => {
           const active = item.match(pathname)
           return (
-            <ShellLink key={item.id} href={hrefFor(item)} className={active ? 'is-active' : undefined} aria-current={active ? 'page' : undefined}>
+            <ShellLink key={item.id} href={item.href} className={active ? 'is-active' : undefined} aria-current={active ? 'page' : undefined}>
               <NavIcon name={item.icon} />
               <span>{item.short}</span>
             </ShellLink>

@@ -1229,15 +1229,18 @@ test('slot tablet + mobile: editor stays wide, check + save/restore on phone', a
 })
 
 /**
- * PR #573 review: 编程课堂 must continue the signed-in account's own lesson.
- * Two accounts share one browser; the entry is resolved from the same owner
- * the classroom uses, and an unconfirmed identity fails closed to the picker.
+ * PR #573 review kept two accounts in one browser from seeing each other's
+ * lesson through the global 编程课堂 entry. OPS-052 removed that menu: the
+ * shell must now expose no lesson link for any account, must not resolve
+ * identity for the menu, and must leave both accounts' drafts untouched.
  */
-test('account isolation: 编程课堂 continues each account\'s own lesson in one browser', async ({
+test('account isolation: the global shell exposes no account\'s lesson after 编程课堂 removal', async ({
   page,
 }) => {
   let owner: string | null = 'user:a'
+  const ownerRequests: string[] = []
   await page.route('**/api/lesson-draft-owner', async (route) => {
+    ownerRequests.push(route.request().url())
     await route.fulfill({ json: { owner } })
   })
   await page.addInitScript(() => {
@@ -1253,21 +1256,28 @@ test('account isolation: 编程课堂 continues each account\'s own lesson in on
     )
   })
   await page.goto('/learn/catalog')
-  const nav = page.getByTestId('kc-nav-lesson')
-  await expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
+  await expect(page.getByTestId('kc-app-shell')).toBeVisible()
+  const shellLessonLinks = page.locator(
+    '.kc-sidebar a[href*="G1-U1-L01"], .kc-sidebar a[href*="lesson-02-forest-greeting"], .kc-mobile-bottom a[href*="G1-U1-L01"], .kc-mobile-bottom a[href*="lesson-02-forest-greeting"]',
+  )
 
-  // Switch to account B: A's lesson and draft must not leak into B's entry.
-  owner = 'user:b'
-  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
-  await expect(nav).toHaveAttribute('href', '/learn/lesson/lesson-02-forest-greeting')
+  for (const next of ['user:a', 'user:b', null, 'user:a'] as const) {
+    owner = next
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await expect(page.getByTestId('kc-nav-lesson')).toHaveCount(0)
+    await expect(page.locator('.kc-sidebar')).not.toContainText('编程课堂')
+    await expect(shellLessonLinks).toHaveCount(0)
+  }
 
-  // Unconfirmed identity: the picker, never the previous account's lesson.
-  owner = null
-  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
-  await expect(nav).toHaveAttribute('href', '/learn/catalog')
+  // The catalog page itself does not resolve identity, and the shell no
+  // longer does it for a menu link.
+  await page.waitForLoadState('networkidle')
+  expect(ownerRequests).toEqual([])
 
-  // Switching back restores A's own record, not B's.
-  owner = 'user:a'
-  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
-  await expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
+  // Both accounts' own drafts are left exactly as they were.
+  const keys = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith('kids-lesson-owner-v1:')).sort())
+  expect(keys).toEqual([
+    'kids-lesson-owner-v1:user%3Aa:kidscoding-draft:G1-U1-L01',
+    'kids-lesson-owner-v1:user%3Ab:kidscoding-draft:lesson-02-forest-greeting',
+  ])
 })
