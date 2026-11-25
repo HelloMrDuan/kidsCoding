@@ -1619,6 +1619,9 @@ test('EDU-105: instructions and diagnoses are read aloud in Chinese and point at
   await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
   const oldDraft = JSON.stringify({ stepIndex: 1, passed: ['locked-door'], observed: ['locked-door'], programs: {}, savedAt: null })
   await page.evaluate((raw) => localStorage.setItem('kids-grid-lesson-v1:G0-U1-L05', raw), oldDraft)
+  // Strict ownership (review #7149447993): the old draft is only importable
+  // with a matching claim stamp; without a cookie this visitor is bare `guest`.
+  await page.evaluate(() => localStorage.setItem('kc-lesson-draft-owner-v1', 'guest'))
   await page.reload()
   await codeClick(page, 'grid-import-legacy')
   await expect(page.getByTestId('grid-notice')).toContainText('已导入旧课堂的草稿')
@@ -2249,7 +2252,7 @@ async function seedLegacy(page: Page, raw: string) {
 
 const readKey = (page: Page, key: string) => page.evaluate((k) => localStorage.getItem(k), key)
 
-test('OPS-052 legacy grid draft is owner-isolated: guest A imports it, guest B cannot read it, A still can', async ({ page }, testInfo) => {
+test('OPS-052 legacy grid draft is owner-isolated: B opening an unclaimed draft first gets nothing; only a matching claim imports', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'legacy isolation runs once, on desktop')
   test.setTimeout(180_000)
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -2266,34 +2269,42 @@ test('OPS-052 legacy grid draft is owner-isolated: guest A imports it, guest B c
     },
     savedAt: null,
   })
+  const expectNothingOfA = async (owner: string) => {
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByTestId('grid-notice')).toContainText('原草稿已原样保留', { timeout: 15_000 })
+    await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+    await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+    await expect(canvasBlocks).toHaveCount(1)
+    expect(await readKey(page, v3DraftKey('G0-U1-L01', owner))).toBeNull()
+    expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
+  }
 
-  await switchGuestCookie(page, 'ops052-legacy-a')
+  // Review #7149447993 negative case: B is the first to open the page on a
+  // browser holding an unclaimed old draft. The first visitor is not the
+  // owner, so B gets no content and nothing is claimed.
+  await switchGuestCookie(page, 'ops052-legacy-b')
   await page.goto('/studio/blockly/grid/G0-U1-L01')
   await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
   await seedLegacy(page, legacy)
   expect(await readKey(page, LEGACY_CLAIM_KEY)).toBeNull()
-
-  // A: the unstamped legacy draft is offered to the first confirmed guest.
   await page.reload()
-  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByTestId('grid-legacy-import')).toBeVisible({ timeout: 15_000 })
-  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBe(A)
-  // Offering it does not import it: A's V3 key is still empty.
-  expect(await readKey(page, v3DraftKey('G0-U1-L01', A))).toBeNull()
+  await expectNothingOfA(B)
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBeNull()
 
-  // B on the same browser: nothing of A's draft is shown or read.
+  // A without ownership evidence: the same, only the "kept as-is" notice.
+  await switchGuestCookie(page, 'ops052-legacy-a')
+  await page.reload()
+  await expectNothingOfA(A)
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBeNull()
+
+  // A trusted, matching claim already on the device (written by the old
+  // classroom): B still gets nothing, A is offered the import.
+  await page.evaluate(({ key, value }) => localStorage.setItem(key, value), { key: LEGACY_CLAIM_KEY, value: A })
   await switchGuestCookie(page, 'ops052-legacy-b')
   await page.reload()
-  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByTestId('grid-notice')).toContainText('不能自动恢复', { timeout: 15_000 })
-  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
-  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
-  await expect(canvasBlocks).toHaveCount(1)
-  expect(await readKey(page, v3DraftKey('G0-U1-L01', B))).toBeNull()
+  await expectNothingOfA(B)
   expect(await readKey(page, LEGACY_CLAIM_KEY)).toBe(A)
-  expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
 
-  // Back to A: the import is still offered and works; the old key survives.
   await switchGuestCookie(page, 'ops052-legacy-a')
   await page.reload()
   await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
@@ -2333,6 +2344,9 @@ test('OPS-052 a finished legacy lesson restores as finished, autosaves and stays
   await page.goto('/studio/blockly/grid/G0-U1-L01')
   await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
   await seedLegacy(page, legacy)
+  // Strict policy: a legitimate restore needs trusted, matching ownership
+  // evidence (the old classroom's claim stamp for this very guest).
+  await page.evaluate(({ key, value }) => localStorage.setItem(key, value), { key: LEGACY_CLAIM_KEY, value: owner })
   await page.reload()
   await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
   await expect(page.getByTestId('grid-legacy-import-finished')).toBeVisible({ timeout: 15_000 })
@@ -2387,4 +2401,55 @@ test('OPS-052 an existing V3 draft is never overwritten or prompted over by a le
   await expect(page.getByTestId('grid-notice')).toHaveCount(0)
   expect(await readKey(page, v3DraftKey('G0-U1-L01', owner))).toBe(savedV3)
   expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
+})
+
+test('OPS-052 editing after the import prompt revokes it: the stale legacy draft never overwrites the new work, even after refresh', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'revoke-on-edit runs once, on desktop')
+  test.setTimeout(180_000)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const owner = 'guest:ops052-legacy-revoke'
+  const canvasBlocks = page.locator('svg.blocklySvg .blocklyBlockCanvas .blocklyDraggable')
+  const legacy = JSON.stringify({
+    stepIndex: 2,
+    passed: ['leave-treehouse', 'mushroom-house'],
+    observed: ['leave-treehouse'],
+    programs: { 'stop-before-river': [{ type: 'when_start' }] },
+    savedAt: null,
+  })
+
+  await switchGuestCookie(page, 'ops052-legacy-revoke')
+  await page.goto('/studio/blockly/grid/G0-U1-L01')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await seedLegacy(page, legacy)
+  await page.evaluate(({ key, value }) => localStorage.setItem(key, value), { key: LEGACY_CLAIM_KEY, value: owner })
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+
+  // 1. The prompt is really shown first.
+  await expect(page.getByTestId('grid-legacy-import')).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByTestId('grid-import-legacy')).toBeVisible()
+
+  // 2. A real edit on the canvas, autosaved.
+  await add(page, 'when_start')
+  await expect(canvasBlocks).toHaveCount(2)
+  await waitForSaved(page)
+  const savedV3 = await readKey(page, v3DraftKey('G0-U1-L01', owner))
+  expect(savedV3).not.toBeNull()
+
+  // 3. Trying to import now: the qualification was revoked by the edit, the
+  //    button is gone and nothing can replay the cached old data.
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  await expect(page.getByTestId('grid-import-legacy')).toHaveCount(0)
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+  expect(await readKey(page, v3DraftKey('G0-U1-L01', owner))).toBe(savedV3)
+
+  // 4. Refresh: still the new draft (2 blocks, step 1), no second prompt.
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(canvasBlocks).toHaveCount(2, { timeout: 15_000 })
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+  await expect(page.getByTestId('grid-legacy-import')).toHaveCount(0)
+  expect(await readKey(page, v3DraftKey('G0-U1-L01', owner))).toBe(savedV3)
+  expect(await readKey(page, LEGACY_L01_KEY)).toBe(legacy)
+  expect(await readKey(page, LEGACY_CLAIM_KEY)).toBe(owner)
 })

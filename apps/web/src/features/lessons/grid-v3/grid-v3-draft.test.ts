@@ -191,15 +191,33 @@ describe('legacy classroom draft (owner-isolated read-only compatibility)', () =
     expect(window.localStorage.getItem(gridDraftKey(L01.id))).toBe(JSON.stringify(old))
   })
 
-  it('offers the owner-scoped key first; the unscoped key only to a guest that may claim it', () => {
-    expect(legacyGridDraftKeys(L01.id, GUEST_A)).toEqual([gridDraftKey(L01.id, GUEST_A), gridDraftKey(L01.id)])
+  const seedClaim = (owner: string) => window.localStorage.setItem(LESSON_DRAFT_OWNER_STORAGE_KEY, owner)
+
+  it('offers the owner-scoped key first; the unscoped key only with an existing, exactly matching claim', () => {
+    // 无认领戳：首个打开页面的访客不等于历史草稿所有者，只给同 owner 分键旧键。
+    expect(legacyGridDraftKeys(L01.id, GUEST_A)).toEqual([gridDraftKey(L01.id, GUEST_A)])
     expect(legacyGridDraftKeys(L01.id, USER_A)).toEqual([gridDraftKey(L01.id, USER_A)])
-    window.localStorage.setItem(LESSON_DRAFT_OWNER_STORAGE_KEY, GUEST_A)
+    seedClaim(GUEST_A)
+    expect(legacyGridDraftKeys(L01.id, GUEST_A)).toEqual([gridDraftKey(L01.id, GUEST_A), gridDraftKey(L01.id)])
     expect(legacyGridDraftKeys(L01.id, GUEST_B)).toEqual([gridDraftKey(L01.id, GUEST_B)])
+    expect(legacyGridDraftKeys(L01.id, USER_A)).toEqual([gridDraftKey(L01.id, USER_A)])
   })
 
-  it('imports a real old draft for its claiming guest and stamps the claim without touching the old key', () => {
+  it('no claim evidence: B opening an unclaimed old draft first gets no content, and nothing is claimed', () => {
     seedUnscoped()
+    for (const owner of [GUEST_B, GUEST_A, 'guest', USER_A]) {
+      expect(hasLegacyGridDraft(L01, owner)).toBe(false)
+      expect(importLegacyGridDraft(L01, owner)).toEqual({ ok: false, reason: '旧课堂没有找到可导入的草稿。' })
+      // 只提示原键保留：不读内容、不解析、不认领。
+      expect(hasUnclaimableLegacyGridDraft(L01, owner)).toBe(true)
+    }
+    expect(stamp()).toBeNull()
+    expect(window.localStorage.getItem(gridDraftKey(L01.id))).toBe(JSON.stringify(old))
+  })
+
+  it('imports a real old draft for the guest whose claim already matches, never writing the claim or the old key', () => {
+    seedUnscoped()
+    seedClaim(GUEST_A)
     expect(hasLegacyGridDraft(L01, GUEST_A)).toBe(true)
     expect(hasUnclaimableLegacyGridDraft(L01, GUEST_A)).toBe(false)
     const imported = importLegacyGridDraft(L01, GUEST_A)
@@ -225,6 +243,7 @@ describe('legacy classroom draft (owner-isolated read-only compatibility)', () =
 
   it('guest A then B then A: B never reads the old draft A claimed, A still can', () => {
     seedUnscoped()
+    seedClaim(GUEST_A)
     expect(importLegacyGridDraft(L01, GUEST_A).ok).toBe(true)
     expect(hasLegacyGridDraft(L01, GUEST_B)).toBe(false)
     expect(importLegacyGridDraft(L01, GUEST_B)).toEqual({ ok: false, reason: '旧课堂没有找到可导入的草稿。' })
@@ -236,14 +255,18 @@ describe('legacy classroom draft (owner-isolated read-only compatibility)', () =
     expect(window.localStorage.getItem(gridDraftKey(L01.id))).toBe(JSON.stringify(old))
   })
 
-  it('a pre-cookie bare guest claim is adopted by the concrete guest id, then closed to the bare guest', () => {
+  it('strict grid policy: a bare guest stamp is not trusted evidence for a concrete guest id, and is never rewritten', () => {
     seedUnscoped()
+    seedClaim('guest')
+    // 裸 guest 戳不能证明属于哪一位 guest:<id>：严格策略下不接管、不读取。
+    expect(hasLegacyGridDraft(L01, GUEST_A)).toBe(false)
+    expect(importLegacyGridDraft(L01, GUEST_A).ok).toBe(false)
+    expect(hasUnclaimableLegacyGridDraft(L01, GUEST_A)).toBe(true)
+    expect(hasLegacyGridDraft(L01, GUEST_B)).toBe(false)
+    // 戳与 owner 完全一致（裸 guest 本人）才可读。
     expect(importLegacyGridDraft(L01, 'guest').ok).toBe(true)
     expect(stamp()).toBe('guest')
-    expect(importLegacyGridDraft(L01, GUEST_A).ok).toBe(true)
-    expect(stamp()).toBe(GUEST_A)
-    expect(hasLegacyGridDraft(L01, 'guest')).toBe(false)
-    expect(hasLegacyGridDraft(L01, GUEST_B)).toBe(false)
+    expect(window.localStorage.getItem(gridDraftKey(L01.id))).toBe(JSON.stringify(old))
   })
 
   it('user A then B then A: signed-in accounts never read the unscoped draft, only their own scoped one', () => {
@@ -278,6 +301,7 @@ describe('legacy classroom draft (owner-isolated read-only compatibility)', () =
 
   it('restores a fully-passed old draft as finished, keeping passes, reflection and the creative work', () => {
     seedUnscoped(finishedOld)
+    seedClaim(GUEST_A)
     const imported = importLegacyGridDraft(L01, GUEST_A)
     expect(imported.ok).toBe(true)
     if (!imported.ok) return
@@ -297,6 +321,7 @@ describe('legacy classroom draft (owner-isolated read-only compatibility)', () =
     })
     expect(hasUnclaimableLegacyGridDraft(L01, GUEST_A)).toBe(false)
     window.localStorage.setItem(gridDraftKey(L01.id), '{not json')
+    seedClaim(GUEST_A)
     expect(importLegacyGridDraft(L01, GUEST_A)).toEqual({
       ok: false,
       reason: '旧课堂的草稿格式不对，无法导入。',

@@ -185,7 +185,7 @@ export function StudioShell({ lesson, saveState, saveMessage, shellControl, chil
               </span>
               <span className="kc-v3-topbar-divider" aria-hidden="true" />
               <div className="kc-v3-topbar-heading">
-                <span className="kc-v3-breadcrumb">编程课堂 / Blockly 创意编程</span>
+                <span className="kc-v3-breadcrumb">课程学习 / Blockly 图形化编程</span>
                 <h1 data-testid="studio-title">{lesson.title}</h1>
               </div>
             </>

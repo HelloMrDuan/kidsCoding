@@ -21,10 +21,12 @@
  * - 关卡通过的硬证据只有真实运行；编辑会清掉本关通过记录（旧课堂语义）。
  *
  * 旧课堂草稿（`kids-grid-lesson-v1:<id>`，G0-U1 未按账号分键）只读兼容：
- * 仅当新草稿为空、且旧草稿归属当前 owner 已确认（共享认领戳策略）时提示
- * 一键导入；已完成的历史课同样可导入，保留完成态、通过记录、反思与作品。
- * 归属无法确认（已登录账号 / 其他访客 / 身份未知）时不读内容，只如实提示
- * 不能自动恢复。导入后旧键原样保留，永不删除、永不覆盖（调用方不写旧键）。
+ * 仅当新草稿为空、且旧草稿归属当前 owner 已确认（同 owner 分键旧键，或已有
+ * 与当前 owner 完全一致的认领戳；严格策略，见 grid-v3-draft）时提示一键导入；
+ * 已完成的历史课同样可导入，保留完成态、通过记录、反思与作品。归属无法确认
+ * 时不读内容、不解析、不认领，只如实提示原草稿已保留。提示出现后任何新数据
+ * 写入即撤销导入资格；点击导入时重新校验身份、归属与草稿仍为空。导入后旧键
+ * 原样保留，永不删除、永不覆盖（调用方不写旧键，也不写认领戳）。
  */
 'use client'
 
@@ -97,6 +99,19 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
   const [notice, setNotice] = useState<string | null>(null)
   /** 旧草稿导入提示（仅当新草稿为空且旧草稿可导入时出现）。 */
   const [legacyImport, setLegacyImport] = useState<ReturnType<typeof importLegacyGridDraft> | null>(null)
+  /**
+   * 导入资格（复审 #7149447993）：挂载时提示出现即为 true；之后任何新数据写入
+   * （编辑、运行判定、舞台写回、切关）立即撤销，且不可恢复——不得用缓存的
+   * 旧数据覆盖刚写入的新草稿。
+   */
+  const legacyEligibleRef = useRef(false)
+  const draftOwnerRef = useRef(draftOwner)
+  draftOwnerRef.current = draftOwner
+  const revokeLegacyImport = useCallback(() => {
+    if (!legacyEligibleRef.current) return
+    legacyEligibleRef.current = false
+    setLegacyImport(null)
+  }, [])
   /** 已应用过副作用的那个判定对象（同一对象只应用一次）。 */
   const appliedJudgmentRef = useRef<JudgmentResult | null>(null)
 
@@ -118,13 +133,15 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
 
   const persist = useCallback(
     (next: GridSlotData) => {
+      // 任何新数据写入都撤销旧草稿导入资格（导入本身先撤销再 persist）。
+      revokeLegacyImport()
       draftRef.current = next
       lastGoodGridDraft = next
       setDraft(next)
       store.setState({ draft: next })
       onChangeRef.current(next)
     },
-    [store],
+    [store, revokeLegacyImport],
   )
 
   /**
@@ -159,6 +176,7 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
         // 通过记录、反思与作品）；新版草稿非空时根本不进这里，绝不覆盖。
         const imported = importLegacyGridDraft(lesson, draftOwner)
         if (imported.ok) {
+          legacyEligibleRef.current = true
           setLegacyImport(imported)
         } else {
           setNotice(`旧课堂的草稿没能导入：${imported.reason}`)
@@ -182,12 +200,14 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
   useEffect(() => {
     const storeDraft = store.getState().draft
     if (JSON.stringify(storeDraft) !== JSON.stringify(draftRef.current)) {
+      // 舞台插槽写回的新数据同样撤销旧草稿导入资格。
+      revokeLegacyImport()
       draftRef.current = storeDraft
       lastGoodGridDraft = storeDraft
       setDraft(storeDraft)
       onChangeRef.current(storeDraft)
     }
-  }, [sessionState.draft, store])
+  }, [sessionState.draft, store, revokeLegacyImport])
 
   /** 快照变化即 persist（与旧课堂 handleSnapshot 同语义，含去重）。 */
   const handleSnapshot = useCallback(
@@ -294,13 +314,27 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
 
   function handleImportLegacy() {
     if (!legacyImport || !legacyImport.ok) return
+    const eligible = legacyEligibleRef.current
+    // 先撤销资格并收起提示：无论成功与否，这次点击之后都不能再导入一次。
+    legacyEligibleRef.current = false
     setLegacyImport(null)
+    // 点击时重新校验（复审 #7149447993）：资格仍在、当前草稿仍为空、并按
+    // 当前身份与归属重新读取旧草稿——不使用挂载时缓存的数据。
+    if (!eligible || !isEmptyGridDraft(lesson, draftRef.current)) {
+      setNotice('你已经开始了新的作品，旧草稿不会覆盖它；原草稿已原样保留。')
+      return
+    }
+    const fresh = importLegacyGridDraft(lesson, draftOwnerRef.current)
+    if (!fresh.ok) {
+      setNotice('无法再确认旧草稿属于当前账号，没有导入；原草稿已原样保留。')
+      return
+    }
     setNotice(
-      legacyImport.data.finished === true
-        ? `已恢复旧课堂里完成的这节课（共 ${legacyImport.importedSteps} 关有程序），完成状态、通过记录、复盘选择和作品都带过来了。`
-        : `已导入旧课堂的草稿（到第 ${legacyImport.fromStep + 1} 关，共 ${legacyImport.importedSteps} 关有程序），原来的通过记录也一起带过来了。`,
+      fresh.data.finished === true
+        ? `已恢复旧课堂里完成的这节课（共 ${fresh.importedSteps} 关有程序），完成状态、通过记录、复盘选择和作品都带过来了。`
+        : `已导入旧课堂的草稿（到第 ${fresh.fromStep + 1} 关，共 ${fresh.importedSteps} 关有程序），原来的通过记录也一起带过来了。`,
     )
-    persist(legacyImport.data)
+    persist(fresh.data)
     // 旧草稿可能改了当前关程序：重建画布，确保显示的是导入后的积木。
     store.setState({ editorRevision: store.getState().editorRevision + 1 })
   }
@@ -367,6 +401,10 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
         key={`${step.id}:${sessionState.editorRevision}`}
         allowedBlocks={step.allowedBlocks}
         blocks={blocks}
+        // P0-1：六课统一接入《小狐狸出场》同一套 V3 docked 编辑器（分类图标、
+        // 固定素材区、撤销/重做/适合画面）；starter / 预置错误程序仍放在画布里。
+        // layoutMode="golden" 只为保留运行时逐块高亮（docked 下挂载与外观以 docked 为准）。
+        docked={{ stepKey: step.id, preferredBlock: step.allowedBlocks.find((type) => type !== 'when_start') }}
         enableProgramTools
         snapStartOnTop
         layoutMode="golden"
@@ -425,7 +463,7 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
           <button type="button" data-testid="grid-import-legacy" onClick={handleImportLegacy}>
             一键导入旧草稿
           </button>{' '}
-          <button type="button" data-testid="grid-dismiss-legacy" onClick={() => setLegacyImport(null)}>
+          <button type="button" data-testid="grid-dismiss-legacy" onClick={() => { legacyEligibleRef.current = false; setLegacyImport(null) }}>
             不用了
           </button>
         </div>

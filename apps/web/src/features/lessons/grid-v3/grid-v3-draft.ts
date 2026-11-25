@@ -9,9 +9,10 @@
  *
  * 草稿键由外壳信封管理，键名必须是 kidscoding-draft:<lessonId>
  * （契约校验）。旧课堂的草稿在未按账号分键的 kids-grid-lesson-v1:<id>；
- * 本模块只读旧键做一次性兼容导入（不写、不删、不复制旧键），且只读当前
- * owner 归属已确认的旧草稿：分键版本优先；未分键版本按共享认领戳策略
- * （legacy-draft-claim.ts）判断，已登录账号、其他访客、身份未知一律不可读。
+ * 本模块只读旧键做一次性兼容导入（不写、不删、不复制旧键，也不写认领戳），
+ * 且只读当前 owner 归属已确认的旧草稿：同 owner 分键版本优先；未分键版本
+ * 仅在已有认领戳与当前 owner 完全一致时可读（严格策略，见
+ * hasMatchingLegacyGridClaim），其余情况只提示原键已保留。
  *
  * 校验分层（与 lesson-01-forest-hello 同一策略）：
  * - isValidGridDraft：严格形状，任一字段不对即 false；外壳恢复/导入时
@@ -26,7 +27,7 @@ import { sanitizeProgram, type ProgramBlock } from '@/features/lessons/blockly/p
 
 import { GRID_MAX_ACTIONS, type Cell, type GridFailure } from '../grid/grid-engine'
 import { gridDraftKey, parseGridDraft } from '../grid/grid-draft'
-import { canReadLegacyDrafts, claimLegacyDrafts, isKnownOwner } from '../legacy-draft-claim'
+import { isKnownOwner, readLegacyDraftClaim } from '../legacy-draft-claim'
 
 const MAX_PROGRAM_BLOCKS = GRID_MAX_ACTIONS + 1
 
@@ -304,19 +305,30 @@ export function coerceGridDraft(lesson: GridLesson, value: unknown): GridSlotDat
 }
 
 /**
+ * OPS-052 复审 #7149447993：本批 grid 导入的严格归属判定（只作用于 G0-U1
+ * grid 导入，不改共享 legacy-draft-claim.ts 的语义，不扩展其他课程）。
+ * 未分键旧键本身没有归属信息；“首个打开页面的访客”不等于历史草稿所有者，
+ * 所以戳为空、裸 `guest` 戳都不算可信证据。只有已存在的认领戳与当前 owner
+ * 完全一致时，才视为归属已确认。本模块从不写认领戳。
+ */
+export function hasMatchingLegacyGridClaim(owner?: string | null): owner is string {
+  if (!isKnownOwner(owner)) return false
+  return readLegacyDraftClaim() === owner
+}
+
+/**
  * 旧课堂草稿键（只读），只返回当前 owner 归属已确认的候选键：
- * - 当前 owner 的分键旧草稿 `gridDraftKey(id, owner)`（旧课堂若曾以 golden
- *   布局按账号分键写过）——归属由键本身证明，优先读取；
- * - 未分键的 `kids-grid-lesson-v1:<lessonId>`（G0-U1 旧课堂实际写入位置）
- *   没有归属信息，复用已审核的认领戳策略（legacy-draft-claim.ts，与
- *   kc-progress / 编程课堂同一套）：仅对戳为空、戳等于本人、或裸 guest 被
- *   guest:<id> 接管的访客可读；已登录账号、其他访客、身份未知一律不可读。
+ * - 当前 owner 的分键旧草稿 `gridDraftKey(id, owner)`：归属由键本身证明，
+ *   优先读取；
+ * - 未分键的 `kids-grid-lesson-v1:<lessonId>`（G0-U1 旧课堂实际写入位置）：
+ *   仅当已有认领戳且与当前 owner 完全一致时可读（hasMatchingLegacyGridClaim）；
+ *   无戳、裸 guest 戳、他人戳、已登录账号未认领、身份未知一律不可读。
  * 身份未知（含 undefined / 空串 / 非 user:/guest: 前缀）返回空列表。
  */
 export function legacyGridDraftKeys(lessonId: string, owner?: string | null): string[] {
   if (!isKnownOwner(owner)) return []
   const keys = [gridDraftKey(lessonId, owner)]
-  if (canReadLegacyDrafts(owner)) keys.push(gridDraftKey(lessonId))
+  if (hasMatchingLegacyGridClaim(owner)) keys.push(gridDraftKey(lessonId))
   return keys
 }
 
@@ -335,12 +347,13 @@ function readLegacy(lessonId: string, owner?: string | null): { key: string; raw
 }
 
 /**
- * 未分键旧草稿存在、但当前 owner 无法确认归属（已登录账号 / 其他访客已认领 /
- * 身份未知）：不读内容、不展示、不导入，只供提示“无法自动恢复”。旧键保留。
+ * 未分键旧草稿存在、但当前 owner 没有可信且匹配的归属证据（无戳 / 裸 guest 戳 /
+ * 他人戳 / 已登录账号 / 身份未知）：只检查键是否存在，不读内容、不解析、不展示、
+ * 不认领、不导入，只供提示“原草稿已保留”。旧键保留。
  */
 export function hasUnclaimableLegacyGridDraft(lesson: GridLesson, owner?: string | null): boolean {
   if (typeof window === 'undefined') return false
-  if (isKnownOwner(owner) && canReadLegacyDrafts(owner)) return false
+  if (hasMatchingLegacyGridClaim(owner)) return false
   if (readLegacy(lesson.id, owner)) return false
   try {
     return window.localStorage.getItem(gridDraftKey(lesson.id)) !== null
@@ -385,9 +398,8 @@ export function importLegacyGridDraft(lesson: GridLesson, owner?: string | null)
   if (!parsed) {
     return { ok: false, reason: '旧课堂的草稿格式不对，无法导入。' }
   }
-  // 读到的是未分键旧草稿：按共享认领策略盖戳（只写认领戳，不改、不删、不复制
-  // 旧键），此后同一浏览器里的其他访客 / 账号不再能读到它。
-  if (found.key === gridDraftKey(lesson.id) && isKnownOwner(owner)) claimLegacyDrafts(owner)
+  // 严格策略：本函数只读，从不写认领戳（提示出现 ≠ 归属确认）。未分键旧键
+  // 只有在已有匹配认领戳时才会被 readLegacy 返回。
   const programs: Record<string, ProgramBlock[]> = {}
   let importedSteps = 0
   for (const step of lesson.steps) {

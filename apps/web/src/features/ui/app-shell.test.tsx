@@ -53,10 +53,28 @@ describe('AppShell (frozen V2 global shell)', () => {
   it.each([
     '/learn/remedial/r1',
     '/learn/lesson/lesson-02-forest-greeting',
-    '/studio/blockly/grid/G0-U1-L01',
+    '/learn/grid-lab/G0-U1-L01',
     '/learn/scratch-lab/G2-U1-L03/golden',
-  ])('classroom route %s activates no top-level item and keeps the breadcrumb on 学习中心', (path) => {
+  ])('classroom route %s activates no top-level item and shows 课程学习 in the breadcrumb (OPS-052 P1-1)', (path) => {
     mockPath = path
+    render(<AppShell><div /></AppShell>)
+    expect(document.querySelectorAll('.kc-sidebar [aria-current="page"]')).toHaveLength(0)
+    expect(document.querySelector('.kc-breadcrumb b')?.textContent).toBe('课程学习')
+    expect(document.querySelector('.kc-breadcrumb')?.textContent).not.toContain('学习中心')
+  })
+
+  it.each(['/create', '/learn/scratch-lab/G2-U1-L03'])(
+    'free-creation route %s stays on 创作中心 and is never labelled 课程学习 (OPS-052 P1-1)',
+    (path) => {
+      mockPath = path
+      render(<AppShell><div /></AppShell>)
+      expect(screen.getByTestId('kc-nav-scratch')).toHaveAttribute('aria-current', 'page')
+      expect(document.querySelector('.kc-breadcrumb b')?.textContent).toBe('创作中心')
+    },
+  )
+
+  it('a non-classroom route outside /learn keeps the 学习中心 fallback', () => {
+    mockPath = '/studio/blockly/grid/G0-U1-L01'
     render(<AppShell><div /></AppShell>)
     expect(document.querySelectorAll('.kc-sidebar [aria-current="page"]')).toHaveLength(0)
     expect(document.querySelector('.kc-breadcrumb b')?.textContent).toBe('学习中心')

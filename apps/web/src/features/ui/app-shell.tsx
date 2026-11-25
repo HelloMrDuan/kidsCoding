@@ -26,6 +26,16 @@ function isGoldenScratchClassroom(path: string) {
   return path.startsWith('/learn/scratch-lab/') && path.endsWith('/golden')
 }
 
+/**
+ * OPS-052 P1-1：没有匹配一级菜单时的面包屑。/learn/ 下未匹配的路由都是选课后
+ * 进入的课程课堂（含 golden scratch-lab），显示「课程学习」，不再误显示「学习中心」；
+ * 自由创作（/create、非 golden scratch-lab）已由「创作中心」匹配，不会落到这里。
+ * 其余未匹配路由保持原有「学习中心」回落。
+ */
+function breadcrumbFallback(path: string) {
+  return path.startsWith('/learn/') ? '课程学习' : '学习中心'
+}
+
 const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: 'LEARNING',
@@ -131,7 +141,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
             </button>
-            <span className="kc-breadcrumb">KidsCoding / <b>{current?.label ?? '学习中心'}</b></span>
+            <span className="kc-breadcrumb">KidsCoding / <b>{current?.label ?? breadcrumbFallback(pathname)}</b></span>
           </div>
           <div className="kc-top-actions">
             <ShellLink href="/learn/catalog" className="kc-top-search">
