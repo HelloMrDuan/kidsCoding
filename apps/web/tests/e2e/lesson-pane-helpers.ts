@@ -18,9 +18,20 @@ export function isGridV3(page: Page): boolean {
   return GRID_V3_PATH.test(new URL(page.url()).pathname)
 }
 
+/**
+ * OPS-053: the six G0-U2 event lessons share the same V3 studio under
+ * /studio/blockly/event/<lessonId>; their old /learn/event-lab/<lessonId>
+ * entries redirect there (G0-U3 event+loop lessons stay on event-lab).
+ */
+const EVENT_V3_PATH = /^\/studio\/blockly\/event(\/|$)/
+
+export function isEventV3(page: Page): boolean {
+  return EVENT_V3_PATH.test(new URL(page.url()).pathname)
+}
+
 /** Any lesson that renders the V3 studio (one shell, no per-lesson copies). */
 export function isLessonStudioV3(page: Page): boolean {
-  return isForestV3(page) || isGridV3(page)
+  return isForestV3(page) || isGridV3(page) || isEventV3(page)
 }
 
 /** Open the only official 《小狐狸出场》 workspace and wait for it to mount. */
@@ -128,7 +139,10 @@ export async function showLessonPane(
   page: Page,
   pane: 'task' | 'code' | 'stage',
 ) {
-  const isV3 = (path: string) => FOREST_V3_PATH.test(path) || GRID_V3_PATH.test(path)
+  // OPS-053: the G0-U2 event lessons render the same V3 studio, so their pane
+  // switches go through the V3 tabs too (on phones the old classroom tab row
+  // does not exist there and the legacy branch below would silently no-op).
+  const isV3 = (path: string) => FOREST_V3_PATH.test(path) || GRID_V3_PATH.test(path) || EVENT_V3_PATH.test(path)
   let pathname = new URL(page.url()).pathname
   if (isV3(pathname)) {
     // The shell is visible in every pane mode; the slot is not (phones show

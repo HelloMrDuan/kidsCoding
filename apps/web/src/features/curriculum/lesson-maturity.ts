@@ -4,6 +4,7 @@ import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
 import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
+import { eventV3Route } from '@/features/lessons/event-v3/event-v3-lessons'
 import { gridV3Route } from '@/features/lessons/grid-v3/grid-v3-lessons'
 import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
 import { validTrialsFor } from './child-trial'
@@ -86,8 +87,17 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
     ]),
   ),
   // G0-U2 (Hark A): event lessons on the event-stage engine; their E2E lives in grid-lab.spec.ts (already in CI).
+  // OPS-053: the six G0-U2 lessons now open the V3 studio workspace; the old
+  // /learn/event-lab/<id> entry 308-redirects to the same lesson. G0-U3
+  // event+loop lessons stay on /learn/event-lab/<id>.
   ...Object.fromEntries(
-    [...Object.keys(g0u2EventLessons), ...Object.keys(g0u3EventLessons)].map((id) => [
+    Object.keys(g0u2EventLessons).map((id) => [
+      id,
+      { engine: 'blockly', route: eventV3Route(id), e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
+    ]),
+  ),
+  ...Object.fromEntries(
+    Object.keys(g0u3EventLessons).map((id) => [
       id,
       { engine: 'blockly', route: `/learn/event-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
     ]),
