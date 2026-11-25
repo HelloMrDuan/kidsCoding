@@ -4222,10 +4222,10 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/574",
-        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/45345656021",
-        "localTests": "grid-v3 vitest 35 passed; ESLint exit 0; tsc 81 baseline errors, 0 in OPS-052 files; next build exit 0; grid-lab.spec.ts desktop 27 passed"
+        "prCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/45371838325",
+        "localTests": "HEAD 11a421c6: vitest 1339 passed, 3 failed outside OPS-052 files (g2-u3-l02/l03 sandbox marker under Windows CRLF checkout, g2-u3-l05 judge.vm 5s timeout; files untouched); ESLint on changed files exit 0; tsc 81 baseline errors, 0 in OPS-052 files; Node 20 next build exit 0; Playwright classroom-entry.spec.ts 14 passed; grid-lab.spec.ts -g 'OPS-052|EDU-105' 9 passed 7 skipped (desktop-only tests under mobile project; desktop 8/8 passed); grid-lab.spec.ts -g 'G0-U1' 13 passed 1 skipped; lesson-workspace.spec.ts passed"
       },
-      "notes": "2026-11-24 duan 指令：Blockly 全课程统一 V3，第一批 G0-U1 六节，先以《先拿钥匙再开门》验证完整迁移链路。Task-ID 核对：台账建任务前最高 OPS-051，开放 PR 无 OPS-052。本任务堆叠于 OPS-049 #573（HEAD e16e0084，未合并），不得复制或修改其共享组件，#573 合入 main 后须以其新基底重建。开放 PR #458/#459 触碰 grid-lab.tsx、g0-u1-grid-lessons.ts 等文件，本任务只新增 grid-v3 模块与路由并改入口/测试，不修改重叠文件。已推 codex/ops-052-g0-u1-v3（最终 HEAD f1d0f80a）并建 Draft PR #574：PR CI 53 success、2 skipped、0 failure。首次尝试 g2-u3-l02-browser-trial 因 12 分钟 Job 预算被 runner 环境占去而 cancelled，同一提交重跑通过；workflow 预算问题属 SYS-108，本任务不改 workflow。保持 Draft，不合并、不部署，等待用户视觉验收与独立审核。"
+      "notes": "2026-11-24 duan 指令：Blockly 全课程统一 V3，第一批 G0-U1 六节，先以《先拿钥匙再开门》验证完整迁移链路。Task-ID 核对：台账建任务前最高 OPS-051，开放 PR 无 OPS-052。本任务堆叠于 OPS-049 #573（HEAD e16e0084，未合并），不得复制或修改其共享组件，#573 合入 main 后须以其新基底重建。开放 PR #458/#459 触碰 grid-lab.tsx、g0-u1-grid-lessons.ts 等文件，本任务只新增 grid-v3 模块与路由并改入口/测试，不修改重叠文件。已推 codex/ops-052-g0-u1-v3（最终 HEAD f1d0f80a）并建 Draft PR #574：PR CI 53 success、2 skipped、0 failure。首次尝试 g2-u3-l02-browser-trial 因 12 分钟 Job 预算被 runner 环境占去而 cancelled，同一提交重跑通过；workflow 预算问题属 SYS-108，本任务不改 workflow。按 Review #7126618285（HOLD）整改并推 HEAD 11a421c6：①旧 kids-grid-lesson-v1 草稿按 owner 隔离（新增 legacy-draft-claim.ts，复用既有认领戳；无主旧键只对可认领的访客可读，已登录账号与其他访客不可见、不自动认领，界面提示无法自动恢复且原键原样保留，不删除不覆盖）；②已完成历史课在归属确认且新草稿为空时可恢复为完成态，刷新后保持，不覆盖已有新草稿；③移除全局「编程课堂」一级菜单（侧栏、图标轨、移动底栏）及仅为它存在的身份请求，学习中心继续学习、学习地图课程卡、课程体系开始学习/试玩入口保留。PR CI（run 45371838325）首轮 57 pass、1 fail、3 skipping：g2-u1-viewport-trial 因 Playwright webServer 构建启动 240s 超时失败（未执行任何用例，非本轮改动所致），单 Job 重跑一次（job 138379700668）success，汇总 58 pass、0 fail、3 skipping（build/wake-machine 为 skipping，不计为通过）。状态保持 in_review，保持 Draft，不合并、不部署，不启动第二批，等待用户视觉验收与独立审核。"
     }
   ]
 }
