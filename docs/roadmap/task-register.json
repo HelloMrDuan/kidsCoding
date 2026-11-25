@@ -4104,7 +4104,7 @@
         "title": "V3 Blockly 工作区专项整改（Codex 接手，G0 第一课《小狐狸出场》）",
         "priority": "P0",
         "category": "OPS",
-        "status": "in_review",
+        "status": "completed",
         "dependencies": [
             "OPS-041",
             "OPS-048"
@@ -4122,6 +4122,9 @@
         ],
         "evidence": {
           "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/573",
+          "mergeCommit": "ef3cd8e49d8cb0fc91596c31f5c1aa18ce9c0932",
+          "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/45543505552",
+          "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/45543505664",
           "visualEvidence": "docs/product/p0-kitten-workspace/evidence/OPS-049/README.md",
           "tests": [
             "手机整改后复跑生产 Next.js 构建、TypeScript 和修改文件 lint（0 错误、1 条既有未用参数警告）。53 文件、455 条相关单测通过。",
@@ -4138,8 +4141,13 @@
             "2026-11-22 #573 复审整改 CI 首轮：head 05793943 的 LessonWorkspace E2E 在 CI desktop 失败——21 块回归展开工具抽屉后画布重排，旧代码用重排前的积木矩形点击，未选中底部积木，删除后计数仍为 21（tablet/mobile 通过）。测试改为先展开抽屉、重新平移并测量、用 elementFromPoint 校验命中同一积木、断言 blocklySelected 后再删除，断言强度不变。stock Chromium 本地复跑：desktop 3/3、tablet 1/1、mobile 1/1，desktop 全量 42 passed 1 skipped。同轮 g2-u1-viewport-trial 与 p3-u1-l01-browser-trial (desktop) 在 checkout 阶段因 runner 连不上 github.com:443 失败，属基础设施，与本轮改动无关。",
             "2026-11-22 #573 收口实测（本地生产构建）：七关导航三断点均为真实 button（边框/胶囊底/圆角、≥36px 与手机 ≥40px 高度、第 7 关不裁切、active/idle/complete 三色互异、hover、focus-visible、点击切关、完成后 ✓ 入草稿并刷新保留）；运行/保存为 V2 主次按钮（≥44px、rgb(36, 99, 235) 主色、保存 data-save-state=saved、刷新回第 5 关）；任务区默认当前关、教案折叠；guest A/B 读隔离与 21 块真实删除用例保留。Vitest 4 文件 56 用例、lesson-workspace 127 passed/2 skipped、g1-v3-classroom-ui 3/3、g1-golden-story 10/10、g1-u1-l01-workspace 11 passed/11 skipped、ESLint 0 错误、next build --webpack 成功。证据：docs/product/p0-kitten-workspace/evidence/OPS-049/README.md 与 g1-v3-ui-{1440,768,375}-{run,final}.png。",
             "2026-11-23 #573 终审前最小整改（P0-1/P0-2/P1-2）：launchLessonHref 统一 lesson-01 到 /studio/blockly/lesson-01-forest-hello，旧 /learn/lesson/lesson-01-forest-hello 307 重定向（刷新不循环），首页/地图/导航/补救/完成/项目继续入口矩阵均解析 V3，lesson-02～12 保留旧课堂；首页与地图同用 useOwnerProgress，未知身份 fail-closed，guest A→B→A 与 user A→B→未确认→A 真实浏览器隔离通过。本地生产构建：Vitest 9 文件 115 用例 + resolve-project-continue 3 用例；Playwright V3/入口 5 spec 50 passed/2 skipped；旧 lesson-01 流程 4 spec 20 passed；ux-101 组 18 passed；tsc 81 条与基线一致、改动文件 0；ESLint 0。",
-            "2026-11-23 #573 CI head 0079d1a6：scratch-v2-visual-browser 失败——本地复跑同 job 10 个 spec 为 49 passed/3 failed，全部因旧断言仍假设 lesson-01 走旧三栏课堂（ux-102 桌面+手机点击 lesson-01 后期待 lesson-workbench-shell；v2-tokens 期待 /learn/lesson/）。按 P0-2 更新为 V3 断言（studio-shell、forest-hello-slot、V3 URL），未删除断言；同 job 全量复跑 52 passed/0 failed。"
-          ]
+            "2026-11-23 #573 CI head 0079d1a6：scratch-v2-visual-browser 失败——本地复跑同 job 10 个 spec 为 49 passed/3 failed，全部因旧断言仍假设 lesson-01 走旧三栏课堂（ux-102 桌面+手机点击 lesson-01 后期待 lesson-workbench-shell；v2-tokens 期待 /learn/lesson/）。按 P0-2 更新为 V3 断言（studio-shell、forest-hello-slot、V3 URL），未删除断言；同 job 全量复跑 52 passed/0 failed。",
+            "PR #573 门禁：58 项检查 58 成功 + 3 跳过、0 失败（头 e16e0084；合并 SHA ef3cd8e49d8cb0fc91596c31f5c1aa18ce9c0932）",
+            "main CI（主线头 ef3cd8e4）：课程 45543505552、追踪 45543505664、deploy-pipeline 45543505648、LessonWorkspace E2E 45543505645 均 success",
+            "生产核验：ef3cd8e4 部署经 12:25 跟进确认（deploys.log DEPLOYED ef3cd8e4、看门狗 lastDeployedSha ef3cd8e4、main CI 全绿）；最终版 ca570cae 真实浏览器核验（2026-11-25 13:03-13:05）：/api/health {\"status\":\"ok\"}、首页、学习地图、六节 V3 课全部打开，L01 真实运行（错误实验反馈正确）、保存与刷新恢复通过，L06 运行检出顺序错误",
+            "台账校验：scripts/check-task-ledger.py 校验通过（changed == {OPS-049}）"
+          ],
+          "reviewer": "ChatGPT 独立复审 PASS（#573 评论 7098120274，头 e16e0084）；用户视觉验收通过；Claude 合并前审计无阻塞"
         },
         "notes": "2026-11-23 #573 终审前最小整改（Codex）：lesson-01 全部正式入口统一 V3、旧 URL 307 兼容重定向、lesson-02～12 不变；首页/地图/继续学习统一 owner 解析，未知身份 fail-closed；仍为 Draft/in_review，未合并、未部署。2026-11-22 #573 收口（Codex）：七关导航为真实 V3 步骤按钮（短名 + 完整 aria-label/title）、运行/保存主次按钮、任务区折叠教案、guest A/B 读隔离、21 块删除用例保留，均已本地实测；仍为 Draft/in_review，未合并、未部署，等待 ChatGPT 复审与 main CI。2026-11-22 #573 复审整改（Codex）：G1 视觉统一与编程课堂账号隔离已提交，仍为 Draft/in_review，未合并、未部署；等待 ChatGPT 复审与 main CI。2026-11-22 #573（Codex）：长脚本整改与编程课堂入口统一提交独立 PR，状态保持 in_review；#554/OPS-047 未改实现，待原负责人 rebase 到最新 main 并适配共享 V3 组件；旧版第二课双滚动条/页面溢出仍为已知缺口，不由本 PR 声称解决。2026-11-18 16:12 duan 下达 Codex 接手指令：V3 Blockly 工作区专项整改现交由 Codex 独立负责；2 号暂停对共享 Blockly 工作区的并行修改，保留其分支 muse-c/v3-forest-workspace（HEAD a1894bc9）供 Codex 复用；4 号负责后续独立审核，主号负责合并部署；2 号可继续其他不冲突课程任务，但不得自行合并旧 V3 实现。Task-ID 核对：OPS-049 在建任务时确认未被占用（台账 138 条、最高 OPS-048；开放 PR 无 OPS-049；OPS-044 已预留给主号做 E2E CI 接线，不用）。OPS-048（2 号 V3 样板）已改为 blocked，由本任务接手同一范围继续实施。参考分支 review/kitten-forest-v3-reference（PROTOTYPE-FOREST-v3.html、VISUAL-CONTRACT-FOREST-v3.md），原型 SVG 积木与模拟运行不能作为真实产品代码。"
     },
