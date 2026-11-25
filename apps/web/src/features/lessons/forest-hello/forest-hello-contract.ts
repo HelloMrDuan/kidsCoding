@@ -29,12 +29,17 @@
 import { launchLessons } from '@/content/curriculum/launch-lessons'
 import { foundationUnits } from '@/content/curriculum/foundation-units'
 import { foundationVoiceovers } from '@/content/curriculum/foundation-voiceovers'
+import {
+  FOREST_HELLO_LESSON_ID,
+  FOREST_HELLO_LEGACY_ROUTE,
+  FOREST_HELLO_STUDIO_ROUTE,
+} from '../launch-lesson-routes'
 import type { LessonContract } from '../workspace/lesson-contract'
 
-export const FOREST_LESSON_ID = 'lesson-01-forest-hello'
+export const FOREST_LESSON_ID = FOREST_HELLO_LESSON_ID
 export const FOREST_LESSON_TITLE = '小狐狸出场'
-export const FOREST_ROUTE = '/studio/blockly/lesson-01-forest-hello'
-export const FOREST_OLD_ROUTE = '/learn/lesson/lesson-01-forest-hello'
+export const FOREST_ROUTE = FOREST_HELLO_STUDIO_ROUTE
+export const FOREST_OLD_ROUTE = FOREST_HELLO_LEGACY_ROUTE
 export const FOREST_REWARD_CARD_ID = 'theme-forest-fox'
 
 /** 课程数据源（launch-lessons.ts lesson-01 条目）；缺失即 fail-closed。 */

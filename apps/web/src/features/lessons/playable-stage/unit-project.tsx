@@ -52,7 +52,16 @@ function startBlocks(lessonId: string, initialBlocks: unknown): ProgramBlock[] {
  * judge (several programs may be right), and saves edits to kc-progress only after a passing
  * run since the last edit. Modelled on DuoProject (lessons 10–12).
  */
-export function UnitProject({ lessonId, initialBlocks }: { lessonId: string; initialBlocks?: unknown }) {
+export function UnitProject({
+  lessonId,
+  initialBlocks,
+  owner,
+}: {
+  lessonId: string
+  initialBlocks?: unknown
+  /** Resolved draft/progress owner. Omitted keeps the legacy unscoped read. */
+  owner?: string | null
+}) {
   const project = getUnitProject(lessonId)
   const template = useMemo(() => {
     const lesson = launchLessons.find((item) => item.id === lessonId)
@@ -87,14 +96,17 @@ export function UnitProject({ lessonId, initialBlocks }: { lessonId: string; ini
   function save() {
     if (!passed) return
     try {
-      const progress = readGuestProgress()
-      writeGuestProgress({
-        ...progress,
-        projectSnapshots: [
-          ...progress.projectSnapshots.filter((snapshot) => snapshot.lessonId !== lessonId),
-          { lessonId, blocks: toSnapshot(blocks), updatedAt: new Date().toISOString() },
-        ],
-      })
+      const progress = readGuestProgress(owner)
+      writeGuestProgress(
+        {
+          ...progress,
+          projectSnapshots: [
+            ...progress.projectSnapshots.filter((snapshot) => snapshot.lessonId !== lessonId),
+            { lessonId, blocks: toSnapshot(blocks), updatedAt: new Date().toISOString() },
+          ],
+        },
+        owner,
+      )
       setSaveState('saved')
       setMessage(SAVED)
     } catch {

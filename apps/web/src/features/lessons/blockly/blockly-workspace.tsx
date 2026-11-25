@@ -96,6 +96,121 @@ class DockedFlyout extends Blockly.VerticalFlyout {
   }
 }
 
+/**
+ * BLK-竖条 root cause: Blockly 12 constructs every flyout's own scrollbar
+ * pair with `containerVisible = isHandleVisible = true`, then `Flyout.init()`
+ * calls `hide()` — which no-ops because the flyout is not visible yet. Until
+ * the flyout is first opened nothing calls `updateDisplay()`, so a flyout
+ * that never opens (the auto-closed toolbox flyout, the trashcan flyout)
+ * keeps its 25px vertical scrollbar rendered at the injection origin. That
+ * orphan bar is the "竖条" beside the first script block.
+ *
+ * `Flyout.updateDisplay()` recomputes the flyout group AND its scrollbar's
+ * container visibility from Blockly's own state (public at runtime, typed
+ * `private` in the declarations). Calling it for every flyout of the
+ * workspace after inject and after each resize hides the orphan bars by
+ * state, not by CSS masking; a flyout that is actually opened still shows
+ * its bar through `setVisible()` / `positionAt_()`, and the bar hides again
+ * when its contents fit.
+ */
+function syncFlyoutScrollbars(workspace: Blockly.WorkspaceSvg) {
+  const flyouts: { updateDisplay?: () => void }[] = []
+  const main = workspace.getFlyout()
+  if (main) flyouts.push(main as unknown as { updateDisplay?: () => void })
+  const trash = workspace.trashcan?.flyout
+  if (trash) flyouts.push(trash as unknown as { updateDisplay?: () => void })
+  for (const flyout of flyouts) flyout.updateDisplay?.()
+}
+
+/** Parts of the canvas that own their own pointer/wheel handling. */
+const DOCKED_NATIVE_TARGETS = [
+  '.blocklyFlyout',
+  '.blocklyToolboxDiv',
+  '.blocklyScrollbar',
+  '.blocklyZoom',
+  '.blocklyTrash',
+  '.blocklyWidgetDiv',
+  '.blocklyDropDownDiv',
+  '.blocklyBubbleCanvas',
+].join(', ')
+
+/**
+ * V3 docked canvas without overlay scrollbars.
+ *
+ * Blockly only enables `move.wheel` / `move.drag` when
+ * `options.move.scrollbars` is truthy (Options.parseMoveOptions), so
+ * `scrollbars: false` reaches the intended no-bar look but silently disables
+ * BOTH ways of moving a long script. Fit shrinks to 0.6 at best, so a 20-block
+ * stack cannot be reached at all. Restore exactly the two missing gestures on
+ * the workspace SVG, without re-enabling Blockly's scrollbar:
+ * - wheel over the script pans it (deltaMode-aware);
+ * - dragging the grey background pans it.
+ * The flyout / toolbox / zoom / trash keep their own handlers, so material
+ * scrolling never moves the script and vice versa.
+ */
+function enableDockedCanvasPan(workspace: Blockly.WorkspaceSvg) {
+  const svg = workspace.getParentSvg()
+  const isFreeTarget = (target: EventTarget | null, includeBlocks: boolean) => {
+    if (!(target instanceof Element)) return false
+    const selector = includeBlocks ? DOCKED_NATIVE_TARGETS : `${DOCKED_NATIVE_TARGETS}, .blocklyBlockCanvas`
+    return !target.closest(selector)
+  }
+
+  const onWheel = (event: WheelEvent) => {
+    // Ctrl/Cmd + wheel stays the browser's page zoom.
+    if (event.ctrlKey || event.metaKey) return
+    if (!isFreeTarget(event.target, true)) return
+    event.preventDefault()
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 400 : 1
+    workspace.scroll(
+      workspace.scrollX - event.deltaX * unit,
+      workspace.scrollY - event.deltaY * unit,
+    )
+  }
+
+  let pointerId: number | null = null
+  let lastX = 0
+  let lastY = 0
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.button !== 0 || pointerId !== null) return
+    if (!isFreeTarget(event.target, false)) return
+    pointerId = event.pointerId
+    lastX = event.clientX
+    lastY = event.clientY
+    svg.setPointerCapture?.(event.pointerId)
+  }
+  const onPointerMove = (event: PointerEvent) => {
+    if (event.pointerId !== pointerId) return
+    const dx = event.clientX - lastX
+    const dy = event.clientY - lastY
+    if (!dx && !dy) return
+    lastX = event.clientX
+    lastY = event.clientY
+    event.preventDefault()
+    workspace.scroll(workspace.scrollX - dx, workspace.scrollY - dy)
+  }
+  const endPan = (event: PointerEvent) => {
+    if (event.pointerId !== pointerId) return
+    pointerId = null
+    if (svg.hasPointerCapture?.(event.pointerId)) svg.releasePointerCapture(event.pointerId)
+  }
+
+  svg.addEventListener('wheel', onWheel, { passive: false })
+  // Blockly stops pointerdown propagation before it reaches the SVG's bubble
+  // phase, so the background drag must listen in the capture phase.
+  svg.addEventListener('pointerdown', onPointerDown, true)
+  svg.addEventListener('pointermove', onPointerMove, { passive: false, capture: true })
+  svg.addEventListener('pointerup', endPan, true)
+  svg.addEventListener('pointercancel', endPan, true)
+  return () => {
+    svg.removeEventListener('wheel', onWheel)
+    svg.removeEventListener('pointerdown', onPointerDown, true)
+    svg.removeEventListener('pointermove', onPointerMove, true)
+    svg.removeEventListener('pointerup', endPan, true)
+    svg.removeEventListener('pointercancel', endPan, true)
+  }
+}
+
 export type DockedBlocklyOptions = {
   /** A changed key selects a fresh default category without remounting the engine. */
   stepKey: string
@@ -111,7 +226,7 @@ function BlocklyToolsPanel({ mode, children }: { mode: 'docked' | 'golden' | 'le
   if (mode === 'docked') {
     return (
       <details className="kc-v3-assist">
-        <summary>点按添加 · 删除 · 键盘</summary>
+        <summary data-testid="golden-block-tools">点按添加 · 删除 · 键盘</summary>
         <div className="kc-v3-assist-content">{children}</div>
       </details>
     )
@@ -395,13 +510,23 @@ export function BlocklyWorkspace({
       plugins: isDocked ? { flyoutsVerticalToolbox: DOCKED_FLYOUT } : undefined,
       trashcan: true,
       move: {
-        scrollbars: true,
+        // V3 docked canvas: Blockly's main-workspace scrollbars paint a ~20px
+        // vertical handle over the right edge of the script area. At 375px it
+        // covered the say-line block (measured 18.8×88.8 overlap), so the
+        // classroom uses the prototype's canvas instead: pan by dragging the
+        // background / wheel, no overlay bar on top of the blocks. Flyout
+        // scrollbars are separate and stay enabled.
+        scrollbars: !isDocked,
         drag: true,
         wheel: true,
       },
       zoom: {
         controls: true,
-        wheel: true,
+        // Wheel over the docked canvas pans the long script (move.wheel). If
+        // Blockly also owns wheel-zoom, it pans nothing and zooms instead, so a
+        // 20-block script can only be reached by dragging the background.
+        // Docked zoom stays on the explicit ± controls and 适合画面.
+        wheel: !isDocked,
         startScale: BASE_SCALE,
         minScale: MIN_FIT_SCALE,
         maxScale: 1.2,
@@ -409,6 +534,7 @@ export function BlocklyWorkspace({
     })
 
     workspaceRef.current = workspace
+    const disposeDockedPan = isDocked ? enableDockedCanvasPan(workspace) : null
     const keyboardNav = new KeyboardNavigation(workspace)
     const restoredBlocks = restoreBlockSequence(
       latestBlocksRef.current,
@@ -426,6 +552,9 @@ export function BlocklyWorkspace({
       else positionOrConnectBlock(workspace, block)
     })
 
+    // Hide orphan flyout scrollbars before the first paint (see helper).
+    syncFlyoutScrollbars(workspace)
+
     let fitFrame = 0
     // The program loaded with the step is shown from the top until the child moves it.
     let pendingFromTop = true
@@ -438,6 +567,12 @@ export function BlocklyWorkspace({
     }
     showFromTopRef.current = () => scheduleFit(true)
 
+    // Legacy lessons restore the next step's program on every change, so they
+    // re-fit. The V3 docked canvas is one long, user-panned program: re-fitting
+    // on an edit jumped a kid who was editing the bottom of a long script back
+    // to the top of the first block.
+    const autoFit = !isDocked && layoutMode === 'legacy'
+
     const handleResize = () => {
       if (layoutMode === 'golden' && (!mountRef.current?.offsetWidth || workspace.isDragging())) return
       const flyout = workspace.getFlyout()
@@ -445,7 +580,8 @@ export function BlocklyWorkspace({
         flyout.reservedWidth = flyoutColumnRef.current.offsetWidth
       }
       Blockly.svgResize(workspace)
-      if (layoutMode === 'legacy' || pendingFromTop) scheduleFit()
+      syncFlyoutScrollbars(workspace)
+      if (autoFit || pendingFromTop) scheduleFit()
     }
 
     let previousSnapshot = JSON.stringify(latestBlocksRef.current)
@@ -462,9 +598,9 @@ export function BlocklyWorkspace({
         previousSnapshot = key
         const notifySnapshot = injectionSnapshotHandler ?? setupRef.current.onSnapshotChange
         notifySnapshot(next)
-        if (layoutMode === 'legacy') scheduleFit()
+        if (autoFit) scheduleFit()
       } else if (event?.type === Blockly.Events.BLOCK_DRAG && !(event as Blockly.Events.BlockDrag).isStart) {
-        if (layoutMode === 'legacy') scheduleFit()
+        if (autoFit) scheduleFit()
         else handleResize()
       }
     }
@@ -488,6 +624,7 @@ export function BlocklyWorkspace({
       window.removeEventListener('resize', handleResize)
       workspace.removeChangeListener(handleChange)
       keyboardNav.dispose()
+      disposeDockedPan?.()
       workspace.dispose()
       workspaceRef.current = null
       lastSelectedBlockIdRef.current = null
@@ -630,16 +767,17 @@ export function BlocklyWorkspace({
   return (
     <section className={isDocked ? 'kc-v3-blockly' : 'flex flex-col gap-3'} data-testid="lesson-blockly-workspace">
       {isDocked && <>
-        <header className="kc-v3-material-heading" data-testid="v3-material-heading">
-          <h2>积木素材</h2>
-          <span>拖到脚本区</span>
-        </header>
-        <header className="kc-v3-script-heading" data-testid="v3-script-heading">
-          <h2>脚本工作区</h2>
-          <div>
-            <button type="button" data-testid="v3-undo" onClick={() => workspaceRef.current?.undo(false)}>撤销</button>
-            <button type="button" data-testid="v3-redo" onClick={() => workspaceRef.current?.undo(true)}>重做</button>
-            <button type="button" onClick={() => showFromTopRef.current?.()}>适合画面</button>
+        <header className="kc-v3-editor-head" data-testid="v3-editor-head">
+          <span className="kc-v3-paneltitle">
+            <span className="kc-v3-headerglyph" aria-hidden="true">▦</span>
+            积木编程
+            <span className="kc-v3-secondary">Blockly</span>
+          </span>
+          <div className="kc-v3-editor-tools">
+            <button type="button" data-testid="v3-undo" onClick={() => workspaceRef.current?.undo(false)}>↶ 撤销</button>
+            <button type="button" data-testid="v3-redo" onClick={() => workspaceRef.current?.undo(true)}>↷ 重做</button>
+            <button type="button" data-testid="v3-fit" onClick={() => showFromTopRef.current?.()}>⤢ 适合画面</button>
+            <span className="kc-v3-zoom-label">素材缩放 90%</span>
           </div>
         </header>
         <nav className="kc-v3-categories" data-testid="v3-categories" aria-label="积木分类">
@@ -656,7 +794,7 @@ export function BlocklyWorkspace({
           <button type="button" aria-label="重置脚本缩放" onClick={resetScriptZoom}>↺</button>
           <button type="button" aria-label="放大脚本" onClick={() => workspaceRef.current?.zoomCenter(1)}>+</button>
         </div>
-        <div className="kc-v3-flyout-size" aria-hidden="true" ref={flyoutColumnRef} />
+        <div className="kc-v3-flyout-size" data-testid="v3-flyout" aria-hidden="true" ref={flyoutColumnRef} />
       </>}
       {/* isolate: Blockly's flyout (z-index 20) must not paint over the sticky top bar when scrolled. */}
       <div className={isDocked ? 'kc-v3-engine' : 'isolate overflow-hidden rounded-[10px] border border-[var(--kc-line)] bg-white'}>

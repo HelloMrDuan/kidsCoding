@@ -4,11 +4,16 @@ test('blockly workspace fills the lesson workbench', async ({ page }) => {
   await page.goto('/learn/lesson/lesson-01-forest-hello')
 
   await page.waitForSelector('[data-testid="lesson-blockly-workspace"]')
+  // V3 injects the Blockly SVG asynchronously inside .kc-v3-engine-mount;
+  // measuring the mount before the engine lands would only test the skeleton.
+  await page.waitForSelector('.blocklySvg')
 
   const debugInfo = await page.evaluate(() => {
-    const mount = document.querySelector(
-      '[data-testid="lesson-blockly-workspace"] > div:nth-of-type(2) > div',
-    ) as HTMLElement | null
+    const root = document.querySelector('[data-testid="lesson-blockly-workspace"]')
+    // lesson-01 now renders the V3 studio, whose engine mount is marked with
+    // .kc-v3-engine-mount; lessons 02–12 keep the old classroom's second child.
+    const mount = (root?.querySelector('.kc-v3-engine-mount') ??
+      root?.querySelector(':scope > div:nth-of-type(2) > div')) as HTMLElement | null
     const workspace = document.querySelector('.blocklySvg')
     const flyout = document.querySelector('.blocklyFlyout')
     const toolbox = document.querySelector('.blocklyToolboxDiv')

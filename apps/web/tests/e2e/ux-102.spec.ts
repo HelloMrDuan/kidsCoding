@@ -96,11 +96,14 @@ for (const [name, width, height] of [
 
     // Completed lesson re-study: the node links to the lesson page,
     // and the lesson page renders the playable workspace (not the
-    // lock screen).
+    // lock screen). lesson-01's only official workspace is the V3 studio
+    // (P0-1); lessons 02–12 keep the three-column workbench shell.
     await map
       .getByTestId('lesson-card-lesson-01-forest-hello')
       .click()
-    await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    await expect(page).toHaveURL(/\/studio\/blockly\/lesson-01-forest-hello$/)
+    await expect(page.getByTestId('studio-shell')).toBeVisible()
+    await expect(page.getByTestId('forest-hello-slot')).toBeVisible()
     await expect(page.getByText('看看高阶升级内容')).toHaveCount(0)
 
     // Back on the map, the real route is unchanged (V2 layout intact).

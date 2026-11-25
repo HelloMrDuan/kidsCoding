@@ -45,6 +45,15 @@ async function addStoryBlock(page: Page, type: string) {
   await page.getByTestId('lesson-add-' + type).click()
 }
 
+/** V3 G1 folds the guide, block list and reflection into the G0-style
+ *  auxiliary collapse; open it before touching those controls. */
+async function openEditorGuide(page: Page) {
+  const details = page.locator('details.kc-v3-editor-details')
+  if (!await details.evaluate(el => (el as HTMLDetailsElement).open)) {
+    await details.locator('summary').click()
+  }
+}
+
 for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]]) {
   test(`G1-U1-L01 Golden keeps one editor at ${width}×${height}`, async ({ browser }) => {
     test.setTimeout(70_000)
@@ -61,6 +70,9 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
         await expect(stage).toBeVisible()
         await page.getByRole('button', { name: '收起任务' }).click()
         await expect.poll(async () => (await editor.boundingBox())!.width).toBeGreaterThan(before.width + 180)
+        // The step card lives in the mission column, so restore it before
+        // the lesson flow continues.
+        await page.getByRole('button', { name: '展开任务' }).click()
       } else if (width === 375) {
         await page.getByTestId('golden-story-pane-stage').tap()
         await expect(stage).toBeVisible()
@@ -68,8 +80,12 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
         await page.getByTestId('golden-story-pane-code').tap()
       }
       expect(await editor.evaluate((current, original) => current.isSameNode(original), mounted)).toBe(true)
+      // V3 pane mode: the step card (and its 完成这一关 button) lives in the
+      // 任务 pane below 1040px, so open it first and come back to 编程.
+      if (width <= 768) await page.getByTestId('golden-story-pane-task').tap()
       await page.getByTestId('g1-u1-l01-complete-step').click()
       await page.getByTestId('g1-u1-l01-complete-step').click()
+      if (width <= 768) await page.getByTestId('golden-story-pane-code').tap()
       await addStoryBlock(page, 'say_line')
       await addStoryBlock(page, 'move_right')
       await moveStoryBlock(page, width <= 768)
@@ -80,7 +96,11 @@ for (const [width, height] of [[1440, 900], [1366, 768], [768, 1024], [375, 812]
         return program?.filter((block: { disconnected?: boolean }) => !block.disconnected)
           .map((block: { type: string }) => block.type) ?? []
       }, draftKey)).toEqual(['when_start', 'say_line', 'move_right'])
-      if (width === 375) {
+      if (width <= 768) {
+        // V3 pane mode: the stage pane (and its ws-run-toggle) is hidden
+        // while 编程 is selected, so the slot's own 运行 button is the
+        // reachable entry; it runs through the same shell and reveals the
+        // stage pane (data-pane="stage").
         await lesson.getByRole('button', { name: '运行', exact: true }).tap()
         await expect(lesson).toHaveAttribute('data-pane', 'stage')
       } else {
@@ -138,11 +158,13 @@ test('G1-U1-L01 Golden verifies wrong program, an independently edited encore an
   await expect(verdict).toContainText('请在狐狸移动之后')
   await addStoryBlock(page, 'switch_character')
   await addStoryBlock(page, 'say_line')
+  await openEditorGuide(page)
   await page.getByTestId('g1-u1-l01-block-line-4').selectOption('ready')
   await run()
   await expect(verdict).toContainText('拓展也做到了')
   await expect(page.getByTestId('g1-u1-l01-rabbit')).toHaveAttribute('data-speaking', 'true')
   await goTo('review')
+  await openEditorGuide(page)
   await page.getByTestId('g1-u1-l01-reflection-option-0').click()
   await page.getByTestId('g1-u1-l01-complete-step').click()
   await expect(page.getByTestId('golden-story-badge')).toBeVisible()

@@ -1,19 +1,38 @@
 'use client'
 
-import Link from 'next/link'
+/**
+ * G1 金色课堂（/learn/story-lab/G1-U1-L01/golden）。
+ *
+ * V3 整改（2026-11-22）：课堂外壳改用与 G0 相同的 StudioShell +
+ * LessonWorkspace(chrome="studio", studioLayout="blockly-v3")，让课程体系
+ * 与编程课堂进入同一节课时看到同一套工作台、存档与学习进度。课程语义
+ * 全部保留：
+ * - 课程自有 EditorSlot / StageSlot / SlotRunAdapter 原样挂载（真实
+ *   Blockly、7 关流程、判定、草稿键都不动）；
+ * - 根节点仍为 `golden-story`，`data-pane` 与 `golden-story-pane-*`
+ *   测试 id 不变，手机端点“运行”仍切到舞台；
+ * - 顶栏“返回 / 保存 / 全屏”与桌面“收起任务”继续可用，分别交给
+ *   StudioShell 的返回链接、ShellTopbarAction 与任务列折叠；
+ * - 保存失败时的 beforeunload 提醒保留。
+ */
+
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { LessonWorkspace } from '@/features/lessons/workspace/lesson-workspace'
-import type { EditorSlotProps, ShellControl } from '@/features/lessons/workspace/workspace-slots'
-import { G1_WORKSPACE_CONTRACT } from './g1-u1-l01-contract'
+import type { EditorSlotProps, SaveState, ShellControl, ShellTopbarAction } from '@/features/lessons/workspace/workspace-slots'
+import { StudioShell } from '@/features/lessons/studio/studio-shell'
+import type { StudioLesson } from '@/features/lessons/studio/studio-lesson'
+import { G1_WORKSPACE_CONTRACT, G1_WORKSPACE_CONTRACT_FIELDS } from './g1-u1-l01-contract'
 import { emptyStoryDraft } from './g1-u1-l01-draft'
 import { StoryAdapter, StoryRunAdapter } from './g1-u1-l01-run-adapter'
 import { StoryEditorSlot } from './g1-u1-l01-slot'
 import { StoryStageSlot } from './g1-u1-l01-stage'
 import '../golden/golden-lesson-layout.css'
-import './story-golden-classroom.css'
 
-function GoldenStoryEditor(props: EditorSlotProps) {
-  return <StoryEditorSlot {...props} goldenLayout />
+const STUDIO_LESSON: StudioLesson = {
+  ...G1_WORKSPACE_CONTRACT_FIELDS,
+  engine: 'slot',
+  demo: true,
+  backHref: '/learn/catalog/G1-U1-L01',
 }
 
 export function StoryGoldenClassroom() {
@@ -22,9 +41,10 @@ export function StoryGoldenClassroom() {
   const initial = useMemo(() => emptyStoryDraft(), [])
   const root = useRef<HTMLElement>(null)
   const [controls, setControls] = useState<ShellControl>()
+  const [saveState, setSaveState] = useState<SaveState>()
+  const [saveMessage, setSaveMessage] = useState<string | null>(null)
   const [pane, setPane] = useState<'code' | 'task' | 'stage'>('code')
-  const [taskOpen, setTaskOpen] = useState(true)
-  const [tabletTaskOpen, setTabletTaskOpen] = useState(false)
+  const [missionCollapsed, setMissionCollapsed] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [focus, setFocus] = useState(false)
 
@@ -44,14 +64,14 @@ export function StoryGoldenClassroom() {
   }, [focus])
 
   useEffect(() => {
-    if (controls?.saveState !== 'failed') return
+    if (saveState !== 'failed') return
     const warn = (event: BeforeUnloadEvent) => {
       event.preventDefault()
       event.returnValue = ''
     }
     window.addEventListener('beforeunload', warn)
     return () => window.removeEventListener('beforeunload', warn)
-  }, [controls?.saveState])
+  }, [saveState])
 
   async function toggleFullscreen() {
     if (focus) setFocus(false)
@@ -66,60 +86,96 @@ export function StoryGoldenClassroom() {
     }
   }
 
+  /** 手机端：点运行先切到舞台再运行（旧课堂行为，测试依赖 data-pane）。 */
   function run() {
     setPane('stage')
-    setTabletTaskOpen(false)
-    controls?.run()
+    controlsRef.current?.run()
   }
+  const controlsRef = useRef<ShellControl | undefined>(undefined)
+  controlsRef.current = controls
+  const runRef = useRef(run)
+  runRef.current = run
+  const [controlsReady, setControlsReady] = useState(false)
+  useEffect(() => {
+    setControlsReady(Boolean(controls))
+  }, [controls])
 
-  const saveLabel = controls?.saveState === 'saved' ? '已保存到本机'
-    : controls?.saveState === 'failed' ? '本机保存失败' : '尚未保存'
+  /** Stable slot identity: V3 docked Blockly + mission/stepbar portals. */
+  const editorSlot = useMemo(() => {
+    function GoldenStoryEditor(props: EditorSlotProps) {
+      return (
+        <StoryEditorSlot
+          {...props}
+          goldenLayout
+          v3
+          onRunRequest={() => runRef.current()}
+        />
+      )
+    }
+    return GoldenStoryEditor
+  }, [])
+
+  const fullscreenRef = useRef<() => void>(() => {})
+  fullscreenRef.current = () => void toggleFullscreen()
+  const fullscreenLabel = fullscreen || focus ? '退出全屏' : '全屏'
+  // Stays identity-stable across shellControl updates (controls appear in
+  // deps only through the stable ready flag); otherwise the shellControl →
+  // onShellControl → setControls effect would re-create itself forever.
+  const topbarActions = useMemo<ShellTopbarAction[]>(
+    () => [
+      {
+        label: '保存',
+        onClick: () => controlsRef.current?.save(),
+        disabled: !controlsReady,
+        testId: 'golden-story-save',
+      },
+      {
+        label: fullscreenLabel,
+        onClick: () => fullscreenRef.current(),
+        testId: 'golden-story-fullscreen',
+      },
+    ],
+    [controlsReady, fullscreenLabel],
+  )
+
   return (
-    <main ref={root} className="kc-golden kc-golden-story" data-testid="golden-story"
-      data-pane={pane} data-task-open={taskOpen} data-tablet-task-open={tabletTaskOpen} data-focus-mode={focus}>
-      <header className="kc-golden-toolbar">
-        <div className="kc-golden-title">
-          <span className="kc-golden-brand">KidsCoding</span>
-          <h1>{G1_WORKSPACE_CONTRACT.title}</h1>
-        </div>
-        <div className="kc-golden-top-actions">
-          <Link href="/learn/catalog/G1-U1-L01" className="kc-action-surface kc-btn-outline kc-btn-sm" aria-label="返回课程"
-            onNavigate={event => {
-              if (controls?.saveState === 'failed' && !window.confirm('这次修改还没保存。要离开课堂吗？')) event.preventDefault()
-            }}>返回</Link>
-          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => controls?.save()} disabled={!controls}>保存</button>
-          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm kc-golden-story-task-toggle"
-            onClick={() => setTaskOpen(open => !open)} aria-expanded={taskOpen}>{taskOpen ? '收起任务' : '展开任务'}</button>
-          <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm kc-golden-story-tablet-task"
-            onClick={() => setTabletTaskOpen(open => !open)} aria-expanded={tabletTaskOpen}>{tabletTaskOpen ? '收起任务' : '任务'}</button>
-          {controls?.file && (
-            <details className="kc-golden-story-file">
-              <summary className="kc-action-surface kc-btn-outline kc-btn-sm">文件</summary>
-              <div>
-                <button type="button" onClick={() => controls.file?.export()}>导出作品</button>
-                <button type="button" onClick={() => controls.file?.import()}>导入作品</button>
-              </div>
-            </details>
-          )}
-          <button type="button" className="kc-action-surface kc-btn-sm" onClick={() => void toggleFullscreen()}>
-            {fullscreen || focus ? '退出全屏' : '全屏'}
-          </button>
-        </div>
-        <div className="kc-golden-progress"><span role="status">{saveLabel}</span></div>
-      </header>
-      <nav className="kc-golden-tabs" aria-label="课堂分区">
-        {([['task', '任务'], ['code', '代码'], ['stage', '舞台']] as const).map(([id, label]) =>
-          <button type="button" key={id} onClick={() => setPane(id)} aria-pressed={pane === id}
-            data-testid={`golden-story-pane-${id}`} className={`kc-action-surface kc-btn-sm ${pane === id ? '' : 'kc-btn-outline'}`}>{label}</button>)}
-      </nav>
-      <div className="kc-golden-story-workspace">
-        <LessonWorkspace contract={G1_WORKSPACE_CONTRACT} adapter={adapter} runAdapter={runAdapter} stageSlot={StoryStageSlot}
-          editorSlot={GoldenStoryEditor} initialScript={initial} onShellControl={setControls} />
-      </div>
-      <div className="kc-golden-runbar kc-golden-story-runbar">
-        <button type="button" className="kc-action-surface kc-btn-sm" onClick={run} disabled={!controls || controls.running}>运行</button>
-        <button type="button" className="kc-action-surface kc-btn-outline kc-btn-sm" onClick={() => controls?.stop()} disabled={!controls?.running}>停止</button>
-      </div>
+    <main
+      ref={root}
+      data-testid="golden-story"
+      data-pane={pane}
+      data-mission-collapsed={missionCollapsed}
+      data-focus-mode={focus}
+      style={{ position: 'fixed', inset: 0, zIndex: 100, height: '100dvh', overflow: 'hidden' }}
+    >
+      <StudioShell
+        lesson={STUDIO_LESSON}
+        layout="blockly-v3"
+        saveState={saveState}
+        saveMessage={saveMessage}
+        shellControl={controls}
+      >
+        <LessonWorkspace
+          contract={G1_WORKSPACE_CONTRACT}
+          adapter={adapter}
+          runAdapter={runAdapter}
+          stageSlot={StoryStageSlot}
+          editorSlot={editorSlot}
+          initialScript={initial}
+          chrome="studio"
+          studioLayout="blockly-v3"
+          studioPane={pane}
+          onStudioPaneChange={setPane}
+          paneTestIdPrefix="golden-story-pane"
+          missionCollapsed={missionCollapsed}
+          onMissionToggle={() => setMissionCollapsed((open) => !open)}
+          topbarActions={topbarActions}
+          onSaveStateChange={(state, message) => {
+            setSaveState(state)
+            setSaveMessage(message)
+          }}
+          onShellControl={setControls}
+        />
+      </StudioShell>
     </main>
   )
 }

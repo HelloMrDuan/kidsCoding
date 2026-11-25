@@ -134,7 +134,8 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
       const original = Storage.prototype.setItem
       Object.assign(window, { graduationSetItem: original })
       Storage.prototype.setItem = function (key, value) {
-        if (key === 'kc-progress') throw new DOMException('full', 'QuotaExceededError')
+        // Block every progress envelope (legacy + owner-scoped), like a real quota failure.
+        if (key.endsWith('kc-progress')) throw new DOMException('full', 'QuotaExceededError')
         return original.call(this, key, value)
       }
     })

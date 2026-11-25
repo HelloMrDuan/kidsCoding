@@ -152,7 +152,8 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await page.evaluate(() => {
       const original = Storage.prototype.setItem
       Storage.prototype.setItem = function (key, value) {
-        if (key === 'kc-progress') throw new DOMException('Storage full', 'QuotaExceededError')
+        // Block every progress envelope (legacy + owner-scoped), like a real quota failure.
+        if (key.endsWith('kc-progress')) throw new DOMException('Storage full', 'QuotaExceededError')
         return original.call(this, key, value)
       }
     })

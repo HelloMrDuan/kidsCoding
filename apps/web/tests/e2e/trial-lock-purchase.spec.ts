@@ -4,6 +4,7 @@ import {
   GUEST_PROGRESS_STORAGE_KEY,
   seedGuestProgress,
 } from './_fixtures/progress'
+import { showLessonPane } from './lesson-pane-helpers'
 
 const COURSE_LESSON_FIXTURE_PAYLOAD = {
   lessons: [
@@ -45,7 +46,10 @@ test.describe('trial and course access control', () => {
 
     await page.goto('/learn/lesson/lesson-01-forest-hello')
 
-    await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // P0-1: trial lesson-01 opens its only official workspace, the V3 studio;
+    // the compat URL redirects there and no entitlement is required.
+    await page.waitForURL('**/studio/blockly/lesson-01-forest-hello')
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
     await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
   })
 
@@ -93,6 +97,9 @@ test.describe('trial and course access control', () => {
     await page.goto('/learn/lesson/course-fixture-advanced-story')
 
     await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // On phones the classroom shows one pane at a time; select 积木 before
+    // asserting the workspace itself is on screen (desktop is a no-op).
+    await showLessonPane(page, 'code')
     await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
     await expect(
       page.getByRole('link', { name: '看看高阶升级内容' }),
@@ -138,7 +145,10 @@ test('graduation project shows the upgrade invitation after lesson twelve', asyn
       {
         lessonId: 'lesson-12-graduation-show',
         updatedAt: '2026-03-31T10:00:00.000Z',
-        blocks: [],
+        // The graduation page only shows the finished piece when the save has
+        // real blocks (an empty snapshot is the "还未完成" lock). The old
+        // fixture's `[]` contradicted that gate and never exercised the copy.
+        blocks: [{ type: 'when_start' }, { type: 'move_right' }],
       },
     ],
   })

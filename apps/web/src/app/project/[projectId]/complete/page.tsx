@@ -11,6 +11,7 @@ import { buildProjectCompletionCopy } from '@/features/projects/build-project-co
 import { ProjectCompleteCard } from '@/features/projects/project-complete-card'
 import { DuoProject } from '@/features/lessons/playable-stage/duo-project'
 import { UnitProject } from '@/features/lessons/playable-stage/unit-project'
+import { launchLessonHref } from '@/features/lessons/launch-lesson-routes'
 import { getUnitProject } from '@/content/curriculum/unit-projects'
 import { resolveProjectContinueAction } from '@/features/projects/resolve-project-continue-action'
 import {
@@ -18,15 +19,17 @@ import {
   readGuestProgress,
   subscribeGuestProgress,
 } from '@/features/progress/local-progress'
+import { useResolvedDraftOwner } from '@/features/lessons/use-resolved-draft-owner'
 
 export default function ProjectCompletePage() {
   const params = useParams<{ projectId: string }>()
   const projectId = Array.isArray(params.projectId)
     ? params.projectId[0]
     : params.projectId
+  const draftOwner = useResolvedDraftOwner()
   const progress = useSyncExternalStore(
     subscribeGuestProgress,
-    readGuestProgress,
+    () => readGuestProgress(draftOwner),
     () => defaultGuestProgress,
   )
   const curriculum = useLaunchCurriculum()
@@ -45,7 +48,7 @@ export default function ProjectCompletePage() {
   if (isFoundationGraduate && (!progress.completedLessonIds.includes(lesson.id) || snapshotBlocks.length === 0)) {
     return <main className="min-h-screen bg-[var(--kc-canvas)] p-6"><section className="kc-panel mx-auto max-w-xl p-6">
       <h1 className="text-2xl font-bold">毕业作品还未完成</h1><p className="my-4 leading-7">请回课堂实际运行、完成错误实验并保存作品，再领取毕业奖励。</p>
-      <Link className="inline-flex min-h-11 items-center rounded-full bg-emerald-800 px-5 text-white" href={`/learn/lesson/${lesson.id}`}>回课堂继续寻宝</Link>
+      <Link className="inline-flex min-h-11 items-center rounded-full bg-emerald-800 px-5 text-white" href={launchLessonHref(lesson.id)}>回课堂继续寻宝</Link>
     </section></main>
   }
   // TQ-012: lessons 01–09 reopen the child's own saved program — only after the lesson was
@@ -56,7 +59,7 @@ export default function ProjectCompletePage() {
     return <main className="min-h-screen p-6"><section className="kc-panel mx-auto max-w-xl p-6" data-testid="unit-project-locked">
       <span className="kc-task-mark">我的单元作品</span>
       <h1 className="mt-3 text-2xl font-bold">《{unitProject.title}》还没有做好</h1><p className="kc-text-muted my-4 leading-7">这台电脑上还没有这节课的作品。先回课堂学完这节课，作品就会出现在这里。</p>
-      <Link className="kc-action-surface inline-flex min-h-11 items-center" href={`/learn/lesson/${lesson.id}`}>回课堂完成这节课</Link>
+      <Link className="kc-action-surface inline-flex min-h-11 items-center" href={launchLessonHref(lesson.id)}>回课堂完成这节课</Link>
     </section></main>
   }
   const completionCopy = buildProjectCompletionCopy(lesson.id)
@@ -80,8 +83,8 @@ export default function ProjectCompletePage() {
         key={`${lesson.id}-${replayCount}`}
         blocks={snapshotBlocks}
         playableProject={unitProject
-          ? <UnitProject lessonId={lesson.id} key={lesson.id} initialBlocks={snapshotBlocks}/>
-          : ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lesson.id) ? <DuoProject lessonId={lesson.id} key={`${lesson.id}:${snapshotBlocks.length > 0}`} initialBlocks={snapshotBlocks}/> : undefined}
+          ? <UnitProject lessonId={lesson.id} key={lesson.id} initialBlocks={snapshotBlocks} owner={draftOwner}/>
+          : ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lesson.id) ? <DuoProject lessonId={lesson.id} key={`${lesson.id}:${snapshotBlocks.length > 0}`} initialBlocks={snapshotBlocks} owner={draftOwner}/> : undefined}
         completionCopy={completionCopy}
         isFoundationGraduate={isFoundationGraduate}
         lessonTitle={lesson.title}

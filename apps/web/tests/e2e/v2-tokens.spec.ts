@@ -62,6 +62,8 @@ test('real pages consume V2 foundation and reduced motion without changing store
   await expect(page.getByTestId('learning-map-primary-cta')).toHaveCSS('transition-duration', '0s')
   await page.getByTestId('learning-map-primary-cta').focus()
   await page.keyboard.press('Enter')
-  await expect(page).toHaveURL(/\/learn\/lesson\//)
+  // P0-1: with no progress the map CTA opens lesson-01's only official
+  // workspace, the V3 studio; the Blockly engine still rides the V2 page.
+  await expect(page).toHaveURL(/\/studio\/blockly\/lesson-01-forest-hello$/)
   await expect(page.getByTestId('lesson-blockly-workspace').locator('.blocklySvg')).toBeVisible()
 })

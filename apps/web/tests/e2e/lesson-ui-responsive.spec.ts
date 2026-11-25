@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { clickLessonControl, expectStageWalk, showLessonPane, solveMistakeStep, solvePracticeStep } from './lesson-pane-helpers'
+import { clickLessonControl, expectStageWalk, showLessonPane, solveMistakeStep, solvePracticeStep, openForestV3, completeForestStep } from './lesson-pane-helpers'
 
 /** UX-206: integrated classroom regression across lessons 1 / 5 / 9 / 12 —
  *  success, error, reset-rebuild recovery and reward, at 1440 / 768 / 375
@@ -20,29 +20,29 @@ async function press(page: Page, id: string) {
 }
 
 async function add(page: Page, types: string[]) {
-  await showLessonPane(page, 'code')
-  for (const type of types) await press(page, `lesson-add-${type}`)
+  // Routes through the shared helper: lesson-01's V3 studio keeps its palette
+  // in a <details> under the code pane, lessons 02–12 keep the old code column.
+  for (const type of types) await clickLessonControl(page, `lesson-add-${type}`)
 }
 
 async function runOk(page: Page) {
-  await showLessonPane(page, 'stage')
-  await press(page, 'run-code-button')
+  await clickLessonControl(page, 'run-code-button')
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 25_000 })
 }
 
 test('lesson 1: empty run errors, adding the start block recovers to success', async ({ page }) => {
   test.setTimeout(120_000)
-  await page.goto('/learn/lesson/lesson-01-forest-hello')
+  await openForestV3(page)
   // Step 1 only offers when_start, so the error leg is the empty run
   // (the TQ-008 pattern), not a move_right without when_start.
   await showLessonPane(page, 'stage')
-  await press(page, 'run-code-button')
+  await clickLessonControl(page, 'run-code-button')
   await expect(page.getByTestId('stage-run-reason')).toBeVisible({ timeout: 12_000 })
   await expect(page.getByTestId('lesson-playable-stage')).not.toContainText('运行成功')
   await add(page, ['when_start'])
   await runOk(page)
-  await press(page, 'lesson-complete-step')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 2 关')
+  await completeForestStep(page)
+  await expect(page.getByTestId('forest-hello-step-progress')).toContainText('第 2 / 4 关')
 })
 
 test('lesson 5: scene-switch success, then stage reset and re-run repeats it', async ({ page }) => {
@@ -109,23 +109,26 @@ test('lesson 12: duo success runs both actors and the gift stays unfound until e
 
 test('lesson 1 reward: full completion awards 3 stars, reopening keeps exactly 3', async ({ page }) => {
   test.setTimeout(180_000)
-  await page.goto('/learn/lesson/lesson-01-forest-hello')
+  await openForestV3(page)
   await showLessonPane(page, 'stage')
   await clickLessonControl(page, 'lesson-add-when_start')
   await clickLessonControl(page, 'lesson-complete-step')
-  await expect(page.getByTestId('lesson-feedback-card')).toContainText('请先点击舞台')
-  for (let step = 0; step < 2; step++) {
-    if (step === 1) await clickLessonControl(page, 'lesson-add-move_right')
-    await clickLessonControl(page, 'run-code-button')
-    await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 15_000 })
-    await clickLessonControl(page, 'lesson-complete-step')
-  }
-  await solvePracticeStep(page, { goalType: 'change-distance', guess: 'beside-friend', build: ['move_right'] })
+  await expect(page.getByTestId('forest-hello-notice')).toContainText('请先点击舞台')
+  // 第 1 关's real 0-step run, then each later 关 builds its own program in V3.
+  await clickLessonControl(page, 'run-code-button')
+  await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 15_000 })
+  await completeForestStep(page)
+  await clickLessonControl(page, 'lesson-add-when_start')
+  await clickLessonControl(page, 'lesson-add-move_right')
+  await clickLessonControl(page, 'run-code-button')
+  await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 15_000 })
+  await completeForestStep(page)
+  await solvePracticeStep(page, { goalType: 'change-distance', guess: 'beside-friend', build: ['when_start', 'move_right', 'move_right'] })
   await expectStageWalk(page, 200)
-  await clickLessonControl(page, 'lesson-complete-step')
+  await completeForestStep(page)
   await solveMistakeStep(page, { expectCode: 'missing-start', answer: 'stayed', fix: ['when_start', 'move_right'] })
   await expectStageWalk(page, 100)
-  await clickLessonControl(page, 'lesson-complete-step')
+  await completeForestStep(page)
   await page.waitForURL('**/project/lesson-01-forest-hello/complete')
   await expect(page.getByTestId('project-complete-heading')).toBeVisible()
   await expect(page.getByText('当前累计 3 颗星星')).toBeVisible()

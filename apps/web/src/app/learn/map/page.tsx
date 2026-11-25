@@ -8,6 +8,7 @@ import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum
 import { resolveCourseAccess } from '@/features/billing/resolve-course-access'
 import { useCourseAccess } from '@/features/billing/use-course-access'
 import { MapView } from '@/features/lessons/map-view'
+import { launchLessonHref } from '@/features/lessons/launch-lesson-routes'
 import { useBackScrollRestore } from '@/features/lessons/use-back-scroll-restore'
 import { CharacterArt } from '@/features/lessons/playable-stage/character-art'
 import {
@@ -15,11 +16,7 @@ import {
   readOnboardingSession,
   subscribeOnboardingSession,
 } from '@/features/onboarding/onboarding-session'
-import {
-  defaultGuestProgress,
-  readGuestProgress,
-  subscribeGuestProgress,
-} from '@/features/progress/local-progress'
+import { useOwnerProgress } from '@/features/progress/use-owner-progress'
 
 const startLevelLabels = {
   starter: '启蒙起点',
@@ -31,11 +28,9 @@ export default function LearnMapPage() {
   const curriculum = useLaunchCurriculum()
   const { allLessons, foundationUnits } = buildLaunchMap(curriculum.lessons)
   const { hasLaunchPack } = useCourseAccess()
-  const progress = useSyncExternalStore(
-    subscribeGuestProgress,
-    readGuestProgress,
-    () => defaultGuestProgress,
-  )
+  // Same owner-scoped source as home: guest:A / guest:B / user:A never
+  // inherit each other's record in one browser.
+  const { progress } = useOwnerProgress()
   const onboarding = useSyncExternalStore(
     subscribeOnboardingSession,
     readOnboardingSession,
@@ -104,7 +99,7 @@ export default function LearnMapPage() {
               <Link
                 className="kc-button-3d kc-map-next-cta"
                 data-testid="learning-map-primary-cta"
-                href={`/learn/lesson/${nextLesson.id}`}
+                href={launchLessonHref(nextLesson.id)}
               >
                 开始第 {nextLesson.sortOrder} 节 ▶
               </Link>

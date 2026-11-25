@@ -26,7 +26,7 @@ describe('MapView', () => {
     const first = within(steps).getByTestId('lesson-card-lesson-01-forest-hello')
     expect(first).toHaveTextContent('✓')
     expect(first).toHaveTextContent('已完成')
-    expect(first).toHaveAttribute('href', '/learn/lesson/lesson-01-forest-hello')
+    expect(first).toHaveAttribute('href', '/studio/blockly/lesson-01-forest-hello')
     const current = within(steps).getByTestId('lesson-card-lesson-03-forest-story')
     expect(current).toHaveTextContent('当前练习')
     expect(current).toHaveAttribute('href', '/learn/lesson/lesson-03-forest-story')

@@ -10,6 +10,7 @@ import type { LessonCardState } from '@/features/ui/lesson-card'
 
 import { AdventureMap } from './adventure-map'
 import type { AdventureMapUnit } from './adventure-map'
+import { launchLessonHref } from './launch-lesson-routes'
 
 /**
  * UX-102 map view. Data adapter for AdventureMap: resolves the real
@@ -107,7 +108,7 @@ export function MapView({ lessons, progress, hasLaunchPack }: MapViewProps) {
               hasLaunchPack,
             })
           : 'available',
-        href: `/learn/lesson/${lesson.id}`,
+        href: launchLessonHref(lesson.id),
       })),
   }))
 

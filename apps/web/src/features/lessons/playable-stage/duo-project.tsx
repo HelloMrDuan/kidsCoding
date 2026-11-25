@@ -17,7 +17,16 @@ import { DuoStage } from './duo-stage'
 const allowed = ['when_start', 'move_right', 'switch_character', 'say_line']
 const required = ['when_start', 'move_right', 'switch_character', 'move_right']
 
-export function DuoProject({ initialBlocks, lessonId = 'lesson-10-second-friend' }: { initialBlocks: Array<{ type: string }>; lessonId?: string }) {
+export function DuoProject({
+  initialBlocks,
+  lessonId = 'lesson-10-second-friend',
+  owner,
+}: {
+  initialBlocks: Array<{ type: string }>
+  lessonId?: string
+  /** Resolved draft/progress owner. Omitted keeps the legacy unscoped read. */
+  owner?: string | null
+}) {
   const router = useRouter()
   const [blocks, setBlocks] = useState(initialBlocks)
   const [passed, setPassed] = useState(false)
@@ -46,11 +55,17 @@ export function DuoProject({ initialBlocks, lessonId = 'lesson-10-second-friend'
   }
   function save() {
     try {
-      const progress = readGuestProgress()
-      writeGuestProgress({ ...progress, projectSnapshots: [
-        ...progress.projectSnapshots.filter(snapshot => snapshot.lessonId !== lessonId),
-        { lessonId, blocks, updatedAt: new Date().toISOString() },
-      ] })
+      const progress = readGuestProgress(owner)
+      writeGuestProgress(
+        {
+          ...progress,
+          projectSnapshots: [
+            ...progress.projectSnapshots.filter((snapshot) => snapshot.lessonId !== lessonId),
+            { lessonId, blocks, updatedAt: new Date().toISOString() },
+          ],
+        },
+        owner,
+      )
       setMessage('作品已保存到本机浏览器。重新打开这个页面可以运行和继续修改。')
     } catch {
       setMessage('本机存储失败，作品尚未保存。请检查浏览器存储空间后重试。')

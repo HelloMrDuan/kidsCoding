@@ -1140,3 +1140,16 @@ a.kc-v2c-filter:hover { border-color: #b9cdf2; color: #2a63d6; }
 /* G0-U1-L01: a neutral pick (prediction or creative goal) has no right/wrong colour, only a clear selected state. */
 .kc-reflect-option[data-chosen='true']:not([data-correct]) { border-color: var(--kc-action); background: #eef4ff; color: var(--kc-action-dark); }
 .kc-choice-compact { text-align: center; white-space: nowrap; padding-left: 8px; padding-right: 8px; }
+
+/* Blockly 12 hides Scrollbar/Flyout chrome by setting the SVG presentation
+   attribute display="none" (Scrollbar.updateDisplay_). Tailwind v4's preflight
+   ships `svg { display: block }`, an author rule that outranks presentation
+   attributes, so every scrollbar Blockly hides stays painted. A flyout that is
+   never opened then leaves its 25×150 vertical scrollbar at the injection
+   origin — the "竖条" beside the first block. These higher-specificity rules
+   give the attribute its intended meaning; visibility stays Blockly's state,
+   nothing is hidden by hand. */
+svg.blocklyFlyoutScrollbar[display="none"],
+svg.blocklyMainWorkspaceScrollbar[display="none"] {
+  display: none;
+}

@@ -27,7 +27,7 @@
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   G1_U1_L01_STORY_LESSON,
@@ -38,6 +38,7 @@ import {
 import { getKidsBlockLabel } from '@/features/lessons/blockly/block-labels'
 import type { ProgramBlock } from '@/features/lessons/blockly/program-tree'
 import type { EditorSlotProps, JudgmentResult } from '@/features/lessons/workspace/workspace-slots'
+import { BlocklyStudioMission, BlocklyStudioSteps } from '@/features/lessons/workspace/blockly-studio-layout'
 
 import {
   findStoryWorkspace,
@@ -62,9 +63,19 @@ function blockLabel(block: ProgramBlock): string {
   return base
 }
 
-type StoryEditorProps = EditorSlotProps & { goldenLayout?: boolean }
+type StoryEditorProps = EditorSlotProps & {
+  goldenLayout?: boolean
+  /**
+   * V3 classroom (shared layout): the step card portals into the mission
+   * panel, the step pills into the step bar, and Blockly renders the docked
+   * palette. The run button keeps its test id and calls `onRunRequest`
+   * (which runs through the same shell and reveals the stage on phones).
+   */
+  v3?: boolean
+  onRunRequest?: () => void
+}
 
-export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment, goldenLayout = false }: StoryEditorProps) {
+export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment, goldenLayout = false, v3 = false, onRunRequest }: StoryEditorProps) {
   const lesson = G1_U1_L01_STORY_LESSON
   const [draft, setDraft] = useState<StorySlotData>(() => coerceStoryDraft(initial))
   const draftRef = useRef(draft)
@@ -216,11 +227,23 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
     return judgeStoryProgram(draft.programs[step.id] ?? [])
   }, [judgment, draft, step.id, lastRunStep])
 
-  function goToStep(index: number) {
+  /**
+   * `passedId` is set when the move is a completion (「完成这一关」): thinking
+   * gates (guided / design / review) have no run judgment, so without it the
+   * V3 step pill could never show the ✓ completed state for them.
+   */
+  function goToStep(index: number, passedId?: string) {
     const current = draftRef.current
     setGuess(null)
     setNotice(null)
-    persist({ ...current, stepIndex: index, finished: false })
+    persist({
+      ...current,
+      stepIndex: index,
+      finished: false,
+      passed: passedId && !current.passed.includes(passedId)
+        ? [...current.passed, passedId]
+        : current.passed,
+    })
   }
 
   function restoreStarter() {
@@ -247,9 +270,10 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
       }
     }
     if (step.kind === 'guided' || step.kind === 'design' || step.kind === 'review') {
-      if (current.stepIndex < lesson.steps.length - 1) goToStep(current.stepIndex + 1)
+      const passed = current.passed.includes(step.id) ? current.passed : [...current.passed, step.id]
+      if (current.stepIndex < lesson.steps.length - 1) goToStep(current.stepIndex + 1, step.id)
       else {
-        persist({ ...current, finished: true })
+        persist({ ...current, passed, finished: true })
       }
       return
     }
@@ -319,6 +343,209 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
 
   const guessPicked = guess === null ? null : step.predictChoices?.[guess]
 
+  /**
+   * V3 step nav reuses the approved G0 step pills (dot = number or ✓,
+   * current = is-active, passed = is-complete). The pill shows the gate's
+   * short name (the part before "：") because seven full titles cannot fit a
+   * single 45px step bar even at 1440; the full title stays in `title`,
+   * `aria-label` and the task card heading. At ≤670px the shared V3 CSS
+   * converges it to dots plus the current label. `data-testid` and the click
+   * target stay exactly as before; the classic (non-V3) layout keeps its
+   * compact button row below the canvas.
+   */
+  const stepNav = (
+    <div data-testid="g1-u1-l01-step-nav" className={v3 ? 'kc-v3-stepbar-pills' : undefined}>
+      {lesson.steps.map((s, i) => {
+        const complete = draft.passed.includes(s.id) && i !== draft.stepIndex
+        const shortTitle = s.title.split(/[：:]/)[0]?.trim() || s.title
+        return (
+          <Fragment key={s.id}>
+            {v3 && i > 0 ? <span className="kc-v3-step-line" aria-hidden="true" /> : null}
+            <button
+              type="button"
+              data-testid={`g1-u1-l01-goto-${s.id}`}
+              className={v3
+                ? `kc-v3-step-pill${complete ? ' is-complete' : i === draft.stepIndex ? ' is-active' : ''}`
+                : undefined}
+              aria-current={i === draft.stepIndex ? 'step' : undefined}
+              aria-label={v3 ? `第 ${i + 1} 关：${s.title}` : undefined}
+              title={v3 ? s.title : undefined}
+              onClick={() => goToStep(i)}
+            >
+              {v3 ? (
+                <>
+                  <span className="kc-v3-step-dot" aria-hidden="true">{complete ? '✓' : i + 1}</span>
+                  <span className="kc-v3-step-label">{shortTitle}</span>
+                </>
+              ) : (
+                <>第 {i + 1} 关{complete ? ' ✓' : ''}</>
+              )}
+            </button>
+          </Fragment>
+        )
+      })}
+    </div>
+  )
+
+  const predictAndCreative = (
+    <>
+      <div data-testid="g1-u1-l01-predict">
+        <p>🤔 {step.predict}</p>
+        {step.predictChoices ? (
+          <div data-testid="g1-u1-l01-predict-choices">
+            {step.predictChoices.map((choice, i) => (
+              <button
+                key={choice.text}
+                type="button"
+                data-testid={`g1-u1-l01-predict-choice-${i}`}
+                data-chosen={guess === i ? 'true' : 'false'}
+                aria-pressed={guess === i}
+                onClick={() => setGuess(i)}
+              >
+                {choice.text}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {guessPicked ? <p>你猜“{guessPicked.text}”。运行后对照一下，猜错也没关系。</p> : null}
+      </div>
+
+      {step.creative ? (
+        <div data-testid="g1-u1-l01-creative">
+          <p>🎤 {step.creative.prompt}</p>
+        </div>
+      ) : null}
+    </>
+  )
+
+  const lineNote = (
+    <p data-testid="g1-u1-l01-line-note">
+      提醒：“选一句对白”按钮会改写全部“说一句话”积木；要给两块各配一句，用每块积木自己的
+      下拉框（点积木上的对白小箭头），或下面列表里每块后面的选句。
+    </p>
+  )
+
+  const blockList = (
+    <ol data-testid="g1-u1-l01-block-list">
+      {blocks.map((block, index) => (
+        <li key={`${block.type}-${index}`} data-testid={`g1-u1-l01-block-${index}`}>
+          <span>
+            {index + 1}. {blockLabel(block)}
+            {block.disconnected ? '（散块，不计入运行）' : ''}
+          </span>{' '}
+          <button
+            type="button"
+            data-testid={`g1-u1-l01-block-up-${index}`}
+            disabled={index <= 1 || index >= chainLength}
+            onClick={() => moveBlock(index, -1)}
+            aria-label={`第 ${index + 1} 块上移`}
+          >
+            ↑
+          </button>{' '}
+          <button
+            type="button"
+            data-testid={`g1-u1-l01-block-down-${index}`}
+            disabled={index < 1 || index >= chainLength - 1}
+            onClick={() => moveBlock(index, 1)}
+            aria-label={`第 ${index + 1} 块下移`}
+          >
+            ↓
+          </button>
+          {block.type === 'say_line' && index < chainLength ? (
+            <label>
+              选句
+              <select
+                data-testid={`g1-u1-l01-block-line-${index}`}
+                value={block.line ?? 'opening'}
+                onChange={(event) => setBlockLine(index, event.target.value)}
+              >
+                {STORY_SAY_CHOICES.map((choice) => (
+                  <option key={choice.id} value={choice.id}>
+                    {choice.text}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+        </li>
+      ))}
+    </ol>
+  )
+
+  const actionRow = (
+    <div className={v3 ? 'kc-v3-run-row' : undefined}>
+      <button
+        type="button"
+        data-testid="g1-u1-l01-run"
+        data-running={running ? 'true' : 'false'}
+        aria-pressed={running}
+        className={v3 ? 'kc-v3-run-primary' : undefined}
+        disabled={!shell}
+        onClick={() => (onRunRequest ?? shell?.run)?.()}
+      >
+        {v3 ? (
+          <>
+            <span aria-hidden="true">{running ? '■' : '▶'}</span>
+            {running ? '停止' : '运行'}
+          </>
+        ) : running ? (
+          '停止'
+        ) : (
+          '▶ 运行'
+        )}
+      </button>
+      <button
+        type="button"
+        data-testid="g1-u1-l01-save"
+        data-save-state={shell?.saveState ?? 'unsaved'}
+        className={v3 ? 'kc-v3-run-secondary' : undefined}
+        disabled={!shell}
+        onClick={() => shell?.save()}
+      >
+        {shell?.saveState === 'saved' ? '✓ 已保存' : shell?.saveState === 'failed' ? '⚠ 保存失败' : '保存作品'}
+      </button>
+      {step.errorLab && !observedHere && JSON.stringify(blocks) !== JSON.stringify(step.starterBlocks ?? []) ? (
+        <button type="button" data-testid="g1-u1-l01-restore-starter" onClick={restoreStarter}>
+          换回原来的错误程序
+        </button>
+      ) : null}
+    </div>
+  )
+
+  const reflectionBlock = step.kind === 'review' ? (
+    <div data-testid="g1-u1-l01-reflection">
+      <p>💭 想一想：{lesson.reflection.question}</p>
+      <div>
+        {lesson.reflection.options.map((option, i) => (
+          <button
+            key={option.text}
+            type="button"
+            data-testid={`g1-u1-l01-reflection-option-${i}`}
+            data-chosen={draft.reflection === i ? 'true' : 'false'}
+            data-correct={option.correct ? 'true' : 'false'}
+            onClick={() => persist({ ...draftRef.current, reflection: i })}
+          >
+            {option.text}
+          </button>
+        ))}
+      </div>
+      {draft.reflection !== undefined ? (
+        <p data-testid="g1-u1-l01-reflection-result" data-correct={lesson.reflection.options[draft.reflection].correct ? 'true' : 'false'}>
+          {lesson.reflection.why}
+        </p>
+      ) : null}
+      <p>给家长：{lesson.parentQuestion}</p>
+    </div>
+  ) : null
+
+  const runLogBlock = lastRun ? (
+    <ol data-testid="g1-u1-l01-run-log">
+      {lastRun.log.map((line, i) => (
+        <li key={i}>{line}</li>
+      ))}
+    </ol>
+  ) : null
+
   // 画布 Gate 1（平板 ≥300px、手机 ≥220px，有效可视高度 = 视口 ∩ 画布）：
   // 画布上方只留一行紧凑步骤行（进度 + 标题 + 完成按钮）；指导、预测、
   // 创意、关间导航移到画布下方（仍在同一插槽内，testid 不变），否则
@@ -328,180 +555,88 @@ export function StoryEditorSlot({ initial, onChange, editable, shell, onJudgment
   // E7（2026-11-12）：通过标记只写 ✓ 不写“（已通过）”，否则第 3 关
   // 通过后步骤行换行、画布顶再下沉约 30px。
   return (
-    <div ref={containerRef} data-testid="g1-u1-l01-slot">
+    <div
+      ref={containerRef}
+      data-testid="g1-u1-l01-slot"
+      className={v3 ? 'kc-v3-slot-editor kc-v3-slot-editor--guide' : undefined}
+      style={v3 ? { height: '100%', overflowY: 'auto' } : undefined}
+    >
+      <BlocklyStudioMission>
       <div
         data-testid="g1-u1-l01-step-header"
-        style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px' }}
+        className={v3 ? 'kc-v3-task' : undefined}
+        style={v3 ? undefined : { display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px' }}
       >
-        <p data-testid="g1-u1-l01-step-progress">
+        <p data-testid="g1-u1-l01-step-progress" className={v3 ? 'kc-v3-step-index' : undefined}>
           第 {draft.stepIndex + 1} / {lesson.steps.length} 关{passedHere ? ' ✓' : ''}
         </p>
-        <h3 data-testid="g1-u1-l01-step-title">
-          第 {draft.stepIndex + 1} 关：{step.title}
-        </h3>
+        {v3 ? (
+          <div className="kc-v3-task-copy">
+            <h3 data-testid="g1-u1-l01-step-title">
+              第 {draft.stepIndex + 1} 关：{step.title}
+            </h3>
+            <p data-testid="g1-u1-l01-instruction">{step.instruction}</p>
+          </div>
+        ) : (
+          <h3 data-testid="g1-u1-l01-step-title">
+            第 {draft.stepIndex + 1} 关：{step.title}
+          </h3>
+        )}
         <button type="button" data-testid="g1-u1-l01-complete-step" onClick={handleComplete}>
           {draft.stepIndex === lesson.steps.length - 1 ? '完成本课' : '完成这一关'}
         </button>
       </div>
+      </BlocklyStudioMission>
+
+      {v3 ? (
+        <BlocklyStudioSteps>
+          {stepNav}
+          <span className="kc-v3-step-note">
+            第 {draft.stepIndex + 1} / {lesson.steps.length} 关 · {step.title}
+          </span>
+        </BlocklyStudioSteps>
+      ) : null}
 
       <BlocklyWorkspace
         allowedBlocks={step.allowedBlocks}
         blocks={blocks}
-        layoutMode={goldenLayout ? 'golden' : 'legacy'}
+        layoutMode={goldenLayout && !v3 ? 'golden' : 'legacy'}
+        docked={v3 ? { stepKey: step.id, preferredBlock: step.allowedBlocks.find((type) => type !== 'when_start') } : undefined}
         enableProgramTools
         snapStartOnTop
         sayLineChoices={STORY_SAY_CHOICES}
         onSnapshotChange={handleSnapshot}
       />
 
-      <div data-testid="g1-u1-l01-step-guide">
-        <p data-testid="g1-u1-l01-instruction">{step.instruction}</p>
-
-        <div data-testid="g1-u1-l01-predict">
-          <p>🤔 {step.predict}</p>
-          {step.predictChoices ? (
-            <div data-testid="g1-u1-l01-predict-choices">
-              {step.predictChoices.map((choice, i) => (
-                <button
-                  key={choice.text}
-                  type="button"
-                  data-testid={`g1-u1-l01-predict-choice-${i}`}
-                  data-chosen={guess === i ? 'true' : 'false'}
-                  aria-pressed={guess === i}
-                  onClick={() => setGuess(i)}
-                >
-                  {choice.text}
-                </button>
-              ))}
-            </div>
-          ) : null}
-          {guessPicked ? <p>你猜“{guessPicked.text}”。运行后对照一下，猜错也没关系。</p> : null}
-        </div>
-
-        {step.creative ? (
-          <div data-testid="g1-u1-l01-creative">
-            <p>🎤 {step.creative.prompt}</p>
+      {v3 ? (
+        <>
+          {actionRow}
+          {notice && <p data-testid="g1-u1-l01-notice">{notice}</p>}
+          <details className="kc-v3-editor-details">
+            <summary>本关指引与积木顺序</summary>
+            <div data-testid="g1-u1-l01-step-guide">{predictAndCreative}</div>
+            {lineNote}
+            {blockList}
+            {reflectionBlock}
+            {runLogBlock}
+          </details>
+        </>
+      ) : (
+        <>
+          <div data-testid="g1-u1-l01-step-guide">
+            <p data-testid="g1-u1-l01-instruction">{step.instruction}</p>
+            {predictAndCreative}
+            <BlocklyStudioSteps>{stepNav}</BlocklyStudioSteps>
           </div>
-        ) : null}
 
-        <div data-testid="g1-u1-l01-step-nav">
-          {lesson.steps.map((s, i) => (
-            <button
-              key={s.id}
-              type="button"
-              data-testid={`g1-u1-l01-goto-${s.id}`}
-              aria-current={i === draft.stepIndex}
-              onClick={() => goToStep(i)}
-            >
-              第 {i + 1} 关{draft.passed.includes(s.id) ? ' ✓' : ''}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <p data-testid="g1-u1-l01-line-note">
-        提醒：“选一句对白”按钮会改写全部“说一句话”积木；要给两块各配一句，用每块积木自己的
-        下拉框（点积木上的对白小箭头），或下面列表里每块后面的选句。
-      </p>
-      <ol data-testid="g1-u1-l01-block-list">
-        {blocks.map((block, index) => (
-          <li key={`${block.type}-${index}`} data-testid={`g1-u1-l01-block-${index}`}>
-            <span>
-              {index + 1}. {blockLabel(block)}
-              {block.disconnected ? '（散块，不计入运行）' : ''}
-            </span>{' '}
-            <button
-              type="button"
-              data-testid={`g1-u1-l01-block-up-${index}`}
-              disabled={index <= 1 || index >= chainLength}
-              onClick={() => moveBlock(index, -1)}
-              aria-label={`第 ${index + 1} 块上移`}
-            >
-              ↑
-            </button>{' '}
-            <button
-              type="button"
-              data-testid={`g1-u1-l01-block-down-${index}`}
-              disabled={index < 1 || index >= chainLength - 1}
-              onClick={() => moveBlock(index, 1)}
-              aria-label={`第 ${index + 1} 块下移`}
-            >
-              ↓
-            </button>
-            {block.type === 'say_line' && index < chainLength ? (
-              <label>
-                选句
-                <select
-                  data-testid={`g1-u1-l01-block-line-${index}`}
-                  value={block.line ?? 'opening'}
-                  onChange={(event) => setBlockLine(index, event.target.value)}
-                >
-                  {STORY_SAY_CHOICES.map((choice) => (
-                    <option key={choice.id} value={choice.id}>
-                      {choice.text}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-          </li>
-        ))}
-      </ol>
-
-      <div>
-        <button
-          type="button"
-          data-testid="g1-u1-l01-run"
-          disabled={!shell}
-          onClick={() => shell?.run()}
-        >
-          {running ? '停止' : '▶ 运行'}
-        </button>{' '}
-        <button type="button" data-testid="g1-u1-l01-save" disabled={!shell} onClick={() => shell?.save()}>
-          保存作品
-        </button>{' '}
-        {step.errorLab && !observedHere && JSON.stringify(blocks) !== JSON.stringify(step.starterBlocks ?? []) ? (
-          <button type="button" data-testid="g1-u1-l01-restore-starter" onClick={restoreStarter}>
-            换回原来的错误程序
-          </button>
-        ) : null}
-      </div>
-
-      {notice && <p data-testid="g1-u1-l01-notice">{notice}</p>}
-
-      {step.kind === 'review' ? (
-        <div data-testid="g1-u1-l01-reflection">
-          <p>💭 想一想：{lesson.reflection.question}</p>
-          <div>
-            {lesson.reflection.options.map((option, i) => (
-              <button
-                key={option.text}
-                type="button"
-                data-testid={`g1-u1-l01-reflection-option-${i}`}
-                data-chosen={draft.reflection === i ? 'true' : 'false'}
-                data-correct={option.correct ? 'true' : 'false'}
-                onClick={() => persist({ ...draftRef.current, reflection: i })}
-              >
-                {option.text}
-              </button>
-            ))}
-          </div>
-          {draft.reflection !== undefined ? (
-            <p data-testid="g1-u1-l01-reflection-result" data-correct={lesson.reflection.options[draft.reflection].correct ? 'true' : 'false'}>
-              {lesson.reflection.why}
-            </p>
-          ) : null}
-          <p>给家长：{lesson.parentQuestion}</p>
-        </div>
-      ) : null}
-
-      {lastRun ? (
-        <ol data-testid="g1-u1-l01-run-log">
-          {lastRun.log.map((line, i) => (
-            <li key={i}>{line}</li>
-          ))}
-        </ol>
-      ) : null}
+          {lineNote}
+          {blockList}
+          {actionRow}
+          {notice && <p data-testid="g1-u1-l01-notice">{notice}</p>}
+          {reflectionBlock}
+          {runLogBlock}
+        </>
+      )}
     </div>
   )
 }

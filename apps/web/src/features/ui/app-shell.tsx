@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { COURSE_PICKER_HREF, resolveClassroomHref } from '@/features/lessons/classroom-entry'
 
 /**
  * Frozen V2 global shell: 222px navy sidebar + 76px white top bar.
@@ -32,7 +33,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
     items: [
       { id: 'home', label: '学习中心', short: '首页', href: '/', icon: 'home', match: (p) => p === '/' },
       { id: 'map', label: '学习地图', short: '地图', href: '/learn/map', icon: 'map', match: (p) => p.startsWith('/learn/map') },
-      { id: 'lesson', label: '编程课堂', short: '课堂', href: '/learn/lesson/lesson-01-forest-hello', icon: 'lesson', match: (p) => p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') || isGoldenScratchClassroom(p) },
+      { id: 'lesson', label: '编程课堂', short: '课堂', href: COURSE_PICKER_HREF, icon: 'lesson', match: (p) => p.startsWith('/studio/blockly') || p.startsWith('/learn/lesson') || p.startsWith('/learn/remedial') || isGoldenScratchClassroom(p) },
       // OPS-051 (#565): the Python lab has no top-level menu; its teaching
       // lessons stay under 课程体系 so the breadcrumb keeps its meaning.
       { id: 'catalog', label: '课程体系', short: '课程', href: '/learn/catalog', icon: 'catalog', match: (p) => p.startsWith('/learn/catalog') || p.startsWith('/learn/python-lab') },
@@ -76,9 +77,67 @@ function NavIcon({ name }: { name: IconName }) {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? '/'
   const [drawerOpen, setDrawerOpen] = useState(false)
+  // 「编程课堂」 continues the lesson in the child's own record (the same
+  // route the course system opens); with no record it is a course picker.
+  // The owner is resolved from the same identity source the classroom uses
+  // (`/api/lesson-draft-owner` → user:<id> or guest:<id>), and reads are
+  // scoped to it: switching accounts in one browser must never inherit the
+  // previous account's lesson or drafts. Unknown identity fails closed to
+  // the picker.
+  const [lessonHref, setLessonHref] = useState(COURSE_PICKER_HREF)
   const current = ALL_ITEMS.find((i) => i.match(pathname))
   // Golden lessons use document history so the editor's beforeunload protection also covers navigation.
   const ShellLink = isGoldenScratchClassroom(pathname) ? 'a' : Link
+
+  useEffect(() => {
+    let active = true
+    let request = 0
+    const sync = async () => {
+      const token = ++request
+      // Do not keep the previous account's route while identity is checked.
+      if (active) setLessonHref(COURSE_PICKER_HREF)
+      let owner: string | null = null
+      try {
+        const response = await fetch('/api/lesson-draft-owner', { cache: 'no-store' })
+        if (response.ok) {
+          const body = (await response.json()) as { owner?: unknown }
+          owner = typeof body.owner === 'string' ? body.owner : null
+        }
+      } catch {
+        // The account cannot be confirmed: stay on the course picker.
+      }
+      if (!active || token !== request) return
+      // No confirmed identity: the picker is already set, so do not guess.
+      if (owner === null) return
+      try {
+        const href = await resolveClassroomHref(owner)
+        if (active && token === request) setLessonHref(href)
+      } catch {
+        /* fail closed to the course picker */
+      }
+    }
+    void sync()
+    const resync = () => { void sync() }
+    const visible = () => {
+      if (document.visibilityState === 'visible') void sync()
+    }
+    window.addEventListener('kc-progress-change', resync)
+    window.addEventListener('storage', resync)
+    window.addEventListener('focus', resync)
+    window.addEventListener('pageshow', resync)
+    document.addEventListener('visibilitychange', visible)
+    return () => {
+      active = false
+      request += 1
+      window.removeEventListener('kc-progress-change', resync)
+      window.removeEventListener('storage', resync)
+      window.removeEventListener('focus', resync)
+      window.removeEventListener('pageshow', resync)
+      document.removeEventListener('visibilitychange', visible)
+    }
+  }, [pathname])
+
+  const hrefFor = (item: NavItem) => (item.id === 'lesson' ? lessonHref : item.href)
 
   return (
     <div className="kc-app" data-testid="kc-app-shell">
@@ -96,7 +155,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 return (
                   <ShellLink
                     key={item.id}
-                    href={item.href}
+                    href={hrefFor(item)}
                     className={`kc-nav-item${active ? ' is-active' : ''}`}
                     aria-current={active ? 'page' : undefined}
                     title={item.label}
@@ -148,7 +207,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {MOBILE_ITEMS.map((item) => {
           const active = item.match(pathname)
           return (
-            <ShellLink key={item.id} href={item.href} className={active ? 'is-active' : undefined} aria-current={active ? 'page' : undefined}>
+            <ShellLink key={item.id} href={hrefFor(item)} className={active ? 'is-active' : undefined} aria-current={active ? 'page' : undefined}>
               <NavIcon name={item.icon} />
               <span>{item.short}</span>
             </ShellLink>

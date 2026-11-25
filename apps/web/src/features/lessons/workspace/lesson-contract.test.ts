@@ -47,4 +47,12 @@ describe('lesson-contract validation', () => {
     const bad = { ...DEMO_A.contract, judging: { ...DEMO_A.contract.judging, scopeLabel: '自由' } }
     expect(validateLessonContract(bad)).toContain('judging.scopeLabel 必须是教学定向或开放创作')
   })
+
+  it('accepts the V3 foldTaskExtras flag only as a boolean', () => {
+    expect(validateLessonContract({ ...DEMO_A.contract, foldTaskExtras: true })).toEqual([])
+    expect(validateLessonContract({ ...DEMO_A.contract, foldTaskExtras: false })).toEqual([])
+    expect(validateLessonContract({ ...DEMO_A.contract, foldTaskExtras: 'yes' })).toContain(
+      'foldTaskExtras 必须是布尔值',
+    )
+  })
 })

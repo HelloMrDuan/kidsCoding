@@ -35,7 +35,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 import { getMistakeStep } from '@/content/curriculum/mistake-steps'
 import { getPracticeStep } from '@/content/curriculum/practice-steps'
@@ -46,10 +46,11 @@ import type { ProgramBlock } from '@/features/lessons/blockly/program-tree'
 import { explainRunFailure } from '@/features/lessons/blockly/run-feedback'
 import { motionVerbForTemplate } from '@/features/lessons/blockly/block-labels'
 import { launchStepGate, useLaunchLessonCompletion } from '@/features/lessons/launch-lesson-session'
-import { readGuestProgress } from '@/features/progress/local-progress'
+import { LessonDraftOwnerContext } from '@/features/lessons/lesson-draft-boundary'
 import { draftKeyFor } from '@/features/lessons/workspace/lesson-contract'
 import type { EditorSlotProps, JudgmentResult } from '@/features/lessons/workspace/workspace-slots'
-import { BlocklyStudioMission } from '@/features/lessons/workspace/blockly-studio-layout'
+import { readGuestProgress } from '@/features/progress/local-progress'
+import { BlocklyStudioMission, BlocklyStudioSteps } from '@/features/lessons/workspace/blockly-studio-layout'
 
 import {
   findForestWorkspace,
@@ -104,6 +105,9 @@ function blockLabel(block: ProgramBlock): string {
 }
 
 export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgment }: EditorSlotProps) {
+  // 进度归属人来自外壳边界（G0/G1 路由均在服务端解析）；单测直接渲染
+  // 插槽时没有边界，保持 undefined → 旧的全局读写路径。
+  const draftOwner = useContext(LessonDraftOwnerContext)
   const { store, runAdapter } = useForestSession()
   const sessionState = useForestSessionState()
   const [draft, setDraft] = useState<ForestSlotData>(() => coerceForestDraft(initial))
@@ -141,6 +145,7 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
     continueLocalOnly,
   } = useLaunchLessonCompletion({
       lessonId: FOREST_LESSON_ID,
+      owner: draftOwner,
       onClearDrafts: () => {
         // 先重置内存草稿（外壳卸载保存写回的即是空草稿），再删存储键。
         const empty = emptyForestDraft()
@@ -208,7 +213,7 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
     if (isEmptyForestDraft(coerced) && hasLegacyForestDraft()) {
       let completed = false
       try {
-        completed = readGuestProgress().completedLessonIds.includes(FOREST_LESSON_ID)
+        completed = readGuestProgress(draftOwner).completedLessonIds.includes(FOREST_LESSON_ID)
       } catch {
         completed = false
       }
@@ -490,6 +495,27 @@ export function ForestEditorSlot({ initial, onChange, editable, shell, onJudgmen
         </button>
       </div>
       </BlocklyStudioMission>
+
+      <BlocklyStudioSteps>
+        <div className="kc-v3-stepbar-pills" data-testid="forest-hello-stepbar">
+          {FOREST_STEPS.map((item, index) => (
+            <Fragment key={item.id}>
+              {index > 0 && <span className="kc-v3-step-line" aria-hidden="true" />}
+              <span
+                className={`kc-v3-step-pill${index < draft.stepIndex ? ' is-complete' : index === draft.stepIndex ? ' is-active' : ''}`}
+                aria-current={index === draft.stepIndex ? 'step' : undefined}
+                data-testid={`forest-hello-stepbar-${index + 1}`}
+              >
+                <span className="kc-v3-step-dot" aria-hidden="true">
+                  {index < draft.stepIndex ? '✓' : index + 1}
+                </span>
+                {item.title}
+              </span>
+            </Fragment>
+          ))}
+        </div>
+        <span className="kc-v3-step-note">第 {draft.stepIndex + 1} / {FOREST_STEPS.length} 关 · {step.title}</span>
+      </BlocklyStudioSteps>
 
       <BlocklyWorkspace
         allowedBlocks={step.allowedBlocks}

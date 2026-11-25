@@ -27,6 +27,7 @@ import { getFoundationLessonFeedback } from '@/features/lessons/foundation-lesso
 import { GuidedLessonShell } from '@/features/lessons/guided-lesson-shell'
 import type { LessonLocalSaveState } from '@/features/lessons/guided-lesson-shell'
 import { launchStepGate, useLaunchLessonCompletion } from '@/features/lessons/launch-lesson-session'
+import { useResolvedDraftOwner } from '@/features/lessons/use-resolved-draft-owner'
 import { TemplateStoryBuilder } from '@/features/lessons/template-story-builder'
 import {
   clearLessonDraft,
@@ -78,6 +79,7 @@ export default function LessonPage() {
   const [localSaveState, setLocalSaveState] =
     useState<LessonLocalSaveState>('unsaved')
   const restoredForRef = useRef<string | null>(null)
+  const draftOwner = useResolvedDraftOwner()
   // 完成流程（奖励 + 本机进度 + 云端同步 + 重试 / 仅用本机继续 + 跳转）：
   // 与新 studio 路由共用的共享 hook（launch-lesson-session.ts）；清草稿
   // 仍按旧路由的按步 sessionStorage 模型（clearLessonDraftsForLesson）。
@@ -89,6 +91,7 @@ export default function LessonPage() {
     continueLocalOnly,
   } = useLaunchLessonCompletion({
     lessonId: lessonId ?? '',
+    owner: draftOwner,
     onClearDrafts: () => {
       if (lessonId) clearLessonDraftsForLesson(lessonId)
     },

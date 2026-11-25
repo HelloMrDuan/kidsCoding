@@ -26,9 +26,10 @@ test('OPS-049: the live V3 palette is visible and runs the first gate', async ({
   await expect(start).toBeInViewport({ timeout: 30_000 })
   await expect(material.getByRole('button')).toHaveCount(1)
   await expect(material.getByRole('button', { name: '开始' })).toHaveAttribute('aria-pressed', 'true')
-  const script = await page.getByTestId('v3-script-heading').boundingBox()
+  const materialColumn = await page.getByTestId('v3-flyout').boundingBox()
   const source = await start.boundingBox()
-  expect(source!.x + source!.width).toBeLessThan(script!.x)
+  // The docked palette tile sits inside the material column, left of the script canvas.
+  expect(source!.x + source!.width).toBeLessThanOrEqual(materialColumn!.x + materialColumn!.width + 1)
   const workspace = page.getByTestId('lesson-blockly-workspace')
   const assist = workspace.locator('details summary').first()
   const add = workspace.getByTestId('lesson-add-when_start')
@@ -40,10 +41,150 @@ test('OPS-049: the live V3 palette is visible and runs the first gate', async ({
     await add.click()
   }
   await expect(workspace.locator('svg.blocklySvg .blocklyBlockCanvas .when_start')).toBeVisible()
-  await page.getByTestId('ws-run-toggle').click()
+  // ≤1040 the V3 shell shows one pane at a time; the run button lives in the
+  // stage pane, so open that tab before pressing 运行.
+  const runToggle = page.getByTestId('ws-run-toggle')
+  if (!(await runToggle.isVisible())) await page.getByTestId('v3-pane-stage').click()
+  await runToggle.click()
   await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
+  if (!(await start.isVisible())) await page.getByTestId('v3-pane-code').click()
   await expect(start).toBeVisible()
+})
+
+/**
+ * OPS-049 long-script regression: the V3 docked canvas hides Blockly's own
+ * overlay scrollbars, so a 21-block script has to stay reachable through the
+ * replacement gestures (wheel pan), editable at the bottom of the stack, and
+ * must never reintroduce a page scrollbar or occlude the block it shows.
+ * This is the CI version of the real-Chrome long-script probe.
+ */
+test('OPS-049: a 21-block script stays reachable and editable without overlay scrollbars', async ({ page }) => {
+  await page.goto('/learn/story-lab/G1-U1-L01/golden')
+  const canvas = page.locator('.kc-v3-blockly svg.blocklySvg').first()
+  await expect(canvas).toBeVisible({ timeout: 30_000 })
+  const canvasTransform = () =>
+    page.locator('.kc-v3-blockly svg.blocklySvg .blocklyBlockCanvas').first()
+      .evaluate((el) => el.getAttribute('transform') ?? '')
+
+  // The extra block types unlock on the second step; at ≤1040 the step list
+  // and the canvas live in separate panes.
+  const width = page.viewportSize()?.width ?? 1440
+  if (width <= 1040) {
+    await page.getByTestId('golden-story-pane-task').click()
+    await page.getByTestId('g1-u1-l01-complete-step').click()
+    await page.getByTestId('g1-u1-l01-complete-step').click()
+    await page.getByTestId('golden-story-pane-code').click()
+  } else {
+    await page.getByTestId('g1-u1-l01-complete-step').click()
+    await page.getByTestId('g1-u1-l01-complete-step').click()
+  }
+
+  const tools = page.getByTestId('golden-block-tools')
+  const toolsOpen = () => tools.evaluate((el) => el.parentElement?.hasAttribute('open') ?? false)
+  if (!(await toolsOpen())) await tools.click()
+  for (const type of [...Array(10).fill('say_line'), ...Array(10).fill('move_right')]) {
+    await page.getByTestId(`lesson-add-${type}`).click()
+  }
+  const blocks = page.locator('.kc-v3-blockly svg.blocklySvg .blocklyBlockCanvas g.blocklyBlock')
+  await expect(blocks).toHaveCount(21)
+  if (await toolsOpen()) await tools.click()
+  await expect(page.getByTestId('lesson-add-say_line')).toBeHidden()
+  // The shell scrolls the editor into place after hydration; measure only
+  // once the canvas has settled inside the viewport.
+  await canvas.scrollIntoViewIfNeeded()
+  await expect(canvas).toBeInViewport({ ratio: 0.9 })
+
+  const blockRects = () => page.evaluate(() =>
+    [...document.querySelectorAll('.kc-v3-blockly svg.blocklySvg .blocklyBlockCanvas g.blocklyBlock > .blocklyPath')]
+      .map((path) => {
+        const g = path.parentElement
+        const r = path.getBoundingClientRect()
+        return { type: g?.classList[0] ?? '?', x: r.x, y: r.y, w: r.width, h: r.height }
+      }))
+  const bottomRect = async () => {
+    const rects = await blockRects()
+    return rects.reduce((a, b) => (b.y + b.h > a.y + a.h ? b : a))
+  }
+  const bottomFullyInCanvas = async () => {
+    const box = await canvas.boundingBox()
+    const bottom = await bottomRect()
+    return !!box && bottom.y >= box.y - 1 && bottom.y + bottom.h <= box.y + box.height + 1
+  }
+
+  // Pan from the free strip right of the flyout, exactly as the class does.
+  const box = (await canvas.boundingBox())!
+  const panX = box.x + box.width * 0.85
+  const panY = box.y + 40
+  const beforeWheel = await canvasTransform()
+  await page.mouse.move(panX, panY)
+  await page.mouse.wheel(0, 400)
+  await expect.poll(canvasTransform, { timeout: 10_000 }).not.toBe(beforeWheel)
+
+  // Keep panning until the bottom of the 21-block stack is fully in view.
+  await expect.poll(async () => {
+    if (await bottomFullyInCanvas()) return true
+    await page.mouse.move(panX, panY)
+    await page.mouse.wheel(0, 500)
+    return false
+  }, { timeout: 20_000, intervals: [200] }).toBe(true)
+
+  // The visible bottom block paints itself (not covered by a panel or overlay).
+  const bottom = await bottomRect()
+  const hitType = await page.evaluate(({ x, y }) => {
+    const el = document.elementFromPoint(x, y)
+    const g = el?.closest('g.blocklyBlock')
+    return g?.classList[0] ?? null
+  }, { x: bottom.x + bottom.w / 2, y: bottom.y + bottom.h / 2 })
+  expect(hitType).toBe(bottom.type)
+
+  // Edit the bottom block of the long script: select it and delete it.
+  // The tool drawer reflows the canvas, so a rect measured before it opens is
+  // stale and the click can land beside the block (CI desktop caught this).
+  // Open it first, then pan/measure again and verify the click target paints
+  // that exact block before deleting.
+  if (!(await toolsOpen())) await tools.click()
+  await expect.poll(async () => {
+    if (await bottomFullyInCanvas()) return true
+    await page.mouse.move(panX, panY)
+    await page.mouse.wheel(0, 500)
+    return false
+  }, { timeout: 20_000, intervals: [200] }).toBe(true)
+  const target = await bottomRect()
+  const targetHit = await page.evaluate(({ x, y }) => {
+    const el = document.elementFromPoint(x, y)
+    const g = el?.closest('g.blocklyBlock')
+    return g?.classList[0] ?? null
+  }, { x: target.x + target.w / 2, y: target.y + target.h / 2 })
+  expect(targetHit).toBe(target.type)
+  await page.mouse.click(target.x + target.w / 2, target.y + target.h / 2)
+  const selected = page.locator('.kc-v3-blockly svg.blocklySvg g.blocklyBlock.blocklySelected')
+  await expect(selected).toHaveCount(1)
+  await page.getByTestId('lesson-delete-selected').click()
+  await expect(blocks).toHaveCount(20)
+  if (await toolsOpen()) await tools.click()
+
+  // Fit the long script: pan away from the fitted view first, then 适应 must
+  // bring the view back (a no-op at an already-fitted view proves nothing).
+  const beforePanUp = await canvasTransform()
+  await page.mouse.move(panX, panY)
+  await page.mouse.wheel(0, -600)
+  await expect.poll(canvasTransform, { timeout: 10_000 }).not.toBe(beforePanUp)
+  const beforeFit = await canvasTransform()
+  await page.getByTestId('v3-fit').click()
+  await expect.poll(canvasTransform, { timeout: 10_000 }).not.toBe(beforeFit)
+  await expect(canvas).toBeInViewport()
+  const viewport = await canvas.boundingBox()
+  expect(viewport!.width).toBeGreaterThan(0)
+  expect(viewport!.height).toBeGreaterThan(0)
+  const visibleScrollbars = await page.evaluate(() =>
+    [...document.querySelectorAll('.blocklyMainWorkspaceScrollbar, .blocklyFlyoutScrollbar')]
+      .filter((el) => {
+        const r = el.getBoundingClientRect()
+        return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'
+      }).length)
+  expect(visibleScrollbars).toBe(0)
+  expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1)
 })
 
 async function dragFlyoutBlockToWorkspace(
@@ -846,11 +987,13 @@ test('round4 fix 2: one material surface at a time (rail flyout vs palette drawe
 
 test('round4 mobile touch: touchscreen taps open the drawer, add a block, and run to pass', async ({
   page,
-}) => {
+}, testInfo) => {
   // Touchscreen.tap needs a touch context; the desktop/tablet projects
-  // skip honestly instead of faking a tap with a mouse click.
-  const touchPoints = await page.evaluate(() => navigator.maxTouchPoints)
-  test.skip(touchPoints === 0, 'needs a touch-capable browser context')
+  // skip honestly instead of faking a tap with a mouse click. The check must
+  // read the context's hasTouch flag: on a touch-screen laptop Chrome reports
+  // navigator.maxTouchPoints > 0 even in a non-touch context, and tap() then
+  // throws "hasTouch must be enabled on the browser context".
+  test.skip(!testInfo.project.use.hasTouch, 'needs a touch-capable browser context')
   await page.setViewportSize({ width: 375, height: 812 })
   await page.goto(DEMO_A)
   await expect(page.locator('[data-testid^="ws-script-item-"]')).toHaveCount(2)
@@ -1083,4 +1226,48 @@ test('slot tablet + mobile: editor stays wide, check + save/restore on phone', a
   await expect(page.getByTestId('ws-save-chip')).toHaveText('已保存到本机')
   await page.reload()
   await expect(page.getByTestId('ws-demo-slot-item-2')).toBeChecked({ timeout: 10000 })
+})
+
+/**
+ * PR #573 review: 编程课堂 must continue the signed-in account's own lesson.
+ * Two accounts share one browser; the entry is resolved from the same owner
+ * the classroom uses, and an unconfirmed identity fails closed to the picker.
+ */
+test('account isolation: 编程课堂 continues each account\'s own lesson in one browser', async ({
+  page,
+}) => {
+  let owner: string | null = 'user:a'
+  await page.route('**/api/lesson-draft-owner', async (route) => {
+    await route.fulfill({ json: { owner } })
+  })
+  await page.addInitScript(() => {
+    const draft = (lessonId: string) =>
+      JSON.stringify({ lessonId, savedAt: '2026-11-21T10:00:00.000Z', script: { stepIndex: 0, programs: {} } })
+    localStorage.setItem(
+      'kids-lesson-owner-v1:user%3Aa:kidscoding-draft:G1-U1-L01',
+      draft('G1-U1-L01'),
+    )
+    localStorage.setItem(
+      'kids-lesson-owner-v1:user%3Ab:kidscoding-draft:lesson-02-forest-greeting',
+      draft('lesson-02-forest-greeting'),
+    )
+  })
+  await page.goto('/learn/catalog')
+  const nav = page.getByTestId('kc-nav-lesson')
+  await expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
+
+  // Switch to account B: A's lesson and draft must not leak into B's entry.
+  owner = 'user:b'
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(nav).toHaveAttribute('href', '/learn/lesson/lesson-02-forest-greeting')
+
+  // Unconfirmed identity: the picker, never the previous account's lesson.
+  owner = null
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(nav).toHaveAttribute('href', '/learn/catalog')
+
+  // Switching back restores A's own record, not B's.
+  owner = 'user:a'
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(nav).toHaveAttribute('href', '/learn/story-lab/G1-U1-L01/golden')
 })

@@ -19,7 +19,14 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
  * 用临时 Playwright config（独立端口）运行；playwright.config.ts 不动。
  */
 const ROUTE = '/studio/blockly/lesson-01-forest-hello'
-const KEY = 'kidscoding-draft:lesson-01-forest-hello'
+// The V3 studio route resolves the draft owner on the server
+// (`LessonDraftBoundary`), so LessonWorkspace reads and writes the
+// owner-scoped envelope. This spec's contexts carry no `kc_guest_id`
+// cookie, so the resolved owner is the bare browser guest and the scoped
+// key is `kids-lesson-owner-v1:guest:kidscoding-draft:…`. The unscoped
+// legacy key is intentionally not read by scoped readers
+// (`scopedLessonDraftKey`), matching the isolation contract.
+const KEY = 'kids-lesson-owner-v1:guest:kidscoding-draft:lesson-01-forest-hello'
 const EVIDENCE = path.resolve(__dirname, '../../test-results/forest-hello-evidence')
 fs.mkdirSync(EVIDENCE, { recursive: true })
 
@@ -120,9 +127,18 @@ async function clickRun(page: Page) {
   // < 768px the sticky row (ws-sticky-run) is the in-flow run entry.
   if (await page.getByTestId('ws-run-toggle').isVisible()) {
     await page.getByTestId('ws-run-toggle').click()
-  } else {
-    await page.getByTestId('ws-sticky-run').click()
+    return
   }
+  if (await page.getByTestId('ws-sticky-run').isVisible()) {
+    await page.getByTestId('ws-sticky-run').click()
+    return
+  }
+  // V3 pane mode (<=1040px): the stage pane is hidden while 积木编程 is
+  // selected, so the runbar is not reachable yet. Open the stage pane,
+  // run, then come back to the editor pane the caller is working in.
+  await page.getByTestId('v3-pane-stage').click()
+  await page.getByTestId('ws-run-toggle').click()
+  await page.getByTestId('v3-pane-code').click()
 }
 
 async function runAndExpect(page: Page, passed: boolean, text?: string) {
@@ -182,7 +198,8 @@ async function assertShellInvariants(page: Page) {
 async function assertTopbarFits(page: Page, width: number) {
   const topbarBox = await page.getByTestId('studio-topbar').boundingBox()
   expect(topbarBox, 'topbar has a bounding box').not.toBeNull()
-  expect(topbarBox!.height, 'V3 topbar height').toBe(width <= 650 ? 54 : 62)
+  // Approved V3 topbar: 67px desktop, 57px at <=670px.
+  expect(topbarBox!.height, 'V3 topbar height').toBe(width <= 670 ? 57 : 67)
   for (const id of [
     'studio-back',
     'studio-title',
@@ -211,8 +228,8 @@ async function assertTouchTarget(control: Locator) {
     )
     return { width, height, receivesTouch }
   })
-  expect(width).toBeGreaterThanOrEqual(44)
-  expect(height).toBeGreaterThanOrEqual(44)
+  expect(width, `${control} is at least 44px wide`).toBeGreaterThanOrEqual(44)
+  expect(height, `${control} is at least 44px tall`).toBeGreaterThanOrEqual(44)
   expect(receivesTouch, `${control} has a clear touch area`).toBe(true)
 }
 
@@ -424,13 +441,29 @@ for (const size of SIZES) {
     if (size.width === 768) expect(visible).toBeGreaterThanOrEqual(300)
     if (size.width === 375) expect(visible).toBeGreaterThanOrEqual(220)
     // The stage and the run entry are reachable without scrolling the page.
-    // (Mobile <768px uses the sticky run row instead of the stage runbar.)
-    const stageBox = await page.getByTestId('ws-stage-box').boundingBox()
-    expect(stageBox).not.toBeNull()
-    expect(stageBox!.y).toBeLessThan(size.height)
+    // (Desktop shows the stage column; <=1040px opens it as a pane tab, and
+    // the in-flow sticky row is the fallback at <768px.)
     const runToggle = page.getByTestId('ws-run-toggle')
-    const runEntry = (await runToggle.isVisible()) ? runToggle : page.getByTestId('ws-sticky-run')
-    const runBox = await runEntry.boundingBox()
+    const stickyRun = page.getByTestId('ws-sticky-run')
+    let runBox: { x: number; y: number; width: number; height: number } | null = null
+    if (await runToggle.isVisible()) {
+      const stageBox = await page.getByTestId('ws-stage-box').boundingBox()
+      expect(stageBox).not.toBeNull()
+      expect(stageBox!.y).toBeLessThan(size.height)
+      runBox = await runToggle.boundingBox()
+    } else if (await stickyRun.isVisible()) {
+      runBox = await stickyRun.boundingBox()
+    } else {
+      const stageTab = page.getByTestId('v3-pane-stage')
+      await expect(stageTab).toBeVisible()
+      await stageTab.click()
+      await expect(runToggle).toBeVisible()
+      const stageBox = await page.getByTestId('ws-stage-box').boundingBox()
+      expect(stageBox).not.toBeNull()
+      expect(stageBox!.y).toBeLessThan(size.height)
+      runBox = await runToggle.boundingBox()
+      await page.getByTestId('v3-pane-code').click()
+    }
     expect(runBox).not.toBeNull()
     expect(runBox!.y).toBeLessThan(size.height)
     const categories = page.getByTestId('v3-categories')
@@ -438,17 +471,30 @@ for (const size of SIZES) {
     await expect(categories.getByRole('button', { name: '开始' })).toHaveAttribute('aria-pressed', 'true')
     const tile = page.locator('.kc-v3-engine .blocklyFlyout .when_start')
     await expect(tile).toBeInViewport()
-    await expect(page.getByTestId('v3-mission')).toBeInViewport()
+    const mission = page.getByTestId('v3-mission')
+    if (await mission.isVisible()) {
+      await expect(mission).toBeInViewport()
+    } else {
+      // <=1040px pane mode: 学习任务 is a tab, still one tap away.
+      await page.getByTestId('v3-pane-task').click()
+      await expect(mission).toBeInViewport()
+      await page.getByTestId('v3-pane-code').click()
+    }
     if (size.width >= 1280) {
-      const left = (await page.getByTestId('v3-stage-region').boundingBox())!
-      const middle = (await page.getByTestId('v3-material-heading').boundingBox())!
-      const right = (await page.getByTestId('v3-script-heading').boundingBox())!
+      // Approved V3 desktop grid: mission | editor (rail · flyout · canvas)
+      // | stage. The editor head is one full-width bar, so the two inner
+      // columns are measured from the flyout marker and the region edges.
+      const missionBox = (await page.getByTestId('v3-mission').boundingBox())!
+      const editorRegion = (await page.locator('.kc-v3-editor-region').boundingBox())!
+      const stageRegion = (await page.getByTestId('v3-stage-region').boundingBox())!
+      const material = (await page.getByTestId('v3-flyout').boundingBox())!
       const tileBounds = (await tile.boundingBox())!
-      expect(left.x + left.width).toBeLessThanOrEqual(middle.x)
-      expect(middle.x + middle.width).toBeCloseTo(right.x, 0)
-      expect(middle.width / size.width).toBeGreaterThan(0.16)
-      expect(right.width / size.width).toBeGreaterThan(0.48)
-      expect(tileBounds.x + tileBounds.width).toBeLessThan(right.x)
+      expect(missionBox.x + missionBox.width).toBeLessThanOrEqual(editorRegion.x)
+      expect(editorRegion.x + editorRegion.width).toBeLessThanOrEqual(stageRegion.x)
+      expect(material.width / editorRegion.width).toBeGreaterThan(0.12)
+      const scriptWidth = editorRegion.x + editorRegion.width - (material.x + material.width)
+      expect(scriptWidth / editorRegion.width).toBeGreaterThan(0.48)
+      expect(tileBounds.x + tileBounds.width).toBeLessThan(editorRegion.x + editorRegion.width)
       await expect(page.getByTestId('ws-roles-panel')).toBeInViewport({ ratio: 1 })
     }
     await page.screenshot({ path: `${EVIDENCE}/e5-first-${size.name}.png` })
@@ -520,6 +566,9 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
       await page.goto(ROUTE)
       const svg = page.getByTestId('ws-editor-slot').locator('svg.blocklySvg')
       await expect(svg).toBeVisible({ timeout: 30_000 })
+      const taskTab = page.getByTestId('v3-pane-task')
+      const codeTab = page.getByTestId('v3-pane-code')
+      const stageTab = page.getByTestId('v3-pane-stage')
       if (phone) {
         for (const id of topbarControls) await assertTouchTarget(page.getByTestId(id))
         const guide = page.getByTestId('studio-guide-drawer')
@@ -533,20 +582,35 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
         await expect(guide).toBeVisible()
         await page.getByTestId('studio-guide-close').tap()
         await expect(guide).toBeHidden()
-        const stageToggle = page.getByTestId('studio-stage-toggle')
-        await stageToggle.tap()
+        // V3 pane mode: the stage column stays mounted and is shown/hidden
+        // by the 舞台 pane tab (the topbar stage toggle is still reachable
+        // and touch-sized, checked above).
+        await stageTab.tap()
+        await expect(page.locator('.kc-v3-stage-region')).toBeVisible()
+        await codeTab.tap()
         await expect(page.locator('.kc-v3-stage-region')).toBeHidden()
-        await stageToggle.tap()
+        await stageTab.tap()
         await expect(page.locator('.kc-v3-stage-region')).toBeVisible()
         await expect(svg.locator('.blocklyZoom:visible')).toHaveCount(0)
       } else {
         await expect(zoom).toBeHidden()
         await expect(svg.locator('.blocklyZoom:visible')).toHaveCount(3)
       }
-      await expect(page.getByTestId('forest-hello-instruction')).toBeInViewport({ ratio: 1 })
-      await expect(page.getByTestId('forest-hello-complete-step')).toBeInViewport({ ratio: 1 })
-      await expect(page.getByTestId('studio-save-chip')).toBeInViewport({ ratio: 1 })
-      await expect(page.getByTestId('ws-run-toggle')).toBeInViewport({ ratio: 1 })
+      // <=1040px each pane is complete on its own: the instruction card
+      // lives in 任务, the run entry in 舞台.
+      if (await taskTab.isVisible()) {
+        await taskTab.tap()
+        await expect(page.getByTestId('forest-hello-instruction')).toBeInViewport({ ratio: 1 })
+        await expect(page.getByTestId('forest-hello-complete-step')).toBeInViewport({ ratio: 1 })
+        await expect(page.getByTestId('studio-save-chip')).toBeInViewport({ ratio: 1 })
+        await stageTab.tap()
+        await expect(page.getByTestId('ws-run-toggle')).toBeInViewport({ ratio: 1 })
+      } else {
+        await expect(page.getByTestId('forest-hello-instruction')).toBeInViewport({ ratio: 1 })
+        await expect(page.getByTestId('forest-hello-complete-step')).toBeInViewport({ ratio: 1 })
+        await expect(page.getByTestId('studio-save-chip')).toBeInViewport({ ratio: 1 })
+        await expect(page.getByTestId('ws-run-toggle')).toBeInViewport({ ratio: 1 })
+      }
       const stage = page.locator('.kc-v3-stage-region .kc-stage-scene')
       const stageBox = (await stage.boundingBox())!
       expect(stageBox.width).toBeGreaterThanOrEqual(size.width === 768 ? 410 : 310)
@@ -577,13 +641,14 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
         }
       }
       await assertReadableStage()
+      if (await codeTab.isVisible()) await codeTab.tap()
       const categories = page.getByTestId('v3-categories')
       await expect(categories.getByRole('button', { name: '移动' })).toHaveAttribute('aria-pressed', 'true')
       const move = page.locator('.kc-v3-engine .blocklyFlyout .move_right')
       const start = svg.locator('.blocklyBlockCanvas .when_start')
       const scriptMove = svg.locator('.blocklyBlockCanvas .move_right')
       const scale = () => start.evaluate((element: SVGGraphicsElement) => element.getScreenCTM()!.a)
-      const heading = page.getByTestId('v3-script-heading')
+      const heading = page.getByTestId('v3-editor-head')
       const fit = heading.getByRole('button', { name: '适合画面' })
       const undo = heading.getByRole('button', { name: '撤销' })
       const redo = heading.getByRole('button', { name: '重做' })
@@ -616,8 +681,9 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
       }
       await expect(move).toBeInViewport({ ratio: 1 })
       const tile = (await move.boundingBox())!
-      const scriptHeading = (await heading.boundingBox())!
-      expect(tile.x + tile.width).toBeLessThan(scriptHeading.x)
+      const flyoutColumn = (await page.getByTestId('v3-flyout').boundingBox())!
+      // The palette tile sits inside the material column, left of the canvas.
+      expect(tile.x + tile.width).toBeLessThanOrEqual(flyoutColumn.x + flyoutColumn.width + 1)
       const workspace = await svg.elementHandle()
       const scaleBeforeDrag = await scale()
       await dragToolboxBlock(page, '移动', true, phone ? async () => {
@@ -643,6 +709,7 @@ for (const size of [{ width: 768, height: 1024 }, { width: 375, height: 812 }]) 
         await dragToolboxBlock(page, '移动', true)
         await expect.poll(() => draftProgram(page, 'step-2')).toEqual([START, MOVE])
       }
+      if (await stageTab.isVisible() && !await page.getByTestId('ws-run-toggle').isVisible()) await stageTab.tap()
       await page.getByTestId('ws-run-toggle').tap()
       await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
       await expect(page.getByTestId('ws-feedback-conclusion')).toContainText('已完成')
@@ -1003,7 +1070,8 @@ test('N8 desktop 1440 (OPS-046): local progress write failure at completion is a
   await page.addInitScript(() => {
     const original = Storage.prototype.setItem
     Storage.prototype.setItem = function (key: string, value: string) {
-      if (key === 'kc-progress') throw new Error('kc-progress write blocked (OPS-046 N8)')
+      // Block every progress envelope (legacy + owner-scoped), like a real quota failure.
+      if (key.endsWith('kc-progress')) throw new Error('kc-progress write blocked (OPS-046 N8)')
       return original.call(this, key, value)
     }
   })
