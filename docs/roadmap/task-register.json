@@ -4251,7 +4251,7 @@
       "title": "Blockly 全课程 V3 统一第二批：G0-U2 六节森林事件课迁移 V3 工作台",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-052"
       ],
@@ -4265,11 +4265,22 @@
         "第一批合并后对齐最新 main 并核对集成差异；不自行合并，等待独立审核与用户验收"
       ],
       "evidence": {
-        "localTests": "最终代码 HEAD bbaeeeb4（合入 main 0c422835，merge-tree 无冲突；本提交仅改本条台账）Node 20 next build exit 0，BUILD_ID 5-x8u32ysWFRhRq1mP-9f：3110 六课 /studio/blockly/event/G0-U2-L01～L06 均 200，旧 /learn/event-lab/G0-U2-L01～L06 均 308 到 V3，G0-U3-L04 旧页 200、V3 路由 404；Playwright desktop+mobile -g \"G0-U2-L0[1-6] |OPS-053\" 21 passed、9 skipped（OPS-053 仅 desktop 用例在 mobile 跳过）、0 failed（4.7m）。此前 fbaa7ecc 构建 wWmrTNZ8f5P-gQI9pyFXP 上 desktop 定向 15 passed；构建 U0ww8OMoAEGLAUPj450wE 上 vitest event-v3/blockly/grid-v3 18 files 166 passed、ESLint 改动文件 0 error、tsc 81 个基线错误（OPS-053 文件 0 个）、grid-lab+classroom-entry 全量回归 77 passed/17 skipped/0 failed、三断点截图已生成。",
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/578",
-        "prCI": "Draft PR #578 base 已由 codex/ops-052-g0-u1-v3 改为 main（#573/#574/#576/#577 均已合并）。旧 HEAD fbaa7ecc（stacked）PR CI：53 success、2 skipped、0 failure。合入 main 后 HEAD bbaeeeb4：task-ledger run 45579024314 failure——该 run 08:45:05 由 push 触发，早于 08:45:06 改 base，GITHUB_BASE_REF 仍为旧 base，merge-base=b084ca35，把 main 已合并的 OPS-049/052 关账算作本 PR 改动；以 main 为基实算本 PR 台账改动仅 OPS-053。本提交推送后在 base=main 上重新触发，新 HEAD CI 结果另行回填；queued/pending/cancelled 不记为通过。"
+        "mergeCommit": "d08a22ca90ad359bd6c339092e868200273322e0",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/45589634425",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/45589634397",
+        "tests": [
+          "PR #578 门禁：55 项检查 53 成功 + 2 跳过、0 失败（头 3849ea8964029774e1fc6edb8a59805687600119；合并 SHA d08a22ca90ad359bd6c339092e868200273322e0）",
+          "main CI（主线头 d08a22ca）：课程 45589634425、追踪 45589634397、deploy-pipeline 45589634485 均 success；scratch-real-vm-shard-s3 重跑 success（14 分 20 秒，近 15 分钟上限，见 SYS-124）",
+          "生产部署：部署代理 2026-11-25 18:55:50 CST 自动 DEPLOYED d08a22ca（镜像 sha256:73fddc90dfba834e5f02d24a872c9014fea22659489140c6edc407ae32068829）；看门狗 lastDeployedSha d08a22ca、verdict ok；/api/health {\"status\":\"ok\"}",
+          "生产核验（2026-11-26 15:36-15:45 真实浏览器，d08a22ca）：入口全部可访问——G0-U2 事件课 L01～L06 与 G0-U1 网格课 L01～L06 十二节全部打开；抽样真实交互——G0-U2-L01 真实运行通过（初版事件在下未通过，拖到顶后通过，小狐狸醒来说“早上好！”，第 1/5 关打勾）、保存后刷新显示“已恢复草稿”且工作区与通过状态均恢复；G0-U1-L01 真实运行通过（补“开始时”后小狐狸由第 1 列走到第 2 列蘑菇屋格，第 1/5 关打勾），无回归",
+          "验收文案口径（2026-11-26 负责人正式裁定）：核验第 2、3 项为验收预期文案错误，不属于生产部署故障；以当前线上产品为准——学习地图为启蒙主线 4 单元 12 节，单元名森林见面会/小动物去旅行/花园互动秀/动物朋友合作演出；G0 完整路线为图形化启蒙与计算思维、5～7 岁、4 单元 24 节规划课程，单元名认识程序与方向/事件与角色/循环与规律/条件与小游戏；保留年龄段分类，不改成年级分类；不修改首页、学习地图、课程体系页面及课程名称",
+          "G0-U1-L01 多一块移动积木复现（2026-11-26 16:20-16:22 云浏览器）：用页面“文件 → 恢复初始”回到初始状态后，初始工作区恰好 1 块孤立“向右走一格”、无“开始时”，无障碍树亦只列 1 块；源码 starterBlocks 本身只产生 1 块，此前看到的 2 块为旧本地草稿（kidscoding-draft:G0-U1-L01）残留，不是全新首次访问的真实缺陷，不登记整改事项，不阻塞关账",
+          "台账校验：scripts/check-task-ledger.py 校验通过（changed == {OPS-053}）"
+        ],
+        "reviewer": "ChatGPT 独立终审 PASS（#578 评论 7158801426，头 3849ea89）；用户视觉验收通过；负责人 2026-11-26 正式裁定生产验收通过"
       },
-      "notes": "2026-11-25 方案 3：不等待第一批合并即开工。首轮 OPS-053 E2E 3 个旧草稿用例失败（导入提示在画布挂载后消失），根因为 BlocklyWorkspace 挂载即上报快照：L01 第 1 关初始脚本故意把“开始时”放在下面，Blockly 重建为两串，被当成编辑落盘并撤销导入资格。已加开关修复并复测通过。"
+      "notes": "2026-11-25 方案 3：不等待第一批合并即开工。首轮 OPS-053 E2E 3 个旧草稿用例失败（导入提示在画布挂载后消失），根因为 BlocklyWorkspace 挂载即上报快照：L01 第 1 关初始脚本故意把“开始时”放在下面，Blockly 重建为两串，被当成编辑落盘并撤销导入资格。已加开关修复并复测通过。2026-11-26 关账：#578 已合并（d08a22ca），主 CI 全绿，生产部署与真实浏览器核验通过；负责人正式裁定生产验收通过，第 2、3 项核验文案不符为验收预期文案错误、非部署故障，以线上产品文案为准，不改任何页面与课程名称；G0-U1-L01 多一块积木复现证实为旧本地草稿残留、非真实缺陷，不阻塞关账。"
     }
   ]
 }
