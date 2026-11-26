@@ -928,8 +928,14 @@ jobs:
           name: duo-chrome-evidence-s2
           path: apps/web/test-results/
 
-  scratch-real-vm-shard-s3:
-    timeout-minutes: 15 # documented exception (SYS-113): slowest shard, mean ~9.9 min over 10 runs
+  # SYS-124: S3 split (was one 15-min job, SYS-113 exception). Grid-lab grew
+  # 24 -> 48 tests on main (54 on the #579/#580 baseline) and hit the 15-min
+  # cap (main re-run 14m20s; #580 S3 cancelled after 15m17s). Split by unit
+  # with --grep/--grep-invert pairs; --list proves the five shards sum to the
+  # S3 total with no overlap (main 6+6+10+18+8=48; #580 6+6+12+22+8=54).
+  # Each shard keeps timeout-minutes 12 (SYS-108 target, all overhead incl.).
+  scratch-real-vm-shard-s3-g0u1:
+    timeout-minutes: 12
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -946,12 +952,116 @@ jobs:
         run: |
           command -v google-chrome
           google-chrome --version
-      - name: Run Scratch/Blockly desktop shard S3 (grid-lab + garden-click)
-        run: npx playwright test tests/e2e/grid-lab.spec.ts tests/e2e/blockly-garden-click.spec.ts --project=desktop --workers=2
+      - name: Run Scratch/Blockly desktop shard S3-G0U1 (grid-lab G0-U1 formal course)
+        run: npx playwright test tests/e2e/grid-lab.spec.ts --project=desktop --workers=2 --grep "G0-U1" --grep-invert "OPS-052"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: duo-chrome-evidence-s3
+          name: duo-chrome-evidence-s3-g0u1
+          path: apps/web/test-results/
+
+  scratch-real-vm-shard-s3-g0u2:
+    timeout-minutes: 12
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
+      - name: Run Scratch/Blockly desktop shard S3-G0U2 (grid-lab G0-U2 formal course)
+        run: npx playwright test tests/e2e/grid-lab.spec.ts --project=desktop --workers=2 --grep "G0-U2" --grep-invert "OPS-053"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: duo-chrome-evidence-s3-g0u2
+          path: apps/web/test-results/
+
+  scratch-real-vm-shard-s3-g0u3:
+    timeout-minutes: 12
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
+      - name: Run Scratch/Blockly desktop shard S3-G0U3 (grid-lab G0-U3 formal + L05)
+        run: npx playwright test tests/e2e/grid-lab.spec.ts --project=desktop --workers=2 --grep "G0-U3" --grep-invert "OPS-053|OPS-054"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: duo-chrome-evidence-s3-g0u3
+          path: apps/web/test-results/
+
+  scratch-real-vm-shard-s3-shared:
+    timeout-minutes: 12
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
+      - name: Run Scratch/Blockly desktop shard S3-shared (grid-lab OPS-052/053/054 + EDU-105 regression)
+        run: npx playwright test tests/e2e/grid-lab.spec.ts --project=desktop --workers=2 --grep "OPS-052|OPS-053|OPS-054|EDU-105"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: duo-chrome-evidence-s3-shared
+          path: apps/web/test-results/
+
+  scratch-real-vm-shard-s3-garden:
+    timeout-minutes: 12
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
+      - name: Run Scratch/Blockly desktop shard S3-garden (blockly-garden-click)
+        run: npx playwright test tests/e2e/blockly-garden-click.spec.ts --project=desktop --workers=2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: duo-chrome-evidence-s3-garden
           path: apps/web/test-results/
 
   scratch-real-vm-shard-s4:

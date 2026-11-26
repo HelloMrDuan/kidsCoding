@@ -140,20 +140,29 @@
 
 ## 附录 B：Scratch/Blockly 桌面套件 6 分片方案概要（SYS-109 实施依据）
 
-全量 148 测试（`--list --project=desktop` 实测），分片如下：
+全量 178 测试（`--list --project=desktop` 实测；S3 部分按 2026-11-26 的 #579/#580 基线 54 计，其余分片沿用 2026-10-30 快照），分片如下：
 
 | 分片 | 命令范围 | 测试数 |
 |---|---|---|
 | S1 | scratch-g2-u1.spec.ts，`--grep-invert "G2-U2"` | 32 |
 | S2 | scratch-g2-u1.spec.ts，`--grep "G2-U2"` | 23 |
-| S3 | grid-lab.spec.ts + blockly-garden-click.spec.ts | 24 |
+| S3-G0U1 | grid-lab.spec.ts，`--grep "G0-U1" --grep-invert "OPS-052"` | 6 |
+| S3-G0U2 | grid-lab.spec.ts，`--grep "G0-U2" --grep-invert "OPS-053"` | 6 |
+| S3-G0U3 | grid-lab.spec.ts，`--grep "G0-U3" --grep-invert "OPS-053\|OPS-054"` | 12 |
+| S3-shared | grid-lab.spec.ts，`--grep "OPS-052\|OPS-053\|OPS-054\|EDU-105"` | 22 |
+| S3-garden | blockly-garden-click.spec.ts | 8 |
 | S4 | scratch-vm.spec.ts + unit-project.spec.ts + scratch-workbench-ux401.spec.ts + scratch-vm-regression-ux403.spec.ts | 25 |
 | S5 | scratch-characters-ux402.spec.ts + blockly-duo.spec.ts + blockly-second-practice.spec.ts + blockly-meadow-journey.spec.ts | 25 |
 | S6 | blockly-duo-graduation.spec.ts + blockly-first-run.spec.ts + blockly-duo-dialogue.spec.ts + blockly-forest-sequence.spec.ts + reward-idempotency.spec.ts + guest-story.spec.ts | 19 |
-| 合计 | | **148** |
+| 合计 | | **178** |
 
-- 32+23+24+25+25+19 = 148，无重复、无遗漏；S1+S2 的 grep 配对以 `--list`
-  验证（23 + 32 = 55，等于该文件全量）。
+- 32+23+(6+6+12+22+8)+25+25+19 = 178，无重复、无遗漏；S1+S2 的 grep 配对以 `--list`
+  验证（23 + 32 = 55，等于该文件全量）。S3 的五个子分片以 `--list` 验证
+  （main 6+6+10+18+8=48；#579/#580 基线 6+6+12+22+8=54，等于 S3 全量）。
 - 每个分片独立 Job、独立 `timeout-minutes: 12`、独立上传报告；
   首轮实测任一分片超过 12 分钟时继续细分或优化，不得接受。
 - 本方案不改 Scratch VM 业务行为，不删测试，不降断言，不混入 SSR-101。
+- S3 拆分（SYS-124，2026-11-26）：原 S3 单 Job（grid-lab + garden-click）
+  随课程增加由 24 涨至 48（main）/54（#580），15 分钟预算（SYS-113 例外）
+  已不够用（main 重跑 14 分 20 秒；#580 跑 15 分 17 秒后被取消），故拆为
+  上述五个并行 Job；SYS-113 的 15 分钟例外随原 S3 移除，各新 Job 回到 12 分钟。
