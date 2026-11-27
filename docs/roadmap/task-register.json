@@ -4287,7 +4287,7 @@
       "title": "拆分 scratch-real-vm-shard-s3：按 G0-U1/G0-U2/G0-U3/共享回归/garden-click 分片，解决课程持续增加造成的 CI 容量不足",
       "priority": "P0",
       "category": "SYS",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [
         "SYS-108",
         "SYS-113"
@@ -4302,12 +4302,19 @@
         "聚合门禁与证据上传已同步：新 Job 均出现在 pr-status 门禁中，各 Job 独立上传 duo-chrome-evidence-s3-*；CI-EXECUTION-STANDARD.md 附录 B 分配表已同步更新"
       ],
       "evidence": {
-        "pr": null,
-        "mergeCommit": null,
-        "mainCI": null,
-        "tests": []
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/581",
+        "mergeCommit": "7c9679764508e50319e91ddc978c6e2833852d17",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/45969482140",
+        "tests": [
+          "PR #581 门禁：64 项检查 61 成功 + 3 跳过、0 失败（头 46c814bf；合并 SHA 7c9679764508e50319e91ddc978c6e2833852d17）",
+          "main CI（主线头 7c967976）：57 项 check-runs 全部 completed/success、0 失败 0 取消；课程 run 45969482140 success；新分片 g0u1/g0u2/g0u3/shared/garden 全部 success",
+          "Playwright --list 核对：拆分前 S3 用例集合（main 48、#580 基线 54）与拆分后各 Job --grep 选中集合并集一致，无遗漏无重复；本地全量实测 877.3s；本地 1 例失败（G0-U1-L05 字体裁剪断言）属本地字体环境差异，CI 同 run 48 例全过",
+          "ChatGPT 独立终审 PASS（#581 评论 7214035092，头 46c814bf）；duan 2026-11-27 授权合并",
+          "不重新部署生产：仅 CI 工作流与文档改动，无课程代码、无部署配置改动；台账-only 合并无新镜像（预期）"
+        ],
+        "reviewer": "ChatGPT 独立终审 PASS（#581 评论 7214035092，头 46c814bf）；duan 2026-11-27 授权合并"
       },
-      "notes": "2026-11-26 duan 下达 CI 专项治理指令：ChatGPT 已独立核实 #579/#580 的 S3 超时与 main 的 curriculum-content.yml；OPS-052～OPS-055 持续增加真实课程测试，S3 现有分片容量不足。实证：main d08a22ca 的 S3 重跑 14 分 20 秒（run 45589634425，仅差 40 秒即触 15 分钟上限）；#580 的 S3 跑 15 分 17 秒后被取消（run 45764661869）。授权另立独立 CI 治理任务、单独分支与 Draft PR，ChatGPT 审核通过、取得合并授权后优先集成，再由课程 PR 对齐最新 main；不阻塞 Claude 的 OPS-055 收尾。"
+      "notes": "2026-11-26 duan 下达 CI 专项治理指令：ChatGPT 已独立核实 #579/#580 的 S3 超时与 main 的 curriculum-content.yml；OPS-052～OPS-055 持续增加真实课程测试，S3 现有分片容量不足。实证：main d08a22ca 的 S3 重跑 14 分 20 秒（run 45589634425，仅差 40 秒即触 15 分钟上限）；#580 的 S3 跑 15 分 17 秒后被取消（run 45764661869）。授权另立独立 CI 治理任务、单独分支与 Draft PR，ChatGPT 审核通过、取得合并授权后优先集成，再由课程 PR 对齐最新 main；不阻塞 Claude 的 OPS-055 收尾。 2026-11-27 关账：ChatGPT 独立终审 PASS（评论 7214035092，头 46c814bf），duan 授权合并；PR #581 合并 SHA 7c967976；main CI 全绿（57 项 check-runs 全部 success，课程 run 45969482140）；不重新部署生产。后续 #579/#580/#584 对齐新 main 时须用 Playwright --list 核对 S3 原始全量与新分片并集（duan 2026-11-27 指令）。"
     }
   ]
 }
