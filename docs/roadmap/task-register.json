@@ -4281,6 +4281,33 @@
         "reviewer": "ChatGPT 独立终审 PASS（#578 评论 7158801426，头 3849ea89）；用户视觉验收通过；负责人 2026-11-26 正式裁定生产验收通过"
       },
       "notes": "2026-11-25 方案 3：不等待第一批合并即开工。首轮 OPS-053 E2E 3 个旧草稿用例失败（导入提示在画布挂载后消失），根因为 BlocklyWorkspace 挂载即上报快照：L01 第 1 关初始脚本故意把“开始时”放在下面，Blockly 重建为两串，被当成编辑落盘并撤销导入资格。已加开关修复并复测通过。2026-11-26 关账：#578 已合并（d08a22ca），主 CI 全绿，生产部署与真实浏览器核验通过；负责人正式裁定生产验收通过，第 2、3 项核验文案不符为验收预期文案错误、非部署故障，以线上产品文案为准，不改任何页面与课程名称；G0-U1-L01 多一块积木复现证实为旧本地草稿残留、非真实缺陷，不阻塞关账。"
+    },
+    {
+      "id": "SYS-124",
+      "title": "拆分 scratch-real-vm-shard-s3：按 G0-U1/G0-U2/G0-U3/共享回归/garden-click 分片，解决课程持续增加造成的 CI 容量不足",
+      "priority": "P0",
+      "category": "SYS",
+      "status": "in_progress",
+      "dependencies": [
+        "SYS-108",
+        "SYS-113"
+      ],
+      "scope": "只改 .github/workflows/curriculum-content.yml 的 scratch-real-vm-shard-s3 一个 Job、docs/engineering/CI-EXECUTION-STANDARD.md 附录 B 分配表与本条台账登记：把 S3（grid-lab.spec.ts + blockly-garden-click.spec.ts，desktop，--workers=2）拆成多个独立并行 Job，按 G0-U1、G0-U2、G0-U3、共享回归、garden-click 分组，用例标题锚定 --grep（^G0-U1、^G0-U2、^G0-U3、^OPS-052、^OPS-053、^OPS-054、^EDU-105），根据实测耗时均衡；每 Job timeout-minutes 12（SYS-108 目标，含全部开销），不靠提高超时解决；保留全部测试用例、断言、重试与质量门禁，禁 continue-on-error、禁删测试、禁扩大 skip、禁绕过门禁；各 Job 独立上传 duo-chrome-evidence-s3-* 证据（if: always()）；不改课程功能、UI、部署配置，不碰 Claude 的 OPS-055 分支与 #579/#580。S3 原 15 分钟为例外（SYS-113），拆分后该例外随 S3 移除。",
+      "acceptance": [
+        "Playwright --list 核对：拆分前 S3 用例集合（main 48、#580 基线 54）与拆分后各 Job --grep 选中集合的并集完全一致，无遗漏、无意外重复",
+        "新分片在 #579/#580 最终课程代码基线上覆盖全部用例（--list 验证）",
+        "每个新 Job 实测耗时满足 SYS-108（≤12 分钟，含 checkout/安装/构建/测试/上传），不提高 timeout-minutes",
+        "未删除任何测试用例，未弱化任何断言，未使用 continue-on-error，未扩大 skip",
+        "PR CI 全绿（新分片全部 success，原有其余 Job 无回退）；ChatGPT 独立审核 PASS 后才合并",
+        "聚合门禁与证据上传已同步：新 Job 均出现在 pr-status 门禁中，各 Job 独立上传 duo-chrome-evidence-s3-*；CI-EXECUTION-STANDARD.md 附录 B 分配表已同步更新"
+      ],
+      "evidence": {
+        "pr": null,
+        "mergeCommit": null,
+        "mainCI": null,
+        "tests": []
+      },
+      "notes": "2026-11-26 duan 下达 CI 专项治理指令：ChatGPT 已独立核实 #579/#580 的 S3 超时与 main 的 curriculum-content.yml；OPS-052～OPS-055 持续增加真实课程测试，S3 现有分片容量不足。实证：main d08a22ca 的 S3 重跑 14 分 20 秒（run 45589634425，仅差 40 秒即触 15 分钟上限）；#580 的 S3 跑 15 分 17 秒后被取消（run 45764661869）。授权另立独立 CI 治理任务、单独分支与 Draft PR，ChatGPT 审核通过、取得合并授权后优先集成，再由课程 PR 对齐最新 main；不阻塞 Claude 的 OPS-055 收尾。"
     }
   ]
 }
