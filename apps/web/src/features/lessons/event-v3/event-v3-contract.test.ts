@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { g0u2EventLessons } from '@/content/curriculum/g0-u2-event-lessons'
+import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
+import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { validateLessonContract } from '../workspace/lesson-contract'
 import {
   buildEventActivities,
@@ -25,8 +27,8 @@ import {
 const L01 = g0u2EventLessons['G0-U2-L01']
 const L02 = g0u2EventLessons['G0-U2-L02']
 
-describe('event-v3 lesson registry (batch 2 only)', () => {
-  it('registers exactly the six G0-U2 lessons, in curriculum order', () => {
+describe('event-v3 lesson registry (batch 2 + G0-U3-L04)', () => {
+  it('registers the six G0-U2 lessons and G0-U3-L04, in curriculum order', () => {
     expect(EVENT_V3_LESSON_IDS).toEqual([
       'G0-U2-L01',
       'G0-U2-L02',
@@ -34,9 +36,12 @@ describe('event-v3 lesson registry (batch 2 only)', () => {
       'G0-U2-L04',
       'G0-U2-L05',
       'G0-U2-L06',
+      'G0-U3-L04',
     ])
-    expect(Object.keys(g0u2EventLessons)).toEqual([...EVENT_V3_LESSON_IDS])
-    for (const id of EVENT_V3_LESSON_IDS) expect(getEventV3Lesson(id)).toBe(g0u2EventLessons[id])
+    expect(Object.keys(g0u2EventLessons)).toEqual([...EVENT_V3_LESSON_IDS.slice(0, 6)])
+    for (const id of EVENT_V3_LESSON_IDS) {
+      expect(getEventV3Lesson(id)).toBe(g0u2EventLessons[id] ?? g0u3EventLessons[id])
+    }
     expect(eventV3Route('G0-U2-L03')).toBe('/studio/blockly/event/G0-U2-L03')
   })
 
@@ -48,6 +53,14 @@ describe('event-v3 lesson registry (batch 2 only)', () => {
     expect(getPreviousEventV3Lesson('G0-U2-L01')).toBeNull()
     expect(getPreviousEventV3Lesson('G0-U2-L02')).toBe(L01)
     expect(getPreviousEventV3Lesson('G0-U3-L01')).toBeNull()
+    // 注册表里 G0-U3-L04 紧跟 G0-U2-L06，但不同单元，不算上一课。
+    expect(getPreviousEventV3Lesson('G0-U3-L04')).toBeNull()
+  })
+
+  it('G0-U3-L04 goal5 links to the previous lesson in its own unit (L03 grid lesson)', () => {
+    const line = buildEventGoal5(getEventV3Lesson('G0-U3-L04')!)[3]
+    expect(line).toContain(`上一课《${g0u3LoopLessons['G0-U3-L03'].title}》`)
+    expect(line).toContain('的第 4 课')
   })
 })
 

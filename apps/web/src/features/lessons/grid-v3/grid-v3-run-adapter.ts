@@ -41,6 +41,7 @@ import {
   isValidGridDraft,
   type GridSlotData,
 } from './grid-v3-draft'
+import { gridActorName, gridStepGoalPhrase, withGridActorName } from './grid-v3-actor'
 
 /** 每帧节拍：与旧课堂 useGridPlayback 默认 420ms 一致。 */
 export const GRID_FRAME_MS = 420
@@ -82,14 +83,24 @@ export function buildGridJudgment(
   step: GridLessonStep,
   run: GridRun,
 ): JudgmentResult {
-  const diagnosis = run.failure ? lesson.diagnoses[run.failure] ?? run.message : run.message
+  const actor = gridActorName(step.level)
+  const goal = gridStepGoalPhrase(step)
+  const message = withGridActorName(run.message, step.level)
+  const diagnosis = withGridActorName(
+    run.failure ? lesson.diagnoses[run.failure] ?? run.message : run.message,
+    step.level,
+  )
   return {
     layers: [
       {
         id: 'stage',
         label: '舞台',
         passed: run.passed,
-        detail: run.passed ? '小狐狸真的按积木走到了目标格。' : run.message,
+        detail: run.passed
+          ? goal === '走到目标格'
+            ? `${actor}真的按积木走到了目标格。`
+            : `${actor}真的按积木${goal}。`
+          : message,
       },
       {
         id: 'task',
@@ -110,7 +121,9 @@ export function buildGridJudgment(
     ],
     passed: run.passed,
     conclusion: run.passed
-      ? '本次运行通过：小狐狸真的走到了目标格。'
+      ? goal === '走到目标格'
+        ? `本次运行通过：${actor}真的走到了目标格。`
+        : `本次运行通过：${actor}真的${goal}。`
       : `本次运行未通过：${diagnosis}`,
     methodEvidence: `本次运行共 ${run.frames.length} 个动作。`,
   }

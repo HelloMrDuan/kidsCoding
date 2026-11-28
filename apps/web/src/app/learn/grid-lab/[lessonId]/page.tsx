@@ -9,9 +9,9 @@ import { gridV3Route, isGridV3LessonId } from '@/features/lessons/grid-v3/grid-v
 
 export default async function GridLabPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params
-  // OPS-052：G0-U1 六课已迁入 V3 工作台（同一课节、同一份课程数据），
-  // 旧入口 308 兼容跳转，不让同一课节同时存在两套页面系统；G0-U2 / G0-U3
-  // 等未迁移课程继续走本页旧课堂。
+  // OPS-052/OPS-054：G0-U1 六课与 G0-U3-L01/L02/L03/L05 已迁入 V3 工作台
+  // （同一课节、同一份课程数据），旧入口 308 兼容跳转，不让同一课节同时存在
+  // 两套页面系统；其余未登记课程继续走本页旧课堂。
   if (isGridV3LessonId(lessonId)) permanentRedirect(gridV3Route(lessonId))
   const lesson = getGridLesson(lessonId) ?? g0u3LoopLessons[lessonId] ?? null
   if (!lesson) notFound()

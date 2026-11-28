@@ -69,6 +69,14 @@ function GridStudioWorkspace({ lesson }: { lesson: GridLesson }) {
   const handleShellControl = useCallback((control: ShellControl) => {
     setShellControl(control)
   }, [])
+  // 桌面端“收起任务”：复用 BlocklyStudioLayout 已有的 missionCollapsed /
+  // onMissionToggle（与 story-golden-classroom 同一能力）。只切换网格列宽，
+  // 编辑器与舞台节点不卸载，Blockly 实例、积木、草稿和运行状态都保持不变；
+  // 手机端标签页布局由样式表恢复完整任务面板。
+  const [missionCollapsed, setMissionCollapsed] = useState(false)
+  const handleMissionToggle = useCallback(() => {
+    setMissionCollapsed((collapsed) => !collapsed)
+  }, [])
 
   return (
     <StudioShell
@@ -90,6 +98,8 @@ function GridStudioWorkspace({ lesson }: { lesson: GridLesson }) {
           studioLayout="blockly-v3"
           onSaveStateChange={handleSaveStateChange}
           onShellControl={handleShellControl}
+          missionCollapsed={missionCollapsed}
+          onMissionToggle={handleMissionToggle}
         />
       </GridSessionContext.Provider>
     </StudioShell>

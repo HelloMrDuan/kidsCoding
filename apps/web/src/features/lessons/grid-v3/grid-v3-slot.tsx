@@ -51,6 +51,7 @@ import {
   type GridSlotData,
 } from './grid-v3-draft'
 import { useGridSession, useGridSessionState } from './grid-v3-session'
+import { gridActorName, gridStepGoalPhrase } from './grid-v3-actor'
 
 const BlocklyWorkspace = dynamic(
   () => import('@/features/lessons/blockly/blockly-workspace').then((m) => m.BlocklyWorkspace),
@@ -299,7 +300,9 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
           ? goalPromptFor(currentStep)
           : !observed
             ? '这是错误实验：先按原样运行一次，亲眼看看错在哪，再修好它。'
-            : '先按“运行”，让小狐狸真的到达目标，才能完成这一关。',
+            : gridStepGoalPhrase(currentStep) === '走到目标格'
+              ? `先按“运行”，让${gridActorName(currentStep.level)}真的到达目标，才能完成这一关。`
+              : `先按“运行”，让${gridActorName(currentStep.level)}真的${gridStepGoalPhrase(currentStep)}，才能完成这一关。`,
       )
       return
     }
