@@ -19,7 +19,7 @@ import type { EventLesson, EventLessonStep } from '@/content/curriculum/g0-u2-ev
 
 import { draftKeyFor, type LessonContract } from '../workspace/lesson-contract'
 import type { StudioLesson } from '../studio/studio-lesson'
-import { EVENT_V3_LESSON_IDS, eventV3LessonIndex, getPreviousEventV3Lesson } from './event-v3-lessons'
+import { v3PreviousLessonLine } from '../v3-unit-context'
 
 const STEP_KIND_LABEL: Record<EventLessonStep['kind'], string> = {
   guided: '引导练习',
@@ -48,11 +48,8 @@ export function eventStepText(lesson: EventLesson): string {
  * 4. G0-U2 单元序号 + 上一课标题（第一课如实写“无前置课节”）；5. 全部关标题。
  */
 export function buildEventGoal5(lesson: EventLesson): [string, string, string, string, string] {
-  const index = Math.max(eventV3LessonIndex(lesson.id), 0)
-  const previous = getPreviousEventV3Lesson(lesson.id)
-  const relation = previous
-    ? `和上节课的联系：上一课《${previous.title}》学的是“${previous.concept}”；本课接着学“${lesson.concept}”，是 G0 森林事件单元的第 ${index + 1} 课（共 ${EVENT_V3_LESSON_IDS.length} 课）。`
-    : `和上节课的联系：无前置课节，本课是 G0 森林事件单元的第 1 课（共 ${EVENT_V3_LESSON_IDS.length} 课）。`
+  // 单元序号与上一课按单元计算（G0-U3-L04 的上一课是 L03 网格课）。
+  const relation = v3PreviousLessonLine(lesson.id, lesson.concept)
   return [
     `今天学什么：${lesson.concept}。`,
     `要解决什么问题：${lesson.steps[0]?.predict ?? lesson.story}`,

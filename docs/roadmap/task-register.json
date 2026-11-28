@@ -4315,6 +4315,33 @@
         "reviewer": "ChatGPT 独立终审 PASS（#581 评论 7214035092，头 46c814bf）；duan 2026-11-27 授权合并"
       },
       "notes": "2026-11-26 duan 下达 CI 专项治理指令：ChatGPT 已独立核实 #579/#580 的 S3 超时与 main 的 curriculum-content.yml；OPS-052～OPS-055 持续增加真实课程测试，S3 现有分片容量不足。实证：main d08a22ca 的 S3 重跑 14 分 20 秒（run 45589634425，仅差 40 秒即触 15 分钟上限）；#580 的 S3 跑 15 分 17 秒后被取消（run 45764661869）。授权另立独立 CI 治理任务、单独分支与 Draft PR，ChatGPT 审核通过、取得合并授权后优先集成，再由课程 PR 对齐最新 main；不阻塞 Claude 的 OPS-055 收尾。 2026-11-27 关账：ChatGPT 独立终审 PASS（评论 7214035092，头 46c814bf），duan 授权合并；PR #581 合并 SHA 7c967976；main CI 全绿（57 项 check-runs 全部 success，课程 run 45969482140）；不重新部署生产。后续 #579/#580/#584 对齐新 main 时须用 Playwright --list 核对 S3 原始全量与新分片并集（duan 2026-11-27 指令）。"
+    },
+    {
+      "id": "OPS-054",
+      "title": "Blockly 全课程 V3 统一第三批：G0-U3 循环与规律课迁移 V3 工作台",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-053"
+      ],
+      "scope": "按项目负责人 2026-11-25 第三批指令：暂以 #578 已验收 HEAD 3849ea89 为基底（#578 合并后对齐最新 main），把 G0-U3 课节迁移到 OPS-052/053 同一套 V3 docked 编辑器与共享工作台（StudioShell + LessonWorkspace），不复制工作台、不引入 V4、不新建重复引擎。按原真实引擎选择适配：G0-U3-L01/L02/L03/L05 走 grid-v3（GridRunAdapter），G0-U3-L04 萤火虫事件课走 event-v3（EventRunAdapter，含 loop 积木与多角色同步）。保留 L05 golden 工作台有效功能（导出/导入、停止、记录结果、无 owner 时锁定、逐块高亮）与全部教学内容、关卡、运行器、判定器与作品回放；教学文案与舞台角色、积木程序一致。旧 /learn/grid-lab/G0-U3-* 与 /learn/event-lab/G0-U3-L04 308 到 V3。草稿按 owner 隔离；归属不明的历史草稿不认领、不导入、不覆盖；完成态合法恢复。G0-U3-L06 目前仅有 detailed_script 课程数据（playable=false，依赖引擎尚无的 sound 能力与原创授权素材），无可玩实现，按 AGENTS.md 先报告差异与最小方案、等待裁定，不以原型或 mock 冒充。不改部署 workflow，不改其他 PR 分支，不自行合并；合并与生产部署由主 Muse 负责。",
+      "acceptance": [
+        "G0-U3 可玩课节全部进入 V3 工作台；旧入口 308 到 V3；前两批课程行为不变",
+        "真实 Blockly 编辑与运行：循环积木、嵌套脚本、事件触发、多角色交互；错误实验、练习、创意关、复盘、作品展示真实运行，禁止静态图或 mock 冒充",
+        "积木分类、固定素材区、独立画布、撤销、重做、适合画面与前两批一致；L05 golden 有效功能在 V3 中保留",
+        "保存、刷新恢复、跨账号隔离；旧草稿仅在认领匹配时导入，归属不明不认领不覆盖，完成态可恢复",
+        "真实 Chrome 1440×900、768×1024、375×812 三断点验证，无横向溢出",
+        "单元测试、真实 Playwright E2E、ESLint、tsc（与已知 81 个基线错误一致）、生产构建与 PR CI 均有真实结果；排队/未跑/失败不得记为通过",
+        "G0-U3-L06 缺口如实记录并等待项目负责人裁定；不自行合并，等待独立审核与用户验收"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/579",
+        "prCI": "Draft PR #579（base main d08a22ca，#578 已合并后对齐），head b0a71842 的 PR CI 已触发，结果待回填；queued/pending/cancelled 不记为通过。",
+        "localTests": "ESLint 改动文件 exit 0；vitest grid-v3/event-v3/progress/curriculum/studio/workspace 51 files 424 passed，stage 修复后 grid-v3 3 files 46 passed；tsc 81 个基线错误；Node 20 next build exit 0；Playwright 真实 Chrome（127.0.0.1:3110）desktop -g \"G0-U3|OPS-052|OPS-053|OPS-054\" 32 passed，mobile 同组 12 passed、20 skipped（仅 desktop 用例）、0 failed；OPS-054 入口矩阵、三断点（1440×900/768×1024/375×812 无横向溢出）、旧草稿 owner 隔离三条用例通过。最终 HEAD 重建后复测结果另行回填。",
+        "gaps": "G0-U3-L06 仅 detailed_script（playable=false），缺 sound 引擎能力与授权素材，两 studio 均 404、目录成熟度 1，待裁定；grid V3 未接入“收起任务释放编辑区”（BlocklyStudioLayout 仅在传入 onMissionToggle 时渲染），最小方案为 grid studio client 传 missionCollapsed/onMissionToggle，待裁定，未实施。"
+      },
+      "notes": "2026-11-25 第三批开工：分支 codex/ops-054-g0-u3-v3 自 3849ea89 创建。L06 无可玩实现且缺 sound 引擎能力，与“六节全部迁移”指令存在差异，已列入汇报待裁定。 2026-11-26：#578 合并后变基到 main d08a22ca，提交 b0a71842，创建 Draft PR #579，状态改为 in_review。"
     }
   ]
 }

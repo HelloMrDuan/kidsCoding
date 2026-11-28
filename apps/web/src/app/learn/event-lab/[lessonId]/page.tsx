@@ -8,9 +8,9 @@ import { eventV3Route, isEventV3LessonId } from '@/features/lessons/event-v3/eve
 
 export default async function EventLabPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params
-  // OPS-053：G0-U2 六课已迁入 V3 工作台（同一课节、同一份课程数据），
-  // 旧入口 308 兼容跳转，不让同一课节同时存在两套页面系统；G0-U3
-  // 事件+循环课继续走本页旧课堂。
+  // OPS-053/OPS-054：G0-U2 六课与 G0-U3-L04 已迁入 V3 工作台（同一课节、
+  // 同一份课程数据），旧入口 308 兼容跳转，不让同一课节同时存在两套页面系统；
+  // 其余未登记课程继续走本页旧课堂。
   if (isEventV3LessonId(lessonId)) permanentRedirect(eventV3Route(lessonId))
   const lesson = getEventLesson(lessonId) ?? g0u3EventLessons[lessonId]
   if (!lesson) notFound()

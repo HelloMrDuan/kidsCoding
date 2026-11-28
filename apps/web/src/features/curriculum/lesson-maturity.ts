@@ -4,8 +4,8 @@ import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
 import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 import { g2ScratchLessons } from '@/content/curriculum/g2-u1-scratch-lessons'
 import { launchLessons } from '@/content/curriculum/launch-lessons'
-import { eventV3Route } from '@/features/lessons/event-v3/event-v3-lessons'
-import { gridV3Route } from '@/features/lessons/grid-v3/grid-v3-lessons'
+import { eventV3Route, isEventV3LessonId } from '@/features/lessons/event-v3/event-v3-lessons'
+import { gridV3Route, isGridV3LessonId } from '@/features/lessons/grid-v3/grid-v3-lessons'
 import { getCatalogLesson, getLessonContentStage } from './full-catalog-access'
 import { validTrialsFor } from './child-trial'
 import { EXAMPLE_DEBT_BASELINE } from './lesson-schema'
@@ -80,16 +80,18 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
     ]),
   ),
   // G0-U3 (Hark A): loop lessons on the grid engine with the SYS-107 repeat block; E2E in grid-lab.spec.ts.
+  // OPS-054: G0-U3 grid lessons registered in grid-v3 open the V3 studio; the old
+  // /learn/grid-lab/<id> entry 308-redirects. Unregistered ids keep the old page.
   ...Object.fromEntries(
     Object.keys(g0u3LoopLessons).map((id) => [
       id,
-      { engine: 'blockly', route: `/learn/grid-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
+      { engine: 'blockly', route: isGridV3LessonId(id) ? gridV3Route(id) : `/learn/grid-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
     ]),
   ),
   // G0-U2 (Hark A): event lessons on the event-stage engine; their E2E lives in grid-lab.spec.ts (already in CI).
   // OPS-053: the six G0-U2 lessons now open the V3 studio workspace; the old
-  // /learn/event-lab/<id> entry 308-redirects to the same lesson. G0-U3
-  // event+loop lessons stay on /learn/event-lab/<id>.
+  // /learn/event-lab/<id> entry 308-redirects to the same lesson. OPS-054: the
+  // G0-U3-L04 event+loop lesson joins the same V3 event studio.
   ...Object.fromEntries(
     Object.keys(g0u2EventLessons).map((id) => [
       id,
@@ -99,7 +101,7 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
   ...Object.fromEntries(
     Object.keys(g0u3EventLessons).map((id) => [
       id,
-      { engine: 'blockly', route: `/learn/event-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
+      { engine: 'blockly', route: isEventV3LessonId(id) ? eventV3Route(id) : `/learn/event-lab/${id}`, e2eSpec: 'tests/e2e/grid-lab.spec.ts' } satisfies TrialIntegration,
     ]),
   ),
   // 12 standalone launch lessons: Blockly stage at /learn/lesson/<id>, covered by tests/e2e/blockly-*.spec.ts.

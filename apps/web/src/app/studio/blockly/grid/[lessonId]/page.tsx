@@ -7,12 +7,13 @@ import { LessonDraftBoundary } from '@/features/lessons/lesson-draft-boundary'
 import StudioGridClient from './studio-grid-client'
 
 /**
- * OPS-052 G0-U1 route: /studio/blockly/grid/<lessonId>（本批仅六个 G0-U1 id）。
+ * OPS-052/OPS-054 grid route: /studio/blockly/grid/<lessonId>（六个 G0-U1 id，
+ * 以及 OPS-054 迁入的 G0-U3-L01/L02/L03/L05）。
  *
  * 草稿/进度归属人由服务端解析（与 /learn 各路由同一个
  * `currentLessonDraftOwner()`），身份未确认时边界锁写；六个课节共用同一
- * 套 V3 插槽与外壳，不为每节课复制工作台。本批之外的 id 一律 404，旧
- * `/learn/grid-lab/<id>` 继续服务 G0-U2 / G0-U3 等未迁移课程。
+ * 套 V3 插槽与外壳，不为每节课复制工作台。未登记的 id 一律 404（含尚无
+ * 可玩课节的 G0-U3-L06）；已登记 id 的旧 `/learn/grid-lab/<id>` 308 到这里。
  */
 export default async function StudioGridPage({
   params,

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { g0u1GridLessons } from '@/content/curriculum/g0-u1-grid-lessons'
+import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
+import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
 import { validateLessonContract } from '../workspace/lesson-contract'
 import {
   buildGridActivities,
@@ -19,8 +21,8 @@ import { GRID_V3_LESSON_IDS, getGridV3Lesson, isGridV3LessonId } from './grid-v3
 const L01 = g0u1GridLessons['G0-U1-L01']
 const L05 = g0u1GridLessons['G0-U1-L05']
 
-describe('grid-v3 lesson registry (batch 1 only)', () => {
-  it('registers exactly the six G0-U1 lessons, in curriculum order', () => {
+describe('grid-v3 lesson registry (batch 1 + batch 3 grid lessons)', () => {
+  it('registers the six G0-U1 lessons and the four G0-U3 grid lessons, in curriculum order', () => {
     expect(GRID_V3_LESSON_IDS).toEqual([
       'G0-U1-L01',
       'G0-U1-L02',
@@ -28,15 +30,32 @@ describe('grid-v3 lesson registry (batch 1 only)', () => {
       'G0-U1-L04',
       'G0-U1-L05',
       'G0-U1-L06',
+      'G0-U3-L01',
+      'G0-U3-L02',
+      'G0-U3-L03',
+      'G0-U3-L05',
     ])
     expect(Object.keys(g0u1GridLessons)).toHaveLength(6)
-    for (const id of GRID_V3_LESSON_IDS) expect(getGridV3Lesson(id)).toBe(g0u1GridLessons[id])
+    for (const id of GRID_V3_LESSON_IDS) {
+      expect(getGridV3Lesson(id)).toBe(g0u1GridLessons[id] ?? g0u3LoopLessons[id])
+    }
   })
 
-  it('never claims lessons outside this batch (G0-U2 / G0-U3 / launch lessons)', () => {
+  it('never claims lessons outside the registry (G0-U2 / G0-U3 event+unplayable / launch lessons)', () => {
     expect(isGridV3LessonId('G0-U2-L01')).toBe(false)
-    expect(getGridV3Lesson('G0-U3-L01')).toBeNull()
+    // G0-U3-L04 是事件课（event-v3），G0-U3-L06 尚无可玩实现。
+    expect(getGridV3Lesson('G0-U3-L04')).toBeNull()
+    expect(getGridV3Lesson('G0-U3-L06')).toBeNull()
     expect(getGridV3Lesson('lesson-01-forest-hello')).toBeNull()
+  })
+
+  it('computes unit position and previous lesson per unit, across engines', () => {
+    // G0-U3-L01 是 G0-U3 第一课：不把 G0-U1-L06 当上一课。
+    expect(buildGridGoal5(getGridV3Lesson('G0-U3-L01')!)[3]).toContain('无前置课节')
+    // G0-U3-L05 的上一课是 L04 萤火虫事件课（走 event-v3），序号按单元算。
+    const l05 = buildGridGoal5(getGridV3Lesson('G0-U3-L05')!)[3]
+    expect(l05).toContain(`上一课《${g0u3EventLessons['G0-U3-L04'].title}》`)
+    expect(l05).toContain('的第 5 课')
   })
 })
 

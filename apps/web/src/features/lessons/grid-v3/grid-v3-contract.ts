@@ -21,7 +21,8 @@ import type { GridLesson, GridLessonStep } from '@/content/curriculum/g0-u1-grid
 
 import { draftKeyFor, type LessonContract } from '../workspace/lesson-contract'
 import type { StudioLesson } from '../studio/studio-lesson'
-import { gridV3LessonIndex, getPreviousGridV3Lesson, GRID_V3_LESSON_IDS } from './grid-v3-lessons'
+import { v3PreviousLessonLine } from '../v3-unit-context'
+import { gridLessonActorName, gridLessonGoalPhrase } from './grid-v3-actor'
 
 const STEP_KIND_LABEL: Record<GridLessonStep['kind'], string> = {
   guided: '引导练习',
@@ -46,15 +47,12 @@ export function gridStepNumber(lesson: GridLesson, stepId: string): number {
  * 1. lesson.concept 原文。
  * 2. 第一关 predict 原文（课程自带的“先猜一猜”问题）。
  * 3. 第一条 objective 原文。
- * 4. G0-U1 单元序号 + 上一课标题（第一课如实写“无前置课节”）。
+ * 4. 本单元（G0-U1 / G0-U3）序号 + 上一课标题，按单元跨引擎计算（第一课如实写“无前置课节”）。
  * 5. 全部关标题原文。
  */
 export function buildGridGoal5(lesson: GridLesson): [string, string, string, string, string] {
-  const index = Math.max(gridV3LessonIndex(lesson.id), 0)
-  const previous = getPreviousGridV3Lesson(lesson.id)
-  const relation = previous
-    ? `和上节课的联系：上一课《${previous.title}》学的是“${previous.concept}”；本课接着学“${lesson.concept}”，是 G0 森林寻路单元的第 ${index + 1} 课（共 ${GRID_V3_LESSON_IDS.length} 课）。`
-    : `和上节课的联系：无前置课节，本课是 G0 森林寻路单元的第 1 课（共 ${GRID_V3_LESSON_IDS.length} 课）。`
+  // 单元序号与上一课按单元计算（G0-U3 跨网格/事件两种引擎，L05 的上一课是 L04 事件课）。
+  const relation = v3PreviousLessonLine(lesson.id, lesson.concept)
   return [
     `今天学什么：${lesson.concept}。`,
     `要解决什么问题：${lesson.steps[0]?.predict ?? lesson.story}`,
@@ -105,13 +103,15 @@ export function buildGridActivities(
     kinds: GridLessonStep['kind'][],
   ): GridLessonStep[] => lesson.steps.filter((step) => kinds.includes(step.kind))
   const titles = (steps: GridLessonStep[]) => steps.map((step) => step.title).join('、')
+  const actor = gridLessonActorName(lesson)
+  const goal = gridLessonGoalPhrase(lesson)
   const activities: { level: 1 | 2 | 3; title: string; text: string }[] = []
   const guided = list(['guided'])
   if (guided.length > 0) {
     activities.push({
       level: 1,
       title: '探索预测：先猜再运行',
-      text: `${titles(guided)}：先猜小狐狸会怎么走，再按“运行”看真实结果。`,
+      text: `${titles(guided)}：先猜${actor}会怎么走，再按“运行”看真实结果。`,
     })
   }
   const practice = list(['practice-a', 'practice-b'])
@@ -119,7 +119,9 @@ export function buildGridActivities(
     activities.push({
       level: 2,
       title: '独立解决：自己搭建并验收',
-      text: `${titles(practice)}：自己拼出路线，真实运行到目标格。`,
+      text: goal === '走到目标格'
+        ? `${titles(practice)}：自己拼出路线，真实运行到目标格。`
+        : `${titles(practice)}：自己拼出程序，真实运行并${goal}。`,
     })
   }
   const transfer = list(['error-lab', 'creative'])
@@ -142,6 +144,9 @@ export function buildGridContract(lesson: GridLesson): LessonContract {
   const hints = buildGridHints(lesson)
   const methodSteps = buildGridMethodSteps(lesson)
   const goal5 = buildGridGoal5(lesson)
+  const actor = gridLessonActorName(lesson)
+  const goal = gridLessonGoalPhrase(lesson)
+  const creativeNote = goal === '走到目标格' ? '（创意关：你选的那一格）' : ''
   return {
     lessonId: lesson.id,
     title: lesson.title,
@@ -155,8 +160,8 @@ export function buildGridContract(lesson: GridLesson): LessonContract {
     ] as [string, string, string],
     engine: 'slot',
     judging: {
-      stageRule: '运行后小狐狸真的按积木走到目标格（创意关：你选的那一格）。',
-      taskRule: '在当前关搭好程序，按“运行”让小狐狸真实走到目标格；错误实验须先按原样运行看到错误，再修好。',
+      stageRule: `运行后${actor}真的按积木${goal}${creativeNote}。`,
+      taskRule: `在当前关搭好程序，按“运行”让${actor}真实${goal}；错误实验须先按原样运行看到错误，再修好。`,
       knowledgeRule: `本课知识点：${lesson.concept}。`,
       scopeLabel: '教学定向',
     },
@@ -177,10 +182,12 @@ export function buildGridContract(lesson: GridLesson): LessonContract {
 
 /** 玩法帮助（StudioShell 抽屉）：真实玩法 + 每关标题与指导。 */
 export function buildGridHelp(lesson: GridLesson): { title: string; body: string[] } {
+  const actor = gridLessonActorName(lesson)
+  const goal = gridLessonGoalPhrase(lesson)
   return {
     title: `${lesson.title} · 玩法帮助`,
     body: [
-      '玩法：把积木从左边的工具箱拖到画布上，接在“开始时”下面，再按“运行”。小狐狸会按积木一步一步走；走到目标格才算这一关通过。',
+      `玩法：把积木从左边的工具箱拖到画布上，接在“开始时”下面，再按“运行”。${actor}会按积木一步一步走；${goal}才算这一关通过。`,
       '改积木：选中积木后可以删除，也可以拖回工具箱；想从头来，按壳里的“恢复初始”。',
       ...buildGridMethodSteps(lesson),
     ],

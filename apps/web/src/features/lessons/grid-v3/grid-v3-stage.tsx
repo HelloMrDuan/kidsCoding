@@ -31,6 +31,7 @@ import { failingBlockNote, MISTAKE_LABELS, stepLevel } from '../grid/grid-lab'
 import { GridStage, useGridPlayback, type GridStageState } from '../grid/grid-stage'
 import { gridStarterProgram, type GridSlotData } from './grid-v3-draft'
 import { useGridSession, useGridSessionState } from './grid-v3-session'
+import { gridActorName, gridStageLabel } from './grid-v3-actor'
 
 function goalPromptFor(step: GridLessonStep): string {
   const creative = step.creative
@@ -89,6 +90,14 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
   // 不需要额外 effect 写状态。
   const stopped = !!run && !observation.playing && observation.executionState === 'idle'
   const guess = sessionState.guess
+  // 角色名在 memo 外派生成字符串，memo 只依赖纯值。
+  const actorName = gridActorName(step.level)
+  // 舞台 aria-label 只读原始值拼字符串：不把 run 派生的帧对象交给函数，
+  // React Compiler 才能确认 feedback 的 memo 依赖之后不会被改写。
+  const stageLabel = gridStageLabel(
+    { actor: level.actor, cols: level.cols, rows: level.rows },
+    { x: display.x, y: display.y, facing: display.facing },
+  )
 
   const feedback = useMemo(() => {
     if (notice) return { tone: 'warning', text: notice }
@@ -101,10 +110,10 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
         tone: 'idle',
         text: passedHere
           ? '这一关已经通过。可以再试一种不同的程序，或者点“完成这一关”。'
-          : '想好了就按“运行”，看看小狐狸会不会按你猜的走。',
+          : `想好了就按“运行”，看看${actorName}会不会按你猜的走。`,
       }
     }
-    if (!done) return { tone: 'idle', text: '小狐狸正在按积木一块一块走……' }
+    if (!done) return { tone: 'idle', text: `${actorName}正在按积木一块一块走……` }
     const outcome = run.passed ? 'pass' : run.failure
     const picked = guess === null ? null : step.predictChoices?.[guess]
     const guessNote = picked
@@ -129,7 +138,7 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
     const pointer = failingBlockNote(run, blocks)
     const text = run.failure === 'not_at_goal' ? `${diagnosis}（${run.message}）` : diagnosis
     return { tone: 'error', text: `${guessNote}${pointer ? `${text}${pointer}` : text}` }
-  }, [notice, needsGoal, goalPrompt, stopped, run, done, passedHere, lesson.diagnoses, blocks, guess, step, observedHere])
+  }, [notice, needsGoal, goalPrompt, stopped, run, done, passedHere, lesson.diagnoses, blocks, guess, step, observedHere, actorName])
 
   const hintLayer = draft.failures === 0 ? -1 : Math.min(draft.failures - 1, 2)
   const hintCopy = hintLayer >= 0 ? `（第 ${hintLayer + 1} 层）${step.hints[hintLayer]}` : undefined
@@ -302,6 +311,7 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
           trail={run ? trail : []}
           stamps={run ? stamps : []}
           watered={run ? watered : []}
+          label={stageLabel}
         />
       </div>
 
@@ -409,7 +419,7 @@ function GridProjectCard({ lesson, draft }: { lesson: GridLesson; draft: GridSlo
         ))}
       </ol>
       <div className="mt-4 max-w-[420px]">
-        <GridStage level={level} state={state} trail={run ? trail : []} stamps={run ? stamps : []} watered={run ? watered : []} />
+        <GridStage level={level} state={state} trail={run ? trail : []} stamps={run ? stamps : []} watered={run ? watered : []} label={gridStageLabel(level, state)} />
       </div>
       <button
         type="button"

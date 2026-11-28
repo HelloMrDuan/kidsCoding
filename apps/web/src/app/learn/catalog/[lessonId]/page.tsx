@@ -16,8 +16,9 @@ export default async function CatalogLessonPage({ params }: { params: Promise<{ 
   const maturity = getLessonMaturity(lesson.id)!
   const trial = maturity.trialAvailable ? maturity.trialRoute : null
   const gridIntroduction = g0u3LoopLessons[lesson.id]?.trialIntroduction
-  // OPS-053: G0-U2 event lessons open the V3 studio (/studio/blockly/event/<id>);
-  // G0-U3 event+loop lessons stay on /learn/event-lab/<id>. Both keep the same event card.
+  // OPS-053/OPS-054: G0-U2 event lessons and G0-U3-L04 open the V3 studio
+  // (/studio/blockly/event/<id>); any unmigrated event lesson keeps /learn/event-lab/<id>.
+  // Both keep the same event card.
   const eventTrial = !!trial && (trial.startsWith('/learn/event-lab/') || trial.startsWith(EVENT_V3_ROUTE_PREFIX))
   return (
     <main className="min-h-screen bg-[linear-gradient(150deg,#eaf7f0_0%,#f7faff_65%,#fff9ea_100%)] p-5 md:p-10">
