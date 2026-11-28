@@ -156,36 +156,14 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await clickLessonControl(page, 'lesson-complete-step')
     await page.waitForURL(`**/project/${LESSON}/complete`)
     await expect(page.getByTestId('project-complete-heading')).toBeVisible()
-    await expect(page.getByTestId('duo-saved-project')).toBeVisible()
-    await run(page, 100, 100)
-    await page.getByTestId('duo-reflect-own').click()
-    await page.getByTestId('duo-save-project').click()
-    await expect(page.getByTestId('duo-save-status')).toContainText('作品已保存到本机')
-    // Inject a real browser storage failure, never a substitute executor.
-    await page.evaluate(() => {
-      const original = Storage.prototype.setItem
-      Storage.prototype.setItem = function (key, value) {
-        // Block every progress envelope (legacy + owner-scoped), like a real quota failure.
-        if (key.endsWith('kc-progress')) throw new DOMException('Storage full', 'QuotaExceededError')
-        return original.call(this, key, value)
-      }
-    })
-    await page.getByTestId('duo-save-project').click()
-    await expect(page.getByTestId('duo-save-status')).toContainText('作品尚未保存')
-    await page.reload()
-    await run(page, 100, 100)
-    await page.getByTestId('duo-reflect-own').click()
-    // Editing invalidates old pass credit; no stale success may be saved.
-    await add(page, 'move_right')
-    await expect(page.getByTestId('duo-save-project')).toBeDisabled()
-    await showLessonPane(page, 'stage')
-    await page.getByTestId('run-code-button').click()
-    await expect(page.getByTestId('duo-result')).toContainText('距离不对')
-    await showLessonPane(page, 'code')
-    await page.getByTestId('lesson-remove-last').click()
-    await run(page, 100, 100)
-    await page.getByTestId('duo-save-project').click()
-    await expect(page.getByTestId('duo-save-status')).toContainText('作品已保存到本机')
+    // OPS-057: the completion page only replays the saved work; editing lives in V3.
+    await expect(page.getByTestId('project-work-replay')).toBeVisible()
+    await expect(page.getByTestId('duo-saved-project')).toHaveCount(0)
+    await expect(page.getByTestId('duo-save-project')).toHaveCount(0)
+    await expect(page.getByTestId('project-open-v3')).toHaveAttribute('href', `/studio/blockly/project/${LESSON}`)
+    await expect(page.getByRole('status').filter({ hasText: '回放完成' })).toBeVisible({ timeout: 25_000 })
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    await page.screenshot({ path: testInfo.outputPath(`${viewport.name}-after.png`), fullPage: true })
     const progress = await page.evaluate(() => JSON.parse(localStorage.getItem('kc-progress') ?? '{}'))
     expect(progress.completedLessonIds).toContain(LESSON)
     expect(progress.projectSnapshots.find((p: { lessonId: string }) => p.lessonId === LESSON).blocks.map((b: { type: string }) => b.type)).toEqual(['when_start', 'move_right', 'say_line', 'switch_character', 'move_right'])
@@ -245,52 +223,26 @@ test('TQ-015 (V3): duo lesson failed runs keep manual hint levels; the character
   await page.waitForURL(`**/studio/blockly/launch/${LESSON}`)
 })
 
-test('TQ-019: completion-page duo work escalates hints and offers the switch remedial', async ({ page }) => {
-  test.setTimeout(180000)
-  await start(page)
-  // Step 3: the correct switch program.
-  await clickLessonControl(page, 'lesson-clear-program')
-  await add(page, 'when_start', 'move_right', 'switch_character', 'move_right')
-  await run(page, 100, 100)
-  await next(page, 4)
-  // Step 4: baseline run, the designed mistake, then repair it.
-  // 第 4 关 opens on its own canvas: lay the 第 3 关 program for the baseline run.
-  await add(page, 'when_start', 'move_right', 'switch_character', 'move_right')
-  await run(page, 100, 100)
-  await clickLessonControl(page, 'lesson-complete-step')
-  await clickLessonControl(page, 'lesson-clear-program')
-  await add(page, 'when_start', 'move_right', 'move_right')
-  await pressRun(page)
-  await expectFailure(page, '小熊还没动')
-  await clickLessonControl(page, 'lesson-remove-last')
-  await add(page, 'switch_character', 'move_right')
-  await run(page, 100, 100)
-  await next(page, 5)
-  // Step 5 (the work): build the saved program, reflect, and finish to the completion page.
-  await clickLessonControl(page, 'lesson-clear-program')
-  await add(page, 'when_start', 'move_right', 'say_line', 'switch_character', 'move_right')
-  await run(page, 100, 100)
-  await stageClick(page, 'duo-reflect-own')
-  await clickLessonControl(page, 'lesson-complete-step')
-  await page.waitForURL(`**/project/${LESSON}/complete`)
-  await expect(page.getByTestId('duo-saved-project')).toBeVisible()
-  // TQ-019: no hint before any failed run on the completion page.
+test('OPS-057: duo completion replays the saved work read-only and sends edits to V3', async ({ page }) => {
+  test.setTimeout(90_000)
+  await page.goto(`/project/${LESSON}/complete`)
+  await page.evaluate((id) => {
+    localStorage.setItem('kc-progress', JSON.stringify({
+      completedLessonIds: [id], currentLessonId: id, stars: 3, badgeIds: [], cardIds: [], streakDays: 1,
+      completedProjectIds: [],
+      projectSnapshots: [{
+        lessonId: id,
+        updatedAt: '2026-10-01T00:00:00.000Z',
+        blocks: [{ type: 'when_start' }, { type: 'move_right' }, { type: 'say_line' }, { type: 'switch_character' }, { type: 'move_right' }],
+      }],
+    }))
+  }, LESSON)
+  await page.reload()
+  await expect(page.getByTestId('project-work-replay')).toBeVisible()
+  // 旧完成页编辑器、提示与保存入口全部下线。
+  await expect(page.getByTestId('duo-saved-project')).toHaveCount(0)
+  await expect(page.getByTestId('duo-save-project')).toHaveCount(0)
   await expect(page.getByTestId('duo-project-hint')).toHaveCount(0)
-  // Break the saved work: remove the bear's move, leaving the switch dangling.
-  await page.getByTestId('lesson-remove-last').click()
-  await page.getByTestId('run-code-button').click()
-  await expect(page.getByTestId('duo-result')).toContainText('动错角色啦')
-  await expect(page.getByTestId('duo-project-hint')).toHaveAttribute('data-hint-tier', '1')
-  await page.getByTestId('run-code-button').click()
-  await expect(page.getByTestId('duo-result')).toContainText('动错角色啦')
-  await expect(page.getByTestId('duo-project-hint')).toHaveAttribute('data-hint-tier', '2')
-  await expect(page.getByTestId('duo-project-hint')).toContainText('每个角色有自己的位置')
-  await page.getByTestId('run-code-button').click()
-  await expect(page.getByTestId('duo-result')).toContainText('动错角色啦')
-  await expect(page.getByTestId('duo-project-hint')).toHaveAttribute('data-hint-tier', '3')
-  const link = page.getByTestId('lesson-remedial-link')
-  await expect(link).toHaveAttribute('data-remedial-id', 'remedial-switch-character')
-  await link.click()
-  await page.waitForURL(`**/learn/remedial/remedial-switch-character?from=${LESSON}&step=step-3**`)
-  await expect(page.getByRole('heading', { name: '先学会切换角色' })).toBeVisible()
+  await expect(page.getByTestId('project-open-v3')).toHaveAttribute('href', `/studio/blockly/project/${LESSON}`)
+  await expect(page.getByRole('status').filter({ hasText: '回放完成' })).toBeVisible({ timeout: 25_000 })
 })

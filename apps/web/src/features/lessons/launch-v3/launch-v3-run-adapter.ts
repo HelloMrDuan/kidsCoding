@@ -10,6 +10,7 @@
  * - reset()：切关清理，快照、判定、帧全部回到初始值。
  * - 设计错误实验的“已观察”是会话内状态，由路由经构造参数传入读取函数。
  */
+import type { ProgramBlock } from '@/features/lessons/blockly/observable-run'
 import type {
   EngineAdapter,
   EngineState,
@@ -75,6 +76,44 @@ export function currentLaunchProgram(data: LaunchSlotData) {
   return stepId ? (data.programs[stepId] ?? []) : []
 }
 
+/** 一次运行要播放的程序（课程模式取当前关；作品模式取整件作品）。 */
+export type LaunchRunData = {
+  stepIndex: number
+  stepId: string
+  program: ProgramBlock[]
+}
+
+/**
+ * OPS-057：运行数据来源。课程模式与作品模式共用同一个 LaunchRunAdapter，
+ * 区别只在“读哪份草稿、判定用哪套规则、判定结果怎么分层呈现”：
+ * - 课程模式（默认）：launchLessonRunSource，行为与 OPS-056 完全一致。
+ * - 作品模式：launchProjectRunSource（launch-v3-project.ts），只如实播放，不按教学答案判分。
+ */
+export type LaunchRunSource = {
+  coerce: (value: unknown) => LaunchRunData
+  validate: (value: unknown) => boolean
+  judge: (data: LaunchRunData, isStepObserved: boolean) => LaunchJudgeResult
+  toJudgment: (result: LaunchJudgeResult) => JudgmentResult
+}
+
+/** 课程模式的运行来源（与 OPS-056 原实现逐行等价）。 */
+export function launchLessonRunSource(lessonId: string): LaunchRunSource {
+  return {
+    coerce: (value) => {
+      const data = coerceLaunchDraft(lessonId, value)
+      return {
+        stepIndex: data.stepIndex,
+        stepId: launchV3StepIds(lessonId)[data.stepIndex] ?? '',
+        program: currentLaunchProgram(data),
+      }
+    },
+    validate: (value) => isValidLaunchDraft(lessonId, value),
+    judge: (data, isStepObserved) =>
+      judgeLaunchStep(lessonId, data.program, data.stepIndex, isStepObserved),
+    toJudgment: (result) => buildLaunchJudgment(result),
+  }
+}
+
 /** 执行快照 → PlayableStage external 模式的字段。 */
 export function launchExternalState(snapshot: LaunchExecutionSnapshot): PlayableStageExternalState {
   const frame = snapshot.frame
@@ -106,25 +145,21 @@ export class LaunchRunAdapter implements SlotRunAdapter {
   private pending: ((event: RunEvent) => void) | null = null
   private readonly listeners = new Set<() => void>()
   private readonly isStepObserved: (stepId: string) => boolean
+  private readonly source: LaunchRunSource
 
   constructor(
     readonly lessonId: string,
-    options?: { isStepObserved?: (stepId: string) => boolean },
+    options?: { isStepObserved?: (stepId: string) => boolean; source?: LaunchRunSource },
   ) {
     this.isStepObserved = options?.isStepObserved ?? (() => false)
+    this.source = options?.source ?? launchLessonRunSource(lessonId)
   }
 
   runProgram(program: unknown, onEvent: (event: RunEvent) => void): void {
     // 同一时刻至多一个 live run：新 run 先停旧 run（重复运行不叠加）。
     this.stop()
-    const data = coerceLaunchDraft(this.lessonId, program)
-    const stepId = launchV3StepIds(this.lessonId)[data.stepIndex] ?? ''
-    const result = judgeLaunchStep(
-      this.lessonId,
-      currentLaunchProgram(data),
-      data.stepIndex,
-      this.isStepObserved(stepId),
-    )
+    const data = this.source.coerce(program)
+    const result = this.source.judge(data, this.isStepObserved(data.stepId))
     this.result = result
     this.snapshot = {
       ...emptyLaunchExecutionSnapshot(),
@@ -189,7 +224,7 @@ export class LaunchRunAdapter implements SlotRunAdapter {
    * lesson-workspace.tsx loadEditorSlotData），普通方法里的 this 会是 undefined、抛错后被
    * 外壳按 fail-closed 判为无效，导致合法草稿永远恢复不了。用箭头属性绑定本课 lessonId。
    */
-  readonly validateDraft = (data: unknown): boolean => isValidLaunchDraft(this.lessonId, data)
+  readonly validateDraft = (data: unknown): boolean => this.source.validate(data)
 
   getJudgmentResult(): JudgmentResult | null {
     return this.lastJudgment
@@ -276,7 +311,7 @@ export class LaunchRunAdapter implements SlotRunAdapter {
     const result = this.result
     if (!result) return
     // 判定只在播放结束（或不能运行直接结束）时赋值。
-    this.lastJudgment = buildLaunchJudgment(result)
+    this.lastJudgment = this.source.toJudgment(result)
     const actionLog = result.giftFound
       ? [...this.snapshot.actionLog, GIFT_FOUND_LOG]
       : this.snapshot.actionLog
@@ -287,7 +322,11 @@ export class LaunchRunAdapter implements SlotRunAdapter {
       actionLog,
       frameIndex: Math.max(result.frames.length - 1, 0),
       giftFound: result.giftFound,
-      failureReason: result.duoVerdict && !result.passed ? (result.duoVerdict.reason ?? null) : null,
+      // OPS-057：作品模式自带失败原因时以它为准；课程课保持 OPS-056 行为（单角色课由舞台解释）。
+      failureReason: result.passed
+        ? null
+        : (result.failureReason ??
+          (result.duoVerdict ? (result.duoVerdict.reason ?? null) : null)),
     }
     this.state = {
       x: result.final.mainPosition,
@@ -303,12 +342,15 @@ export class LaunchRunAdapter implements SlotRunAdapter {
 /** 路由必需的 adapter prop 载体（外壳对 slot 引擎不挂载、不调用其 run）。 */
 export class LaunchAdapter implements EngineAdapter {
   private draft: LaunchSlotData
+  /** OPS-057：作品模式传入自己的运行来源后，原样保存作品数据并用自己的校验。 */
+  private readonly source?: LaunchRunSource
+  private raw: unknown = undefined
 
-  constructor(
-    readonly lessonId: string,
-    initial?: unknown,
-  ) {
-    this.draft = initial === undefined ? emptyLaunchDraft(lessonId) : coerceLaunchDraft(lessonId, initial)
+  constructor(readonly lessonId: string, initial?: unknown, source?: LaunchRunSource) {
+    this.source = source
+    this.raw = initial
+    this.draft =
+      initial === undefined ? emptyLaunchDraft(lessonId) : coerceLaunchDraft(lessonId, initial)
   }
 
   mount(): void {}
@@ -316,11 +358,12 @@ export class LaunchAdapter implements EngineAdapter {
   unmount(): void {}
 
   loadScript(script: unknown): void {
-    this.draft = coerceLaunchDraft(this.lessonId, script)
+    this.raw = script
+    if (!this.source) this.draft = coerceLaunchDraft(this.lessonId, script)
   }
 
   getScript(): unknown {
-    return this.draft
+    return this.source ? (this.raw ?? null) : this.draft
   }
 
   getState(): EngineState {
@@ -334,7 +377,8 @@ export class LaunchAdapter implements EngineAdapter {
   stop(): void {}
 
   /** 同 LaunchRunAdapter：外壳的后备校验也是解绑调用，必须绑定 this。 */
-  readonly validateDraft = (script: unknown): boolean => isValidLaunchDraft(this.lessonId, script)
+  readonly validateDraft = (script: unknown): boolean =>
+    this.source ? this.source.validate(script) : isValidLaunchDraft(this.lessonId, script)
 
   getFileCapabilities(): FileCapabilities {
     return { canNew: true, canSave: true, canExport: true, canImport: true, canReset: true }

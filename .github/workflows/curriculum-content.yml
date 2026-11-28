@@ -90,6 +90,7 @@ on:
       - 'apps/web/tests/e2e/grid-lab.spec.ts'
       - 'apps/web/tests/e2e/launch-v3-forest-greeting.spec.ts'
       - 'apps/web/tests/e2e/launch-v3-legacy-owner.spec.ts'
+      - 'apps/web/tests/e2e/ops-057-project-edit.spec.ts'
       - 'apps/web/tests/e2e/unit-project.spec.ts'
       - 'apps/web/src/app/project/**'
       - 'apps/web/src/features/projects/**'
@@ -193,6 +194,9 @@ jobs:
       # 只放宽超时到 30 秒，测试本身与断言不变（本地共享 CPU 环境实测 7 次里 2 次因 5000ms 超时失败，放宽后全过）。
       - name: G2-U3-L05 unit tests (program validation, judging on real VM traces, session, lesson adapter, reference alternatives, draft, sandbox/TS parity)
         run: npx vitest run src/features/lessons/g2-u3-l05 --testTimeout=30000
+
+      - name: OPS-057 unit tests (launch-v3 modules, event-v3 audio, playable-stage external v3, workspace draft store)
+        run: npx vitest run src/features/lessons/launch-v3 src/features/lessons/event-v3/event-v3-audio.test.ts src/features/lessons/event-v3/event-v3-run-adapter-drum.test.ts src/features/lessons/playable-stage/playable-stage-external-v3.test.tsx src/features/lessons/workspace/workspace-draft-store.test.tsx
 
   scratch-rls-postgres:
     runs-on: ubuntu-latest
@@ -1168,6 +1172,32 @@ jobs:
         if: always()
         with:
           name: launch-v3-chrome-evidence
+          path: apps/web/test-results/
+
+  ops-057-project-edit:
+    timeout-minutes: 12
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
+      - name: Run OPS-057 project-edit spec (work edit mode, isolation and delete safety)
+        run: npx playwright test tests/e2e/ops-057-project-edit.spec.ts --project=desktop --workers=2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ops-057-project-edit-evidence
           path: apps/web/test-results/
 
   scratch-vm-local:

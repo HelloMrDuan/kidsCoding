@@ -47,8 +47,12 @@ export function getLaunchV3Lesson(lessonId: string) {
   return launchLessons.find((lesson) => lesson.id === lessonId) ?? null
 }
 
+/**
+ * OPS-057：模板查找不再只限 V3 登记的 02～12 课。作品模式（lesson-01～12）与角色插槽
+ * 需要同一份模板；对已登记的 02～12 课，查得的模板与旧实现完全相同（仍按 lesson.templateId）。
+ */
 export function getLaunchV3Template(lessonId: string) {
-  const lesson = getLaunchV3Lesson(lessonId)
+  const lesson = launchLessons.find((item) => item.id === lessonId)
   return lesson ? launchTemplates.find((template) => template.id === lesson.templateId) : undefined
 }
 

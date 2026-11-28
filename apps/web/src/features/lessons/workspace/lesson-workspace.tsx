@@ -34,7 +34,12 @@ import {
 import type { LessonContract } from './lesson-contract'
 import { validateLessonContract } from './lesson-contract'
 import type { EngineAdapter, EngineState, RunEvent, SlotRunAdapter } from './workspace-adapters'
-import { loadDraftFromLocal, saveDraftToLocal } from './workspace-draft'
+import {
+  loadDraftFromLocal,
+  saveDraftToLocal,
+  type LoadResult,
+  type SaveResult,
+} from './workspace-draft'
 import {
   shouldAutosavePreservePrompt,
   type EditorSlotComponent,
@@ -50,6 +55,12 @@ export type LessonWorkspaceProps = {
   contract: LessonContract
   adapter: EngineAdapter
   initialScript?: unknown
+  /**
+   * OPS-057: course-owned draft storage. Project mode (作品编辑) passes its own
+   * store so a work edit can never read or write the lesson draft key; absent
+   * keeps the spec local draft keys exactly as before.
+   */
+  draftStore?: WorkspaceDraftStore
   onLessonSwitch?: (lessonId: string) => void
   /**
    * TEST HOOK, demo route only: when true, 保存 reports failure without
@@ -127,6 +138,17 @@ export type LessonWorkspaceProps = {
 
 /** Autosave debounce (R4/C8 proposal value; #470's 350ms is reference only). */
 export const AUTOSAVE_DEBOUNCE_MS = 1000
+
+/** Load/save surface the shell uses for its draft envelope (OPS-057). */
+export type WorkspaceDraftStore = {
+  load: (lessonId: string, owner?: string | null) => LoadResult
+  save: (lessonId: string, script: unknown, owner?: string | null) => SaveResult
+}
+
+const LOCAL_DRAFT_STORE: WorkspaceDraftStore = {
+  load: (lessonId, owner) => loadDraftFromLocal(lessonId, owner ?? undefined),
+  save: (lessonId, script, owner) => saveDraftToLocal(lessonId, script, owner ?? undefined),
+}
 
 /**
  * Self-drawn icon-rail glyphs (simple geometric shapes, not copied from
@@ -215,6 +237,7 @@ export function LessonWorkspace({
   stageSlot,
   rolesSlot,
   runAdapter,
+  draftStore,
   chrome = 'full',
   studioLayout,
   onSaveStateChange,
@@ -277,6 +300,13 @@ export function LessonWorkspace({
   const [saveState, setSaveState] = useState<SaveState>('unsaved')
   const draftOwner = useContext(LessonDraftOwnerContext)
   const draftOwnerRef = useRef(draftOwner)
+  // OPS-057: every restore/save below goes through this store, so project mode
+  // can keep its work data in its own key and never touch the lesson draft.
+  const draftStoreRef = useRef<WorkspaceDraftStore>(draftStore ?? LOCAL_DRAFT_STORE)
+  // Render must not touch refs; these stores are stable, but keep the latest prop after commit.
+  useEffect(() => {
+    draftStoreRef.current = draftStore ?? LOCAL_DRAFT_STORE
+  }, [draftStore])
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [fileMenuOpen, setFileMenuOpen] = useState(false)
@@ -392,7 +422,7 @@ export function LessonWorkspace({
         setSaveMessageAndRef('演示保存失败（测试钩子）：未能保存')
         return
       }
-      const result = saveDraftToLocal(contractRef.current.lessonId, script, draftOwnerRef.current)
+      const result = draftStoreRef.current.save(contractRef.current.lessonId, script, draftOwnerRef.current)
       if (result.ok) {
         lastSavedJsonRef.current = json
         setSaveState('saved')
@@ -423,7 +453,7 @@ export function LessonWorkspace({
   /** Editor-slot counterpart of loadIntoAdapter (draft or initial, no adapter). */
   const loadEditorSlotData = useCallback(
     (targetContract: LessonContract, targetInitial: unknown) => {
-      const draft = loadDraftFromLocal(targetContract.lessonId, draftOwnerRef.current)
+      const draft = draftStoreRef.current.load(targetContract.lessonId, draftOwnerRef.current)
       let loaded: unknown = null
       let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
@@ -478,7 +508,7 @@ export function LessonWorkspace({
     (targetContract: LessonContract, targetInitial: unknown) => {
       const entry = mountedAdapterRef.current
       if (!entry) return
-      const draft = loadDraftFromLocal(targetContract.lessonId, draftOwnerRef.current)
+      const draft = draftStoreRef.current.load(targetContract.lessonId, draftOwnerRef.current)
       let loaded = false
       let fromDraft = false
       if (draft.data !== null && draft.reason === null) {
@@ -566,7 +596,7 @@ export function LessonWorkspace({
         // target and stop a target that never ran.
         setEngineState((prev) => (prev.running ? { ...prev, running: false } : prev))
         try {
-          saveDraftToLocal(
+          draftStoreRef.current.save(
             mountedLessonRef.current ?? contractRef.current.lessonId,
             editorDataRef.current ?? null,
             draftOwnerRef.current,
@@ -579,7 +609,7 @@ export function LessonWorkspace({
     const prev = mountedAdapterRef.current
     if (prev && prev.engine !== engine) {
       try {
-        saveDraftToLocal(contractRef.current.lessonId, prev.adapter.getScript(), draftOwnerRef.current)
+        draftStoreRef.current.save(contractRef.current.lessonId, prev.adapter.getScript(), draftOwnerRef.current)
       } catch {
         // Best effort on engine switch; the contract-change effect also saves.
       }
@@ -653,7 +683,7 @@ export function LessonWorkspace({
         // OPS-023: save under the lesson the outgoing adapter/data
         // belonged to (mountedLessonRef), never contractRef (which
         // already points at the incoming lesson when this cleanup runs).
-        saveDraftToLocal(
+        draftStoreRef.current.save(
           mountedLessonRef.current ?? contractRef.current.lessonId,
           useSlotData ? (editorDataRef.current ?? null) : (active?.getScript() ?? null),
           draftOwnerRef.current,
@@ -704,13 +734,13 @@ export function LessonWorkspace({
     if (mountedLessonRef.current === prevId) {
       if (editorSlot) {
         try {
-          saveDraftToLocal(prevId, editorDataRef.current ?? null, draftOwnerRef.current)
+          draftStoreRef.current.save(prevId, editorDataRef.current ?? null, draftOwnerRef.current)
         } catch {
           // Best effort; explicit 保存 remains available.
         }
       } else if (entry) {
         try {
-          saveDraftToLocal(prevId, entry.adapter.getScript(), draftOwnerRef.current)
+          draftStoreRef.current.save(prevId, entry.adapter.getScript(), draftOwnerRef.current)
         } catch {
           // Best effort; explicit 保存 remains available.
         }
@@ -943,7 +973,7 @@ export function LessonWorkspace({
       }
       script = entry.adapter.getScript()
     }
-    const result = saveDraftToLocal(contract.lessonId, script, draftOwnerRef.current)
+    const result = draftStoreRef.current.save(contract.lessonId, script, draftOwnerRef.current)
     if (result.ok) {
       lastSavedJsonRef.current = scriptToJson(script)
       setSaveState('saved')

@@ -16,6 +16,8 @@
  */
 import { createContext, useContext, useSyncExternalStore } from 'react'
 
+import type { ProgramBlock } from '@/features/lessons/blockly/observable-run'
+
 import { emptyLaunchDraft, type LaunchSlotData } from './launch-v3-draft'
 import type { LaunchRunAdapter } from './launch-v3-run-adapter'
 
@@ -88,6 +90,14 @@ export type LaunchSessionContextValue = {
   lessonId: string
   store: LaunchSessionStore
   runAdapter: LaunchRunAdapter
+  /**
+   * OPS-057（可选）：作品模式共享的当前作品程序。编辑插槽写入、舞台插槽读取；
+   * 课程模式的插槽不读取它，行为与 OPS-056 完全一致。
+   */
+  project?: {
+    program: ProgramBlock[]
+    setProgram: (program: ProgramBlock[]) => void
+  }
   /**
    * OPS-056 复审 HOLD P1（可选）：插槽出现新提示时调用。路由用它在 1040px 以下把面板切到
    * 提示所在的编程面板，保证同步失败 / 导航失败 / notice 与重试操作在当前可见面板里。

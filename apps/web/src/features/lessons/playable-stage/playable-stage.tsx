@@ -9,7 +9,12 @@ import { motionVerbForTemplate, motionWord } from '../blockly/block-labels'
 import { explainRunFailure } from '../blockly/run-feedback'
 
 import { CharacterArt, SceneBackdrop, type SceneId } from './character-art'
+import { CHARACTER_LABELS, getMainCharacterLabel } from './character-labels'
 import { useBlockExecutor, type ProgramJudge } from './use-block-executor'
+
+// OPS-057: the label lookup now lives in a hook-free module (server pages import the work
+// judging chain); keep this re-export so existing imports of playable-stage keep working.
+export { getMainCharacterLabel } from './character-labels'
 
 /**
  * TQ-009: steps are story distance, not pixels. 200 steps (the longest walk in lessons 01–09)
@@ -21,15 +26,6 @@ export const STAGE_ARRIVAL_STEPS = 200
 export function stageWalkProgress(steps: number) {
   if (!Number.isFinite(steps) || steps <= 0) return 0
   return Math.min(steps, STAGE_ARRIVAL_STEPS) / STAGE_ARRIVAL_STEPS
-}
-
-const CHARACTER_LABELS: Record<string, string> = {
-  fox: '小狐狸',
-  rabbit: '小兔子',
-  bird: '草地小鸟',
-  butterfly: '小蝴蝶',
-  frog: '小青蛙',
-  bear: '小熊',
 }
 
 const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
@@ -50,12 +46,6 @@ const SCENE_LABELS: Record<string, { badge: string; note: string }> = {
     badge: '毕业舞台',
     note: '让两个朋友按顺序上场，再一起完成故事。',
   },
-}
-
-/** TQ-008: name used in kid-facing failure reasons (“小狐狸还没开口呢！”). */
-export function getMainCharacterLabel(template?: ProjectTemplateDefinition) {
-  const first = template?.starterCharacters[0]
-  return first ? CHARACTER_LABELS[first] ?? '小狐狸' : '小狐狸'
 }
 
 function getTemplateCharacterLabels(template?: ProjectTemplateDefinition) {

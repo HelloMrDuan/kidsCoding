@@ -11,6 +11,7 @@ import { buildScratchWork } from './scratch-portfolio'
 import { readScratchDraftMeta, removeScratchDraft } from '@/features/scratch-vm/scratch-local-draft'
 import { findUploadConflicts } from './cloud-upload-conflict'
 import { collectGridWorks, removeGridWork } from './grid-portfolio'
+import { removeLaunchProjectDraft } from '@/features/lessons/launch-v3/launch-v3-project'
 import { useDraftOwnerLock } from '@/features/lessons/use-draft-owner-lock'
 
 export function LocalPracticePortfolio({ gridOwner }: { gridOwner?: string | null } = {}) {
@@ -193,6 +194,8 @@ export function LocalPracticePortfolio({ gridOwner }: { gridOwner?: string | nul
         removeGridWork(window.localStorage, work.lessonId, gridOwner)
         refresh()
       } else {
+        // OPS-057：独立作品信封与旧快照一起删，避免已删除作品重新出现。
+        removeLaunchProjectDraft(work.lessonId, progressOwner)
         const current = readGuestProgress(progressOwner)
         writeGuestProgress({ ...current, projectSnapshots: current.projectSnapshots.filter((snapshot) => snapshot.lessonId !== work.lessonId) }, progressOwner)
       }

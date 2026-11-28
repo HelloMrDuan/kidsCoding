@@ -100,6 +100,8 @@ async function waitForSaved(page: Page) {
 const fenceId = 'G0-U3-L05'
 /** OPS-054: the formal entry is the V3 studio; the old classroom URL 308s there. */
 const fenceUrl = '/studio/blockly/grid/' + fenceId
+// OPS-057：作品中心的网格作品进入独立作品模式，不再写课程草稿。
+const fenceWorkUrl = '/studio/blockly/project/grid/' + fenceId
 const oldFenceKey = 'kids-grid-lesson-v1:' + fenceId
 /** V3 draft key: owner-scoped envelope around the per-step programs. */
 const fenceKey = 'kids-lesson-owner-v1:guest:kidscoding-draft:' + fenceId
@@ -322,25 +324,25 @@ test('G0-U3-L05 fence: five steps, three hints, failed storage retry, portfolio 
   await page.getByRole('link', { name: '查看作品中心' }).click()
   const work = page.getByTestId('portfolio-work-' + fenceId)
   await expect(work).toContainText('我的花圃围栏')
-  await work.locator('a[href="' + fenceUrl + '"]').click()
-  // Reopening lands on the phone's default pane; the project card is on the stage.
+  await work.locator('a[href="' + fenceWorkUrl + '"]').click()
+  // OPS-057：作品中心进入独立作品模式；课程完成态与作品卡仍由同一舞台提供。
+  await expect(page).toHaveURL(new RegExp(fenceWorkUrl + '$'), { timeout: 30_000 })
   await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
   await fencePane(page, 'stage')
-  await expect(page.getByTestId('grid-completion-badge')).toHaveText('本机成就 · 围栏工程师')
-  await expect(page.getByTestId('grid-project-status')).toContainText('围栏已闭合')
-  await page.getByTestId('grid-project-play').click()
-  await expect(page.getByTestId('grid-project-play')).toBeEnabled({ timeout: 15_000 })
-  await expect(page.locator('[data-grid-item="route-trace"]')).toBeVisible()
-  if (process.env.KC_FENCE_EVIDENCE_DIR) {
-    await page.getByTestId('grid-project-card').screenshot({ path: `${process.env.KC_FENCE_EVIDENCE_DIR}/reopened-project.png` })
-  }
-  await page.getByTestId('grid-replay-my-fence').click()
-  await fencePane(page, 'code')
-  await openFenceTools(page)
-  await codeClick(page, 'lesson-repeat-times-3')
-  await next(page)
-  await expect(page.getByTestId('grid-notice')).toContainText('先按')
-  await runAndExpect(page, 'error')
+  // 作品模式不是课堂完成页：没有关卡进度、完成按钮、课堂预测或“本课完成”卡片。
+  await expect(page.getByTestId('grid-work-mode')).toBeVisible()
+  await expect(page.getByTestId('grid-step-progress')).toHaveCount(0)
+  await expect(page.getByTestId('grid-stepbar')).toHaveCount(0)
+  await expect(page.getByTestId('grid-complete-step')).toHaveCount(0)
+  await expect(page.getByTestId('grid-predict')).toHaveCount(0)
+  await expect(page.getByTestId('grid-completion-badge')).toHaveCount(0)
+  await expect(page.getByTestId('grid-lesson-finished')).toHaveCount(0)
+  await expect(page.getByTestId('grid-goal-choice-1')).toHaveAttribute('aria-pressed', 'true')
+  // 同一个网格引擎真实播放，但只报告执行结果，不做课堂通过/未通过判定。
+  await page.getByTestId('ws-run-toggle').click()
+  await expect(page.getByTestId('grid-feedback')).toHaveAttribute('data-work-mode', 'true')
+  await expect(page.getByTestId('grid-feedback')).toContainText('播放结束', { timeout: 30_000 })
+  await expect(page.getByTestId('ws-feedback-conclusion')).toHaveCount(0)
 
   // The draft is owner-scoped: another account never reads the guest's work.
   await page.evaluate(({ scoped, legacy }) => localStorage.setItem(legacy, localStorage.getItem(scoped)!), { scoped: fenceKey, legacy: oldFenceKey })
@@ -348,8 +350,9 @@ test('G0-U3-L05 fence: five steps, three hints, failed storage retry, portfolio 
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
   await expect(page.getByText(/当前账号无法确认，课堂草稿已锁定/)).toBeVisible()
   await page.reload()
-  await fencePane(page, 'task')
-  await expect(page.getByTestId('grid-step-title')).toContainText('观察少掉的一边')
+  // OPS-057：作品模式按 owner 读独立信封；另一个账号既读不到作品，也不会自动造一件。
+  await expect(page.getByTestId('grid-project-missing')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('studio-shell')).toHaveCount(0)
   await page.goto('/learn/portfolio')
   await expect(page.getByTestId('portfolio-work-' + fenceId)).toHaveCount(0)
   await page.context().clearCookies({ name: 'kc_guest_id' })

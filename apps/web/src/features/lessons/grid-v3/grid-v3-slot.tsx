@@ -88,9 +88,20 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
   // 进度归属人来自外壳边界（路由在服务端解析）；单测直接渲染插槽时没有
   // 边界，保持 undefined → 身份未知，旧草稿一律不读（fail-closed）。
   const draftOwner = useContext(LessonDraftOwnerContext)
-  const { lesson, store, runAdapter } = useGridSession()
+  const { lesson, store, runAdapter, work } = useGridSession()
+  const workStepIndex = work
+    ? lesson.steps.findIndex((item) => item.id === work.stepId)
+    : -1
+  const workMode = workStepIndex >= 0
+  const normalizeDraft = useCallback(
+    (data: GridSlotData): GridSlotData =>
+      workMode ? { ...data, stepIndex: workStepIndex } : data,
+    [workMode, workStepIndex],
+  )
   const sessionState = useGridSessionState()
-  const [draft, setDraft] = useState<GridSlotData>(() => coerceGridDraft(lesson, initial))
+  const [draft, setDraft] = useState<GridSlotData>(() =>
+    normalizeDraft(coerceGridDraft(lesson, initial)),
+  )
   const draftRef = useRef(draft)
   draftRef.current = draft
   const onChangeRef = useRef(onChange)
@@ -116,7 +127,9 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
   /** 已应用过副作用的那个判定对象（同一对象只应用一次）。 */
   const appliedJudgmentRef = useRef<JudgmentResult | null>(null)
 
-  const stepIndex = Math.min(Math.max(draft.stepIndex, 0), lesson.steps.length - 1)
+  const stepIndex = workMode
+    ? workStepIndex
+    : Math.min(Math.max(draft.stepIndex, 0), lesson.steps.length - 1)
   const step = lesson.steps[stepIndex]
   const stepId = step.id
   const blocks: ProgramBlock[] = draft.programs[stepId] ?? gridStarterProgram(step)
@@ -158,7 +171,7 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
     const raw = initial as { lessonId?: unknown } | null
     if (raw && typeof raw === 'object' && raw.lessonId !== undefined && raw.lessonId !== lesson.id) {
       setNotice('导入文件属于其他课节，已拒绝，原作品未变。')
-      const fallback = lastGoodGridDraft ?? emptyGridDraft(lesson)
+      const fallback = normalizeDraft(lastGoodGridDraft ?? emptyGridDraft(lesson))
       draftRef.current = fallback
       lastGoodGridDraft = fallback
       setDraft(fallback)
@@ -169,8 +182,10 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
       onChangeRef.current(fallback)
       return
     }
-    const coerced = coerceGridDraft(lesson, initial)
+    const coerced = normalizeDraft(coerceGridDraft(lesson, initial))
     store.setState({ draft: coerced })
+    // 作品模式只编辑作品关，不提示导入课堂旧草稿。
+    if (workMode) return
     if (isEmptyGridDraft(lesson, coerced)) {
       if (hasLegacyGridDraft(lesson, draftOwner)) {
         // 归属已确认：未完成与已完成的历史课都提示导入（已完成的保留完成态、
@@ -199,7 +214,7 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
    * 渲染快照，避免挂载那一拍把已加载草稿短暂覆成空草稿。
    */
   useEffect(() => {
-    const storeDraft = store.getState().draft
+    const storeDraft = normalizeDraft(store.getState().draft)
     if (JSON.stringify(storeDraft) !== JSON.stringify(draftRef.current)) {
       // 舞台插槽写回的新数据同样撤销旧草稿导入资格。
       revokeLegacyImport()
@@ -208,7 +223,7 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
       setDraft(storeDraft)
       onChangeRef.current(storeDraft)
     }
-  }, [sessionState.draft, store, revokeLegacyImport])
+  }, [sessionState.draft, store, revokeLegacyImport, normalizeDraft])
 
   /** 快照变化即 persist（与旧课堂 handleSnapshot 同语义，含去重）。 */
   const handleSnapshot = useCallback(
@@ -218,17 +233,26 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
       const key = lesson.steps[index].id
       const fallback = gridStarterProgram(lesson.steps[index])
       if (JSON.stringify(current.programs[key] ?? fallback) === JSON.stringify(next)) return
-      // 程序变了：本关的通过记录与整课完成状态都不再被这份程序证明。
-      persist({
-        ...current,
-        programs: { ...current.programs, [key]: next },
-        passed: current.passed.filter((id) => id !== key),
-        finished: false,
-      })
+      if (workMode) {
+        // 作品模式只更新作品关的程序；不改课堂 passed / finished。
+        persist({
+          ...current,
+          stepIndex: workStepIndex,
+          programs: { ...current.programs, [key]: next },
+        })
+      } else {
+        // 程序变了：本关的通过记录与整课完成状态都不再被这份程序证明。
+        persist({
+          ...current,
+          programs: { ...current.programs, [key]: next },
+          passed: current.passed.filter((id) => id !== key),
+          finished: false,
+        })
+      }
       runAdapter.reset()
       setNotice(null)
     },
-    [lesson, persist, runAdapter],
+    [lesson, persist, runAdapter, workMode, workStepIndex],
   )
 
   /**
@@ -237,7 +261,8 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
    * onJudgment 原样再上报一次；appliedJudgmentRef 防重复应用、防循环。
    */
   useEffect(() => {
-    if (!judgment) return
+    // 作品模式不应用课堂判定：不记 passed / failures / observed / mistakes。
+    if (workMode || !judgment) return
     const execution = runAdapter.getExecutionSnapshot()
     const runStepIndex = execution.stepIndex
     const run = execution.run
@@ -355,48 +380,68 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
     <div className="kc-v3-slot-editor" data-testid="grid-slot" style={{ height: '100%', overflowY: 'auto' }}>
       <BlocklyStudioMission>
         <div data-testid="grid-step-header" className="kc-v3-task">
-          <p className="kc-v3-step-index" data-testid="grid-step-progress">
-            第 {stepIndex + 1} / {lesson.steps.length} 关{passedHere ? ' ✓' : ''}
-          </p>
-          <div className="kc-v3-task-copy">
-            <h2 data-testid="grid-step-title">
-              <span className="sr-only">第 {stepIndex + 1} 关：</span>
-              {step.title}
-            </h2>
-            <p data-testid="grid-instruction">{step.instruction}</p>
-          </div>
-          <button
-            type="button"
-            data-testid="grid-complete-step"
-            disabled={playing || running}
-            onClick={handleComplete}
-          >
-            {isLastStep ? '完成本课' : '完成这一关'}
-          </button>
+          {workMode ? (
+            <>
+              <p className="kc-v3-step-index" data-testid="grid-work-mode">
+                作品编辑模式 · 只编辑这一关
+              </p>
+              <div className="kc-v3-task-copy">
+                <h2 data-testid="grid-step-title">{step.title}</h2>
+                <p data-testid="grid-work-note">这是我的作品；修改后按“运行”看看真实效果，再保存。</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="kc-v3-step-index" data-testid="grid-step-progress">
+                第 {stepIndex + 1} / {lesson.steps.length} 关{passedHere ? ' ✓' : ''}
+              </p>
+              <div className="kc-v3-task-copy">
+                <h2 data-testid="grid-step-title">
+                  <span className="sr-only">第 {stepIndex + 1} 关：</span>
+                  {step.title}
+                </h2>
+                <p data-testid="grid-instruction">{step.instruction}</p>
+              </div>
+              <button
+                type="button"
+                data-testid="grid-complete-step"
+                disabled={playing || running}
+                onClick={handleComplete}
+              >
+                {isLastStep ? '完成本课' : '完成这一关'}
+              </button>
+            </>
+          )}
         </div>
       </BlocklyStudioMission>
 
       <BlocklyStudioSteps>
-        <div className="kc-v3-stepbar-pills" data-testid="grid-stepbar">
-          {lesson.steps.map((item, index) => (
-            <Fragment key={item.id}>
-              {index > 0 && <span className="kc-v3-step-line" aria-hidden="true" />}
-              <span
-                className={`kc-v3-step-pill${index < stepIndex ? ' is-complete' : index === stepIndex ? ' is-active' : ''}`}
-                aria-current={index === stepIndex ? 'step' : undefined}
-                data-testid={`grid-stepbar-${index + 1}`}
-                data-passed={draft.passed.includes(item.id) ? 'true' : 'false'}
-              >
-                <span className="kc-v3-step-dot" aria-hidden="true">
-                  {index < stepIndex ? '✓' : index + 1}
+        {workMode ? (
+          <span className="kc-v3-step-note" data-testid="grid-work-step-note">
+            作品模式：只编辑实际保存的作品关，不进入课堂关卡流程
+          </span>
+        ) : (
+          <div className="kc-v3-stepbar-pills" data-testid="grid-stepbar">
+            {lesson.steps.map((item, index) => (
+              <Fragment key={item.id}>
+                {index > 0 && <span className="kc-v3-step-line" aria-hidden="true" />}
+                <span
+                  className={`kc-v3-step-pill${index < stepIndex ? ' is-complete' : index === stepIndex ? ' is-active' : ''}`}
+                  aria-current={index === stepIndex ? 'step' : undefined}
+                  data-testid={`grid-stepbar-${index + 1}`}
+                  data-passed={draft.passed.includes(item.id) ? 'true' : 'false'}
+                >
+                  <span className="kc-v3-step-dot" aria-hidden="true">
+                    {index < stepIndex ? '✓' : index + 1}
+                  </span>
+                  {item.title}
                 </span>
-                {item.title}
-              </span>
-            </Fragment>
-          ))}
-        </div>
+              </Fragment>
+            ))}
+          </div>
+        )}
         <span className="kc-v3-step-note">
-          第 {stepIndex + 1} / {lesson.steps.length} 关 · {step.title}
+          {workMode ? '我的作品' : `第 ${stepIndex + 1} / ${lesson.steps.length} 关 · ${step.title}`}
         </span>
       </BlocklyStudioSteps>
 
@@ -416,24 +461,26 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
       />
 
       <details className="kc-v3-editor-details">
-        <summary>本关目标、三级提示与积木清单</summary>
-        <div data-testid="grid-step-guide">
-          <div data-testid="grid-objectives">
-            <b>学习目标</b>
-            <ul>
-              {lesson.objectives.map((text) => (
-                <li key={text}>{text}</li>
+        <summary>{workMode ? '积木清单与保存' : '本关目标、三级提示与积木清单'}</summary>
+        {!workMode ? (
+          <div data-testid="grid-step-guide">
+            <div data-testid="grid-objectives">
+              <b>学习目标</b>
+              <ul>
+                {lesson.objectives.map((text) => (
+                  <li key={text}>{text}</li>
+                ))}
+              </ul>
+            </div>
+            <ol data-testid="grid-hints">
+              {step.hints.map((text, index) => (
+                <li key={text} data-testid={`grid-hint-${index + 1}`}>
+                  第 {index + 1} 层：{text}
+                </li>
               ))}
-            </ul>
+            </ol>
           </div>
-          <ol data-testid="grid-hints">
-            {step.hints.map((text, index) => (
-              <li key={text} data-testid={`grid-hint-${index + 1}`}>
-                第 {index + 1} 层：{text}
-              </li>
-            ))}
-          </ol>
-        </div>
+        ) : null}
 
         <ol data-testid="grid-block-list">
           {blocks.map((block, index) => (
@@ -451,7 +498,7 @@ export function GridEditorSlot({ initial, onChange, editable, shell, onJudgment 
         </div>
       </details>
 
-      {legacyImport?.ok ? (
+      {!workMode && legacyImport?.ok ? (
         <div className="kc-v3-alert" data-testid="grid-legacy-import">
           {legacyImport.data.finished === true ? (
             <p data-testid="grid-legacy-import-finished">
