@@ -9,10 +9,13 @@ import { buildLaunchMap } from '@/features/curriculum/build-launch-map'
 import { useLaunchCurriculum } from '@/features/curriculum/use-launch-curriculum'
 import { buildProjectCompletionCopy } from '@/features/projects/build-project-completion-copy'
 import { ProjectCompleteCard } from '@/features/projects/project-complete-card'
-import { DuoProject } from '@/features/lessons/playable-stage/duo-project'
-import { UnitProject } from '@/features/lessons/playable-stage/unit-project'
+import { ProjectWorkReplay } from '@/features/projects/project-work-replay'
 import { launchLessonHref } from '@/features/lessons/launch-lesson-routes'
 import { getUnitProject } from '@/content/curriculum/unit-projects'
+import {
+  getLaunchProjectSpec,
+  launchProjectRoute,
+} from '@/features/lessons/launch-v3/launch-v3-project'
 import { resolveProjectContinueAction } from '@/features/projects/resolve-project-continue-action'
 import {
   defaultGuestProgress,
@@ -82,9 +85,15 @@ export default function ProjectCompletePage() {
       <ProjectCompleteCard
         key={`${lesson.id}-${replayCount}`}
         blocks={snapshotBlocks}
-        playableProject={unitProject
-          ? <UnitProject lessonId={lesson.id} key={lesson.id} initialBlocks={snapshotBlocks} owner={draftOwner}/>
-          : ['lesson-10-second-friend', 'lesson-11-duo-rehearsal', 'lesson-12-graduation-show'].includes(lesson.id) ? <DuoProject lessonId={lesson.id} key={`${lesson.id}:${snapshotBlocks.length > 0}`} initialBlocks={snapshotBlocks} owner={draftOwner}/> : undefined}
+        playableProject={
+          snapshotBlocks.length > 0 ? (
+            <ProjectWorkReplay
+              blocks={snapshotBlocks}
+              lessonId={lesson.id}
+              template={currentTemplate}
+            />
+          ) : undefined
+        }
         completionCopy={completionCopy}
         isFoundationGraduate={isFoundationGraduate}
         lessonTitle={lesson.title}
@@ -98,6 +107,15 @@ export default function ProjectCompletePage() {
       />
 
       <div className="mx-auto mt-5 flex max-w-5xl flex-wrap justify-center gap-3">
+        {getLaunchProjectSpec(lesson.id) ? (
+          <Link
+            className="kc-button-3d rounded-full border border-emerald-700 bg-emerald-800 px-5 py-3 text-sm font-bold text-white shadow-[0_12px_24px_rgba(15,23,42,0.06)] transition hover:bg-emerald-900"
+            data-testid="project-open-v3"
+            href={launchProjectRoute(lesson.id)}
+          >
+            继续编辑作品
+          </Link>
+        ) : null}
         <Link
           className="kc-button-3d rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)] transition hover:bg-slate-50"
           href="/auth/bind"

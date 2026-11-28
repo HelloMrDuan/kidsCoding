@@ -74,6 +74,11 @@ export type GridSessionContextValue = {
   lesson: GridLesson
   store: GridSessionStore
   runAdapter: GridRunAdapter
+  /**
+   * OPS-057 复审：作品模式只编辑实际保存的作品关。设置后插槽不再渲染
+   * 课堂关卡进度/完成按钮/预测/教学判定，舞台只播放真实执行结果。
+   */
+  work?: { stepId: string }
 }
 
 export const GridSessionContext = createContext<GridSessionContextValue | null>(null)

@@ -40,9 +40,20 @@ export function isLaunchV3(page: Page): boolean {
   return LAUNCH_V3_PATH.test(new URL(page.url()).pathname)
 }
 
+/**
+ * OPS-057: the V3 project edit mode (作品编辑) reuses the same studio under
+ * /studio/blockly/project/<lessonId>; only the data store and the editor/stage
+ * slots differ, so the pane and tools helpers apply unchanged.
+ */
+const PROJECT_V3_PATH = /^\/studio\/blockly\/project(\/|$)/
+
+export function isProjectV3(page: Page): boolean {
+  return PROJECT_V3_PATH.test(new URL(page.url()).pathname)
+}
+
 /** Any lesson that renders the V3 studio (one shell, no per-lesson copies). */
 export function isLessonStudioV3(page: Page): boolean {
-  return isForestV3(page) || isGridV3(page) || isEventV3(page) || isLaunchV3(page)
+  return isForestV3(page) || isGridV3(page) || isEventV3(page) || isLaunchV3(page) || isProjectV3(page)
 }
 
 /**
@@ -202,7 +213,11 @@ export async function showLessonPane(
   // does not exist there and the legacy branch below would silently no-op).
   // OPS-056: the launch lessons lesson-02…12 render it too.
   const isV3 = (path: string) =>
-    FOREST_V3_PATH.test(path) || GRID_V3_PATH.test(path) || EVENT_V3_PATH.test(path) || LAUNCH_V3_PATH.test(path)
+    FOREST_V3_PATH.test(path) ||
+    GRID_V3_PATH.test(path) ||
+    EVENT_V3_PATH.test(path) ||
+    LAUNCH_V3_PATH.test(path) ||
+    PROJECT_V3_PATH.test(path)
   let pathname = new URL(page.url()).pathname
   if (isV3(pathname)) {
     // The shell is visible in every pane mode; the slot is not (phones show
@@ -311,7 +326,7 @@ export async function resolveV3LessonControl(page: Page, testId: string): Promis
 }
 
 export async function clickLessonControl(page: Page, testId: string) {
-  if (isForestV3(page) || isLaunchV3(page)) {
+  if (isForestV3(page) || isLaunchV3(page) || isProjectV3(page)) {
     // The V3 studio renames the shell's controls. Map the old classroom's
     // test ids onto the real V3 ones so specs keep expressing the child's
     // intent (add a block, run, clear, complete) instead of per-page markup.

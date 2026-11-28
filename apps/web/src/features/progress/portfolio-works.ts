@@ -1,4 +1,5 @@
 import { launchLessons, launchTemplates } from '@/content/curriculum/launch-lessons'
+import { launchProjectRoute } from '@/features/lessons/launch-v3/launch-v3-project'
 import type { GuestProgress } from './local-progress'
 import type { LocalPractice } from './local-practice'
 import type { CloudPythonDraft } from './cloud-python-drafts'
@@ -58,7 +59,8 @@ export function buildPortfolioWorks(input: {
       meta: `积木故事 · ${snapshot.blocks.length} 块积木`,
       updatedAt: snapshot.updatedAt,
       source: 'local',
-      href: `/project/${lesson.id}/complete`,
+      // OPS-057：作品中心的“继续编辑作品”统一进入 V3 作品编辑模式。
+      href: launchProjectRoute(lesson.id),
       cover: { type: 'scene', scene: sceneOf(template?.starterScene), characters: template?.starterCharacters ?? ['fox'] },
       localPassed: input.progress.completedLessonIds.includes(lesson.id),
     })

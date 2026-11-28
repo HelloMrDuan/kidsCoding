@@ -202,3 +202,69 @@ export function buildGridStudioLesson(lesson: GridLesson): StudioLesson {
     help: buildGridHelp(lesson),
   }
 }
+
+/**
+ * OPS-057 复审：网格作品模式的契约。
+ *
+ * 与课堂契约分开：不把整课的 5 关目标、活动分层和教学提示塞进作品编辑，
+ * 只说明“这是我的作品、只编辑作品保存的那一关、运行只播放真实结果”。
+ * 文件能力也不提供“新建/导入”，避免把普通课程草稿带进作品。
+ */
+export function buildGridWorkStudioLesson(
+  lesson: GridLesson,
+  projectTitle: string,
+  stepId: string,
+): StudioLesson {
+  const step = lesson.steps.find((item) => item.id === stepId) ?? lesson.steps[0]
+  return {
+    lessonId: lesson.id,
+    title: `我的作品：${projectTitle}`,
+    goal5: [
+      `这是我的作品：${projectTitle}。`,
+      '我可以修改积木、换一个目标，再运行看看。',
+      `只编辑作品保存的这一关：${step.title}。`,
+      '作品模式不按课堂标准答案判定，只看真实执行结果。',
+      '作品只保存在这台设备；改完记得保存。',
+    ],
+    brief: '这是我的作品，不是课堂关卡。',
+    step: step.title,
+    hints: [
+      '先看看积木是不是都接在“开始时”下面。',
+      '作品模式不判课堂对错，按“运行”看真实执行结果。',
+      '想换目标，可以在舞台上重新选一格，再运行。',
+    ],
+    engine: 'slot',
+    judging: {
+      stageRule: '作品模式只播放网格引擎的真实执行结果，不按课堂标准答案判定。',
+      taskRule: '只编辑作品保存的这一关；保存写独立作品信封，不改课程草稿。',
+      knowledgeRule: `仍然使用本课的网格积木与执行引擎（${lesson.concept}）。`,
+      scopeLabel: '开放创作',
+    },
+    draftKey: draftKeyFor(lesson.id),
+    methodSteps: [`作品关：${step.title}`],
+    scopeGap: '作品保存在这台设备的浏览器里；这里播放的是真实执行结果，不是课堂成绩。',
+    activities: [
+      {
+        level: 1,
+        title: '编辑并运行作品',
+        text: `只编辑 ${step.title}，按“运行”看真实效果，满意后保存。`,
+      },
+    ],
+    fileCapabilities: {
+      canNew: false,
+      canSave: true,
+      canExport: true,
+      canImport: false,
+      canReset: true,
+    },
+    backHref: '/learn/portfolio',
+    help: {
+      title: `${projectTitle} · 作品模式`,
+      body: [
+        '这是作品编辑模式：只编辑这件作品保存的那一关。',
+        '按“运行”会用同一个网格引擎真实播放；作品不按课堂标准答案判分。',
+        '保存只写这件作品自己的信封，不会改动课程草稿。',
+      ],
+    },
+  }
+}

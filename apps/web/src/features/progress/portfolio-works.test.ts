@@ -17,7 +17,7 @@ describe('UX-301 portfolio works are real saved works only', () => {
       progress: { projectSnapshots: [{ lessonId: 'lesson-07-garden-click', updatedAt: '2026-10-18T08:00:00.000Z', blocks: [{ type: 'when_clicked' }, { type: 'move_right' }] }], completedLessonIds: ['lesson-07-garden-click'] },
       practices: [],
     })
-    expect(work).toMatchObject({ kind: 'blockly', title: '点一下，蝴蝶飞起来', source: 'local', href: '/project/lesson-07-garden-click/complete', localPassed: true })
+    expect(work).toMatchObject({ kind: 'blockly', title: '点一下，蝴蝶飞起来', source: 'local', href: '/studio/blockly/project/lesson-07-garden-click', localPassed: true })
     expect(work.meta).toContain('2 块积木')
     expect(work.cover).toEqual({ type: 'scene', scene: 'garden', characters: ['butterfly', 'frog'] })
   })

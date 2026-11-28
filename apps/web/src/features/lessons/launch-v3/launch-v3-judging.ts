@@ -26,7 +26,7 @@ import {
   type DuoMode,
   type DuoVerdict,
 } from '@/features/lessons/playable-stage/duo-judge'
-import { getMainCharacterLabel } from '@/features/lessons/playable-stage/playable-stage'
+import { getMainCharacterLabel } from '@/features/lessons/playable-stage/character-labels'
 import type { JudgmentResult } from '@/features/lessons/workspace/workspace-slots'
 
 import { getLaunchV3Lesson, getLaunchV3Template, launchV3DuoMode } from './launch-v3-lessons'
@@ -77,6 +77,11 @@ export type LaunchJudgeResult = {
   verdict: ObservableVerdict | null
   duoVerdict: DuoVerdict | null
   program: ProgramBlock[]
+  /**
+   * OPS-057（可选）：作品模式不能运行时给舞台的失败原因。课程判定不填（保持 OPS-056 行为：
+   * 单角色课由舞台按本关目标自行解释）。
+   */
+  failureReason?: string | null
 }
 
 function singleFrames(program: ProgramBlock[]): LaunchStageFrame[] {
@@ -119,11 +124,18 @@ function singleFrames(program: ProgramBlock[]): LaunchStageFrame[] {
   return frames
 }
 
+/**
+ * 按一块积木一帧播放整段双角色程序。
+ *
+ * `verdict` 只用于课程模式：教学判定在哪一块失败，播放就停在哪一块，
+ * 与旧执行器一致。作品模式（OPS-057）不传 verdict：自由作品没有教学目标，
+ * 只要结构合法就把每块积木真实执行一遍，帧与最终报告都以这份播报为准。
+ */
 function duoFrames(
   program: ProgramBlock[],
   mode: DuoMode,
   stepIndex: number,
-  verdict: DuoVerdict,
+  verdict?: DuoVerdict,
 ): LaunchStageFrame[] {
   const dialogue = mode === 'dialogue'
   const graduation = mode === 'graduation'
@@ -147,8 +159,8 @@ function duoFrames(
       log,
     })
   for (let i = 1; i < program.length; i++) {
-    // 判定已模拟同一段程序：在它失败的那一块停下（与旧执行器一致）。
-    if (verdict.failIndex === i) break
+    // 课程模式：判定已模拟同一段程序，在它失败的那一块停下。
+    if (verdict?.failIndex === i) break
     const type = program[i].type
     if (type === 'move_right' || (type === 'repeat_twice' && graduation)) {
       if (actor === 'main') fox += STEP_DISTANCE
@@ -160,13 +172,22 @@ function duoFrames(
     } else if (type === 'switch_character') {
       actor = 'partner'
       push('idle', '切换到小熊：后面的动作只给小熊')
-    } else if (type === 'say_line' && (dialogue || (graduation && stepIndex === 4))) {
-      if (actor === 'main') foxMessage = '你好！'
-      else bearMessage = graduation ? '找到礼物啦！' : '我们一起出发吧！'
-      push('speaking', `${label(actor)}说：${actor === 'main' ? foxMessage : bearMessage}`)
-    } else if (type === 'say_line' && actor === 'main' && stepIndex === 4) {
-      foxMessage = '你好！'
-      push('speaking', '小狐狸说：你好！')
+    } else if (type === 'say_line') {
+      // 作品模式（无 verdict）：谁在说话，就记在谁身上，绝不套用教学对白规则。
+      if (!verdict) {
+        if (actor === 'main') foxMessage = '你好！'
+        else bearMessage = graduation ? '找到礼物啦！' : dialogue ? '我们一起出发吧！' : '你好！'
+        push('speaking', `${label(actor)}说：${actor === 'main' ? foxMessage : bearMessage}`)
+      } else if (dialogue || (graduation && stepIndex === 4)) {
+        if (actor === 'main') foxMessage = '你好！'
+        else bearMessage = graduation ? '找到礼物啦！' : '我们一起出发吧！'
+        push('speaking', `${label(actor)}说：${actor === 'main' ? foxMessage : bearMessage}`)
+      } else if (actor === 'main' && stepIndex === 4) {
+        foxMessage = '你好！'
+        push('speaking', '小狐狸说：你好！')
+      } else {
+        push('idle', null)
+      }
     } else {
       push('idle', null)
     }
@@ -277,6 +298,83 @@ export function judgeLaunchStep(
     verdict,
     duoVerdict: null,
     program,
+  }
+}
+
+/**
+ * OPS-057：作品模式的运行结果。
+ *
+ * 作品模式不按教学标准答案判分（自由修改的作品没有“标准答案”）：
+ * - 单角色作品：能运行时按积木逐帧播放，播完即算运行完成；不能运行时如实说明。
+ * - 双角色作品：复用 judgeDuoProgram 判断程序能否运行（未连接 / 没有“开始时”），
+ *   逐帧播放时不因教学目标未达成而中断，两位朋友各走各的，如实显示步数。
+ * - 不产生礼物条件、设计错误实验、知识证据等教学结论；运行不写进度、不发奖励。
+ */
+export function judgeLaunchProject(lessonId: string, blocks: ProgramBlock[]): LaunchJudgeResult {
+  const program = blocks.map((block) => ({ ...block }))
+  const mode = launchV3DuoMode(lessonId)
+  if (mode) {
+    const verdict = judgeDuoProgram(program, mode, 4)
+    // 作品模式只检查执行结构（有“开始时”、积木都接好）；切换顺序、距离、对白
+    // 归属等教学目标不参与判定。结构合法就逐块真实执行，报告只引用实际帧。
+    const canRun = verdict.code !== 'not-connected' && verdict.code !== 'no-start'
+    const frames = canRun ? duoFrames(program, mode, 4) : []
+    const final = frames[frames.length - 1] ?? EMPTY_LAUNCH_FRAME
+    const message = canRun
+      ? `运行完成：小狐狸走了 ${final.mainPosition} 步，小熊走了 ${final.partnerPosition} 步。`
+      : (verdict.reason ?? '再看看积木的顺序吧！')
+    return {
+      passed: canRun,
+      failure: canRun ? null : verdict.code,
+      message,
+      trigger: 'start',
+      canRun,
+      frames,
+      final,
+      designedMistake: false,
+      giftFound: false,
+      verdict: null,
+      duoVerdict: null,
+      program,
+      failureReason: canRun ? null : message,
+    }
+  }
+  const simulation = simulateProgram(program)
+  const frames = simulation.ok ? singleFrames(program) : []
+  const final = frames[frames.length - 1] ?? EMPTY_LAUNCH_FRAME
+  const label = getMainCharacterLabel(getLaunchV3Template(lessonId))
+  const scenePart = final.scene === 'meadow' ? '，来到草地' : ''
+  const sayPart = final.mainMessage ? `，说：“${final.mainMessage}”` : ''
+  const message = simulation.ok
+    ? `运行完成：${label}移动了 ${final.mainPosition} 步${scenePart}${sayPart}。`
+    : '程序还不能运行：先放好“开始时”，再把积木接成一条。'
+  return {
+    passed: simulation.ok,
+    failure: simulation.ok ? null : 'not-runnable',
+    message,
+    trigger: program[0]?.type === 'when_clicked' ? 'click' : 'start',
+    canRun: simulation.ok,
+    frames,
+    final,
+    designedMistake: false,
+    giftFound: false,
+    verdict: null,
+    duoVerdict: null,
+    program,
+    failureReason: simulation.ok ? null : message,
+  }
+}
+
+/** 作品模式的三层判定：只有“作品运行”一层，不伪造教学结论。 */
+export function buildLaunchProjectJudgment(result: LaunchJudgeResult): JudgmentResult {
+  const final = result.final
+  const programText =
+    result.program.length > 0 ? result.program.map((block) => block.type).join(' → ') : '（空）'
+  return {
+    layers: [{ id: 'stage', label: '作品运行', passed: result.passed, detail: result.message }],
+    passed: result.passed,
+    conclusion: result.passed ? `运行完成。${result.message}` : `还不能运行。${result.message}`,
+    methodEvidence: `作品积木：${programText}；主角位置：${final.mainPosition}；伙伴位置：${final.partnerPosition}；帧数：${result.frames.length}。`,
   }
 }
 

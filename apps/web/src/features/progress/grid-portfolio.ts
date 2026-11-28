@@ -4,9 +4,15 @@ import { gridDraftKey, parseGridDraft } from '@/features/lessons/grid/grid-draft
 import { countBlocks, type ProgramBlock } from '@/features/lessons/blockly/program-tree'
 import { scopedLessonDraftKey } from '@/features/lessons/scoped-draft-key'
 import { isValidGridDraft, type GridSlotData } from '@/features/lessons/grid-v3/grid-v3-draft'
-import { gridV3Route, isGridV3LessonId } from '@/features/lessons/grid-v3/grid-v3-lessons'
+import { isGridV3LessonId } from '@/features/lessons/grid-v3/grid-v3-lessons'
+import {
+  gridProjectRoute,
+  isGridProjectDeleted,
+  markGridProjectDeleted,
+  removeGridProjectDraft,
+} from '@/features/lessons/grid-v3/grid-project'
 import { draftKeyFor } from '@/features/lessons/workspace/lesson-contract'
-import { loadDraft, saveDraft } from '@/features/lessons/workspace/workspace-draft'
+import { loadDraft } from '@/features/lessons/workspace/workspace-draft'
 import type { PortfolioWork } from './portfolio-works'
 
 /**
@@ -17,8 +23,35 @@ import type { PortfolioWork } from './portfolio-works'
  */
 type FoundWork = { blocks: ProgramBlock[]; passed: string[]; savedAt: string }
 
-function readV3Work(storage: Storage, lesson: GridLesson, stepId: string, owner: string): FoundWork | null {
-  if (!isGridV3LessonId(lesson.id)) return null
+/**
+ * OPS-057：作品模式保存的独立信封（`kidscoding-project:<id>`，按 owner 分键）。
+ * 存在时优先于课程 V3 草稿，因为作品模式里的修改不会写回课程草稿。
+ */
+function readProjectWork(storage: Storage, lesson: GridLesson, stepId: string, owner: string): FoundWork | null {
+  const raw = storage.getItem(scopedLessonDraftKey(owner, `kidscoding-project:${lesson.id}`))
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw) as { lessonId?: unknown; savedAt?: unknown; kind?: unknown; draft?: unknown } | null
+    if (
+      !parsed ||
+      parsed.lessonId !== lesson.id ||
+      parsed.kind !== 'grid-project' ||
+      typeof parsed.savedAt !== 'string' ||
+      !Number.isFinite(Date.parse(parsed.savedAt)) ||
+      !isValidGridDraft(lesson, parsed.draft)
+    ) {
+      return null
+    }
+    const draft = parsed.draft as GridSlotData
+    const blocks = draft.programs[stepId]
+    if (!blocks?.length || !draft.creative?.[stepId]) return null
+    return { blocks, passed: draft.passed, savedAt: parsed.savedAt }
+  } catch {
+    return null
+  }
+}
+
+function readV3Work(storage: Storage, lesson: GridLesson, stepId: string, owner: string): FoundWork | null {  if (!isGridV3LessonId(lesson.id)) return null
   const raw = storage.getItem(scopedLessonDraftKey(owner, draftKeyFor(lesson.id)))
   if (!raw) return null
   let savedAt: unknown
@@ -46,45 +79,32 @@ export function collectGridWorks(storage: Storage, owner?: string | null): Portf
   return Object.values(g0u3LoopLessons).flatMap(lesson => {
     const project = lesson.project
     if (!project?.showInPortfolio || (lesson.layoutMode === 'golden' && !owner)) return []
-    const found = (owner ? readV3Work(storage, lesson, project.stepId, owner) : null)
-      ?? readLegacyWork(storage, lesson, project.stepId, owner)
+    const deleted = !!owner && isGridProjectDeleted(lesson.id, owner)
+    const found = (owner ? readProjectWork(storage, lesson, project.stepId, owner) : null)
+      ?? (owner && !deleted ? readV3Work(storage, lesson, project.stepId, owner) : null)
+      ?? (!deleted ? readLegacyWork(storage, lesson, project.stepId, owner) : null)
     if (!found) return []
     return [{
       id: `grid:${lesson.id}`, kind: 'blockly', lessonId: lesson.id, title: project.title,
       meta: `网格编程 · ${countBlocks(found.blocks)} 块积木`, updatedAt: found.savedAt, source: 'local',
-      href: isGridV3LessonId(lesson.id) ? gridV3Route(lesson.id) : `/learn/grid-lab/${lesson.id}`,
+      href: gridProjectRoute(lesson.id),
       localPassed: found.passed.includes(project.stepId),
       cover: { type: 'scene', scene: 'forest', characters: ['fox'] },
     }]
   })
 }
 
-/** 删除作品：只删作品那一关（程序、创意选择、通过记录），V3 草稿与旧草稿都处理；其余关保留。 */
+/**
+ * OPS-057 复审：删除作品只删独立作品信封并记录按 owner 的删除标记。
+ * 课程 V3 草稿与旧课堂草稿一律不改（程序、创意、passed、finished 原样，
+ * 删除前后逐字节一致）；取消“删作品=改课堂进度”的旧行为。
+ */
 export function removeGridWork(storage: Storage, lessonId: string, owner?: string | null) {
   const lesson = g0u3LoopLessons[lessonId]
   const project = lesson?.project
   if (!project?.showInPortfolio || (lesson.layoutMode === 'golden' && !owner)) return
-  const stepId = project.stepId
+  if (typeof owner !== 'string' || owner.length === 0) return
 
-  if (owner && isGridV3LessonId(lessonId)) {
-    const { data } = loadDraft(storage, lessonId, owner)
-    if (isValidGridDraft(lesson, data)) {
-      const next: GridSlotData = {
-        ...data,
-        programs: Object.fromEntries(Object.entries(data.programs).filter(([id]) => id !== stepId)),
-        passed: data.passed.filter(id => id !== stepId),
-        ...(data.creative ? { creative: Object.fromEntries(Object.entries(data.creative).filter(([id]) => id !== stepId)) } : {}),
-        ...(data.finished ? { finished: false } : {}),
-      }
-      saveDraft(storage, lessonId, next, owner)
-    }
-  }
-
-  const key = gridDraftKey(lessonId, lesson.layoutMode === 'golden' ? owner! : undefined)
-  const draft = parseGridDraft(lesson, storage.getItem(key))
-  if (!draft) return
-  delete draft.programs[stepId]
-  delete draft.creative?.[stepId]
-  draft.passed = draft.passed.filter(id => id !== stepId)
-  storage.setItem(key, JSON.stringify(draft))
+  removeGridProjectDraft(lessonId, owner)
+  markGridProjectDeleted(lessonId, owner)
 }

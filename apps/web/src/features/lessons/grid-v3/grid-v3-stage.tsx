@@ -43,7 +43,11 @@ function goalPromptFor(step: GridLessonStep): string {
 }
 
 export function GridStageSlot({ sceneActions }: StageSlotProps) {
-  const { lesson, store, runAdapter } = useGridSession()
+  const { lesson, store, runAdapter, work } = useGridSession()
+  const workStepIndex = work
+    ? lesson.steps.findIndex((item) => item.id === work.stepId)
+    : -1
+  const workMode = workStepIndex >= 0
   const sessionState = useGridSessionState()
   const draft = sessionState.draft
   const [notice, setNotice] = useState<string | null>(null)
@@ -51,12 +55,15 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
   // 关卡边界清快照：主清理在编辑插槽 goToStep（persist 之前同步执行），
   // 这里覆盖一切绕过 goToStep 的切关路径（例如旧草稿导入落在别的关），
   // 挂载时同样执行一次（适配器本就是 idle，无副作用）。
+  const activeStepIndex = workMode
+    ? workStepIndex
+    : Math.min(Math.max(draft.stepIndex, 0), lesson.steps.length - 1)
   useEffect(() => {
     runAdapter.reset()
-  }, [runAdapter, draft.stepIndex])
+  }, [runAdapter, activeStepIndex])
 
   const observation = runAdapter.getExecutionSnapshot()
-  const step = lesson.steps[Math.min(Math.max(draft.stepIndex, 0), lesson.steps.length - 1)]
+  const step = lesson.steps[activeStepIndex]
   const stepId = step.id
   const blocks: ProgramBlock[] = draft.programs[stepId] ?? gridStarterProgram(step)
   const passedHere = draft.passed.includes(stepId)
@@ -99,7 +106,26 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
     { x: display.x, y: display.y, facing: display.facing },
   )
 
-  const feedback = useMemo(() => {
+  // 作品模式：只报告真实执行，不按课堂目标判通过/未通过，也不揭示教学提示。
+  // 单独算成纯值，不把 workMode 混进课堂反馈 memo 的依赖集合。
+  const workFeedback = workMode
+    ? notice
+      ? { tone: 'warning' as const, text: notice }
+      : needsGoal
+        ? { tone: 'warning' as const, text: goalPrompt }
+        : stopped
+          ? { tone: 'warning' as const, text: '已停止。积木还在，可以改完再运行。' }
+          : !run
+            ? { tone: 'idle' as const, text: '按“运行”看看这件作品会怎么动。' }
+            : !done
+              ? { tone: 'idle' as const, text: '正在按积木真实播放……' }
+              : {
+                  tone: 'idle' as const,
+                  text: '播放结束。作品只按真实积木执行，不套用课堂标准答案。',
+                }
+    : null
+
+  const teachingFeedback = useMemo(() => {
     if (notice) return { tone: 'warning', text: notice }
     if (needsGoal) return { tone: 'warning', text: goalPrompt }
     if (stopped) {
@@ -140,11 +166,24 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
     return { tone: 'error', text: `${guessNote}${pointer ? `${text}${pointer}` : text}` }
   }, [notice, needsGoal, goalPrompt, stopped, run, done, passedHere, lesson.diagnoses, blocks, guess, step, observedHere, actorName])
 
+  const feedback = workFeedback ?? teachingFeedback
+
   const hintLayer = draft.failures === 0 ? -1 : Math.min(draft.failures - 1, 2)
   const hintCopy = hintLayer >= 0 ? `（第 ${hintLayer + 1} 层）${step.hints[hintLayer]}` : undefined
 
   function updateDraft(next: GridSlotData) {
     store.setState({ draft: next })
+  }
+
+  // 作品模式只改这件作品的目标格，不写课堂 passed / finished。
+  function chooseWorkGoal(choice: number) {
+    const goal = step.creative!.goalChoices[choice]
+    runAdapter.reset()
+    setNotice(null)
+    updateDraft({
+      ...draft,
+      creative: { ...(draft.creative ?? {}), [step.id]: { goal } },
+    })
   }
 
   function chooseGuess(choice: number) {
@@ -191,7 +230,7 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
     setNotice(null)
   }
 
-  if (draft.finished === true) {
+  if (!workMode && draft.finished === true) {
     return (
       <section className="kc-lesson-shell p-6" data-testid="grid-lesson-finished">
         <div className="kc-feedback kc-feedback-success">
@@ -240,34 +279,36 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
 
   return (
     <div data-testid="grid-stage-slot">
-      <div
-        className="flex flex-wrap items-center gap-2 rounded-[8px] border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-950"
-        data-testid="grid-predict"
-      >
-        <span className="flex-1">🤔 {step.predict}</span>
-        <ReadAloudButton
-          key={step.id}
-          testId="grid-read-instruction"
-          text={`第 ${draft.stepIndex + 1} 关，${step.title}。${step.instruction}。${step.predict}`}
-        />
-        {step.predictChoices ? (
-          <div className="grid w-full gap-2 sm:grid-cols-2" data-testid="grid-predict-choices">
-            {step.predictChoices.map((choice, choiceIndex) => (
-              <button
-                key={choice.text}
-                type="button"
-                className="kc-reflect-option"
-                data-testid={`grid-predict-choice-${choiceIndex}`}
-                data-chosen={guess === choiceIndex ? 'true' : 'false'}
-                aria-pressed={guess === choiceIndex}
-                onClick={() => chooseGuess(choiceIndex)}
-              >
-                {choice.text}
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </div>
+      {!workMode ? (
+        <div
+          className="flex flex-wrap items-center gap-2 rounded-[8px] border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-950"
+          data-testid="grid-predict"
+        >
+          <span className="flex-1">🤔 {step.predict}</span>
+          <ReadAloudButton
+            key={step.id}
+            testId="grid-read-instruction"
+            text={`第 ${draft.stepIndex + 1} 关，${step.title}。${step.instruction}。${step.predict}`}
+          />
+          {step.predictChoices ? (
+            <div className="grid w-full gap-2 sm:grid-cols-2" data-testid="grid-predict-choices">
+              {step.predictChoices.map((choice, choiceIndex) => (
+                <button
+                  key={choice.text}
+                  type="button"
+                  className="kc-reflect-option"
+                  data-testid={`grid-predict-choice-${choiceIndex}`}
+                  data-chosen={guess === choiceIndex ? 'true' : 'false'}
+                  aria-pressed={guess === choiceIndex}
+                  onClick={() => chooseGuess(choiceIndex)}
+                >
+                  {choice.text}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {step.creative ? (
         <div
@@ -291,7 +332,7 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
                   aria-pressed={isChosen}
                   data-chosen={isChosen ? 'true' : 'false'}
                   disabled={playing}
-                  onClick={() => chooseGoal(cellIndex)}
+                  onClick={() => (workMode ? chooseWorkGoal(cellIndex) : chooseGoal(cellIndex))}
                 >
                   {step.creative!.labels?.[cellIndex] ??
                     (step.level.rows > 1
@@ -325,6 +366,7 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
         <div
           aria-live="polite"
           data-testid="grid-feedback"
+          data-work-mode={workMode ? 'true' : undefined}
           data-tone={feedback.tone}
           className={`kc-feedback ${
             feedback.tone === 'success'
@@ -348,13 +390,14 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
           </div>
         </div>
 
-        {hintCopy ? (
+        {!workMode && hintCopy ? (
           <p className="kc-hint" data-testid="lesson-hint">
             {hintCopy}
           </p>
         ) : null}
 
-        <div className="kc-run-actions flex-wrap">
+        {!workMode ? (
+          <div className="kc-run-actions flex-wrap">
           {step.errorLab &&
           !observedHere &&
           JSON.stringify(blocks) !== JSON.stringify(step.starterBlocks ?? []) ? (
@@ -378,7 +421,8 @@ export function GridStageSlot({ sceneActions }: StageSlotProps) {
               再给点提示
             </button>
           ) : null}
-        </div>
+          </div>
+        ) : null}
       </div>
     </div>
   )

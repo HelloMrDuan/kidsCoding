@@ -4412,6 +4412,33 @@
         "gaps": "已完成：合并、部署、main CI、十一节真实浏览器核验、旧入口 308、真实运行回归。2026-11-27 duan 裁定 #584 替代 #554（G1～G8 全部选 A 由 #584 补齐），#554 待 OPS-056 生产验收通过后申请关闭；ux-102/ux-201/ux-202 三处 test.fail 已按裁定处理，剩余 test.fail 0。仍未完成（保留为后续事项，不阻塞本轮集成）：教学行为差异（练习关提示/小结果/tier-3、practice-need-guess、失败计数、每关独立画布、花园预测、lesson-10 第 3 关 duo-active-actor）；lesson-12 第一关提示与关卡目标不一致（后续集中教学引导优化）；OPS-055 的人工耳听与 AudioContext/节点计数未取得（见 OPS-055 gaps）。"
       },
       "notes": "2026-11-26 开工：分支 codex/ops-056-g0-launch-v3 自 OPS-055 HEAD e25c6ba4 创建；第三批剩余事项（3110 源码与构建一致性、#579/#580 正文统一更新、CI 分片、L06 人工耳听）不阻塞本任务。 2026-11-28：#584 合并 1cb89bde，main CI 全绿，1cb89bde 已部署并通过十一节真实浏览器核验与旧入口 308 核验；关账 PR 改台账为 completed（不重新部署生产）。"
+    },
+    {
+      "id": "OPS-057",
+      "title": "Blockly V3 作品编辑模式统一：已保存的 Blockly 作品在 V3 工作台打开、修改、运行、保存",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-056"
+      ],
+      "scope": "按项目负责人 2026-11-27 指示：已保存的 Blockly 作品统一使用 V3 工作台编辑，不再分旧完成页 / 旧工作台两套。分支 codex/ops-057-blockly-v3-project-edit 自 OPS-056 HEAD 5d7b8222 创建，独立 Stacked Draft PR，不改 #584 分支与正文，不合并、不部署。复用 StudioShell + LessonWorkspace V3（chrome=studio、studioLayout=blockly-v3）+ docked Blockly + 作品舞台插槽 + LaunchRunAdapter：左栏作品信息 / 创作说明 / 保存，中栏积木，右栏舞台与运行 / 停止 / 重来；不复制工作台、不建 V4、不重新设计视觉。统一入口：作品中心的“继续编辑作品”与课程完成页“继续编辑作品”都进入 /studio/blockly/project/<lessonId>，列表与汇总页外观不变。数据隔离：作品存于 owner 作用域 kidscoding-project:<lessonId> 信封（64KB、严格校验），镜像到既有 projectSnapshots；与课程草稿键、课程进度、星星 / 卡片 / 奖励完全分离；兼容旧作品快照 {type} 与 {type,line}；无标准答案，运行不判教学通过、不发奖励。覆盖单角色 lesson-01～09、双角色 lesson-10～12（independent / dialogue / graduation）与既有可编辑积木作品；不改 Scratch / Python 工作台。",
+      "acceptance": [
+        "单角色、双角色与既有可编辑 Blockly 作品都能从作品中心与完成页进入 V3 作品模式，真实打开已保存作品并在 1440/834/390 三断点打开、修改、运行、停止、重来、保存、刷新重开",
+        "作品模式只显示作品信息、创作说明、保存、积木与舞台；不出现教学关卡、预测答题、错误实验、过关按钮与完成奖励",
+        "保存只写作品信封与 projectSnapshots；课程草稿键逐字节不变，stars / cardIds / completedLessonIds 不变；不同 owner 的作品互不可见，旧作品快照可只读兼容打开",
+        "运行复用真实执行器逐帧播放：单角色 simulateProgram，双角色 judgeDuoProgram；不按教学标准答案判分，不产生礼物 / 知识证据结论，运行与保存都不发奖励",
+        "作品中心与完成页入口指向 V3 作品模式，列表与汇总页外观不变；不改 #584 分支、Scratch / Python 工作台与既有视觉基线",
+        "单元测试、真实 Playwright E2E、ESLint、tsc（与已知基线一致）、生产构建与 PR CI 均有真实结果；排队 / 未跑 / 失败不得记为通过",
+        "保持 Draft，不自行合并、不部署；等待独立审核与用户验收"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/588（stacked Draft，base codex/ops-056-g0-launch-v3，head 6a6dcbbc）",
+        "prCI": "head fdcc37bf：https://github.com/HelloMrDuan/kidsCoding/actions/runs/46100477887 结果 53 pass / 2 skipping / 1 cancelled，不记为全绿；唯一 cancelled 为 scratch-real-vm-shard-s3（grid-lab + blockly-garden-click 54 条，15 分钟 job 上限取消，无断言失败，重跑同结果），同规格本地 54 passed (16.6m)，base OPS-056 最新 CI 同为 cancelled，与本 PR 改动无关，按 SYS-108 不在本 PR 改 CI 预算",
+        "localTests": "本地真实运行（HOLD 整改后构建 HxD1bxt6Sffcp6oHnMgjH，Node 20）：Vitest（Node 22）progress / grid-v3 / launch-v3 定向 133 条全通过（含新增网格作品信封、删除信封、双人帧与报告一致用例）；Playwright desktop：ops-057 7 条全通过（单/双角色、834、390、网格作品模式、删除作品、缺失/损坏如实提示），unit-project 3 条全通过，blockly-duo / duo-dialogue / duo-graduation 17 条全通过。旧完成页编辑器已移除，E2E 改为只读回放断言。tsc / ESLint 改动文件无新增错误。未重跑 29 节课程全量。",
+        "gaps": "HOLD 整改已按点完成：台账只改 OPS-057、完成页只读回放、网格作品独立路由、删除清信封与旧快照、双人报告按实际帧。PR CI 仍需在新 head 上重跑；scratch S3 超时交主 Muse，不在本 PR 改 workflow。"
+      },
+      "notes": "2026-11-28 开工：分支 codex/ops-057-blockly-v3-project-edit 自 OPS-056 HEAD 5d7b8222 创建；Draft PR #588 已建，状态 in_review，等待独立审核与 PR CI。 2026-11-28 阶段审核 HOLD 五项已整改，构建 HxD1bxt6Sffcp6oHnMgjH。"
     }
     ]
 }
