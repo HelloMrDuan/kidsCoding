@@ -112,7 +112,9 @@ for (const [name, width, height] of [
     } else {
       await card.click()
     }
-    await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // OPS-056: the card opens the shared V3 launch studio for this lesson.
+    await page.waitForURL('**/studio/blockly/launch/lesson-03-forest-story')
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
     // A real click may scroll the card into view before navigating. The
     // departure-time position persisted by the app is the restore target.
     const departureOffset = await page.evaluate(() =>

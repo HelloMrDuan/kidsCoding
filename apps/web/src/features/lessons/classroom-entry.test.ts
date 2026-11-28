@@ -36,21 +36,21 @@ describe('classroom entry for 编程课堂', () => {
     expect(COURSE_PICKER_HREF).toBe('/learn/catalog')
   })
 
-  it('continues the launch lesson recorded in guest progress at its original URL', async () => {
+  it('continues the launch lesson recorded in guest progress at its V3 studio URL', async () => {
     window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('lesson-02-forest-greeting'))
     expect(readLearningRecord('guest')).toEqual({ lessonId: 'lesson-02-forest-greeting' })
-    await expect(resolveClassroomHref('guest')).resolves.toBe('/learn/lesson/lesson-02-forest-greeting')
+    await expect(resolveClassroomHref('guest')).resolves.toBe('/studio/blockly/launch/lesson-02-forest-greeting')
   })
 
-  it('gives lesson-01 exactly one official entry and leaves lesson-02…12 on the old URL', async () => {
+  it('gives lesson-01 and lesson-02…12 exactly one official V3 entry each', async () => {
     await expect(resolveLessonHref('lesson-01-forest-hello')).resolves.toBe(
       '/studio/blockly/lesson-01-forest-hello',
     )
     await expect(resolveLessonHref('lesson-02-forest-greeting')).resolves.toBe(
-      '/learn/lesson/lesson-02-forest-greeting',
+      '/studio/blockly/launch/lesson-02-forest-greeting',
     )
     await expect(resolveLessonHref('lesson-12-graduation-show')).resolves.toBe(
-      '/learn/lesson/lesson-12-graduation-show',
+      '/studio/blockly/launch/lesson-12-graduation-show',
     )
   })
 
@@ -158,7 +158,7 @@ describe('编程课堂 guest progress isolation (kc-progress claim)', () => {
     window.localStorage.setItem(GUEST_PROGRESS_STORAGE_KEY, progress('lesson-02-forest-greeting'))
     expect(readLearningRecord('guest:family-a')).toEqual({ lessonId: 'lesson-02-forest-greeting' })
     expect(window.localStorage.getItem(GUEST_PROGRESS_OWNER_STORAGE_KEY)).toBe('guest:family-a')
-    await expect(resolveClassroomHref('guest:family-a')).resolves.toBe('/learn/lesson/lesson-02-forest-greeting')
+    await expect(resolveClassroomHref('guest:family-a')).resolves.toBe('/studio/blockly/launch/lesson-02-forest-greeting')
   })
 
   it('never lets guest:B continue guest:A\'s progress in the same browser', async () => {

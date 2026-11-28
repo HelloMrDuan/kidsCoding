@@ -79,7 +79,8 @@ function getTemplateCharacterLabels(template?: ProjectTemplateDefinition) {
 
 /** OPS-041: 外部运行模式的执行快照（studio 路由专用）。 */
 export type PlayableStageExternalState = {
-  executionState: 'idle' | 'running' | 'success' | 'error'
+  /** OPS-056: 'armed' = 点击程序已启动、等待孩子点角色（与 useBlockExecutor 同语义）。 */
+  executionState: 'idle' | 'armed' | 'running' | 'success' | 'error'
   /** 主角实际走的步数（与 adapter 的执行快照一致）。 */
   characterPosition: number
   /** 主角气泡文案（本课无对白积木时为空）。 */
@@ -89,6 +90,21 @@ export type PlayableStageExternalState = {
   frameIndex: number
   /** 本次运行是否为设计错误实验（adapter 判定，见 mistake-steps.ts）。 */
   designedMistake: boolean
+  /** OPS-056（可选，缺省即 OPS-041 行为）：当前实际场景（switch_scene 之后为草地）。 */
+  scene?: 'forest' | 'meadow'
+  /** OPS-056（可选）：第二位角色实际走的步数与气泡。 */
+  partnerPosition?: number
+  partnerMessage?: string
+  /** OPS-056（可选）：当前操作的角色。 */
+  activeActor?: 'main' | 'partner'
+  /** OPS-056（可选）：本帧两位角色的动作（与 useBlockExecutor 的 actorActions 同语义）。 */
+  mainAction?: 'idle' | 'moving' | 'speaking'
+  partnerAction?: 'idle' | 'moving' | 'speaking'
+  /**
+   * OPS-056（可选）：适配器判定给出的失败原因。舞台自带的 evaluateObservable 不认识双角色课
+   * （对 L10～L12 恒为 goal-misconfigured），external 时失败原因必须以适配器为准。
+   */
+  failureReason?: string | null
 }
 
 export function PlayableStage({
@@ -109,10 +125,13 @@ export function PlayableStage({
   practiceAnswer = null,
   onPracticeAnswer,
   askClickPrediction,
+  clickPrediction,
+  onClickPrediction,
   judge,
   successMessage,
   runControls = 'internal',
   externalState,
+  onExternalCharacterClick,
   sceneActions,
 }: {
   sceneActions?: ReactNode
@@ -148,6 +167,12 @@ export function PlayableStage({
    * step; the classroom asks it only where it teaches something (lesson-07 main + mistake).
    */
   askClickPrediction?: boolean
+  /**
+   * OPS-056：花园“先猜一猜”的受控值（可选）。传入时由调用方保存（V3 会话 store），
+   * 供完成门控读取；不传时保持组件内部状态，旧路由行为不变。
+   */
+  clickPrediction?: 'automatic' | 'needs-click' | null
+  onClickPrediction?: (value: 'automatic' | 'needs-click') => void
   /** TQ-012: custom judge (unit projects accept several programs); replaces evaluateObservable. */
   judge?: ProgramJudge
   /** TQ-012: success copy outside the classroom (no “完成这一关” button there). */
@@ -163,6 +188,8 @@ export function PlayableStage({
   runControls?: 'internal' | 'external'
   /** OPS-041: 'external' 时的执行快照（internal 时忽略）。 */
   externalState?: PlayableStageExternalState
+  /** OPS-056: 'external' 时点角色交给课程运行适配器（点击课 armed → 执行）；internal 时忽略。 */
+  onExternalCharacterClick?: () => void
 }) {
   const {
     executionState: internalExecutionState,
@@ -187,17 +214,19 @@ export function PlayableStage({
   const executionState = isExternal ? (externalState?.executionState ?? 'idle') : internalExecutionState
   const characterPosition = isExternal ? (externalState?.characterPosition ?? 0) : internalCharacterPosition
   const characterMessage = isExternal ? (externalState?.message ?? '') : internalCharacterMessage
-  // 本课的伙伴（小兔子）从不移动；external 快照不带伙伴位置，恒为 0。
-  const partnerPosition = isExternal ? 0 : internalPartnerPosition
-  const partnerMessage = isExternal ? '' : internalPartnerMessage
-  const activeActor = isExternal ? 'main' : internalActiveActor
+  // OPS-041 缺省：伙伴不动（恒为 0）；OPS-056 起 external 快照可选带伙伴位置、气泡与当前角色。
+  const partnerPosition = isExternal ? (externalState?.partnerPosition ?? 0) : internalPartnerPosition
+  const partnerMessage = isExternal ? (externalState?.partnerMessage ?? '') : internalPartnerMessage
+  const activeActor = isExternal ? (externalState?.activeActor ?? 'main') : internalActiveActor
   const actorActions = isExternal
     ? {
-        main: executionState === 'running' ? ('moving' as const) : ('idle' as const),
-        partner: 'idle' as const,
+        main: externalState?.mainAction ?? (executionState === 'running' ? ('moving' as const) : ('idle' as const)),
+        partner: externalState?.partnerAction ?? ('idle' as const),
       }
     : internalActorActions
   const actionLog = isExternal ? (externalState?.actionLog ?? []) : internalActionLog
+  // OPS-056: external 时场景取适配器快照（缺省森林，即 OPS-041 行为）。
+  const effectiveStageScene = isExternal ? (externalState?.scene ?? 'forest') : stageScene
   // TQ-010: internal 时由 handleRun 在按下运行时判定；external 时由适配器给出。
   const externalDesignedRun = isExternal ? Boolean(externalState?.designedMistake) : false
 
@@ -207,22 +236,30 @@ export function PlayableStage({
   const failureCode = verdict.passed ? null : verdict.code
   // TQ-009: the butterfly flies (“飞”), the fox walks (“走”) — feedback and the distance chip follow the stage.
   const motionVerb = motionVerbForTemplate(template?.id)
-  const kidReason = (verdict.passed ? '' : explainRunFailure(verdict, getMainCharacterLabel(template), motionVerb)) || errorMessage || '再看看积木的顺序吧！'
+  // OPS-056: external 且适配器给了失败原因时以它为准（双角色课的判定只在适配器里）。
+  const externalReason = isExternal ? (externalState?.failureReason ?? null) : null
+  const kidReason = externalReason || (verdict.passed ? '' : explainRunFailure(verdict, getMainCharacterLabel(template), motionVerb)) || errorMessage || '再看看积木的顺序吧！'
   // Each press of “运行” is one attempt; a failed attempt is reported exactly once,
   // even when two failures in a row leave executionState at 'error'.
   const [attemptId, setAttemptId] = useState(0)
   const reportedAttemptRef = useRef(-1)
   const clickLesson=requiredBlocks[0]==='when_clicked'
   const askPrediction = askClickPrediction ?? clickLesson
-  const [prediction,setPrediction]=useState<'automatic'|'needs-click'|null>(null)
+  const [internalPrediction,setInternalPrediction]=useState<'automatic'|'needs-click'|null>(null)
+  // OPS-056：传了 clickPrediction 即为受控（null 表示尚未预测），否则沿用内部状态。
+  const prediction = clickPrediction !== undefined ? clickPrediction : internalPrediction
+  const setPrediction = (value: 'automatic' | 'needs-click') => {
+    onClickPrediction?.(value)
+    if (clickPrediction === undefined) setInternalPrediction(value)
+  }
   // TQ-011: second practice. predict = guess before running; compare = answer after a successful run.
   const practicePick = practice?.choices.find((choice) => choice.id === practiceAnswer)
   const practiceGuessNeeded = practice?.mode === 'predict' && !practicePick
   const practiceQuestionVisible = practice ? practice.mode === 'predict' || executionState === 'success' || Boolean(practicePick) : false
   const practiceDone = Boolean(practice && executionState === 'success' && isPracticeAnswered(practice, practiceAnswer))
   const practiceLocked = practice?.mode === 'predict' && executionState !== 'idle' && executionState !== 'error'
-  const visualScene=stageScene==='meadow'?'草地':template?.starterScene==='garden'?'花园':'森林'
-  const sceneId: SceneId = stageScene==='meadow'?'meadow':template?.starterScene==='garden'?'garden':'forest'
+  const visualScene=effectiveStageScene==='meadow'?'草地':template?.starterScene==='garden'?'花园':'森林'
+  const sceneId: SceneId = effectiveStageScene==='meadow'?'meadow':template?.starterScene==='garden'?'garden':'forest'
   const mainId = template?.starterCharacters[0] ?? 'fox'
   const pickedChoice = mistake?.choices.find((choice) => choice.id === mistakeAnswer)
   const mistakeAnswered = Boolean(pickedChoice?.correct)
@@ -284,7 +321,7 @@ export function PlayableStage({
 
         <div className="kc-stage-actors">
           <button type="button" aria-label={clickLesson?'点击蝴蝶触发积木程序':mainLabel}
-            disabled={executionState!=='armed'} onClick={()=>void clickCharacter()}
+            disabled={executionState!=='armed'} onClick={()=>{ if (isExternal) { onExternalCharacterClick?.(); return } void clickCharacter() }}
             className="kc-stage-actor kc-stage-actor-main"
             style={{ '--kc-walk': stageWalkProgress(characterPosition) } as CSSProperties}
             data-steps={characterPosition}
@@ -374,7 +411,7 @@ export function PlayableStage({
             </div>
           ) : null}
           {practiceGuessNeeded ? (
-            <p data-testid="practice-need-guess" className="mt-2 text-sm font-semibold">👆 先选一个你的猜测，运行按钮就会亮起来。</p>
+            <p data-testid="practice-need-guess" className="mt-2 text-sm font-semibold">{isExternal ? '👆 先选一个你的猜测，再按运行，看看猜得对不对。' : '👆 先选一个你的猜测，运行按钮就会亮起来。'}</p>
           ) : null}
           {practiceDone ? <p data-testid="practice-done" className="mt-2 font-bold text-emerald-800">✅ {practice.done}</p> : null}
         </div>

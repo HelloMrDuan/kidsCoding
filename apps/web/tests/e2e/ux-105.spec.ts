@@ -72,6 +72,9 @@ for (const [name, width, height] of [
   test(`UX-105 keyboard focus-visible + Enter opens lesson node on ${name}`, async ({
     browser,
   }) => {
+    // OPS-056: Enter now opens the V3 studio (up to 30s on a cold server);
+    // keep the whole case inside one budget instead of the 30s default.
+    test.setTimeout(90_000)
     const context = await browser.newContext({
       baseURL: 'http://127.0.0.1:3100',
       viewport: { width, height },
@@ -99,7 +102,9 @@ for (const [name, width, height] of [
     expect(outline.offset).toBe('2px')
 
     await page.keyboard.press('Enter')
-    await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // OPS-056: Enter on the node opens the shared V3 launch studio.
+    await page.waitForURL('**/studio/blockly/launch/lesson-03-forest-story')
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
 
     await page.unrouteAll({ behavior: 'ignoreErrors' })
     await context.close()
@@ -155,7 +160,9 @@ test('UX-105 tablet touch switches unit and opens a lesson', async ({
     map.getByRole('heading', { name: '第二单元 · 小动物去旅行' }),
   ).toBeVisible()
   await map.getByTestId('lesson-card-lesson-04-meadow-scene').tap()
-  await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+  // OPS-056: the tapped node opens the shared V3 launch studio.
+  await page.waitForURL('**/studio/blockly/launch/lesson-04-meadow-scene')
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
 
   await page.unrouteAll({ behavior: 'ignoreErrors' })
   await context.close()

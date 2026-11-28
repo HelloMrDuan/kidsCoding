@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { expectStageWalk, solveMistakeStep, solvePracticeStep } from './lesson-pane-helpers'
+import { clickLessonControl, expectStageWalk, solveMistakeStep, solvePracticeStep } from './lesson-pane-helpers'
 
 /**
  * TQ-012: the playable unit project on the completion page of lessons 01–09.
@@ -280,22 +280,27 @@ test('L03 finished in the lesson opens its unit project with the program the chi
   // The lesson flow helpers drive the desktop classroom (like blockly-forest-sequence, desktop-only in CI).
   test.skip(testInfo.project.name === 'mobile', 'lesson flow is covered on desktop')
   test.setTimeout(180_000)
+  // OPS-056: the old /learn/lesson/<id> entry 308-redirects to the V3 launch studio, whose
+  // controls are reached through clickLessonControl (tools drawer, run toggle, task-pane
+  // 完成这一关). V3 keeps a program per 关, so 第 2 关 opens on its own canvas and the
+  // 第 1 关 blocks are laid again before say_line (same program as the old carry-over).
   await page.goto(`/learn/lesson/${L03}`)
-  await expect(page.getByTestId('lesson-playable-stage')).toBeVisible()
-  await page.getByTestId('lesson-add-when_start').click()
-  await page.getByTestId('lesson-add-move_right').click()
-  await page.getByTestId('lesson-add-move_right').click()
+  await page.waitForURL(`**/studio/blockly/launch/${L03}`)
+  await expect(page.getByTestId('launch-v3-slot')).toBeAttached({ timeout: 30_000 })
   for (let step = 0; step < 4; step++) {
-    if (step === 1) await page.getByTestId('lesson-add-say_line').click()
+    if (step === 0 || step === 1) {
+      for (const type of ['when_start', 'move_right', 'move_right']) await clickLessonControl(page, `lesson-add-${type}`)
+      if (step === 1) await clickLessonControl(page, 'lesson-add-say_line')
+    }
     if (step === 2) {
       await solvePracticeStep(page, { goalType: 'compare-orders', clear: true, build: ['when_start', 'move_right', 'say_line', 'move_right'], answer: 'say-place' })
     } else if (step === 3) {
       await solveMistakeStep(page, { expectCode: 'say-too-early', answer: 'said-first', fix: ['when_start', 'move_right', 'move_right', 'say_line'] })
     } else {
-      await page.getByTestId('run-code-button').click()
+      await clickLessonControl(page, 'run-code-button')
       await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 20_000 })
     }
-    await page.getByTestId('lesson-complete-step').click()
+    await clickLessonControl(page, 'lesson-complete-step')
   }
   await page.waitForURL(`**/project/${L03}/complete`)
   const project = page.getByTestId('unit-project')

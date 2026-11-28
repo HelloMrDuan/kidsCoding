@@ -119,9 +119,13 @@ for (const [name, width, height] of [
       await firstAvailable.getAttribute('data-testid'),
     )
     const href = await firstAvailable.getAttribute('href')
+    expect(href).toMatch(/^\/learn\/lesson\/lesson-\d{2}-/)
+    const lessonId = href!.replace('/learn/lesson/', '')
     await page.keyboard.press('Enter')
-    await page.waitForURL(`**${href}`)
-    expect(page.url()).toContain('/learn/lesson/')
+    // OPS-056: the fixture card keeps the old /learn/lesson/<id> href; for
+    // lessons 02–12 that entry 308s to the shared V3 launch studio.
+    await page.waitForURL(`**/studio/blockly/launch/${lessonId}`)
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
 
     await context.close()
   })

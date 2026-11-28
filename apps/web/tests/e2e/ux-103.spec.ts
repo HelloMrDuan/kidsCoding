@@ -163,9 +163,10 @@ for (const [name, width, height] of [
     // The highlight is paint-only (border + box-shadow ring): the node
     // stays a real link, and the ring must not shrink its hit area.
     expect(await current.evaluate((el) => el.tagName)).toBe('A')
+    // OPS-056: lessons 02–12 link to the shared V3 launch studio.
     await expect(current).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-03-forest-story',
+      '/studio/blockly/launch/lesson-03-forest-story',
     )
     const nodeStyle = await current
       .locator('.kc-step-node')
@@ -194,7 +195,10 @@ for (const [name, width, height] of [
     } else {
       await current.click()
     }
-    await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // OPS-056: the node opens the shared V3 launch studio for this lesson.
+    await page.waitForURL('**/studio/blockly/launch/lesson-03-forest-story')
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByTestId('launch-v3-slot')).toHaveAttribute('data-lesson-id', 'lesson-03-forest-story', { timeout: 30_000 })
 
     await page.unrouteAll({ behavior: 'ignoreErrors' })
     await context.close()

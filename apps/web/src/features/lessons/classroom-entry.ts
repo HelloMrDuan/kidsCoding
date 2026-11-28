@@ -22,9 +22,9 @@ import { scopedLessonDraftKey } from './scoped-draft-key'
  *
  * The classroom entry must never be a second, parallel classroom: it reuses the
  * exact route the course system uses for the same lesson.
- * - launch lessons keep their original classroom URL, id and draft archive,
- *   except lesson-01 which has exactly one official entry: its V3 studio
- *   workspace (`launchLessonHref`);
+ * - launch lessons keep their id and draft archive and resolve through
+ *   `launchLessonHref`: lesson-01 → its V3 studio workspace, lesson-02…12 →
+ *   the shared V3 launch studio `/studio/blockly/launch/<id>` (OPS-056);
  * - catalog lessons use the same `trialRoute` the catalog card links to;
  * - no learning record → the course picker (课程体系), never the demo lesson.
  *
@@ -159,8 +159,8 @@ export function readLearningRecord(owner?: string | null): LearningRecord | null
 
 /**
  * One resolver for every classroom entry. Launch lessons resolve through
- * `launchLessonHref` (lesson-01 → its V3 workspace; lesson-02…12 keep the
- * original classroom URL); catalog lessons return the catalog's `trialRoute`
+ * `launchLessonHref` (lesson-01 → its V3 workspace; lesson-02…12 → the shared
+ * V3 launch studio `/studio/blockly/launch/<id>`); catalog lessons return the catalog's `trialRoute`
  * (the same page and engine the 课程体系 card opens), or the course detail
  * page when no trial runner exists. Unknown ids fail closed to the picker.
  */

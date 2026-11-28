@@ -29,7 +29,7 @@ describe('MapView', () => {
     expect(first).toHaveAttribute('href', '/studio/blockly/lesson-01-forest-hello')
     const current = within(steps).getByTestId('lesson-card-lesson-03-forest-story')
     expect(current).toHaveTextContent('当前练习')
-    expect(current).toHaveAttribute('href', '/learn/lesson/lesson-03-forest-story')
+    expect(current).toHaveAttribute('href', '/studio/blockly/launch/lesson-03-forest-story')
   })
 
   it('shows all 12 real lessons across the four units, none repeated, none invented', () => {
@@ -67,12 +67,12 @@ describe('MapView', () => {
     const steps = screen.getByTestId('adventure-map-steps')
     const next = within(steps).getByTestId('lesson-card-lesson-04-meadow-scene')
     expect(next).toHaveTextContent('可以开始')
-    expect(next).toHaveAttribute('href', '/learn/lesson/lesson-04-meadow-scene')
+    expect(next).toHaveAttribute('href', '/studio/blockly/launch/lesson-04-meadow-scene')
     expect(within(steps).queryByText('已锁定')).not.toBeInTheDocument()
     expect(within(steps).queryByText('未开放')).not.toBeInTheDocument()
     expect(screen.getByTestId('adventure-map-next-lesson')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-04-meadow-scene',
+      '/studio/blockly/launch/lesson-04-meadow-scene',
     )
   })
 
@@ -171,7 +171,7 @@ describe('MapView', () => {
     expect(within(steps).getAllByText('已完成')).toHaveLength(3)
     expect(screen.getByTestId('adventure-map-next-lesson')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-10-second-friend',
+      '/studio/blockly/launch/lesson-10-second-friend',
     )
   })
 
@@ -209,11 +209,11 @@ describe('MapView', () => {
     // Trial lessons in the same unit stay playable: no order-based locking.
     const next = within(steps).getByTestId('lesson-card-lesson-05-meadow-order')
     expect(next).toHaveTextContent('可以开始')
-    expect(next).toHaveAttribute('href', '/learn/lesson/lesson-05-meadow-order')
+    expect(next).toHaveAttribute('href', '/studio/blockly/launch/lesson-05-meadow-order')
     // The unit bottom action skips the locked lesson for a playable one.
     expect(screen.getByTestId('adventure-map-next-lesson')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-05-meadow-order',
+      '/studio/blockly/launch/lesson-05-meadow-order',
     )
   })
 
@@ -237,7 +237,7 @@ describe('MapView', () => {
     )
     const unlocked = screen.getByTestId('lesson-card-lesson-04-meadow-scene')
     expect(unlocked).toHaveTextContent('可以开始')
-    expect(unlocked).toHaveAttribute('href', '/learn/lesson/lesson-04-meadow-scene')
+    expect(unlocked).toHaveAttribute('href', '/studio/blockly/launch/lesson-04-meadow-scene')
   })
 
   it('locks a completed lesson whose access is gone, instead of promising re-study', () => {

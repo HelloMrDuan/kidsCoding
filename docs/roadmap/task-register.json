@@ -4382,5 +4382,33 @@
       },
       "notes": "2026-11-26 开工：分支 codex/ops-055-g0-u3-l06-sound 自 OPS-054 HEAD 245c3f9b 创建；L06 不计入 OPS-054 已完成课程。 2026-11-26：提交 e5665cdd 推送，创建 stacked Draft PR #580（base codex/ops-054-g0-u3-v3，依赖 #579），状态改为 in_review。 2026-11-26：自由试玩逐拍补声音（方案②，OPS-055 内完成），补三场景验收截图，回归与 L06 E2E 在新构建上复跑通过；保持 Draft，不合并、不部署。 2026-11-28：#580 合并 a58b15b8，main CI 全绿，a58b15b8 已部署并通过真实浏览器核验；关账 PR 改台账为 completed（不重新部署生产）。"
     }
-  ]
+  ,
+{
+      "id": "OPS-056",
+      "title": "Blockly 全课程 V3 统一第四批：启蒙课 lesson-02～lesson-12 十一节迁移 V3 工作台",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-055"
+      ],
+      "scope": "按项目负责人 2026-11-26 指示开始第四批：12 节 Blockly 启蒙课中 lesson-02～lesson-12 共十一节从旧三栏课堂 /learn/lesson/[lessonId] 迁移到统一 V3 工作台。分支 codex/ops-056-g0-launch-v3 自 OPS-055 HEAD e25c6ba4 创建，stacked Draft PR 依赖 #580/#579，不等第三批合并与部署。复用 OPS-041（lesson-01-forest-hello）已验证的组装方式与前三批同一套 StudioShell + LessonWorkspace + docked Blockly：单角色课（L02～L09）运行与判定复用 simulateProgram / evaluateObservable / getStepJudgeOptions / isDesignedMistakeRun / explainRunFailure，舞台复用 PlayableStage external 模式；双角色课（L10～L12）复用 judgeDuoProgram（independent / dialogue / graduation）与 DuoStage。保留旧课已有内容、四/五关结构、预测练习、设计错误实验、三级提示、对白选择、作品与奖励卡、进度与草稿语义（owner 隔离、旧草稿只读导入）。路由只改 launch-lesson-routes.ts 单一出口，旧入口 308 到 V3。与 OPS-047（#554，muse-c，lesson-02）范围重叠：不改其分支与台账条目，吸收其已验证的判定规则（说话位置、所选对白、say-too-early、导航失败横幅），最终取舍由主 Muse 裁定。不重新设计 UI，不建 V4，不复制工作台，不新建引擎，不改 lesson-01，不改部署 workflow，不改其他 Agent 分支，不自行合并、不部署。",
+      "acceptance": [
+        "lesson-02～lesson-12 十一节均在 V3 工作台真实可玩；launchLessonHref 统一指向 V3，旧 /learn/lesson/<id> 308 到 V3；lesson-01 与前三批行为不变",
+        "判定只走真实执行器：单角色课 evaluateObservable，双角色课 judgeDuoProgram；错误程序、顺序错误、漏切换、少走一次均不通过；不以静态动画或改字段冒充",
+        "每节课保留原有关卡数、预测练习、设计错误实验（必须先观察错误才能修复）、三级提示与对白选择",
+        "草稿保护：保存、刷新恢复、跨账号隔离、旧草稿只读导入不改旧键；完成后进度、奖励卡与作品重开语义与旧课堂一致",
+        "真实 Chrome 1440×900、768×1024、375×812 三断点无横向溢出",
+        "单元测试、真实 Playwright E2E、ESLint、tsc（与已知基线一致）、生产构建与 PR CI 均有真实结果；排队/未跑/失败不得记为通过",
+        "保持 Draft，不自行合并、不部署；等待独立审核与用户验收"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/584（stacked Draft，base codex/ops-055-g0-u3-l06-sound，head 7c2088a6）",
+        "prCI": "PR 创建后尚未核对，不记为通过",
+        "localTests": "本地真实运行，构建 GfPa5SUOQ9pOulHUvoUIX（Node 20）：E2E ux 全量 204 条 179 passed/22 skipped/3 failed（3 条复跑 12 次全过）；课程 25 规格 358 条 346 passed/10 skipped/2 failed（2 条复跑 12 次全过）；舞台 8 规格 150 条 144 passed/6 skipped/0 failed；三断点气泡与标签无重叠测量 18/18 passed；Vitest（Node 22）2834 条 3 failed/2829 passed/2 expected fail，失败项与基线 e25c6ba4 一致；tsc 81 错误与基线持平且不在 OPS-056 文件；ESLint 排除 gitignore 的 public 生成产物后 0 errors、13 warnings 与基线一致",
+        "gaps": "与 OPS-047（#554，muse-c，lesson-02）范围重叠，待主 Muse 裁定；ux-102/ux-201/ux-202 三处 V3 缺口保留 test.fail；教学与布局差异清单见 PR #584 正文，待裁定"
+      },
+      "notes": "2026-11-26 开工：分支 codex/ops-056-g0-launch-v3 自 OPS-055 HEAD e25c6ba4 创建；第三批剩余事项（3110 源码与构建一致性、#579/#580 正文统一更新、CI 分片、L06 人工耳听）不阻塞本任务。"
+    }
+    ]
 }

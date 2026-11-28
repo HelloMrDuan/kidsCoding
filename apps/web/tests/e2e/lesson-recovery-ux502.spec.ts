@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { clickLessonControl, expectStageWalk, showLessonPane, solveMistakeStep, solvePracticeStep, openForestV3, completeForestStep } from './lesson-pane-helpers'
 
 /** UX-502: remedial learning and reward collection stay consistent —
@@ -26,23 +26,52 @@ test('advancing then reloading resumes the new step, not step 1', async ({ page 
   await expect(canvas).toContainText('向右走 100 步')
 })
 
-test('remedial return restores the failed lesson step and program', async ({ page }) => {
-  test.setTimeout(120_000)
+/**
+ * OPS-056: lesson-05 runs in the V3 launch studio (/studio/blockly/launch/<id>; the old
+ * /learn/lesson/<id> entry 308-redirects there). Mapping (same strength):
+ * - lesson-task-card 第 N 关 -> launch-v3-step-progress 第 N / M 关;
+ * - the return lands on the V3 studio (the remedial page links via launchLessonHref);
+ * - "three real failures" is asserted on the real owner-scoped draft's script.failures.
+ * 复审 HOLD P1 (restored): V3 counts every real failed run again and shows the tier-3 hint
+ * with a lesson-remedial-link (asserted in the second spec). The return leg below enters the
+ * remedial page through the exact URL that link pushes (from + step).
+ */
+const LAUNCH_DRAFT_KEY = 'kids-lesson-owner-v1:guest:kidscoding-draft:lesson-05-meadow-order'
+
+async function failLesson5ThreeTimes(page: Page) {
   // Lesson 5 step 1 (not lesson 1 step 1, whose palette is when_start only):
   // move_right + switch_scene without when_start is a real wrong program.
   await page.goto('/learn/lesson/lesson-05-meadow-order')
+  await page.waitForURL('**/studio/blockly/launch/lesson-05-meadow-order')
   await clickLessonControl(page, 'lesson-add-move_right')
   await clickLessonControl(page, 'lesson-add-switch_scene')
   for (let i = 0; i < 3; i++) {
     await clickLessonControl(page, 'run-code-button')
     await expect(page.getByTestId('stage-run-reason')).toBeVisible({ timeout: 12_000 })
+    await expect(page.getByTestId('ws-run-toggle')).not.toHaveText(/停止/, { timeout: 15_000 })
   }
-  await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier', '3', { timeout: 12_000 })
-  await clickLessonControl(page, 'lesson-remedial-link')
-  await page.waitForURL('**/learn/remedial/**')
+}
+
+function draftFailures(page: Page) {
+  return page.evaluate((key) => {
+    const raw = window.localStorage.getItem(key)
+    if (!raw) return null
+    try { return (JSON.parse(raw) as { script?: { failures?: number } }).script?.failures ?? null } catch { return null }
+  }, LAUNCH_DRAFT_KEY)
+}
+
+test('remedial return restores the failed lesson step and program', async ({ page }) => {
+  test.setTimeout(120_000)
+  await failLesson5ThreeTimes(page)
+  // Real failed runs are recorded in the real draft (autosaved before leaving).
+  // Same as the old classroom: every real failed run counts, so three runs record 3 (tier 3).
+  await expect.poll(() => draftFailures(page), { timeout: 15_000 }).toBe(3)
+  // Same remedial URL the old classroom's tier-3 link pushed (from + step).
+  await page.goto('/learn/remedial/remedial-scene-switch?from=lesson-05-meadow-order&step=step-1')
   await page.getByRole('link', { name: '回到刚才的课程' }).click()
-  await page.waitForURL('**/learn/lesson/lesson-05-meadow-order')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 1 关')
+  await page.waitForURL('**/studio/blockly/launch/lesson-05-meadow-order')
+  await showLessonPane(page, 'task')
+  await expect(page.getByTestId('launch-v3-step-progress')).toContainText(/第 1 \/ \d+ 关/)
   const canvas = page.getByTestId('lesson-blockly-workspace').locator('svg.blocklySvg .blocklyBlockCanvas')
   await expect(canvas).toContainText('向右走 100 步')
   // Appending when_start last leaves it disconnected ("掉队"), so the real
@@ -60,7 +89,19 @@ test('remedial return restores the failed lesson step and program', async ({ pag
   await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 15_000 })
   await expect(page.getByTestId('stage-current-scene')).toContainText('草地')
   await clickLessonControl(page, 'lesson-complete-step')
-  await expect(page.getByTestId('lesson-task-card')).toContainText('第 2 关')
+  await showLessonPane(page, 'task')
+  await expect(page.getByTestId('launch-v3-step-progress')).toContainText(/第 2 \/ \d+ 关/)
+})
+
+test('OPS-056: V3 offers the tier-3 hint and remedial link after three failures (restored)', async ({ page }) => {
+  test.setTimeout(90_000)
+  await failLesson5ThreeTimes(page)
+  await showLessonPane(page, 'task')
+  await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier', '3', { timeout: 12_000 })
+  await expect(page.getByTestId('lesson-remedial-link')).toHaveAttribute('data-remedial-id', 'remedial-scene-switch')
+  await page.getByTestId('lesson-remedial-link').click()
+  await page.waitForURL('**/learn/remedial/**')
+  expect(new URL(page.url()).searchParams.get('from')).toBe('lesson-05-meadow-order')
 })
 
 test('click farming awards nothing; one completion fills the cards shelf exactly once', async ({ page }) => {

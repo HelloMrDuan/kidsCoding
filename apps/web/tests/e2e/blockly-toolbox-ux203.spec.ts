@@ -63,13 +63,42 @@ async function workspaceScale(page: Page) {
 }
 
 test('toolbox shows 开始 / 移动 / 说话 categories and the category flyout lists its blocks', async ({ page }) => {
-  await expect(page.locator('.blocklyToolboxCategoryLabel')).toHaveText(['开始', '移动', '说话'])
-  await page.locator('.blocklyToolboxCategory', { hasText: '移动' }).click()
+  // OPS-056: lesson-02 now opens the shared V3 launch studio, whose docked
+  // Blockly replaces Blockly's own toolbox with the studio's 积木分类 rail
+  // (same rail grid-lab asserts). Same three categories, same flyout check.
+  const categories = page.getByTestId('v3-categories')
+  await expect(categories.getByRole('button')).toHaveText(['开始', '移动', '说话'])
+  await categories.getByRole('button', { name: '移动' }).click()
   // The trashcan has its own .blocklyFlyout; scope to the category flyout.
   await expect(page.locator('.blocklyFlyout:not(.blocklyTrashcanFlyout)')).toContainText('向右走 100 步')
 })
 
 test('zoom controls and trashcan are present and zoom-in changes the workspace scale', async ({ page }) => {
+  if (test.info().project.name === 'mobile') {
+    // OPS-056: lesson-02 now opens the V3 launch studio. At phone width the approved V3
+    // layout (6b474494) hides Blockly's own zoom widget and offers its 44px touch zoom bar
+    // (脚本缩放) instead. Same strength: the bar's three buttons are on screen and each
+    // really changes the workspace scale; Blockly's widget is asserted hidden, not skipped.
+    const bar = page.getByRole('group', { name: '脚本缩放' })
+    await expect(page.locator('.blocklyZoomIn')).toBeHidden()
+    await expect(bar.getByRole('button', { name: '放大脚本' })).toBeVisible()
+    await expect(bar.getByRole('button', { name: '缩小脚本' })).toBeVisible()
+    await expect(bar.getByRole('button', { name: '重置脚本缩放' })).toBeVisible()
+    await expect(page.locator('.blocklyTrash')).toBeVisible()
+    const start = await workspaceScale(page)
+    expect(start).toBeGreaterThan(0)
+    await bar.getByRole('button', { name: '放大脚本' }).click()
+    await expect.poll(() => workspaceScale(page)).toBeGreaterThan(start)
+    const zoomed = await workspaceScale(page)
+    await bar.getByRole('button', { name: '缩小脚本' }).click()
+    await expect.poll(() => workspaceScale(page)).toBeLessThan(zoomed)
+    await bar.getByRole('button', { name: '放大脚本' }).click()
+    await bar.getByRole('button', { name: '放大脚本' }).click()
+    await expect.poll(() => workspaceScale(page)).toBeGreaterThan(start)
+    await bar.getByRole('button', { name: '重置脚本缩放' }).click()
+    await expect.poll(() => workspaceScale(page)).toBeCloseTo(start, 2)
+    return
+  }
   await expect(page.locator('.blocklyZoomIn')).toBeVisible()
   await expect(page.locator('.blocklyZoomOut')).toBeVisible()
   await expect(page.locator('.blocklyZoomReset')).toBeVisible()

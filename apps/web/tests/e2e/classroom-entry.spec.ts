@@ -5,12 +5,18 @@ import { expect, test, type BrowserContext, type Page } from '@playwright/test'
  * owner isolation for the home/learning-map continue entries (review C).
  *
  * lesson-01 has exactly one official entry: the V3 studio workspace. The
- * historical URL stays bookmarkable via a compat redirect; lesson-02…12 keep
- * their original three-column classroom unchanged.
+ * historical URL stays bookmarkable via a compat redirect.
+ *
+ * OPS-056: lesson-02…12 now also have one official entry each, the shared V3
+ * launch studio `/studio/blockly/launch/<id>` (launchLessonHref); their old
+ * `/learn/lesson/<id>` URLs 308 there. So every continue href that used to be
+ * `/learn/lesson/lesson-02-forest-greeting` is asserted as LAUNCH_02 (same
+ * lesson, same owner isolation, only the route changed).
  */
 
 const V3 = '/studio/blockly/lesson-01-forest-hello'
 const OLD = '/learn/lesson/lesson-01-forest-hello'
+const LAUNCH_02 = '/studio/blockly/launch/lesson-02-forest-greeting'
 
 const seedProgress = (page: Page, progress: Record<string, unknown>) =>
   page.addInitScript((value) => {
@@ -79,11 +85,22 @@ test('OPS-052: 课程体系 course card → 试玩 entry still opens the catalog
   await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
 })
 
-test('lesson-02 keeps the original three-column classroom (no lesson-01 spill-over)', async ({ page }) => {
+/**
+ * OPS-056: lesson-02…12 moved to the shared V3 launch studio. The old URL
+ * 308-redirects to `/studio/blockly/launch/<id>`; the page must be the launch
+ * slot (not lesson-01's forest slot, not the old three-zone classroom), and a
+ * reload must stay there with no redirect cycle.
+ */
+test('old lesson-02 URL compat-redirects to the V3 launch studio (no lesson-01 spill-over, no loop)', async ({ page }) => {
   await page.goto('/learn/lesson/lesson-02-forest-greeting')
-  await expect(page).toHaveURL(/\/learn\/lesson\/lesson-02-forest-greeting$/)
-  await expect(page.getByTestId('lesson-three-zone-grid')).toBeVisible()
-  await expect(page.getByTestId('studio-shell')).toHaveCount(0)
+  for (let pass = 0; pass < 2; pass++) {
+    if (pass === 1) await page.reload()
+    await expect(page).toHaveURL(new RegExp(`${LAUNCH_02}$`))
+    await expect(page.getByTestId('studio-shell')).toBeVisible()
+    await expect(page.getByTestId('launch-v3-slot')).toHaveAttribute('data-lesson-id', 'lesson-02-forest-greeting', { timeout: 30_000 })
+    await expect(page.getByTestId('forest-hello-slot')).toHaveCount(0)
+    await expect(page.getByTestId('lesson-three-zone-grid')).toHaveCount(0)
+  }
 })
 
 test('old lesson-01 URL compat-redirects to the V3 workspace, with no loop', async ({ page }) => {
@@ -152,7 +169,7 @@ test('home and learning map keep guest A → B → A progress isolated', async (
   await page.reload()
   await expect(page.getByTestId('home-continue')).toHaveAttribute(
     'href',
-    '/learn/lesson/lesson-02-forest-greeting',
+    LAUNCH_02,
   )
   await expect(page.getByTestId('home-next-lesson')).toContainText('小狐狸打招呼')
 
@@ -170,13 +187,13 @@ test('home and learning map keep guest A → B → A progress isolated', async (
   await page.goto('/')
   await expect(page.getByTestId('home-continue')).toHaveAttribute(
     'href',
-    '/learn/lesson/lesson-02-forest-greeting',
+    LAUNCH_02,
   )
   await expect(page.getByTestId('home-next-lesson')).toContainText('小狐狸打招呼')
   await page.goto('/learn/map')
   await expect(page.getByTestId('learning-map-primary-cta')).toHaveAttribute(
     'href',
-    '/learn/lesson/lesson-02-forest-greeting',
+    LAUNCH_02,
   )
 })
 
@@ -225,7 +242,7 @@ test('same-page A → B re-check is fail-closed while the owner API is delayed',
   await page.goto('/')
   await expect(page.getByTestId('home-continue')).toHaveAttribute(
     'href',
-    '/learn/lesson/lesson-02-forest-greeting',
+    LAUNCH_02,
   )
 
   // A → B: while the identity API is held open, nothing of A may be shown.
@@ -249,6 +266,6 @@ test('same-page A → B re-check is fail-closed while the owner API is delayed',
   releaseA()
   await expect(page.getByTestId('home-continue')).toHaveAttribute(
     'href',
-    '/learn/lesson/lesson-02-forest-greeting',
+    LAUNCH_02,
   )
 })

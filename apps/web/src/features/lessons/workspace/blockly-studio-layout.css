@@ -482,6 +482,21 @@
   box-shadow: inset 0 0 0 1px #ffffff66;
 }
 .kc-v3-stage-column .kc-stage-actor-art { width: clamp(58px, 6.4vw, 86px); height: auto; }
+/* OPS-056 (approved minimal fix): the stage lays out by its own width, not
+   the window's. The desktop stage column is only ~300px wide, where the
+   badge + three scene chips stacked into three rows behind the speech
+   bubbles. Below 420px of stage the topline uses the same compaction the
+   phone already has (no badge, no "当前实际" prefix, actors on the floor)
+   and the chips stay on one row, so every bubble sits under them. */
+.kc-v3-stage-column .kc-stage-scene { container: kc-stage / inline-size; }
+@container kc-stage (max-width: 420px) {
+  .kc-stage-topline { padding: 6px; }
+  .kc-stage-badge, .kc-stage-scene-prefix { display: none; }
+  .kc-stage-actors { bottom: 8px; }
+}
+/* The friend stands at the right edge: its bubble grows leftwards from the
+   friend's right edge instead of past the stage edge, where it was cut off. */
+.kc-v3-stage-column .kc-stage-actor-friend .kc-stage-speech { left: auto; right: 0; transform: none; }
 .kc-v3-stage-column .kc-stage-panel { padding: 0; }
 .kc-v3-stage-column .ws-runbar,
 .kc-v3-stage-column .kc-v3-stage-actions {
