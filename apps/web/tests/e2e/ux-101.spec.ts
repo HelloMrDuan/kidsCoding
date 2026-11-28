@@ -72,7 +72,7 @@ for (const [name, width, height] of [
     await expect(steps.getByTestId('lesson-card-lesson-03-forest-story')).toContainText('当前练习')
     await expect(map.getByTestId('adventure-map-next-lesson')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-03-forest-story',
+      '/studio/blockly/launch/lesson-03-forest-story',
     )
 
     // No locked / unreleased nodes from real data (locking is UX-102).
@@ -105,21 +105,22 @@ for (const [name, width, height] of [
         seenHrefs.add((await card.getAttribute('href')) ?? '')
       }
     }
-    // P0-1: lesson-01's only official workspace is the V3 studio, so its map
-    // card is the one node that no longer uses the old /learn/lesson URL;
-    // lessons 02–12 keep it. Every lesson still appears exactly once.
+    // P0-1: lesson-01's only official workspace is the V3 studio. OPS-056:
+    // lessons 02–12 moved to the shared V3 launch studio
+    // (/studio/blockly/launch/<id>, launchLessonHref); their old
+    // /learn/lesson/<id> URLs 308 there. Every lesson still appears exactly once.
     expect([...seenHrefs].sort()).toEqual(
       ALL_LESSONS.map((id) =>
         id === 'lesson-01-forest-hello'
           ? '/studio/blockly/lesson-01-forest-hello'
-          : `/learn/lesson/${id}`,
+          : `/studio/blockly/launch/${id}`,
       ).sort(),
     )
 
     // Bottom action follows the selected unit's next lesson.
     await expect(map.getByTestId('adventure-map-next-lesson')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-10-second-friend',
+      '/studio/blockly/launch/lesson-10-second-friend',
     )
 
     // Cover (UX-106): kid cartoon world with real illustrated characters, not a placeholder.
@@ -187,7 +188,7 @@ for (const [name, width, height] of [
     await expect(doneSteps.getByTestId('lesson-card-lesson-12-graduation-show')).toContainText('✓')
     await expect(doneMap.getByTestId('adventure-map-next-lesson')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-10-second-friend',
+      '/studio/blockly/launch/lesson-10-second-friend',
     )
     if (name === 'desktop') {
       await donePage.screenshot({ path: testInfo.outputPath('ux-101-real-all-complete-desktop.png'), fullPage: true })

@@ -9,7 +9,7 @@ describe('resolveProjectContinueAction', () => {
     expect(
       resolveProjectContinueAction(launchLessons, 'lesson-01-forest-hello'),
     ).toEqual({
-      href: '/learn/lesson/lesson-02-forest-greeting',
+      href: '/studio/blockly/launch/lesson-02-forest-greeting',
       label: '继续下一课',
     })
   })
@@ -18,7 +18,7 @@ describe('resolveProjectContinueAction', () => {
     expect(
       resolveProjectContinueAction(launchLessons, 'lesson-03-forest-story'),
     ).toEqual({
-      href: '/learn/lesson/lesson-04-meadow-scene',
+      href: '/studio/blockly/launch/lesson-04-meadow-scene',
       label: '进入下一单元',
     })
   })

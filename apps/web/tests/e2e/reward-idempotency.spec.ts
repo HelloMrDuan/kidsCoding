@@ -90,12 +90,18 @@ test.describe('reward idempotency', () => {
       ],
     })
 
+    // OPS-056: the old address leads to lesson-02's only official workspace, V3.
     await page.goto('/learn/lesson/lesson-02-forest-greeting')
+    await page.waitForURL('**/studio/blockly/launch/lesson-02-forest-greeting')
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
 
-    // lesson-02 step 1 requires when_start + move_right.
-    await clickLessonControl(page, 'lesson-add-when_start')
-    await clickLessonControl(page, 'lesson-add-move_right')
+    // V3 keeps a program per 关 (same as lesson-01 above), so 第 1 关 and
+    // 第 2 关 each build their own when_start + move_right (+ say_line).
     for(let step=0;step<4;step++){
+      if(step<2){
+        await clickLessonControl(page, 'lesson-add-when_start')
+        await clickLessonControl(page, 'lesson-add-move_right')
+      }
       if(step===1)await clickLessonControl(page, 'lesson-add-say_line')
       // TQ-011: 第 3 关 is the second practice (greet without walking).
       if(step===2)await solvePracticeStep(page,{goalType:'change-distance',guess:'stay',clear:true,build:['when_start','say_line']})

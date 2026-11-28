@@ -71,6 +71,9 @@ for (const [name, width, height] of [
   test(`UX-102 real data: no fake locking, completed lesson re-studies on ${name}`, async ({
     browser,
   }, testInfo) => {
+    // Map -> V3 studio -> map in one case: on a cold server the 30s default
+    // ends the test mid page.goto. Explicit budget only; no assertion relaxed.
+    test.setTimeout(90_000)
     const context = await browser.newContext({
       baseURL: 'http://127.0.0.1:3100',
       viewport: { width, height },
@@ -91,13 +94,13 @@ for (const [name, width, height] of [
     // Page CTA points at the first incomplete playable lesson.
     await expect(page.getByTestId('learning-map-primary-cta')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-03-forest-story',
+      '/studio/blockly/launch/lesson-03-forest-story',
     )
 
     // Completed lesson re-study: the node links to the lesson page,
     // and the lesson page renders the playable workspace (not the
     // lock screen). lesson-01's only official workspace is the V3 studio
-    // (P0-1); lessons 02–12 keep the three-column workbench shell.
+    // (P0-1); OPS-056: lessons 02–12 open the shared V3 launch studio.
     await map
       .getByTestId('lesson-card-lesson-01-forest-hello')
       .click()
@@ -152,17 +155,17 @@ for (const [name, width, height] of [
     await expect(sibling).toContainText('可以开始')
     await expect(sibling).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-05-meadow-order',
+      '/studio/blockly/launch/lesson-05-meadow-order',
     )
 
     // Unit bottom action and page CTA both skip the locked lesson.
     await expect(map.getByTestId('adventure-map-next-lesson')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-05-meadow-order',
+      '/studio/blockly/launch/lesson-05-meadow-order',
     )
     await expect(page.getByTestId('learning-map-primary-cta')).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-05-meadow-order',
+      '/studio/blockly/launch/lesson-05-meadow-order',
     )
 
     if (name === 'desktop') {
@@ -174,13 +177,18 @@ for (const [name, width, height] of [
 
     // Direct URL cannot bypass the map: the lesson page enforces the
     // same rule and renders the lock screen, never the workspace.
+    // OPS-056: the old URL 308s to the V3 launch studio, which reads the
+    // same /api/curriculum/launch phase + /api/course-access entitlement and
+    // renders its own lock screen (launch-v3-locked) instead of any editor.
+    // ux-102 裁定: the V3 lock screen restores the old upgrade copy, the
+    // 看看高阶升级内容 link and a back-to-map link (asserted in the spec below).
     await page.goto('/learn/lesson/lesson-04-meadow-scene')
-    await expect(
-      page.getByText('这节高阶内容会在启蒙毕业后开启'),
-    ).toBeVisible()
-    await expect(page.getByTestId('lesson-workbench-shell')).toHaveCount(0)
+    await page.waitForURL('**/studio/blockly/launch/lesson-04-meadow-scene')
+    await expect(page.getByTestId('launch-v3-locked')).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByTestId('studio-shell')).toHaveCount(0)
+    await expect(page.getByTestId('lesson-blockly-workspace')).toHaveCount(0)
+    await expect(page.getByTestId('launch-v3-complete-step')).toHaveCount(0)
     await expect(page.getByTestId('lesson-complete-step')).toHaveCount(0)
-    await expect(page.getByText('看看高阶升级内容')).toBeVisible()
     if (name === 'desktop') {
       await page.screenshot({
         path: testInfo.outputPath('ux-102-lock-screen-desktop.png'),
@@ -208,15 +216,50 @@ for (const [name, width, height] of [
     await expect(card).toContainText('当前练习')
     await expect(card).toHaveAttribute(
       'href',
-      '/learn/lesson/lesson-04-meadow-scene',
+      '/studio/blockly/launch/lesson-04-meadow-scene',
     )
 
     await card.click()
-    await expect(page.getByTestId('lesson-workbench-shell')).toBeVisible()
+    // OPS-056: lesson-04 opens in the V3 launch studio; entitled -> the real
+    // workspace renders, not the lock screen.
+    await page.waitForURL('**/studio/blockly/launch/lesson-04-meadow-scene')
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByTestId('launch-v3-slot')).toHaveAttribute('data-lesson-id', 'lesson-04-meadow-scene', { timeout: 30_000 })
+    await expect(page.getByTestId('launch-v3-locked')).toHaveCount(0)
     await page.unrouteAll({ behavior: 'ignoreErrors' })
     await context.close()
   })
 }
+
+test('UX-102 V3 lock screen keeps the upgrade copy, the upgrade link and a working back link', async ({
+  browser,
+}) => {
+  test.setTimeout(90_000)
+  const context = await browser.newContext({
+    baseURL: 'http://127.0.0.1:3100',
+    viewport: { width: 1440, height: 900 },
+  })
+  await context.addInitScript(seedProgress(LOCKED_FIRST_PROGRESS))
+  const page = await context.newPage()
+  await withCourseAccess(page, false)
+  await withLessonPhase(page, 'lesson-04-meadow-scene', 'course')
+  await page.goto('/learn/lesson/lesson-04-meadow-scene')
+  const locked = page.getByTestId('launch-v3-locked')
+  await expect(locked).toBeVisible({ timeout: 30_000 })
+  await expect(locked.getByText('这节高阶内容会在启蒙毕业后开启')).toBeVisible({ timeout: 5_000 })
+  const upgrade = page.getByTestId('launch-v3-locked-upgrade')
+  await expect(upgrade).toBeVisible()
+  await expect(upgrade).toHaveText('看看高阶升级内容')
+  await expect(upgrade).toHaveAttribute('href', '/parent/purchase')
+  const back = page.getByTestId('launch-v3-locked-back')
+  await expect(back).toBeVisible()
+  await expect(back).toHaveAttribute('href', '/learn/map')
+  // The back entry really navigates: the child lands on the map, not a dead end.
+  await Promise.all([page.waitForURL('**/learn/map', { timeout: 30_000 }), back.click()])
+  await expect(page.getByTestId('adventure-map')).toBeVisible({ timeout: 30_000 })
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+  await context.close()
+})
 
 test('UX-102 abnormal data fails closed and permission change re-derives', async ({
   browser,
@@ -265,7 +308,7 @@ test('UX-102 abnormal data fails closed and permission change re-derives', async
   await expect(locked).toContainText('当前练习')
   await expect(locked).toHaveAttribute(
     'href',
-    '/learn/lesson/lesson-04-meadow-scene',
+    '/studio/blockly/launch/lesson-04-meadow-scene',
   )
 
   // Refresh keeps the new permission state.

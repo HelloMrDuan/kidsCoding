@@ -88,6 +88,8 @@ on:
       - 'apps/web/tests/e2e/blockly-duo-dialogue.spec.ts'
       - 'apps/web/tests/e2e/blockly-duo-graduation.spec.ts'
       - 'apps/web/tests/e2e/grid-lab.spec.ts'
+      - 'apps/web/tests/e2e/launch-v3-forest-greeting.spec.ts'
+      - 'apps/web/tests/e2e/launch-v3-legacy-owner.spec.ts'
       - 'apps/web/tests/e2e/unit-project.spec.ts'
       - 'apps/web/src/app/project/**'
       - 'apps/web/src/features/projects/**'
@@ -1140,6 +1142,32 @@ jobs:
         if: always()
         with:
           name: duo-chrome-evidence-s6
+          path: apps/web/test-results/
+
+  launch-v3-equivalence:
+    timeout-minutes: 12
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Verify preinstalled real Chrome (avoid 9-minute apt install)
+        run: |
+          command -v google-chrome
+          google-chrome --version
+      - name: Run launch-v3 equivalence specs (forest-greeting G1-G8 + legacy owner safety)
+        run: npx playwright test tests/e2e/launch-v3-forest-greeting.spec.ts tests/e2e/launch-v3-legacy-owner.spec.ts --project=desktop --workers=2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: launch-v3-chrome-evidence
           path: apps/web/test-results/
 
   scratch-vm-local:

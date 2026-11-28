@@ -68,5 +68,7 @@ test('reset: every observed state returns to its pre-run value', async ({ page }
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '0')
   await expect(page.getByTestId('stage-current-scene')).toContainText('森林')
   await expect(page.getByTestId('stage-action-log')).toHaveCount(0)
-  await expect(page.getByTestId('run-code-button')).toContainText('▶ 运行')
+  // OPS-056: lesson-02 runs in the shared V3 launch studio, where the shell
+  // owns the run control (ws-run-toggle); after reset it is back to 运行.
+  await expect(page.getByTestId('ws-run-toggle')).toHaveText('运行')
 })

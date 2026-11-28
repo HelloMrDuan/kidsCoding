@@ -1,7 +1,20 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { showLessonPane } from './lesson-pane-helpers'
+import { isLaunchV3, resolveV3LessonControl, showLessonPane } from './lesson-pane-helpers'
 
+/**
+ * OPS-056: lesson-12 now runs in the V3 launch studio
+ * (/studio/blockly/launch/<id>; the old /learn/lesson/<id> entry 308-redirects).
+ * Everything up to /project/<id>/complete asserts the V3 DOM; the completion
+ * page keeps its own DuoProject workbench and its original assertions.
+ * DOM mapping (same strength): data-position -> data-steps,
+ * stage-character-partner -> stage-character-friend, duo-result failure copy ->
+ * stage-run-reason, duo-result 运行成功 -> run toggle back to 运行 + stage 运行成功,
+ * duo-fox/bear-message -> .kc-stage-speech inside stage-character-main/friend,
+ * duo-action-log li -> stage-action-log li (5 lines incl. the gift log),
+ * lesson-task-card 第 N 关 -> launch-v3-step-progress 第 N /,
+ * lesson-feedback-card 尚未保存 -> launch-v3-notice.
+ */
 const lessonId = 'lesson-12-graduation-show'
 const movement = ['when_start', 'move_right', 'switch_character', 'move_right']
 const repeat = [...movement, 'repeat_twice']
@@ -10,51 +23,96 @@ const touchPages = new WeakMap<Page, boolean>()
 test.beforeEach(({ page }, testInfo) => { touchPages.set(page, Boolean(testInfo.project.use.hasTouch)) })
 // Touch projects dispatch native taps, including at desktop/tablet-sized viewports.
 async function press(page: Page, id: string) {
-  const button = page.getByTestId(id)
+  let target = id
+  if (isLaunchV3(page)) {
+    // Same V3 mapping as clickLessonControl (pane / tools drawer first), but
+    // keep this spec's own tap-vs-click choice.
+    if (id === 'run-code-button') {
+      await showLessonPane(page, 'stage')
+      target = 'ws-run-toggle'
+    } else if (id.startsWith('duo-') || id === 'graduation-gift') {
+      await showLessonPane(page, 'stage')
+    } else {
+      target = (await resolveV3LessonControl(page, id)) ?? id
+    }
+  }
+  const button = page.getByTestId(target)
   await button.scrollIntoViewIfNeeded()
   if (touchPages.get(page)) await button.tap()
   else await button.click()
 }
+function foxSpeech(page: Page) {
+  return page.getByTestId('stage-character-main').locator('.kc-stage-speech')
+}
+function bearSpeech(page: Page) {
+  return page.getByTestId('stage-character-friend').locator('.kc-stage-speech')
+}
 async function add(page: Page, types: string[]) {
-  await showLessonPane(page, 'code')
+  if (!isLaunchV3(page)) await showLessonPane(page, 'code')
   for (const type of types) await press(page, `lesson-add-${type}`)
 }
 async function program(page: Page, types: string[]) {
-  await showLessonPane(page, 'code')
+  if (!isLaunchV3(page)) await showLessonPane(page, 'code')
   await press(page, 'lesson-clear-program')
   await add(page, types)
 }
 async function positions(page: Page, fox: number, bear: number) {
   await showLessonPane(page, 'stage')
+  if (isLaunchV3(page)) {
+    await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', String(fox))
+    await expect(page.getByTestId('stage-character-friend')).toHaveAttribute('data-steps', String(bear))
+    return
+  }
   await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-position', String(fox))
   await expect(page.getByTestId('stage-character-partner')).toHaveAttribute('data-position', String(bear))
+}
+async function expectFailure(page: Page, text: string) {
+  if (isLaunchV3(page)) {
+    await expect(page.getByTestId('stage-run-reason')).toContainText(text, { timeout: 15000 })
+    return
+  }
+  await expect(page.getByTestId('duo-result')).toContainText(text)
 }
 async function run(page: Page, fox = 100, bear = 200) {
   await showLessonPane(page, 'stage')
   await press(page, 'run-code-button')
-  await expect(page.getByTestId('duo-result')).toContainText('运行成功', { timeout: 15000 })
+  if (isLaunchV3(page)) {
+    await expect(page.getByTestId('ws-run-toggle')).not.toHaveText(/停止/, { timeout: 15000 })
+    await expect(page.getByTestId('lesson-playable-stage')).toContainText('运行成功', { timeout: 15000 })
+  } else {
+    await expect(page.getByTestId('duo-result')).toContainText('运行成功', { timeout: 15000 })
+  }
   await positions(page, fox, bear)
   await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', String(bear === 200))
 }
+async function expectStep(page: Page, step: number) {
+  await showLessonPane(page, 'task')
+  await expect(page.getByTestId('launch-v3-step-progress')).toContainText(`第 ${step} /`)
+}
 async function next(page: Page, step: number) {
   await press(page, 'lesson-complete-step')
-  await showLessonPane(page, 'task')
-  await expect(page.getByTestId('lesson-task-card')).toContainText(`第 ${step} 关`)
+  await expectStep(page, step)
 }
 async function opening(page: Page) {
   await page.goto(`/learn/lesson/${lessonId}`)
+  await page.waitForURL(`**/studio/blockly/launch/${lessonId}`)
   await showLessonPane(page, 'stage')
   await expect(page.getByTestId('lesson-playable-stage')).toBeVisible()
   await showLessonPane(page, 'code')
   await expect(page.getByTestId('lesson-blockly-workspace').locator('.blocklySvg')).toBeVisible()
   await positions(page, 0, 0)
   await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', 'false')
-  await expect(page.getByTestId('run-code-button')).toBeDisabled()
+  // V3: the run toggle is never disabled; the predict gate lives on 完成这一关.
+  await press(page, 'lesson-complete-step')
+  await expect(page.getByTestId('launch-v3-notice')).toContainText('先在舞台下方猜一猜')
+  await expectStep(page, 1)
   await press(page, 'duo-predict-both')
   await add(page, ['when_start'])
   await run(page, 0, 0)
   await next(page, 2)
-  await add(page, ['move_right'])
+  // V3 keeps a program per 关: 第 2 关 opens on its own canvas, so lay the
+  // 第 1 关 block again before the new one (same program as the old carry-over).
+  await add(page, ['when_start', 'move_right'])
   await run(page, 100, 0)
   await next(page, 3)
 }
@@ -62,7 +120,7 @@ async function debug(page: Page) {
   await program(page, movement)
   await showLessonPane(page, 'stage')
   await press(page, 'run-code-button')
-  await expect(page.getByTestId('duo-result')).toContainText('还差 100 步')
+  await expectFailure(page, '还差 100 步')
   await positions(page, 100, 100)
   await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', 'false')
 }
@@ -84,48 +142,45 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await opening(page)
     await debug(page)
     await press(page, 'lesson-complete-step')
-    await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 3 关')
+    await expectStep(page, 3)
     await add(page, ['repeat_twice'])
     await showLessonPane(page, 'stage')
     await press(page, 'run-code-button')
-    await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-position', '100')
+    await expect(page.getByTestId('stage-character-main')).toHaveAttribute('data-steps', '100')
     await press(page, 'reset-code-button')
     await positions(page, 0, 0)
     await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', 'false')
     await run(page)
     await run(page)
-    await expect(page.getByTestId('duo-action-log').locator('li')).toHaveCount(5)
+    await expect(page.getByTestId('stage-action-log').locator('li')).toHaveCount(5)
     await next(page, 4)
+    // 第 4 关 opens on its own canvas: lay the 第 3 关 program for the baseline run.
+    await program(page, repeat)
     await run(page)
     await press(page, 'lesson-complete-step')
-    await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 4 关')
+    await expectStep(page, 4)
     await debug(page)
     await expect(page.getByTestId('duo-debug-task')).toContainText('已观察')
     await page.getByTestId('lesson-playable-stage').screenshot({ path: testInfo.outputPath(`${viewport.name}-error.png`) })
-    // TQ-015: the designed mistake above is the experiment — it raises no hint.
-    // Two more real failed runs escalate the classroom hint 1 → 2.
+    // TQ-015: the designed mistake above is the experiment. Two more real
+    // failed runs stay failures; V3 hints are revealed by the child, level by level.
     await press(page, 'run-code-button')
-    await expect(page.getByTestId('duo-result')).toContainText('还差 100 步')
+    await expectFailure(page, '还差 100 步')
     await press(page, 'run-code-button')
-    await expect(page.getByTestId('duo-result')).toContainText('还差 100 步')
-    await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-hint')).toHaveAttribute('data-hint-tier', '2')
-    await expect(page.getByTestId('lesson-hint')).toContainText('只重复当前角色的移动')
-    await showLessonPane(page, 'stage')
+    await expectFailure(page, '还差 100 步')
+    await press(page, 'ws-hint-reveal-1')
+    await press(page, 'ws-hint-reveal-2')
+    await expect(page.getByTestId('ws-task-content')).toContainText('只重复当前角色的移动')
     await add(page, ['repeat_twice'])
     await run(page)
     await next(page, 5)
     await program(page, creative)
     await run(page)
-    await expect(page.getByTestId('duo-fox-message')).toHaveText('你好！')
-    await expect(page.getByTestId('duo-bear-message')).toHaveText('找到礼物啦！')
+    await expect(foxSpeech(page)).toHaveText('你好！')
+    await expect(bearSpeech(page)).toHaveText('找到礼物啦！')
     await press(page, 'duo-reflect-together')
     await press(page, 'lesson-complete-step')
-    await showLessonPane(page, 'task')
-    await expect(page.getByTestId('lesson-task-card')).toContainText('第 5 关')
-    await showLessonPane(page, 'stage')
+    await expectStep(page, 5)
     await press(page, 'duo-reflect-own')
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     await page.screenshot({ path: testInfo.outputPath(`${viewport.name}-after.png`), fullPage: true })
@@ -140,8 +195,9 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
       }
     })
     await press(page, 'lesson-complete-step')
-    await showLessonPane(page, 'stage')
-    await expect(page.getByTestId('lesson-feedback-card')).toContainText('尚未保存')
+    await showLessonPane(page, 'task')
+    await expect(page.getByTestId('launch-v3-notice')).toContainText('尚未保存')
+    expect(new URL(page.url()).pathname).toBe(`/studio/blockly/launch/${lessonId}`)
     expect((await progress(page)).completedLessonIds ?? []).not.toContain(lessonId)
     await page.evaluate(() => { Storage.prototype.setItem = (window as unknown as { graduationSetItem: typeof Storage.prototype.setItem }).graduationSetItem })
     await finish(page)
@@ -178,6 +234,8 @@ for (const viewport of [{ name: 'desktop', width: 1440, height: 900 }, { name: '
     await add(page, ['repeat_twice'])
     await run(page)
     await next(page, 5)
+    // 第 5 关 opens on its own canvas: lay the repaired program before the run.
+    await program(page, repeat)
     await run(page)
     await finish(page)
     const again = await progress(page)
@@ -191,13 +249,13 @@ test('repetition never borrows the other actor’s move, and invalid trailing co
   await program(page, ['when_start', 'move_right', 'switch_character', 'repeat_twice'])
   await showLessonPane(page, 'stage')
   await press(page, 'run-code-button')
-  await expect(page.getByTestId('duo-result')).toContainText('要跟在移动后面')
+  await expectFailure(page, '要跟在移动后面')
   await positions(page, 100, 0)
   await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', 'false')
   await program(page, [...repeat, 'switch_character'])
   await showLessonPane(page, 'stage')
   await press(page, 'run-code-button')
-  await expect(page.getByTestId('duo-result')).toContainText('重复切换')
+  await expectFailure(page, '重复切换')
   await positions(page, 100, 200)
   await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', 'false')
   await program(page, repeat)
@@ -209,5 +267,7 @@ test('opening the completion URL cannot invent graduation or a saved work', asyn
   await expect(page.getByTestId('project-complete-rewards')).toHaveCount(0)
   await expect(page.getByTestId('duo-saved-project')).toHaveCount(0)
   await page.getByRole('link', { name: '回课堂继续寻宝' }).click()
+  await page.waitForURL(`**/studio/blockly/launch/${lessonId}`)
+  await showLessonPane(page, 'stage')
   await expect(page.getByTestId('graduation-gift')).toHaveAttribute('data-found', 'false')
 })

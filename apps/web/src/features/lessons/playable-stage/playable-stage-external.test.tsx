@@ -135,6 +135,9 @@ describe('PlayableStage external mode (OPS-041)', () => {
     )
     expect(screen.getByTestId('practice-question')).toHaveTextContent('先猜一猜')
     expect(screen.getByTestId('practice-need-guess')).toHaveTextContent('先选一个你的猜测')
+    // 复审 HOLD P1：外接模式没有“会亮起来”的内部运行按钮，文案改为先猜再按运行。
+    expect(screen.getByTestId('practice-need-guess')).toHaveTextContent('再按运行')
+    expect(screen.getByTestId('practice-need-guess')).not.toHaveTextContent('运行按钮就会亮起来')
   })
 
   it('internal mode still renders its own run button (default unchanged)', () => {

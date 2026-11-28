@@ -29,9 +29,31 @@ export function isEventV3(page: Page): boolean {
   return EVENT_V3_PATH.test(new URL(page.url()).pathname)
 }
 
+/**
+ * OPS-056: the eleven launch lessons lesson-02…12 share the same V3 studio
+ * under /studio/blockly/launch/<lessonId>; their old /learn/lesson/<lessonId>
+ * entries permanently redirect there.
+ */
+const LAUNCH_V3_PATH = /^\/studio\/blockly\/launch(\/|$)/
+
+export function isLaunchV3(page: Page): boolean {
+  return LAUNCH_V3_PATH.test(new URL(page.url()).pathname)
+}
+
 /** Any lesson that renders the V3 studio (one shell, no per-lesson copies). */
 export function isLessonStudioV3(page: Page): boolean {
-  return isForestV3(page) || isGridV3(page) || isEventV3(page)
+  return isForestV3(page) || isGridV3(page) || isEventV3(page) || isLaunchV3(page)
+}
+
+/**
+ * Where a lesson explains why a step cannot pass yet: lesson-01's V3 slot
+ * notice, the launch V3 slot notice (OPS-056, lesson-02…12), or the old
+ * classroom's feedback card. Same message, each workspace's own element.
+ */
+function lessonNotice(page: Page) {
+  if (isForestV3(page)) return page.getByTestId('forest-hello-notice')
+  if (isLaunchV3(page)) return page.getByTestId('launch-v3-notice')
+  return page.getByTestId('lesson-feedback-card')
 }
 
 /** Open the only official 《小狐狸出场》 workspace and wait for it to mount. */
@@ -126,6 +148,42 @@ export async function seedForestV3Draft(
 }
 
 /**
+ * OPS-056: seed the owner-scoped V3 draft for a launch lesson (lesson-02…12)
+ * before the page loads. Same envelope and owner key as seedForestV3Draft;
+ * steps without a program fall back to their starter programs.
+ */
+export async function seedLaunchV3Draft(
+  page: Page,
+  lessonId: string,
+  stepIndex: number,
+  programs: Record<string, ReadonlyArray<{ type: string }>>,
+) {
+  await page.evaluate(
+    ({ lessonId, stepIndex, programs }) => {
+      const script = {
+        version: 1,
+        lessonId,
+        stepIndex,
+        programs: Object.fromEntries(
+          Object.entries(programs).map(([stepId, blocks]) => [
+            stepId,
+            blocks.map((block) => ({ type: block.type })),
+          ]),
+        ),
+        passed: [],
+        failures: 0,
+      }
+      window.localStorage.setItem(
+        `kids-lesson-owner-v1:guest:kidscoding-draft:${lessonId}`,
+        JSON.stringify({ lessonId, savedAt: new Date().toISOString(), script, version: 1 }),
+      )
+      window.sessionStorage.clear()
+    },
+    { lessonId, stepIndex, programs },
+  )
+}
+
+/**
  * UX-202: on phones (<=600px) the classroom shows one zone at a time
  * behind the 任务 / 积木 / 舞台 tabs. On larger viewports all zones are
  * visible and the tabs are display:none, so this is a no-op there.
@@ -142,7 +200,9 @@ export async function showLessonPane(
   // OPS-053: the G0-U2 event lessons render the same V3 studio, so their pane
   // switches go through the V3 tabs too (on phones the old classroom tab row
   // does not exist there and the legacy branch below would silently no-op).
-  const isV3 = (path: string) => FOREST_V3_PATH.test(path) || GRID_V3_PATH.test(path) || EVENT_V3_PATH.test(path)
+  // OPS-056: the launch lessons lesson-02…12 render it too.
+  const isV3 = (path: string) =>
+    FOREST_V3_PATH.test(path) || GRID_V3_PATH.test(path) || EVENT_V3_PATH.test(path) || LAUNCH_V3_PATH.test(path)
   let pathname = new URL(page.url()).pathname
   if (isV3(pathname)) {
     // The shell is visible in every pane mode; the slot is not (phones show
@@ -206,34 +266,65 @@ export async function showLessonPane(
  * On desktop the tabs are absent/hidden, so behavior stays unchanged.
  * This does not alter acceptance assertions, app code or frozen V2 layout.
  */
+/**
+ * OPS-056: prepare a V3 control the way a child reaches it (open the right
+ * pane / the tools drawer) and return the real V3 test id to press. Returns
+ * null for controls that need the full helper flow (run / forest complete),
+ * which callers must route through clickLessonControl instead. Exported so
+ * specs that tap on touch projects (blockly-duo-graduation press()) reuse the
+ * same mapping and keep their own tap-vs-click choice.
+ */
+export async function resolveV3LessonControl(page: Page, testId: string): Promise<string | null> {
+  if (isLaunchV3(page) && testId === 'lesson-complete-step') {
+    // lesson-02…12: the completion button lives under the launch slot's id.
+    await showLessonPane(page, 'task')
+    return 'launch-v3-complete-step'
+  }
+  if (
+    testId.startsWith('lesson-add-') ||
+    testId.startsWith('lesson-say-line-') ||
+    testId === 'lesson-clear-program' ||
+    testId === 'lesson-remove-last' ||
+    testId === 'lesson-delete-selected'
+  ) {
+    // 撤回最后一块 / 删除选中 live in the same tools <details> as 清空 / 添加;
+    // OPS-056: so do the “选一句对白” buttons (BlocklyToolsPanel renders them).
+    await openForestTools(page)
+    return testId
+  }
+  if (testId === 'run-code-button' || testId === 'lesson-complete-step') return null
+  if (testId === 'reset-code-button') {
+    await showLessonPane(page, 'stage')
+    return 'v3-reset-stage'
+  }
+  if (testId === 'lesson-remedial-link' || testId.startsWith('ws-hint-reveal-')) {
+    await showLessonPane(page, 'task')
+  } else if (
+    testId.startsWith('stage-') ||
+    testId.startsWith('practice-') ||
+    testId.startsWith('mistake-') ||
+    testId.startsWith('garden-')
+  ) {
+    await showLessonPane(page, 'stage')
+  }
+  return testId
+}
+
 export async function clickLessonControl(page: Page, testId: string) {
-  if (isForestV3(page)) {
+  if (isForestV3(page) || isLaunchV3(page)) {
     // The V3 studio renames the shell's controls. Map the old classroom's
     // test ids onto the real V3 ones so specs keep expressing the child's
     // intent (add a block, run, clear, complete) instead of per-page markup.
-    if (testId.startsWith('lesson-add-') || testId === 'lesson-clear-program') {
-      await openForestTools(page)
-    } else if (testId === 'run-code-button') {
+    const resolved = await resolveV3LessonControl(page, testId)
+    if (resolved) {
+      await page.getByTestId(resolved).click()
+      return
+    }
+    if (testId === 'run-code-button') {
       await runForestStage(page)
       return
-    } else if (testId === 'reset-code-button') {
-      await showLessonPane(page, 'stage')
-      await page.getByTestId('v3-reset-stage').click()
-      return
-    } else if (testId === 'lesson-complete-step') {
-      await completeForestStep(page)
-      return
-    } else if (testId === 'lesson-remedial-link' || testId.startsWith('ws-hint-reveal-')) {
-      await showLessonPane(page, 'task')
-    } else if (
-      testId.startsWith('stage-') ||
-      testId.startsWith('practice-') ||
-      testId.startsWith('mistake-') ||
-      testId.startsWith('garden-')
-    ) {
-      await showLessonPane(page, 'stage')
     }
-    await page.getByTestId(testId).click()
+    await completeForestStep(page)
     return
   }
   if (testId.startsWith('lesson-add-') || testId === 'lesson-clear-program') {
@@ -292,7 +383,10 @@ export async function expectStageWalk(page: Page, steps: number) {
   expect(overlaps(mainTag!, friendTag!), 'name tags must not overlap').toBe(false)
   expect(mainArt!.x + mainArt!.width).toBeLessThan(friendArt!.x)
   if (progress === 1) {
-    if (isForestV3(page)) {
+    // OPS-056: the launch lessons (lesson-02…12) render the same V3 stage column as
+    // lesson-01, so they share its slot contract (measured the same 43.45px painted
+    // gap at Pixel 7 on /studio/blockly/launch/*).
+    if (isForestV3(page) || isLaunchV3(page)) {
       // V3's stage column scales the artwork (clamp(52px, 13vw, 72px) on phones) inside
       // fixed 92px/74px actor slots, so the painted gap carries both slot insets on top
       // of the 14px meeting gap (measured 43.45px at Pixel 7). The layout contract is
@@ -346,7 +440,7 @@ export async function solveMistakeStep(
   // The designed mistake is the experiment, not a failed attempt: no hint tier is raised.
   // The old classroom has an auto-escalating `lesson-hint`; the V3 studio has no automatic
   // hint at all, so the equivalent promise is that tier 2 stays locked until the child asks.
-  if (isForestV3(page)) {
+  if (isForestV3(page) || isLaunchV3(page)) {
     await expect(page.getByTestId('ws-hint-reveal-2')).toBeDisabled()
   } else {
     await expect(page.getByTestId('lesson-hint')).toHaveCount(0)
@@ -354,7 +448,7 @@ export async function solveMistakeStep(
   // Observed but not answered: the step does not pass yet.
   await clickLessonControl(page, 'lesson-complete-step')
   await expect(
-    isForestV3(page) ? page.getByTestId('forest-hello-notice') : page.getByTestId('lesson-feedback-card'),
+    lessonNotice(page),
   ).toContainText('先回答舞台上的问题')
   await clickLessonControl(page, `mistake-answer-${options.answer}`)
   await expect(page.getByTestId('mistake-fix')).toBeVisible()
@@ -406,11 +500,11 @@ export async function solvePracticeStep(
   if (options.guess) {
     // A prediction is made before the run: no guess, no run, no completion.
     await expect(page.getByTestId('practice-need-guess')).toBeVisible()
-    if (isForestV3(page)) {
+    if (isForestV3(page) || isLaunchV3(page)) {
       // The V3 shell owns the run button, so the gate is the completion attempt:
       // it must explain the missing prediction instead of advancing the step.
       await clickLessonControl(page, 'lesson-complete-step')
-      await expect(page.getByTestId('forest-hello-notice')).toContainText('先在舞台上猜一猜')
+      await expect(lessonNotice(page)).toContainText('先在舞台上猜一猜')
     } else {
       await expect(page.getByTestId('run-code-button')).toBeDisabled()
       await clickLessonControl(page, 'lesson-complete-step')
@@ -433,7 +527,7 @@ export async function solvePracticeStep(
     await expect(page.getByTestId('practice-need-answer')).toBeVisible()
     await clickLessonControl(page, 'lesson-complete-step')
     await expect(
-      isForestV3(page) ? page.getByTestId('forest-hello-notice') : page.getByTestId('lesson-feedback-card'),
+      lessonNotice(page),
     ).toContainText('先回答舞台上的问题')
     if (options.wrongAnswer) {
       await clickLessonControl(page, `practice-answer-${options.wrongAnswer}`)
