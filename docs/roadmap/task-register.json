@@ -4357,7 +4357,7 @@
       "title": "G0-U3-L06《森林节奏演出》：event-v3 补齐真实 sound 能力与可玩课程",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-054"
       ],
@@ -4373,11 +4373,14 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/580",
-        "prCI": "Draft PR #580（stacked，base codex/ops-054-g0-u3-v3 245c3f9b，依赖 #579）。head b9b98ab2 的 PR CI：run 45764661869 / 45764661341 等，除 scratch-real-vm-shard-s3 外全部 pass（build、wake-machine 为 skipping）；scratch-real-vm-shard-s3（job 139722567463）约 15 分钟超时 cancelled，记为未通过，不记为通过。S3 超时由主 Muse 另行做 CI 分片治理，本任务不改 workflow、不反复重跑。最终 HEAD 的 CI 以 PR 页面为准。",
+        "mergeCommit": "a58b15b82d2f414de1ae3087bde04d086237198a",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/46112663073",
+        "prCI": "最终 HEAD 3cc41efb（base main 01e88eca）：64 项检查 61 成功 + 3 跳过，0 失败 0 取消（run 46104541002）；S3 五分片全部 success；ChatGPT 最终代码终审 PASS（评论 7234721343）；duan 2026-11-28 授权转 Ready、合并及自动生产部署，merge SHA a58b15b8。旧 S3 cancelled 为过时描述，已作废。",
         "localTests": "定向 Vitest（event/event-v3/grid-v3/blockly/curriculum/content/curriculum）50 files 617 passed exit 0（Node 22）；自由试玩补声音后 event+event-v3 6 files 79 passed exit 0（新增 4 条 playFree 单测）；全量 Vitest 278 files 中 4 files / 3 tests 失败，与 main 基线一致（lesson-scaffold、g2-u3-l02、g2-u3-l03、g2-u3-l05 judge.vm），已在临时 main worktree 复核；tsc 81 个基线错误，无新增；ESLint 改动文件 exit 0；Node 20 next build exit 0（BUILD_ID 3UsBnbOdu3ed2w_cAplwz，3110 运行该构建）；Playwright 本地 3110 生产构建：L06 desktop 2 passed，mobile 1 passed、1 skipped（三断点仅 desktop），含自由试玩逐拍出声、运行检查接管、切关释放断言；G0-U2/G0-U3/OPS-052/053/054 回归 desktop+mobile 82 条：60 passed、22 skipped、0 failed，exit 0（12.9 分钟）；三场景验收截图（运行检查、自由试玩、作品回放，desktop+mobile）与三断点截图见 docs/roadmap/evidence/G0-U3-L06/。真实音频节点测试只证明 AudioContext 与鼓声节点真实创建与释放，不等于人工耳听验收。",
-        "gaps": "自由试玩声音已按方案②在 OPS-055 内补齐（仅能敲鼓的关卡逐拍出声，G0-U2 六课与 L04 不变）；鼓点气泡与节奏记录已裁定保留。仍未完成：人工耳听、iOS Safari 与 Android 真机验收；独立教研、儿童试学；创意关/复盘三断点截图；PR CI scratch-real-vm-shard-s3 超时 cancelled（未通过，CI 治理由主 Muse 负责）；独立审核、合并与 main CI 未完成。"
+        "tests": "PR #580 最终 CI（HEAD 3cc41efb）：64 项检查 61 成功 + 3 跳过，0 失败 0 取消（run 46104541002）；S3 五分片全部 success，--list 核对全量 54 = 6+6+12+22+8，0 遗漏 0 重复；main CI 全绿（课程 run 46112663073、deploy-pipeline 46112663038、追踪 46112663023）；a58b15b8 已部署（deploys.log 2026-11-28 13:47:51 CST DEPLOYED，镜像 sha256:db99a295…，/api/health 200）；真实浏览器核验 G0-U3-L06 通过（加载/渲染、空程序按设计不通过、修好后 8 鼓 4 跳与程序一致；音频监听有效演出有输出、无效运行无播放）。",
+        "gaps": "已完成：合并、部署、main CI、真实浏览器核验。仍未完成：人工耳听（音频管线已验证，耳听待 duan 本人确认）、iOS Safari 与 Android 真机验收；独立教研、儿童试学；创意关/复盘三断点截图。"
       },
-      "notes": "2026-11-26 开工：分支 codex/ops-055-g0-u3-l06-sound 自 OPS-054 HEAD 245c3f9b 创建；L06 不计入 OPS-054 已完成课程。 2026-11-26：提交 e5665cdd 推送，创建 stacked Draft PR #580（base codex/ops-054-g0-u3-v3，依赖 #579），状态改为 in_review。 2026-11-26：自由试玩逐拍补声音（方案②，OPS-055 内完成），补三场景验收截图，回归与 L06 E2E 在新构建上复跑通过；保持 Draft，不合并、不部署。"
+      "notes": "2026-11-26 开工：分支 codex/ops-055-g0-u3-l06-sound 自 OPS-054 HEAD 245c3f9b 创建；L06 不计入 OPS-054 已完成课程。 2026-11-26：提交 e5665cdd 推送，创建 stacked Draft PR #580（base codex/ops-054-g0-u3-v3，依赖 #579），状态改为 in_review。 2026-11-26：自由试玩逐拍补声音（方案②，OPS-055 内完成），补三场景验收截图，回归与 L06 E2E 在新构建上复跑通过；保持 Draft，不合并、不部署。 2026-11-28：#580 合并 a58b15b8，main CI 全绿，a58b15b8 已部署并通过真实浏览器核验；关账 PR 改台账为 completed（不重新部署生产）。"
     }
   ]
 }
