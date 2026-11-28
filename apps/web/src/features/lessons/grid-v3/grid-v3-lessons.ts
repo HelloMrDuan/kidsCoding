@@ -20,8 +20,8 @@ import { g0u3LoopLessons } from '@/content/curriculum/g0-u3-loop-lessons'
 
 /**
  * 已迁入 V3 的网格课节（顺序与课程数据登记顺序一致）。
- * OPS-054 第三批追加 G0-U3 的四节网格课（L01/L02/L03/L05）；G0-U3-L04 是
- * 事件课，走 event-v3；G0-U3-L06 尚无可玩实现，不登记。
+ * OPS-054 第三批追加 G0-U3 的四节网格课（L01/L02/L03/L05）；G0-U3-L04 与
+ * G0-U3-L06（OPS-055 森林节奏演出）是事件课，走 event-v3，不在本表登记。
  * 单元内序号与“上一课”由 `v3-unit-context.ts` 按单元计算，不按本数组。
  */
 export const GRID_V3_LESSON_IDS = [

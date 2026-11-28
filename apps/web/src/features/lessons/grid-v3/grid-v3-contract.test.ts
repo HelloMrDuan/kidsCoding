@@ -41,9 +41,9 @@ describe('grid-v3 lesson registry (batch 1 + batch 3 grid lessons)', () => {
     }
   })
 
-  it('never claims lessons outside the registry (G0-U2 / G0-U3 event+unplayable / launch lessons)', () => {
+  it('never claims lessons outside the registry (G0-U2 / G0-U3 event lessons / launch lessons)', () => {
     expect(isGridV3LessonId('G0-U2-L01')).toBe(false)
-    // G0-U3-L04 是事件课（event-v3），G0-U3-L06 尚无可玩实现。
+    // G0-U3-L04、G0-U3-L06（OPS-055）都是事件课，走 event-v3，不归网格注册表。
     expect(getGridV3Lesson('G0-U3-L04')).toBeNull()
     expect(getGridV3Lesson('G0-U3-L06')).toBeNull()
     expect(getGridV3Lesson('lesson-01-forest-hello')).toBeNull()

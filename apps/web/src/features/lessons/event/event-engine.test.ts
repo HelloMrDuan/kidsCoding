@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkEventGoal, runEventProgram, stageStateAfter, type EventLevel } from './event-engine'
+import { checkEventGoal, runEventProgram, stageStateAfter, type EventAction, type EventLevel } from './event-engine'
 
 const level: EventLevel = {
   actors: [
@@ -125,5 +125,78 @@ describe('event engine: repeat and show stage (G0-U3-L04)', () => {
     expect(checkEventGoal(show, { firefly_a: rounds(3, 'glow_on'), firefly_b: rounds(3, 'glow_on') }, goal(3)).failure).toBe('left_glowing')
     expect(checkEventGoal(show, { firefly_a: rounds(3, 'glow_on', 'glow_off'), firefly_b: rounds(2, 'glow_on', 'glow_off') }, goal(3)).failure).toBe('missing_effect')
     expect(checkEventGoal(show, { firefly_a: rounds(3, 'glow_on', 'glow_off'), firefly_b: rounds(4, 'glow_on', 'glow_off') }, goal(3)).failure).toBe('extra_effect')
+  })
+})
+
+describe('event engine: drum beat, jump and an entrance on a show stage (G0-U3-L06)', () => {
+  const can: EventAction[] = ['enter_stage', 'drum_beat', 'jump']
+  const band: EventLevel = {
+    actors: [
+      { id: 'fox', name: '小狐狸', can: [...can], x: 30, y: 62, offstage: true },
+      { id: 'rabbit', name: '小兔子', can: [...can], x: 70, y: 62, offstage: true },
+    ],
+    parallel: true,
+  }
+  // when_start → enter_stage, then 重复 n 次 (body).
+  const act = (n: number, body: string[], enter = true) => [
+    { type: 'when_start' },
+    ...(enter ? [{ type: 'enter_stage' }] : []),
+    { type: 'repeat_times', times: n, body: body.map(type => ({ type })) },
+  ]
+  const UNIT = ['drum_beat', 'drum_beat', 'jump']
+  const goal = (n: number) => [{
+    interaction: { kind: 'start' as const },
+    effects: (['fox', 'rabbit'] as const).flatMap(id => [
+      [id, 'enter_stage'] as [typeof id, EventAction],
+      ...Array.from({ length: n }, () => UNIT.map(a => [id, a] as [typeof id, EventAction])).flat(),
+    ]),
+  }]
+  const both = (n: number, body = UNIT, enter = true) => ({ fox: act(n, body, enter), rabbit: act(n, body, enter) })
+
+  it('unrolls the rhythm unit: entrance on beat 0, then drum-drum-jump per round, recorded as rhythm', () => {
+    const run = runEventProgram(band, both(4), [{ kind: 'start' }])
+    const fox = run.effects.filter(e => e.actor === 'fox')
+    expect(fox.map(e => e.action)).toEqual(['enter_stage', ...Array.from({ length: 4 }, () => UNIT).flat()])
+    expect(fox.map(e => e.beat)).toEqual(Array.from({ length: 13 }, (_, i) => i))
+    // The rabbit plays the same beat numbers, so the stage shows them together.
+    expect(run.effects.filter(e => e.actor === 'rabbit').map(e => e.beat)).toEqual(fox.map(e => e.beat))
+    const final = stageStateAfter(band, run.effects)
+    expect(final.fox).toMatchObject({ onstage: true, rhythm: 'ddjddjddjddj' })
+    expect(stageStateAfter(band, []).fox).toMatchObject({ onstage: false, rhythm: '' })
+  })
+
+  it('passes four or more in-step rounds and rejects a wrong rhythm, a short show, an empty repeat and a missing entrance', () => {
+    expect(checkEventGoal(band, both(4), goal(4)).passed).toBe(true)
+    expect(checkEventGoal(band, both(6), goal(6)).passed).toBe(true)
+    // Both play drum-jump-drum: in step with each other, but not the rhythm the band asked for.
+    expect(checkEventGoal(band, both(4, ['drum_beat', 'jump', 'drum_beat']), goal(4)).failure).toBe('wrong_order')
+    // One plays the wrong rhythm: from that beat on the two are out of step.
+    expect(checkEventGoal(band, { fox: act(4, UNIT), rabbit: act(4, ['drum_beat', 'jump', 'drum_beat']) }, goal(4))).toMatchObject({ passed: false, failure: 'out_of_sync', actor: 'rabbit' })
+    // Three rounds for a four-round show.
+    expect(checkEventGoal(band, both(3), goal(4)).failure).toBe('missing_effect')
+    expect(checkEventGoal(band, { fox: act(4, UNIT), rabbit: act(3, UNIT) }, goal(4)).failure).toBe('missing_effect')
+    // A repeat with nothing inside never runs.
+    expect(checkEventGoal(band, both(4, []), goal(4)).failure).toBe('empty_repeat')
+    // Nobody walks on stage first.
+    expect(checkEventGoal(band, both(4, UNIT, false), goal(4)).failure).toBe('missing_effect')
+    expect(checkEventGoal(band, { fox: act(4, UNIT), rabbit: act(4, UNIT, false) }, goal(4)).failure).toBe('out_of_sync')
+    // A drum or jump the character cannot do never runs.
+    const quiet: EventLevel = { ...band, actors: band.actors.map(a => a.id === 'rabbit' ? { ...a, can: ['enter_stage', 'jump'] as EventAction[] } : a) }
+    expect(checkEventGoal(quiet, both(4), goal(4)).failure).toBe('cannot_do')
+  })
+
+  it('a long finite chorus (more than 40 effects, no bell) is not mistaken for a ringing loop; a self-ringing bell still is', () => {
+    // 2 performers × (1 entrance + 8 rounds × 3) = 50 effects.
+    const run = runEventProgram(band, both(8), [{ kind: 'start' }])
+    expect(run.loop).toBe(false)
+    expect(run.effects).toHaveLength(50)
+    expect(checkEventGoal(band, both(8), goal(8)).passed).toBe(true)
+    const bell: EventAction[] = ['send_bell']
+    const ring = runEventProgram(
+      { actors: [{ id: 'fox', name: '小狐狸', can: bell, x: 30, y: 60 }, { id: 'bird', name: '小鸟', can: bell, x: 70, y: 60 }] },
+      { fox: B('when_start', 'send_bell'), bird: B('when_bell', 'send_bell') },
+      [{ kind: 'start' }],
+    )
+    expect(ring.loop).toBe(true)
   })
 })

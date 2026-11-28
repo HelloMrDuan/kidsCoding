@@ -27,6 +27,9 @@ export const EVENT_ACTIONS = [
   // G0-U3-L04: a firefly lights up / goes dark
   'glow_on',
   'glow_off',
+  // G0-U3-L06: a drum beat (a real Web Audio sound on the V3 stage) and a jump
+  'drum_beat',
+  'jump',
 ] as const
 export type EventAction = (typeof EVENT_ACTIONS)[number]
 
@@ -85,6 +88,12 @@ export type EventRun = {
 }
 
 export const EVENT_MAX_EFFECTS = 40
+/**
+ * G0-U3-L06: a script without the bell is always finite (one level of repeat, counts from
+ * REPEAT_TIMES_OPTIONS), so only a bell chain is cut at EVENT_MAX_EFFECTS. This is a
+ * defensive ceiling for forged input only; no real lesson program comes near it.
+ */
+export const EVENT_HARD_MAX_EFFECTS = 1000
 
 const isHat = (type: string): type is EventHat => (EVENT_HATS as readonly string[]).includes(type)
 const isAction = (type: string): type is EventAction => (EVENT_ACTIONS as readonly string[]).includes(type)
@@ -126,27 +135,37 @@ export function runEventProgram(level: EventLevel, scripts: EventScripts, intera
     const queue = parsed.filter(p => p.hat && (interaction.kind === 'start'
       ? p.hat === 'when_start'
       : p.hat === 'when_clicked' && p.actor.id === interaction.actor))
+    // Scripts started by the bell (the only way a program can ring forever).
+    const byBell = new Set<(typeof parsed)[number]>()
     while (queue.length && !loop) {
       const p = queue.shift()!
+      const fromBell = byBell.has(p)
       let rang = false
       p.actions.forEach((action, i) => {
         if (loop) return
-        if (effects.length >= EVENT_MAX_EFFECTS) { loop = true; return }
+        // A bell chain past EVENT_MAX_EFFECTS keeps ringing itself (G0-U2, unchanged). A finite
+        // program without the bell (G0-U3 repeats on a show stage) only stops at the hard cap.
+        if ((fromBell && effects.length >= EVENT_MAX_EFFECTS) || effects.length >= EVENT_HARD_MAX_EFFECTS) { loop = true; return }
         effects.push({ actor: p.actor.id, action, interaction: index, blockIndex: p.from?.[i] ?? i + 1, beat: i })
         if (action === 'send_bell') rang = true
       })
-      if (rang) queue.push(...parsed.filter(q => q.hat === 'when_bell'))
+      if (rang) {
+        const woken = parsed.filter(q => q.hat === 'when_bell')
+        for (const q of woken) byBell.add(q)
+        queue.push(...woken)
+      }
     }
   })
   return { effects, issues, loop }
 }
 
 /** What the stage looks like after some effects (for drawing and for checks). */
-export type EventActorState = { awake: boolean; onstage: boolean; said: boolean; surprised: boolean; flagUp: boolean; fallen: boolean; glowing: boolean }
+/** `rhythm` (G0-U3-L06): the drum beats and jumps so far, one letter per beat ('d' = drum, 'j' = jump). */
+export type EventActorState = { awake: boolean; onstage: boolean; said: boolean; surprised: boolean; flagUp: boolean; fallen: boolean; glowing: boolean; rhythm: string }
 
 export function stageStateAfter(level: EventLevel, effects: EventEffect[]): Record<EventActorId, EventActorState> {
   const state = {} as Record<EventActorId, EventActorState>
-  for (const a of level.actors) state[a.id] = { awake: !a.asleep, onstage: !a.offstage, said: false, surprised: false, flagUp: false, fallen: false, glowing: false }
+  for (const a of level.actors) state[a.id] = { awake: !a.asleep, onstage: !a.offstage, said: false, surprised: false, flagUp: false, fallen: false, glowing: false, rhythm: '' }
   for (const e of effects) {
     const s = state[e.actor]
     if (!s) continue
@@ -158,6 +177,8 @@ export function stageStateAfter(level: EventLevel, effects: EventEffect[]): Reco
     if (e.action === 'fall_down') s.fallen = true
     if (e.action === 'glow_on') s.glowing = true
     if (e.action === 'glow_off') s.glowing = false
+    if (e.action === 'drum_beat') s.rhythm += 'd'
+    if (e.action === 'jump') s.rhythm += 'j'
   }
   return state
 }
@@ -237,6 +258,19 @@ export function checkEventGoal(level: EventLevel, scripts: EventScripts, expecta
     if (got.length === 0) return fail('nothing_happened', i)
     // G0-U3-L04: a repeat that ran too few / too many rounds leaves a prefix of the goal / overshoots it.
     const prefix = (a: Array<[string, string]>, b: Array<[string, string]>) => a.length < b.length && a.every((x, k) => x[0] === b[k][0] && x[1] === b[k][1])
+    if (level.parallel) {
+      // G0-U3-L06: on a show stage each performer's effects are listed one after another, so when
+      // every performer ran too few / too many rounds the whole list is no prefix; compare per performer.
+      for (const actor of level.actors) {
+        const mine = (list: Array<[EventActorId, EventAction]>) => list.filter(([a]) => a === actor.id)
+        const g = mine(got)
+        const w = mine(want)
+        if (same(g, w)) continue
+        if (prefix(g, w)) return fail('missing_effect', i, actor.id)
+        if (prefix(w, g)) return fail('extra_effect', i, actor.id)
+        break
+      }
+    }
     if (level.parallel && prefix(got, want)) return fail('missing_effect', i, want[got.length][0])
     if (level.parallel && prefix(want, got)) return fail('extra_effect', i, got[want.length][0])
     const wantKeys = new Set(want.map(([a, x]) => `${a}:${x}`))
