@@ -4321,7 +4321,7 @@
       "title": "Blockly 全课程 V3 统一第三批：G0-U3 循环与规律课迁移 V3 工作台",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-053"
       ],
@@ -4337,11 +4337,20 @@
       ],
       "evidence": {
         "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/579",
-        "prCI": "Draft PR #579（base main d08a22ca，#578 已合并后对齐），head b0a71842 的 PR CI 已触发，结果待回填；queued/pending/cancelled 不记为通过。",
-        "localTests": "ESLint 改动文件 exit 0；vitest grid-v3/event-v3/progress/curriculum/studio/workspace 51 files 424 passed，stage 修复后 grid-v3 3 files 46 passed；tsc 81 个基线错误；Node 20 next build exit 0；Playwright 真实 Chrome（127.0.0.1:3110）desktop -g \"G0-U3|OPS-052|OPS-053|OPS-054\" 32 passed，mobile 同组 12 passed、20 skipped（仅 desktop 用例）、0 failed；OPS-054 入口矩阵、三断点（1440×900/768×1024/375×812 无横向溢出）、旧草稿 owner 隔离三条用例通过。最终 HEAD 重建后复测结果另行回填。",
-        "gaps": "G0-U3-L06 仅 detailed_script（playable=false），缺 sound 引擎能力与授权素材，两 studio 均 404、目录成熟度 1，待裁定；grid V3 未接入“收起任务释放编辑区”（BlocklyStudioLayout 仅在传入 onMissionToggle 时渲染），最小方案为 grid studio client 传 missionCollapsed/onMissionToggle，待裁定，未实施。"
+        "mergeCommit": "4325b2a95419da29669cdcef15efc1e7e41f23c8",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/46095262405",
+        "mainTaskCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/46095262445",
+        "tests": [
+          "PR #579 门禁：64 项检查 61 成功 + 3 跳过、0 失败（头 70f5531ad2bcee74d3e03b61dd9a036c2e51ea43；合并 SHA 4325b2a95419da29669cdcef15efc1e7e41f23c8）",
+          "main CI（主线头 4325b2a9）：课程 46095262405、追踪 46095262445、deploy-pipeline 46095262417 均 success；57 项 check-runs 全部 success",
+          "生产部署：部署代理 2026-11-28 10:04:39 CST（02:04:39Z）自动 DEPLOYED 4325b2a9（镜像 sha256:1b80252a3dda6bd90504fdc80a2fc5f44dfde53d65cd0f80666ab839d666543f）；/api/health 200",
+          "生产核验（2026-11-28 10:13-10:14 真实浏览器，4325b2a9）：五节 G0-U3 课入口全部 PASS——L01 蘑菇小路的规律、L02 重复走两步、L03 花园浇水机器、L04 萤火虫闪三次、L05 用循环画围栏，V3 课堂均渲染（任务面板、积木工作区、作品舞台），无 404/空白/429/可见错误；仅核对加载与渲染，未点击运行、未完成关卡",
+          "S3 五分片 --list 核对：原全量 52 用例，分片并集 6+6+10+22+8=52，无遗漏无重复；五分片耗时 G0U1 5m39s/G0U2 4m48s/G0U3 5m56s/shared 2m39s/garden 2m12s",
+          "台账校验：scripts/check-task-ledger.py 校验通过（changed == {OPS-054}）"
+        ],
+        "reviewer": "ChatGPT 独立终审 PASS（#579 评论 7231932872，头 70f5531a）；用户产品验收通过（2026-11-28 duan 确认第四批十一节全部通过，四批共 29 节均已完成用户产品验收）"
       },
-      "notes": "2026-11-25 第三批开工：分支 codex/ops-054-g0-u3-v3 自 3849ea89 创建。L06 无可玩实现且缺 sound 引擎能力，与“六节全部迁移”指令存在差异，已列入汇报待裁定。 2026-11-26：#578 合并后变基到 main d08a22ca，提交 b0a71842，创建 Draft PR #579，状态改为 in_review。"
+      "notes": "2026-11-25 第三批开工：分支 codex/ops-054-g0-u3-v3 自 3849ea89 创建。L06 无可玩实现且缺 sound 引擎能力，与“六节全部迁移”指令存在差异，已列入汇报待裁定。 2026-11-26：#578 合并后变基到 main d08a22ca，提交 b0a71842，创建 Draft PR #579，状态改为 in_review。 2026-11-28 关账：#579 已合并（4325b2a9），主 CI 全绿，生产部署与真实浏览器核验通过（五节入口全部 PASS）；L06 归 #580 不阻塞本 PR，L05 收起任务已实际实现，手机端运行按钮位置为既定行为；用户产品验收已通过（四批 29 节）。"
     }
   ]
 }
