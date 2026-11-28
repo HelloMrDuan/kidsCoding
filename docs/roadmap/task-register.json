@@ -4388,11 +4388,11 @@
       "title": "Blockly 全课程 V3 统一第四批：启蒙课 lesson-02～lesson-12 十一节迁移 V3 工作台",
       "priority": "P0",
       "category": "OPS",
-      "status": "in_review",
+      "status": "completed",
       "dependencies": [
         "OPS-055"
       ],
-      "scope": "按项目负责人 2026-11-26 指示开始第四批：12 节 Blockly 启蒙课中 lesson-02～lesson-12 共十一节从旧三栏课堂 /learn/lesson/[lessonId] 迁移到统一 V3 工作台。分支 codex/ops-056-g0-launch-v3 自 OPS-055 HEAD e25c6ba4 创建，stacked Draft PR 依赖 #580/#579，不等第三批合并与部署。复用 OPS-041（lesson-01-forest-hello）已验证的组装方式与前三批同一套 StudioShell + LessonWorkspace + docked Blockly：单角色课（L02～L09）运行与判定复用 simulateProgram / evaluateObservable / getStepJudgeOptions / isDesignedMistakeRun / explainRunFailure，舞台复用 PlayableStage external 模式；双角色课（L10～L12）复用 judgeDuoProgram（independent / dialogue / graduation）与 DuoStage。保留旧课已有内容、四/五关结构、预测练习、设计错误实验、三级提示、对白选择、作品与奖励卡、进度与草稿语义（owner 隔离、旧草稿只读导入）。路由只改 launch-lesson-routes.ts 单一出口，旧入口 308 到 V3。与 OPS-047（#554，muse-c，lesson-02）范围重叠：不改其分支与台账条目，吸收其已验证的判定规则（说话位置、所选对白、say-too-early、导航失败横幅），最终取舍由主 Muse 裁定。不重新设计 UI，不建 V4，不复制工作台，不新建引擎，不改 lesson-01，不改部署 workflow，不改其他 Agent 分支，不自行合并、不部署。",
+      "scope": "按项目负责人 2026-11-26 指示开始第四批：12 节 Blockly 启蒙课中 lesson-02～lesson-12 共十一节从旧三栏课堂 /learn/lesson/[lessonId] 迁移到统一 V3 工作台。分支 codex/ops-056-g0-launch-v3 自 OPS-055 HEAD e25c6ba4 创建，stacked Draft PR 依赖 #580/#579，不等第三批合并与部署。复用 OPS-041（lesson-01-forest-hello）已验证的组装方式与前三批同一套 StudioShell + LessonWorkspace + docked Blockly：单角色课（L02～L09）运行与判定复用 simulateProgram / evaluateObservable / getStepJudgeOptions / isDesignedMistakeRun / explainRunFailure，舞台复用 PlayableStage external 模式；双角色课（L10～L12）复用 judgeDuoProgram（independent / dialogue / graduation）与 DuoStage。保留旧课已有内容、四/五关结构、预测练习、设计错误实验、三级提示、对白选择、作品与奖励卡、进度与草稿语义（owner 隔离、旧草稿只读导入）。路由只改 launch-lesson-routes.ts 单一出口，旧入口 308 到 V3。与 OPS-047（#554，muse-c，lesson-02）范围重叠：不改其分支与台账条目，吸收其已验证的判定规则（说话位置、所选对白、say-too-early、导航失败横幅），2026-11-27 duan 已裁定由 #584 替代 #554（G1～G8 全部选 A）。不重新设计 UI，不建 V4，不复制工作台，不新建引擎，不改 lesson-01，不改部署 workflow，不改其他 Agent 分支，不自行合并、不部署。",
       "acceptance": [
         "lesson-02～lesson-12 十一节均在 V3 工作台真实可玩；launchLessonHref 统一指向 V3，旧 /learn/lesson/<id> 308 到 V3；lesson-01 与前三批行为不变",
         "判定只走真实执行器：单角色课 evaluateObservable，双角色课 judgeDuoProgram；错误程序、顺序错误、漏切换、少走一次均不通过；不以静态动画或改字段冒充",
@@ -4403,12 +4403,15 @@
         "保持 Draft，不自行合并、不部署；等待独立审核与用户验收"
       ],
       "evidence": {
-        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/584（stacked Draft，base codex/ops-055-g0-u3-l06-sound，head 7c2088a6）",
-        "prCI": "PR 创建后尚未核对，不记为通过",
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/584（base main，head 3f973d22）",
+        "mergeCommit": "1cb89bde0c6c63408be54b3fb0d4c94701582b91",
+        "mainCI": "https://github.com/HelloMrDuan/kidsCoding/actions/runs/46129980966",
+        "prCI": "最终 HEAD 3f973d22（base main 2e485937）：66 项检查 63 成功 + 3 跳过，0 失败 0 取消（run 46127487174）；S3 五分片全部 success；launch-v3-equivalence 实际执行，desktop 16/16 passed（job 140925207728）；ChatGPT 终审 PASS（评论 7237147889）；duan 2026-11-28 批准解除 Draft、合并及生产部署，merge SHA 1cb89bde。",
         "localTests": "本地真实运行，构建 GfPa5SUOQ9pOulHUvoUIX（Node 20）：E2E ux 全量 204 条 179 passed/22 skipped/3 failed（3 条复跑 12 次全过）；课程 25 规格 358 条 346 passed/10 skipped/2 failed（2 条复跑 12 次全过）；舞台 8 规格 150 条 144 passed/6 skipped/0 failed；三断点气泡与标签无重叠测量 18/18 passed；Vitest（Node 22）2834 条 3 failed/2829 passed/2 expected fail，失败项与基线 e25c6ba4 一致；tsc 81 错误与基线持平且不在 OPS-056 文件；ESLint 排除 gitignore 的 public 生成产物后 0 errors、13 warnings 与基线一致",
-        "gaps": "与 OPS-047（#554，muse-c，lesson-02）范围重叠，待主 Muse 裁定；ux-102/ux-201/ux-202 三处 V3 缺口保留 test.fail；教学与布局差异清单见 PR #584 正文，待裁定"
+        "tests": "PR #584 最终 CI（HEAD 3f973d22）：66 项检查 63 成功 + 3 跳过，0 失败 0 取消（run 46127487174）；launch-v3-equivalence 实际执行，desktop 16/16 passed；S3 五分片全部 success，--list 核对全量 54 = 6+6+12+22+8，0 遗漏 0 重复；main CI 全绿（课程 run 46129980966、deploy-pipeline 46129980907、追踪 46129980957）；1cb89bde 已部署（deploys.log 2026-11-28 18:13:23 CST DEPLOYED，镜像 sha256:1200e8e7…，/api/health 200）；十一节入口真实浏览器核验全部 PASS（L02～L12 逐一打开，标题/关数/V3 工作区/舞台可见；L02～09 各 4 关，L10～12 各 5 关；12 次导航一次成功）；旧入口 /learn/lesson/lesson-02-forest-greeting 308 到 V3；真实运行回归 lesson-02 第 1 关通过（空程序按设计不通过、正确程序通过）。",
+        "gaps": "已完成：合并、部署、main CI、十一节真实浏览器核验、旧入口 308、真实运行回归。2026-11-27 duan 裁定 #584 替代 #554（G1～G8 全部选 A 由 #584 补齐），#554 待 OPS-056 生产验收通过后申请关闭；ux-102/ux-201/ux-202 三处 test.fail 已按裁定处理，剩余 test.fail 0。仍未完成（保留为后续事项，不阻塞本轮集成）：教学行为差异（练习关提示/小结果/tier-3、practice-need-guess、失败计数、每关独立画布、花园预测、lesson-10 第 3 关 duo-active-actor）；lesson-12 第一关提示与关卡目标不一致（后续集中教学引导优化）；OPS-055 的人工耳听与 AudioContext/节点计数未取得（见 OPS-055 gaps）。"
       },
-      "notes": "2026-11-26 开工：分支 codex/ops-056-g0-launch-v3 自 OPS-055 HEAD e25c6ba4 创建；第三批剩余事项（3110 源码与构建一致性、#579/#580 正文统一更新、CI 分片、L06 人工耳听）不阻塞本任务。"
+      "notes": "2026-11-26 开工：分支 codex/ops-056-g0-launch-v3 自 OPS-055 HEAD e25c6ba4 创建；第三批剩余事项（3110 源码与构建一致性、#579/#580 正文统一更新、CI 分片、L06 人工耳听）不阻塞本任务。 2026-11-28：#584 合并 1cb89bde，main CI 全绿，1cb89bde 已部署并通过十一节真实浏览器核验与旧入口 308 核验；关账 PR 改台账为 completed（不重新部署生产）。"
     }
     ]
 }
