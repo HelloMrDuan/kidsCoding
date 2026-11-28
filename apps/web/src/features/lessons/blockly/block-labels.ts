@@ -49,6 +49,9 @@ export const kidsBlockLabels: Record<string, string> = {
   // G0-U3-L04: firefly lights
   glow_on: '亮起来',
   glow_off: '熄灭',
+  // G0-U3-L06: forest rhythm show
+  drum_beat: '敲鼓',
+  jump: '跳一下',
 }
 
 /** Labels that change when the character flies instead of walks. */

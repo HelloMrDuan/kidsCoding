@@ -34,8 +34,18 @@ describe('engine capabilities (SYS-106)', () => {
     expect(existsSync(path.resolve(__dirname, '../lessons/event/event-engine.ts'))).toBe(true)
   })
 
+  it('G0-U3-L06 needs (finite_repeat, movement, visual_effect, sound) point at real files (OPS-055)', () => {
+    const l06 = lessons.find(l => l.id === 'G0-U3-L06')!
+    expect(l06.requiredEngineCapabilities).toEqual(expect.arrayContaining(['finite_repeat', 'movement', 'visual_effect', 'sound']))
+    expect(missingEngineCapabilities(l06.requiredEngineCapabilities)).toEqual([])
+    expect(blocklyEngineCapabilities.sound).toContain('event-v3/event-v3-audio.ts')
+    expect(existsSync(path.resolve(__dirname, '../lessons/event-v3/event-v3-audio.ts'))).toBe(true)
+    expect(blocklyEngineCapabilities.visual_effect).toContain('event/event-stage.tsx')
+    expect(existsSync(path.resolve(__dirname, '../lessons/event/event-stage.tsx'))).toBe(true)
+  })
+
   it('does not claim capabilities the engine lacks', () => {
-    expect(missingEngineCapabilities(['if_else', 'sound', 'counter', 'state', 'visual_effect'])).toHaveLength(5)
+    expect(missingEngineCapabilities(['if_else', 'counter', 'state'])).toHaveLength(3)
   })
 
   it('the legacy L1 scripts stay non-playable; playability comes only from the grid trial integration', () => {

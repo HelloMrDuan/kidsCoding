@@ -17,7 +17,8 @@ import { g0u3EventLessons } from '@/content/curriculum/g0-u3-event-loop-lessons'
 /**
  * 已迁入 V3 的事件课节（顺序与课程数据登记顺序一致）。
  * OPS-054 第三批追加 G0-U3-L04 萤火虫事件 + 循环课（同一套 event-v3 插槽，
- * 真实 loop 积木与多角色同步）。单元内序号与“上一课”由 `v3-unit-context.ts`
+ * 真实 loop 积木与多角色同步）。OPS-055 追加 G0-U3-L06 森林节奏演出（同一套插槽，
+ * 鼓声由 event-v3-audio 的 Web Audio 现场合成）。单元内序号与“上一课”由 `v3-unit-context.ts`
  * 按单元计算，不按本数组。
  */
 export const EVENT_V3_LESSON_IDS = [
@@ -28,6 +29,7 @@ export const EVENT_V3_LESSON_IDS = [
   'G0-U2-L05',
   'G0-U2-L06',
   'G0-U3-L04',
+  'G0-U3-L06',
 ] as const
 
 export type EventV3LessonId = (typeof EVENT_V3_LESSON_IDS)[number]

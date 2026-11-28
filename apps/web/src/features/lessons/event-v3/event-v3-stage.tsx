@@ -3,9 +3,10 @@
  *
  * 只渲染，不跑第二个播放器：“运行检查”唯一的运行与判定来源是 EventRunAdapter，
  * 舞台按适配器执行快照（check + shown）逐步揭示真实引擎动作。
- * 自由试玩（按开始旗 / 点角色）与旧课堂一致：不经过适配器、不产生判定，
- * 直接用 runEventProgram 即时显示；交互序列存在路由 store 的 `play` 里，
- * 编辑、切关、选角色时清空。
+ * 自由试玩（按开始旗 / 点角色）不产生判定、不记进度；交互序列存在路由 store 的
+ * `play` 里，编辑、切关、选角色时清空。没有鼓的关与旧课堂一致，直接用
+ * runEventProgram 即时显示；能敲鼓的关（G0-U3-L06）交给 EventRunAdapter.playFree
+ * 逐拍揭示、逐拍出声（见下）。
  *
  * 舞台承担的课程交互（与旧 event-lab 一致）：
  * - 先猜一猜（会话内）与猜对/猜错说明；
@@ -15,11 +16,19 @@
  * - 错误实验可一键“换回原来的错误程序”（重建画布、清掉本关通过）；
  * - 整课完成后：复盘、反思选择、真实作品卡、重玩任关、回课程介绍。
  * 运行/停止/重来按钮由外壳经 sceneActions 传进来，舞台只负责摆位置。
+ *
+ * OPS-055（G0-U3-L06）声音：运行检查的鼓声由 EventRunAdapter 发出，舞台只把它的真实
+ * 计数（敲过几下、还有几个节点在响）挂在 data 属性上；作品卡回放用自己的 EventDrumKit，
+ * 在点击手势内解锁，每揭示一拍敲一下，重播与卸载时全部释放。自由试玩在能敲鼓的关
+ * 与运行检查同一程序、同一声音与动作：开始旗 / 角色的点击回调里同步调用
+ * runAdapter.playFree（用户手势内解锁），最新一次交互逐拍揭示、逐拍敲鼓，不会一次性
+ * 播完全部鼓声；停止（运行检查接管）、切关、编辑、重新运行、离开页面都经适配器
+ * stop / reset / dispose 清掉计时器与鼓声节点。
  */
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { resolveEventGoal, type EventLesson } from '@/content/curriculum/g0-u2-event-lessons'
 import { getKidsBlockLabel } from '@/features/lessons/blockly/register-kids-blocks'
@@ -36,6 +45,7 @@ import {
   type EventInteraction,
 } from '../event/event-engine'
 import { EventStage, useEventPlayback } from '../event/event-stage'
+import { EventDrumKit } from './event-v3-audio'
 import { eventStarterPrograms, isStarterProgram, type EventSlotData } from './event-v3-draft'
 import {
   describeEventInteractions,
@@ -45,7 +55,9 @@ import {
   eventStepScripts,
   EVENT_FRAME_MS,
   EVENT_V3_MISTAKE_LABELS,
+  eventLevelCanDrum,
   visibleEffects,
+  visibleFreeEffects,
 } from './event-v3-run-adapter'
 import { useEventSession, useEventSessionState } from './event-v3-session'
 import { EVENT_PICK_PROMPT } from './event-v3-slot'
@@ -85,11 +97,22 @@ export function EventStageSlot({ sceneActions }: StageSlotProps) {
   const playing = !!check && observation.playing
   const done = !!check && !observation.playing && observation.shown >= observation.total
   const stopped = !!check && !observation.playing && observation.executionState === 'idle'
+  // 能敲鼓的关：自由试玩逐拍播放（适配器的节拍计时器 + 鼓声）；其余关保持即时显示。
+  const canDrum = useMemo(() => eventLevelCanDrum(step.level), [step.level])
+  const [, setFreeFrame] = useState(0)
+  const freeSnapshot = runAdapter.getFreePlaySnapshot()
   const freeEffects = useMemo<EventEffect[]>(
-    () => (play.length ? runEventProgram(step.level, scripts, play).effects : []),
-    [play, step.level, scripts],
+    () => (play.length && !canDrum ? runEventProgram(step.level, scripts, play).effects : []),
+    [play, step.level, scripts, canDrum],
   )
-  const shownEffects = check ? visibleEffects(observation) : freeEffects
+  const shownEffects = check
+    ? visibleEffects(observation)
+    : canDrum
+      ? freeSnapshot.stepId === stepId
+        ? visibleFreeEffects(freeSnapshot)
+        : []
+      : freeEffects
+  const drumStats = runAdapter.getDrumStats()
 
   const feedback = useMemo(() => {
     if (needsPick) return { tone: 'warning', text: EVENT_PICK_PROMPT }
@@ -144,7 +167,10 @@ export function EventStageSlot({ sceneActions }: StageSlotProps) {
     if (playing) return
     const fresh = !!check
     runAdapter.reset()
-    store.setState({ play: fresh ? [interaction] : [...store.getState().play, interaction] })
+    const nextPlay = fresh ? [interaction] : [...store.getState().play, interaction]
+    // 能敲鼓的关：仍在这次点击的回调里（用户手势），由适配器逐拍演出、逐拍敲鼓。
+    if (canDrum) runAdapter.playFree(step, scripts, nextPlay, () => setFreeFrame((n) => n + 1))
+    store.setState({ play: nextPlay })
   }
 
   function pickTarget(index: number) {
@@ -235,7 +261,12 @@ export function EventStageSlot({ sceneActions }: StageSlotProps) {
   }
 
   return (
-    <div data-testid="event-stage-slot">
+    <div
+      data-testid="event-stage-slot"
+      data-drum-hits={drumStats.hits}
+      data-drum-live={drumStats.liveNodes}
+      data-audio-supported={drumStats.supported ? 'true' : 'false'}
+    >
       <div
         className="flex flex-wrap items-center gap-2 rounded-[8px] border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-950"
         data-testid="grid-predict"
@@ -392,12 +423,34 @@ function EventProjectCard({ lesson, draft }: { lesson: EventLesson; draft: Event
   const [effects, setEffects] = useState<EventEffect[] | null>(null)
   // 作品卡自成一体的回放（与主舞台无关，不产生判定）。
   const { visible, done } = useEventPlayback(effects, EVENT_FRAME_MS, step.level.parallel)
+  // G0-U3-L06：作品卡回放同样出真实鼓声；每揭示一个鼓点敲一下，卸载时释放全部节点。
+  const drumsRef = useRef<EventDrumKit | null>(null)
+  const heardRef = useRef(0)
+  const playedDrums = visible.filter((effect) => effect.action === 'drum_beat').length
+  useEffect(() => {
+    const drums = drumsRef.current
+    if (!drums) return
+    for (let k = heardRef.current; k < playedDrums; k += 1) drums.hit()
+    heardRef.current = playedDrums
+  }, [playedDrums])
+  useEffect(() => () => drumsRef.current?.dispose(), [])
+  const canDrum = step.level.actors.some((actor) => actor.can.includes('drum_beat'))
+  function playProject() {
+    if (canDrum) {
+      // 点击手势内解锁 AudioContext；重播先释放上一遍的声音。
+      drumsRef.current ??= new EventDrumKit()
+      drumsRef.current.unlock()
+      drumsRef.current.beginRun()
+      heardRef.current = 0
+    }
+    setEffects(runEventProgram(step.level, scripts, interactions).effects)
+  }
   const choiceIndex = Math.max(0, step.creative?.choices.indexOf(target ?? '') ?? 0)
   const statusText = project.passedText
     .replace('{target}', eventActorName(step, (target ?? step.creative?.choices[0]) as EventActorId))
     .replace('{label}', step.creative?.labels[choiceIndex] ?? '')
   return (
-    <section className="kc-surface-3d mt-4 rounded-[18px] p-5" data-testid="grid-project-card">
+    <section className="kc-surface-3d mt-4 rounded-[18px] p-5" data-testid="grid-project-card" data-drum-hits={playedDrums}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-lg font-black">🌞 {project.title}</h3>
         <span
@@ -427,7 +480,7 @@ function EventProjectCard({ lesson, draft }: { lesson: EventLesson; draft: Event
         className="kc-action-surface mt-3"
         data-testid="grid-project-play"
         disabled={!!effects && !done}
-        onClick={() => setEffects(runEventProgram(step.level, scripts, interactions).effects)}
+        onClick={playProject}
       >
         {effects && !done ? '播放中…' : `▶ 播放${project.title}`}
       </button>

@@ -16,6 +16,10 @@ export const blocklyEngineCapabilities: Record<string, string> = {
   jump_over: 'grid/grid-engine.ts (G0-U3-L02 jump_forward hops over one cell: puddles yes, rocks / locked doors no)',
   pattern_stamp: 'grid/grid-engine.ts (G0-U3 stamp_red / stamp_blue footprints judged against the level pattern)',
   route_trace: 'grid/grid-engine.ts + grid/grid-stage.tsx (judge and draw the visited route and final heading)',
+  // OPS-055 (G0-U3-L06): drum_beat is a real sound, synthesised live with Web Audio (no audio files),
+  // hit on the beat the action is revealed, released on stop / rerun / reset / leaving the page.
+  sound: 'event-v3/event-v3-audio.ts + event-v3/event-v3-run-adapter.ts (G0-U3-L06 drum_beat: Web Audio drum hit per revealed beat; stopAll on stop, beginRun on rerun, dispose on unmount)',
+  visual_effect: 'event/event-stage.tsx (G0-U3-L04 glow on/off; G0-U3-L06 jump lift, drum bubble and per-actor rhythm log)',
 }
 
 export function missingEngineCapabilities(required: readonly string[] | undefined | null) {

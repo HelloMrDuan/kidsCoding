@@ -17,7 +17,7 @@
  */
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { EventLesson } from '@/content/curriculum/g0-u2-event-lessons'
 import { buildEventStudioLesson } from '@/features/lessons/event-v3/event-v3-contract'
@@ -51,6 +51,8 @@ export default function StudioEventClient({ lessonId }: { lessonId: string }) {
 function EventStudioWorkspace({ lesson }: { lesson: EventLesson }) {
   const store = useMemo(() => createEventSessionStore(lesson), [lesson])
   const runAdapter = useMemo(() => new EventRunAdapter(lesson), [lesson])
+  // OPS-055：离开页面（或换课）时停止播放、释放全部鼓声节点并关闭 AudioContext。
+  useEffect(() => () => runAdapter.dispose(), [runAdapter])
   const adapter = useMemo(() => new EventAdapter(lesson), [lesson])
   const sessionValue = useMemo(
     () => ({ lesson, store, runAdapter }),

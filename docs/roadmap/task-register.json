@@ -4351,6 +4351,33 @@
         "reviewer": "ChatGPT 独立终审 PASS（#579 评论 7231932872，头 70f5531a）；用户产品验收通过（2026-11-28 duan 确认第四批十一节全部通过，四批共 29 节均已完成用户产品验收）"
       },
       "notes": "2026-11-25 第三批开工：分支 codex/ops-054-g0-u3-v3 自 3849ea89 创建。L06 无可玩实现且缺 sound 引擎能力，与“六节全部迁移”指令存在差异，已列入汇报待裁定。 2026-11-26：#578 合并后变基到 main d08a22ca，提交 b0a71842，创建 Draft PR #579，状态改为 in_review。 2026-11-28 关账：#579 已合并（4325b2a9），主 CI 全绿，生产部署与真实浏览器核验通过（五节入口全部 PASS）；L06 归 #580 不阻塞本 PR，L05 收起任务已实际实现，手机端运行按钮位置为既定行为；用户产品验收已通过（四批 29 节）。"
+    },
+{
+      "id": "OPS-055",
+      "title": "G0-U3-L06《森林节奏演出》：event-v3 补齐真实 sound 能力与可玩课程",
+      "priority": "P0",
+      "category": "OPS",
+      "status": "in_review",
+      "dependencies": [
+        "OPS-054"
+      ],
+      "scope": "按项目负责人 2026-11-26 对 #579 的整改裁定第 2 条：另立 Task-ID 补齐真实 sound 能力及 G0-U3-L06 可玩课程，不长期标记 blocked；不等 #579 合并即开始，分支 codex/ops-055-g0-u3-l06-sound 基于 OPS-054 HEAD 245c3f9b，stacked Draft PR 依赖 #579。严格遵照 track-g0-detailed-lessons-v1.json 中 G0-U3-L06：小狐狸、小兔子；两拍鼓声加一次跳跃的节奏单元；有限循环；多角色入场事件；至少四轮节拍与动作同步；停止后声音和动作都停止；支持错误实验、修正、创意扩展与作品回放。复用现有 event-engine（features/lessons/event/event-engine.ts）、EventRunAdapter 与 OPS-052/053/054 同一套 V3 工作台（StudioShell + LessonWorkspace + docked Blockly），不新建重复引擎、不复制工作台、不引入 V4。声音用 Web Audio API 原创合成鼓点（不使用第三方音频素材），角色与场景优先复用已有原创资产，确需新增时原创并记录来源。engine-capabilities 仅在真实实现后登记 sound / visual_effect 并写明实现位置；不以静态动画、假播放或只改 playable/成熟度字段冒充。不改部署 workflow，不改其他 PR 分支，不自行合并；合并与生产部署由主 Muse 负责。",
+      "acceptance": [
+        "G0-U3-L06 在 /studio/blockly/event/G0-U3-L06 真实可玩，进入与前五节同一 V3 工作台；旧 /learn/event-lab/G0-U3-L06 308 到 V3；前两批与 OPS-054 五节行为不变",
+        "真实判定：循环次数与节奏顺序（鼓、鼓、跳）正确才通过；动作与声音同一时间轴同步；错误节奏、空循环、轮数不足均不通过",
+        "声音：AudioContext 在用户手势时创建或恢复，兼容 webkitAudioContext 与移动端；停止、切关、离开页面后音频节点全部释放；重复运行不叠加旧音频；作品回放与自由试玩同样处理",
+        "错误实验、修正、创意扩展、复盘与作品回放真实运行；保存、刷新恢复、跨账号隔离",
+        "真实 Chrome 1440×900、768×1024、375×812 三断点验证，无横向溢出",
+        "单元测试、真实 Playwright E2E、ESLint、tsc（与已知基线一致）、生产构建与 PR CI 均有真实结果；排队/未跑/失败不得记为通过",
+        "不自行合并，等待独立审核与用户验收；第三批完成条件为 G0-U3 六节全部可玩并通过验收"
+      ],
+      "evidence": {
+        "pr": "https://github.com/HelloMrDuan/kidsCoding/pull/580",
+        "prCI": "Draft PR #580（stacked，base codex/ops-054-g0-u3-v3 245c3f9b，依赖 #579）。head b9b98ab2 的 PR CI：run 45764661869 / 45764661341 等，除 scratch-real-vm-shard-s3 外全部 pass（build、wake-machine 为 skipping）；scratch-real-vm-shard-s3（job 139722567463）约 15 分钟超时 cancelled，记为未通过，不记为通过。S3 超时由主 Muse 另行做 CI 分片治理，本任务不改 workflow、不反复重跑。最终 HEAD 的 CI 以 PR 页面为准。",
+        "localTests": "定向 Vitest（event/event-v3/grid-v3/blockly/curriculum/content/curriculum）50 files 617 passed exit 0（Node 22）；自由试玩补声音后 event+event-v3 6 files 79 passed exit 0（新增 4 条 playFree 单测）；全量 Vitest 278 files 中 4 files / 3 tests 失败，与 main 基线一致（lesson-scaffold、g2-u3-l02、g2-u3-l03、g2-u3-l05 judge.vm），已在临时 main worktree 复核；tsc 81 个基线错误，无新增；ESLint 改动文件 exit 0；Node 20 next build exit 0（BUILD_ID 3UsBnbOdu3ed2w_cAplwz，3110 运行该构建）；Playwright 本地 3110 生产构建：L06 desktop 2 passed，mobile 1 passed、1 skipped（三断点仅 desktop），含自由试玩逐拍出声、运行检查接管、切关释放断言；G0-U2/G0-U3/OPS-052/053/054 回归 desktop+mobile 82 条：60 passed、22 skipped、0 failed，exit 0（12.9 分钟）；三场景验收截图（运行检查、自由试玩、作品回放，desktop+mobile）与三断点截图见 docs/roadmap/evidence/G0-U3-L06/。真实音频节点测试只证明 AudioContext 与鼓声节点真实创建与释放，不等于人工耳听验收。",
+        "gaps": "自由试玩声音已按方案②在 OPS-055 内补齐（仅能敲鼓的关卡逐拍出声，G0-U2 六课与 L04 不变）；鼓点气泡与节奏记录已裁定保留。仍未完成：人工耳听、iOS Safari 与 Android 真机验收；独立教研、儿童试学；创意关/复盘三断点截图；PR CI scratch-real-vm-shard-s3 超时 cancelled（未通过，CI 治理由主 Muse 负责）；独立审核、合并与 main CI 未完成。"
+      },
+      "notes": "2026-11-26 开工：分支 codex/ops-055-g0-u3-l06-sound 自 OPS-054 HEAD 245c3f9b 创建；L06 不计入 OPS-054 已完成课程。 2026-11-26：提交 e5665cdd 推送，创建 stacked Draft PR #580（base codex/ops-054-g0-u3-v3，依赖 #579），状态改为 in_review。 2026-11-26：自由试玩逐拍补声音（方案②，OPS-055 内完成），补三场景验收截图，回归与 L06 E2E 在新构建上复跑通过；保持 Draft，不合并、不部署。"
     }
   ]
 }

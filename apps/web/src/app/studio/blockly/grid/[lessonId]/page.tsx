@@ -12,8 +12,8 @@ import StudioGridClient from './studio-grid-client'
  *
  * 草稿/进度归属人由服务端解析（与 /learn 各路由同一个
  * `currentLessonDraftOwner()`），身份未确认时边界锁写；六个课节共用同一
- * 套 V3 插槽与外壳，不为每节课复制工作台。未登记的 id 一律 404（含尚无
- * 可玩课节的 G0-U3-L06）；已登记 id 的旧 `/learn/grid-lab/<id>` 308 到这里。
+ * 套 V3 插槽与外壳，不为每节课复制工作台。未登记的 id 一律 404（含走
+ * event-v3 的事件课 G0-U3-L04、L06）；已登记 id 的旧 `/learn/grid-lab/<id>` 308 到这里。
  */
 export default async function StudioGridPage({
   params,

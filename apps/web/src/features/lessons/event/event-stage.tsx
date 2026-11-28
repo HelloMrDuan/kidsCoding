@@ -250,12 +250,18 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
         const firefly = actor.id.startsWith('firefly')
         // G0-U3-L04: the light log under a firefly, one dot per beat (filled = lit).
         const glowLog = effects.filter(e => e.actor === actor.id && (e.action === 'glow_on' || e.action === 'glow_off')).map(e => (e.action === 'glow_on' ? '1' : '0')).join('')
+        // G0-U3-L06: what it is doing on this beat (a jump lifts it, a drum beat shows the drum) and the rhythm so far.
+        const lastAction = [...effects].reverse().find(e => e.actor === actor.id)?.action
+        const jumping = lastAction === 'jump'
+        const drumming = lastAction === 'drum_beat'
+        const drums = s.rhythm.split('').filter(x => x === 'd').length
+        const jumps = s.rhythm.length - drums
         return (
           <button
             key={actor.id}
             type="button"
             className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full focus-visible:outline focus-visible:outline-4 focus-visible:outline-sky-400"
-            style={{ left: `${actor.x}%`, top: `${s.fallen && actor.fallY !== undefined ? actor.fallY : actor.y}%`, width: `${actor.size ?? 18}%`, opacity: s.onstage ? 1 : 0.25, transition: 'top .5s ease-in' }}
+            style={{ left: `${actor.x}%`, top: `${s.fallen && actor.fallY !== undefined ? actor.fallY : jumping ? actor.y - 12 : actor.y}%`, width: `${actor.size ?? 18}%`, opacity: s.onstage ? 1 : 0.25, transition: jumping || drumming ? 'top .18s ease-out' : 'top .5s ease-in' }}
             data-testid={`event-actor-${actor.id}`}
             data-awake={s.awake ? 'true' : 'false'}
             data-onstage={s.onstage ? 'true' : 'false'}
@@ -265,7 +271,9 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             data-rang={rang.has(actor.id) ? 'true' : 'false'}
             data-glowing={s.glowing ? 'true' : 'false'}
             data-glow-log={glowLog}
-            aria-label={`${name}：${s.onstage ? '' : '在后台，'}${firefly ? (s.glowing ? '亮着' : '暗着') : actor.id === 'apple' || actor.id === 'tree' ? '' : s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${s.fallen ? '，落到了地上' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${onActorClick ? '。点一下它' : ''}`}
+            data-rhythm={s.rhythm}
+            data-last-action={lastAction ?? ''}
+            aria-label={`${name}：${s.onstage ? '' : '在后台，'}${firefly ? (s.glowing ? '亮着' : '暗着') : actor.id === 'apple' || actor.id === 'tree' ? '' : s.awake ? '醒着' : '睡着'}${s.said ? `，说了“${actor.line ?? '早上好！'}”` : ''}${s.surprised ? '，露出惊喜' : ''}${s.fallen ? '，落到了地上' : ''}${rang.has(actor.id) ? '，摇响了铃铛' : ''}${s.rhythm ? `，敲了 ${drums} 下鼓、跳了 ${jumps} 下` : ''}${onActorClick ? '。点一下它' : ''}`}
             onClick={() => onActorClick?.(actor.id)}
           >
             <svg viewBox="0 0 100 110" className="block w-full" aria-hidden="true">
@@ -289,7 +297,15 @@ export function EventStage({ level, effects, onActorClick, label }: EventStagePr
             {rang.has(actor.id) && !s.said ? (
               <span className="absolute -top-3 left-1/2 whitespace-nowrap rounded-[12px] border-2 border-orange-400 bg-white px-2 py-0.5 text-xs font-black text-orange-700 shadow" style={{ transform: 'translate(-50%, -210%)' }} data-event-mark="bell">{s.surprised ? '✨🔔 叮铃！' : '🔔 叮铃！'}</span>
             ) : null}
+            {drumming ? (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[12px] border-2 border-amber-500 bg-amber-50 px-2 py-0.5 text-xs font-black text-amber-800 shadow" data-event-mark="drum">🥁 咚！</span>
+            ) : null}
             <span className={`mt-0.5 block text-center text-[11px] font-black ${firefly ? 'text-amber-100' : 'text-slate-700'}`}>{name}</span>
+            {s.rhythm ? (
+              <span className="mx-auto mt-0.5 flex max-w-[72px] flex-wrap justify-center gap-[2px]" data-event-mark="rhythm-log" aria-hidden="true">
+                {s.rhythm.split('').map((r, i) => <i key={i} className={`block h-[7px] shrink-0 border ${r === 'd' ? 'w-[7px] rounded-full border-amber-600 bg-amber-400' : 'w-[5px] rounded-sm border-sky-600 bg-sky-300'}`} />)}
+              </span>
+            ) : null}
             {firefly && glowLog ? (
               <span className="mx-auto mt-0.5 flex max-w-[64px] flex-wrap justify-center gap-[2px]" data-event-mark="glow-log" aria-hidden="true">
                 {glowLog.split('').map((g, i) => <i key={i} className={`block h-[7px] w-[7px] shrink-0 rounded-full border ${g === '1' ? 'border-amber-500 bg-yellow-300' : 'border-slate-400 bg-slate-600'}`} />)}

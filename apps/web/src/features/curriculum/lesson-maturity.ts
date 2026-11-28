@@ -91,7 +91,8 @@ export const trialIntegrations: Record<string, TrialIntegration> = {
   // G0-U2 (Hark A): event lessons on the event-stage engine; their E2E lives in grid-lab.spec.ts (already in CI).
   // OPS-053: the six G0-U2 lessons now open the V3 studio workspace; the old
   // /learn/event-lab/<id> entry 308-redirects to the same lesson. OPS-054: the
-  // G0-U3-L04 event+loop lesson joins the same V3 event studio.
+  // G0-U3-L04 event+loop lesson joins the same V3 event studio. OPS-055: the
+  // G0-U3-L06 rhythm show (real Web Audio drum) joins it too.
   ...Object.fromEntries(
     Object.keys(g0u2EventLessons).map((id) => [
       id,

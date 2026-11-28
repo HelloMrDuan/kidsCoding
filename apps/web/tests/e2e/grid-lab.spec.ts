@@ -2149,6 +2149,200 @@ test('G0-U3-L04 firefly show: only on, one flash, three rounds, catch the beat, 
 })
 
 /**
+ * OPS-055 (G0-U3-L06 森林节奏演出): the five steps on the one V3 event studio with a
+ * real Web Audio drum. The judge is the real event engine; the drum counters on the
+ * stage slot come from EventDrumKit itself (data-drum-hits = drums hit this run,
+ * data-drum-live = voices still sounding, data-audio-supported), so no mock stands in.
+ * Runs on both projects: desktop Chrome and the Pixel 7 (touch) mobile project.
+ */
+const OPS055_EVIDENCE = path.resolve(__dirname, '../../test-results/ops-055-evidence')
+fs.mkdirSync(OPS055_EVIDENCE, { recursive: true })
+const L06_MAIN = 'ddj'.repeat(4)
+
+test('G0-U3-L06 rhythm show: empty repeat, one unit, rabbit enters, off-beat fix, chorus; real drum hits, stop and rerun release sound, saved, reopened and owner-isolated', async ({ page }) => {
+  test.setTimeout(300_000)
+  const q = async (...types: string[]) => { for (const t of types) await add(page, t) }
+  const edit = async (id: string) => { await lessonPane(page, 'code'); await page.getByTestId(`event-edit-${id}`).click() }
+  const clear = async () => { await codeClick(page, 'lesson-clear-program') }
+  const slot = page.getByTestId('event-stage-slot')
+  const hits = async () => Number(await slot.getAttribute('data-drum-hits'))
+  await page.goto('/learn/catalog/G0-U3-L06')
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
+  await page.getByTestId('event-trial-entry').click()
+  await expect(page).toHaveURL(/\/studio\/blockly\/event\/G0-U3-L06$/, { timeout: 30_000 })
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await lessonPane(page, 'code')
+  await expect(page.getByTestId('lesson-blockly-workspace')).toBeVisible()
+  const fox = page.getByTestId('event-actor-fox')
+  const rabbit = page.getByTestId('event-actor-rabbit')
+
+  // Step 1 — error lab: repeat 4 with an empty mouth: not one drum, the fox stands still.
+  // The step cannot be skipped before the starter has really been run.
+  await next(page)
+  await lessonPane(page, 'code')
+  await expect(page.getByTestId('grid-notice')).toContainText('错误实验')
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+  await stageClick(page, 'grid-predict-choice-1')
+  await runAndExpect(page, 'error', '预想')
+  await expect(slot).toHaveAttribute('data-drum-hits', '0')
+  await expect(fox).toHaveAttribute('data-rhythm', '')
+  await q('drum_beat', 'drum_beat', 'jump')
+  await runAndExpect(page, 'success')
+  // The browser really created the audio context inside the run tap.
+  await expect(slot).toHaveAttribute('data-audio-supported', 'true')
+  await expect(fox).toHaveAttribute('data-rhythm', L06_MAIN)
+  await expect(slot).toHaveAttribute('data-drum-hits', '8')
+  await expect(slot).toHaveAttribute('data-drum-live', '0', { timeout: 5_000 })
+  await lessonPane(page, 'stage')
+  await page.screenshot({ path: `${OPS055_EVIDENCE}/ops-055-${test.info().project.name}-L06-run-check.png` })
+
+  // Stop mid-show: sound and motion stop together, no voice keeps ringing or beating.
+  await gridRun(page)
+  await expect.poll(hits, { timeout: 15_000 }).toBeGreaterThanOrEqual(2)
+  await gridRun(page) // while playing the shell's run button is 停止
+  await expect(page.getByTestId('grid-feedback')).toContainText('已停止')
+  await expect(slot).toHaveAttribute('data-drum-live', '0')
+  const stoppedAt = await hits()
+  expect(stoppedAt).toBeLessThan(8)
+  await page.waitForTimeout(1_500)
+  expect(await hits()).toBe(stoppedAt)
+  await expect(slot).toHaveAttribute('data-drum-live', '0')
+  // Rerun: this run counts from zero again, old voices never pile up.
+  await runAndExpect(page, 'success')
+  await expect(slot).toHaveAttribute('data-drum-hits', '8')
+  await expect(slot).toHaveAttribute('data-drum-live', '0', { timeout: 5_000 })
+
+  // Free play (start flag): the same real script, sound and motion beat by beat, never all
+  // drums at once; it judges nothing and adds no progress.
+  await stageClick(page, 'event-flag')
+  await expect(page.getByTestId('grid-feedback')).toContainText('自由试一试')
+  await expect.poll(hits, { timeout: 10_000 }).toBeGreaterThanOrEqual(2)
+  expect(await hits()).toBeLessThan(8)
+  await expect(slot).toHaveAttribute('data-drum-hits', '8', { timeout: 15_000 })
+  await expect(fox).toHaveAttribute('data-rhythm', L06_MAIN)
+  await expect(slot).toHaveAttribute('data-drum-live', '0', { timeout: 5_000 })
+  await expect(page.getByTestId('grid-feedback')).toHaveAttribute('data-tone', 'idle')
+  await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
+  await lessonPane(page, 'stage')
+  await page.screenshot({ path: `${OPS055_EVIDENCE}/ops-055-${test.info().project.name}-L06-free-play.png` })
+  // A run check takes over mid free play: the free-play beat is cleared, only the check's 8 drums sound.
+  await stageClick(page, 'event-flag')
+  await expect.poll(hits, { timeout: 10_000 }).toBeGreaterThanOrEqual(2)
+  await runAndExpect(page, 'success')
+  await expect(slot).toHaveAttribute('data-drum-hits', '8')
+  await expect(slot).toHaveAttribute('data-drum-live', '0', { timeout: 5_000 })
+  // Changing step mid free play: timer and voices are released, nothing keeps beating.
+  await stageClick(page, 'event-flag')
+  await expect.poll(hits, { timeout: 10_000 }).toBeGreaterThanOrEqual(2)
+  await next(page)
+  await expect(slot).toHaveAttribute('data-drum-hits', '0')
+  await expect(slot).toHaveAttribute('data-drum-live', '0')
+  await page.waitForTimeout(1_500)
+  await expect(slot).toHaveAttribute('data-drum-hits', '0')
+  await expect(slot).toHaveAttribute('data-drum-live', '0')
+
+  // Step 2 — one unit: two drums alone miss the jump.
+  await q('when_start', 'drum_beat', 'drum_beat')
+  await runAndExpect(page, 'error', '少演了')
+  await q('jump')
+  await runAndExpect(page, 'success')
+  await expect(fox).toHaveAttribute('data-rhythm', 'ddj')
+  await expect(slot).toHaveAttribute('data-drum-hits', '2')
+  await next(page)
+
+  // Practice A — the rabbit plays without walking on: off the beat; enter first, then repeat 4.
+  await q('when_start', 'repeat_times', 'drum_beat', 'drum_beat', 'jump')
+  await codeClick(page, 'lesson-repeat-times-4')
+  await runAndExpect(page, 'error', '没跟上节拍')
+  await clear()
+  await q('when_start', 'enter_stage', 'repeat_times', 'drum_beat', 'drum_beat', 'jump')
+  await codeClick(page, 'lesson-repeat-times-4')
+  await runAndExpect(page, 'success')
+  await expect(rabbit).toHaveAttribute('data-onstage', 'true')
+  await expect(rabbit).toHaveAttribute('data-rhythm', L06_MAIN)
+  await expect(fox).toHaveAttribute('data-rhythm', L06_MAIN)
+  await expect(slot).toHaveAttribute('data-drum-hits', '16')
+  await next(page)
+
+  // Practice B — right count, wrong order (drum, jump, drum): off the beat; rebuild drum, drum, jump.
+  await runAndExpect(page, 'error', '没跟上节拍')
+  await expect(rabbit).toHaveAttribute('data-rhythm', 'djd'.repeat(4))
+  await clear()
+  await q('when_start', 'enter_stage', 'repeat_times', 'drum_beat', 'drum_beat', 'jump')
+  await codeClick(page, 'lesson-repeat-times-4')
+  await runAndExpect(page, 'success')
+  await expect(rabbit).toHaveAttribute('data-rhythm', L06_MAIN)
+  await next(page)
+
+  // Creative — chorus 跳、跳、咚 twice after the verse; only the fox changed misses, both pass.
+  const chorus = async (id: string) => {
+    await edit(id)
+    await codeClick(page, 'lesson-repeat-target-after')
+    await q('repeat_times', 'jump', 'jump', 'drum_beat')
+    await codeClick(page, 'lesson-repeat-times-2')
+  }
+  await stageClick(page, 'grid-goal-choice-0')
+  await chorus('fox')
+  await runAndExpect(page, 'error', '少演了')
+  await chorus('rabbit')
+  await runAndExpect(page, 'success')
+  const song = L06_MAIN + 'jjd'.repeat(2)
+  await expect(fox).toHaveAttribute('data-rhythm', song)
+  await expect(rabbit).toHaveAttribute('data-rhythm', song)
+  await expect(slot).toHaveAttribute('data-drum-hits', '20')
+  await next(page)
+
+  await lessonPane(page, 'stage')
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await page.getByTestId('grid-review-reveal').click()
+  await expect(page.getByTestId('grid-review-answer')).toContainText('改成 6')
+  await page.getByTestId('grid-reflection-option-0').click()
+  await expect(page.getByTestId('grid-reflection-result')).toHaveAttribute('data-correct', 'true')
+  await expect(page.getByTestId('grid-project-status')).toContainText('副歌：跳、跳、咚')
+  // The project card replays the show with the same real drum.
+  await page.getByTestId('grid-project-play').click()
+  await expect(page.getByTestId('grid-project-card')).toHaveAttribute('data-drum-hits', '20', { timeout: 30_000 })
+  await page.getByTestId('grid-project-card').scrollIntoViewIfNeeded()
+  await page.screenshot({ path: `${OPS055_EVIDENCE}/ops-055-${test.info().project.name}-L06-project-replay.png` })
+
+  // Saved and reopened.
+  await waitForSaved(page)
+  await page.reload()
+  await lessonPane(page, 'stage')
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  await expect(page.getByTestId('grid-project-status')).toContainText('副歌：跳、跳、咚')
+  const keyA = v3DraftKey('G0-U3-L06', 'guest')
+  const savedA = await readKey(page, keyA)
+  expect(savedA).not.toBeNull()
+
+  // Owner isolation: guest B on the same browser starts fresh and never sees A's show; back to A restores it.
+  await page.context().addCookies([{ name: 'kc_guest_id', value: 'ops055-b', url: new URL(page.url()).origin }])
+  await page.reload()
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('grid-lesson-finished')).toHaveCount(0)
+  expect(await readKey(page, v3DraftKey('G0-U3-L06', 'guest:ops055-b'))).toBeNull()
+  expect(await readKey(page, keyA)).toBe(savedA)
+  await page.context().clearCookies({ name: 'kc_guest_id' })
+  await page.reload()
+  await lessonPane(page, 'stage')
+  await expect(page.getByTestId('grid-lesson-finished')).toBeVisible()
+  expect(await readKey(page, keyA)).toBe(savedA)
+})
+
+test('G0-U3-L06 three breakpoints: the rhythm-show studio fits and really runs at 1440×900, 768×1024 and 375×812', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'explicit viewports run once, on desktop')
+  test.setTimeout(180_000)
+  for (const [name, width, height] of [['desktop-1440x900', 1440, 900], ['tablet-768x1024', 768, 1024], ['phone-375x812', 375, 812]] as const) {
+    await page.setViewportSize({ width, height })
+    await page.goto('/studio/blockly/event/G0-U3-L06')
+    await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+    await runAndExpect(page, 'error', '预想')
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1), name).toBe(false)
+    await page.screenshot({ path: `${OPS055_EVIDENCE}/ops-055-${name}-L06-error-lab.png` })
+  }
+})
+
+/**
  * OPS-052 batch 1 (G0-U1): the six formal grid lessons all run on the one V3
  * studio shell. The per-lesson tests above prove each lesson's pedagogy; these
  * four prove the shared migration contract the task calls for: one entry
@@ -2204,7 +2398,7 @@ test('OPS-052 entry matrix: all six G0-U1 lessons open the one V3 workspace; oth
   await expect(page.getByTestId('grid-step-progress')).toContainText('第 1 /')
 
   // The studio route is fail-closed: unregistered lessons are not served there
-  // (G0-U3-L04 is an event lesson on event-v3; G0-U3-L06 has no playable build)…
+  // (G0-U3-L04 and, since OPS-055, G0-U3-L06 are event lessons on event-v3)…
   for (const foreign of ['G0-U3-L04', 'G0-U3-L06', 'G0-U2-L01']) {
     const res = await page.goto(`/studio/blockly/grid/${foreign}`)
     expect(res?.status(), foreign).toBe(404)
@@ -3036,14 +3230,15 @@ test('OPS-053 editing after the import prompt revokes it: the stale legacy event
 /**
  * OPS-054: the G0-U3 loop unit. L01/L02/L03/L05 run on the grid V3 studio,
  * L04 (event + loop) on the event V3 studio; every old entry 308s there.
- * L06 is still only a detailed script (no playable lesson, needs the sound
- * capability), so neither studio serves it and the catalog keeps it at level 1.
+ * OPS-055: L06 (rhythm show with a real Web Audio drum) is an event lesson too:
+ * only the event studio serves it, its old event-lab entry 308s there, and both
+ * grid entries stay 404.
  */
 const G0_U3_GRID_IDS = ['G0-U3-L01', 'G0-U3-L02', 'G0-U3-L03', 'G0-U3-L05']
 const OPS054_EVIDENCE = path.resolve(__dirname, '../../test-results/ops-054-evidence')
 fs.mkdirSync(OPS054_EVIDENCE, { recursive: true })
 
-test('OPS-054 entry matrix: G0-U3 grid lessons and L04 open the one V3 studio; old URLs 308 there; L06 is not served', async ({ page }, testInfo) => {
+test('OPS-054 entry matrix: G0-U3 grid lessons and L04 open the one V3 studio; old URLs 308 there; L06 only on the event studio', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'entry matrix runs once, on desktop')
   test.setTimeout(180_000)
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -3063,14 +3258,21 @@ test('OPS-054 entry matrix: G0-U3 grid lessons and L04 open the one V3 studio; o
   await expect(page).toHaveURL(/\/studio\/blockly\/event\/G0-U3-L04$/)
   await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
   await expect(page.getByTestId('event-slot')).toBeAttached()
+  // OPS-055: the old L06 entry 308s to the event V3 studio as well.
+  const l06 = await page.goto('/learn/event-lab/G0-U3-L06')
+  expect(l06?.status()).toBe(200)
+  expect(l06?.request().redirectedFrom()?.url()).toMatch(/\/learn\/event-lab\/G0-U3-L06$/)
+  await expect(page).toHaveURL(/\/studio\/blockly\/event\/G0-U3-L06$/)
+  await expect(page.getByTestId('studio-shell')).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByTestId('event-slot')).toBeAttached()
 
-  // Fail-closed: each lesson is served by its own engine's studio only, and L06 by neither.
-  for (const url of ['/studio/blockly/grid/G0-U3-L04', '/studio/blockly/event/G0-U3-L05', '/studio/blockly/grid/G0-U3-L06', '/studio/blockly/event/G0-U3-L06', '/learn/grid-lab/G0-U3-L06']) {
+  // Fail-closed: each lesson is served by its own engine's studio only (L06 never by the grid one).
+  for (const url of ['/studio/blockly/grid/G0-U3-L04', '/studio/blockly/event/G0-U3-L05', '/studio/blockly/grid/G0-U3-L06', '/learn/grid-lab/G0-U3-L06']) {
     const res = await page.goto(url)
     expect(res?.status(), url).toBe(404)
   }
   await page.goto('/learn/catalog/G0-U3-L06')
-  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '1')
+  await expect(page.getByTestId('catalog-lesson-maturity')).toHaveAttribute('data-level', '3')
 })
 
 test('OPS-054 three breakpoints: the G0-U3 entries and a real L01 run work at 1440×900, 768×1024 and 375×812', async ({ page }, testInfo) => {

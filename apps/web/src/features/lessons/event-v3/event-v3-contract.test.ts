@@ -27,8 +27,8 @@ import {
 const L01 = g0u2EventLessons['G0-U2-L01']
 const L02 = g0u2EventLessons['G0-U2-L02']
 
-describe('event-v3 lesson registry (batch 2 + G0-U3-L04)', () => {
-  it('registers the six G0-U2 lessons and G0-U3-L04, in curriculum order', () => {
+describe('event-v3 lesson registry (batch 2 + G0-U3-L04 + G0-U3-L06)', () => {
+  it('registers the six G0-U2 lessons, G0-U3-L04 and G0-U3-L06 (OPS-055), in curriculum order', () => {
     expect(EVENT_V3_LESSON_IDS).toEqual([
       'G0-U2-L01',
       'G0-U2-L02',
@@ -37,6 +37,7 @@ describe('event-v3 lesson registry (batch 2 + G0-U3-L04)', () => {
       'G0-U2-L05',
       'G0-U2-L06',
       'G0-U3-L04',
+      'G0-U3-L06',
     ])
     expect(Object.keys(g0u2EventLessons)).toEqual([...EVENT_V3_LESSON_IDS.slice(0, 6)])
     for (const id of EVENT_V3_LESSON_IDS) {
@@ -55,12 +56,20 @@ describe('event-v3 lesson registry (batch 2 + G0-U3-L04)', () => {
     expect(getPreviousEventV3Lesson('G0-U3-L01')).toBeNull()
     // 注册表里 G0-U3-L04 紧跟 G0-U2-L06，但不同单元，不算上一课。
     expect(getPreviousEventV3Lesson('G0-U3-L04')).toBeNull()
+    // 同单元的上一节事件课是 L04（本函数只看事件课）；页面上的“上一课”按单元算，是 L05 网格课（见下）。
+    expect(getPreviousEventV3Lesson('G0-U3-L06')).toBe(g0u3EventLessons['G0-U3-L04'])
   })
 
   it('G0-U3-L04 goal5 links to the previous lesson in its own unit (L03 grid lesson)', () => {
     const line = buildEventGoal5(getEventV3Lesson('G0-U3-L04')!)[3]
     expect(line).toContain(`上一课《${g0u3LoopLessons['G0-U3-L03'].title}》`)
     expect(line).toContain('的第 4 课')
+  })
+
+  it('G0-U3-L06 goal5 links to the previous lesson in its own unit (L05 grid lesson)', () => {
+    const line = buildEventGoal5(getEventV3Lesson('G0-U3-L06')!)[3]
+    expect(line).toContain(`上一课《${g0u3LoopLessons['G0-U3-L05'].title}》`)
+    expect(line).toContain('的第 6 课')
   })
 })
 

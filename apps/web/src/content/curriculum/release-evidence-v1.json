@@ -658,6 +658,42 @@
         "note": "实验课本机进度和作品已验证，正式进度尚未接入。"
       }
     },
+    "G0-U3-L06": {
+      "contentReviewed": {
+        "status": "unchecked",
+        "note": "OPS-055 课程由实现者 AI 按 track-g0-detailed-lessons-v1.json 编写，尚无独立教研审阅"
+      },
+      "engineProductionReady": {
+        "status": "unchecked",
+        "evidence": [
+          { "kind": "file", "ref": "apps/web/src/features/lessons/event-v3/event-v3-audio.ts" },
+          { "kind": "file", "ref": "apps/web/src/features/lessons/event-v3/event-v3-run-adapter-drum.test.ts" }
+        ],
+        "note": "事件引擎 + Web Audio 现场合成鼓声，仅本地单测与本地 Chrome 验证，未做目标浏览器和真实设备验收"
+      },
+      "assessmentE2EPassed": {
+        "status": "unchecked",
+        "evidence": [
+          { "kind": "file", "ref": "apps/web/src/content/curriculum/g0-u3-event-loop-lessons.test.ts" },
+          { "kind": "file", "ref": "apps/web/tests/e2e/grid-lab.spec.ts" }
+        ],
+        "note": "每关已有正确/错误示例，真实引擎判定；未经独立测评复核"
+      },
+      "licensedAssetsReady": {
+        "status": "unchecked",
+        "note": "鼓声为程序实时合成（无音频文件），角色与场景复用已登记原创素材；正式素材清单未审"
+      },
+      "progressVerified": {
+        "status": "unchecked",
+        "note": "只验证了本机按账号隔离的保存与刷新恢复，未验证正式登录和跨设备"
+      },
+      "minorPrivacyApproved": {
+        "status": "unchecked"
+      },
+      "humanApproved": {
+        "status": "unchecked"
+      }
+    },
     "G1-U1-L01": {
       "engineProductionReady": {
         "status": "unchecked",
